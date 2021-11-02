@@ -8,12 +8,17 @@ The goal is to have a robust aerosol (gas phase + particle phase) simulation sys
 
 ## Goals & conduct
 
-This is an open source project, so feel free to contribute. 
-We have a set of rules and standards to follow when contributing.
+The main goal is to develop an aerosol particle model that is usable, efficient, and productive. 
+In this process, we all will learn developing models in Python and associated packages. 
+Let us all be friendly, respectful, and nice to each other. 
+Any code added to this repository is automatically owned by all. 
+Please speak up if something (even if trivial) bothers you. 
+Talking through things always helps. 
+This is an open source project, so feel free to contribute, however small or big your contribution may be.
 
 ## Notebooks & scratchbooks
 
-Each aerosol process will have its own notebook to discuss the dynamics and limitations of the implication. 
+The development of this model will be illustrated through Jupyter notebooks that will be put together in the form of a Jupyterbook on our website.
 
 <!-- ## Run & viz -->
 
@@ -47,18 +52,3 @@ python -m ipykernel install --user
 
 Similar to Linux above.
 
-### Codespaces
-
-The Codespaces feature is enabled for this organization. Click on "Code" (in green) on the right hand side and you can take it from there. Read more [here](https://github.com/features/codespaces). Basically a virtual machine that could be run in the browser or in VSCode.
-
-### Browser
-
-For light editing, try pressing the dot (`.`) on your keyboard, and this repository should turn from `github.com/uncscode/particula` to `github.dev/uncscode/particula` (changing from `.com` to `.dev`) --- now you could edit the files and commit! Read more [here](https://docs.github.com/en/codespaces/the-githubdev-web-based-editor). Related: [vscode.dev](https://vscode.dev).
-
-<!-- ## Experimental features
-
-Planned future activities
-
-### Inverse methods + ML/DL
-
-### Instrument inversions -->
