@@ -9,6 +9,7 @@ The goal is to have a robust aerosol (gas phase + particle phase) simulation sys
 ## Goals & conduct
 
 This is an open source project, so feel free to contribute. 
+We will have a set up rules and standards to follow when contributing.
 
 ## Notebooks & scratchbooks
 
