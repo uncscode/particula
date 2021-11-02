@@ -1,5 +1,8 @@
 pylint
 pytest
-numpy
-jupyterlab
 autopep8
+jupyterlab
+numpy
+pandas
+
+
