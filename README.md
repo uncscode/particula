@@ -1,6 +1,6 @@
 # particula
 
-Particula is a simple, fast, and powerful particle system, or at least it aims to be two of those three. 
+Particula is a simple, fast, and powerful particle simulator, or at least two of those three, we hope. 
 It is a simple particle system that is designed to be easy to use and easy to extend.
 The goal is to have a robust aerosol (gas phase + particle phase) simulation system that can be used to answer simple questions that arise for experiments and research discussions. 
 
@@ -9,13 +9,11 @@ The goal is to have a robust aerosol (gas phase + particle phase) simulation sys
 ## Goals & conduct
 
 This is an open source project, so feel free to contribute. 
-We will have a set up rules and standards to follow when contributing.
+We have a set of rules and standards to follow when contributing.
 
 ## Notebooks & scratchbooks
 
 Each aerosol process will have its own notebook to discuss the dynamics and limitations of the implication. 
-These notebooks will be joined in to a jypyter book. 
-
 
 <!-- ## Run & viz -->
 
