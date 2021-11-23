@@ -2,28 +2,32 @@
 Centralized location for physical parameters.
 """
 
-from . import ureg
+from . import u
 
 # air viscosity in kg/m-s
-MEDIUM_VISCOSITY = 18.27e-6 * ureg.kg / ureg.m / ureg.s
+MEDIUM_VISCOSITY = 18.27e-6 * u.kg / u.m / u.s
 
 # mean free path of air in m
-MEAN_FREE_PATH_AIR = 65e-9 * ureg.m
+MEAN_FREE_PATH_AIR = 65e-9 * u.m
 
 # Boltzmann's constant in m^2 kg s^-2 K^-1
-BOLTZMANN_CONSTANT = 1.380649e-21 * ureg.m ** 2 * ureg.kg / ureg.s / ureg.K
+BOLTZMANN_CONSTANT = 1.380649e-21 * u.m ** 2 * u.kg / u.s / u.K
 
 # temperature in K
-TEMPERATURE = 300 * ureg.K
+TEMPERATURE = 300 * u.K
 
 # elementary charge in C
-ELEMENTARY_CHARGE_VALUE = 1.60217662e-19 * ureg.C
+ELEMENTARY_CHARGE_VALUE = 1.60217662e-19 * u.C
 
-# dielectric constant of air
-EPSI = 1.0005 # unitless
+# Relative permittivity of air at room temperature
+# Previously known as the "dielectric constant"
+# Often denoted as epsilon
+RELATIVE_PERMITTIVITY_AIR = 1.0005 # unitless
 
 # permittivity of free space in F/m
-EPS0 = 8.85418782e-12 * ureg.F / ureg.m
+# Also known as the electric constant, permittivity of free space
+# Often denoted by epsilon_0
+VACUUM_PERMITTIVITY = 8.85418782e-12 * u.F / u.m
 
 # permittivity of air
-ELECTRIC_PERMITTIVITY = EPSI*EPS0
+ELECTRIC_PERMITTIVITY = RELATIVE_PERMITTIVITY_AIR * VACUUM_PERMITTIVITY

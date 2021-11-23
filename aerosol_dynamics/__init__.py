@@ -1,2 +1,6 @@
+'''
+Import pint here to avoid creating a different registry in 
+each module.
+'''
 from pint import UnitRegistry
-ureg = UnitRegistry()
+u = UnitRegistry()
