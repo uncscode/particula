@@ -53,8 +53,7 @@ def test_slip_correction_factor():
 
 def test_friction_factor():
     assert small_particle.friction_factor() == pytest.approx(3.180803e-15)
-    # This is commented out because there is likely a precision issue with
-    # this test.
+    # This is commented out because there is an odd issue with this test.
     # assert large_particle.friction_factor() == pytest.approx(1.84e-11)
     assert small_particle.friction_factor().check("[mass]/[time]")
 
