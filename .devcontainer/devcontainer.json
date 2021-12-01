@@ -10,7 +10,7 @@
 			// Update 'VARIANT' to pick a Python version: 3, 3.10, 3.9, 3.8, 3.7, 3.6
 			// Append -bullseye or -buster to pin to an OS version.
 			// Use -bullseye variants on local on arm64/Apple Silicon.
-			"VARIANT": "3",
+			"VARIANT": "3.9",
 			// Options
 			"NODE_VERSION": "lts/*"
 		}
@@ -33,6 +33,8 @@
 		"python.linting.pylintPath": "/usr/local/py-utils/bin/pylint",
         "breadcrumbs.enabled": true,
         "editor.stablePeek": true,
+		// "editor.tabSize": 2, // Add this to override the default of 4.
+		// "editor.detectIndentation": false, // Add this to disable automatic indentation detection.
         "editor.bracketPairColorization.enabled": true,
         "editor.lightbulb.enable": true,
         "python.defaultInterpreterPath": "/usr/local/bin/python"
@@ -57,17 +59,18 @@
 		"mhutchie.git-graph",
 		"ms-vscode.github-issues-prs",
 		"davidanson.vscode-markdownlint",
-        "streetsidesoftware.code-spell-checker",
+		"streetsidesoftware.code-spell-checker",
 		"streetsidesoftware.code-spell-checker-scientific-terms",
 		"visualstudioexptteam.intellicode-api-usage-examples",
 		"redhat.vscode-yaml",
-        "sourcery.sourcery",
+		"sourcery.sourcery",
 		"ms-vscode.github-issues-prs",
 		"davidanson.vscode-markdownlint",
-        // for viewing pandas dataframes (must have pandas)
-        "msrvida.vscode-sanddance",
-        "analytic-signal.preview-pdf",
-        "eamodio.gitlens",
+		// for viewing pandas dataframes (must have pandas)
+		"msrvida.vscode-sanddance",
+		"analytic-signal.preview-pdf",
+		"eamodio.gitlens",
+		"ms-vsliveshare.vsliveshare-pack"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
