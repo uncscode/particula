@@ -7,7 +7,7 @@ import pint
 import pytest
 
 from aerosol_dynamics import particle
-
+from aerosol_dynamics import environment
 from . import u
 
 small_particle = particle.Particle(
@@ -31,12 +31,15 @@ invalid_particle = particle.Particle(
     charge=3 * u.C,
     )
 
+standard_environment = environment.Environment(
+    temperature=298 * u.K,
+    pressure=101325 * u.Pa,
+)
+
 
 def test_getters():
     """
     Test that the getters work.
-    TODO:
-    - can we check units instead of numbers?
     """
 
     assert small_particle.name() == "small_particle"
@@ -52,17 +55,14 @@ def test_getters():
 def test_knudsen_number():
     """
     Test that the knudsen number is calculated correctly.
-    TODO:
-    - can we check units instead of numbers?
-    - 65? 65nm? it should be flexible
     """
-
-    assert small_particle.knudsen_number() == pytest.approx(65.)
-    assert small_particle.knudsen_number().check(["None"])
-    assert large_particle.knudsen_number() == pytest.approx(0.65)
+    
+    assert small_particle.knudsen_number(standard_environment) == pytest.approx(66.4374)
+    assert small_particle.knudsen_number(standard_environment).check(["None"])
+    assert large_particle.knudsen_number(standard_environment) == pytest.approx(0.664374)
     with pytest.raises(pint.errors.DimensionalityError):
-        assert invalid_particle.knudsen_number() == pytest.approx(0.65)
-        assert invalid_particle.knudsen_number().check("[None]")
+        assert invalid_particle.knudsen_number(standard_environment) == pytest.approx(0.65)
+        assert invalid_particle.knudsen_number(standard_environment).check("[None]")
     # with pytest.raises(AssertionError):
     #     assert invalid_particle.knudsen_number() == pytest.approx(0.65)
     #     assert invalid_particle.knudsen_number().check("[None]")
@@ -71,27 +71,21 @@ def test_knudsen_number():
 def test_slip_correction_factor():
     """"
     Test that the slip correction factor is calculated correctly.
-    TODO:
-    - can we check units instead of numbers?
-    - that's an overly specific number with lots of digs
     """
 
-    assert small_particle.slip_correction_factor() == pytest.approx(108.268702)
-    assert large_particle.slip_correction_factor() == pytest.approx(1.864914)
-    assert small_particle.slip_correction_factor().check(["None"])
+    assert small_particle.slip_correction_factor(standard_environment) == pytest.approx(110.650)
+    assert large_particle.slip_correction_factor(standard_environment) == pytest.approx(1.88587)
+    assert small_particle.slip_correction_factor(standard_environment).check(["None"])
 
 
 def test_friction_factor():
     """
     Test that the friction factor is calculated correctly.
-    TODO:
-    - can we check units instead of numbers?
-    - again, too specific of a number maybe.
     """
-    assert small_particle.friction_factor() == pytest.approx(3.180803e-15)
-    # This is commented out because there is an odd issue with this test.
-    # assert large_particle.friction_factor() == pytest.approx(1.84e-11)
-    assert small_particle.friction_factor().check("[mass]/[time]")
+
+    assert small_particle.friction_factor(standard_environment).magnitude == pytest.approx(3.18080e-15)
+    assert large_particle.friction_factor(standard_environment).magnitude == pytest.approx(1.84e-11)
+    assert small_particle.friction_factor(standard_environment).check("[mass]/[time]")
 
 
 def test_reduced_mass():
@@ -110,7 +104,6 @@ def test_reduced_friction_factor():
     """
 
     reduced_friction_factor_1_2 = small_particle.reduced_friction_factor(
-        large_particle
-    )
+        large_particle, standard_environment)
     assert reduced_friction_factor_1_2 == pytest.approx(3.18e-15)
     assert reduced_friction_factor_1_2.check("[mass]/[time]")
