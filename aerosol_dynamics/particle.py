@@ -8,6 +8,7 @@ from aerosol_dynamics import physical_parameters as pp
 
 from . import u
 
+
 class Particle:
     """Sets the class for creating particles.
     This forms the framework for particle-particle and gas-particle interactions.
@@ -109,8 +110,10 @@ class Particle:
         body problem to be solved as a one body problem.
         """
 
-        return (self.friction_factor() * other.friction_factor()
-            / (self.friction_factor() + other.friction_factor()))
+        return (
+            self.friction_factor() * other.friction_factor()
+            / (self.friction_factor() + other.friction_factor())
+        )
 
     def coulomb_potential_ratio(self, other) -> float:
         """
@@ -127,7 +130,7 @@ class Particle:
         """
 
         coulomb_potential_ratio = self.coulomb_potential_ratio(other)
-        return 1 + coulomb_potential_ratio if coulomb_potential_ratio >=0 \
+        return 1 + coulomb_potential_ratio if coulomb_potential_ratio >= 0 \
             else np.exp(coulomb_potential_ratio)
 
     def coulomb_enhancement_continuum_limit(self, other) -> float:
@@ -154,7 +157,7 @@ class Particle:
         return (
             (
                 pp.TEMPERATURE * pp.BOLTZMANN_CONSTANT * reduced_mass**0.5
-            ) * coulomb_enhancement_continuum_limit/
+            ) * coulomb_enhancement_continuum_limit /
             (
                 reduced_friction_factor * (
                     self.radius() + other.radius()
@@ -185,10 +188,10 @@ class Particle:
             )
         )
         denominator = (
-            1 \
-                + hsc3 * diffusive_knudsen_number \
-                    + hsc4 * diffusive_knudsen_number**2 \
-                        + hsc2 * diffusive_knudsen_number**3
+            1
+            + hsc3 * diffusive_knudsen_number
+            + hsc4 * diffusive_knudsen_number**2
+            + hsc2 * diffusive_knudsen_number**3
         )
 
         return numerator / denominator
