@@ -41,8 +41,8 @@ jobs:
         
     - name: Analysing the code with pylint
       run: |
-        pylint aerosol_dynamics/ `ls -R|grep .py$|xargs`
+        pylint `ls -R|grep .py$|xargs`
         
     - name: Test with pytest
       run: |
-        pytest aerosol_dynamics/
+        pytest
