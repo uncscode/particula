@@ -180,7 +180,7 @@ class Particle:
             (hsc1 * diffusive_knudsen_number**3) +
             ((8 * np.pi)**(1/2) * hsc2 * diffusive_knudsen_number**4)
         )
-        
+
         denominator = (
             1
             + hsc3 * diffusive_knudsen_number
