@@ -60,7 +60,7 @@ class Particle:
     def knudsen_number(self) -> float:
         """Returns a particle's Knudsen number. Unitless.
 
-        The Knudsen number seeks to reflect the relative length scales of the
+        The Knudsen number reflects the relative length scales of the
         particle and the suspending fluid (air, water, etc.). This is calculated
         by the mean free path of the medium divided by the particle radius.
         """
@@ -148,6 +148,7 @@ class Particle:
         Calculates the diffusive Knudsen number for a particle-particle interaction
         TODO:
         - do return statements in steps -> easier to debug
+        - assess if multi-step --> higher resources
         """
 
         reduced_mass = self.reduced_mass(other)
@@ -155,14 +156,10 @@ class Particle:
         reduced_friction_factor = self.reduced_friction_factor(other)
         coulomb_enhancement_kinetic_limit = self.coulomb_enhancement_kinetic_limit(other)
         return (
-            (
-                pp.TEMPERATURE * pp.BOLTZMANN_CONSTANT * reduced_mass**0.5
-            ) * coulomb_enhancement_continuum_limit /
-            (
-                reduced_friction_factor * (
-                    self.radius() + other.radius()
-                ) * coulomb_enhancement_kinetic_limit
-            )
+            (pp.TEMPERATURE * pp.BOLTZMANN_CONSTANT * reduced_mass**0.5)
+            * coulomb_enhancement_continuum_limit /
+            (reduced_friction_factor * (self.radius() + other.radius())
+            * coulomb_enhancement_kinetic_limit)
         )
 
     def dimensionless_coagulation_kernel_hard_sphere(self, other) -> float:
@@ -179,14 +176,11 @@ class Particle:
         diffusive_knudsen_number = self.diffusive_knudsen_number(other)
 
         numerator = (
-            (
-                4 * np.pi * diffusive_knudsen_number**2
-            ) + (
-                hsc1 * diffusive_knudsen_number**3
-            ) + (
-                (8 * np.pi)**(1/2) * hsc2 * diffusive_knudsen_number**4
-            )
+            (4 * np.pi * diffusive_knudsen_number**2) +
+            (hsc1 * diffusive_knudsen_number**3) +
+            ((8 * np.pi)**(1/2) * hsc2 * diffusive_knudsen_number**4)
         )
+        
         denominator = (
             1
             + hsc3 * diffusive_knudsen_number
