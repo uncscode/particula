@@ -22,7 +22,7 @@ ELEMENTARY_CHARGE_VALUE = 1.60217662e-19 * u.C
 # Relative permittivity of air at room temperature
 # Previously known as the "dielectric constant"
 # Often denoted as epsilon
-RELATIVE_PERMITTIVITY_AIR = 1.0005 # unitless
+RELATIVE_PERMITTIVITY_AIR = 1.0005  # unitless
 
 # permittivity of free space in F/m
 # Also known as the electric constant, permittivity of free space

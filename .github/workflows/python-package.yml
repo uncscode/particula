@@ -40,9 +40,11 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
         
     - name: Analysing the code with pylint
+        # https://stackoverflow.com/questions/68860511/github-actions-pylint-fails-with-f0001-no-module-named-init-py-fatal/68860512#68860512
       run: |
-        pylint `ls -R|grep .py$|xargs`
-        
+        # pylint aerosol_dynamics/ `ls -R|grep .py$|xargs`
+        pylint $(find . -name "*.py" | xargs)
+
     - name: Test with pytest
       run: |
         pytest
