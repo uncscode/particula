@@ -1,6 +1,12 @@
+"""
+Env Class
+"""
+
+import math
+
 from aerosol_dynamics import physical_parameters as pp
 from . import u
-import math
+
 
 class Environment:
     """
@@ -26,34 +32,34 @@ class Environment:
     @u.wraps(u.kg / u.m / u.s, [None])
     def dynamic_viscosity_air(self) -> float:
         """Returns the dynamic viscosity of air. [kg/m/s]
-        
+
         The dynamic viscosity is calculated using the 3 parameter
         Sutherland Viscosity Law.
         """
-        MU_REF = 1.716e-5 * u.Pa * u.s # Viscosity at T_REF
-        T_REF = 273.15 * u.K
-        S = 110.4 * u.K # Sutherland constant
+        mu_ref = 1.716e-5 * u.Pa * u.s # Viscosity at T_REF
+        t_ref = 273.15 * u.K
+        s = 110.4 * u.K # Sutherland constant
 
         return (
-            MU_REF *
-            (self.temperature()/T_REF)**(3/2) *
-            (T_REF+S) / (self.temperature()+S)
+            mu_ref *
+            (self.temperature()/t_ref)**(3/2) *
+            (t_ref+s) / (self.temperature()+s)
         )
 
     # mean free path of air in m
     # @u.wraps(u.m, [None])
     def mean_free_path_air(self) -> float:
         """Returns the mean free path of this environment. [m]
-        
+
         The mean free path is the average distance traveled by a molecule
         between collisions with other molecules.
         """
-        MOLECULAR_WEIGHT = (28.9644 * u.g / u.mol).to_base_units() # Molecular weight of air
-        
+        molecular_weight = (28.9644 * u.g / u.mol).to_base_units() # Molecular weight of air
+
         return (
             (
                 2 * self.dynamic_viscosity_air() /
                 self.pressure() /
-                (8*MOLECULAR_WEIGHT / (math.pi*pp.GAS_CONSTANT*self.temperature()))**0.5
+                (8*molecular_weight / (math.pi*pp.GAS_CONSTANT*self.temperature()))**0.5
             ).to_base_units()
         )
