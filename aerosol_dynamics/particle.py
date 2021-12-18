@@ -183,7 +183,7 @@ class Particle:
                 environment.temperature() * pp.BOLTZMANN_CONSTANT
                 * self.reduced_mass(other)
             )**0.5
-            / self.reduced_friction_factor(other)
+            / self.reduced_friction_factor(other, environment)
         )
         denominator = (
             (self.radius() + other.radius())
