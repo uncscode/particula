@@ -180,7 +180,7 @@ class Particle:
 
         numerator = (
             (
-                pp.TEMPERATURE * pp.BOLTZMANN_CONSTANT
+                environment.temperature() * pp.BOLTZMANN_CONSTANT
                 * self.reduced_mass(other)
             )**0.5
             / self.reduced_friction_factor(other)
