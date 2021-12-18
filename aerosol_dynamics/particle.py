@@ -159,7 +159,9 @@ class Particle:
             * coulomb_enhancement_kinetic_limit)
         )
 
-    def dimensionless_coagulation_kernel_hard_sphere(self, other, environment: Environment) -> float:
+    def dimensionless_coagulation_kernel_hard_sphere(
+        self, other, environment: Environment
+    ) -> float:
         """
         Calculates the dimensionless coagulation kernel for a particle-particle interaction
         """
