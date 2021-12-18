@@ -4,17 +4,14 @@ Centralized location for physical parameters.
 
 from . import u
 
-# air viscosity in kg/m-s
-MEDIUM_VISCOSITY = 18.27e-6 * u.kg / u.m / u.s
-
-# mean free path of air in m
-MEAN_FREE_PATH_AIR = 65e-9 * u.m
-
 # Boltzmann's constant in m^2 kg s^-2 K^-1
-BOLTZMANN_CONSTANT = 1.380649e-23 * u.m ** 2 * u.kg / (u.s**2) / u.K
+BOLTZMANN_CONSTANT = 1.380649e-23 * u.m**2 * u.kg / u.s**2 / u.K
 
-# temperature in K
-TEMPERATURE = 300 * u.K
+# Avogadro's number
+AVOGADRO_NUMBER = 6.022140857e23 / u.mol
+
+# Gas constant in J mol^-1 K^-1
+GAS_CONSTANT = BOLTZMANN_CONSTANT * AVOGADRO_NUMBER
 
 # elementary charge in C
 ELEMENTARY_CHARGE_VALUE = 1.60217662e-19 * u.C
