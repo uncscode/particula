@@ -42,8 +42,8 @@ jobs:
     - name: Analysing the code with pylint
         # https://stackoverflow.com/questions/68860511/github-actions-pylint-fails-with-f0001-no-module-named-init-py-fatal/68860512#68860512
       run: |
-        # pylint aerosol_dynamics/ `ls -R|grep .py$|xargs`
-        pylint $(find . -name "*.py" | xargs)
+        # pylint `ls -R|grep .py$|xargs`
+        pylint $(find aerosol_dynamics/ -name "*.py" | xargs) 
 
     - name: Test with pytest
       run: |

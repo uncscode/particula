@@ -1,5 +1,5 @@
 """
-Class for creating particles
+Class for creating particles.
 """
 
 import numpy as np
@@ -10,15 +10,16 @@ from . import u
 
 
 class Particle:
-    """Sets the class for creating particles.
-    This forms the framework for particle-particle and gas-particle interactions.
+    """
+    Class for creating particles:
+    Framework for particle--particle and gas--particle interactions.
 
     Attributes:
-        name (str): The name of the particle.
-        radius (float): The radius of the particle.
-        density (float): The density of the particle.
-        charge (float): The charge of the particle.
-        mass (float): The mass of the particle.
+        name    (str)   [no units]
+        radius  (float) [m]
+        density (float) [kg/m**3]
+        charge  (int)   [dimensionless]
+        mass    (float) [kg]
     """
 
     def __init__(self, name: str, radius, density, charge):
@@ -26,183 +27,205 @@ class Particle:
         Constructs the particle object.
 
         Parameters:
-            name (str): The name of the particle.
-            radius (float): The radius of the particle.
-            density (float): The density of the particle.
-            charge (float): The charge of the particle.
+            name    (str)   [no units]
+            radius  (float) [m]
+            density (float) [kg/m**3]
+            charge  (int)   [dimensionless]
         """
         self._name = name
         self._radius = radius
-        # self._density = density
+        self._density = density
         self._charge = charge
         self._mass = density * (4*np.pi/3) * (radius**3)
 
     def name(self) -> str:
-        """Returns the name of the particle."""
+        """Returns the name of particle."""
         return self._name
 
     @u.wraps(u.kg, [None])
     def mass(self) -> float:
-        """Returns mass of a particle. Checks units. [kg]"""
+        """Returns mass of particle.
+        Checks units: [kg]"""
         return self._mass
 
     @u.wraps(u.m, [None])
     def radius(self) -> float:
-        """Returns radius of a particle. Checks units. [m]"""
+        """Returns radius of particle.
+        Checks units: [m]"""
         return self._radius
 
+    @u.wraps(u.kg / u.m**3, [None])
+    def density(self) -> int:
+        """Returns density of particle.
+        Checks units: [kg/m**3]"""
+        return self._density
+
     @u.wraps(u.dimensionless, [None])
-    def charge(self) -> float:
-        """Returns charge of a particle. Checks units. [unitless]"""
+    def charge(self) -> int:
+        """Returns charge of particle.
+        Checks units: [dimensionless]"""
         return self._charge
 
     @u.wraps(u.dimensionless, [None])
     def knudsen_number(self) -> float:
-        """Returns a particle's Knudsen number. Unitless.
+        """Returns particle's Knudsen number.
+        Checks units: [dimensionless]
 
-        The Knudsen number reflects the relative length scales of the
-        particle and the suspending fluid (air, water, etc.). This is calculated
-        by the mean free path of the medium divided by the particle radius.
-        """
-
+        The Knudsen number reflects the relative length scales of
+        the particle and the suspending fluid (air, water, etc.).
+        This is calculated by the mean free path of the medium
+        divided by the particle radius."""
         return pp.MEAN_FREE_PATH_AIR / self.radius()
 
     @u.wraps(u.dimensionless, [None])
     def slip_correction_factor(self) -> float:
-        """Returns a particle's Cunningham slip correction factor. Unitless.
+        """Returns particle's Cunningham slip correction factor.
+        Checks units: [dimensionless]
 
-        The slip correction factor is a dimensionless quantity that accounts for
-        non-continuum effects when calculating the drag on small particles.
-        This is a deviation from Stokes' Law; Stokes assumes a no-slip
-        condition that is no longer correct at high Knudsen numbers.
-        The slip correction factor is used to calculate the friction factor.
-        See Eq 9.34 in Atmos. Chem. & Phys. (2016) for more information.
-        """
+        Dimensionless quantity accounting for non-continuum effects
+        on small particles. It is a deviation from Stokes' Law.
+        Stokes assumes a no-slip condition that is not correct at
+        high Knudsen numbers. The slip correction factor is used to
+        calculate the friction factor.
 
+        See Eq 9.34 in Atmos. Chem. & Phys. (2016) for more informatiom."""
         knudsen_number: float = self.knudsen_number()
-        return 1 + knudsen_number * (1.257 + 0.4*np.exp(-1.1/knudsen_number))
+        return 1 + knudsen_number * (
+            1.257 + 0.4*np.exp(-1.1/knudsen_number)
+        )
 
     @u.wraps(u.kg / u.s, [None])
     def friction_factor(self) -> float:
-        """Returns a particle's friction factor. [N-s/m].
+        """Returns a particle's friction factor.
+        Checks units: [N*s/m]
 
-        The friction factor is a property of the particle's size and the medium
-        that the particle is in. Multiplying the friction factor by the fluid
-        velocity gives the drag force on the particle.
-        """
-
+        Property of the particle's size and surrounding medium.
+        Multiplying the friction factor by the fluid velocity
+        yields the drag force on the particle."""
         slip_correction_factor: float = self.slip_correction_factor()
-        return 6 * np.pi * pp.MEDIUM_VISCOSITY * self.radius() / slip_correction_factor
+        return (
+            6 * np.pi * pp.MEDIUM_VISCOSITY * self.radius() /
+            slip_correction_factor
+        )
 
     @u.wraps(u.kg, [None, None])
     def reduced_mass(self, other) -> float:
-        """Returns the reduced mass of two particles. [kg].
+        """Returns the reduced mass of two particles.
+        Checks units: [kg]
 
-        The reduced mass is an "effective inertial" mass that allows a two body
-        problem to be solved as a one body problem.
-        """
-
+        The reduced mass is an "effective inertial" mass.
+        Allows a two-body problem to be solved as a one-body problem."""
         return self.mass() * other.mass() / (self.mass() + other.mass())
 
+    @u.wraps(u.kg / u.s, [None, None])
     def reduced_friction_factor(self, other) -> float:
-        """Returns the reduced friction factor between two particles. [N-s/m]
-        Similar to the reduced mass, the reduced friction factor allows a two
-        body problem to be solved as a one body problem.
-        """
+        """Returns the reduced friction factor between two particles.
+        Checks units: [N*s/m]
 
+        Similar to the reduced mass.
+        The reduced friction factor allows a two-body problem
+        to be solved as a one-body problem."""
         return (
             self.friction_factor() * other.friction_factor()
             / (self.friction_factor() + other.friction_factor())
         )
 
+    @u.wraps(u.dimensionless, [None, None])
     def coulomb_potential_ratio(self, other) -> float:
-        """
-        Calculates the Coulomb potential ratio.
-        """
-
-        numerator = -1 * self.charge() * other.charge() * (pp.ELEMENTARY_CHARGE_VALUE ** 2)
-        denominator = 4 * np.pi * pp.ELECTRIC_PERMITTIVITY * (self.radius() + other.radius())
-        return numerator / (denominator * pp.BOLTZMANN_CONSTANT * pp.TEMPERATURE)
-
-    def coulomb_enhancement_kinetic_limit(self, other) -> float:
-        """
-        Calculates the Coulomb enhancement for a particle-particle interaction
-        """
-
-        coulomb_potential_ratio = self.coulomb_potential_ratio(other)
-        return 1 + coulomb_potential_ratio if coulomb_potential_ratio >= 0 \
-            else np.exp(coulomb_potential_ratio)
-
-    def coulomb_enhancement_continuum_limit(self, other) -> float:
-        """
-        Calculates the Coulomb enhancement for a particle-particle interaction
-        """
-
-        coulomb_potential_ratio = self.coulomb_potential_ratio(other)
-        return coulomb_potential_ratio / (
-            1 - np.exp(-1*coulomb_potential_ratio)
-        ) if coulomb_potential_ratio != 0 else 1
-
-    def diffusive_knudsen_number(self, other) -> float:
-        """
-        Calculates the diffusive Knudsen number for a particle-particle interaction
-        TODO:
-        - do return statements in steps -> easier to debug
-        - assess if multi-step --> higher resources
-        """
-
-        reduced_mass = self.reduced_mass(other)
-        coulomb_enhancement_continuum_limit = self.coulomb_enhancement_continuum_limit(other)
-        reduced_friction_factor = self.reduced_friction_factor(other)
-        coulomb_enhancement_kinetic_limit = self.coulomb_enhancement_kinetic_limit(other)
+        """Calculates the Coulomb potential ratio.
+        Checks units: [dimensionless]"""
+        numerator = -1 * self.charge() * other.charge() * (
+            pp.ELEMENTARY_CHARGE_VALUE ** 2
+        )
+        denominator = 4 * np.pi * pp.ELECTRIC_PERMITTIVITY * (
+            self.radius() + other.radius()
+        )
         return (
-            (pp.TEMPERATURE * pp.BOLTZMANN_CONSTANT * reduced_mass**0.5)
-            * coulomb_enhancement_continuum_limit /
-            (reduced_friction_factor * (self.radius() + other.radius())
-            * coulomb_enhancement_kinetic_limit)
+            numerator /
+            (denominator * pp.BOLTZMANN_CONSTANT * pp.TEMPERATURE)
         )
 
-    def dimensionless_coagulation_kernel_hard_sphere(self, other) -> float:
-        """
-        Calculates the dimensionless coagulation kernel for a particle-particle interaction
-        """
+    @u.wraps(u.dimensionless, [None, None])
+    def coulomb_enhancement_kinetic_limit(self, other) -> float:
+        """Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
+        Checks units: [dimensionless]"""
+        coulomb_potential_ratio = self.coulomb_potential_ratio(other)
+        return (
+            1 + coulomb_potential_ratio if coulomb_potential_ratio >= 0
+            else np.exp(coulomb_potential_ratio)
+        )
 
+    @u.wraps(u.dimensionless, [None, None])
+    def coulomb_enhancement_continuum_limit(self, other) -> float:
+        """Continuum limit of Coulomb enhancement for particle--particle coagulation.
+        Checks units: [dimensionless]"""
+        coulomb_potential_ratio = self.coulomb_potential_ratio(other)
+        return (
+            coulomb_potential_ratio / (
+                1 - np.exp(-1*coulomb_potential_ratio)
+            ) if coulomb_potential_ratio != 0
+            else 1
+        )
+
+    @u.wraps(u.dimensionless, [None, None])
+    def diffusive_knudsen_number(self, other) -> float:
+        """Diffusive Knudsen number.
+        Checks units: [dimensionless]
+
+        The *diffusive* Knudsen number is different from Knudsen number.
+        Ratio of:
+            - numerator: mean persistence of one particle
+            - denominator: effective length scale of
+                particle--particle Coulombic interaction"""
+        numerator = (
+            (
+                pp.TEMPERATURE * pp.BOLTZMANN_CONSTANT
+                * self.reduced_mass(other)
+            )**0.5
+            / self.reduced_friction_factor(other)
+        )
+        denominator = (
+            (self.radius() + other.radius())
+            * self.coulomb_enhancement_kinetic_limit(other)
+            / self.coulomb_enhancement_continuum_limit(other)
+        )
+        return numerator / denominator
+
+    @u.wraps(u.dimensionless, [None, None])
+    def dimensionless_coagulation_kernel_hard_sphere(self, other) -> float:
+        """Dimensionless particle--particle coagulation kernel.
+        Checks units: [dimensionless]"""
         # Constants for the chargeless hard-sphere limit
+        # see doi:
         hsc1 = 25.836
         hsc2 = 11.211
         hsc3 = 3.502
         hsc4 = 7.211
-
         diffusive_knudsen_number = self.diffusive_knudsen_number(other)
-
         numerator = (
-            (4 * np.pi * diffusive_knudsen_number**2) +
-            (hsc1 * diffusive_knudsen_number**3) +
-            ((8 * np.pi)**(1/2) * hsc2 * diffusive_knudsen_number**4)
+            (4 * np.pi * diffusive_knudsen_number**2)
+            + (hsc1 * diffusive_knudsen_number**3)
+            + ((8 * np.pi)**(1/2) * hsc2 * diffusive_knudsen_number**4)
         )
-
         denominator = (
             1
             + hsc3 * diffusive_knudsen_number
             + hsc4 * diffusive_knudsen_number**2
             + hsc2 * diffusive_knudsen_number**3
         )
-
         return numerator / denominator
 
+    @u.wraps(u.dimensionless, [None, None])
     def collision_kernel_continuum_limit(self, other) -> float:
-        """
-        Calculates the collision kernel for a particle-particle interaction
-        """
-
+        """Continuum limit of collision kernel.
+        Checks units: [dimensionless]"""
         diffusive_knudsen_number = self.diffusive_knudsen_number(other)
         return 4 * np.pi * (diffusive_knudsen_number**2)
 
+    @u.wraps(u.dimensionless, [None, None])
     def collision_kernel_kinetic_limit(self, other) -> float:
-        """
-        Calculates the collision kernel for a particle-particle interaction
-        """
-
+        """Kinetic limit of collision kernel.
+        Checks units: [dimensionless]"""
         diffusive_knudsen_number = self.diffusive_knudsen_number(other)
         return np.sqrt(8 * np.pi) * diffusive_knudsen_number
 
@@ -227,4 +250,5 @@ class Particle:
     # # 10.1103/PhysRevE.85.026410,
     # # Equation 13
     # def dimensionless_coagulation_kernel_GattiKortshagen2008(self, other):
-    #     kernel_hard_sphere = self.dimensionless_coagulation_kernel_hard_sphere(other)
+    #     kernel_hard_sphere =
+    # self.dimensionless_coagulation_kernel_hard_sphere(other)

@@ -11,7 +11,7 @@ MEDIUM_VISCOSITY = 18.27e-6 * u.kg / u.m / u.s
 MEAN_FREE_PATH_AIR = 65e-9 * u.m
 
 # Boltzmann's constant in m^2 kg s^-2 K^-1
-BOLTZMANN_CONSTANT = 1.380649e-23 * u.m ** 2 * u.kg / u.s / u.K
+BOLTZMANN_CONSTANT = 1.380649e-23 * u.m ** 2 * u.kg / (u.s**2) / u.K
 
 # temperature in K
 TEMPERATURE = 300 * u.K
