@@ -18,7 +18,7 @@ class Particle:
         name    (str)   [no units]
         radius  (float) [m]
         density (float) [kg/m**3]
-        charge  (int)   [unitless]
+        charge  (int)   [dimensionless]
         mass    (float) [kg]
     """
 
@@ -30,7 +30,7 @@ class Particle:
             name    (str)   [no units]
             radius  (float) [m]
             density (float) [kg/m**3]
-            charge  (int)   [unitless]
+            charge  (int)   [dimensionless]
         """
         self._name      = name
         self._radius    = radius
@@ -63,13 +63,13 @@ class Particle:
     @u.wraps(u.dimensionless, [None])
     def charge(self) -> int:
         """Returns charge of particle.
-        Checks units: [unitless]"""
+        Checks units: [dimensionless]"""
         return self._charge
 
     @u.wraps(u.dimensionless, [None])
     def knudsen_number(self) -> float:
         """Returns particle's Knudsen number.
-        Checks units: [unitless]
+        Checks units: [dimensionless]
 
         The Knudsen number reflects the relative length scales of the
         particle and the suspending fluid (air, water, etc.).
@@ -79,7 +79,7 @@ class Particle:
     @u.wraps(u.dimensionless, [None])
     def slip_correction_factor(self) -> float:
         """Returns particle's Cunningham slip correction factor.
-        Checks units: [unitless]
+        Checks units: [dimensionless]
 
         Dimensionless quantity accounting for non-continuum effects on small particles.
         It is a deviation from Stokes' Law.
@@ -141,7 +141,8 @@ class Particle:
 
     @u.wraps(u.dimensionless, [None, None])
     def coulomb_enhancement_kinetic_limit(self, other) -> float:
-        """Kinetic limit of Coulomb enhancement for particle--particle cooagulation."""
+        """Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
+        Checks units: [dimensionless]"""
         coulomb_potential_ratio = self.coulomb_potential_ratio(other)
         return (
             1 + coulomb_potential_ratio if coulomb_potential_ratio >= 0
@@ -150,7 +151,8 @@ class Particle:
 
     @u.wraps(u.dimensionless, [None, None])
     def coulomb_enhancement_continuum_limit(self, other) -> float:
-        """Continuum limit of Coulomb enhancement for particle--particle coagulation."""
+        """Continuum limit of Coulomb enhancement for particle--particle coagulation.
+        Checks units: [dimensionless]"""
         coulomb_potential_ratio = self.coulomb_potential_ratio(other)
         return (
             coulomb_potential_ratio / (
