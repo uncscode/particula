@@ -14,14 +14,14 @@ small_particle = particle.Particle(
     name="small_particle",
     radius=1.0e-9 * u.m,
     density=1.0 * u.kg / u.m**3,
-    charge=1.0,
+    charge=1,
     )
 
 large_particle = particle.Particle(
     name="large_particle",
     radius=1.0e-7 * u.m,
     density=1.8 * u.kg / u.m**3,
-    charge=1.0,
+    charge=1,
     )
 
 invalid_particle = particle.Particle(
@@ -57,9 +57,9 @@ def test_knudsen_number():
     Test that the knudsen number is calculated correctly.
     """
 
-    assert small_particle.knudsen_number(standard_environment) == pytest.approx(66.4374)
+    assert small_particle.knudsen_number(standard_environment) == pytest.approx(66.44, rel=1e-3)
     assert small_particle.knudsen_number(standard_environment).check(["None"])
-    assert large_particle.knudsen_number(standard_environment) == pytest.approx(0.664374)
+    assert large_particle.knudsen_number(standard_environment) == pytest.approx(0.6644, rel=1e-3)
     with pytest.raises(pint.errors.DimensionalityError):
         assert invalid_particle.knudsen_number(standard_environment) == pytest.approx(0.65)
         assert invalid_particle.knudsen_number(standard_environment).check("[None]")
@@ -73,8 +73,8 @@ def test_slip_correction_factor():
     Test that the slip correction factor is calculated correctly.
     """
 
-    assert small_particle.slip_correction_factor(standard_environment) == pytest.approx(110.6503)
-    assert large_particle.slip_correction_factor(standard_environment) == pytest.approx(1.885865)
+    assert small_particle.slip_correction_factor(standard_environment) == pytest.approx(110.7, rel=1e-3)
+    assert large_particle.slip_correction_factor(standard_environment) == pytest.approx(1.886, rel=1e-3)
     assert small_particle.slip_correction_factor(standard_environment).check(["None"])
 
 
@@ -85,7 +85,7 @@ def test_friction_factor():
 
     assert small_particle.friction_factor(
         standard_environment
-    ).magnitude == pytest.approx(3.18080e-15)
+    ).magnitude == pytest.approx(3.181e-15, rel=1e-3)
     assert large_particle.friction_factor(
         standard_environment
     ).magnitude == pytest.approx(1.84e-11)
@@ -100,7 +100,7 @@ def test_reduced_mass():
     """
 
     reduced_mass_1_2 = small_particle.reduced_mass(large_particle)
-    assert reduced_mass_1_2 == pytest.approx(4.18879e-27)
+    assert reduced_mass_1_2 == pytest.approx(4.189e-27, rel=1e-3)
     assert reduced_mass_1_2.check("[mass]")
 
 

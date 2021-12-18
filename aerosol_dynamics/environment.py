@@ -1,12 +1,10 @@
 """
-Env Class
+Environment Class
 """
 
-import math
-
+import numpy as np
 from aerosol_dynamics import physical_parameters as pp
 from . import u
-
 
 class Environment:
     """
@@ -47,7 +45,7 @@ class Environment:
         )
 
     # mean free path of air in m
-    # @u.wraps(u.m, [None])
+    @u.wraps(u.m, [None])
     def mean_free_path_air(self) -> float:
         """Returns the mean free path of this environment. [m]
 
@@ -60,6 +58,6 @@ class Environment:
             (
                 2 * self.dynamic_viscosity_air() /
                 self.pressure() /
-                (8*molecular_weight / (math.pi*pp.GAS_CONSTANT*self.temperature()))**0.5
+                (8*molecular_weight / (np.pi*pp.GAS_CONSTANT*self.temperature()))**0.5
             ).to_base_units()
         )
