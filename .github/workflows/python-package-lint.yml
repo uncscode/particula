@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python package
+name: Python package lint
 
 on:
   push:
@@ -42,9 +42,9 @@ jobs:
     - name: Analysing the code with pylint
         # https://stackoverflow.com/questions/68860511/github-actions-pylint-fails-with-f0001-no-module-named-init-py-fatal/68860512#68860512
       run: |
-        # pylint aerosol_dynamics/ `ls -R|grep .py$|xargs`
-        pylint $(find . -name "*.py" | xargs)
+        # pylint `ls -R|grep .py$|xargs`
+        pylint $(find aerosol_dynamics/ -name "*.py" | xargs) 
 
-    - name: Test with pytest
-      run: |
-        pytest
+    # - name: Test with pytest
+    #   run: |
+    #     pytest
