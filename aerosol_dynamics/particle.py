@@ -32,11 +32,11 @@ class Particle:
             density (float) [kg/m**3]
             charge  (int)   [dimensionless]
         """
-        self._name      = name
-        self._radius    = radius
-        self._density   = density
-        self._charge    = charge
-        self._mass      = density * (4*np.pi/3) * (radius**3)
+        self._name = name
+        self._radius = radius
+        self._density = density
+        self._charge = charge
+        self._mass = density * (4*np.pi/3) * (radius**3)
 
     def name(self) -> str:
         """Returns the name of particle."""
@@ -71,9 +71,10 @@ class Particle:
         """Returns particle's Knudsen number.
         Checks units: [dimensionless]
 
-        The Knudsen number reflects the relative length scales of the
-        particle and the suspending fluid (air, water, etc.).
-        This is calculated by the mean free path of the medium divided by the particle radius."""
+        The Knudsen number reflects the relative length scales of
+        the particle and the suspending fluid (air, water, etc.).
+        This is calculated by the mean free path of the medium
+        divided by the particle radius."""
         return pp.MEAN_FREE_PATH_AIR / self.radius()
 
     @u.wraps(u.dimensionless, [None])
@@ -81,10 +82,12 @@ class Particle:
         """Returns particle's Cunningham slip correction factor.
         Checks units: [dimensionless]
 
-        Dimensionless quantity accounting for non-continuum effects on small particles.
-        It is a deviation from Stokes' Law.
-        Stokes assumes a no-slip condition that is not correct at high Knudsen numbers.
-        The slip correction factor is used to calculate the friction factor.
+        Dimensionless quantity accounting for non-continuum effects
+        on small particles. It is a deviation from Stokes' Law.
+        Stokes assumes a no-slip condition that is not correct at
+        high Knudsen numbers. The slip correction factor is used to
+        calculate the friction factor.
+
         See Eq 9.34 in Atmos. Chem. & Phys. (2016) for more informatiom."""
         knudsen_number: float = self.knudsen_number()
         return 1 + knudsen_number * (
@@ -97,7 +100,8 @@ class Particle:
         Checks units: [N*s/m]
 
         Property of the particle's size and surrounding medium.
-        Multiplying the friction factor by the fluid velocity is the drag force on the particle."""
+        Multiplying the friction factor by the fluid velocity
+        yields the drag force on the particle."""
         slip_correction_factor: float = self.slip_correction_factor()
         return (
             6 * np.pi * pp.MEDIUM_VISCOSITY * self.radius() /
@@ -115,10 +119,12 @@ class Particle:
 
     @u.wraps(u.kg / u.s, [None, None])
     def reduced_friction_factor(self, other) -> float:
-        """Returns the reduced friction factor between two particles. Checks units: [N*s/m]
+        """Returns the reduced friction factor between two particles.
+        Checks units: [N*s/m]
 
         Similar to the reduced mass.
-        The reduced friction factor allows a two-body problem to be solved as a one-body problem."""
+        The reduced friction factor allows a two-body problem
+        to be solved as a one-body problem."""
         return (
             self.friction_factor() * other.friction_factor()
             / (self.friction_factor() + other.friction_factor())
@@ -169,7 +175,8 @@ class Particle:
         The *diffusive* Knudsen number is different from Knudsen number.
         Ratio of:
             - numerator: mean persistence of one particle
-            - denominator: effective length scale of particle--particle Coulombic interaction"""
+            - denominator: effective length scale of
+                particle--particle Coulombic interaction"""
         numerator = (
             (
                 pp.TEMPERATURE * pp.BOLTZMANN_CONSTANT
@@ -243,4 +250,5 @@ class Particle:
     # # 10.1103/PhysRevE.85.026410,
     # # Equation 13
     # def dimensionless_coagulation_kernel_GattiKortshagen2008(self, other):
-    #     kernel_hard_sphere = self.dimensionless_coagulation_kernel_hard_sphere(other)
+    #     kernel_hard_sphere =
+    # self.dimensionless_coagulation_kernel_hard_sphere(other)
