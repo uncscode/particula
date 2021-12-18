@@ -35,9 +35,9 @@ jobs:
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=jupyterbook/*
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=jupyterbook/*
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
         
     - name: Analysing the code with pylint
         # https://stackoverflow.com/questions/68860511/github-actions-pylint-fails-with-f0001-no-module-named-init-py-fatal/68860512#68860512
