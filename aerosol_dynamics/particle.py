@@ -228,6 +228,7 @@ class Particle:
         diffusive_knudsen_number = self.diffusive_knudsen_number(other, environment)
         return 4 * np.pi * (diffusive_knudsen_number**2)
 
+    @u.wraps(u.dimensionless, [None, None, None])
     def collision_kernel_kinetic_limit(self, other, environment: Environment) -> float:
         """Kinetic limit of collision kernel.
         Checks units: [dimensionless]"""
