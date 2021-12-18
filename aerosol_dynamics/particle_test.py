@@ -56,7 +56,7 @@ def test_knudsen_number():
     """
     Test that the knudsen number is calculated correctly.
     """
-    
+
     assert small_particle.knudsen_number(standard_environment) == pytest.approx(66.4374)
     assert small_particle.knudsen_number(standard_environment).check(["None"])
     assert large_particle.knudsen_number(standard_environment) == pytest.approx(0.664374)
@@ -83,9 +83,15 @@ def test_friction_factor():
     Test that the friction factor is calculated correctly.
     """
 
-    assert small_particle.friction_factor(standard_environment).magnitude == pytest.approx(3.18080e-15)
-    assert large_particle.friction_factor(standard_environment).magnitude == pytest.approx(1.84e-11)
-    assert small_particle.friction_factor(standard_environment).check("[mass]/[time]")
+    assert small_particle.friction_factor(
+        standard_environment
+    ).magnitude == pytest.approx(3.18080e-15)
+    assert large_particle.friction_factor(
+        standard_environment
+    ).magnitude == pytest.approx(1.84e-11)
+    assert small_particle.friction_factor(
+        standard_environment
+    ).check("[mass]/[time]")
 
 
 def test_reduced_mass():
