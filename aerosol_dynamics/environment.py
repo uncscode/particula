@@ -38,12 +38,12 @@ class Environment:
         """
         mu_ref = 1.716e-5 * u.Pa * u.s # Viscosity at T_REF
         t_ref = 273.15 * u.K
-        s = 110.4 * u.K # Sutherland constant
+        suth_const = 110.4 * u.K # Sutherland constant
 
         return (
             mu_ref *
             (self.temperature()/t_ref)**(3/2) *
-            (t_ref+s) / (self.temperature()+s)
+            (t_ref + suth_const) / (self.temperature() + suth_const)
         )
 
     # mean free path of air in m
