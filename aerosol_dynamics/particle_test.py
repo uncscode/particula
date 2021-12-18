@@ -74,7 +74,7 @@ def test_slip_correction_factor():
     """
 
     assert small_particle.slip_correction_factor(standard_environment) == pytest.approx(110.6503)
-    assert large_particle.slip_correction_factor(standard_environment) == pytest.approx(1.88587)
+    assert large_particle.slip_correction_factor(standard_environment) == pytest.approx(1.885865)
     assert small_particle.slip_correction_factor(standard_environment).check(["None"])
 
 
