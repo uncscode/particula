@@ -1,0 +1,5 @@
+format: jb-book
+root: intro
+chapters:
+- file: 000_beginnings
+- file: 001_particle
