@@ -145,11 +145,15 @@ class Particle:
         """
 
         reduced_mass = self.reduced_mass(other)
-        coulomb_enhancement_continuum_limit = self.coulomb_enhancement_continuum_limit(other, environment)
+        coulomb_enhancement_continuum_limit = self.coulomb_enhancement_continuum_limit(
+            other, environment
+        )
         reduced_friction_factor = self.reduced_friction_factor(other, environment)
-        coulomb_enhancement_kinetic_limit = self.coulomb_enhancement_kinetic_limit(other, environment)
+        coulomb_enhancement_kinetic_limit = self.coulomb_enhancement_kinetic_limit(
+            other, environment
+        )
         return (
-            (environment.temperature() * pp.BOLTZMANN_CONSTANT * reduced_mass**0.5) 
+            (environment.temperature() * pp.BOLTZMANN_CONSTANT * reduced_mass**0.5)
             * coulomb_enhancement_continuum_limit /
             (reduced_friction_factor * (self.radius() + other.radius())
             * coulomb_enhancement_kinetic_limit)
