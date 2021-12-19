@@ -1,4 +1,15 @@
 title: "Particula Book"
 logo: images/placeholder.png
 execute:
-  execute_notebooks: "off"
+  execute_notebooks: "auto"
+
+repository:
+  url: "https://github.com/uncscode/particula/"
+  branch: main
+  path_to_book: docs
+
+launch_buttons:
+  notebook_interface: "jupyterlab"
+  binderhub_url: "https://mybinder.org"
+  colab_url: "https://colab.research.google.com"
+  thebe: true
