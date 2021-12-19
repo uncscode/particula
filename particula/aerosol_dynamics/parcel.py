@@ -14,7 +14,7 @@ class Parcel:
 
     Attributes:
         name            (str)               The name of the parcel.
-        particle_data   (object list)       The radius of the particle.
+        particle_data   (object list)       Particle objects.
         enviroment      (object)            The enviroment of the parcel.
     """
 
