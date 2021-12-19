@@ -2,6 +2,4 @@
 PARTICULA!
 """
 
-__all__ = [
-    'aerosol_dynamics',
-]
+__version__ = '0.0.2'
