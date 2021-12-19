@@ -10,8 +10,8 @@ Particula is a simple, fast, and powerful particle simulator, or at least two of
 
 The main goal is to develop an aerosol particle model that is usable, efficient, and productive. In this process, we all will learn developing models in Python and associated packages. Let us all be friendly, respectful, and nice to each other. Any code added to this repository is automatically owned by all. Please speak up if something (even if trivial) bothers you. Talking through things always helps. This is an open-source project, so feel free to contribute, however small or big your contribution may be.
 
-We follow the Google Python style guide [here](https://google.github.io/styleguide/pyguide.html). We have contribution guidelines [here](./CONTRIBUTING.md) and a code of conduct [here](./CODE_OF_CONDUCT.md) as well.
+We follow the Google Python style guide [here](https://google.github.io/styleguide/pyguide.html). We have contribution guidelines [here](https://github.com/uncscode/particula/blob/main/CONTRIBUTING.md) and a code of conduct [here](https://github.com/uncscode/particula/blob/main/CODE_OF_CONDUCT.md) as well.
 
 ## Usage & development
 
-The development of this model will be illustrated through Jupyter notebooks ([here](./docs/)) that will be put together in the form of a Jupyter book on our [website](https://uncscode.github.io/particula). You can install `particula` from PyPI or conda-forge with `pip install particula` or `conda install -c conda-forge particula`.
+The development of this model will be illustrated through Jupyter notebooks ([here](https://github.com/uncscode/particula/blob/main/docs)) that will be put together in the form of a Jupyter book on our [website](https://uncscode.github.io/particula). You can install `particula` from PyPI or conda-forge with `pip install particula` or `conda install -c conda-forge particula`.
