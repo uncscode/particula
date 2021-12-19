@@ -95,7 +95,7 @@ class Parcel:
         return [i.knudsen_number(self._enviroment) for i in self.particle_classes()]
 
 
-    # TODO: unit errors for this function.
+    # TODO: #47 unit errors for this function.
     # def dimensionless_coagulation_kernel_hard_sphere(self, particle_i):
     #     """Returns the dimensionless coagulation kernel for a hard sphere.
     #     Parameters:
