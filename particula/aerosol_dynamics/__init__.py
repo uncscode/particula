@@ -10,4 +10,5 @@ It can do the following:
 # in each module.
 
 from pint import UnitRegistry
+
 u = UnitRegistry()

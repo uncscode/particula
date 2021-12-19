@@ -3,7 +3,9 @@ Tests for the Environment class.
 """
 
 import pytest
+
 from aerosol_dynamics import environment
+
 from . import u
 
 standard_environment = environment.Environment(
@@ -30,6 +32,7 @@ def test_mean_free_path_air():
     """
     Test that the calculation for the mean free path of air works.
     """
-    assert (standard_environment.mean_free_path_air().magnitude ==
+    assert (
+        standard_environment.mean_free_path_air().magnitude ==
         pytest.approx(6.644e-8, rel=1e-3)
-        )
+    )

@@ -6,8 +6,8 @@ import numpy as np
 import pint
 import pytest
 
-from aerosol_dynamics import particle
-from aerosol_dynamics import environment
+from aerosol_dynamics import environment, particle
+
 from . import u
 
 small_particle = particle.Particle(
