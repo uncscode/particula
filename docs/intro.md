@@ -1,3 +1,3 @@
-# PARTICULA BOOK
+# The `particula` JupyterBook
 
-This space is for the tutorials and documentation of `particula`!
+This is the `particula` JupyterBook for tutorials and documentation. It is a Jupyter "book" that is organized into chapters. Each chapter is a Jupyter notebook. The notebooks are organized in a way that makes it easy to follow along. More to follow...

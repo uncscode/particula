@@ -43,8 +43,4 @@ jobs:
         # https://stackoverflow.com/questions/68860511/github-actions-pylint-fails-with-f0001-no-module-named-init-py-fatal/68860512#68860512
       run: |
         # pylint `ls -R|grep .py$|xargs`
-        pylint $(find aerosol_dynamics/ -name "*.py" | xargs) 
-
-    # - name: Test with pytest
-    #   run: |
-    #     pytest
+        pylint $(find particula/ -name "*.py" | xargs) 
