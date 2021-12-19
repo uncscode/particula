@@ -6,9 +6,9 @@ import numpy as np
 import pint
 import pytest
 
-from aerosol_dynamics import environment, particle
+from particula.aerosol_dynamics import environment, particle
 
-from . import u
+from particula.aerosol_dynamics import u
 
 small_particle = particle.Particle(
     name="small_particle",

@@ -4,9 +4,9 @@ Environment Class
 
 import numpy as np
 
-from aerosol_dynamics import physical_parameters as pp
+from particula.aerosol_dynamics import physical_parameters as pp
 
-from . import u
+from particula.aerosol_dynamics import u
 
 
 class Environment:

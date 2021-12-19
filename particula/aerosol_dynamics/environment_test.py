@@ -4,13 +4,13 @@ Tests for the Environment class.
 
 import pytest
 
-from aerosol_dynamics import environment
+from particula.aerosol_dynamics import environment
 
-from . import u
+from particula.aerosol_dynamics import u
 
 standard_environment = environment.Environment(
-    temperature=298 * u.K,
-    pressure=101325 * u.Pa,
+    temperature=298, # * u.K,
+    pressure=101325 # * u.Pa,
 )
 
 def test_getters():

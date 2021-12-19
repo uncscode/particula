@@ -4,10 +4,10 @@ Class for creating particles.
 
 import numpy as np
 
-from aerosol_dynamics import physical_parameters as pp
-from aerosol_dynamics.environment import Environment
+from particula.aerosol_dynamics import physical_parameters as pp
+from particula.aerosol_dynamics.environment import Environment
 
-from . import u
+from particula.aerosol_dynamics import u
 
 
 class Particle:
