@@ -3,7 +3,6 @@ pytest
 autopep8
 jupyterlab
 numpy
-pandas
 pytype
 typing
 pint
