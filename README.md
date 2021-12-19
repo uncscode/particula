@@ -4,7 +4,7 @@ Particula is a simple, fast, and powerful particle simulator, or at least two of
 
 (_DISCLAIMER_ GitHub Copilot is heavily involved in the development of this project and especially in the writing of these paragraphs! _DISCLAIMER_)
 
-(_WARNING_ `PARTICULA` is in early and messy development. It is not ready for production use yet, but you are welcome to use it anyway --- even better, you're welcome to contribute _WARNING_)
+(_WARNING_ `PARTICULA` is in early and messy development. It is not ready for production use yet, but you are welcome to use it anyway --- even better, you're welcome to contribute! _WARNING_)
 
 ## Goals & conduct
 
