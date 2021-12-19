@@ -44,9 +44,9 @@
     <script src="_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script>
-        const thebe_selector = ".thebe"
-        const thebe_selector_input = "pre"
-        const thebe_selector_output = ".output"
+        const thebe_selector = ".thebe,.cell"
+        const thebe_selector_input = "pre,.cell_input div.highlight"
+        const thebe_selector_output = ".output,.cell_output"
     </script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -178,7 +178,7 @@
         aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
     <div class="dropdown-buttons">
         
-        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/001_particle.ipynb"><button type="button"
+        <a class="binder-button" href="https://mybinder.org/v2/gh/uncscode/particula/main?urlpath=lab/tree/docs/001_particle.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
                 data-placement="left"><img class="binder-button-logo"
                     src="_static/images/logo_binder.svg"
@@ -186,6 +186,14 @@
         
         
         
+        <a class="colab-button" href="https://colab.research.google.com/github/uncscode/particula/blob/main/docs/001_particle.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        <button type="button" class="btn btn-secondary topbarbtn"
+            onclick="initThebeSBT()" title="Launch Thebe" data-toggle="tooltip" data-placement="left"><i
+                class="fas fa-play"></i><span style="margin-left: .4em;">Live Code</span></button>
         
     </div>
 </div>
@@ -229,7 +237,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;module &#39;particula.aerosol_dynamics.environment&#39; from &#39;/Users/ngam/Repos/particula/particula/aerosol_dynamics/environment.py&#39;&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;module &#39;particula.aerosol_dynamics.environment&#39; from &#39;/opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages/particula/aerosol_dynamics/environment.py&#39;&gt;
 </pre></div>
 </div>
 </div>
@@ -260,27 +268,6 @@
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">?</span>particle.Particle.diffusive_knudsen_number
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Red">Signature:</span>
-particle<span class=" -Color -Color-Blue">.</span>Particle<span class=" -Color -Color-Blue">.</span>diffusive_knudsen_number<span class=" -Color -Color-Blue">(</span>
-    self<span class=" -Color -Color-Blue">,</span>
-    other<span class=" -Color -Color-Blue">,</span>
-    environment<span class=" -Color -Color-Blue">:</span> particula<span class=" -Color -Color-Blue">.</span>aerosol_dynamics<span class=" -Color -Color-Blue">.</span>environment<span class=" -Color -Color-Blue">.</span>Environment<span class=" -Color -Color-Blue">,</span>
-<span class=" -Color -Color-Blue">)</span> <span class=" -Color -Color-Blue">-&gt;</span> float
-<span class=" -Color -Color-Red">Docstring:</span>
-Diffusive Knudsen number.
-Checks units: [dimensionless]
-
-The *diffusive* Knudsen number is different from Knudsen number.
-Ratio of:
-    - numerator: mean persistence of one particle
-    - denominator: effective length scale of
-        particle--particle Coulombic interaction
-<span class=" -Color -Color-Red">File:</span>      ~/Repos/particula/particula/aerosol_dynamics/particle.py
-<span class=" -Color -Color-Red">Type:</span>      function
 </pre></div>
 </div>
 </div>
@@ -419,7 +406,43 @@ Ratio of:
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html">0.0 dimensionless</div></div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_1700</span><span class="o">/</span><span class="mf">1795841852.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">particle_a</span><span class="o">.</span><span class="n">coulomb_potential_ratio</span><span class="p">(</span><span class="n">particle_b</span><span class="p">)</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages/pint/registry_helpers.py</span> in <span class="ni">wrapper</span><span class="nt">(*values, **kw)</span>
+<span class="g g-Whitespace">    </span><span class="mi">273</span>         <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quantity</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
+<span class="g g-Whitespace">    </span><span class="mi">274</span> 
+<span class="ne">--&gt; </span><span class="mi">275</span>             <span class="n">values</span><span class="p">,</span> <span class="n">kw</span> <span class="o">=</span> <span class="n">_apply_defaults</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">kw</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">276</span> 
+<span class="g g-Whitespace">    </span><span class="mi">277</span>             <span class="c1"># In principle, the values are used as is</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages/pint/registry_helpers.py</span> in <span class="ni">_apply_defaults</span><span class="nt">(func, args, kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">177</span> 
+<span class="g g-Whitespace">    </span><span class="mi">178</span>     <span class="n">sig</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">179</span>     <span class="n">bound_arguments</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">180</span>     <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+<span class="g g-Whitespace">    </span><span class="mi">181</span>         <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bound_arguments</span><span class="o">.</span><span class="n">arguments</span><span class="p">:</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/inspect.py</span> in <span class="ni">bind</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3013</span>         <span class="k">if</span> <span class="n">the</span> <span class="n">passed</span> <span class="n">arguments</span> <span class="n">can</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">bound</span><span class="o">.</span>
+<span class="g g-Whitespace">   </span><span class="mi">3014</span>         <span class="s2">&quot;&quot;&quot;</span>
+<span class="ne">-&gt; </span><span class="mi">3015</span><span class="s2">         return args[0]._bind(args[1:], kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">3016</span><span class="s2"> </span>
+<span class="g g-Whitespace">   </span><span class="mi">3017</span><span class="s2">     def bind_partial(*args, **kwargs):</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/inspect.py</span> in <span class="ni">_bind</span><span class="nt">(self, args, kwargs, partial)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2928</span><span class="s2">                             msg = &#39;missing a required argument: </span><span class="si">{arg!r}</span><span class="s2">&#39;</span>
+<span class="g g-Whitespace">   </span><span class="mi">2929</span><span class="s2">                             msg = msg.format(arg=param.name)</span>
+<span class="ne">-&gt; </span><span class="mi">2930</span><span class="s2">                             raise TypeError(msg) from None</span>
+<span class="g g-Whitespace">   </span><span class="mi">2931</span><span class="s2">             else:</span>
+<span class="g g-Whitespace">   </span><span class="mi">2932</span><span class="s2">                 # We have a positional argument to process</span>
+
+<span class="ne">TypeError</span>: missing a required argument: &#39;environment&#39;
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -481,8 +504,8 @@ Ratio of:
     {
         requestKernel: true,
         binderOptions: {
-            repo: "binder-examples/jupyter-stacks-datascience",
-            ref: "master",
+            repo: "uncscode/particula",
+            ref: "main",
         },
         codeMirrorConfig: {
             theme: "abcdef",
