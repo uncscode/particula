@@ -93,13 +93,3 @@ class Parcel:
     def knudsen_number_particle(self) -> float:
         """Returns the knudsen number of the particle. Checks units. [unitless]"""
         return [i.knudsen_number(self._enviroment) for i in self.particle_classes()]
-
-
-    # TODO: #47 unit errors for this function.
-    # def dimensionless_coagulation_kernel_hard_sphere(self, particle_i):
-    #     """Returns the dimensionless coagulation kernel for a hard sphere.
-    #     Parameters:
-    #         particle_i: a single particle object.
-    #     """
-    #     return [particle_i.dimensionless_coagulation_kernel_hard_sphere
-    # (i, self._enviroment) for i in self.particle_classes()]
