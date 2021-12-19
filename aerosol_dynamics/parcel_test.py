@@ -2,14 +2,8 @@
 Test suites for parcel class.
 """
 
-import numpy as np
-import pint
-import pytest
-
 from aerosol_dynamics import particle
-from aerosol_dynamics import environment
 from aerosol_dynamics import parcel
-from . import u
 
 small_particle = particle.Particle(
     name="small_particle",
@@ -25,12 +19,14 @@ large_particle = particle.Particle(
     charge=1,
     )
 
+# create a parcel
 simple_parcel = parcel.Parcel('simple', temperature=300, pressure=101325)
 
+# add single particle to parcel
 simple_parcel.add_particle(small_particle)
 simple_parcel.add_particle(large_particle)
-
 simple_parcel.create_and_add_particle('org1',50e-9)
+# add multiple particles to parcel
 simple_parcel.create_and_add_list_of_particle('org2',[1e-9,2e-9,3e-9])
 
 def test_getters():

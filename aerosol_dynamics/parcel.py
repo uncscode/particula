@@ -1,19 +1,13 @@
 """
 Class for creating a air parcel to put particles and gases in.
 """
-
-import numpy as np
-
 from aerosol_dynamics import particle
 from aerosol_dynamics import environment
 
-from . import u # maybe not needed?
-
-
 class Parcel:
     """Sets the class for creating a parcel.
-    This starts the base for particle and gas dynamic simulations. 
-    Like the eveolution of a size distribution with time. 
+    This starts the base for particle and gas dynamic simulations.
+    Like the eveolution of a size distribution with time.
     Or a change in temperature causing particle evaporation or gas condensation.
 
     Attributes:
@@ -45,14 +39,6 @@ class Parcel:
     def name(self) -> str:
         """Returns the name of the parcel."""
         return self._name
-
-    def temperature(self) -> float:
-        """Returns the temperature of the parcel. Checks units. [K]"""
-        return self._temperature
-
-    def pressure(self) -> float:
-        """Returns the pressure of the parcel. Checks units. [Pa]"""
-        return self._pressure
 
     def add_particle(self, particle_object):
         """Adds a particle to the parcel.
@@ -115,5 +101,5 @@ class Parcel:
     #     Parameters:
     #         particle_i: a single particle object.
     #     """
-    #     return [particle_i.dimensionless_coagulation_kernel_hard_sphere(i, self._enviroment) for i in self.particle_classes()]
-
+    #     return [particle_i.dimensionless_coagulation_kernel_hard_sphere
+    # (i, self._enviroment) for i in self.particle_classes()]
