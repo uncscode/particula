@@ -1,6 +1,9 @@
 # ignore local .vscode folder
 .vscode/
 
+# ignore local development folder
+private_dev/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
