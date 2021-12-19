@@ -103,12 +103,13 @@ class Particle:
         Property of the particle's size and surrounding medium.
         Multiplying the friction factor by the fluid velocity
         yields the drag force on the particle."""
-        slip_correction_factor: float = self.slip_correction_factor(environment)
+        slip_correction_factor: float = self.slip_correction_factor(
+            environment
+        )
         return (
             6 * np.pi * environment.dynamic_viscosity_air() * self.radius() /
             slip_correction_factor
         )
-
 
     @u.wraps(u.kg, [None, None])
     def reduced_mass(self, other) -> float:
@@ -120,7 +121,9 @@ class Particle:
         return self.mass() * other.mass() / (self.mass() + other.mass())
 
     @u.wraps(u.kg / u.s, [None, None, None])
-    def reduced_friction_factor(self, other, environment: Environment) -> float:
+    def reduced_friction_factor(
+        self, other, environment: Environment
+    ) -> float:
         """Returns the reduced friction factor between two particles.
         Checks units: [N*s/m]
 
@@ -128,12 +131,18 @@ class Particle:
         The reduced friction factor allows a two-body problem
         to be solved as a one-body problem."""
         return (
-            self.friction_factor(environment) * other.friction_factor(environment)
-            / (self.friction_factor(environment) + other.friction_factor(environment))
+            self.friction_factor(environment)
+            * other.friction_factor(environment)
+            / (
+                self.friction_factor(environment)
+                + other.friction_factor(environment)
+            )
         )
 
     @u.wraps(u.dimensionless, [None, None, None])
-    def coulomb_potential_ratio(self, other, environment: Environment) -> float:
+    def coulomb_potential_ratio(
+        self, other, environment: Environment
+    ) -> float:
         """Calculates the Coulomb potential ratio.
         Checks units: [dimensionless]"""
         numerator = -1 * self.charge() * other.charge() * (
@@ -148,10 +157,14 @@ class Particle:
         )
 
     @u.wraps(u.dimensionless, [None, None, None])
-    def coulomb_enhancement_kinetic_limit(self, other, environment: Environment) -> float:
+    def coulomb_enhancement_kinetic_limit(
+        self, other, environment: Environment
+    ) -> float:
         """Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
         Checks units: [dimensionless]"""
-        coulomb_potential_ratio = self.coulomb_potential_ratio(other, environment)
+        coulomb_potential_ratio = self.coulomb_potential_ratio(
+            other, environment
+        )
         return (
             1 + coulomb_potential_ratio if coulomb_potential_ratio >= 0
 
@@ -159,17 +172,23 @@ class Particle:
         )
 
     @u.wraps(u.dimensionless, [None, None, None])
-    def coulomb_enhancement_continuum_limit(self, other, environment: Environment) -> float:
+    def coulomb_enhancement_continuum_limit(
+        self, other, environment: Environment
+    ) -> float:
         """Continuum limit of Coulomb enhancement for particle--particle coagulation.
         Checks units: [dimensionless]"""
 
-        coulomb_potential_ratio = self.coulomb_potential_ratio(other, environment)
+        coulomb_potential_ratio = self.coulomb_potential_ratio(
+            other, environment
+        )
         return coulomb_potential_ratio / (
             1 - np.exp(-1*coulomb_potential_ratio)
         ) if coulomb_potential_ratio != 0 else 1
 
     @u.wraps(u.dimensionless, [None, None, None])
-    def diffusive_knudsen_number(self, other, environment: Environment) -> float:
+    def diffusive_knudsen_number(
+        self, other, environment: Environment
+    ) -> float:
         """Diffusive Knudsen number.
         Checks units: [dimensionless]
 
@@ -193,7 +212,6 @@ class Particle:
         )
         return numerator / denominator
 
-
     @u.wraps(u.dimensionless, [None, None, None])
     def dimensionless_coagulation_kernel_hard_sphere(
         self, other, environment: Environment
@@ -207,7 +225,9 @@ class Particle:
         hsc2 = 11.211
         hsc3 = 3.502
         hsc4 = 7.211
-        diffusive_knudsen_number = self.diffusive_knudsen_number(other, environment)
+        diffusive_knudsen_number = self.diffusive_knudsen_number(
+            other, environment
+        )
 
         numerator = (
             (4 * np.pi * diffusive_knudsen_number**2)
@@ -223,17 +243,25 @@ class Particle:
         return numerator / denominator
 
     @u.wraps(u.dimensionless, [None, None, None])
-    def collision_kernel_continuum_limit(self, other, environment: Environment) -> float:
+    def collision_kernel_continuum_limit(
+        self, other, environment: Environment
+    ) -> float:
         """Continuum limit of collision kernel.
         Checks units: [dimensionless]"""
-        diffusive_knudsen_number = self.diffusive_knudsen_number(other, environment)
+        diffusive_knudsen_number = self.diffusive_knudsen_number(
+            other, environment
+        )
         return 4 * np.pi * (diffusive_knudsen_number**2)
 
     @u.wraps(u.dimensionless, [None, None, None])
-    def collision_kernel_kinetic_limit(self, other, environment: Environment) -> float:
+    def collision_kernel_kinetic_limit(
+        self, other, environment: Environment
+    ) -> float:
         """Kinetic limit of collision kernel.
         Checks units: [dimensionless]"""
-        diffusive_knudsen_number = self.diffusive_knudsen_number(other, environment)
+        diffusive_knudsen_number = self.diffusive_knudsen_number(
+            other, environment
+        )
         return np.sqrt(8 * np.pi) * diffusive_knudsen_number
 
     # # Gopalkrishnan and Hogan, 2012

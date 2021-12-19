@@ -57,12 +57,22 @@ def test_knudsen_number():
     Test that the knudsen number is calculated correctly.
     """
 
-    assert small_particle.knudsen_number(standard_environment) == pytest.approx(66.44, rel=1e-3)
-    assert small_particle.knudsen_number(standard_environment).check(["None"])
-    assert large_particle.knudsen_number(standard_environment) == pytest.approx(0.6644, rel=1e-3)
+    assert small_particle.knudsen_number(
+        standard_environment
+    ) == pytest.approx(66.44, rel=1e-3)
+    assert small_particle.knudsen_number(
+        standard_environment
+    ).check(["None"])
+    assert large_particle.knudsen_number(
+        standard_environment
+    ) == pytest.approx(0.6644, rel=1e-3)
     with pytest.raises(pint.errors.DimensionalityError):
-        assert invalid_particle.knudsen_number(standard_environment) == pytest.approx(0.65)
-        assert invalid_particle.knudsen_number(standard_environment).check("[None]")
+        assert invalid_particle.knudsen_number(
+            standard_environment
+        ) == pytest.approx(0.65)
+        assert invalid_particle.knudsen_number(
+            standard_environment
+        ).check("[None]")
     # with pytest.raises(AssertionError):
     #     assert invalid_particle.knudsen_number() == pytest.approx(0.65)
     #     assert invalid_particle.knudsen_number().check("[None]")
@@ -81,7 +91,9 @@ def test_slip_correction_factor():
         standard_environment
     ) == pytest.approx(1.886, rel=1e-3)
 
-    assert small_particle.slip_correction_factor(standard_environment).check(["None"])
+    assert small_particle.slip_correction_factor(
+        standard_environment
+    ).check(["None"])
 
 
 def test_friction_factor():

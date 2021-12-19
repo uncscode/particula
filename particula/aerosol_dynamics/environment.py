@@ -11,12 +11,12 @@ from particula.aerosol_dynamics import u
 
 class Environment:
     """
-    Sets the environment class for creating air parcels, with properties such as
-    temperature and pressure, and derived properties such as air viscosity.
+    Sets the environment class
+    with properties such as temperature and pressure
+    and derived properties such as air viscosity.
     """
     def __init__(self, temperature, pressure):
-        # assert temperature == 298 * u.K , "Currently 300 K is the only temperature supported"
-        # assert pressure == 1 * u.atm , "Currently 1 atm is the only pressure supported"
+        """Function calls for enviornment class."""
         self._temperature = temperature
         self._pressure = pressure
 
@@ -37,9 +37,9 @@ class Environment:
         The dynamic viscosity is calculated using the 3 parameter
         Sutherland Viscosity Law.
         """
-        mu_ref = 1.716e-5 * u.Pa * u.s # Viscosity at T_REF
+        mu_ref = 1.716e-5 * u.Pa * u.s  # Viscosity at T_REF
         t_ref = 273.15 * u.K
-        suth_const = 110.4 * u.K # Sutherland constant
+        suth_const = 110.4 * u.K  # Sutherland constant
 
         return (
             mu_ref *
@@ -55,12 +55,18 @@ class Environment:
         The mean free path is the average distance traveled by a molecule
         between collisions with other molecules.
         """
-        molecular_weight = (28.9644 * u.g / u.mol).to_base_units() # Molecular weight of air
+        # Molecular weight of air in kg/mol
+        molecular_weight = (28.9644 * u.g / u.mol).to_base_units()
 
         return (
             (
-                2 * self.dynamic_viscosity_air() /
-                self.pressure() /
-                (8*molecular_weight / (np.pi*pp.GAS_CONSTANT*self.temperature()))**0.5
+                2 * self.dynamic_viscosity_air()
+                / self.pressure()
+                / (
+                    8*molecular_weight
+                    / (
+                        np.pi*pp.GAS_CONSTANT*self.temperature()
+                    )
+                )**0.5
             ).to_base_units()
         )
