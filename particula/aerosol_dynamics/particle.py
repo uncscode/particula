@@ -269,7 +269,7 @@ class Particle:
         self,
         other,
         environment: Environment,
-        authors: str = "gh2012",
+        authors: str = "cg2019",
     ) -> float:
         """Dimensionless particle--particle coagulation kernel.
         Checks units: [dimensionless]
@@ -279,17 +279,17 @@ class Particle:
             other:          particle 2
             environment:    environment conditions
             authors:        authors of the parameterization
-                - gh2012    https://doi.org/10.1103/PhysRevE.78.046402
-                - cg2020    https://doi.org/XXXXXXXXXXXXXXXXXXXXXXXXXX
-                - hs        https://doi.org/XXXXXXXXXXXXXXXXXXXXXXXXXX
-                (default: gh2012)
+                - gh2012    doi.org:10.1103/PhysRevE.78.046402
+                - cg2019    doi:10.1080/02786826.2019.1614522
+                - hard_sphere
+                (default: hard_sphere)
         """
 
-        if authors == "cg2020":
+        if authors == "cg2019":
             # some parameters
             corra = 2.5
             corrb = (
-                4.528*np.exp(-1088*self.coulomb_potential_ratio(
+                4.528*np.exp(-1.088*self.coulomb_potential_ratio(
                     other, environment
                 ))
             ) + (
@@ -317,11 +317,11 @@ class Particle:
             )
 
             answer = (
-                self.dimensionless_coagulation_kernel_hard_sphere(
-                    other, environment
-                ) if self.coulomb_potential_ratio(
-                    other, environment
-                ) <= 0 else
+                # self.dimensionless_coagulation_kernel_hard_sphere(
+                #     other, environment
+                # ) if self.coulomb_potential_ratio(
+                #     other, environment
+                # ) <= 0 else
                 self.dimensionless_coagulation_kernel_hard_sphere(
                     other, environment
                 )*np.exp(corr_mu)
@@ -332,20 +332,27 @@ class Particle:
                 other, environment
             )
 
-            denominator = 1 + 1.598*np.minimum(
+            denominator = 1 + 1.598*(np.minimum(
                 self.diffusive_knudsen_number(other, environment),
                 3*self.diffusive_knudsen_number(other, environment)/2
                 / self.coulomb_potential_ratio(other, environment)
+            ))**1.1709
+
+            answer = (
+                self.dimensionless_coagulation_kernel_hard_sphere(
+                    other, environment
+                ) if self.coulomb_potential_ratio(
+                    other, environment
+                ) <= 0.5 else
+                numerator / denominator
             )
 
-            answer = numerator / denominator
-
-        elif authors == "hs":
+        elif authors == "hard_sphere":
             answer = self.dimensionless_coagulation_kernel_hard_sphere(
                 other, environment
             )
 
-        if authors not in ["gh2012", "hs", "cg2020"]:
+        if authors not in ["gh2012", "hard_sphere", "cg2019"]:
             raise ValueError("We don't have this parameterization")
 
         return answer
@@ -355,7 +362,7 @@ class Particle:
         self,
         other,
         environment: Environment,
-        authors: str = "hs",
+        authors: str = "cg2019",
     ) -> float:
         """Dimensioned particle--particle coagulation kernel.
         Checks units: [m**3/s]
@@ -367,8 +374,8 @@ class Particle:
             authors:        authors of the parameterization
                 - gh2012    https://doi.org/10.1103/PhysRevE.78.046402
                 - cg2020    https://doi.org/XXXXXXXXXXXXXXXXXXXXXXXXXX
-                - hs        https://doi.org/XXXXXXXXXXXXXXXXXXXXXXXXXX
-                (default: hs)
+                - hard_sphere (from above)
+                (default: hard_sphere)
         """
         return (
             self.dimensionless_coagulation_kernel_parameterized(

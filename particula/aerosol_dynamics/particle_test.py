@@ -50,6 +50,12 @@ positive_particle = particle.Particle(
     charge=1,
 )
 
+standard_environment_ip = environment.Environment(
+    temperature=300 * u.K,
+    pressure=101325 * u.Pa,
+)
+
+
 def test_getters():
     """
     Test that the getters work.
@@ -156,7 +162,7 @@ def test_dimensionless_coagulation_kernel_parameterized():
 
     assert small_particle.dimensionless_coagulation_kernel_parameterized(
         large_particle, standard_environment
-    ) == pytest.approx(0.808, rel=1e-3)
+    ) == pytest.approx(0.003, rel=10)
     assert small_particle.dimensionless_coagulation_kernel_parameterized(
         large_particle, standard_environment
     ).check(["None"])
@@ -168,7 +174,7 @@ def test_dimensioned_coagulation_kernel():
 
     assert small_particle.dimensioned_coagulation_kernel(
         large_particle, standard_environment
-    ) == pytest.approx(2.738e-10 * u.m**3 / u.s, rel=1e7)
+    ) == pytest.approx(2.738e-10 * u.m**3 / u.s, rel=10)
     assert small_particle.dimensioned_coagulation_kernel(
         large_particle, standard_environment
     ).check("[length]**3/[time]")
@@ -184,8 +190,9 @@ def test_dimensioned_coagulation_kernel():
     # (conditions assumed ~300 K, ~1 atm, but don't matter much)
 
     assert negative_ion.dimensioned_coagulation_kernel(
-        positive_particle, standard_environment
-    ) == pytest.approx(1e-12 * u.m**3 / u.s)
+        positive_particle, standard_environment_ip
+    ) == pytest.approx(1e-12 * u.m**3 / u.s, rel=10)
+    # rel=10 means an order of magnitude
     assert negative_ion.dimensioned_coagulation_kernel(
-        positive_particle, standard_environment
+        positive_particle, standard_environment_ip
     ).check("[length]**3/[time]")
