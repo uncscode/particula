@@ -73,14 +73,24 @@ class Parcel:
         densities_of_particles=None,
         charges_of_particles=None
     ):
-        """Adds a list of particles to the parcel based on size only
-            or delcaring denisty and charge.
+        """Adds a list of particles to the parcel based on size only (simple).
+            or delcaring denisties and charges (detailed).
         Parameters:
             name_of_particles   (str)   [no units],
             radi_of_particles (list)  [m]
         Optional:
             densities_of_particles (list) [kg/m**3],
             charges_of_particles  (list) [dimensionless]
+        Examples:
+            simple: parcel.create_and_add_list_of_particle(
+                'org2',
+                [1e-9, 2e-9, 3e-9] * u.m
+                )
+            detailed: create_and_add_list_of_particle(
+                'org3',
+                [1e-9, 2e-9, 3e-9] * u.m,
+                [1.8, 1, 1] * u.kg / u.m ** 3,
+                [1, 0, 2] * u.dimensionless)
         """
         if densities_of_particles is None:
             for size_add in radi_of_particles:
