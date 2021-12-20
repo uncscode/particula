@@ -42,49 +42,57 @@ def test_getters():
     """
     Test that the getters work by confirming particle creation
     """
-    assert len(simple_parcel.particle_classes()) == 9
-    assert len(simple_parcel.particle_mass()) == 9
-    assert len(simple_parcel.particle_radius()) == 9
-    assert len(simple_parcel.particle_charge()) == 9
+    assert len(simple_parcel.particle_classes_list()) == 9
+    assert len(simple_parcel.particle_masses_list()) == 9
+    assert len(simple_parcel.particle_radi_list()) == 9
+    assert len(simple_parcel.particle_charges_list()) == 9
 
 
 def test_particle_mass_units():
     '''
     Test that the mass of the particles is returned in kg
     '''
-    assert sum([i.mass().check('kg')
-                for i in simple_parcel.particle_classes()]) == 9
+    assert sum(
+        [i.mass().check('kg')
+            for i in simple_parcel.particle_classes_list()]
+    ) == 9
 
 
 def test_particle_radius_units():
     '''
     Test that the radius of the particles is returned in m
     '''
-    assert sum([i.check('m') for i in simple_parcel.particle_radius()]) == 9
+    assert sum([i.check('m') for i in simple_parcel.particle_radi_list()]) == 9
 
 
 def test_particle_density_units():
     '''
     Test that the density of the particles is returned in kg/m^3
     '''
-    assert sum([i.check(u.kg / u.m ** 3)
-                for i in simple_parcel.particle_density()]) == 9
+    assert sum(
+        [i.check(u.kg / u.m ** 3)
+            for i in simple_parcel.particle_densities_list()]
+    ) == 9
 
 
 def test_particle_charge_units():
     '''
     Test that the charge of the particles is returned in dimensionless
     '''
-    assert sum([i.check(u.dimensionless)
-                for i in simple_parcel.particle_charge()]) == 9
+    assert sum(
+        [i.check(u.dimensionless)
+            for i in simple_parcel.particle_charges_list()]
+    ) == 9
 
 
 def test_particle_knudsen_number():
     '''
     Test that the knudsen number is returned in dimensionless
     '''
-    assert sum([i.check(u.dimensionless)
-                for i in simple_parcel.particle_knudsen_number()]) == 9
+    assert sum(
+        [i.check(u.dimensionless)
+            for i in simple_parcel.particle_knudsen_numbers_list()]
+    ) == 9
 
 
 def test_remove_particle():
@@ -92,9 +100,9 @@ def test_remove_particle():
     Test that the remove particle method works
     '''
     simple_parcel.remove_particle([0])
-    assert len(simple_parcel.particle_classes()) == 8
+    assert len(simple_parcel.particle_classes_list()) == 8
     simple_parcel.remove_particle([2, 4])
-    assert len(simple_parcel.particle_classes()) == 6
+    assert len(simple_parcel.particle_classes_list()) == 6
 
 
 def test_remove_all_particles():
@@ -102,4 +110,4 @@ def test_remove_all_particles():
     Test that the remove all particles method works
     '''
     simple_parcel.remove_all_particles()
-    assert len(simple_parcel.particle_classes()) == 0
+    assert len(simple_parcel.particle_classes_list()) == 0
