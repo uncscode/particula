@@ -281,7 +281,7 @@ class Particle:
             authors:        authors of the parameterization
                 - gh2012    https://doi.org/10.1103/PhysRevE.78.046402
                 - cg2020    https://doi.org/XXXXXXXXXXXXXXXXXXXXXXXXXX
-                - hs        https://doi.org/XXXXXXXXXXXXXXXXXXXXXXXXXX
+                - hs        hard sphere approximation
                 (default: gh2012)
         """
 
