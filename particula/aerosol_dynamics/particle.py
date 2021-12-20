@@ -282,7 +282,7 @@ class Particle:
                 - gh2012    doi.org:10.1103/PhysRevE.78.046402
                 - cg2019    doi:10.1080/02786826.2019.1614522
                 - hard_sphere
-                (default: hard_sphere)
+                (default: cg2019)
         """
 
         if authors == "cg2019":
@@ -375,7 +375,7 @@ class Particle:
                 - gh2012    https://doi.org/10.1103/PhysRevE.78.046402
                 - cg2020    https://doi.org/XXXXXXXXXXXXXXXXXXXXXXXXXX
                 - hard_sphere (from above)
-                (default: hard_sphere)
+                (default: cg2019)
         """
         return (
             self.dimensionless_coagulation_kernel_parameterized(
