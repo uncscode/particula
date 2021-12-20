@@ -15,27 +15,40 @@ small_particle = particle.Particle(
     radius=1.0e-9 * u.m,
     density=1.0 * u.kg / u.m**3,
     charge=1,
-    )
+)
 
 large_particle = particle.Particle(
     name="large_particle",
     radius=1.0e-7 * u.m,
     density=1.8 * u.kg / u.m**3,
     charge=1,
-    )
+)
 
 invalid_particle = particle.Particle(
     name="invalid_particle",
     radius=1.0e-7 * u.lb,
     density=1 * u.kg / u.m**3,
     charge=3 * u.C,
-    )
+)
 
 standard_environment = environment.Environment(
     temperature=298 * u.K,
     pressure=101325 * u.Pa,
 )
 
+negative_ion = particle.Particle(
+    name="negative_ion",
+    radius=0.5e-9 * u.m,
+    density=1.84 * u.kg / u.m**3,
+    charge=-1,
+)
+
+positive_particle = particle.Particle(
+    name="positive_particle",
+    radius=3e-9 * u.m,
+    density=1.7 * u.kg / u.m**3,
+    charge=1,
+)
 
 def test_getters():
     """
@@ -133,3 +146,46 @@ def test_reduced_friction_factor():
         large_particle, standard_environment)
     assert reduced_friction_factor_1_2 == pytest.approx(3.18e-15)
     assert reduced_friction_factor_1_2.check("[mass]/[time]")
+
+
+def test_dimensionless_coagulation_kernel_parameterized():
+    """
+    Test that the paramaterized dimensionless coagulation kernel
+    is calculated correctly.
+    """
+
+    assert small_particle.dimensionless_coagulation_kernel_parameterized(
+        large_particle, standard_environment
+    ) == pytest.approx(0.808, rel=1e-3)
+    assert small_particle.dimensionless_coagulation_kernel_parameterized(
+        large_particle, standard_environment
+    ).check(["None"])
+
+def test_dimensioned_coagulation_kernel():
+    """
+    Test: dimensioned coagulation kernel is calculated correctly.
+    """
+
+    assert small_particle.dimensioned_coagulation_kernel(
+        large_particle, standard_environment
+    ) == pytest.approx(2.738e-10 * u.m**3 / u.s, rel=1e7)
+    assert small_particle.dimensioned_coagulation_kernel(
+        large_particle, standard_environment
+    ).check("[length]**3/[time]")
+
+    # FROM PHYSICS & FIRST PRINCIPLES:
+    # when
+    # negative ion with 1 charge and size 0.5e-9 m
+    # with
+    # positive particle with 1 charge and size 3e-9 m
+    # then:
+    # coagulation should be ~1e-12 m^3/s
+    # (within 2x, or at most an order of magnitude)
+    # (conditions assumed ~300 K, ~1 atm, but don't matter much)
+
+    assert negative_ion.dimensioned_coagulation_kernel(
+        positive_particle, standard_environment
+    ) == pytest.approx(1e-12 * u.m**3 / u.s)
+    assert negative_ion.dimensioned_coagulation_kernel(
+        positive_particle, standard_environment
+    ).check("[length]**3/[time]")
