@@ -6,14 +6,14 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: deploy to PyPI
+name: PyPI package
 
 on:
   release:
     types: [published]
 
 jobs:
-  deploy-package:
+  deployment:
 
     runs-on: ubuntu-latest
 
