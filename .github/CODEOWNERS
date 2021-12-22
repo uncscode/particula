@@ -1,0 +1,18 @@
+<!-- markdownlint-disable -->
+
+# For more info, see
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# This is to document who contributed to certain parts of the code and thus whose review is required/encouraged before merging.
+
+# all files in the repo unless contradicted after this line
+*       @aktwo @Gorkowski @ngam @wkchuang
+
+# assign parcel-related files to @Gorkowski
+parcel*.py @Gorkowski
+
+# assign particle-related files to @wkchuang
+particle*.py @wkchuang
+
+# assign .github files to @ngam
+/.github/ @ngam
