@@ -6,14 +6,14 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Upload Python Package
+name: PyPI package
 
 on:
   release:
     types: [published]
 
 jobs:
-  deploy:
+  deployment:
 
     runs-on: ubuntu-latest
 

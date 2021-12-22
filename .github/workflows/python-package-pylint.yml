@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python package test
+name: pylint 
 
 on:
   push:
@@ -10,28 +10,26 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  linting:
 
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
 
     steps:
     - uses: actions/checkout@v2
     
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.9
         
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest pylint
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-    - name: Test with pytest
+        
+    - name: Analysing the code with pylint
+        # https://stackoverflow.com/questions/68860511/github-actions-pylint-fails-with-f0001-no-module-named-init-py-fatal/68860512#68860512
       run: |
-        pytest
+        # pylint `ls -R|grep .py$|xargs`
+        pylint $(find particula/ -name "*.py" | xargs) 
