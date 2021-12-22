@@ -1,5 +1,5 @@
 # from: https://jupyterbook.org/publish/gh-pages.html
-name: jupyter-book
+name: jupyter-book deployment
 
 # Only run this when the master branch changes
 on:

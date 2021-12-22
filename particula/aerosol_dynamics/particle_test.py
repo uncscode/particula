@@ -167,6 +167,7 @@ def test_dimensionless_coagulation_kernel_parameterized():
         large_particle, standard_environment
     ).check(["None"])
 
+
 def test_dimensioned_coagulation_kernel():
     """
     Test: dimensioned coagulation kernel is calculated correctly.
