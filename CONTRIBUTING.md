@@ -24,15 +24,15 @@ where `000` is the number of the issue from step 1.
 3. Set up an appropriate environment:
     - an easy option is just to use the `.devcontainer` in root
     - another option is to either `pip install` or `conda install`
-    the required packages in `requirements.txt` in root.
+    the packages required for development in `requirements.txt` in root.
 
-4. Write your code in the branch. This includes:
+4. Write your code in the branch. This usually includes the following.
 
     a. Code to be implemented.
 
-    b. Documentation you want to add.
+    b. Documentation associated with added code in a.
 
-    c. Tests you want to add.
+    c. Tests associated with added code in a.
 
     d. Ideally, you'd also add a Jupyter notebook to
     showcase your work (if applicable).
@@ -40,9 +40,11 @@ where `000` is the number of the issue from step 1.
 5. _Optionally_, you can run standard linting and testing calls
 on your code _locally_ to make sure it works as expected.
 This can be done in several ways,
-for example the `pylint`, `flake8`, and `pytest` below.
+for example the `pylint`, `flake8`, and `pytest` calls below.
+These calls will be run once you submit your pull request.
 
 6. Submit a pull request to the `main` branch of this repository.
+Upon submission, standard automated tests will be run on your code.
 
 7. If you don't hear back from maintainers,
 feel free to mention one of us directly in the comments of the PR.
@@ -61,3 +63,6 @@ pytest particula/
 ```
 
 ---
+
+More information about contributing to this project can be found in docs/ and on our website [https://uncscode.github.io/particula](https://uncscode.github.io/particula).
+We are excited and looking forward to your contribution!
