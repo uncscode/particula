@@ -3,3 +3,4 @@ root: intro
 chapters:
 - file: 000_beginnings
 - file: 001_ParticleClass
+- file: contrib_doc.md
