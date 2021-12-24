@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>000 From zeros &#8212; Particula Book</title>
+    <title>Startup and Installation &#8212; Particula Book</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -42,6 +42,8 @@
     <script src="_static/copybutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script>
         const thebe_selector = ".thebe,.cell"
@@ -99,12 +101,17 @@
 <ul class="current nav bd-sidenav">
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   000 From zeros
+   Startup and Installation
   </a>
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="001_ParticleClass.html">
    Startup
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="contrib_docs.html">
+   Contributions appreciated
   </a>
  </li>
 </ul>
@@ -179,13 +186,13 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#particula-python">
+  <a class="reference internal nav-link" href="#python-particula">
+   Python &amp;
    <code class="docutils literal notranslate">
     <span class="pre">
      particula
     </span>
    </code>
-   &amp; Python
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -194,9 +201,26 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#get-started">
-   Get started
+  <a class="reference internal nav-link" href="#install-particula">
+   Install
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     particula
+    </span>
+   </code>
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#prepackaged">
+     Prepackaged
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#from-source">
+     From source
+    </a>
+   </li>
+  </ul>
  </li>
 </ul>
 
@@ -209,17 +233,29 @@
         
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="from-zeros">
-<h1>000 From zeros<a class="headerlink" href="#from-zeros" title="Permalink to this headline">¶</a></h1>
+  <div class="tex2jax_ignore mathjax_ignore section" id="startup-and-installation">
+<h1>Startup and Installation<a class="headerlink" href="#startup-and-installation" title="Permalink to this headline">¶</a></h1>
 <p>If you have no idea what Python is, or if you have no idea what a Jupyter notebook is, or if you have no clue what is going at all, then this is probably a good a place to start!</p>
-<div class="section" id="particula-python">
-<h2><code class="docutils literal notranslate"><span class="pre">particula</span></code> &amp; Python<a class="headerlink" href="#particula-python" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="python-particula">
+<h2>Python &amp; <code class="docutils literal notranslate"><span class="pre">particula</span></code><a class="headerlink" href="#python-particula" title="Permalink to this headline">¶</a></h2>
+<p>Python is a popular programming language that is remarkably easy to learn and use.
+It is also a very popular language for scientific computing with a lot of applications and libraries, comprising a large ecosystem of packages.
+We hope <code class="docutils literal notranslate"><span class="pre">particula</span></code> will be a useful tool in this large ecosystem for anyone who wants to learn more about or research the science of aerosol particles.</p>
 </div>
 <div class="section" id="jupyter-notebooks">
 <h2>Jupyter notebooks<a class="headerlink" href="#jupyter-notebooks" title="Permalink to this headline">¶</a></h2>
+<p>Jupyter notebooks are a popular way to organize and share Python code and output with others. To learn more about Jupyter notebooks, see <a class="reference external" href="https://jupyter.org/">here</a>.
+The idea is that you can write code in a a code cell, and then run said cell to execute the code through a kernel (a computer program that runs Python code).
+Besides code cells, you can also write markdown (text) cells that can be displayed like the text you are reading.
+You can add rendered mathematical symbols, <span class="math notranslate nohighlight">\(\sqrt{x} = y\)</span>, or even images.</p>
 </div>
-<div class="section" id="get-started">
-<h2>Get started<a class="headerlink" href="#get-started" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="install-particula">
+<h2>Install <code class="docutils literal notranslate"><span class="pre">particula</span></code><a class="headerlink" href="#install-particula" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="prepackaged">
+<h3>Prepackaged<a class="headerlink" href="#prepackaged" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">particula</span></code> package is as a Python package through the <a class="reference external" href="https://pypi.org/project/pip/">pip</a> package manager.
+Simply run the following command in a terminal to install the package: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-U</span> <span class="pre">particula</span></code>.
+In a notebook like this, one would run the following command: <code class="docutils literal notranslate"><span class="pre">%pip</span> <span class="pre">install</span> <span class="pre">-U</span> <span class="pre">particula</span></code>, where <code class="docutils literal notranslate"><span class="pre">%</span></code> is the Jupyter magic command to run a cell as if it were a command in terminal. The flag <code class="docutils literal notranslate"><span class="pre">-U</span></code> means “update the package if it is already installed”.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">pip</span> install -U particula
@@ -231,16 +267,18 @@
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Downloading particula-0.0.2-py3-none-any.whl (11 kB)
-Collecting python-version&gt;=&quot;3.7&quot;
+Requirement already satisfied: pint in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (0.18)
+Requirement already satisfied: numpy in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (1.21.5)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Downloading python_version-0.0.2-py2.py3-none-any.whl (3.4 kB)
-Requirement already satisfied: pint in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (0.18)
-Requirement already satisfied: numpy in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (1.21.4)
-Requirement already satisfied: packaging in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (21.3)
-Requirement already satisfied: importlib-metadata in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (4.9.0)
-Requirement already satisfied: zipp&gt;=0.5 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (3.6.0)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Collecting python-version&gt;=&quot;3.7&quot;
+  Downloading python_version-0.0.2-py2.py3-none-any.whl (3.4 kB)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: packaging in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (21.3)
+Requirement already satisfied: importlib-metadata in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (4.10.0)
 Requirement already satisfied: typing-extensions&gt;=3.6.4 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (4.0.1)
+Requirement already satisfied: zipp&gt;=0.5 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (3.6.0)
 Requirement already satisfied: pyparsing!=3.0.5,&gt;=2.0.2 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from packaging-&gt;pint-&gt;particula) (3.0.6)
 </pre></div>
 </div>
@@ -254,6 +292,18 @@ Requirement already satisfied: pyparsing!=3.0.5,&gt;=2.0.2 in /opt/hostedtoolcac
 </pre></div>
 </div>
 </div>
+</div>
+<p>We also have <code class="docutils literal notranslate"><span class="pre">particula</span></code> available as a <a class="reference external" href="https://conda.io/docs/user-guide/tasks/manage-packages/index.html">conda</a> package from the conda-forge channel.
+If you have a flavor of conda installed (e.g. anaconda, miniconda, miniforge, or mambaforge), you can install the package with the following command: <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">conda-forge</span> <span class="pre">particula</span></code>.
+If you do not have conda installed, please see the following to get started: <a class="reference external" href="https://conda.io/docs/user-guide/install/">https://conda.io/docs/user-guide/install/</a>. We recommend mambaforge from the miniforge repository, available <a class="reference external" href="https://github.com/conda-forge/miniforge">here</a>.</p>
+</div>
+<div class="section" id="from-source">
+<h3>From source<a class="headerlink" href="#from-source" title="Permalink to this headline">¶</a></h3>
+<p>You can obtain <code class="docutils literal notranslate"><span class="pre">particula</span></code> from the <a class="reference external" href="https://github.com/uncscode/particula">source</a> repository.
+To install the package, you will need to have a Python 3.7 or newer version installed.
+You then should install the basic dependency packages with the following commands: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code> or <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">--file</span> <span class="pre">requirements.txt</span></code> for development purposes.
+If you intend to only use the package, for now, you only need <code class="docutils literal notranslate"><span class="pre">numpy</span></code> and <code class="docutils literal notranslate"><span class="pre">pint</span></code>.
+We will be providing more information soon.</p>
 </div>
 </div>
 </div>
@@ -305,7 +355,7 @@ Requirement already satisfied: pyparsing!=3.0.5,&gt;=2.0.2 in /opt/hostedtoolcac
     <div class="container">
       <p>
         
-          By The Jupyter Book community<br/>
+          By Particula<br/>
         
             &copy; Copyright 2021.<br/>
       </p>
