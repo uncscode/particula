@@ -1,8 +1,7 @@
-"""
-Centralized location for physical parameters.
+"""centralized location for physical parameters.
 """
 
-from particula.aerosol_dynamics import u
+from particula import u
 
 # Boltzmann's constant in m^2 kg s^-2 K^-1
 BOLTZMANN_CONSTANT = 1.380649e-23 * u.m**2 * u.kg / u.s**2 / u.K

@@ -1,8 +1,9 @@
+"""class for creating a air parcel to put particles and gases in.
 """
-Class for creating a air parcel to put particles and gases in.
-"""
+
 import numpy as np
-from particula.aerosol_dynamics import particle, u
+from particula import u
+from particula.aerosol_dynamics import particle
 
 
 class Parcel:

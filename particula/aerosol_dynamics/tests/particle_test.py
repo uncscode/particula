@@ -1,26 +1,23 @@
-"""
-Test suites for particle class.
+"""Test suites for particle class.
 """
 
 import numpy as np
 import pint
 import pytest
-
+from particula import u
 from particula.aerosol_dynamics import environment, particle
-
-from particula.aerosol_dynamics import u
 
 small_particle = particle.Particle(
     name="small_particle",
     radius=1.0e-9 * u.m,
-    density=1.0 * u.kg / u.m**3,
+    density=1.0 * u.kg / u.m**3,  # need fixing, add e3
     charge=1,
 )
 
 large_particle = particle.Particle(
     name="large_particle",
     radius=1.0e-7 * u.m,
-    density=1.8 * u.kg / u.m**3,
+    density=1.8 * u.kg / u.m**3,  # need fixing, add e3
     charge=1,
 )
 
@@ -39,14 +36,14 @@ standard_environment = environment.Environment(
 negative_ion = particle.Particle(
     name="negative_ion",
     radius=0.5e-9 * u.m,
-    density=1.84 * u.kg / u.m**3,
+    density=1.84e3 * u.kg / u.m**3,
     charge=-1,
 )
 
 positive_particle = particle.Particle(
     name="positive_particle",
     radius=3e-9 * u.m,
-    density=1.7 * u.kg / u.m**3,
+    density=1.7e3 * u.kg / u.m**3,
     charge=1,
 )
 
@@ -57,8 +54,7 @@ standard_environment_ip = environment.Environment(
 
 
 def test_getters():
-    """
-    Test that the getters work.
+    """Test that the getters work.
     """
 
     assert small_particle.name() == "small_particle"
@@ -72,8 +68,7 @@ def test_getters():
 
 
 def test_knudsen_number():
-    """
-    Test that the knudsen number is calculated correctly.
+    """Test that the knudsen number is calculated correctly.
     """
 
     assert small_particle.knudsen_number(
@@ -98,8 +93,7 @@ def test_knudsen_number():
 
 
 def test_slip_correction_factor():
-    """"
-    Test that the slip correction factor is calculated correctly.
+    """"Test that the slip correction factor is calculated correctly.
     """
 
     assert small_particle.slip_correction_factor(
@@ -116,8 +110,7 @@ def test_slip_correction_factor():
 
 
 def test_friction_factor():
-    """
-    Test that the friction factor is calculated correctly.
+    """Test that the friction factor is calculated correctly.
     """
 
     assert small_particle.friction_factor(
@@ -134,8 +127,7 @@ def test_friction_factor():
 
 
 def test_reduced_mass():
-    """
-    Test that the reduced mass is calculated correctly.
+    """Test that the reduced mass is calculated correctly.
     """
 
     reduced_mass_1_2 = small_particle.reduced_mass(large_particle)
@@ -144,8 +136,7 @@ def test_reduced_mass():
 
 
 def test_reduced_friction_factor():
-    """
-    Test that the reduced friction factor is calculated correctly.
+    """Test that the reduced friction factor is calculated correctly.
     """
 
     reduced_friction_factor_1_2 = small_particle.reduced_friction_factor(
@@ -155,8 +146,7 @@ def test_reduced_friction_factor():
 
 
 def test_dimensionless_coagulation_kernel_parameterized():
-    """
-    Test that the paramaterized dimensionless coagulation kernel
+    """Test that the paramaterized dimensionless coagulation kernel
     is calculated correctly.
     """
 
@@ -169,8 +159,7 @@ def test_dimensionless_coagulation_kernel_parameterized():
 
 
 def test_dimensioned_coagulation_kernel():
-    """
-    Test: dimensioned coagulation kernel is calculated correctly.
+    """Tests dimensioned coagulation kernel is calculated correctly.
     """
 
     assert small_particle.dimensioned_coagulation_kernel(

@@ -1,14 +1,13 @@
+""" module to perform calculations related to aerosol dynamics.
+
+    This module contains functions to perform calculations related
+    to aerosol dynamics. It inherits the unit registry, u, from
+    particula. The pacakge contents below are callablle. For example,
+    the particle module is callable as:
+
+    >>> from particula.aerosol_dynamics import particle
+
+    ...
+
+    More details to follow.
 """
-This is the aerosol_dynamics module.
-
-It can do the following:
-
-"""
-
-# Import pint here
-# to avoid creating a different registry
-# in each module.
-
-from pint import UnitRegistry
-
-u = UnitRegistry()

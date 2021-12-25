@@ -1,12 +1,9 @@
-"""
-Tests for the Environment class.
+"""tests for the environment module.
 """
 
 import pytest
-
+from particula import u
 from particula.aerosol_dynamics import environment
-
-from particula.aerosol_dynamics import u
 
 standard_environment = environment.Environment(
     temperature=298,  # * u.K,

@@ -1,21 +1,45 @@
-"""
-Class for creating particles.
+""" to instantiate particles and calculate their properties.
+
+    This module contains the Particle class, which is used to
+    instantiate the particles and calculate their properties.
+    Particles are introduced and defined by calling Particle
+    class, for example:
+
+    >>> from particula import Particle
+    >>> p1 = Particle(name='my_particle', radius=1e-9, density=1e3, charge=1)
+
+    Then, it is possible to return the properties of the particle p1:
+
+    >>> p1.mass()
+
+    The environment is defined by the following parameters:
+    >>> from particula.aerosol_dynamics import environment
+    >>> env = environment.Environment(temperature=300, pressure=1e5)
+
+    If another particle is introduced, it is possible to calculate
+    the binary coagulation coefficient:
+
+    >>> p2 = Particle(name='my_particle2', radius=1e-9, density=1e3, charge=1)
+    >>> p1.dimensioned_coagulation_kernel(p2, env)
+
+    For more details, see below. More information to follow.
 """
 
 import numpy as np
-
+from particula import u
 from particula.aerosol_dynamics import physical_parameters as pp
 from particula.aerosol_dynamics.environment import Environment
 
-from particula.aerosol_dynamics import u
-
 
 class Particle:
-    """
-    Class for creating particles:
-    Framework for particle--particle and gas--particle interactions.
+    """Class to instantiate particles and calculate their properties.
+
+    This class represents the underlying framework for both
+    particle--particle and gas--particle interactions. See detailed
+    methods and functions below.
 
     Attributes:
+
         name    (str)   [no units]
         radius  (float) [m]
         density (float) [kg/m**3]
@@ -24,15 +48,16 @@ class Particle:
     """
 
     def __init__(self, name: str, radius, density, charge):
-        """
-        Constructs the particle object.
+        """Constructs particle objects.
 
         Parameters:
+
             name    (str)   [no units]
             radius  (float) [m]
             density (float) [kg/m**3]
             charge  (int)   [dimensionless]
         """
+
         self._name = name
         self._radius = radius
         self._density = density
@@ -40,47 +65,65 @@ class Particle:
         self._mass = density * (4*np.pi/3) * (radius**3)
 
     def name(self) -> str:
-        """Returns the name of particle."""
+        """Returns the name of particle.
+        """
+
         return self._name
 
     @u.wraps(u.kg, [None])
     def mass(self) -> float:
         """Returns mass of particle.
-        Checks units: [kg]"""
+
+        Checks units: [kg]
+        """
+
         return self._mass
 
     @u.wraps(u.m, [None])
     def radius(self) -> float:
         """Returns radius of particle.
-        Checks units: [m]"""
+
+        Checks units: [m]
+        """
+
         return self._radius
 
     @u.wraps(u.kg / u.m**3, [None])
     def density(self) -> int:
         """Returns density of particle.
-        Checks units: [kg/m**3]"""
+
+        Checks units: [kg/m**3]
+        """
+
         return self._density
 
     @u.wraps(u.dimensionless, [None])
     def charge(self) -> int:
-        """Returns charge of particle.
-        Checks units: [dimensionless]"""
+        """Returns number of charges on particle.
+
+        Checks units: [dimensionless]
+        """
+
         return self._charge
 
     @u.wraps(u.dimensionless, [None, None])
     def knudsen_number(self, environment: Environment) -> float:
         """Returns particle's Knudsen number.
+
         Checks units: [dimensionless]
 
         The Knudsen number reflects the relative length scales of
         the particle and the suspending fluid (air, water, etc.).
         This is calculated by the mean free path of the medium
-        divided by the particle radius."""
+        divided by the particle radius.
+        """
+
         return environment.mean_free_path_air() / self.radius()
 
     @u.wraps(u.dimensionless, [None, None])
     def slip_correction_factor(self, environment: Environment) -> float:
         """Returns particle's Cunningham slip correction factor.
+
         Checks units: [dimensionless]
 
         Dimensionless quantity accounting for non-continuum effects
@@ -90,6 +133,7 @@ class Particle:
         calculate the friction factor.
 
         See Eq 9.34 in Atmos. Chem. & Phys. (2016) for more informatiom."""
+
         knudsen_number: float = self.knudsen_number(environment)
         return 1 + knudsen_number * (
             1.257 + 0.4*np.exp(-1.1/knudsen_number)
@@ -98,11 +142,14 @@ class Particle:
     @u.wraps(u.kg / u.s, [None, None])
     def friction_factor(self, environment: Environment) -> float:
         """Returns a particle's friction factor.
+
         Checks units: [N*s/m]
 
         Property of the particle's size and surrounding medium.
         Multiplying the friction factor by the fluid velocity
-        yields the drag force on the particle."""
+        yields the drag force on the particle.
+        """
+
         slip_correction_factor: float = self.slip_correction_factor(
             environment
         )
@@ -114,10 +161,13 @@ class Particle:
     @u.wraps(u.kg, [None, None])
     def reduced_mass(self, other) -> float:
         """Returns the reduced mass of two particles.
+
         Checks units: [kg]
 
         The reduced mass is an "effective inertial" mass.
-        Allows a two-body problem to be solved as a one-body problem."""
+        Allows a two-body problem to be solved as a one-body problem.
+        """
+
         return self.mass() * other.mass() / (self.mass() + other.mass())
 
     @u.wraps(u.kg / u.s, [None, None, None])
@@ -125,11 +175,14 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Returns the reduced friction factor between two particles.
+
         Checks units: [N*s/m]
 
         Similar to the reduced mass.
         The reduced friction factor allows a two-body problem
-        to be solved as a one-body problem."""
+        to be solved as a one-body problem.
+        """
+
         return (
             self.friction_factor(environment)
             * other.friction_factor(environment)
@@ -144,7 +197,10 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Calculates the Coulomb potential ratio.
-        Checks units: [dimensionless]"""
+
+        Checks units: [dimensionless]
+        """
+
         numerator = -1 * self.charge() * other.charge() * (
             pp.ELEMENTARY_CHARGE_VALUE ** 2
         )
@@ -161,7 +217,10 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
-        Checks units: [dimensionless]"""
+
+        Checks units: [dimensionless]
+        """
+
         coulomb_potential_ratio = self.coulomb_potential_ratio(
             other, environment
         )
@@ -176,7 +235,9 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Continuum limit of Coulomb enhancement for particle--particle coagulation.
-        Checks units: [dimensionless]"""
+
+        Checks units: [dimensionless]
+        """
 
         coulomb_potential_ratio = self.coulomb_potential_ratio(
             other, environment
@@ -190,13 +251,16 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Diffusive Knudsen number.
+
         Checks units: [dimensionless]
 
         The *diffusive* Knudsen number is different from Knudsen number.
         Ratio of:
+
             - numerator: mean persistence of one particle
             - denominator: effective length scale of
-                particle--particle Coulombic interaction"""
+                particle--particle Coulombic interaction
+        """
 
         numerator = (
             (
@@ -217,7 +281,9 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Dimensionless particle--particle coagulation kernel.
-        Checks units: [dimensionless]"""
+
+        Checks units: [dimensionless]
+        """
 
         # Constants for the chargeless hard-sphere limit
         # see doi:
@@ -247,7 +313,10 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Continuum limit of collision kernel.
-        Checks units: [dimensionless]"""
+
+        Checks units: [dimensionless]
+        """
+
         diffusive_knudsen_number = self.diffusive_knudsen_number(
             other, environment
         )
@@ -258,7 +327,10 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Kinetic limit of collision kernel.
-        Checks units: [dimensionless]"""
+
+        Checks units: [dimensionless]
+        """
+
         diffusive_knudsen_number = self.diffusive_knudsen_number(
             other, environment
         )
@@ -272,9 +344,11 @@ class Particle:
         authors: str = "cg2019",
     ) -> float:
         """Dimensionless particle--particle coagulation kernel.
+
         Checks units: [dimensionless]
 
         Paramaters:
+
             self:           particle 1
             other:          particle 2
             environment:    environment conditions
@@ -353,7 +427,7 @@ class Particle:
             )
 
         if authors not in ["gh2012", "hard_sphere", "cg2019"]:
-            raise ValueError("We don't have this parameterization")
+            raise ValueError("We don't have this parameterization.")
 
         return answer
 
@@ -365,9 +439,11 @@ class Particle:
         authors: str = "cg2019",
     ) -> float:
         """Dimensioned particle--particle coagulation kernel.
+
         Checks units: [m**3/s]
 
         Paramaters:
+
             self:           particle 1
             other:          particle 2
             environment:    environment conditions
@@ -377,6 +453,7 @@ class Particle:
                 - hard_sphere (from above)
                 (default: cg2019)
         """
+
         return (
             self.dimensionless_coagulation_kernel_parameterized(
                 other, environment, authors
