@@ -8,4 +8,10 @@ can be used to answer scientific questions that arise for experiments
 and research discussions.
 """
 
+# Import pint here to avoid using a different registry in each module.
+from pint import UnitRegistry
+
+# u is the unit registry name.
+u = UnitRegistry()
+
 __version__ = '0.0.2'
