@@ -5,7 +5,7 @@
     particula. The pacakge contents below are callablle. For example,
     the particle module is callable as:
 
-        from particula.aerosol_dynamics import particle
+    >>> from particula.aerosol_dynamics import particle
 
     ...
 
