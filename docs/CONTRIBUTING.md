@@ -1,4 +1,4 @@
-# Contributing guidelines
+# Contribution Guidelines
 
 First of all, thank you for considering contributing to this project!
 While we have specific guidelines below, _we also encourage you to
@@ -66,3 +66,87 @@ pytest particula/
 
 More information about contributing to this project can be found in docs/ and on our website [https://uncscode.github.io/particula](https://uncscode.github.io/particula).
 We are excited and looking forward to your contribution!
+
+---
+
+## GitHub
+
+We use GitHub to develop `particula` completely in the open. Our repository is available here: [https://uncscode.github.io/particula/](https://uncscode.github.io/particula/).
+There are several ways to use GitHub: through the command line via `git` and/or `gh`, through the web interface and/or the GitHub web editor, or through an IDE like PyCharm or a code editor like Visual Studio Code.
+In general, we recommend that you fork our repository, that you work with VS Code, and that submit a pull request based on an issue.
+If any of these sound unfamiliar or if you need help, please see more information below and feel free to contact us directly to discuss options.
+We look forward to getting you started and up to speed on this project with us!
+
+Links: [https://docs.github.com/en/get-started](https://docs.github.com/en/get-started)
+
+## VS Code
+
+Visual Studio Code is a free and open-source code editor for writing code and it has a rich ecosystem of extensions that allow you to write code in a variety of languages with a lot of helpful features and tools.
+
+Links: [https://code.visualstudio.com/](https://code.visualstudio.com/)
+
+## `.devcontainer`
+
+In the root of our repository, we have a `.devcontainer` folder that contains the environment variables required for development.
+This is a convenient way to set up the environment for development.
+It requires Docker to be installed and running.
+And the first time it runs it may take a few minutes to install the Docker image (a minimal operating system with Python 3.9).
+
+Links: [https://code.visualstudio.com/docs/remote/containers](https://code.visualstudio.com/docs/remote/containers)
+
+## Python code style
+
+We follow the Google's Python style guide.
+We encourage you to follow it too, but we also encourage you to contribute to the best of your ability and not let these guidelines hinder your productivity and creativity.
+
+Links: [https://google.github.io/styleguide/pyguide.html](https://google.github.io/styleguide/pyguide.html)
+
+## Running `particula` locally
+
+Once you are in the root directory, you will be able to import `particula` as a package/model and thus all documentation on website applies.
+You must be in the root directory.
+
+## Writing tests
+
+It is essential that every piece of code has an associated test.
+This is a good way to ensure that the code is working as intended.
+It also ensures that the code is not broken and that the code is not too complex.
+However small or big, a test is always required.
+
+## Running testing/linting locally
+
+We use `pytest`, `pylint`, and `flake8` to run tests and linting.
+The command below can be run in the root directory like you'd run the package above.
+
+```bash
+pylint $(find particula/ -name "*.py" | xargs)
+```
+
+```bash
+flake8 particula/ --count
+```
+
+```bash
+pytest particula/
+```
+
+## Building `particula` locally
+
+To build `particula` locally, you must be in the root directory.
+You have two options, depending on your usage case.
+
+1. You can use `python -m build` to build the package wheels locally (note: you will need to install `build` too, via `pip install build`).
+2. You can build the conda recipe available at [https://github.com/conda-forge/particula-feedstock](https://github.com/conda-forge/particula-feedstock) either via `python build-locally.py` in the root of `particula-feedstock` or via `conda build recipe` (equivalently, but faster, `mamba build recipe`). For the latter, you will need to have `conda-build` installed (for `conda build` to work) or `boa` (for `mamba build` to work). In either case, you can install package with conda via, `conda install conda-build` or `mamba install boa`.
+
+Links: [https://packaging.python.org/en/latest/tutorials/packaging-projects/](https://packaging.python.org/en/latest/tutorials/packaging-projects/) and [https://docs.conda.io/projects/conda-build/en/latest/user-guide/index.html](https://docs.conda.io/projects/conda-build/en/latest/user-guide/index.html)
+
+## Documentation writing
+
+We prefer that the tutorials are written in the form of Jupyter notebooks after the package is released and published.
+A convenient option is using Google's Colaboratory to write the notebooks.
+
+Links: [https://colab.research.google.com/](https://colab.research.google.com/)
+
+## More information
+
+We will update this regularly with more information, but in the meanwhile, please feel free to contact us directly on GitHub.

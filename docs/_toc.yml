@@ -4,15 +4,15 @@ parts:
 - caption: Installation
   numbered: true
   chapters:
-  - file: 000_beginnings.ipynb
+  - file: getting_started.ipynb
 - caption: Tutorials
   numbered: true
   chapters:
-  - file: 001_ParticleClass.md
+  - file: tutorials/001_ParticleClass.md
 - caption: Documentation
   numbered: true
   chapters:
-  - file: d000_detailed_documentation.md
+  - file: documentation/d000_detailed_documentation.md
 - caption: Community
   numbered: true
   chapters:
