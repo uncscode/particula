@@ -10,14 +10,14 @@ from particula.aerosol_dynamics import environment, particle
 small_particle = particle.Particle(
     name="small_particle",
     radius=1.0e-9 * u.m,
-    density=1.0 * u.kg / u.m**3,
+    density=1.0 * u.kg / u.m**3,  # need fixing, add e3
     charge=1,
 )
 
 large_particle = particle.Particle(
     name="large_particle",
     radius=1.0e-7 * u.m,
-    density=1.8 * u.kg / u.m**3,
+    density=1.8 * u.kg / u.m**3,  # need fixing, add e3
     charge=1,
 )
 
@@ -36,14 +36,14 @@ standard_environment = environment.Environment(
 negative_ion = particle.Particle(
     name="negative_ion",
     radius=0.5e-9 * u.m,
-    density=1.84 * u.kg / u.m**3,
+    density=1.84e3 * u.kg / u.m**3,
     charge=-1,
 )
 
 positive_particle = particle.Particle(
     name="positive_particle",
     radius=3e-9 * u.m,
-    density=1.7 * u.kg / u.m**3,
+    density=1.7e3 * u.kg / u.m**3,
     charge=1,
 )
 
