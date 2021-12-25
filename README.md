@@ -10,7 +10,7 @@ Particula is a simple, fast, and powerful particle simulator, or at least two of
 
 The main goal is to develop an aerosol particle model that is usable, efficient, and productive. In this process, we all will learn developing models in Python and associated packages. Let us all be friendly, respectful, and nice to each other. Any code added to this repository is automatically owned by all. Please speak up if something (even if trivial) bothers you. Talking through things always helps. This is an open-source project, so feel free to contribute, however small or big your contribution may be.
 
-We follow the Google Python style guide [here](https://google.github.io/styleguide/pyguide.html). We have contribution guidelines [here](https://github.com/uncscode/particula/blob/main/CONTRIBUTING.md) and a code of conduct [here](https://github.com/uncscode/particula/blob/main/CODE_OF_CONDUCT.md) as well.
+We follow the Google Python style guide [here](https://google.github.io/styleguide/pyguide.html). We have contribution guidelines [here](https://github.com/uncscode/particula/blob/main/docs/CONTRIBUTING.md) and a code of conduct [here](https://github.com/uncscode/particula/blob/main/docs/CODE_OF_CONDUCT.md) as well.
 
 ## Usage & development
 

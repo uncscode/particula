@@ -1,6 +1,28 @@
 format: jb-book
 root: intro
-chapters:
-- file: 000_beginnings
-- file: 001_ParticleClass
-- file: contrib_docs.md
+parts:
+- caption: Installation
+  numbered: true
+  chapters:
+  - file: 000_beginnings
+- caption: Tutorials
+  numbered: true
+  chapters:
+  - file: 002_Tutorials
+  - file: 003_Examples
+  - file: contrib_docs.md
+- caption: Documentation
+  numbered: true
+  chapters:
+  - file: 004_ParticleDocs
+  - file: 005_ParticleDocs
+  - file: contrib_docs.md
+- caption: FAQ
+  numbered: true
+  chapters:
+  - file: FAQ.md
+- caption: Community
+  numbered: true
+  chapters:
+  - file: CONTRIBUTING.md
+  - file: CODE_OF_CONDUCT.md
