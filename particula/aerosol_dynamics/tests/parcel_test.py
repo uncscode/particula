@@ -1,5 +1,4 @@
-"""
-Test suites for parcel class.
+"""tests for the parcel module.
 """
 
 from particula import u

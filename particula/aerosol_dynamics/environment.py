@@ -1,5 +1,4 @@
-"""
-Environment Class
+"""environment class
 """
 
 import numpy as np

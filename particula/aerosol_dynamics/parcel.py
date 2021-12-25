@@ -1,5 +1,4 @@
-"""
-Class for creating a air parcel to put particles and gases in.
+"""class for creating a air parcel to put particles and gases in.
 """
 
 import numpy as np

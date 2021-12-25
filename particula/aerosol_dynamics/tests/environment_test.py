@@ -1,11 +1,8 @@
-"""
-Tests for the Environment class.
+"""tests for the environment module.
 """
 
 import pytest
-
 from particula import u
-
 from particula.aerosol_dynamics import environment
 
 standard_environment = environment.Environment(

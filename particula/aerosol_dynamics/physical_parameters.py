@@ -1,5 +1,4 @@
-"""
-Centralized location for physical parameters.
+"""centralized location for physical parameters.
 """
 
 from particula import u
