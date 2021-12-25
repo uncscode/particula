@@ -1,5 +1,5 @@
 title: "Particula Book"
-author: "Particula"
+author: "`particula` contributors: https://github.com/particula/particula/graphs/contributors"
 logo: images/placeholder.png
 execute:
   execute_notebooks: "auto"
@@ -12,5 +12,9 @@ launch_buttons:
 
 repository:
   url: https://github.com/uncscode/particula
-  path_to_book: docs/
-  branch: main
+  path_to_book: docs
+
+html:
+  use_repository_button: true
+  use_issues_button: true
+  use_edit_page_button: true
