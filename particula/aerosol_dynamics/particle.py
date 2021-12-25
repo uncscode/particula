@@ -32,13 +32,14 @@ from particula.aerosol_dynamics.environment import Environment
 
 
 class Particle:
-    """ class to instantiate particles and calculate their properties.
+    """Class to instantiate particles and calculate their properties.
 
     This class represents the underlying framework for both
     particle--particle and gas--particle interactions. See detailed
     methods and functions below.
 
     Attributes:
+
         name    (str)   [no units]
         radius  (float) [m]
         density (float) [kg/m**3]
@@ -50,6 +51,7 @@ class Particle:
         """Constructs particle objects.
 
         Parameters:
+
             name    (str)   [no units]
             radius  (float) [m]
             density (float) [kg/m**3]
@@ -71,6 +73,7 @@ class Particle:
     @u.wraps(u.kg, [None])
     def mass(self) -> float:
         """Returns mass of particle.
+
         Checks units: [kg]
         """
 
@@ -79,6 +82,7 @@ class Particle:
     @u.wraps(u.m, [None])
     def radius(self) -> float:
         """Returns radius of particle.
+
         Checks units: [m]
         """
 
@@ -87,6 +91,7 @@ class Particle:
     @u.wraps(u.kg / u.m**3, [None])
     def density(self) -> int:
         """Returns density of particle.
+
         Checks units: [kg/m**3]
         """
 
@@ -95,6 +100,7 @@ class Particle:
     @u.wraps(u.dimensionless, [None])
     def charge(self) -> int:
         """Returns number of charges on particle.
+
         Checks units: [dimensionless]
         """
 
@@ -103,6 +109,7 @@ class Particle:
     @u.wraps(u.dimensionless, [None, None])
     def knudsen_number(self, environment: Environment) -> float:
         """Returns particle's Knudsen number.
+
         Checks units: [dimensionless]
 
         The Knudsen number reflects the relative length scales of
@@ -116,6 +123,7 @@ class Particle:
     @u.wraps(u.dimensionless, [None, None])
     def slip_correction_factor(self, environment: Environment) -> float:
         """Returns particle's Cunningham slip correction factor.
+
         Checks units: [dimensionless]
 
         Dimensionless quantity accounting for non-continuum effects
@@ -134,6 +142,7 @@ class Particle:
     @u.wraps(u.kg / u.s, [None, None])
     def friction_factor(self, environment: Environment) -> float:
         """Returns a particle's friction factor.
+
         Checks units: [N*s/m]
 
         Property of the particle's size and surrounding medium.
@@ -152,6 +161,7 @@ class Particle:
     @u.wraps(u.kg, [None, None])
     def reduced_mass(self, other) -> float:
         """Returns the reduced mass of two particles.
+
         Checks units: [kg]
 
         The reduced mass is an "effective inertial" mass.
@@ -165,6 +175,7 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Returns the reduced friction factor between two particles.
+
         Checks units: [N*s/m]
 
         Similar to the reduced mass.
@@ -186,6 +197,7 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Calculates the Coulomb potential ratio.
+
         Checks units: [dimensionless]
         """
 
@@ -205,6 +217,7 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
+
         Checks units: [dimensionless]
         """
 
@@ -222,6 +235,7 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Continuum limit of Coulomb enhancement for particle--particle coagulation.
+
         Checks units: [dimensionless]
         """
 
@@ -237,10 +251,12 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Diffusive Knudsen number.
+
         Checks units: [dimensionless]
 
         The *diffusive* Knudsen number is different from Knudsen number.
         Ratio of:
+
             - numerator: mean persistence of one particle
             - denominator: effective length scale of
                 particle--particle Coulombic interaction
@@ -265,6 +281,7 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Dimensionless particle--particle coagulation kernel.
+
         Checks units: [dimensionless]
         """
 
@@ -296,6 +313,7 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Continuum limit of collision kernel.
+
         Checks units: [dimensionless]
         """
 
@@ -309,6 +327,7 @@ class Particle:
         self, other, environment: Environment
     ) -> float:
         """Kinetic limit of collision kernel.
+
         Checks units: [dimensionless]
         """
 
@@ -325,9 +344,11 @@ class Particle:
         authors: str = "cg2019",
     ) -> float:
         """Dimensionless particle--particle coagulation kernel.
+
         Checks units: [dimensionless]
 
         Paramaters:
+
             self:           particle 1
             other:          particle 2
             environment:    environment conditions
@@ -418,9 +439,11 @@ class Particle:
         authors: str = "cg2019",
     ) -> float:
         """Dimensioned particle--particle coagulation kernel.
+
         Checks units: [m**3/s]
 
         Paramaters:
+
             self:           particle 1
             other:          particle 2
             environment:    environment conditions
