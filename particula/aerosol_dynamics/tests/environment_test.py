@@ -4,9 +4,9 @@ Tests for the Environment class.
 
 import pytest
 
-from particula.aerosol_dynamics import environment
+from particula import u
 
-from particula.aerosol_dynamics import u
+from particula.aerosol_dynamics import environment
 
 standard_environment = environment.Environment(
     temperature=298,  # * u.K,

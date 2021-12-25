@@ -2,7 +2,8 @@
 Test suites for parcel class.
 """
 
-from particula.aerosol_dynamics import parcel, particle, environment, u
+from particula import u
+from particula.aerosol_dynamics import environment, parcel, particle
 
 small_particle = particle.Particle(
     name="small_particle",

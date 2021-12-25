@@ -1,13 +1,12 @@
-"""
-Class for creating particles.
+"""to instantiate particles and calculate their properties.
+
+    This module contains the class Particle, which is used to instantiate
 """
 
 import numpy as np
-
+from particula import u
 from particula.aerosol_dynamics import physical_parameters as pp
 from particula.aerosol_dynamics.environment import Environment
-
-from particula.aerosol_dynamics import u
 
 
 class Particle:
