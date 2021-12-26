@@ -1,8 +1,12 @@
+# runtime requirements:
+pint
+numpy
+
+# development requirements: 
 pylint
 pytest
 autopep8
 jupyterlab
-numpy
 pytype
 typing
-pint
+build
