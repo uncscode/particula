@@ -1,4 +1,4 @@
-# Contribution Guidelines
+# Contributor Guidelines
 
 First of all, thank you for considering contributing to this project!
 While we have specific guidelines below, _we also encourage you to
@@ -64,7 +64,7 @@ pytest particula/
 
 ---
 
-More information about contributing to this project can be found in docs/ and on our website [https://uncscode.github.io/particula](https://uncscode.github.io/particula).
+More information about contributing to this project can be found below.
 We are excited and looking forward to your contribution!
 
 ---
