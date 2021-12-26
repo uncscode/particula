@@ -1,5 +1,5 @@
 title: "Particula Book"
-author: "`particula` contributors: https://github.com/particula/particula/graphs/contributors"
+author: "particula contributors"
 logo: images/placeholder.png
 execute:
   execute_notebooks: "auto"
