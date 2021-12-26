@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>1. Startup and Installation &#8212; Particula Book</title>
+    <title>1. Installing particula &#8212; Particula Book</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -53,7 +53,7 @@
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="2. Startup" href="tutorials/001_ParticleClass.html" />
+    <link rel="next" title="2. Particle Class" href="tutorials/001_ParticleClass.html" />
     <link rel="prev" title="The particula JupyterBook" href="intro.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -106,7 +106,12 @@
 <ul class="current nav bd-sidenav">
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   1. Startup and Installation
+   1. Installing
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     particula
+    </span>
+   </code>
   </a>
  </li>
 </ul>
@@ -118,7 +123,7 @@
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="tutorials/001_ParticleClass.html">
-   2. Startup
+   2. Particle Class
   </a>
  </li>
 </ul>
@@ -130,7 +135,7 @@
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="documentation/d000_detailed_documentation.html">
-   5. Documentation and Reference
+   3. Documentation and Reference
   </a>
  </li>
 </ul>
@@ -142,12 +147,12 @@
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="CONTRIBUTING.html">
-   6. Contribution Guidelines
+   4. Contributor Guidelines
   </a>
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="CODE_OF_CONDUCT.html">
-   7. Contributor Covenant Code of Conduct
+   5. Contributor Covenant Code of Conduct
   </a>
  </li>
 </ul>
@@ -159,7 +164,7 @@
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="FAQ.html">
-   8. FAQ
+   6. FAQ
   </a>
  </li>
 </ul>
@@ -299,8 +304,8 @@
         
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="startup-and-installation">
-<h1><span class="section-number">1. </span>Startup and Installation<a class="headerlink" href="#startup-and-installation" title="Permalink to this headline">¶</a></h1>
+  <div class="tex2jax_ignore mathjax_ignore section" id="installing-particula">
+<h1><span class="section-number">1. </span>Installing <code class="docutils literal notranslate"><span class="pre">particula</span></code><a class="headerlink" href="#installing-particula" title="Permalink to this headline">¶</a></h1>
 <p>If you have no idea what Python is, or if you have no idea what a Jupyter notebook is, or if you have no clue what is going at all, then this is probably a good a place to start!</p>
 <div class="section" id="python-particula">
 <h2><span class="section-number">1.1. </span>Python &amp; <code class="docutils literal notranslate"><span class="pre">particula</span></code><a class="headerlink" href="#python-particula" title="Permalink to this headline">¶</a></h2>
@@ -332,26 +337,22 @@ In a notebook like this, one would run the following command: <code class="docut
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Collecting particula
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Downloading particula-0.0.2-py3-none-any.whl (11 kB)
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Collecting python-version&gt;=&quot;3.7&quot;
-  Downloading python_version-0.0.2-py2.py3-none-any.whl (3.4 kB)
-Requirement already satisfied: numpy in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (1.21.5)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Downloading particula-0.0.3-py3-none-any.whl (13 kB)
 Requirement already satisfied: pint in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (0.18)
-Requirement already satisfied: packaging in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (21.3)
-Requirement already satisfied: importlib-metadata in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (4.10.0)
+Requirement already satisfied: numpy in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (1.21.5)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: zipp&gt;=0.5 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (3.6.0)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: importlib-metadata in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (4.10.0)
+Requirement already satisfied: packaging in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (21.3)
 Requirement already satisfied: typing-extensions&gt;=3.6.4 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (4.0.1)
+Requirement already satisfied: zipp&gt;=0.5 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (3.6.0)
 Requirement already satisfied: pyparsing!=3.0.5,&gt;=2.0.2 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from packaging-&gt;pint-&gt;particula) (3.0.6)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Installing collected packages: python-version, particula
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Installing collected packages: particula
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Successfully installed particula-0.0.2 python-version-0.0.2
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Successfully installed particula-0.0.3
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Note: you may need to restart the kernel to use updated packages.
@@ -409,7 +410,7 @@ We will be providing more information soon.</p>
     <a class='right-next' id="next-link" href="tutorials/001_ParticleClass.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">2. </span>Startup</p>
+        <p class="prev-next-title"><span class="section-number">2. </span>Particle Class</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
