@@ -1,4 +1,4 @@
-""" a simple, fast, and powerful particle simulator.
+""" A simple, fast, and powerful particle simulator.
 
     particula is a simple, fast, and powerful particle simulator,
     or at least two of the three, we hope. It is a simple particle
@@ -18,5 +18,12 @@ from pint import UnitRegistry
 
 # u is the unit registry name.
 u = UnitRegistry()
+
+# Temperature has the quirky issue that mathematical operations on temperature
+# are problematic. e.g. 298.15K + 273.15K != 25C + 0C.
+# The following setting converts all offset units to base units prior to
+# any operations.
+# https://pint.readthedocs.io/en/latest/nonmult.html
+u.autoconvert_offset_to_baseunit = True
 
 __version__ = '0.0.4'

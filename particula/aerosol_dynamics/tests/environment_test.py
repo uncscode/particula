@@ -1,4 +1,4 @@
-"""tests for the environment module.
+"""Tests for the environment module.
 """
 
 import pytest
@@ -6,8 +6,8 @@ from particula import u
 from particula.aerosol_dynamics import environment
 
 standard_environment = environment.Environment(
-    temperature=298,  # * u.K,
-    pressure=101325,  # * u.Pa,
+    temperature=298 * u.degK,
+    pressure=101325 * u.Pa,
 )
 
 
@@ -15,7 +15,7 @@ def test_getters():
     """
     Tests the getters for the Environment class.
     """
-    assert standard_environment.temperature() == 298 * u.K
+    assert standard_environment.temperature() == 298 * u.degK
     assert standard_environment.pressure() == 101325 * u.Pa
 
 

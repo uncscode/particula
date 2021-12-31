@@ -1,4 +1,4 @@
-"""environment class
+"""Environment class
 """
 
 import numpy as np
@@ -12,12 +12,13 @@ class Environment:
     with properties such as temperature and pressure
     and derived properties such as air viscosity.
     """
+    @u.wraps(None, [None, u.degK, u.Pa])
     def __init__(self, temperature, pressure):
         """Function calls for enviornment class."""
         self._temperature = temperature
         self._pressure = pressure
 
-    @u.wraps(u.K, [None])
+    @u.wraps(u.degK, [None])
     def temperature(self) -> float:
         """Returns the temperature of the environment."""
         return self._temperature
@@ -35,8 +36,8 @@ class Environment:
         Sutherland Viscosity Law.
         """
         mu_ref = 1.716e-5 * u.Pa * u.s  # Viscosity at T_REF
-        t_ref = 273.15 * u.K
-        suth_const = 110.4 * u.K  # Sutherland constant
+        t_ref = 273.15 * u.degK
+        suth_const = 110.4 * u.degK  # Sutherland constant
 
         return (
             mu_ref *

@@ -1,4 +1,4 @@
-""" to instantiate particles and calculate their properties.
+""" To instantiate particles and calculate their properties.
 
     This module contains the Particle class, which is used to
     instantiate the particles and calculate their properties.
@@ -47,6 +47,7 @@ class Particle:
         mass    (float) [kg]
     """
 
+    @u.wraps(None, [None, None, u.m, u.kg / u.m**3, None])
     def __init__(self, name: str, radius, density, charge):
         """Constructs particle objects.
 

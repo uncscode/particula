@@ -1,4 +1,4 @@
-"""tests for the parcel module.
+"""Tests for the parcel module.
 """
 
 from particula import u
@@ -6,15 +6,15 @@ from particula.aerosol_dynamics import environment, parcel, particle
 
 small_particle = particle.Particle(
     name="small_particle",
-    radius=1.0e-9,
-    density=1.0,
+    radius=1.0e-9 * u.m,
+    density=1.0 * u.kg / u.m**3,
     charge=1,
 )
 
 large_particle = particle.Particle(
     name="large_particle",
-    radius=1.0e-7,
-    density=1.8,
+    radius=1.0e-7 * u.m,
+    density=1.8 * u.kg / u.m**3,
     charge=1,
 )
 

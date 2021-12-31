@@ -2,7 +2,6 @@
 """
 
 import numpy as np
-import pint
 import pytest
 from particula import u
 from particula.aerosol_dynamics import environment, particle
@@ -19,13 +18,6 @@ large_particle = particle.Particle(
     radius=1.0e-7 * u.m,
     density=1.8 * u.kg / u.m**3,  # need fixing, add e3
     charge=1,
-)
-
-invalid_particle = particle.Particle(
-    name="invalid_particle",
-    radius=1.0e-7 * u.lb,
-    density=1 * u.kg / u.m**3,
-    charge=3 * u.C,
 )
 
 standard_environment = environment.Environment(
@@ -48,7 +40,7 @@ positive_particle = particle.Particle(
 )
 
 standard_environment_ip = environment.Environment(
-    temperature=300 * u.K,
+    temperature=300 * u.degK,
     pressure=101325 * u.Pa,
 )
 
@@ -80,16 +72,6 @@ def test_knudsen_number():
     assert large_particle.knudsen_number(
         standard_environment
     ) == pytest.approx(0.6644, rel=1e-3)
-    with pytest.raises(pint.errors.DimensionalityError):
-        assert invalid_particle.knudsen_number(
-            standard_environment
-        ) == pytest.approx(0.65)
-        assert invalid_particle.knudsen_number(
-            standard_environment
-        ).check("[None]")
-    # with pytest.raises(AssertionError):
-    #     assert invalid_particle.knudsen_number() == pytest.approx(0.65)
-    #     assert invalid_particle.knudsen_number().check("[None]")
 
 
 def test_slip_correction_factor():
