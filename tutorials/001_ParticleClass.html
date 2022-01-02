@@ -231,7 +231,7 @@
             href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Ftutorials/001_ParticleClass.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
-        <a class="edit-button" href="https://github.com/uncscode/particula/edit/main/docs/tutorials/001_ParticleClass.ipynb"><button
+        <a class="edit-button" href="https://github.com/uncscode/particula/edit/v0.0.3/docs/tutorials/001_ParticleClass.ipynb"><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
     </div>
@@ -251,7 +251,7 @@
         aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
     <div class="dropdown-buttons">
         
-        <a class="binder-button" href="https://mybinder.org/v2/gh/uncscode/particula/main?urlpath=lab/tree/docs/tutorials/001_ParticleClass.ipynb"><button type="button"
+        <a class="binder-button" href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.3?urlpath=lab/tree/docs/tutorials/001_ParticleClass.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
                 data-placement="left"><img class="binder-button-logo"
                     src="../_static/images/logo_binder.svg"
@@ -259,7 +259,7 @@
         
         
         
-        <a class="colab-button" href="https://colab.research.google.com/github/uncscode/particula/blob/main/docs/tutorials/001_ParticleClass.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+        <a class="colab-button" href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.3/docs/tutorials/001_ParticleClass.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
                 title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
                     src="../_static/images/logo_colab.png"
                     alt="Interact on Colab">Colab</button></a>
@@ -327,15 +327,13 @@
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: numpy in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (1.21.5)
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: pint in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (0.18)
-Requirement already satisfied: importlib-metadata in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (4.10.0)
+Requirement already satisfied: pint in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (0.18)
 Requirement already satisfied: packaging in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (21.3)
+Requirement already satisfied: importlib-metadata in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (4.10.0)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: zipp&gt;=0.5 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (3.6.0)
-Requirement already satisfied: typing-extensions&gt;=3.6.4 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (4.0.1)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: typing-extensions&gt;=3.6.4 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (4.0.1)
+Requirement already satisfied: zipp&gt;=0.5 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (3.7.0)
 Requirement already satisfied: pyparsing!=3.0.5,&gt;=2.0.2 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from packaging-&gt;pint-&gt;particula) (3.0.6)
 </pre></div>
 </div>
@@ -945,7 +943,7 @@ dimensioned_coagulation_kernel(self, other, environment: particula.aerosol_dynam
         requestKernel: true,
         binderOptions: {
             repo: "uncscode/particula",
-            ref: "main",
+            ref: "v0.0.3",
         },
         codeMirrorConfig: {
             theme: "abcdef",
