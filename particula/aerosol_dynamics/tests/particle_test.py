@@ -146,7 +146,7 @@ def test_dimensioned_coagulation_kernel():
 
     assert small_particle.dimensioned_coagulation_kernel(
         large_particle, standard_environment
-    ) == pytest.approx(2.738e-10 * u.m**3 / u.s, rel=10)
+    ) == pytest.approx(2.738e-10, rel=10)
     assert small_particle.dimensioned_coagulation_kernel(
         large_particle, standard_environment
     ).check("[length]**3/[time]")
@@ -163,7 +163,7 @@ def test_dimensioned_coagulation_kernel():
 
     assert negative_ion.dimensioned_coagulation_kernel(
         positive_particle, standard_environment_ip
-    ) == pytest.approx(1e-12 * u.m**3 / u.s, rel=10)
+    ) == pytest.approx(1e-12, rel=10)
     # rel=10 means an order of magnitude
     assert negative_ion.dimensioned_coagulation_kernel(
         positive_particle, standard_environment_ip
