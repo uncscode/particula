@@ -19,8 +19,8 @@ large_particle = particle.Particle(
 )
 
 standard_environment = environment.Environment(
-    temperature=298 * u.K,
-    pressure=101325 * u.Pa,
+    temperature=298,
+    pressure=101325,
 )
 
 # create a parcel
@@ -29,12 +29,12 @@ simple_parcel = parcel.Parcel('simple', standard_environment)
 # add single particle to parcel
 simple_parcel.add_particle(small_particle)
 simple_parcel.add_particle(large_particle)
-simple_parcel.create_and_add_particle('org1', 500*u.nm)
+simple_parcel.create_and_add_particle('org1', 500)
 # add multiple particles to parcel
-simple_parcel.create_and_add_list_of_particle('org2', [1e-9, 2e-9, 3e-9] * u.m)
+simple_parcel.create_and_add_list_of_particle('org2', [1e-9, 2e-9, 3e-9])
 simple_parcel.create_and_add_list_of_particle(
-    'org2', [1e-9, 2e-9, 3e-9] * u.m,
-    [1.8, 1, 1] * u.kg / u.m ** 3, [1, 0, 2] * u.dimensionless
+    'org2', [1e-9, 2e-9, 3e-9],
+    [1.8, 1, 1], [1, 0, 2]
 )
 
 
@@ -44,8 +44,18 @@ def test_getters():
     """
     assert len(simple_parcel.particle_classes_list()) == 9
     assert len(simple_parcel.particle_masses_list()) == 9
-    assert len(simple_parcel.particle_radi_list()) == 9
+    assert len(simple_parcel.particle_radii_list()) == 9
     assert len(simple_parcel.particle_charges_list()) == 9
+    assert len(
+        simple_parcel.particle_dimensioned_coagulation_kernel_list(
+            large_particle
+        )
+    ) == 9
+    assert len(
+        simple_parcel.particle_dimensionless_coagulation_kernel_list(
+            large_particle
+        )
+    ) == 9
 
 
 def test_particle_mass_units():
@@ -62,7 +72,9 @@ def test_particle_radius_units():
     '''
     Test that the radius of the particles is returned in m
     '''
-    assert sum([i.check('m') for i in simple_parcel.particle_radi_list()]) == 9
+    assert sum(
+        [i.check('m') for i in simple_parcel.particle_radii_list()]
+    ) == 9
 
 
 def test_particle_density_units():
@@ -92,6 +104,33 @@ def test_particle_knudsen_number():
     assert sum(
         [i.check(u.dimensionless)
             for i in simple_parcel.particle_knudsen_numbers_list()]
+    ) == 9
+
+
+def test_particle_dimensioned_coagulation_kernel_list():
+    '''
+    Test that the dimensioned coagulation kernel list is returned in m^3/s
+    '''
+    assert sum(
+        [i.check(u.m ** 3 / u.s)
+            for i in
+            simple_parcel.particle_dimensioned_coagulation_kernel_list(
+                large_particle
+            )]
+    ) == 9
+
+
+def test_particle_dimensionless_coagulation_kernel_list():
+    '''
+    Test that the dimensionless coagulation kernel list is returned
+    in dimensionless
+    '''
+    assert sum(
+        [i.check(u.dimensionless)
+            for i in
+            simple_parcel.particle_dimensionless_coagulation_kernel_list(
+                large_particle
+            )]
     ) == 9
 
 
