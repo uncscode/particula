@@ -4,7 +4,6 @@
 import numpy as np
 from particula.aerosol_dynamics import particle
 
-
 class Parcel:
     """
     Creates an air parcel to track and interact with a list of particle
@@ -29,6 +28,7 @@ class Parcel:
         self._name = name
         self._particle_data = np.array([])
         self._enviroment = parcel_environment
+        self.unit_warning_flag = True
 
     def name(self) -> str:
         """Returns the name of the parcel."""
@@ -56,6 +56,15 @@ class Parcel:
             density (float) [kg/m**3]       default = 1e3 [kg/m**3],
             charge  (int)   [dimensionless] default = 0 [dimensionless]
         """
+        try:  # maybe move to particle class
+            radius.check('m')
+        except AttributeError:
+            if self.unit_warning_flag:
+                print(
+                    "Warning: radius has no units, assuming [m]."
+                )
+                self.unit_warning_flag = False
+
         self.add_particle(
             particle.Particle(name, radius, density, charge)
         )
@@ -83,7 +92,7 @@ class Parcel:
             detailed: create_and_add_list_of_particle(
                 'org3',
                 [1e-9, 2e-9, 3e-9],
-                [1.8, 1, 1],
+                [1.8e3, 1e3, 1e3],
                 [1, 0, 2])
         """
         if densities_of_particles is None:
