@@ -4,6 +4,7 @@
 import numpy as np
 from particula.aerosol_dynamics import particle
 
+
 class Parcel:
     """
     Creates an air parcel to track and interact with a list of particle
