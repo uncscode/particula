@@ -13,14 +13,10 @@
     More details to follow.
 """
 
-# importlib to set version
-from importlib import metadata
-
 # Import pint here to avoid using a different registry in each module.
 from pint import UnitRegistry
 
 # u is the unit registry name.
 u = UnitRegistry()
 
-# set the version as defined in setup.cfg
-__version__ = metadata.version('particula')
+__version__ = '0.0.4'
