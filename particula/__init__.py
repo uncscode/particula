@@ -20,4 +20,3 @@ from pint import UnitRegistry
 u = UnitRegistry()
 
 __version__ = '0.0.4-dev0'
-
