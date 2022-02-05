@@ -1,38 +1,8 @@
-
+# %%
 import numpy as np
-import pytest
-from particula import u
-from particula.aerosol_dynamics import environment
 from particula.aerosol_dynamics import particle_utilities as pu
 
-# def dimensioned_coagulation_kernel(
-#     charges_array, charge_other,
-#     radii_array, radius_other,
-#     mass_array, mass_other,
-#     temperature, mean_free_path_air, dynamic_viscosity_air,
-#     authors: str = "cg2019",
-# ) -> float:
-#     """Dimensioned particle--particle coagulation kernel.
-#     Parameters:
-#         charges_array  (np array) [dimensionless]
-#         charge_other  (float) [dimensionless]
-#         radii_array  (np array) [m]
-#         radius_other  (float) [m]
-#         mass_array  (np array) [kg]
-#         mass_other  (float) [kg]
-#         temperature  (float) [K]
-#         mean_free_path_air  (float) [m]
-#         dynamic_viscosity_air  (float) [N*s/m]
-#         authors:        authors of the parameterization
-#             - gh2012    doi.org:10.1103/PhysRevE.78.046402
-#             - cg2019    doi:10.1080/02786826.2019.1614522
-#             - hard_sphere
-#             (default: cg2019)
-#     returns:
-#         dimensioned_coagulation_kernel (array) [m**3/s]
-
-#     """
-
+#
 # standard_environment_ip = environment.Environment(
 #     temperature=300 * u.K,
 #     pressure=101325 * u.Pa,
@@ -54,17 +24,18 @@ temperature = 300
 authors = "cg2019"
 
 
-def test_file_work():
-    assert True
+# def test_file_work():
+#     assert True
 
-# def test_getters():
-#     """Test that the getters work.
-#     """
-
-#     assert pu.dimensioned_coagulation_kernel(
-#         charges_array, charge_other,
-#         radii_array, radius_other,
-#         mass_array, mass_other,
-#         temperature, mean_free_path_air, dynamic_viscosity_air,
-#         authors,
-#     ) > 0
+# """Test that the getters work.
+# """
+def test_dimensions_runs():
+    t = pu.dimensioned_coagulation_kernel(
+        charges_array, charge_other,
+        radii_array, radius_other,
+        mass_array, mass_other,
+        temperature, 5, 5,
+        authors,
+    )
+    print(t)
+    assert (t > 0).all()

@@ -1,7 +1,7 @@
 """Particle derived properties and interactions.
 """
 import numpy as np
-import physical_parameters_unitless as pp
+from particula.aerosol_dynamics import physical_parameters_unitless as pp
 
 
 def knudsen_number(radius, mean_free_path_air) -> float:
@@ -152,10 +152,21 @@ def coulomb_enhancement_kinetic_limit(
     coulomb_potential_ratio_initial = coulomb_potential_ratio(
         charges_array, charge_other, radii_array, radius_other, temperature
     )
+    bool_coulomb = coulomb_potential_ratio_initial >= 0
+                       
+    
+
+    # [i.radius() for i in self.particle_classes_list()]
+
+    
+
     return (
-        1 + coulomb_potential_ratio_initial if coulomb_potential_ratio_initial >= 0  # not sure if this is vectorized
-        else np.exp(coulomb_potential_ratio_initial)
+    np.array([1+x if x >= 0 else np.exp(x) for x in coulomb_potential_ratio_initial])
     )
+    # return (
+    #     1 + coulomb_potential_ratio_initial if coulomb_potential_ratio_initial >= 0  # not sure if this is vectorized
+    #     else np.exp(coulomb_potential_ratio_initial)
+    # )
 
 
 def coulomb_enhancement_continuum_limit(
@@ -176,9 +187,12 @@ def coulomb_enhancement_continuum_limit(
         charges_array, charge_other, radii_array,
         radius_other, temperature,
     )
-    return coulomb_potential_ratio_initial / (
-        1 - np.exp(-1*coulomb_potential_ratio_initial)
-    ) if coulomb_potential_ratio_initial != 0 else 1  # not sure if this is vectorized
+    return(
+        np.array([(x / 1-np.exp(-1*x)) if x != 0 else 1 for x in coulomb_potential_ratio_initial])
+    )
+    # return coulomb_potential_ratio_initial / (
+    #     1 - np.exp(-1*coulomb_potential_ratio_initial)
+    # ) if coulomb_potential_ratio_initial != 0 else 1  # not sure if this is vectorized
 
 
 def diffusive_knudsen_number(
