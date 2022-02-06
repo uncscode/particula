@@ -283,10 +283,10 @@ def dimensionless_coagulation_kernel_hard_sphere(
 
     # Constants for the chargeless hard-sphere limit
     # see doi:
-    hsc1 = 25.836
-    hsc2 = 11.211
-    hsc3 = 3.502
-    hsc4 = 7.211
+    hsc1_rep = 25.836
+    hsc2_rep = 11.211
+    hsc3_rep = 3.502
+    hsc4_rep = 7.211
     diffusive_knudsen_number_initial = diffusive_knudsen_number(
         charges_array, charge_other,
         radii_array, radius_other,
@@ -296,14 +296,14 @@ def dimensionless_coagulation_kernel_hard_sphere(
 
     numerator = (
         (4 * np.pi * diffusive_knudsen_number_initial**2)
-        + (hsc1 * diffusive_knudsen_number_initial**3)
-        + ((8 * np.pi)**(1/2) * hsc2 * diffusive_knudsen_number_initial**4)
+        + (hsc1_rep * diffusive_knudsen_number_initial**3)
+        + ((8 * np.pi)**(1/2) * hsc2_rep * diffusive_knudsen_number_initial**4)
     )
     denominator = (
         1
-        + hsc3 * diffusive_knudsen_number_initial
-        + hsc4 * diffusive_knudsen_number_initial**2
-        + hsc2 * diffusive_knudsen_number_initial**3
+        + hsc3_rep * diffusive_knudsen_number_initial
+        + hsc4_rep * diffusive_knudsen_number_initial**2
+        + hsc2_rep * diffusive_knudsen_number_initial**3
     )
     return numerator / denominator
 
@@ -382,23 +382,24 @@ def dimensionless_coagulation_kernel_parameterized(
     """Dimensionless particle--particle coagulation kernel.
 
     Parameters:
-        charges_array  (np array) [dimensionless]
-        charge_other  (float) [dimensionless]
-        radii_array  (np array) [m]
-        radius_other  (float) [m]
-        mass_array  (np array) [kg]
-        mass_other  (float) [kg]
-        temperature  (float) [K]
-        mean_free_path_air  (float) [m]
-        dynamic_viscosity_air  (float) [N*s/m]
-        authors:        authors of the parameterization
-            - gh2012    doi.org:10.1103/PhysRevE.78.046402
-            - cg2019    doi:10.1080/02786826.2019.1614522
+        charges_array                   (np array)  [unitless]
+        charge_other                    (float)     [unitless]
+        radii_array                     (np array)  [m]
+        radius_other                    (float)     [m]
+        mass_array                      (np array)  [kg]
+        mass_other                      (float)     [kg]
+        temperature                     (float)     [K]
+        mean_free_path_air              (float)     [m]
+        dynamic_viscosity_air           (float)     [N*s/m]
+        authors:                        authors of the parameterization
+            - gh2012                    doi.org:10.1103/PhysRevE.78.046402
+            - cg2019                    doi:10.1080/02786826.2019.1614522
             - hard_sphere
             (default: cg2019)
 
     Returns:
-        dimensionless_coagulation_kernel_parameterized (array) [dimensionless]
+        dimensionless_coagulation_kernel_parameterized
+        (array) [dimensionless]
     """
     coulomb_potential_ratio_initial = coulomb_potential_ratio(
         charges_array, charge_other, radii_array, radius_other, temperature
@@ -490,15 +491,15 @@ def dimensioned_coagulation_kernel(
 ) -> float:
     """Dimensioned particle--particle coagulation kernel.
     Parameters:
-        charges_array  (np array) [dimensionless]
-        charge_other  (float) [dimensionless]
-        radii_array  (np array) [m]
-        radius_other  (float) [m]
-        mass_array  (np array) [kg]
-        mass_other  (float) [kg]
-        temperature  (float) [K]
-        mean_free_path_air  (float) [m]
-        dynamic_viscosity_air  (float) [N*s/m]
+        charges_array                   (np array)  [unitless]
+        charge_other                    (float)     [unitless]
+        radii_array                     (np array)  [m]
+        radius_other                    (float)     [m]
+        mass_array                      (np array)  [kg]
+        mass_other                      (float)     [kg]
+        temperature                     (float)     [K]
+        mean_free_path_air              (float)     [m]
+        dynamic_viscosity_air           (float)     [N*s/m]
         authors:        authors of the parameterization
             - gh2012    doi.org:10.1103/PhysRevE.78.046402
             - cg2019    doi:10.1080/02786826.2019.1614522
