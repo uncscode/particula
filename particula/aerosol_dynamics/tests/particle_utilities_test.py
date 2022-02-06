@@ -35,15 +35,10 @@ def test_dimensions_runs():
     """Test that the getters work.
     """
     test = pu.dimensioned_coagulation_kernel(
-        charges_array,
-        charge_other,
-        radii_array,
-        radius_other,
-        mass_array,
-        mass_other,
-        TEMPERATURE,
-        mean_free_path_air,
-        dynamic_viscosity_air,
+        charges_array, charge_other,
+        radii_array, radius_other,
+        mass_array, mass_other,
+        TEMPERATURE, mean_free_path_air, dynamic_viscosity_air,
         AUTHORS,
     )
     assert (test > 0).all()

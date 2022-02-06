@@ -219,7 +219,7 @@ def diffusive_knudsen_number(
 
     numerator = (
         (
-            temperature * BOLTZMANN_CONSTANT
+            temperature * unitless(BOLTZMANN_CONSTANT)
             * reduced_mass(mass_array, mass_other)
         )**0.5
         / reduced_friction_factor(
