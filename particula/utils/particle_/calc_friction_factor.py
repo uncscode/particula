@@ -5,7 +5,7 @@ import numpy as np
 from particula.utils import slip_correction
 
 def friction_factor(
-    radii_array,
+    radius,
     mean_free_path_air,
     dynamic_viscosity_air,
 ) -> float:
@@ -26,6 +26,6 @@ def friction_factor(
     """
 
     return (
-        6 * np.pi * dynamic_viscosity_air * radii_array /
-        slip_correction(radii_array, mean_free_path_air)
+        6 * np.pi * dynamic_viscosity_air * radius /
+        slip_correction(radius, mean_free_path_air)
     )

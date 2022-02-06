@@ -11,3 +11,9 @@ from particula.utils.particle_.calc_slip_correction import (
 from particula.utils.particle_.calc_friction_factor import (
     friction_factor
 )
+from particula.utils.particle_.calc_reduced_mass import (
+    reduced_mass
+)
+from particula.utils.particle_.calc_reduced_friction import (
+    reduced_friction_factor as reduced_friction
+)

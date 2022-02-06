@@ -1,7 +1,7 @@
 """ calculate the knudsen number
 """
 
-def knudsen_number(radii_array, mean_free_path_air) -> float:
+def knudsen_number(radius, mean_free_path_air) -> float:
 
     """ Returns particle's Knudsen number.
 
@@ -18,4 +18,4 @@ def knudsen_number(radii_array, mean_free_path_air) -> float:
     divided by the particle radius.
     """
 
-    return mean_free_path_air / radii_array
+    return mean_free_path_air / radius

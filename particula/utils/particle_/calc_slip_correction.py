@@ -5,7 +5,7 @@ import numpy as np
 from particula.utils import knudsen_number
 
 
-def slip_correction_factor(radii_array, mean_free_path_air) -> float:
+def slip_correction_factor(radius, mean_free_path_air) -> float:
 
     """ Returns particle's Cunningham slip correction factor.
 
@@ -23,8 +23,8 @@ def slip_correction_factor(radii_array, mean_free_path_air) -> float:
     calculate the friction factor.
     """
 
-    return 1 + knudsen_number(radii_array, mean_free_path_air) * (
+    return 1 + knudsen_number(radius, mean_free_path_air) * (
         1.257 + 0.4*np.exp(
-            -1.1/knudsen_number(radii_array, mean_free_path_air)
+            -1.1/knudsen_number(radius, mean_free_path_air)
         )
     )
