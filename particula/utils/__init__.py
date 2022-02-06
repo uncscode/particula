@@ -18,4 +18,7 @@ from particula.utils.particle_ import (
     friction_factor,
     reduced_mass,
     reduced_friction,
+    coulomb_ratio,
+    coulomb_kinetic,
+    coulomb_continuum,
 )

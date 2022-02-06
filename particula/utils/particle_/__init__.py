@@ -17,3 +17,9 @@ from particula.utils.particle_.calc_reduced_mass import (
 from particula.utils.particle_.calc_reduced_friction import (
     reduced_friction_factor as reduced_friction
 )
+from particula.utils.particle_.calc_coulomb_ratio import (
+    coulomb_potential_ratio as coulomb_ratio
+)
+from particula.utils.particle_.calc_coulomb_enhancement import (
+    coulomb_enhancement_kinetic_limit as coulomb_kinetic, coulomb_enhancement_continuum_limit as coulomb_continuum,
+)
