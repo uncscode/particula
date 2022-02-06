@@ -10,15 +10,15 @@ from particula.aerosol_dynamics import (
 )
 
 
-def knudsen_number(radius, mean_free_path_air) -> float:
+def knudsen_number(radii_array, mean_free_path_air) -> float:
     """Returns particle's Knudsen number.
 
     Parameters:
-        radius              (float) [m]
-        mean_free_path_air  (float) [m]
+        radii_array         (float)     [m]
+        mean_free_path_air  (float)     [m]
 
     Returns:
-        knudsen_number (float) [unitless]
+        knudsen_number      (float)     [unitless]
 
     The Knudsen number reflects the relative length scales of
     the particle and the suspending fluid (air, water, etc.).
@@ -26,18 +26,18 @@ def knudsen_number(radius, mean_free_path_air) -> float:
     divided by the particle radius.
     """
 
-    return mean_free_path_air / radius
+    return mean_free_path_air / radii_array
 
 
-def slip_correction_factor(radius, mean_free_path_air) -> float:
+def slip_correction_factor(radii_array, mean_free_path_air) -> float:
     """Returns particle's Cunningham slip correction factor.
 
     Parameters:
-        radius              (float) [m]
-        mean_free_path_air  (float) [m]
+        radii_array                 (float) [m]
+        mean_free_path_air          (float) [m]
 
     Returns:
-        slip_correction_factor (float) [unitless]
+        slip_correction_factor      (float) [unitless]
 
     Dimensionless quantity accounting for non-continuum effects
     on small particles. It is a deviation from Stokes' Law.
@@ -47,18 +47,24 @@ def slip_correction_factor(radius, mean_free_path_air) -> float:
 
     See Eq 9.34 in Atmos. Chem. & Phys. (2016) for more information."""
 
-    return 1 + knudsen_number(radius, mean_free_path_air) * (
-        1.257 + 0.4*np.exp(-1.1/knudsen_number(radius, mean_free_path_air))
+    return 1 + knudsen_number(radii_array, mean_free_path_air) * (
+        1.257 + 0.4*np.exp(-1.1/knudsen_number(radii_array, mean_free_path_air))
     )
 
 
 def friction_factor(
-    radius,
+    radii_array,
     mean_free_path_air, dynamic_viscosity_air
 ) -> float:
     """Returns a particle's friction factor.
 
-    Checks units: [N*s/m]
+    Parameters:
+        radii_array                 (np array)  [kg]
+        mean_free_path_air          (float)     [m]
+        dynamic_viscosity_air       (float)     [N*s/m]
+
+    Returns:
+        friction_factor             (array)     [N*s/m]
 
     Property of the particle's size and surrounding medium.
     Multiplying the friction factor by the fluid velocity
@@ -66,8 +72,8 @@ def friction_factor(
     """
 
     return (
-        6 * np.pi * dynamic_viscosity_air * radius /
-        slip_correction_factor(radius, mean_free_path_air)
+        6 * np.pi * dynamic_viscosity_air * radii_array /
+        slip_correction_factor(radii_array, mean_free_path_air)
     )
 
 
@@ -75,11 +81,11 @@ def reduced_mass(mass_array, mass_other) -> float:
     """Returns the reduced mass of two particles.
 
     Parameters:
-        mass_array  (np array) [kg]
-        mass_other  (float) [kg]
+        mass_array      (np array)  [kg]
+        mass_other      (float)     [kg]
 
     Returns:
-        reduced_mass (array) [unitless]
+        reduced_mass    (array)     [unitless]
 
     The reduced mass is an "effective inertial" mass.
     Allows a two-body problem to be solved as a one-body problem.
@@ -94,13 +100,13 @@ def reduced_friction_factor(
     """Returns the reduced friction factor between two particles.
 
     Parameters:
-        radii_array  (np array) [m]
-        radius_other  (float) [m]
-        mean_free_path_air  (float) [m]
-        dynamic_viscosity_air  (float) [N*s/m]
+        radii_array                 (np array)  [m]
+        radius_other                (float)     [m]
+        mean_free_path_air          (float)     [m]
+        dynamic_viscosity_air       (float)     [N*s/m]
 
     Returns:
-        reduced_friction_factor (array) [unitless]
+        reduced_friction_factor     (array)     [unitless]
 
     Similar to the reduced mass.
     The reduced friction factor allows a two-body problem
@@ -129,14 +135,14 @@ def coulomb_potential_ratio(
     """Calculates the Coulomb potential ratio.
 
     Parameters:
-        charges_array  (np array) [dimensionless]
-        charge_other  (float) [dimensionless]
-        radii_array  (np array) [m]
-        radius_other  (float) [m]
-        temperature  (float) [K]
+        charges_array                       (np array)  [dimensionless]
+        charge_other                        (float)     [dimensionless]
+        radii_array                         (np array)  [m]
+        radius_other                        (float)     [m]
+        temperature                         (float)     [K]
 
     Returns:
-        coulomb_potential_ratio (array) [unitless]
+        coulomb_potential_ratio             (array)     [unitless]
     """
 
     numerator = -1 * charges_array * charge_other * (
@@ -157,14 +163,14 @@ def coulomb_enhancement_kinetic_limit(
     """Kinetic limit of Coulomb enhancement for particle--particle coagulation.
 
     Parameters:
-        charges_array  (np array) [dimensionless]
-        charge_other  (float) [dimensionless]
-        radii_array  (np array) [m]
-        radius_other  (float) [m]
-        temperature  (float) [K]
+        charges_array                       (np array)  [unitless]
+        charge_other                        (float)     [unitless]
+        radii_array                         (np array)  [m]
+        radius_other                        (float)     [m]
+        temperature                         (float)     [K]
 
     Returns:
-        coulomb_enhancement_kinetic_limit (array) [unitless]
+        coulomb_enhancement_kinetic_limit   (array)     [unitless]
     """
 
     coulomb_potential_ratio_initial = coulomb_potential_ratio(
@@ -185,14 +191,15 @@ def coulomb_enhancement_continuum_limit(
     """Continuum limit of Coulomb enhancement for particle--particle coagulation.
 
     Parameters:
-        charges_array  (np array) [dimensionless]
-        charge_other  (float) [dimensionless]
-        radii_array  (np array) [m]
-        radius_other  (float) [m]
-        temperature  (float) [K]
+        charges_array                       (np array)  [unitless]
+        charge_other                        (float)     [unitless]
+        radii_array                         (np array)  [m]
+        radius_other                        (float)     [m]
+        temperature                         (float)     [K]
 
     Returns:
-        coulomb_enhancement_continuum_limit (array) [unitless]    """
+        coulomb_enhancement_continuum_limit (array)     [unitless]
+    """
 
     coulomb_potential_ratio_initial = coulomb_potential_ratio(
         charges_array, charge_other, radii_array,
@@ -215,18 +222,18 @@ def diffusive_knudsen_number(
     """Diffusive Knudsen number.
 
     Parameters:
-        charges_array  (np array) [dimensionless]
-        charge_other  (float) [dimensionless]
-        radii_array  (np array) [m]
-        radius_other  (float) [m]
-        mass_array  (np array) [kg]
-        mass_other  (float) [kg]
-        temperature  (float) [K]
-        mean_free_path_air  (float) [m]
-        dynamic_viscosity_air  (float) [N*s/m]
+        charges_array                   (np array)  [unitless]
+        charge_other                    (float)     [unitless]
+        radii_array                     (np array)  [m]
+        radius_other                    (float)     [m]
+        mass_array                      (np array)  [kg]
+        mass_other                      (float)     [kg]
+        temperature                     (float)     [K]
+        mean_free_path_air              (float)     [m]
+        dynamic_viscosity_air           (float)     [N*s/m]
 
     Returns:
-        diffusive_knudsen_number (array) [unitless]
+        diffusive_knudsen_number        (array)     [unitless]
 
     The *diffusive* Knudsen number is different from Knudsen number.
     Ratio of:
@@ -267,15 +274,15 @@ def dimensionless_coagulation_kernel_hard_sphere(
     """Dimensionless particle--particle coagulation kernel.
 
     Parameters:
-        charges_array  (np array) [dimensionless]
-        charge_other  (float) [dimensionless]
-        radii_array  (np array) [m]
-        radius_other  (float) [m]
-        mass_array  (np array) [kg]
-        mass_other  (float) [kg]
-        temperature  (float) [K]
-        mean_free_path_air  (float) [m]
-        dynamic_viscosity_air  (float) [N*s/m]
+        charges_array                   (np array)  [unitless]
+        charge_other                    (float)     [unitless]
+        radii_array                     (np array)  [m]
+        radius_other                    (float)     [m]
+        mass_array                      (np array)  [kg]
+        mass_other                      (float)     [kg]
+        temperature                     (float)     [K]
+        mean_free_path_air              (float)     [m]
+        dynamic_viscosity_air           (float)     [N*s/m]
 
     Returns:
         dimensionless_coagulation_kernel_hard_sphere (array) [unitless]
@@ -317,15 +324,15 @@ def collision_kernel_continuum_limit(
     """Continuum limit of collision kernel.
 
     Parameters:
-        charges_array  (np array) [dimensionless]
-        charge_other  (float) [dimensionless]
-        radii_array  (np array) [m]
-        radius_other  (float) [m]
-        mass_array  (np array) [kg]
-        mass_other  (float) [kg]
-        temperature  (float) [K]
-        mean_free_path_air  (float) [m]
-        dynamic_viscosity_air  (float) [N*s/m]
+        charges_array                   (np array)  [unitless]
+        charge_other                    (float)     [unitless]
+        radii_array                     (np array)  [m]
+        radius_other                    (float)     [m]
+        mass_array                      (np array)  [kg]
+        mass_other                      (float)     [kg]
+        temperature                     (float)     [K]
+        mean_free_path_air              (float)     [m]
+        dynamic_viscosity_air           (float)     [N*s/m]
 
     Returns:
         collision_kernel_continuum_limit (array) [unitless]
