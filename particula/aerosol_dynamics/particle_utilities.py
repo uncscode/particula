@@ -152,22 +152,15 @@ def coulomb_enhancement_kinetic_limit(
     coulomb_potential_ratio_initial = coulomb_potential_ratio(
         charges_array, charge_other, radii_array, radius_other, temperature
     )
-    bool_coulomb = coulomb_potential_ratio_initial >= 0
-                       
-    
+    # bool_coulomb = coulomb_potential_ratio_initial >= 0 # delete?
 
     # [i.radius() for i in self.particle_classes_list()]
 
-    
+
 
     return (
     np.array([1+x if x >= 0 else np.exp(x) for x in coulomb_potential_ratio_initial])
     )
-    # return (
-    #     1 + coulomb_potential_ratio_initial if coulomb_potential_ratio_initial >= 0  # not sure if this is vectorized
-    #     else np.exp(coulomb_potential_ratio_initial)
-    # )
-
 
 def coulomb_enhancement_continuum_limit(
     charges_array, charge_other, radii_array, radius_other, temperature
@@ -228,7 +221,9 @@ def diffusive_knudsen_number(
             temperature * pp.BOLTZMANN_CONSTANT
             * reduced_mass(mass_array, mass_other)
         )**0.5
-        / reduced_friction_factor(radii_array, radius_other, mean_free_path_air, dynamic_viscosity_air)
+        / reduced_friction_factor(
+            radii_array, radius_other, mean_free_path_air, dynamic_viscosity_air
+        )
     )
     denominator = (
         (radii_array + radius_other)
@@ -390,7 +385,8 @@ def dimensionless_coagulation_kernel_parameterized(
         mass_array, mass_other,
         temperature, mean_free_path_air, dynamic_viscosity_air,
     )
-    dimensionless_coagulation_kernel_hard_sphere_initial = dimensionless_coagulation_kernel_hard_sphere(
+    dimensionless_coagulation_kernel_hard_sphere_initial = \
+    dimensionless_coagulation_kernel_hard_sphere(
         charges_array, charge_other,
         radii_array, radius_other,
         mass_array, mass_other,
