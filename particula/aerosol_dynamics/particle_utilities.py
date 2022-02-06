@@ -2,16 +2,13 @@
 """
 import numpy as np
 from particula.utils import unitless
-
+# add constants in this import
 from particula.aerosol_dynamics import (
     BOLTZMANN_CONSTANT,
-#    AVOGADRO_NUMBER,
-#    GAS_CONSTANT,
     ELEMENTARY_CHARGE_VALUE,
-#    RELATIVE_PERMITTIVITY_AIR,
-#    VACUUM_PERMITTIVITY,
     ELECTRIC_PERMITTIVITY,
 )
+
 
 def knudsen_number(radius, mean_free_path_air) -> float:
     """Returns particle's Knudsen number.
@@ -19,7 +16,8 @@ def knudsen_number(radius, mean_free_path_air) -> float:
     Parameters:
         radius              (float) [m]
         mean_free_path_air  (float) [m]
-    returns:
+
+    Returns:
         knudsen_number (float) [unitless]
 
     The Knudsen number reflects the relative length scales of
@@ -37,7 +35,8 @@ def slip_correction_factor(radius, mean_free_path_air) -> float:
     Parameters:
         radius              (float) [m]
         mean_free_path_air  (float) [m]
-    returns:
+
+    Returns:
         slip_correction_factor (float) [unitless]
 
     Dimensionless quantity accounting for non-continuum effects
@@ -78,7 +77,8 @@ def reduced_mass(mass_array, mass_other) -> float:
     Parameters:
         mass_array  (np array) [kg]
         mass_other  (float) [kg]
-    returns:
+
+    Returns:
         reduced_mass (array) [unitless]
 
     The reduced mass is an "effective inertial" mass.
@@ -98,7 +98,8 @@ def reduced_friction_factor(
         radius_other  (float) [m]
         mean_free_path_air  (float) [m]
         dynamic_viscosity_air  (float) [N*s/m]
-    returns:
+
+    Returns:
         reduced_friction_factor (array) [unitless]
 
     Similar to the reduced mass.
@@ -108,10 +109,16 @@ def reduced_friction_factor(
 
     return (
         friction_factor(radii_array, mean_free_path_air, dynamic_viscosity_air)
-        * friction_factor(radius_other, mean_free_path_air, dynamic_viscosity_air)
+        * friction_factor(
+            radius_other, mean_free_path_air, dynamic_viscosity_air
+        )
         / (
-            friction_factor(radii_array, mean_free_path_air, dynamic_viscosity_air)
-            + friction_factor(radius_other, mean_free_path_air, dynamic_viscosity_air)
+            friction_factor(
+                radii_array, mean_free_path_air, dynamic_viscosity_air
+            )
+            + friction_factor(
+                radius_other, mean_free_path_air, dynamic_viscosity_air
+            )
         )
     )
 
@@ -127,7 +134,8 @@ def coulomb_potential_ratio(
         radii_array  (np array) [m]
         radius_other  (float) [m]
         temperature  (float) [K]
-    returns:
+
+    Returns:
         coulomb_potential_ratio (array) [unitless]
     """
 
@@ -154,7 +162,8 @@ def coulomb_enhancement_kinetic_limit(
         radii_array  (np array) [m]
         radius_other  (float) [m]
         temperature  (float) [K]
-    returns:
+
+    Returns:
         coulomb_enhancement_kinetic_limit (array) [unitless]
     """
 
@@ -163,7 +172,10 @@ def coulomb_enhancement_kinetic_limit(
     )
 
     return (
-    np.array([1+x if x >= 0 else np.exp(x) for x in coulomb_potential_ratio_initial])
+        np.array([
+            1+x if x >= 0 else np.exp(x)
+            for x in coulomb_potential_ratio_initial
+        ])
     )
 
 
@@ -178,7 +190,8 @@ def coulomb_enhancement_continuum_limit(
         radii_array  (np array) [m]
         radius_other  (float) [m]
         temperature  (float) [K]
-    returns:
+
+    Returns:
         coulomb_enhancement_continuum_limit (array) [unitless]    """
 
     coulomb_potential_ratio_initial = coulomb_potential_ratio(
@@ -186,8 +199,12 @@ def coulomb_enhancement_continuum_limit(
         radius_other, temperature,
     )
     return(
-        np.array([(x / 1-np.exp(-1*x)) if x != 0 else 1 for x in coulomb_potential_ratio_initial])
+        np.array([
+            (x / 1-np.exp(-1*x)) if x != 0 else 1
+            for x in coulomb_potential_ratio_initial
+        ])
     )
+
 
 def diffusive_knudsen_number(
     charges_array, charge_other,
@@ -207,7 +224,8 @@ def diffusive_knudsen_number(
         temperature  (float) [K]
         mean_free_path_air  (float) [m]
         dynamic_viscosity_air  (float) [N*s/m]
-    returns:
+
+    Returns:
         diffusive_knudsen_number (array) [unitless]
 
     The *diffusive* Knudsen number is different from Knudsen number.
@@ -223,7 +241,9 @@ def diffusive_knudsen_number(
             * reduced_mass(mass_array, mass_other)
         )**0.5
         / reduced_friction_factor(
-            radii_array, radius_other, mean_free_path_air, dynamic_viscosity_air
+            radii_array, radius_other,
+            mean_free_path_air,
+            dynamic_viscosity_air
         )
     )
     denominator = (
@@ -256,7 +276,8 @@ def dimensionless_coagulation_kernel_hard_sphere(
         temperature  (float) [K]
         mean_free_path_air  (float) [m]
         dynamic_viscosity_air  (float) [N*s/m]
-    returns:
+
+    Returns:
         dimensionless_coagulation_kernel_hard_sphere (array) [unitless]
     """
 
@@ -305,7 +326,8 @@ def collision_kernel_continuum_limit(
         temperature  (float) [K]
         mean_free_path_air  (float) [m]
         dynamic_viscosity_air  (float) [N*s/m]
-    returns:
+
+    Returns:
         collision_kernel_continuum_limit (array) [unitless]
     """
 
@@ -327,17 +349,18 @@ def collision_kernel_kinetic_limit(
     """Kinetic limit of collision kernel.
 
     Parameters:
-        charges_array  (np array) [dimensionless]
-        charge_other  (float) [dimensionless]
-        radii_array  (np array) [m]
-        radius_other  (float) [m]
-        mass_array  (np array) [kg]
-        mass_other  (float) [kg]
-        temperature  (float) [K]
-        mean_free_path_air  (float) [m]
-        dynamic_viscosity_air  (float) [N*s/m]
-    returns:
-        collision_kernel_kinetic_limit (array) [unitless]
+        charges_array                   (np array)  [unitless]
+        charge_other                    (float)     [unitless]
+        radii_array                     (np array)  [m]
+        radius_other                    (float)     [m]
+        mass_array                      (np array)  [kg]
+        mass_other                      (float)     [kg]
+        temperature                     (float)     [K]
+        mean_free_path_air              (float)     [m]
+        dynamic_viscosity_air           (float)     [N*s/m]
+
+    Returns:
+        collision_kernel_kinetic_limit  (array) [unitless]
     """
 
     diffusive_knudsen_number_initial = diffusive_knudsen_number(
@@ -373,7 +396,8 @@ def dimensionless_coagulation_kernel_parameterized(
             - cg2019    doi:10.1080/02786826.2019.1614522
             - hard_sphere
             (default: cg2019)
-    returns:
+
+    Returns:
         dimensionless_coagulation_kernel_parameterized (array) [dimensionless]
     """
     coulomb_potential_ratio_initial = coulomb_potential_ratio(
@@ -387,12 +411,13 @@ def dimensionless_coagulation_kernel_parameterized(
         temperature, mean_free_path_air, dynamic_viscosity_air,
     )
     dimensionless_coagulation_kernel_hard_sphere_initial = \
-    dimensionless_coagulation_kernel_hard_sphere(
-        charges_array, charge_other,
-        radii_array, radius_other,
-        mass_array, mass_other,
-        temperature, mean_free_path_air, dynamic_viscosity_air,
-    )
+        dimensionless_coagulation_kernel_hard_sphere(
+            charges_array, charge_other,
+            radii_array, radius_other,
+            mass_array, mass_other,
+            temperature, mean_free_path_air,
+            dynamic_viscosity_air,
+        )
 
     if authors == "cg2019":
         # some parameters
@@ -430,7 +455,9 @@ def dimensionless_coagulation_kernel_parameterized(
 
     elif authors == "gh2012":
         numerator = coulomb_enhancement_continuum_limit(
-                charges_array, charge_other, radii_array, radius_other, temperature
+                charges_array, charge_other,
+                radii_array, radius_other,
+                temperature
         )
 
         denominator = 1 + 1.598*(np.minimum(
@@ -477,7 +504,8 @@ def dimensioned_coagulation_kernel(
             - cg2019    doi:10.1080/02786826.2019.1614522
             - hard_sphere
             (default: cg2019)
-    returns:
+
+    Returns:
         dimensioned_coagulation_kernel (array) [m**3/s]
 
     """
@@ -498,7 +526,8 @@ def dimensioned_coagulation_kernel(
             radii_array + radius_other
         )**3
         * coulomb_enhancement_kinetic_limit(
-            charges_array, charge_other, radii_array, radius_other, temperature
+            charges_array, charge_other,
+            radii_array, radius_other, temperature
         )**2
         / reduced_mass(mass_array, mass_other)
         / coulomb_enhancement_continuum_limit(

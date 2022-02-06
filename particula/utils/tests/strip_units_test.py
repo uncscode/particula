@@ -1,4 +1,4 @@
-""" quick test of strip_units functionality
+""" quick test of strip_units.py
 """
 
 from particula import u
@@ -11,7 +11,7 @@ c_quantity = a_quantity * b_quantity
 
 
 def test_strip_units():
-    """ test that the strip_units function works
+    """ testing strip_units
     """
     assert unitless(a_quantity) == 1
     assert unitless(b_quantity) == 1

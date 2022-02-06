@@ -3,6 +3,7 @@
 
 import numpy as np
 from particula import u
+from particula.utils import unitless
 from particula.aerosol_dynamics import particle_utilities as pu
 from particula.aerosol_dynamics import environment
 
@@ -23,8 +24,12 @@ mass_array = np.array([1, 1, 1, 1]) * 1e3
 mass_other = mass_array[0]
 
 TEMPERATURE = 300
-mean_free_path_air = standard_environment_ip.mean_free_path_air().magnitude
-dynamic_viscosity_air = standard_environment_ip.dynamic_viscosity_air().magnitude
+mean_free_path_air = unitless(
+    standard_environment_ip.mean_free_path_air()
+)
+dynamic_viscosity_air = unitless(
+    standard_environment_ip.dynamic_viscosity_air()
+)
 AUTHORS = "cg2019"
 
 

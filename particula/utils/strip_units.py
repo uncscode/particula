@@ -1,4 +1,5 @@
-""" utility to strip units from unit-registry quantities
+# pylint: disable=R0801
+""" getting rid of units
 """
 
 
