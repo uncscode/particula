@@ -1,8 +1,17 @@
 """Particle derived properties and interactions.
 """
 import numpy as np
-from particula.aerosol_dynamics import physical_parameters_unitless as pp
+from particula.utils import unitless
 
+from particula.aerosol_dynamics import (
+    BOLTZMANN_CONSTANT,
+#    AVOGADRO_NUMBER,
+#    GAS_CONSTANT,
+    ELEMENTARY_CHARGE_VALUE,
+#    RELATIVE_PERMITTIVITY_AIR,
+#    VACUUM_PERMITTIVITY,
+    ELECTRIC_PERMITTIVITY,
+)
 
 def knudsen_number(radius, mean_free_path_air) -> float:
     """Returns particle's Knudsen number.
@@ -123,14 +132,14 @@ def coulomb_potential_ratio(
     """
 
     numerator = -1 * charges_array * charge_other * (
-        pp.ELEMENTARY_CHARGE_VALUE ** 2
+        unitless(ELEMENTARY_CHARGE_VALUE) ** 2
     )
-    denominator = 4 * np.pi * pp.ELECTRIC_PERMITTIVITY * (
+    denominator = 4 * np.pi * unitless(ELECTRIC_PERMITTIVITY) * (
         radii_array + radius_other
     )
     return (
         numerator /
-        (denominator * pp.BOLTZMANN_CONSTANT * temperature)
+        (denominator * unitless(BOLTZMANN_CONSTANT) * temperature)
     )
 
 
@@ -152,15 +161,11 @@ def coulomb_enhancement_kinetic_limit(
     coulomb_potential_ratio_initial = coulomb_potential_ratio(
         charges_array, charge_other, radii_array, radius_other, temperature
     )
-    # bool_coulomb = coulomb_potential_ratio_initial >= 0 # delete?
-
-    # [i.radius() for i in self.particle_classes_list()]
-
-
 
     return (
     np.array([1+x if x >= 0 else np.exp(x) for x in coulomb_potential_ratio_initial])
     )
+
 
 def coulomb_enhancement_continuum_limit(
     charges_array, charge_other, radii_array, radius_other, temperature
@@ -183,10 +188,6 @@ def coulomb_enhancement_continuum_limit(
     return(
         np.array([(x / 1-np.exp(-1*x)) if x != 0 else 1 for x in coulomb_potential_ratio_initial])
     )
-    # return coulomb_potential_ratio_initial / (
-    #     1 - np.exp(-1*coulomb_potential_ratio_initial)
-    # ) if coulomb_potential_ratio_initial != 0 else 1  # not sure if this is vectorized
-
 
 def diffusive_knudsen_number(
     charges_array, charge_other,
@@ -218,7 +219,7 @@ def diffusive_knudsen_number(
 
     numerator = (
         (
-            temperature * pp.BOLTZMANN_CONSTANT
+            temperature * BOLTZMANN_CONSTANT
             * reduced_mass(mass_array, mass_other)
         )**0.5
         / reduced_friction_factor(
