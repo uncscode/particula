@@ -3,3 +3,7 @@
 
 # flake8: noqa: F401
 from particula.utils.strip_units import make_unitless as unitless
+from particula.utils.particle_ import (
+    knudsen_number,
+    slip_correction,
+)

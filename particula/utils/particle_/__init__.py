@@ -1,0 +1,13 @@
+""" shorten some utils
+"""
+
+# flake8: noqa: F401
+from particula.utils.particle_.calc_knudsen_number import (
+    knudsen_number
+)
+from particula.utils.particle_.calc_slip_correction import (
+    slip_correction_factor as slip_correction
+)
+from particula.utils.particle_.calc_friction_factor import (
+    friction_factor
+)
