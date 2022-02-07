@@ -10,7 +10,7 @@
 """
 
 from particula import u
-from particula.utils.environment_ import(
+from particula.utils.environment_ import (
     mean_free_path_air as mfp_air,
     dynamic_viscosity_air as dyn_vis_air,
 )
