@@ -3,7 +3,7 @@
 
 import numpy as np
 from particula import u
-from particula.utils.environment_ import (
+from particula.utils.environment_.calc_dynamic_viscosity import (
     dynamic_viscosity_air as dyn_vis_air,
 )
 from particula.utils import (
