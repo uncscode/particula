@@ -27,12 +27,9 @@
 
 import numpy as np
 from particula import u
-from particula.utils.particle_ import (
-    particle_mass,
-    knudsen_number,
-)
 from particula.aerosol_dynamics import physical_parameters as pp
 from particula.aerosol_dynamics.environment import Environment
+from particula.utils.particle_ import knudsen_number, particle_mass
 
 
 class Particle:
