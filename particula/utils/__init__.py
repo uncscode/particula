@@ -13,6 +13,7 @@ from particula.utils.get_constants import(
     REF_VISCOSITY_AIR,
     REF_TEMPERATURE,
     SUTHERLAND_CONSTANT,
+    MOLECULAR_WEIGHT_AIR,
 )
 from particula.utils.strip_units import make_unitless as unitless
 # from particula.utils.particle_ import (

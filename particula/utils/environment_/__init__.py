@@ -5,3 +5,6 @@
 from particula.utils.environment_.calc_dynamic_viscosity import (
     dynamic_viscosity_air,
 )
+from particula.utils.environment_.calc_mean_free_path import (
+    mean_free_path_air,
+)
