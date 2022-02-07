@@ -4,7 +4,7 @@
         - the temperature of the environment in K
         - the pressure inside the environment in Pa
 
-    The enviroment class is used to derivate properties:
+    The enviroment class is used to derive properties:
         - the mean free path in air
         - the dynamic viscosity in air
 """
