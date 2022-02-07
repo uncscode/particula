@@ -19,12 +19,12 @@ from particula.utils.environment_ import(
 class Environment:
     """ sets the environment class.
     """
-    def __init__(self, temperature, pressure):
+    def __init__(self, temperature=298, pressure=101325):
         """ initiates the environment class.
 
             Inputs:
-                - temperature
-                - pressure
+                - temperature   (default: 298)
+                - pressure      (default: 101325)
         """
         self._temperature = temperature
         self._pressure = pressure

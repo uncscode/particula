@@ -14,6 +14,8 @@ standard_environment = environment.Environment(
     pressure=101325,  # * u.Pa,
 )
 
+standard_environment_default = environment.Environment()
+
 
 def test_getters():
     """ tests the getters for the Environment class.
@@ -22,6 +24,12 @@ def test_getters():
     assert standard_environment.temperature() == 298 * u.K
     assert standard_environment.pressure() == 101325 * u.Pa
 
+def test_getters_default():
+    """ tests the getters for the (default) Environment class.
+    """
+
+    assert standard_environment_default.temperature() == 298 * u.K
+    assert standard_environment_default.pressure() == 101325 * u.Pa
 
 def test_dynamic_viscosity_air():
     """ tests calculation for the dynamic viscosity of air.
