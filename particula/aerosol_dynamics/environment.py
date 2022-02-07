@@ -46,6 +46,8 @@ class Environment:
     @u.wraps(u.kg / u.m / u.s, [None])
     def dynamic_viscosity_air(self) -> float:
         """ Returns the dynamic viscosity of air: [kg/m/s]
+
+            uses: utils.environment_.dynamic_viscosity_air
         """
 
         return dyn_vis_air(self.temperature())
@@ -53,6 +55,8 @@ class Environment:
     @u.wraps(u.m, [None])
     def mean_free_path_air(self) -> float:
         """ Returns the mean free path in air: [m]
+
+            uses: utils.environment_.mean_free_path_air
         """
 
         return mfp_air(self.temperature(), self.pressure())
