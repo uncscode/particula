@@ -2,6 +2,9 @@
 """
 
 # flake8: noqa: F401
+from particula.utils.particle_.calc_particle_mass import (
+    particle_mass,
+)
 # from particula.utils.particle_.calc_knudsen_number import (
 #     knudsen_number
 # )

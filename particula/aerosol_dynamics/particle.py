@@ -47,7 +47,13 @@ class Particle:
         mass    (float) [kg]
     """
 
-    def __init__(self, name: str, radius, density, charge):
+    def __init__(
+        self,
+        name: str,
+        radius,
+        density,
+        charge
+    ):
         """Constructs particle objects.
 
         Parameters:
