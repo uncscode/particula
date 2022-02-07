@@ -12,13 +12,13 @@ from particula.utils.get_constants import(
     ELECTRIC_PERMITTIVITY,
 )
 from particula.utils.strip_units import make_unitless as unitless
-from particula.utils.particle_ import (
-    knudsen_number,
-    slip_correction,
-    friction_factor,
-    reduced_mass,
-    reduced_friction,
-    coulomb_ratio,
-    coulomb_kinetic,
-    coulomb_continuum,
-)
+# from particula.utils.particle_ import (
+#     knudsen_number,
+#     slip_correction,
+#     friction_factor,
+#     reduced_mass,
+#     reduced_friction,
+#     coulomb_ratio,
+#     coulomb_kinetic,
+#     coulomb_continuum,
+# )

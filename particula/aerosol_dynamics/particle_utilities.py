@@ -198,7 +198,7 @@ def coulomb_enhancement_continuum_limit(
         temperature                         (float)     [K]
 
     Returns:
-        coulomb_enhancement_continuum_limit (array)     [unitless] 
+        coulomb_enhancement_continuum_limit (array)     [unitless]
     """
 
     coulomb_potential_ratio_initial = coulomb_potential_ratio(
