@@ -14,7 +14,14 @@ from particula.utils import (
 
 def mean_free_path_air(temperature, pressure) -> float:
 
-    """ Returns the mean free path: [m]
+    """ Returns the mean free path of air.
+
+        Parameters:
+            temperature (float) [K]
+            pressure    (float) [Pa]
+
+        Returns:
+                        (float) [m]
 
         The mean free path is the average distance
         traveled by a molecule between collisions

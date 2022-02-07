@@ -11,7 +11,13 @@ from particula.utils import (
 
 def dynamic_viscosity_air(temperature) -> float:
 
-    """ Returns the dynamic viscosity of air: [kg/m/s]
+    """ Returns the dynamic viscosity of air
+
+        Parameters:
+            temperature (float) [K]
+
+        Returns:
+                        (float) [kg/m/s]
 
         The dynamic viscosity is calculated using
         the 3-parameter Sutherland Viscosity Law.

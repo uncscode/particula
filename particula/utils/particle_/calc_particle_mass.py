@@ -6,14 +6,15 @@ from particula import u
 
 
 def particle_mass(radius, density=1000):
+
     """ Returns particle's mass.
 
         Parameters:
-            radius                  (float) [m]
-            density (default: 1000) (float) [kg/m^3]
+            radius  (float) [m]
+            density (float) [kg/m^3] (default: 1000)
 
         Returns:
-            mass                    (float) [kg]
+                    (float) [kg]
     """
 
     if isinstance(radius, u.Quantity):

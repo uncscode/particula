@@ -5,9 +5,9 @@
 from particula.utils.particle_.calc_particle_mass import (
     particle_mass,
 )
-# from particula.utils.particle_.calc_knudsen_number import (
-#     knudsen_number
-# )
+from particula.utils.particle_.calc_knudsen_number import (
+    knudsen_number
+)
 # from particula.utils.particle_.calc_slip_correction import (
 #     slip_correction_factor as slip_correction
 # )

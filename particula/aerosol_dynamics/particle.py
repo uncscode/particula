@@ -27,6 +27,10 @@
 
 import numpy as np
 from particula import u
+from particula.utils.particle_ import (
+    particle_mass,
+    knudsen_number,
+)
 from particula.aerosol_dynamics import physical_parameters as pp
 from particula.aerosol_dynamics.environment import Environment
 
@@ -40,438 +44,438 @@ class Particle:
 
     Attributes:
 
-        name    (str)   [no units]
+        name    (str)   [unitless]  (default: "None")
         radius  (float) [m]
-        density (float) [kg/m**3]
-        charge  (int)   [dimensionless]
+        density (float) [kg/m**3]   (default: 1000)
+        charge  (int)   [unitless]  (default: 0)
         mass    (float) [kg]
     """
 
     def __init__(
         self,
-        name: str,
         radius,
-        density,
-        charge
+        density=1000,
+        charge=0,
+        name="None",
     ):
-        """Constructs particle objects.
+        """ Constructs particle objects.
 
-        Parameters:
+            Parameters:
 
-            name    (str)   [no units]
-            radius  (float) [m]
-            density (float) [kg/m**3]
-            charge  (int)   [dimensionless]
+                name    (str)   [unitless]
+                radius  (float) [m]
+                density (float) [kg/m**3]
+                charge  (int)   [unitless]
         """
 
         self._name = name
         self._radius = radius
         self._density = density
         self._charge = charge
-        self._mass = density * (4*np.pi/3) * (radius**3)
+        self._mass = particle_mass(radius, density)
+
 
     def name(self) -> str:
-        """Returns the name of particle.
+        """ Returns the name of particle
         """
 
         return self._name
 
     @u.wraps(u.kg, [None])
     def mass(self) -> float:
-        """Returns mass of particle.
-
-        Checks units: [kg]
+        """ Returns mass of particle: [kg]
         """
 
         return self._mass
 
     @u.wraps(u.m, [None])
     def radius(self) -> float:
-        """Returns radius of particle.
-
-        Checks units: [m]
+        """ Returns radius of particle: [m]
         """
 
         return self._radius
 
     @u.wraps(u.kg / u.m**3, [None])
     def density(self) -> int:
-        """Returns density of particle.
-
-        Checks units: [kg/m**3]
+        """ Returns density of particle: [kg/m**3]
         """
 
         return self._density
 
     @u.wraps(u.dimensionless, [None])
     def charge(self) -> int:
-        """Returns number of charges on particle.
-
-        Checks units: [dimensionless]
+        """ Returns number of charges on particle
         """
 
         return self._charge
 
     @u.wraps(u.dimensionless, [None, None])
-    def knudsen_number(self, environment: Environment) -> float:
-        """Returns particle's Knudsen number.
+    def knudsen_number(self, environment=Environment()) -> float:
+        """ Returns particle's Knudsen number
 
-        Checks units: [dimensionless]
+            uses:
+                utils.particle_.knudsen_number with self.radius() and
+                environment.Environment().mean_free_path_air() that
+                defaults to standard conditions if not provided with
+                temperature 298 K and pressure 101325 Pa.
 
-        The Knudsen number reflects the relative length scales of
-        the particle and the suspending fluid (air, water, etc.).
-        This is calculated by the mean free path of the medium
-        divided by the particle radius.
+            The Knudsen number reflects the relative length scales of
+            the particle and the suspending fluid (air, water, etc.).
+            This is calculated by the mean free path of the medium
+            divided by the particle radius.
         """
 
-        return environment.mean_free_path_air() / self.radius()
-
-    @u.wraps(u.dimensionless, [None, None])
-    def slip_correction_factor(self, environment: Environment) -> float:
-        """Returns particle's Cunningham slip correction factor.
-
-        Checks units: [dimensionless]
-
-        Dimensionless quantity accounting for non-continuum effects
-        on small particles. It is a deviation from Stokes' Law.
-        Stokes assumes a no-slip condition that is not correct at
-        high Knudsen numbers. The slip correction factor is used to
-        calculate the friction factor.
-
-        See Eq 9.34 in Atmos. Chem. & Phys. (2016) for more informatiom."""
-
-        knudsen_number: float = self.knudsen_number(environment)
-        return 1 + knudsen_number * (
-            1.257 + 0.4*np.exp(-1.1/knudsen_number)
+        return knudsen_number(
+            radius=self.radius(),
+            mean_free_path_air=environment.mean_free_path_air(),
         )
 
-    @u.wraps(u.kg / u.s, [None, None])
-    def friction_factor(self, environment: Environment) -> float:
-        """Returns a particle's friction factor.
+    # @u.wraps(u.dimensionless, [None, None])
+    # def slip_correction_factor(self, environment: Environment) -> float:
+    #     """Returns particle's Cunningham slip correction factor.
 
-        Checks units: [N*s/m]
+    #     Checks units: [dimensionless]
 
-        Property of the particle's size and surrounding medium.
-        Multiplying the friction factor by the fluid velocity
-        yields the drag force on the particle.
-        """
+    #     Dimensionless quantity accounting for non-continuum effects
+    #     on small particles. It is a deviation from Stokes' Law.
+    #     Stokes assumes a no-slip condition that is not correct at
+    #     high Knudsen numbers. The slip correction factor is used to
+    #     calculate the friction factor.
 
-        slip_correction_factor: float = self.slip_correction_factor(
-            environment
-        )
-        return (
-            6 * np.pi * environment.dynamic_viscosity_air() * self.radius() /
-            slip_correction_factor
-        )
+    #     See Eq 9.34 in Atmos. Chem. & Phys. (2016) for more informatiom."""
 
-    @u.wraps(u.kg, [None, None])
-    def reduced_mass(self, other) -> float:
-        """Returns the reduced mass of two particles.
+    #     knudsen_number: float = self.knudsen_number(environment)
+    #     return 1 + knudsen_number * (
+    #         1.257 + 0.4*np.exp(-1.1/knudsen_number)
+    #     )
 
-        Checks units: [kg]
+    # @u.wraps(u.kg / u.s, [None, None])
+    # def friction_factor(self, environment: Environment) -> float:
+    #     """Returns a particle's friction factor.
 
-        The reduced mass is an "effective inertial" mass.
-        Allows a two-body problem to be solved as a one-body problem.
-        """
+    #     Checks units: [N*s/m]
 
-        return self.mass() * other.mass() / (self.mass() + other.mass())
+    #     Property of the particle's size and surrounding medium.
+    #     Multiplying the friction factor by the fluid velocity
+    #     yields the drag force on the particle.
+    #     """
 
-    @u.wraps(u.kg / u.s, [None, None, None])
-    def reduced_friction_factor(
-        self, other, environment: Environment
-    ) -> float:
-        """Returns the reduced friction factor between two particles.
+    #     slip_correction_factor: float = self.slip_correction_factor(
+    #         environment
+    #     )
+    #     return (
+    #         6 * np.pi * environment.dynamic_viscosity_air() * self.radius() /
+    #         slip_correction_factor
+    #     )
 
-        Checks units: [N*s/m]
+    # @u.wraps(u.kg, [None, None])
+    # def reduced_mass(self, other) -> float:
+    #     """Returns the reduced mass of two particles.
 
-        Similar to the reduced mass.
-        The reduced friction factor allows a two-body problem
-        to be solved as a one-body problem.
-        """
+    #     Checks units: [kg]
 
-        return (
-            self.friction_factor(environment)
-            * other.friction_factor(environment)
-            / (
-                self.friction_factor(environment)
-                + other.friction_factor(environment)
-            )
-        )
+    #     The reduced mass is an "effective inertial" mass.
+    #     Allows a two-body problem to be solved as a one-body problem.
+    #     """
 
-    @u.wraps(u.dimensionless, [None, None, None])
-    def coulomb_potential_ratio(
-        self, other, environment: Environment
-    ) -> float:
-        """Calculates the Coulomb potential ratio.
+    #     return self.mass() * other.mass() / (self.mass() + other.mass())
 
-        Checks units: [dimensionless]
-        """
+    # @u.wraps(u.kg / u.s, [None, None, None])
+    # def reduced_friction_factor(
+    #     self, other, environment: Environment
+    # ) -> float:
+    #     """Returns the reduced friction factor between two particles.
 
-        numerator = -1 * self.charge() * other.charge() * (
-            pp.ELEMENTARY_CHARGE_VALUE ** 2
-        )
-        denominator = 4 * np.pi * pp.ELECTRIC_PERMITTIVITY * (
-            self.radius() + other.radius()
-        )
-        return (
-            numerator /
-            (denominator * pp.BOLTZMANN_CONSTANT * environment.temperature())
-        )
+    #     Checks units: [N*s/m]
 
-    @u.wraps(u.dimensionless, [None, None, None])
-    def coulomb_enhancement_kinetic_limit(
-        self, other, environment: Environment
-    ) -> float:
-        """Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
+    #     Similar to the reduced mass.
+    #     The reduced friction factor allows a two-body problem
+    #     to be solved as a one-body problem.
+    #     """
 
-        Checks units: [dimensionless]
-        """
+    #     return (
+    #         self.friction_factor(environment)
+    #         * other.friction_factor(environment)
+    #         / (
+    #             self.friction_factor(environment)
+    #             + other.friction_factor(environment)
+    #         )
+    #     )
 
-        coulomb_potential_ratio = self.coulomb_potential_ratio(
-            other, environment
-        )
-        return (
-            1 + coulomb_potential_ratio if coulomb_potential_ratio >= 0
+    # @u.wraps(u.dimensionless, [None, None, None])
+    # def coulomb_potential_ratio(
+    #     self, other, environment: Environment
+    # ) -> float:
+    #     """Calculates the Coulomb potential ratio.
 
-            else np.exp(coulomb_potential_ratio)
-        )
+    #     Checks units: [dimensionless]
+    #     """
 
-    @u.wraps(u.dimensionless, [None, None, None])
-    def coulomb_enhancement_continuum_limit(
-        self, other, environment: Environment
-    ) -> float:
-        """Continuum limit of Coulomb enhancement for particle--particle coagulation.
+    #     numerator = -1 * self.charge() * other.charge() * (
+    #         pp.ELEMENTARY_CHARGE_VALUE ** 2
+    #     )
+    #     denominator = 4 * np.pi * pp.ELECTRIC_PERMITTIVITY * (
+    #         self.radius() + other.radius()
+    #     )
+    #     return (
+    #         numerator /
+    #         (denominator * pp.BOLTZMANN_CONSTANT * environment.temperature())
+    #     )
 
-        Checks units: [dimensionless]
-        """
+    # @u.wraps(u.dimensionless, [None, None, None])
+    # def coulomb_enhancement_kinetic_limit(
+    #     self, other, environment: Environment
+    # ) -> float:
+    #     """Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
 
-        coulomb_potential_ratio = self.coulomb_potential_ratio(
-            other, environment
-        )
-        return coulomb_potential_ratio / (
-            1 - np.exp(-1*coulomb_potential_ratio)
-        ) if coulomb_potential_ratio != 0 else 1
+    #     Checks units: [dimensionless]
+    #     """
 
-    @u.wraps(u.dimensionless, [None, None, None])
-    def diffusive_knudsen_number(
-        self, other, environment: Environment
-    ) -> float:
-        """Diffusive Knudsen number.
+    #     coulomb_potential_ratio = self.coulomb_potential_ratio(
+    #         other, environment
+    #     )
+    #     return (
+    #         1 + coulomb_potential_ratio if coulomb_potential_ratio >= 0
 
-        Checks units: [dimensionless]
+    #         else np.exp(coulomb_potential_ratio)
+    #     )
 
-        The *diffusive* Knudsen number is different from Knudsen number.
-        Ratio of:
+    # @u.wraps(u.dimensionless, [None, None, None])
+    # def coulomb_enhancement_continuum_limit(
+    #     self, other, environment: Environment
+    # ) -> float:
+    #     """Continuum limit of Coulomb enhancement for particle--particle coagulation.
 
-            - numerator: mean persistence of one particle
-            - denominator: effective length scale of
-                particle--particle Coulombic interaction
-        """
+    #     Checks units: [dimensionless]
+    #     """
 
-        numerator = (
-            (
-                environment.temperature() * pp.BOLTZMANN_CONSTANT
-                * self.reduced_mass(other)
-            )**0.5
-            / self.reduced_friction_factor(other, environment)
-        )
-        denominator = (
-            (self.radius() + other.radius())
-            * self.coulomb_enhancement_kinetic_limit(other, environment)
-            / self.coulomb_enhancement_continuum_limit(other, environment)
-        )
-        return numerator / denominator
+    #     coulomb_potential_ratio = self.coulomb_potential_ratio(
+    #         other, environment
+    #     )
+    #     return coulomb_potential_ratio / (
+    #         1 - np.exp(-1*coulomb_potential_ratio)
+    #     ) if coulomb_potential_ratio != 0 else 1
 
-    @u.wraps(u.dimensionless, [None, None, None])
-    def dimensionless_coagulation_kernel_hard_sphere(
-        self, other, environment: Environment
-    ) -> float:
-        """Dimensionless particle--particle coagulation kernel.
+    # @u.wraps(u.dimensionless, [None, None, None])
+    # def diffusive_knudsen_number(
+    #     self, other, environment: Environment
+    # ) -> float:
+    #     """Diffusive Knudsen number.
 
-        Checks units: [dimensionless]
-        """
+    #     Checks units: [dimensionless]
 
-        # Constants for the chargeless hard-sphere limit
-        # see doi:
-        hsc1 = 25.836
-        hsc2 = 11.211
-        hsc3 = 3.502
-        hsc4 = 7.211
-        diffusive_knudsen_number = self.diffusive_knudsen_number(
-            other, environment
-        )
+    #     The *diffusive* Knudsen number is different from Knudsen number.
+    #     Ratio of:
 
-        numerator = (
-            (4 * np.pi * diffusive_knudsen_number**2)
-            + (hsc1 * diffusive_knudsen_number**3)
-            + ((8 * np.pi)**(1/2) * hsc2 * diffusive_knudsen_number**4)
-        )
-        denominator = (
-            1
-            + hsc3 * diffusive_knudsen_number
-            + hsc4 * diffusive_knudsen_number**2
-            + hsc2 * diffusive_knudsen_number**3
-        )
-        return numerator / denominator
+    #         - numerator: mean persistence of one particle
+    #         - denominator: effective length scale of
+    #             particle--particle Coulombic interaction
+    #     """
 
-    @u.wraps(u.dimensionless, [None, None, None])
-    def collision_kernel_continuum_limit(
-        self, other, environment: Environment
-    ) -> float:
-        """Continuum limit of collision kernel.
+    #     numerator = (
+    #         (
+    #             environment.temperature() * pp.BOLTZMANN_CONSTANT
+    #             * self.reduced_mass(other)
+    #         )**0.5
+    #         / self.reduced_friction_factor(other, environment)
+    #     )
+    #     denominator = (
+    #         (self.radius() + other.radius())
+    #         * self.coulomb_enhancement_kinetic_limit(other, environment)
+    #         / self.coulomb_enhancement_continuum_limit(other, environment)
+    #     )
+    #     return numerator / denominator
 
-        Checks units: [dimensionless]
-        """
+    # @u.wraps(u.dimensionless, [None, None, None])
+    # def dimensionless_coagulation_kernel_hard_sphere(
+    #     self, other, environment: Environment
+    # ) -> float:
+    #     """Dimensionless particle--particle coagulation kernel.
 
-        diffusive_knudsen_number = self.diffusive_knudsen_number(
-            other, environment
-        )
-        return 4 * np.pi * (diffusive_knudsen_number**2)
+    #     Checks units: [dimensionless]
+    #     """
 
-    @u.wraps(u.dimensionless, [None, None, None])
-    def collision_kernel_kinetic_limit(
-        self, other, environment: Environment
-    ) -> float:
-        """Kinetic limit of collision kernel.
+    #     # Constants for the chargeless hard-sphere limit
+    #     # see doi:
+    #     hsc1 = 25.836
+    #     hsc2 = 11.211
+    #     hsc3 = 3.502
+    #     hsc4 = 7.211
+    #     diffusive_knudsen_number = self.diffusive_knudsen_number(
+    #         other, environment
+    #     )
 
-        Checks units: [dimensionless]
-        """
+    #     numerator = (
+    #         (4 * np.pi * diffusive_knudsen_number**2)
+    #         + (hsc1 * diffusive_knudsen_number**3)
+    #         + ((8 * np.pi)**(1/2) * hsc2 * diffusive_knudsen_number**4)
+    #     )
+    #     denominator = (
+    #         1
+    #         + hsc3 * diffusive_knudsen_number
+    #         + hsc4 * diffusive_knudsen_number**2
+    #         + hsc2 * diffusive_knudsen_number**3
+    #     )
+    #     return numerator / denominator
 
-        diffusive_knudsen_number = self.diffusive_knudsen_number(
-            other, environment
-        )
-        return np.sqrt(8 * np.pi) * diffusive_knudsen_number
+    # @u.wraps(u.dimensionless, [None, None, None])
+    # def collision_kernel_continuum_limit(
+    #     self, other, environment: Environment
+    # ) -> float:
+    #     """Continuum limit of collision kernel.
 
-    @u.wraps(u.dimensionless, [None, None, None, None])
-    def dimensionless_coagulation_kernel_parameterized(
-        self,
-        other,
-        environment: Environment,
-        authors: str = "cg2019",
-    ) -> float:
-        """Dimensionless particle--particle coagulation kernel.
+    #     Checks units: [dimensionless]
+    #     """
 
-        Checks units: [dimensionless]
+    #     diffusive_knudsen_number = self.diffusive_knudsen_number(
+    #         other, environment
+    #     )
+    #     return 4 * np.pi * (diffusive_knudsen_number**2)
 
-        Paramaters:
+    # @u.wraps(u.dimensionless, [None, None, None])
+    # def collision_kernel_kinetic_limit(
+    #     self, other, environment: Environment
+    # ) -> float:
+    #     """Kinetic limit of collision kernel.
 
-            self:           particle 1
-            other:          particle 2
-            environment:    environment conditions
-            authors:        authors of the parameterization
-                - gh2012    doi.org:10.1103/PhysRevE.78.046402
-                - cg2019    doi:10.1080/02786826.2019.1614522
-                - hard_sphere
-                (default: cg2019)
-        """
+    #     Checks units: [dimensionless]
+    #     """
 
-        if authors == "cg2019":
-            # some parameters
-            corra = 2.5
-            corrb = (
-                4.528*np.exp(-1.088*self.coulomb_potential_ratio(
-                    other, environment
-                ))
-            ) + (
-                0.7091*np.log(1 + 1.527*self.coulomb_potential_ratio(
-                    other, environment
-                ))
-            )
+    #     diffusive_knudsen_number = self.diffusive_knudsen_number(
+    #         other, environment
+    #     )
+    #     return np.sqrt(8 * np.pi) * diffusive_knudsen_number
 
-            corrc = (11.36)*(self.coulomb_potential_ratio(
-                other, environment
-            )**0.272) - 10.33
-            corrk = - 0.003533*self.coulomb_potential_ratio(
-                other, environment
-            ) + 0.05971
+    # @u.wraps(u.dimensionless, [None, None, None, None])
+    # def dimensionless_coagulation_kernel_parameterized(
+    #     self,
+    #     other,
+    #     environment: Environment,
+    #     authors: str = "cg2019",
+    # ) -> float:
+    #     """Dimensionless particle--particle coagulation kernel.
 
-            # mu for the parameterization
-            corr_mu = (corrc/corra)*(
-                (1 + corrk*((np.log(
-                    self.diffusive_knudsen_number(other, environment)
-                ) - corrb)/corra))**((-1/corrk) - 1)
-            ) * (
-                np.exp(-(1 + corrk*(np.log(
-                    self.diffusive_knudsen_number(other, environment)
-                ) - corrb)/corra)**(- 1/corrk))
-            )
+    #     Checks units: [dimensionless]
 
-            answer = (
-                # self.dimensionless_coagulation_kernel_hard_sphere(
-                #     other, environment
-                # ) if self.coulomb_potential_ratio(
-                #     other, environment
-                # ) <= 0 else
-                self.dimensionless_coagulation_kernel_hard_sphere(
-                    other, environment
-                )*np.exp(corr_mu)
-            )
+    #     Paramaters:
 
-        elif authors == "gh2012":
-            numerator = self.coulomb_enhancement_continuum_limit(
-                other, environment
-            )
+    #         self:           particle 1
+    #         other:          particle 2
+    #         environment:    environment conditions
+    #         authors:        authors of the parameterization
+    #             - gh2012    doi.org:10.1103/PhysRevE.78.046402
+    #             - cg2019    doi:10.1080/02786826.2019.1614522
+    #             - hard_sphere
+    #             (default: cg2019)
+    #     """
 
-            denominator = 1 + 1.598*(np.minimum(
-                self.diffusive_knudsen_number(other, environment),
-                3*self.diffusive_knudsen_number(other, environment)/2
-                / self.coulomb_potential_ratio(other, environment)
-            ))**1.1709
+    #     if authors == "cg2019":
+    #         # some parameters
+    #         corra = 2.5
+    #         corrb = (
+    #             4.528*np.exp(-1.088*self.coulomb_potential_ratio(
+    #                 other, environment
+    #             ))
+    #         ) + (
+    #             0.7091*np.log(1 + 1.527*self.coulomb_potential_ratio(
+    #                 other, environment
+    #             ))
+    #         )
 
-            answer = (
-                self.dimensionless_coagulation_kernel_hard_sphere(
-                    other, environment
-                ) if self.coulomb_potential_ratio(
-                    other, environment
-                ) <= 0.5 else
-                numerator / denominator
-            )
+    #         corrc = (11.36)*(self.coulomb_potential_ratio(
+    #             other, environment
+    #         )**0.272) - 10.33
+    #         corrk = - 0.003533*self.coulomb_potential_ratio(
+    #             other, environment
+    #         ) + 0.05971
 
-        elif authors == "hard_sphere":
-            answer = self.dimensionless_coagulation_kernel_hard_sphere(
-                other, environment
-            )
+    #         # mu for the parameterization
+    #         corr_mu = (corrc/corra)*(
+    #             (1 + corrk*((np.log(
+    #                 self.diffusive_knudsen_number(other, environment)
+    #             ) - corrb)/corra))**((-1/corrk) - 1)
+    #         ) * (
+    #             np.exp(-(1 + corrk*(np.log(
+    #                 self.diffusive_knudsen_number(other, environment)
+    #             ) - corrb)/corra)**(- 1/corrk))
+    #         )
 
-        if authors not in ["gh2012", "hard_sphere", "cg2019"]:
-            raise ValueError("We don't have this parameterization.")
+    #         answer = (
+    #             # self.dimensionless_coagulation_kernel_hard_sphere(
+    #             #     other, environment
+    #             # ) if self.coulomb_potential_ratio(
+    #             #     other, environment
+    #             # ) <= 0 else
+    #             self.dimensionless_coagulation_kernel_hard_sphere(
+    #                 other, environment
+    #             )*np.exp(corr_mu)
+    #         )
 
-        return answer
+    #     elif authors == "gh2012":
+    #         numerator = self.coulomb_enhancement_continuum_limit(
+    #             other, environment
+    #         )
 
-    @u.wraps(u.m**3 / u.s, [None, None, None, None])
-    def dimensioned_coagulation_kernel(
-        self,
-        other,
-        environment: Environment,
-        authors: str = "cg2019",
-    ) -> float:
-        """Dimensioned particle--particle coagulation kernel.
+    #         denominator = 1 + 1.598*(np.minimum(
+    #             self.diffusive_knudsen_number(other, environment),
+    #             3*self.diffusive_knudsen_number(other, environment)/2
+    #             / self.coulomb_potential_ratio(other, environment)
+    #         ))**1.1709
 
-        Checks units: [m**3/s]
+    #         answer = (
+    #             self.dimensionless_coagulation_kernel_hard_sphere(
+    #                 other, environment
+    #             ) if self.coulomb_potential_ratio(
+    #                 other, environment
+    #             ) <= 0.5 else
+    #             numerator / denominator
+    #         )
 
-        Paramaters:
+    #     elif authors == "hard_sphere":
+    #         answer = self.dimensionless_coagulation_kernel_hard_sphere(
+    #             other, environment
+    #         )
 
-            self:           particle 1
-            other:          particle 2
-            environment:    environment conditions
-            authors:        authors of the parameterization
-                - gh2012    https://doi.org/10.1103/PhysRevE.78.046402
-                - cg2020    https://doi.org/XXXXXXXXXXXXXXXXXXXXXXXXXX
-                - hard_sphere (from above)
-                (default: cg2019)
-        """
+    #     if authors not in ["gh2012", "hard_sphere", "cg2019"]:
+    #         raise ValueError("We don't have this parameterization.")
 
-        return (
-            self.dimensionless_coagulation_kernel_parameterized(
-                other, environment, authors
-            ) * self.reduced_friction_factor(
-                other, environment
-            ) * (
-                self.radius() + other.radius()
-            )**3 * self.coulomb_enhancement_kinetic_limit(
-                other, environment
-            )**2 / self.reduced_mass(
-                other
-            ) / self.coulomb_enhancement_continuum_limit(
-                other, environment
-            )
-        )
+    #     return answer
+
+    # @u.wraps(u.m**3 / u.s, [None, None, None, None])
+    # def dimensioned_coagulation_kernel(
+    #     self,
+    #     other,
+    #     environment: Environment,
+    #     authors: str = "cg2019",
+    # ) -> float:
+    #     """Dimensioned particle--particle coagulation kernel.
+
+    #     Checks units: [m**3/s]
+
+    #     Paramaters:
+
+    #         self:           particle 1
+    #         other:          particle 2
+    #         environment:    environment conditions
+    #         authors:        authors of the parameterization
+    #             - gh2012    https://doi.org/10.1103/PhysRevE.78.046402
+    #             - cg2020    https://doi.org/XXXXXXXXXXXXXXXXXXXXXXXXXX
+    #             - hard_sphere (from above)
+    #             (default: cg2019)
+    #     """
+
+    #     return (
+    #         self.dimensionless_coagulation_kernel_parameterized(
+    #             other, environment, authors
+    #         ) * self.reduced_friction_factor(
+    #             other, environment
+    #         ) * (
+    #             self.radius() + other.radius()
+    #         )**3 * self.coulomb_enhancement_kinetic_limit(
+    #             other, environment
+    #         )**2 / self.reduced_mass(
+    #             other
+    #         ) / self.coulomb_enhancement_continuum_limit(
+    #             other, environment
+    #         )
+    #     )
