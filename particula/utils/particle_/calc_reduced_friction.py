@@ -3,6 +3,7 @@
 
 from particula.utils import friction_factor
 
+
 def reduced_friction_factor(
     radius,
     other_radius,

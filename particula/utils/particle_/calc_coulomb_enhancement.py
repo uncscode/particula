@@ -6,6 +6,7 @@ from particula.utils import (
     coulomb_ratio
 )
 
+
 def coulomb_enhancement_kinetic_limit(
     charge, other_charge,
     radius, other_radius,

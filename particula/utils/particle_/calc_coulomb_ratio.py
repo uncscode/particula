@@ -9,6 +9,7 @@ from particula.utils import (
 )
 from particula.utils import unitless
 
+
 def coulomb_potential_ratio(
     charge, other_charge,
     radius, other_radius,

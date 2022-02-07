@@ -8,6 +8,7 @@ from particula.utils import (
     GAS_CONSTANT,
 )
 
+
 def test_get_constants():
 
     """ testing get_constants
@@ -18,17 +19,17 @@ def test_get_constants():
 
     assert (
         GAS_CONSTANT ==
-            BOLTZMANN_CONSTANT * AVOGADRO_NUMBER
+        BOLTZMANN_CONSTANT * AVOGADRO_NUMBER
     )
     assert (
         GAS_CONSTANT.units ==
-            BOLTZMANN_CONSTANT.units * AVOGADRO_NUMBER.units
+        BOLTZMANN_CONSTANT.units * AVOGADRO_NUMBER.units
     )
     assert (
         GAS_CONSTANT.magnitude ==
-            BOLTZMANN_CONSTANT.magnitude * AVOGADRO_NUMBER.magnitude
+        BOLTZMANN_CONSTANT.magnitude * AVOGADRO_NUMBER.magnitude
     )
     assert (
         BOLTZMANN_CONSTANT.units ==
-            u.m**2 * u.kg / u.s**2 / u.K
+        u.m**2 * u.kg / u.s**2 / u.K
     )

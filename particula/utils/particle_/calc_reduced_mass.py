@@ -1,6 +1,7 @@
 """ Calculate the reducedm mass
 """
 
+
 def reduced_mass(mass, other_mass) -> float:
 
     """ Returns the reduced mass of two particles.
