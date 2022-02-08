@@ -12,7 +12,7 @@ def knudsen_number(radius, mfp_air=66.4e-9) -> float:
             mfp_air (float) [m] (default: 66.4e-9)
 
         Returns:
-                    (float) [unitless]
+                    (float) [dimensionless]
 
         The Knudsen number reflects the relative length scales of
         the particle and the suspending fluid (air, water, etc.).

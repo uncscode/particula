@@ -39,19 +39,19 @@ from particula.utils.particle_ import (
 
 class Particle:
 
-    """Class to instantiate particles and calculate their properties.
+    """ Class to instantiate particles and calculate their properties.
 
-    This class represents the underlying framework for both
-    particle--particle and gas--particle interactions. See detailed
-    methods and functions below.
+        This class represents the underlying framework for both
+        particle--particle and gas--particle interactions.
+        See detailed methods and functions below.
 
-    Attributes:
+        Attributes:
 
-        radius  (float) [m]
-        mass    (float) [kg]
-        density (float) [kg/m**3]       (default: 1000)
-        charge  (int)   [dimensionless] (default: 0)
-        name    (str)   [dimensionless] (default: "None")
+            radius  (float) [m]
+            mass    (float) [kg]
+            density (float) [kg/m**3]       (default: 1000)
+            charge  (int)   [dimensionless] (default: 0)
+            name    (str)   [dimensionless] (default: "None")
 
     """
 
