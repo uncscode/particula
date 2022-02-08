@@ -1,4 +1,4 @@
-""" testing the utility calculating reduced quantities 
+""" testing the utility calculating reduced quantities
 """
 
 import pytest
@@ -11,7 +11,7 @@ from particula.utils.particle_.calc_reduced_quantity import (
 def test_reduced_quantity():
     """ Test that the reduced quantity is calculated correctly.
     """
-    
+
     assert (
         reduced_quantity(1, 2) ==
         pytest.approx(2/3)
