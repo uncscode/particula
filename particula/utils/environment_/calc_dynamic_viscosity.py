@@ -21,6 +21,9 @@ def dynamic_viscosity_air(temperature=298) -> float:
 
         The dynamic viscosity is calculated using
         the 3-parameter Sutherland Viscosity Law.
+
+        The expected dynamic viscosity of air is approx.
+        1.8e-05 kg/m/s at standard conditions (298 K).
     """
 
     if isinstance(temperature, u.Quantity):

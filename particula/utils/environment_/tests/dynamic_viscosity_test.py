@@ -19,7 +19,9 @@ def test_dynamic_viscosity():
 
     a_viscosity = dyn_vis_air(298 * u.K)
     b_viscosity = dyn_vis_air(298)
+    c_viscosity = dyn_vis_air(288 * u.K)
 
     assert a_viscosity == b_viscosity
     assert a_viscosity.units == u.kg / u.m / u.s
     assert a_viscosity.magnitude == pytest.approx(1.8e-05, rel=1e-1)
+    assert c_viscosity.magnitude == pytest.approx(1.79e-05, rel=1e-1)

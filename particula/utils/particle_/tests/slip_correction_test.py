@@ -10,7 +10,7 @@ def test_slip_correction():
     """ test the slip correction factor calculation
 
         the slip correction factor is approximately
-            ~1      if  radius ~> 1e-6 m
+            ~1      if  radius ~> 1e-6 m  (Kn -> 0)
             ~100    if  radius ~< 1e-9 m
     """
 

@@ -72,8 +72,8 @@ def test_methods():
         pytest.approx(3e-15)
     )
     assert (
-        large_particle.friction_factor(standard_environment).magnitude
-        == pytest.approx(1.83e-11)
+        large_particle.friction_factor().magnitude ==
+        pytest.approx(1.83e-11)
     )
 
 # import numpy as np

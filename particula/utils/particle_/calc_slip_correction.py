@@ -22,6 +22,11 @@ def slip_correction_factor(radius, mfp_air=66.4e-9) -> float:
         Stokes assumes a no-slip condition that is not correct at
         high Knudsen numbers. The slip correction factor is used to
         calculate the friction factor.
+
+        Thus, the slip correction factor is about unity (1) for larger
+        particles (Kn -> 0). Its behavior on the other end of the
+        spectrum (smaller particles; Kn -> inf) is more nuanced, though
+        it tends to scale linearly on a log-log scale, log Cc vs log Kn.
     """
 
     if isinstance(radius, u.Quantity):

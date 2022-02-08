@@ -1,4 +1,8 @@
 """ test knudsen number utility
+
+    the knudsen number goes like:
+        0   for larger  particles
+        inf for smaller particles
 """
 
 import pytest
@@ -16,4 +20,16 @@ def test_kn():
     assert (
         knudsen_number(radius, mean_free_path_air) ==
         pytest.approx(66)
+    )
+    assert (
+        knudsen_number(1e-10) ==
+        pytest.approx(664)
+    )
+    assert (
+        knudsen_number(1e-3) ==
+        pytest.approx(5e-5, rel=1e0)
+    )
+    assert (
+        knudsen_number(1e-20) ==
+        pytest.approx(5e12, rel=1e0)
     )

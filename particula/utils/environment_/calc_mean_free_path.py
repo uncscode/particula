@@ -26,6 +26,9 @@ def mean_free_path_air(temperature=298, pressure=101325) -> float:
         The mean free path is the average distance
         traveled by a molecule between collisions
         with other molecules present in a medium (air).
+
+        The expeected mean free path of air is approx.
+        65 nm at standard conditions (298 K, 101325 Pa).
     """
 
     if isinstance(temperature, u.Quantity):
