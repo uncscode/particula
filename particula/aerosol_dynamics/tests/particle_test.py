@@ -75,6 +75,36 @@ def test_methods():
         large_particle.friction_factor().magnitude ==
         pytest.approx(1.83e-11)
     )
+    assert (
+        small_particle.reduced_mass(large_particle).units ==
+        small_particle.mass().units
+    )
+    assert (
+        small_particle.reduced_mass(large_particle).magnitude ==
+        pytest.approx(
+            small_particle.mass().magnitude *
+            large_particle.mass().magnitude / (
+                small_particle.mass().magnitude +
+                large_particle.mass().magnitude
+            )
+        )
+    )
+    assert (
+        small_particle.reduced_friction_factor(large_particle).units ==
+        small_particle.friction_factor().units
+    )
+    assert (
+        small_particle.reduced_friction_factor(
+            large_particle
+            ).magnitude ==
+        pytest.approx(
+            small_particle.friction_factor().magnitude *
+            large_particle.friction_factor().magnitude / (
+                small_particle.friction_factor().magnitude +
+                large_particle.friction_factor().magnitude
+            )
+        )
+    )
 
 # import numpy as np
 # import pint

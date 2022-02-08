@@ -33,6 +33,7 @@ from particula.utils.particle_ import (
     knudsen_number,
     slip_correction,
     friction_factor,
+    reduced_quantity,
 )
 
 
@@ -187,39 +188,28 @@ class Particle:
             environment.mean_free_path_air(),
         )
 
-    # @u.wraps(u.kg, [None, None])
-    # def reduced_mass(self, other) -> float:
-    #     """Returns the reduced mass of two particles.
+    @u.wraps(u.kg, [None, None])
+    def reduced_mass(self, other) -> float:
 
-    #     Checks units: [kg]
+        """ Returns the reduced mass of two particles.
 
-    #     The reduced mass is an "effective inertial" mass.
-    #     Allows a two-body problem to be solved as a one-body problem.
-    #     """
+            uses:
+                utils.particle_.reduced_quantity
+        """
 
-    #     return self.mass() * other.mass() / (self.mass() + other.mass())
+        return reduced_quantity(self.mass(), other.mass())
 
-    # @u.wraps(u.kg / u.s, [None, None, None])
-    # def reduced_friction_factor(
-    #     self, other, environment: Environment
-    # ) -> float:
-    #     """Returns the reduced friction factor between two particles.
+    @u.wraps(u.kg / u.s, [None, None])
+    def reduced_friction_factor(self, other) -> float:
+        """ Returns the reduced friction factor of two particles.
 
-    #     Checks units: [N*s/m]
+            uses:
+                utils.particle_.reduced_quantity
+        """
 
-    #     Similar to the reduced mass.
-    #     The reduced friction factor allows a two-body problem
-    #     to be solved as a one-body problem.
-    #     """
-
-    #     return (
-    #         self.friction_factor(environment)
-    #         * other.friction_factor(environment)
-    #         / (
-    #             self.friction_factor(environment)
-    #             + other.friction_factor(environment)
-    #         )
-    #     )
+        return reduced_quantity(
+            self.friction_factor(), other.friction_factor()
+        )
 
     # @u.wraps(u.dimensionless, [None, None, None])
     # def coulomb_potential_ratio(
