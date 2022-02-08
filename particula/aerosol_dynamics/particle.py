@@ -31,9 +31,13 @@ from particula.aerosol_dynamics.environment import Environment
 from particula.utils.particle_ import (
     particle_mass,
     knudsen_number,
+    slip_correction,
+    friction_factor,
 )
 
+
 class Particle:
+
     """Class to instantiate particles and calculate their properties.
 
     This class represents the underlying framework for both
@@ -56,6 +60,7 @@ class Particle:
         charge=0,
         name="None",
     ):
+
         """ Constructs particle objects.
 
             Parameters:
@@ -74,6 +79,7 @@ class Particle:
 
 
     def name(self) -> str:
+
         """ Returns the name of particle
         """
 
@@ -81,6 +87,7 @@ class Particle:
 
     @u.wraps(u.kg, [None])
     def mass(self) -> float:
+
         """ Returns mass of particle: [kg]
         """
 
@@ -88,6 +95,7 @@ class Particle:
 
     @u.wraps(u.m, [None])
     def radius(self) -> float:
+
         """ Returns radius of particle: [m]
         """
 
@@ -95,6 +103,7 @@ class Particle:
 
     @u.wraps(u.kg / u.m**3, [None])
     def density(self) -> int:
+
         """ Returns density of particle: [kg/m**3]
         """
 
@@ -109,6 +118,7 @@ class Particle:
 
     @u.wraps(u.dimensionless, [None, None])
     def knudsen_number(self, environment=Environment()) -> float:
+
         """ Returns particle's Knudsen number
 
             uses:
@@ -125,46 +135,54 @@ class Particle:
 
         return knudsen_number(
             radius=self.radius(),
-            mean_free_path_air=environment.mean_free_path_air(),
+            mfp_air=environment.mean_free_path_air(),
         )
 
-    # @u.wraps(u.dimensionless, [None, None])
-    # def slip_correction_factor(self, environment: Environment) -> float:
-    #     """Returns particle's Cunningham slip correction factor.
+    @u.wraps(u.dimensionless, [None, None])
+    def slip_correction_factor(
+        self, environment=Environment()
+    ) -> float:
 
-    #     Checks units: [dimensionless]
+        """ Returns particle's Cunningham slip correction factor.
 
-    #     Dimensionless quantity accounting for non-continuum effects
-    #     on small particles. It is a deviation from Stokes' Law.
-    #     Stokes assumes a no-slip condition that is not correct at
-    #     high Knudsen numbers. The slip correction factor is used to
-    #     calculate the friction factor.
+            uses:
+                utils.particle_.slip_correction with self.radius() and
+                environment.Environment().mean_free_path_air() that
+                defaults to standard conditions if not provided with
+                temperature 298 K and pressure 101325 Pa.
 
-    #     See Eq 9.34 in Atmos. Chem. & Phys. (2016) for more informatiom."""
+            Dimensionless quantity accounting for non-continuum effects
+            on small particles. It is a deviation from Stokes' Law.
+            Stokes assumes a no-slip condition that is not correct at
+            high Knudsen numbers. The slip correction factor is used to
+            calculate the friction factor.
+        """
 
-    #     knudsen_number: float = self.knudsen_number(environment)
-    #     return 1 + knudsen_number * (
-    #         1.257 + 0.4*np.exp(-1.1/knudsen_number)
-    #     )
+        return slip_correction(
+            self.radius(),
+            environment.mean_free_path_air()
+        )
 
-    # @u.wraps(u.kg / u.s, [None, None])
-    # def friction_factor(self, environment: Environment) -> float:
-    #     """Returns a particle's friction factor.
+    @u.wraps(u.kg / u.s, [None, None])
+    def friction_factor(self, environment=Environment()) -> float:
 
-    #     Checks units: [N*s/m]
+        """ Returns the particle's friction factor.
 
-    #     Property of the particle's size and surrounding medium.
-    #     Multiplying the friction factor by the fluid velocity
-    #     yields the drag force on the particle.
-    #     """
+            uses:
+                utils.particle_.friction_factor with self.radius() and
+                environment.Environment().mean_free_path_air() that
+                defaults to standard conditions if not provided with
+                temperature 298 K and pressure 101325 Pa.
 
-    #     slip_correction_factor: float = self.slip_correction_factor(
-    #         environment
-    #     )
-    #     return (
-    #         6 * np.pi * environment.dynamic_viscosity_air() * self.radius() /
-    #         slip_correction_factor
-    #     )
+            Property of the particle's size and surrounding medium.
+            Multiplying the friction factor by the fluid velocity
+            yields the drag force on the particle.
+        """
+
+        return friction_factor(
+            self.radius(),
+            environment.mean_free_path_air(),
+        )
 
     # @u.wraps(u.kg, [None, None])
     # def reduced_mass(self, other) -> float:

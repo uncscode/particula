@@ -11,9 +11,9 @@ from particula.utils.particle_.calc_knudsen_number import (
 from particula.utils.particle_.calc_slip_correction import (
     slip_correction_factor as slip_correction
 )
-# from particula.utils.particle_.calc_friction_factor import (
-#     friction_factor
-# )
+from particula.utils.particle_.calc_friction_factor import (
+    friction_factor
+)
 # from particula.utils.particle_.calc_reduced_mass import (
 #     reduced_mass
 # )

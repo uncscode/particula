@@ -59,6 +59,14 @@ def test_methods():
         large_particle.knudsen_number(standard_environment) ==
         pytest.approx(.664, rel=1e-1)
     )
+    assert (
+        small_particle.slip_correction_factor() ==
+        pytest.approx(100, rel=1e0)
+    )
+    assert (
+        large_particle.slip_correction_factor(standard_environment) ==
+        pytest.approx(1, rel=1e0)
+    )
 
 
 # import numpy as np
