@@ -183,6 +183,7 @@ class Particle:
 
         return friction_factor(
             self.radius(),
+            environment.dynamic_viscosity_air(),
             environment.mean_free_path_air(),
         )
 

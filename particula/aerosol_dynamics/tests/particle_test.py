@@ -67,7 +67,14 @@ def test_methods():
         large_particle.slip_correction_factor(standard_environment) ==
         pytest.approx(1, rel=1e0)
     )
-
+    assert (
+        small_particle.friction_factor(standard_environment) ==
+        pytest.approx(3e-15)
+    )
+    assert (
+        large_particle.friction_factor(standard_environment).magnitude
+        == pytest.approx(1.83e-11)
+    )
 
 # import numpy as np
 # import pint
