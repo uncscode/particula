@@ -25,9 +25,8 @@
     For more details, see below. More information to follow.
 """
 
-import numpy as np
+# import numpy as np
 from particula import u
-from particula.aerosol_dynamics import physical_parameters as pp
 from particula.aerosol_dynamics.environment import Environment
 from particula.utils.particle_ import knudsen_number, particle_mass
 

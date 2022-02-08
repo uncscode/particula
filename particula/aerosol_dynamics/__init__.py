@@ -23,3 +23,5 @@ from particula.aerosol_dynamics.physical_parameters import (
     VACUUM_PERMITTIVITY,
     ELECTRIC_PERMITTIVITY,
 )
+from particula.aerosol_dynamics.particle import Particle
+from particula.aerosol_dynamics.environment import Environment
