@@ -20,4 +20,4 @@ from pint import UnitRegistry
 u = UnitRegistry()
 
 # set the version: major.minor.patch(-devnumber)
-__version__ = '0.0.4-dev0'
+__version__ = '0.0.4-dev1'
