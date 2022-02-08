@@ -46,11 +46,12 @@ class Particle:
 
     Attributes:
 
-        name    (str)   [unitless]  (default: "None")
         radius  (float) [m]
-        density (float) [kg/m**3]   (default: 1000)
-        charge  (int)   [unitless]  (default: 0)
         mass    (float) [kg]
+        density (float) [kg/m**3]       (default: 1000)
+        charge  (int)   [dimensionless] (default: 0)
+        name    (str)   [dimensionless] (default: "None")
+
     """
 
     def __init__(
@@ -65,10 +66,11 @@ class Particle:
 
             Parameters:
 
-                name    (str)   [unitless]
                 radius  (float) [m]
-                density (float) [kg/m**3]
-                charge  (int)   [unitless]
+                density (float) [kg/m**3]       (default: 1000)
+                charge  (int)   [dimensionless] (default: 0)
+                name    (str)   [dimensionless] (default: "None")
+
         """
 
         self._name = name
