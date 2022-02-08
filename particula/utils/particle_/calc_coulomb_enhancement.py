@@ -1,65 +1,124 @@
-""" Calculate coulomb-base enhancements
+""" Calculate coulombic enhancements
 """
 
 import numpy as np
+
+from particula import u
 from particula.utils import (
-    coulomb_ratio
+    BOLTZMANN_CONSTANT,
+    ELEMENTARY_CHARGE_VALUE,
+    ELECTRIC_PERMITTIVITY,
 )
 
 
-def coulomb_enhancement_kinetic_limit(
-    charge, other_charge,
-    radius, other_radius,
-    temperature,
-) -> float:
+class CoulombEnhancement:
 
-    """ Coulombic coagulation enhancement kinetic limit.
+    """ Calculate coulomb-base enhancements
 
-    Parameters:
-        charge          (np array)  [unitless]
-        other_charge    (float)     [unitless]
-        radius          (np array)  [m]
-        other_radiu     (float)     [m]
-        temperature     (float)     [K]
-
-    Returns:
-                        (array)     [unitless]
+        Attributes:
+            radius          (float) [m]
+            other_radius    (float) [m]
+            charge          (float) [dimensionless] (default: 0)
+            other_charge    (float) [dimensionless] (default: 0)
+            temperature     (float) [K]             (default: 298)
     """
 
-    ret = coulomb_ratio(
-        charge, other_charge,
+    def __init__( # pylint: disable=too-many-arguments
+        self,
         radius, other_radius,
-        temperature,
-    )
+        charge=0, other_charge=0,
+        temperature=298,
+    ):
 
-    return (
-        1 + ret if ret >= 0 else np.exp(ret)
-    )
+        if isinstance(radius, u.Quantity):
+            self.radius = radius.to_base_units()
+        else:
+            self.radius = u.Quantity(radius, u.m)
+
+        if isinstance(other_radius, u.Quantity):
+            self.other_radius = other_radius.to_base_units()
+        else:
+            self.other_radius = u.Quantity(other_radius, u.m)
+
+        if isinstance(temperature, u.Quantity):
+            self.temperature = temperature.to_base_units()
+        else:
+            self.temperature = u.Quantity(temperature, u.K)
+
+        for i in [charge]:
+            self.charge = i.m if isinstance(i, u.Quantity) else i
+        for i in [other_charge]:
+            self.other_charge = i.m if isinstance(i, u.Quantity) else i
 
 
-def coulomb_enhancement_continuum_limit(
-    charge, other_charge,
-    radius, other_radius,
-    temperature
-) -> float:
+    def coulomb_potential_ratio(self) -> float:
 
-    """ Coulombic coagulation enhancement continuum limit.
+        """ Calculates the Coulomb potential ratio.
 
-    Parameters:
-        charge          (np array)  [unitless]
-        other_charge    (float)     [unitless]
-        radius          (np array)  [m]
-        other_radius    (float)     [m]
-        temperature     (float)     [K]
+            Parameters:
+                radius          (float) [m]
+                other_radius    (float) [m]
+                charge          (float) [dimensionless] (default: 0)
+                other_charge    (float) [dimensionless] (default: 0)
+                temperature     (float) [K]             (default: 298)
 
-    Returns:
-                        (array)     [unitless]
-    """
+            Returns:
+                                (float) [dimensionless]
+        """
 
-    ret = coulomb_ratio(
-        charge, other_charge,
-        radius, other_radius,
-        temperature,
-    )
+        numerator = -1 * self.charge * self.other_charge * (
+            ELEMENTARY_CHARGE_VALUE ** 2
+        )
+        denominator = 4 * np.pi * ELECTRIC_PERMITTIVITY * (
+            self.radius + self.other_radius
+        )
 
-    return ret/(1-np.exp(-1*ret)) if ret != 0 else 1
+        return numerator / (
+            denominator * BOLTZMANN_CONSTANT * self.temperature
+        )
+
+
+    def coulomb_enhancement_kinetic_limit(self) -> float:
+
+        """ Coulombic coagulation enhancement kinetic limit.
+
+            Parameters:
+                radius          (float) [m]
+                other_radius    (float) [m]
+                charge          (float) [dimensionless] (default: 0)
+                other_charge    (float) [dimensionless] (default: 0)
+                temperature     (float) [K]             (default: 298)
+
+            Returns:
+                                (float) [dimensionless]
+        """
+
+        ret = self.coulomb_potential_ratio()
+
+        return (
+            1 + ret if ret >= 0 
+            else np.exp(ret)
+        )
+
+
+    def coulomb_enhancement_continuum_limit(self) -> float:
+
+        """ Coulombic coagulation enhancement continuum limit.
+
+            Parameters:
+                radius          (float) [m]
+                other_radius    (float) [m]
+                charge          (float) [dimensionless] (default: 0)
+                other_charge    (float) [dimensionless] (default: 0)
+                temperature     (float) [K]             (default: 298)
+
+            Returns:
+                                (float) [dimensionless]
+        """
+
+        ret = self.coulomb_potential_ratio()
+
+        return (
+            ret/(1-np.exp(-1*ret)) if ret != 0
+            else u.Quantity(1, u.dimensionless)
+        )

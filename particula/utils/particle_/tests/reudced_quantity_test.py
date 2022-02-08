@@ -3,7 +3,7 @@
 
 import pytest
 from particula import u
-from particula.utils.particle_.calc_reduced_quantity import (
+from particula.utils.particle_ import (
     reduced_quantity
 )
 
