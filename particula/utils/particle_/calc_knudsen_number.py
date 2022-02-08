@@ -3,21 +3,21 @@
 
 from particula import u
 
-def knudsen_number(radius, mean_free_path_air) -> float:
+def knudsen_number(radius, mfp_air=66.4e-9) -> float:
 
     """ Returns particle's Knudsen number.
 
-    Parameters:
-        radii_array         (float)     [m]
-        mean_free_path_air  (float)     [m]
+        Parameters:
+            radius  (float) [m]
+            mfp_air (float) [m] (default: 66.4e-9)
 
-    Returns:
-        knudsen_number      (float)     [unitless]
+        Returns:
+                    (float) [unitless]
 
-    The Knudsen number reflects the relative length scales of
-    the particle and the suspending fluid (air, water, etc.).
-    This is calculated by the mean free path of the medium
-    divided by the particle radius.
+        The Knudsen number reflects the relative length scales of
+        the particle and the suspending fluid (air, water, etc.).
+        This is calculated by the mean free path of the medium
+        divided by the particle radius.
     """
 
     if isinstance(radius, u.Quantity):
@@ -25,9 +25,9 @@ def knudsen_number(radius, mean_free_path_air) -> float:
     else:
         radius = u.Quantity(radius, u.m)
 
-    if isinstance(mean_free_path_air, u.Quantity):
-        mean_free_path_air = mean_free_path_air.to_base_units()
+    if isinstance(mfp_air, u.Quantity):
+        mfp_air = mfp_air.to_base_units()
     else:
-        mean_free_path_air = u.Quantity(mean_free_path_air, u.kg/u.m**3)
+        mfp_air = u.Quantity(mfp_air, u.m)
 
-    return mean_free_path_air / radius
+    return mfp_air / radius

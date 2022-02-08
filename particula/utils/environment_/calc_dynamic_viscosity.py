@@ -9,12 +9,12 @@ from particula.utils import (
 )
 
 
-def dynamic_viscosity_air(temperature) -> float:
+def dynamic_viscosity_air(temperature=298) -> float:
 
     """ Returns the dynamic viscosity of air
 
         Parameters:
-            temperature (float) [K]
+            temperature (float) [K] (default: 298)
 
         Returns:
                         (float) [kg/m/s]

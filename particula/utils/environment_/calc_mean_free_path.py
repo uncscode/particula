@@ -12,13 +12,13 @@ from particula.utils import (
 )
 
 
-def mean_free_path_air(temperature, pressure) -> float:
+def mean_free_path_air(temperature=298, pressure=101325) -> float:
 
     """ Returns the mean free path of air.
 
         Parameters:
-            temperature (float) [K]
-            pressure    (float) [Pa]
+            temperature (float) [K]     (default: 298)
+            pressure    (float) [Pa]    (default: 101325)
 
         Returns:
                         (float) [m]
