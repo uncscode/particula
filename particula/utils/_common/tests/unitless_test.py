@@ -16,6 +16,9 @@ def test_strip_units():
     """
 
     assert unitless(1) == 1
+
     assert unitless(1 * u.kg) == 1
+
     assert unitless(5 * u.m) == 5
+
     assert unitless((5 * u.kg) * (1 * u.m)) == 5
