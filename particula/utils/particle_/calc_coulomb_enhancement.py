@@ -58,8 +58,8 @@ class CoulombEnhancement:
             Parameters:
                 radius          (float) [m]
                 other_radius    (float) [m]
-                charge          (float) [dimensionless] (default: 0)
-                other_charge    (float) [dimensionless] (default: 0)
+                charge          (int)   [dimensionless] (default: 0)
+                other_charge    (int)   [dimensionless] (default: 0)
                 temperature     (float) [K]             (default: 298)
 
             Returns:

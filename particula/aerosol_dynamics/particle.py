@@ -34,6 +34,7 @@ from particula.utils.particle_ import (
     slip_correction,
     friction_factor,
     reduced_quantity,
+    CoulombEnhancement,
 )
 
 
@@ -211,59 +212,56 @@ class Particle:
             self.friction_factor(), other.friction_factor()
         )
 
-    # @u.wraps(u.dimensionless, [None, None, None])
-    # def coulomb_potential_ratio(
-    #     self, other, environment: Environment
-    # ) -> float:
-    #     """Calculates the Coulomb potential ratio.
+    @u.wraps(u.dimensionless, [None, None, None])
+    def coulomb_potential_ratio(
+        self, other, environment=Environment()
+    ) -> float:
+        """ Calculates the Coulomb potential ratio.
 
-    #     Checks units: [dimensionless]
-    #     """
+            uses:
+                utils.particle_.CoulombEnhancement class's
+                    coulomb_potential_ratio method
+        """
 
-    #     numerator = -1 * self.charge() * other.charge() * (
-    #         pp.ELEMENTARY_CHARGE_VALUE ** 2
-    #     )
-    #     denominator = 4 * np.pi * pp.ELECTRIC_PERMITTIVITY * (
-    #         self.radius() + other.radius()
-    #     )
-    #     return (
-    #         numerator /
-    #         (denominator * pp.BOLTZMANN_CONSTANT * environment.temperature())
-    #     )
+        return CoulombEnhancement(
+            self.radius(), other.radius(),
+            self.charge(), other.charge(),
+            environment.temperature()
+        ).coulomb_potential_ratio()
 
-    # @u.wraps(u.dimensionless, [None, None, None])
-    # def coulomb_enhancement_kinetic_limit(
-    #     self, other, environment: Environment
-    # ) -> float:
-    #     """Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
 
-    #     Checks units: [dimensionless]
-    #     """
+    @u.wraps(u.dimensionless, [None, None, None])
+    def coulomb_enhancement_kinetic_limit(
+        self, other, environment=Environment()
+    ) -> float:
+        """ Kinetic limit of Coulomb enhancement of cooagulation.
 
-    #     coulomb_potential_ratio = self.coulomb_potential_ratio(
-    #         other, environment
-    #     )
-    #     return (
-    #         1 + coulomb_potential_ratio if coulomb_potential_ratio >= 0
+            uses:
+                utils.particle_.CoulombEnhancement class's
+                    coulomb_enhancement_kinetic_limit method
+        """
+        return CoulombEnhancement(
+            self.radius(), other.radius(),
+            self.charge(), other.charge(),
+            environment.temperature()
+        ).coulomb_enhancement_kinetic_limit()
 
-    #         else np.exp(coulomb_potential_ratio)
-    #     )
+    @u.wraps(u.dimensionless, [None, None, None])
+    def coulomb_enhancement_continuum_limit(
+        self, other, environment=Environment()
+    ) -> float:
+        """ Continuum limit of Coulomb enhancement of coagulation.
 
-    # @u.wraps(u.dimensionless, [None, None, None])
-    # def coulomb_enhancement_continuum_limit(
-    #     self, other, environment: Environment
-    # ) -> float:
-    #     """Continuum limit of Coulomb enhancement for particle--particle coagulation.
+            uses:
+                utils.particle_.CoulombEnhancement class's
+                    coulomb_enhancement_continuum_limit method
+        """
 
-    #     Checks units: [dimensionless]
-    #     """
-
-    #     coulomb_potential_ratio = self.coulomb_potential_ratio(
-    #         other, environment
-    #     )
-    #     return coulomb_potential_ratio / (
-    #         1 - np.exp(-1*coulomb_potential_ratio)
-    #     ) if coulomb_potential_ratio != 0 else 1
+        return CoulombEnhancement(
+            self.radius(), other.radius(),
+            self.charge(), other.charge(),
+            environment.temperature()
+        ).coulomb_enhancement_continuum_limit()
 
     # @u.wraps(u.dimensionless, [None, None, None])
     # def diffusive_knudsen_number(

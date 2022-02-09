@@ -35,14 +35,14 @@ def test_methods():
     small_particle = Particle(
         name="small_particle",
         radius=1.0e-9 * u.m,
-        density=1.0 * u.kg / u.m**3,  # need fixing, add e3
-        charge=1,
+        density=1e3 * u.kg / u.m**3,
+        charge=0,
     )
 
     large_particle = Particle(
         name="large_particle",
         radius=1.0e-7 * u.m,
-        density=1.8 * u.kg / u.m**3,  # need fixing, add e3
+        density=1.8e3 * u.kg / u.m**3,
         charge=1,
     )
 
@@ -105,6 +105,21 @@ def test_methods():
             )
         )
     )
+
+    assert (
+        small_particle.coulomb_potential_ratio(large_particle) ==
+        pytest.approx(0)
+    )
+    assert (
+        large_particle.coulomb_potential_ratio(large_particle) <=
+        small_particle.coulomb_potential_ratio(large_particle)
+    )
+    assert small_particle.coulomb_enhancement_continuum_limit(
+            large_particle
+    ) == pytest.approx(1)
+    assert small_particle.coulomb_enhancement_kinetic_limit(
+            large_particle
+    ) == pytest.approx(1)
 
 # import numpy as np
 # import pint

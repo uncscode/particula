@@ -20,7 +20,3 @@ from particula.utils.particle_.calc_reduced_quantity import (
 from particula.utils.particle_.calc_coulomb_enhancement import (
     CoulombEnhancement
 )
-# from particula.utils.particle_.calc_coulomb_enhancement import (
-#     coulomb_enhancement_kinetic_limit as coulomb_kinetic,
-#     coulomb_enhancement_continuum_limit as coulomb_continuum,
-# )

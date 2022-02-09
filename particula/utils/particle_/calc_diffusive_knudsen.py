@@ -1,74 +1,104 @@
-# """ Calculate the diffusive knudsen number
-# """
+""" Calculate the diffusive knudsen number
+"""
 
-# # def diffusive_knudsen_number_numerator(
-# #     mass, other_mass,
-# #     radius, other_radius,
-# #     temperature, mean_free_path_air, dynamic_viscosity_air,
-# # ) -> float:
-# #     """ something
-# #     """
+from particula import u
+from particula.utils import (
+    BOLTZMANN_CONSTANT as BOL,
+)
+from particula.utils.particle_ import (
+    particle_mass as pm,
+    reduced_quantity as rq,
+    friction_factor as ff,
+    CoulombEnhancement as CE,
+)
 
-# #     numerator = (
-# #         (
-# #             temperature * unitless(BOLTZMANN_CONSTANT)
-# #             * reduced_mass(mass, other_mass)
-# #         )**0.5
-# #         / reduced_friction_factor(
-# #             radius, other_radius,
-# #             mean_free_path_air,
-# #             dynamic_viscosity_air
-# #         )
-# #     )
+# pylint: disable=too-many-arguments, too-many-branches, too-many-locals
+def diffusive_knudsen_number(
+    radius, other_radius,
+    density=1000, other_density=1000,
+    charge=0, other_charge=0,
+    temperature=298,
+    mfp_air=66.4e-9,
+    dyn_vis_air=1.8e-05,
+) -> float:
 
-# def diffusive_knudsen_number(
-#     charges_array, charge_other,
-#     radii_array, radius_other,
-#     mass_array, mass_other,
-#     temperature, mean_free_path_air, dynamic_viscosity_air,
-# ) -> float:
+    """ Diffusive Knudsen number.
 
-#     """Diffusive Knudsen number.
+        Parameters:
+            radius          (float) [m]
+            other_radius    (float) [m]
+            density         (float) [kg/m^3]        (default: 1000)
+            other_density   (float) [kg/m^3]        (default: 1000)
+            charge          (int)   [dimensionless] (default: 0)
+            other_charge    (int)   [dimensionless] (default: 0)
+            temperature     (float) [K]             (default: 298)
+            mfp_air         (float) [m]             (default: 66.4e-9)
+            dyn_vis_air     (float) [kg/m/s]        (default: 1.8e-05)
 
-#     Parameters:
-#         charges_array                   (np array)  [unitless]
-#         charge_other                    (float)     [unitless]
-#         radii_array                     (np array)  [m]
-#         radius_other                    (float)     [m]
-#         mass_array                      (np array)  [kg]
-#         mass_other                      (float)     [kg]
-#         temperature                     (float)     [K]
-#         mean_free_path_air              (float)     [m]
-#         dynamic_viscosity_air           (float)     [N*s/m]
+        Returns:
+                            (float) [dimensionless]
 
-#     Returns:
-#                                         (array)     [unitless]
+        The *diffusive* Knudsen number is different from Knudsen number.
+        Ratio of:
+            - numerator: mean persistence of one particle
+            - denominator: effective length scale of
+                particle--particle Coulombic interaction
+    """
 
-#     The *diffusive* Knudsen number is different from Knudsen number.
-#     Ratio of:
-#         - numerator: mean persistence of one particle
-#         - denominator: effective length scale of
-#             particle--particle Coulombic interaction
-#     """
+    if isinstance(radius, u.Quantity):
+        radius = radius.to_base_units()
+    else:
+        radius = u.Quantity(radius, u.m)
 
-#     numerator = (
-#         (
-#             temperature * unitless(BOLTZMANN_CONSTANT)
-#             * reduced_mass(mass_array, mass_other)
-#         )**0.5
-#         / reduced_friction_factor(
-#             radii_array, radius_other,
-#             mean_free_path_air,
-#             dynamic_viscosity_air
-#         )
-#     )
-#     denominator = (
-#         (radii_array + radius_other)
-#         * coulomb_enhancement_kinetic_limit(
-#             charges_array, charge_other, radii_array, radius_other, temperature
-#         )
-#         / coulomb_enhancement_continuum_limit(
-#             charges_array, charge_other, radii_array, radius_other, temperature
-#         )
-#     )
-#     return numerator / denominator
+    if isinstance(other_radius, u.Quantity):
+        other_radius = other_radius.to_base_units()
+    else:
+        other_radius = u.Quantity(other_radius, u.m)
+
+    if isinstance(density, u.Quantity):
+        density = density.to_base_units()
+    else:
+        density = u.Quantity(density, u.kg*u.m**-3)
+
+    if isinstance(other_density, u.Quantity):
+        other_density = other_density.to_base_units()
+    else:
+        other_density = u.Quantity(other_density, u.kg*u.m**-3)
+
+    if isinstance(temperature, u.Quantity):
+        temperature = temperature.to_base_units()
+    else:
+        temperature = u.Quantity(temperature, u.K)
+
+    for i in [charge, other_charge]:
+        i = i.m if isinstance(i, u.Quantity) else i
+
+    if isinstance(mfp_air, u.Quantity):
+        mfp_air = mfp_air.to_base_units()
+    else:
+        mfp_air = u.Quantity(mfp_air, u.m)
+
+    if isinstance(dyn_vis_air, u.Quantity):
+        dyn_vis_air = dyn_vis_air.to_base_units()
+    else:
+        dyn_vis_air = u.Quantity(dyn_vis_air, u.kg/u.m/u.s)
+
+    r_mass = rq(
+        pm(radius, density),
+        pm(other_radius, other_density)
+    )
+    r_frictionf = rq(
+        ff(radius, dyn_vis_air, mfp_air),
+        ff(other_radius, dyn_vis_air, mfp_air)
+    )
+    cecl = CE(
+        radius, other_radius, charge, other_charge, temperature
+    ).coulomb_enhancement_continuum_limit()
+    cekl = CE(
+        radius, other_radius, charge, other_charge, temperature
+    ).coulomb_enhancement_kinetic_limit()
+
+    return (
+        ((temperature * BOL * r_mass)**0.5 / r_frictionf) /
+        ((radius + other_radius) * cecl / cekl)
+    )
