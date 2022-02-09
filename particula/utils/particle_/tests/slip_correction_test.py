@@ -16,6 +16,7 @@ def test_slip_correction():
 
     radius_micron = 1e-6 * u.m
     radius_nano = 1e-9 * u.m
+    # mean free path air
     mfp_air = 66.4e-9 * u.m
 
     assert (

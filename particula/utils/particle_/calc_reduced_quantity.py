@@ -57,4 +57,5 @@ def reduced_quantity(a_quantity, b_quantity) -> float:
                 f"Quantities must have same units to be reduced.\n\t"
                 f"Try: {b_q} and {a_q} {b_q.units} for example"
             )
+
     return a_quantity * b_quantity / (a_quantity + b_quantity)

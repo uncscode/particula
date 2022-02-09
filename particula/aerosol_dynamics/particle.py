@@ -35,6 +35,7 @@ from particula.utils.particle_ import (
     friction_factor,
     reduced_quantity,
     CoulombEnhancement,
+    diffusive_knudsen,
 )
 
 
@@ -81,9 +82,7 @@ class Particle:
         self._charge = charge
         self._mass = particle_mass(radius, density)
 
-
     def name(self) -> str:
-
         """ Returns the name of particle
         """
 
@@ -229,7 +228,6 @@ class Particle:
             environment.temperature()
         ).coulomb_potential_ratio()
 
-
     @u.wraps(u.dimensionless, [None, None, None])
     def coulomb_enhancement_kinetic_limit(
         self, other, environment=Environment()
@@ -263,35 +261,23 @@ class Particle:
             environment.temperature()
         ).coulomb_enhancement_continuum_limit()
 
-    # @u.wraps(u.dimensionless, [None, None, None])
-    # def diffusive_knudsen_number(
-    #     self, other, environment: Environment
-    # ) -> float:
-    #     """Diffusive Knudsen number.
+    @u.wraps(u.dimensionless, [None, None, None])
+    def diffusive_knudsen_number(
+        self, other, environment=Environment()
+    ) -> float:
+        """ Diffusive Knudsen number.
 
-    #     Checks units: [dimensionless]
-
-    #     The *diffusive* Knudsen number is different from Knudsen number.
-    #     Ratio of:
-
-    #         - numerator: mean persistence of one particle
-    #         - denominator: effective length scale of
-    #             particle--particle Coulombic interaction
-    #     """
-
-    #     numerator = (
-    #         (
-    #             environment.temperature() * pp.BOLTZMANN_CONSTANT
-    #             * self.reduced_mass(other)
-    #         )**0.5
-    #         / self.reduced_friction_factor(other, environment)
-    #     )
-    #     denominator = (
-    #         (self.radius() + other.radius())
-    #         * self.coulomb_enhancement_kinetic_limit(other, environment)
-    #         / self.coulomb_enhancement_continuum_limit(other, environment)
-    #     )
-    #     return numerator / denominator
+            user:
+                utils.particle_.diffusive_knudsen_number
+        """
+        return diffusive_knudsen(
+            self.radius(), other.radius(),
+            self.density(), other.density(),
+            self.charge(), other.charge(),
+            environment.temperature(),
+            environment.mean_free_path_air(),
+            environment.dynamic_viscosity_air(),
+        )
 
     # @u.wraps(u.dimensionless, [None, None, None])
     # def dimensionless_coagulation_kernel_hard_sphere(

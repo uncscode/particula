@@ -28,6 +28,7 @@ def test_getters():
     assert named_particle.charge() == 1
     assert named_particle.density().magnitude == pytest.approx(1700)
 
+
 def test_methods():
     """ test the methods of the Particle class.
     """
@@ -120,6 +121,20 @@ def test_methods():
     assert small_particle.coulomb_enhancement_kinetic_limit(
             large_particle
     ) == pytest.approx(1)
+
+    assert (
+        small_particle.diffusive_knudsen_number(
+            large_particle, standard_environment
+        ).units == u.dimensionless
+    )
+    assert (
+        small_particle.diffusive_knudsen_number(
+            large_particle, standard_environment
+        ).magnitude >=
+        large_particle.diffusive_knudsen_number(
+            large_particle, standard_environment
+        ).magnitude
+    )
 
 # import numpy as np
 # import pint

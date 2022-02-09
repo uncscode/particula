@@ -50,7 +50,6 @@ class CoulombEnhancement:
         for i in [other_charge]:
             self.other_charge = i.m if isinstance(i, u.Quantity) else i
 
-
     def coulomb_potential_ratio(self) -> float:
 
         """ Calculates the Coulomb potential ratio.
@@ -77,7 +76,6 @@ class CoulombEnhancement:
             denominator * BOLTZMANN_CONSTANT * self.temperature
         )
 
-
     def coulomb_enhancement_kinetic_limit(self) -> float:
 
         """ Coulombic coagulation enhancement kinetic limit.
@@ -99,7 +97,6 @@ class CoulombEnhancement:
             1 + ret if ret >= 0
             else np.exp(ret)
         )
-
 
     def coulomb_enhancement_continuum_limit(self) -> float:
 
