@@ -96,7 +96,7 @@ class CoulombEnhancement:
         ret = self.coulomb_potential_ratio()
 
         return (
-            1 + ret if ret >= 0 
+            1 + ret if ret >= 0
             else np.exp(ret)
         )
 
