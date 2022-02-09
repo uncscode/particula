@@ -20,3 +20,6 @@ from particula.utils.particle_.calc_reduced_quantity import (
 from particula.utils.particle_.calc_coulomb_enhancement import (
     CoulombEnhancement
 )
+from particula.utils.particle_.calc_diffusive_knudsen import (
+    diffusive_knudsen_number as diffusive_knudsen
+)
