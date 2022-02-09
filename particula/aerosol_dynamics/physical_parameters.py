@@ -1,7 +1,8 @@
 """centralized location for physical parameters.
 """
 
-# pylint: disable=unused-import
+# pylint: disable=unused-import,
+# flake8: noqa: F401
 from particula.utils._common.get_constants import (
     BOLTZMANN_CONSTANT,
     AVOGADRO_NUMBER,
