@@ -10,3 +10,4 @@ jupyterlab
 pytype
 typing
 build
+flake8
