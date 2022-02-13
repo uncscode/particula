@@ -78,7 +78,7 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "pip3 install --user -r requirements.txt",
-    "postCreateCommand": "sudo pip3 install -e '.[dev]' --prefix=/usr/local",
+    "postCreateCommand": "pip3 install --prefix=~/.local '.[dev]'",
 
     // can add container envs here like dask later
 
