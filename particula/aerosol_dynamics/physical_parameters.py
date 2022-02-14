@@ -1,4 +1,4 @@
-"""centralized location for physical parameters.
+""" A centralized location for physical parameters.
 """
 
 # pylint: disable=unused-import,
