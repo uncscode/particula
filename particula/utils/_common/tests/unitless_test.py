@@ -2,7 +2,7 @@
 """
 
 from particula import u
-from particula.utils._common.strip_units import unitless
+from particula.strip_units import unitless
 
 
 def test_strip_units():
