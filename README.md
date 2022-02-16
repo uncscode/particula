@@ -2,9 +2,9 @@
 
 Particula is a simple, fast, and powerful particle simulator, or at least two of the three, we hope. It is a simple particle system that is designed to be easy to use and easy to extend. The goal is to have a robust aerosol (gas phase *and* particle phase) simulation system that can be used to answer scientific questions that arise for experiments and research discussions.
 
-(*DISCLAIMER* [GitHub Copilot](https://copilot.github.com/) is heavily involved in the development of this project and especially in the writing of these paragraphs! _DISCLAIMER_)
+(*DISCLAIMER* [GitHub Copilot](https://copilot.github.com/) is heavily involved in the development of this project and especially in the writing of these paragraphs! *DISCLAIMER*)
 
-(*WARNING* `particula` is in early and messy development. It is not ready for production use yet, but you are welcome to use it anyway --- even better, you're welcome to contribute! _WARNING_)
+(*WARNING* `particula` is in early and messy development. It is not ready for production use yet, but you are welcome to use it anyway --- even better, you're welcome to contribute! *WARNING*)
 
 ## Goals & conduct
 
