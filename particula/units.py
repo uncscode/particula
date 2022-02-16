@@ -4,7 +4,7 @@
 from particula import u
 
 
-def unitless(quantity):
+def strip(quantity):
 
     """ This simple utility will return:
             the magnitude of a quantity if it has units
