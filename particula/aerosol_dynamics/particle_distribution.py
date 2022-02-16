@@ -46,7 +46,7 @@ class Particle_Distribution:
 
     """
 
-    def __init__(self, radii, density, charge, number, name: str = 'Distribution'):
+    def __init__(self, radii, density, charge, number, name: str='Distribution'):
         """Constructs particle objects.
 
         Parameters:
@@ -72,7 +72,7 @@ class Particle_Distribution:
         return self._name
 
     def masses(self) -> float:
-        """Returns mass of particle.
+        """Returns mass of particles of that size.
 
         units: [kg]
         """
