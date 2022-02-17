@@ -3,7 +3,7 @@
 
 # pylint: disable=unused-import,
 # flake8: noqa: F401
-from particula.get_constants import (
+from particula.constants import (
     BOLTZMANN_CONSTANT,
     AVOGADRO_NUMBER,
     GAS_CONSTANT,
