@@ -120,54 +120,6 @@ class Parcel:
         """Removes all particles from the parcel."""
         self._particle_data = np.array([])
 
-    def particle_classes_list(self) -> list:
-        """Returns the particle data of the parcel."""
-        return self._particle_data
-
-    def particle_masses_list(self) -> float:
-        """Returns the mass of the particle. Checks units. [kg]"""
-        return [i.mass() for i in self.particle_classes_list()]
-
-    def particle_radii_list(self) -> float:
-        """Returns list of radii of particles"""
-        return [i.radius() for i in self.particle_classes_list()]
-
-    def particle_densities_list(self) -> float:
-        """Returns list of densities of particles."""
-        return [i.density() for i in self.particle_classes_list()]
-
-    def particle_charges_list(self) -> float:
-        """Returns list of charges of particles."""
-        return [i.charge() for i in self.particle_classes_list()]
-
-    def particle_knudsen_numbers_list(self) -> float:
-        """Returns list of knudsen numbers of particles."""
-        return [
-            i.knudsen_number(self._enviroment)
-            for i in self.particle_classes_list()
-        ]
-
-    def particle_dimensioned_coagulation_kernel_list(
-        self,
-        other,
-        authors: str = "cg2019",
-    ) -> float:
-        """Returns list of dimensioned coagulation kernel of given particle
-        (other) to the list of particles in the parcel. [m**3/s]
-        Parameters:
-
-            self:           particle_classes_list
-            other:          particle 2
-            authors:        authors of the parameterization
-                - gh2012    https://doi.org/10.1103/PhysRevE.78.046402
-                - cg2020    https://doi.org/XXXXXXXXXXXXXXXXXXXXXXXXXX
-                - hard_sphere
-                (default: cg2019)
-        """
-        return [
-            i.dimensioned_coagulation_kernel(other, self._enviroment, authors)
-            for i in self.particle_classes_list()
-        ]
 
     def particle_dimensionless_coagulation_kernel_list(
         self,

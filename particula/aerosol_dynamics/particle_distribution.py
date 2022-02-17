@@ -1,4 +1,4 @@
-""" Tracking an array of particles.
+"""Tracking an array of particles.
 
     This module contains the Particle class, which is used to
     instantiate an array (distributions) of particles and calculate their 
@@ -28,8 +28,7 @@
 import numpy as np
 
 
-
-class Particle_Distribution:
+class Particle_distribution:
     """Class to instantiate particle distributions.
 
     This class represents the underlying framework for both
@@ -46,7 +45,14 @@ class Particle_Distribution:
 
     """
 
-    def __init__(self, radii, density, charge, number, name: str='Distribution'):
+    def __init__(
+        self,
+        radii,
+        density,
+        charge,
+        number,
+        name: str = 'Distribution',
+    ):
         """Constructs particle objects.
 
         Parameters:

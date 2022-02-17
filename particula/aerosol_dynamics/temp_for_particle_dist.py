@@ -5,12 +5,12 @@ import os
 os.chdir('..')
 
 #%%
-import importlib
-
-from particula.aerosol_dynamics import particle_distribution, environment, particle_utilities
+# import particula.utils.strip_units as strip_units
+from particula.aerosol_dynamics import environment, particle_distribution, parcel
+from particula.utils.strip_units import make_unitless
 import numpy as np
-
-importlib.reload(particle_distribution)
+import matplotlib.pyplot as plt
+# importlib.reload(particula)
 
 #%%
 
@@ -19,36 +19,45 @@ standard_environment = environment.Environment(
     pressure=101325,
 )
 
-TEMPERATURE = 300
-mean_free_path_air = particle_utilities.unitless(standard_environment.mean_free_path_air())
-dynamic_viscosity_air = standard_environment.dynamic_viscosity_air().magnitude
 # %%
+
+dist_sample = np.random.poisson(100, size=10000)*10**-9 # m
+
+bins_centers = np.linspace(0, 1000, 100)
+
+particle_distribution(dist_sample, bins_centers)
+
+
+def distribution_rasterization(particle_distribution, bins_centers):
+    np.histogram(a, bins=10, range=None, normed=None, weights=None, density=None)
+
+
+
+np.logspace(10**-9, 10**-1, num=1000)
 charges_array = np.array([0, 0, 0, 0])
 charge_other = charges_array[0]
+#%%
 
-radii_array = np.array([50, 75, 150, 10000]) * 1e-9
-radius_other = radii_array[0]
-
-
-mass_array = np.array([1, 1, 1, 1]) * 1e3
-mass_other = mass_array[0]
-
-density_array = np.array([1, 1, 1, 1]) * 1e3
-number_array = density_array*1e6
-AUTHORS = "cg2019"
+# %%
+import matplotlib 
+import matplotlib.cbook
+import matplotlib.pyplot
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['ps.fonttype'] = 42
+matplotlib.rcParams['font.size'] = '14'
 
 
-# def test_file_work():
-#     assert True
+fig, ax= matplotlib.pyplot.subplots(1,1,figsize=[6,6])
+
+ax.hist(dist_sample, bins=50, density=True)
 
 
-test = particle_utilities.dimensioned_coagulation_kernel(
-    charges_array, charge_other,
-    radii_array, radius_other,
-    mass_array, mass_other,
-    TEMPERATURE, mean_free_path_air, dynamic_viscosity_air,
-    AUTHORS,
-)
+# ax.set_ylim(0,14000)
+# ax.set_xlabel('particle 1, radi range (nm)', fontsize=12)
+# ax.set_ylabel('coagulation kernel P12 [m^3/sec]', fontsize=12)
+ax.grid(True, alpha=0.5)
+# ax.legend(loc='best', fontsize=14)
+
 # %%
 
 dist1 = particle_distribution.Particle_Distribution(radii_array, density_array, charges_array, number_array)
