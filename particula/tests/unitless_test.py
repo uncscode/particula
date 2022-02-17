@@ -1,4 +1,4 @@
-""" A quick test of units.strip utility
+""" a quick test of units.strip utility
 """
 
 from particula import u
