@@ -1,4 +1,4 @@
-""" Testing getting constants from the get_constants.py file
+""" testing getting constants from the get_constants.py file
 """
 
 from particula import u
