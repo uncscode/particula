@@ -1,4 +1,4 @@
-""" A simple utility to get rid of units if desired.
+""" a simple utility to get rid of units if desired.
 """
 
 from particula import u
@@ -7,8 +7,8 @@ from particula import u
 def strip(quantity):
 
     """ This simple utility will return:
-            the magnitude of a quantity if it has units
-            the quantity itself if it does not have units
+            * the magnitude of a quantity if it has units
+            * the quantity itself if it does not have units
     """
 
     return (
