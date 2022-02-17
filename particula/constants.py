@@ -1,4 +1,4 @@
-""" A centralized location for important, unchanged physics parameters.
+""" a centralized location for important, unchanged physics parameters.
 
     This file contains constants that are used in multiple modules. Each
     constant has its own units and exported with them. The constants are
