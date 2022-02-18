@@ -1,8 +1,6 @@
 """ testing the mean free path calculation
 """
 
-from multiprocessing.sharedctypes import Value
-import py
 import pytest
 from particula import u
 from particula.util.mean_free_path import mean_free_path as mfp
