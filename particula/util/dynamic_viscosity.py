@@ -21,55 +21,80 @@ from particula.constants import SUTHERLAND_CONSTANT as SUTH_CONST
 
 def dyn_vis(
     temp=298.15 * u.K,
-    gas="air",
     mu_ref=REF_VIS_AIR,
     t_ref=REF_TEMP,
 ):
     """ The dynamic viscosity of air via Sutherland formula.
+        This formula depends on temperature (temp) and the reference
+        temperature (t_ref) as well as the reference viscosity (mu_ref).
+
+        Examples:
+        ```
+        >>> # with units
+        >>> dyn_vis(temp=298.15*u.K, mu_ref=1.716e-5*u.Pa*u.s)
+        <Quantity(1.83714937e-05, 'kilogram / meter / second')>
+        >>> # without units and taking magnitude
+        >>> dyn_vis(temp=298.15, mu_ref=1.716e-5).magnitude
+        1.8371493734583912e-05
+        >>> # without units, all keyword arguments
+        >>> dyn_vis(temp=298.15, mu_ref=1.716e-5, t_ref=273.15)
+        <Quantity(1.83714937e-05, 'kilogram / meter / second')>
+        ```
 
         Inputs:
             temp    (float) [K]     (default: 298.15 K)
-            gas     (str)   [ ]     (default: "air")
-            mu_ref  (float) [Pa*s]  (default: constants.REF_VIS_AIR)
-            t_ref   (float) [K]     (default: constants.REF_TEMP)
+            mu_ref  (float) [Pa*s]  (default: REF_VIS_AIR)
+            t_ref   (float) [K]     (default: REF_TEMP)
 
         Returns:
                     (float) [Pa*s]
 
         Notes:
+            * If inputs have no units, they get assigned units above
             * particula.constants has all relevant constants
-            * Most often, only gas="air" is used
+
     """
 
     if isinstance(temp, u.Quantity):
-        temp = temp.to_base_units()
+        if temp.to_base_units().u == "kelvin":
+            temp = temp.to_base_units()
+        else:
+            raise ValueError(
+                f"\n\t"
+                f"Input {temp} has unsupported units.\n\t"
+                f"Input must have temperature units of\n\t"
+                f"either 'kelvin' or 'degree_celsius'.\n"
+            )
     else:
         temp = u.Quantity(temp, u.K)
 
     if isinstance(mu_ref, u.Quantity):
-        mu_ref = mu_ref.to_base_units()
+        if mu_ref.to_base_units().u == REF_VIS_AIR.to_base_units().u:
+            mu_ref = mu_ref.to_base_units()
+        else:
+            raise ValueError(
+                f"\n\t"
+                f"Input {mu_ref} has unsupported units.\n\t"
+                f"Input must have units of\n\t"
+                f"{REF_VIS_AIR.u}.\n"
+            )
     else:
-        mu_ref = u.Quantity(mu_ref, u.Pa * u.s)
+        mu_ref = u.Quantity(mu_ref, REF_VIS_AIR.to_base_units().u)
 
     if isinstance(t_ref, u.Quantity):
-        t_ref = t_ref.to_base_units()
+        if t_ref.to_base_units().u == REF_TEMP.to_base_units().u:
+            t_ref = t_ref.to_base_units()
+        else:
+            raise ValueError(
+                f"\n\t"
+                f"Input {t_ref} has unsupported units.\n\t"
+                f"Input must have units of\n\t"
+                f"{REF_TEMP.u}.\n"
+            )
     else:
         t_ref = u.Quantity(t_ref, u.K)
 
     suth_const = SUTH_CONST
-
-    if gas != "air":
-        print(
-            f"\n"
-            f"\tThis {gas} gas is not air!\n"
-            f"\n"
-            f"\tThe dynamic viscosity is defined by user-provided.\n"
-            f"\treference and reference temperature constants.\n"
-            f"\tthese are respectively\n"
-            f"\t{mu_ref}\n"
-            f"\tand\n"
-            f"\t{t_ref}.\n"
-        )
 
     return (
         mu_ref * (temp/t_ref)**(3/2) * (t_ref + suth_const) /
