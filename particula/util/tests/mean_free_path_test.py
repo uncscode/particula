@@ -1,9 +1,11 @@
 """ testing the mean free path calculation
 """
 
+from multiprocessing.sharedctypes import Value
+import py
 import pytest
 from particula import u
-from particula.util.mean_free_path import mean_free_path_air as mfp_air
+from particula.util.mean_free_path import mean_free_path as mfp
 
 
 def test_mfp():
@@ -16,15 +18,20 @@ def test_mfp():
 
     """
 
-    a_mfp = mfp_air(298 * u.K, 101325 * u.Pa)
-    b_mfp = mfp_air(298, 101325)
+    a_mfp = mfp(298 * u.K, 101325 * u.Pa)
+    b_mfp = mfp(298, 101325)
+    c_mfp = mfp(298 * u.K, 101325 * u.Pa, 0.03 * u.kg / u.mol)
 
     assert a_mfp == b_mfp
     assert a_mfp.units == u.m
     assert a_mfp.magnitude == pytest.approx(66.4e-9, rel=1e-1)
+    assert c_mfp <= a_mfp
 
     with pytest.raises(ValueError):
-        mfp_air(5 * u.m, 101325 * u.Pa)
+        mfp(5 * u.m, 101325 * u.Pa)
 
     with pytest.raises(ValueError):
-        mfp_air(298 * u.K, 5 * u.m)
+        mfp(298 * u.K, 5 * u.m)
+
+    with pytest.raises(ValueError):
+        mfp(300 * u.K, 101325 * u.Pa, 0.03 * u.m/u.mol)
