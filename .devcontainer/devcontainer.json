@@ -37,7 +37,11 @@
 		// "editor.detectIndentation": false, // Add this to disable automatic indentation detection.
         "editor.bracketPairColorization.enabled": true,
         "editor.lightbulb.enable": true,
-        "python.defaultInterpreterPath": "/usr/local/bin/python"
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "cSpell.words": [
+            "particula",
+            "conda",
+        ]
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
@@ -70,7 +74,7 @@
 		"msrvida.vscode-sanddance",
 		"analytic-signal.preview-pdf",
 		"eamodio.gitlens",
-		"ms-vsliveshare.vsliveshare-pack"
+		"ms-vsliveshare.vsliveshare-pack",
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
