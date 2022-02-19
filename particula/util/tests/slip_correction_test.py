@@ -3,7 +3,8 @@
 
 import pytest
 from particula import u
-from particula.util.slip_correction import slip_correction_factor as slip_correction
+from particula.util.knudsen_number import knu
+from particula.util.slip_correction import scf
 
 
 def test_slip_correction():
@@ -18,16 +19,19 @@ def test_slip_correction():
     radius_nano = 1e-9 * u.m
     # mean free path air
     mfp_air = 66.4e-9 * u.m
+    knu_val = knu(radius=radius_micron, mfp=mfp_air)
 
     assert (
-        slip_correction(radius_micron) ==
+        scf(radius=radius_micron) ==
         pytest.approx(1, rel=1e-1)
     )
+
     assert (
-        slip_correction(radius_nano) ==
+        scf(radius=radius_nano) ==
         pytest.approx(100, rel=1e0)
     )
+
     assert (
-        slip_correction(radius_micron, mfp_air) ==
+        scf(radius=radius_micron, knu=knu_val) ==
         pytest.approx(1, rel=1e-1)
     )

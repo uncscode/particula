@@ -7,7 +7,7 @@
 
 import pytest
 from particula import u
-from particula.util.knudsen_number import knudsen_number
+from particula.util.knudsen_number import knu
 
 
 def test_kn():
@@ -15,24 +15,24 @@ def test_kn():
     """
 
     radius = 1e-9 * u.m
-    mean_free_path_air = 66 * u.nm
+    mfp_air = 66 * u.nm
 
     assert (
-        knudsen_number(radius, mean_free_path_air) ==
+        knu(radius=radius, mfp=mfp_air) ==
         pytest.approx(66)
     )
 
     assert (
-        knudsen_number(1e-10) ==
+        knu(radius=1e-10) ==
         pytest.approx(664, rel=1e-1)
     )
 
     assert (
-        knudsen_number(1e-3) ==
+        knu(radius=1e-3) ==
         pytest.approx(5e-5, rel=1e0)
     )
 
     assert (
-        knudsen_number(1e-20) ==
+        knu(radius=1e-20) ==
         pytest.approx(5e12, rel=1e0)
     )

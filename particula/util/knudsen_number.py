@@ -1,19 +1,12 @@
-""" calculating knudsen number
+""" calculating Knudsen number
 """
 
-from particula import u
-from particula.util.mean_free_path import mean_free_path as mfp_def
+from particula.util.input_handling import in_radius, in_length
+from particula.util.mean_free_path import mfp
 
 
-def knudsen_number(radius, mfp=mfp_def()) -> float:
+def knu(**kwargs) -> float:
     """ Returns particle's Knudsen number.
-
-        Parameters:
-            radius  (float) [m]
-            mfp     (float) [m] (default: mfp_def())
-
-        Returns:
-                    (float) [dimensionless]
 
         The Knudsen number reflects the relative length scales of
         the particle and the suspending fluid (air, water, etc.).
@@ -24,22 +17,44 @@ def knudsen_number(radius, mfp=mfp_def()) -> float:
         deviation thereof. For larger particles, the Knudsen number
         goes towards 0. For smaller particles, the Knudsen number
         goes towards infinity.
+
+        Examples:
+        ```
+        >>> from particula import u
+        >>> from particula.util.knudsen_number import knu
+        >>> # with radius 1e-9 m
+        >>> knu(radius=1e-9)
+        <Quantity(66.4798498, 'dimensionless')>
+        >>> # with radius 1e-9 m and mfp 60 nm
+        >>> knu(radius=1e-9*u.m, mfp=60*u.nm).m
+        60.00000000000001
+        >>> calculating via mfp(**kwargs)
+        >>> knu(
+        ... radius=1e-9*u.m,
+        ... temperature=300,
+        ... pressure=1e5,
+        ... molecular_weight=0.03,
+        ... )
+        <Quantity(66.7097062, 'dimensionless')>
+        ```
+
+        Parameters:
+            radius  (float) [m]
+            mfp     (float) [m] (default: util)
+
+        Returns:
+                    (float) [dimensionless]
+
+        Notes:
+            mfp can be calculated using mfp(**kwargs);
+            refer to particula.util.mean_free_path.mfp for more info.
+
     """
 
-    if isinstance(radius, u.Quantity):
-        if radius.to_base_units().u == "meter":
-            radius = radius.to_base_units()
-        else:
-            raise ValueError(f"{radius} must be in meters!")
-    else:
-        radius = u.Quantity(radius, u.m)
+    radius = kwargs.get("radius", "None")
+    mfp_val = kwargs.get("mfp", mfp(**kwargs))
 
-    if isinstance(mfp, u.Quantity):
-        if mfp.to_base_units().u == "meter":
-            mfp = mfp.to_base_units()
-        else:
-            raise ValueError(f"{mfp} must be in meters!")
-    else:
-        mfp = u.Quantity(mfp, u.m)
+    radius = in_radius(radius)
+    mfp_val = in_length(mfp_val)
 
-    return mfp / radius
+    return mfp_val / radius

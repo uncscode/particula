@@ -150,6 +150,9 @@ def in_radius(radius):
             * Assigning m units to scalar input
     """
 
+    if radius == "None":
+        raise ValueError("You must provide a radius!")
+
     if isinstance(radius, u.Quantity):
         if radius.to_base_units().u == u.m:
             radius = radius.to_base_units()
@@ -229,3 +232,36 @@ def in_scalar(scalar):
         scalar = u.Quantity(scalar, u.dimensionless)
 
     return scalar
+
+
+def in_length(length):
+    """ Handles length input
+
+        Parameters:
+            length    (float) [m | dimensionless]
+
+        Returns:
+            length    (float) [m]
+
+        Notes:
+            * If unit is correct, take to base units in m
+            * Throws ValueError if unit is wrong
+            * Assigning m units to scalar input
+    """
+
+    if isinstance(length, u.Quantity):
+        if length.to_base_units().u == u.m:
+            length = length.to_base_units()
+        else:
+            raise ValueError(
+                f"\n\t"
+                f"Input {length} has unsupported units.\n\t"
+                f"Input must have length units of\n\t"
+                f"'meters';\n\t"
+                f"otherwise, if dimensionless, it will\n\t"
+                f"be assigned a m unit.\n"
+            )
+    else:
+        length = u.Quantity(length, u.m)
+
+    return length

@@ -30,22 +30,22 @@ def dyn_vis(**kwargs):
         >>> from particula.util.dynamic_viscosity import dyn_vis
         >>> # with units
         >>> dyn_vis(
-                temperature=298.15*u.K,
-                reference_viscosity=1.716e-5*u.Pa*u.s
-            )
+        ... temperature=298.15*u.K,
+        ... reference_viscosity=1.716e-5*u.Pa*u.s
+        ... )
         <Quantity(1.83714937e-05, 'kilogram / meter / second')>
         >>> # without units and taking magnitude
         >>> dyn_vis(
-                temperature=298.15,
-                reference_viscosity=1.716e-5
-            ).magnitude
+        ... temperature=298.15,
+        ... reference_viscosity=1.716e-5
+        ... ).magnitude
         1.8371493734583912e-05
         >>> # without units, all keyword arguments
         >>> dyn_vis(
-                temperature=298.15,
-                reference_viscosity=1.716e-5,
-                reference_temperature=273.15
-            )
+        ... temperature=298.15,
+        ... reference_viscosity=1.716e-5,
+        ... reference_temperature=273.15
+        ... )
         <Quantity(1.83714937e-05, 'kilogram / meter / second')>
         ```
 

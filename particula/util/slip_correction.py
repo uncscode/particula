@@ -2,21 +2,13 @@
 """
 
 import numpy as np
-from particula import u
-from particula.util.knudsen_number import knudsen_number
-from particula.util.mean_free_path import mean_free_path as mfp_def
+from particula.util.input_handling import in_radius, in_length, in_scalar
+from particula.util.knudsen_number import knu
 
 
-def slip_correction_factor(radius, mfp=mfp_def()) -> float:
+def scf(**kwargs):
 
     """ Returns particle's Cunningham slip correction factor.
-
-        Parameters:
-            radius  (float) [m]
-            mfp     (float) [m] (default: mfp_def())
-
-        Returns:
-                    (float) [dimensionless]
 
         Dimensionless quantity accounting for non-continuum effects
         on small particles. It is a deviation from Stokes' Law.
@@ -28,24 +20,49 @@ def slip_correction_factor(radius, mfp=mfp_def()) -> float:
         particles (Kn -> 0). Its behavior on the other end of the
         spectrum (smaller particles; Kn -> inf) is more nuanced, though
         it tends to scale linearly on a log-log scale, log Cc vs log Kn.
+
+        Examples:
+        ```
+        >>> from particula import u
+        >>> from particula.util.slip_correction import scf
+        >>> # with radius 1e-9 m
+        >>> scf(radius=1e-9)
+        <Quantity(110.720731, 'dimensionless')>
+        >>> # with radius 1e-9 m and knu=1
+        >>> scf(radius=1e-9*u.m, knu=1)
+        <Quantity(2.39014843, 'dimensionless')>
+        >>> # using knu(**kwargs)
+        >>> scf(radius=1e-9*u.m, mfp=60*u.nm)
+        <Quantity(99.9840088, 'dimensionless')>
+        >>> # using mfp(**kwargs)
+        >>> scf(
+        ... radius=1e-9*u.m,
+        ... temperature=300,
+        ... pressure=1e5,
+        ... molecular_weight=0.03
+        ... )
+        <Quantity(111.101591, 'dimensionless')>
+        ```
+
+        Parameters:
+            radius  (float) [m]
+            knu     (float) [m] (default: util)
+
+        Returns:
+                    (float) [dimensionless]
+
+        Notes:
+            knu can be calculated using knu(**kwargs);
+            refer to particula.util.knudsen_number.knu for more info.
+
     """
 
-    if isinstance(radius, u.Quantity):
-        if radius.to_base_units().u == "meter":
-            radius = radius.to_base_units()
-        else:
-            raise ValueError(f"{radius} must be in meters!")
-    else:
-        radius = u.Quantity(radius, u.m)
+    radius = kwargs.get("radius", "None")
+    knu_val = kwargs.get("knu", knu(**kwargs))
 
-    if isinstance(mfp, u.Quantity):
-        if mfp.to_base_units().u == "meter":
-            mfp = mfp.to_base_units()
-        else:
-            raise ValueError(f"{mfp} must be in meters!")
-    else:
-        mfp = u.Quantity(mfp, u.m)
+    radius = in_radius(radius)
+    knu_val = in_scalar(knu_val)
 
-    return 1 + knudsen_number(radius, mfp) * (
-        1.257 + 0.4*np.exp(-1.1/knudsen_number(radius, mfp))
+    return 1 + knu_val * (
+        1.257 + 0.4*np.exp(-1.1/knu_val)
     )

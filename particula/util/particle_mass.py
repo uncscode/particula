@@ -39,9 +39,6 @@ def mass(**kwargs):
     shape_factor = kwargs.get("shape_factor", 1)
     vol_void = kwargs.get("volume_void", 0)
 
-    if radius == "None":
-        raise ValueError("You must provide a radius!")
-
     radius = in_radius(radius)
     density = in_density(density)
     shape_factor = in_scalar(shape_factor)

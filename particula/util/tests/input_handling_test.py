@@ -3,9 +3,10 @@
 
 import pytest
 from particula import u
-from particula.util.input_handling import (in_molecular_weight, in_pressure,
-                                           in_temperature, in_viscosity,
-                                           in_radius, in_density, in_scalar)
+from particula.util.input_handling import (in_density, in_length,
+                                           in_molecular_weight, in_pressure,
+                                           in_radius, in_scalar,
+                                           in_temperature, in_viscosity)
 
 
 def test_in_temp():
@@ -232,3 +233,48 @@ def test_in_scalar():
 
     with pytest.raises(ValueError):
         in_scalar(u.Quantity(5, u.m))
+
+
+def test_in_length():
+    """ Testing the in_length function
+    """
+
+    length = in_length(5)
+    assert length.units == u.m
+    assert length.magnitude == 5
+
+    length = in_length(5 * u.m)
+    assert length.units == u.m
+    assert length.magnitude == 5
+
+    length = in_length(u.Quantity(5, u.mm))
+    assert length.units == u.m
+    assert length.magnitude == u.Quantity(5, u.mm).m_as("m")
+
+    length = in_length(u.Quantity(5, u.cm))
+    assert length.units == u.m
+    assert length.magnitude == u.Quantity(5, u.cm).m_as("m")
+
+    length = in_length(u.Quantity(5, u.m))
+    assert length.units == u.m
+    assert length.magnitude == u.Quantity(5, u.m).m_as("m")
+
+    length = in_length(u.Quantity(5, u.km))
+    assert length.units == u.m
+    assert length.magnitude == u.Quantity(5, u.km).m_as("m")
+
+    length = in_length(u.Quantity(5, u.inch))
+    assert length.units == u.m
+    assert length.magnitude == u.Quantity(5, u.inch).m_as("m")
+
+    length = in_length(u.Quantity(5, u.ft))
+    assert length.units == u.m
+    assert length.magnitude == u.Quantity(5, u.ft).m_as("m")
+
+    length = in_length(u.Quantity(5, u.mi))
+    assert length.units == u.m
+    assert length.magnitude == u.Quantity(5, u.mi).m_as("m")
+
+    length = in_length(u.Quantity(5, u.nmi))
+    assert length.units == u.m
+    assert length.magnitude == u.Quantity(5, u.nmi).m_as("m")

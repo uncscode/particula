@@ -40,20 +40,20 @@ def mfp(**kwargs):
         >>> mfp(temperature=300*u.K, pressure=1e5*u.Pa)
         <Quantity(6.789181e-08, 'meter')>
         >>> mfp(
-            temperature=300,
-            pressure=1e5,
-            molecular_weight=0.03
-            )
+        ... temperature=300,
+        ... pressure=1e5,
+        ... molecular_weight=0.03
+        ... )
         <Quantity(6.67097062e-08, 'meter')>
         >>> # specifying explicit value for dynamic viscosity
         >>> mfp(dynamic_viscosity=1e-5)
         <Quantity(3.61864151e-08, 'meter')>
         >>> # specifying implicit value for dynamic viscosity
         >>> mfp(
-                temperature=300,
-                reference_viscosity=1e-5,
-                reference_temperature=273.15
-            )
+        ... temperature=300,
+        ... reference_viscosity=1e-5,
+        ... reference_temperature=273.15
+        ... )
         <Quantity(3.90466241e-08, 'meter')>
         ```
 
