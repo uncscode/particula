@@ -41,7 +41,6 @@ class Particle_distribution:
         charge      (np array)     [dimensionless]
         mass        (np array)     [kg]
         name        (str)          [no units]
-
     """
 
     def __init__(
@@ -70,18 +69,10 @@ class Particle_distribution:
         self._number = number
         self._mass = density * (4*np.pi/3) * (radii**3)
 
-
     def name(self) -> str:
         """Returns the name of the distribution.
         """
         return self._name
-
-    def masses(self) -> float:
-        """Returns total mass of particles of that radii.
-
-        units: [kg]
-        """
-        return self._mass * self._number
 
     def radii(self) -> float:
         """Returns radii of particle.
@@ -103,7 +94,7 @@ class Particle_distribution:
         units: [dimensionless]
         """
         return self._charge
-    
+
     def number(self) -> int:
         """Returns number of particles.
 
@@ -117,6 +108,13 @@ class Particle_distribution:
         units: [#/m**3]
         """
         return np.sum(self._number)
+
+    def masses(self) -> float:
+        """Returns total mass of particles of that radii.
+
+        units: [kg]
+        """
+        return self._mass * self._number
 
     def mass_concentration(self) -> int:
         """" Returns the mass of the distribution.
