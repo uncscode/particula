@@ -53,8 +53,41 @@ class DimensionlessCoagulation:
         """
 
         if self.authors == "hardsphere":
-            coag = self.hardsphere_coag()
+            result = self.hardsphere_coag()
         else:
             raise ValueError(f"{self.authors} not recognized!")
 
-        return coag
+        return result
+
+
+def hardsphere_coag(**kwargs):
+    """ Return the dimensionless coagulation kernel.
+
+        The dimensionless coagulation kernel is defined as
+        a function of the diffusive knudsen number; for more info,
+        please see the documentation of the respective function:
+            - particula.util.diffusive_knudsen.diff_knu(**kwargs)
+
+        Examples:
+        ```
+        >>> from particula import u
+        >>> from particula.util.dimensionless_coagulation import hardsphere_coag as hsc
+        >>> # with only one radius
+        >>> hsc(radius=1e-9)
+        <Quantity(147.877572, 'dimensionless')>
+        >>> # with two radii
+        >>> hsc(radius=1e-9, other_radius=1e-8)
+        <Quantity(18.4245966, 'dimensionless')>
+        >>> # with two radii and charges
+        >>> hsc(radius=1e-9, other_radius=1e-8, charge=1, other_charge=-1)
+        <Quantity(22.0727435, 'dimensionless')>
+    """
+
+    return DimensionlessCoagulation(**kwargs).hardsphere_coag()
+
+
+def coag(**kwargs):
+    """ Return the dimensionless coagulation kernel.
+    """
+
+    return DimensionlessCoagulation(**kwargs).coag()
