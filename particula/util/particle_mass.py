@@ -40,7 +40,7 @@ def mass(**kwargs):
     vol_void = kwargs.get("volume_void", 0)
 
     if radius == "None":
-        raise ValueError(f"You must provide a radius!")
+        raise ValueError("You must provide a radius!")
 
     radius = in_radius(radius)
     density = in_density(density)
