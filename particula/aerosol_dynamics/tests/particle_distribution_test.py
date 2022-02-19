@@ -5,10 +5,11 @@ import numpy as np
 import pytest
 from particula.aerosol_dynamics import particle_distribution
 
-size = 10000
-radii_sample = np.random.poisson(100, size=size)*10**-9 # m
+SIZE = 10000
+radii_sample = np.random.poisson(100, size=SIZE)*10**-9  # m
 
-particle_dist = particle_distribution.Particle_distribution( radii=radii_sample,
+particle_dist = particle_distribution.ParticleDistribution(
+        radii=radii_sample,
         density=np.ones(len(radii_sample))*1000,
         charge=np.zeros(len(radii_sample)),
         number=np.ones(len(radii_sample)),
@@ -20,18 +21,18 @@ def test_getters():
     Tests the getters for the Environment class.
     """
     assert particle_dist.name() == 'Distribution'
-    assert len(particle_dist.radii()) == size
-    assert len(particle_dist.densities()) == size
-    assert len(particle_dist.charges()) == size
-    assert len(particle_dist.number()) == size
+    assert len(particle_dist.radii()) == SIZE
+    assert len(particle_dist.densities()) == SIZE
+    assert len(particle_dist.charges()) == SIZE
+    assert len(particle_dist.number()) == SIZE
 
 
 def distribution_properties():
     """
     Test the calculation of total concentration properties
     """
-    assert len(particle_dist.masses()) == size
-    assert particle_dist.number_concentration() == size
+    assert len(particle_dist.masses()) == SIZE
+    assert particle_dist.number_concentration() == SIZE
     assert particle_dist.mass_concentration() > 0
 
 

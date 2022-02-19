@@ -1,8 +1,8 @@
 """Tracking an array of particles.
 
     This module contains the Particle class, which is used to
-    instantiate an array (distributions) of particles and calculate their 
-    base properties. Particles distributions are introduced and defined by 
+    instantiate an array (distributions) of particles and calculate their
+    base properties. Particles distributions are introduced and defined by
     calling Particle class, for example:
 
     >>> from particula import Particle
@@ -28,7 +28,7 @@
 import numpy as np
 
 
-class Particle_distribution:
+class ParticleDistribution:
     """Class to instantiate particle distributions.
 
     This class represents the underlying framework for
@@ -104,7 +104,7 @@ class Particle_distribution:
 
     def number_concentration(self) -> int:
         """" Returns the number of distribution of particles.
-        
+
         units: [#/m**3]
         """
         return np.sum(self._number)
@@ -118,7 +118,7 @@ class Particle_distribution:
 
     def mass_concentration(self) -> int:
         """" Returns the mass of the distribution.
-        
+
         units: [kg/m**3]
         """
         return np.sum(self.masses())
@@ -161,8 +161,8 @@ class Particle_distribution:
 
             'stone'
                 Estimator based on leave-one-out cross-validation estimate of
-                the integrated squared error. Can be regarded as a generalization
-                of Scott's rule.
+                the integrated squared error. Can be regarded as a
+                generalization of Scott's rule.
 
             'rice'
                 Estimator does not take variability into account, only data
@@ -177,34 +177,34 @@ class Particle_distribution:
                 Square root (of data size) estimator, used by Excel and
                 other programs for its speed and simplicity.
 
-        returns: 
+        returns:
             particle_number     array of dtype float
             radii               array of dtype float
         """
 
-        # histogram method to rasterize the radii and 
+        # histogram method to rasterize the radii and
         # tracking the number concentration
         bin_edges = np.histogram_bin_edges(self.radii(), bins=bins)
         particle_number, bin_edges = np.histogram(
             self.radii(),
             bins=bin_edges,
-            weights = self.number()
+            weights=self.number()
         )
 
         # calculates bin centers and applies it as the radii
-        radii = np.diff(bin_edges)+bin_edges[0:-1] 
+        radii = np.diff(bin_edges)+bin_edges[0:-1]
 
         # drop the zero concentration bins, in radii and number
-        non_zeros = particle_number>0
+        non_zeros = particle_number > 0
         particle_number = particle_number[non_zeros]
         radii = radii[non_zeros]
 
         return particle_number, radii
 
     def update_distribution(self, rasterized_radii, rasterized_number):
-        """" updates the particle distribution properties, based on a 
-        new rasterization. 
-        
+        """" updates the particle distribution properties, based on a
+        new rasterization.
+
         Conserves total particle mass.
         Does not conserve number.
         Assumes same density and charge.
@@ -229,7 +229,7 @@ class Particle_distribution:
         self._number = rasterized_number * old_mass/new_mass
 
         return
-    
+
     def rasterization_and_update(self, bins):
         """ Bins the radii and number using numpy histogram methods, and updates
         the class data
@@ -269,8 +269,8 @@ class Particle_distribution:
 
             'stone'
                 Estimator based on leave-one-out cross-validation estimate of
-                the integrated squared error. Can be regarded as a generalization
-                of Scott's rule.
+                the integrated squared error. Can be regarded as a
+                generalization of Scott's rule.
 
             'rice'
                 Estimator does not take variability into account, only data
