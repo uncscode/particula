@@ -8,7 +8,7 @@ import numpy as np
 from particula import u
 
 
-def reduced_quantity(a_quantity, b_quantity) -> float:
+def reduced_quantity(a_quantity, b_quantity):
     """ Returns the reduced mass of two particles.
 
         Examples:

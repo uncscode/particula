@@ -90,9 +90,6 @@ def diff_knu(**kwargs):
     cekl_val = cekl(**kwargs)
     cecl_val = cecl(**kwargs)
 
-    print(cekl_val.u)
-    print(cecl_val.u)
-
     boltz_const = BOLTZMANN_CONSTANT
 
     return (

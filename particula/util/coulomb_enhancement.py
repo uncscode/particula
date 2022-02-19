@@ -34,7 +34,7 @@ class CoulombEnhancement:
         self.other_charge = in_scalar(other_charge)
         self.temperature = in_temperature(temperature)
 
-    def coulomb_potential_ratio(self) -> float:
+    def coulomb_potential_ratio(self):
         """ Calculates the Coulomb potential ratio.
 
             Parameters:
@@ -63,7 +63,7 @@ class CoulombEnhancement:
             denominator * boltz_const * self.temperature
         )
 
-    def coulomb_enhancement_kinetic_limit(self) -> float:
+    def coulomb_enhancement_kinetic_limit(self):
         """ Coulombic coagulation enhancement kinetic limit.
 
             Parameters:
