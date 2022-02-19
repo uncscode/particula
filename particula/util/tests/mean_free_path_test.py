@@ -3,7 +3,7 @@
 
 import pytest
 from particula import u
-from particula.util.mean_free_path import mean_free_path as mfp
+from particula.util.mean_free_path import mfp
 
 
 def test_mfp():
@@ -16,9 +16,9 @@ def test_mfp():
 
     """
 
-    a_mfp = mfp(298 * u.K, 101325 * u.Pa)
-    b_mfp = mfp(298, 101325)
-    c_mfp = mfp(298 * u.K, 101325 * u.Pa, 0.03 * u.kg / u.mol)
+    a_mfp = mfp(temperature=298*u.K, pressure=101325 * u.Pa)
+    b_mfp = mfp(temperature=298, pressure=101325)
+    c_mfp = mfp(temperature=298, pressure=101325, molecular_weight=0.03)
 
     assert a_mfp == b_mfp
     assert a_mfp.units == u.m
@@ -26,10 +26,13 @@ def test_mfp():
     assert c_mfp <= a_mfp
 
     with pytest.raises(ValueError):
-        mfp(5 * u.m, 101325 * u.Pa)
+        mfp(temperature=5*u.m, pressure=101325*u.Pa)
 
     with pytest.raises(ValueError):
-        mfp(298 * u.K, 5 * u.m)
+        mfp(temperature=298*u.K, pressure=5*u.m)
 
     with pytest.raises(ValueError):
-        mfp(300 * u.K, 101325 * u.Pa, 0.03 * u.m/u.mol)
+        mfp(temperature=300*u.K,
+            pressure=101325*u.Pa,
+            molecular_weight=0.03*u.m/u.mol,
+            )

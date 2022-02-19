@@ -10,41 +10,14 @@
 """
 
 import numpy as np
-from particula import u
-from particula.constants import GAS_CONSTANT as GAS_CON
-from particula.constants import MOLECULAR_WEIGHT_AIR as MOL_WT_AIR
+from particula.constants import GAS_CONSTANT, MOLECULAR_WEIGHT_AIR
 from particula.util.dynamic_viscosity import dyn_vis
+from particula.util.input_handling import (in_molecular_weight, in_pressure,
+                                           in_temperature, in_viscosity)
 
 
-def mean_free_path(
-    temperature=298,
-    pressure=101325,
-    molec_wt=MOL_WT_AIR,
-) -> float:
+def mfp(**kwargs):
     """ Returns the mean free path of in air.
-
-        Examples:
-        ```
-        >>> # with no inputs, it defaults to 298 K and 101325 Pa
-        >>> mean_free_path()
-        >>> <Quantity(6.64373669e-08, 'meter')>
-        >>> # specifying a temperature of 300 L
-        >>> mean_free_path(temperature=300*u.K).magnitude
-        >>> 6.700400687925813e-08
-        >>> # specifying 300 K and  pressure of 1e5 Pa
-        >>> mean_free_path(temperature=300*u.K, pressure=1e5*u.Pa)
-        >>> <Quantity(6.789181e-08, 'meter')>
-        >>> mean_free_path(temperature=300, pressure=1e5, molec_wt=0.03)
-        >>> <Quantity(6.67097062e-08, 'meter')>
-        ```
-
-        Parameters:
-            temperature (float) [K]      (default: 298)
-            pressure    (float) [Pa]     (default: 101325)
-            molec_wt    (float) [kg/mol] (default: MOL_WT_AIR)
-
-        Returns:
-                        (float) [m]
 
         The mean free path is the average distance
         traveled by a molecule between collisions
@@ -52,47 +25,78 @@ def mean_free_path(
 
         The expeected mean free path of air is approx.
         65 nm at 298 K and 101325 Pa.
+
+        Examples:
+        ```
+        >>> from particula import u
+        >>> from particula.util.mean_free_path import mfp
+        >>> # with no inputs, it defaults to 298 K and 101325 Pa
+        >>> mfp()
+        <Quantity(6.64373669e-08, 'meter')>
+        >>> # specifying a temperature of 300 K
+        >>> mfp(temperature=300*u.K).magnitude
+        6.700400687925813e-08
+        >>> # specifying 300 K and  pressure of 1e5 Pa
+        >>> mfp(temperature=300*u.K, pressure=1e5*u.Pa)
+        <Quantity(6.789181e-08, 'meter')>
+        >>> mfp(
+            temperature=300,
+            pressure=1e5,
+            molecular_weight=0.03
+            )
+        <Quantity(6.67097062e-08, 'meter')>
+        >>> # specifying explicit value for dynamic viscosity
+        >>> mfp(dynamic_viscosity=1e-5)
+        <Quantity(3.61864151e-08, 'meter')>
+        >>> # specifying implicit value for dynamic viscosity
+        >>> mfp(
+                temperature=300,
+                reference_viscosity=1e-5,
+                reference_temperature=273.15
+            )
+        <Quantity(3.90466241e-08, 'meter')>
+        ```
+
+        Parameters: (either # or $)
+            temperature           (float) [K]      (default: 298)
+            pressure              (float) [Pa]     (default: 101325)
+            molecular_weight      (float) [kg/mol] (default: constants)
+
+        #   dynamic_viscosity     (float) [Pa*s]   (default: util)
+        $   reference_viscosity   (float) [Pa*s]   (default: constants)
+        $   reference_temperature (float) [K]      (default: constants)
+
+        Returns:
+                        (float) [m]
+
+        Using particula.constants:
+            GAS_CONSTANT            (float) [J/mol/K]
+            MOLECULAR_WEIGHT_AIR    (float) [kg/mol]
+
+            REF_VISCOSITY_AIR_STP   (float) [Pa*s]
+            REF_TEMPERATURE_STP     (float) [K]
+            SUTHERLAND_CONSTANT     (float) [K]
+
+        Notes:
+            dynamic_viscosity can be calculated independently via
+            particula.util.dynamic_viscosity.dyn_vis(**kwargs), but
+            if the value of dynamic_viscosity is provided directly,
+            it overrides the calculated value.
     """
 
-    if isinstance(temperature, u.Quantity):
-        if temperature.to_base_units().u == "kelvin":
-            temperature = temperature.to_base_units()
-        else:
-            raise ValueError(
-                f"\n\t"
-                f"Input {temperature} has unsupported units.\n\t"
-                f"Input must have temperature units of\n\t"
-                f"either 'kelvin' or 'degree_Celsius'.\n"
-            )
-    else:
-        temperature = u.Quantity(temperature, u.K)
+    temp = kwargs.get("temperature", 298.15)
+    pres = kwargs.get("pressure", 101325)
+    molec_wt = kwargs.get("molecular_weight", MOLECULAR_WEIGHT_AIR)
+    dyn_vis_val = kwargs.get("dynamic_viscosity", dyn_vis(**kwargs))
 
-    if isinstance(pressure, u.Quantity):
-        if pressure.to_base_units().u == (1*u.Pa).to_base_units().u:
-            pressure = pressure.to_base_units()
-        else:
-            raise ValueError(
-                f"\n\t"
-                f"Input {pressure} has unsupported units.\n\t"
-                f"Input must have pressure units of 'pascal'.\n"
-            )
-    else:
-        pressure = u.Quantity(pressure, u.Pa)
+    temp = in_temperature(temp)
+    pres = in_pressure(pres)
+    molec_wt = in_molecular_weight(molec_wt)
+    dyn_vis_val = in_viscosity(dyn_vis_val)
 
-    if isinstance(molec_wt, u.Quantity):
-        if molec_wt.to_base_units().u == u.kg / u.mol:
-            molec_wt = molec_wt.to_base_units()
-        else:
-            raise ValueError(
-                f"\n\t"
-                f"Input {molec_wt} has unsupported units.\n\t"
-                f"Input must have molecular weight units of\n\t"
-                f"'kg/mol'.\n"
-            )
-    else:
-        molec_wt = u.Quantity(molec_wt, u.kg / u.mol)
+    gas_con = GAS_CONSTANT
 
     return (
-        (2*dyn_vis(temperature)/pressure) /
-        (8*molec_wt/(np.pi*GAS_CON*temperature))**0.5
+        (2 * dyn_vis_val / pres) /
+        (8 * molec_wt / (np.pi * gas_con * temp))**0.5
     ).to_base_units()
