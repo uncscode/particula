@@ -3,6 +3,7 @@
 
 from particula import u
 
+
 def in_temperature(temp):
     """ Handles temperature input
 
@@ -34,6 +35,7 @@ def in_temperature(temp):
         temp = u.Quantity(temp, u.K)
 
     return temp
+
 
 def in_viscosity(vis):
     """ Handles viscosity input
@@ -67,6 +69,7 @@ def in_viscosity(vis):
 
     return vis
 
+
 def in_pressure(pressure):
     """ Handles pressure input
 
@@ -97,6 +100,7 @@ def in_pressure(pressure):
         pressure = u.Quantity(pressure, u.kg/u.m/u.s**2)
 
     return pressure
+
 
 def in_molecular_weight(molec_wt):
     """ Handles molecular weight input
