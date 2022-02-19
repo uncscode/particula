@@ -123,7 +123,7 @@ def cekl(**kwargs):
     return CoulombEnhancement(**kwargs).coulomb_enhancement_kinetic_limit()
 
 
-def cecm(**kwargs):
+def cecl(**kwargs):
     """ Calculate coulombic enhancement continuum limit
 
         Parameters:

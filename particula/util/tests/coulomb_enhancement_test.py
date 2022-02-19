@@ -4,7 +4,7 @@
 import pytest
 from particula import u
 from particula.util.coulomb_enhancement import CoulombEnhancement as CE
-from particula.util.coulomb_enhancement import cecm, cekl
+from particula.util.coulomb_enhancement import cecl, cekl
 
 
 def test_coulomb_ratio():
@@ -96,24 +96,24 @@ def test_cekl():
     )
 
 
-def test_cecm():
+def test_cecl():
     """ testing cecm
     """
 
     a_ra = u.Quantity(1, u.m)
     b_ra = u.Quantity(1, u.m)
 
-    ce_default = cecm(radius=a_ra, other_radius=b_ra)
-    ce_charged = cecm(radius=a_ra, other_radius=b_ra,
+    ce_default = cecl(radius=a_ra, other_radius=b_ra)
+    ce_charged = cecl(radius=a_ra, other_radius=b_ra,
                       charge=-1, other_charge=1)
-    ce_extreme = cecm(radius=a_ra, other_radius=b_ra,
+    ce_extreme = cecl(radius=a_ra, other_radius=b_ra,
                       charge=-1000, other_charge=1000)
-    ce_unlikes = cecm(radius=a_ra, radiys=b_ra, charge=-1, other_charge=-1)
-    ce_neutral_a = cecm(radius=a_ra, other_radius=b_ra,
+    ce_unlikes = cecl(radius=a_ra, radiys=b_ra, charge=-1, other_charge=-1)
+    ce_neutral_a = cecl(radius=a_ra, other_radius=b_ra,
                         charge=0, other_charge=0)
-    ce_neutral_b = cecm(radius=a_ra, other_radius=b_ra,
+    ce_neutral_b = cecl(radius=a_ra, other_radius=b_ra,
                         charge=0, other_charge=1)
-    ce_neutral_c = cecm(radius=a_ra, other_radius=b_ra,
+    ce_neutral_c = cecl(radius=a_ra, other_radius=b_ra,
                         charge=-1, other_charge=0)
 
     assert (
