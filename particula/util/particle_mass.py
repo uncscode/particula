@@ -6,7 +6,7 @@ import numpy as np
 from particula import u
 
 
-def particle_mass(radius, density=1000):
+def particle_mass(radius, density=1000, shape_factor=1, vol_void=0):
     """ Returns particle's mass: 4/3 pi r^3 * density.
 
         Examples:
@@ -26,11 +26,13 @@ def particle_mass(radius, density=1000):
         ```
 
         Parameters:
-            radius  (float) [m]
-            density (float) [kg/m^3] (default: 1000)
+            radius       (float) [m]
+            density      (float) [kg/m^3] (default: 1000)
+            shape_factor (float) [ ]      (default: 1)
+            vol_void     (float) [ ]      (default: 0)
 
         Returns:
-                    (float) [kg]
+                         (float) [kg]
     """
 
     if isinstance(radius, u.Quantity):
@@ -53,4 +55,17 @@ def particle_mass(radius, density=1000):
     else:
         density = u.Quantity(density, u.kg/u.m**3)
 
-    return density * (4*np.pi/3) * (radius**3)
+    if isinstance(shape_factor, u.Quantity):
+        raise ValueError(
+            f"input {shape_factor} must be a scalar."
+        )
+
+    if isinstance(vol_void, u.Quantity):
+        raise ValueError(
+            f"input {vol_void} must be a scalar."
+        )
+
+    return (
+        density * (4*np.pi/3) * (radius**3)
+        * shape_factor * (1 - vol_void)
+    )
