@@ -82,9 +82,9 @@ class CoulombEnhancement:
         return (
             1 + ratio if ratio >= 0
             else np.exp(ratio)
-        )
+        ).to_base_units()
 
-    def coulomb_enhancement_continuum_limit(self) -> float:
+    def coulomb_enhancement_continuum_limit(self):
         """ Coulombic coagulation enhancement continuum limit.
 
             Parameters:
@@ -103,7 +103,7 @@ class CoulombEnhancement:
         return (
             ratio/(1-np.exp(-1*ratio)) if ratio != 0
             else u.Quantity(1, u.dimensionless)
-        )
+        ).to_base_units()
 
 
 def cekl(**kwargs):

@@ -54,7 +54,7 @@ class DimensionlessCoagulation:
         """
 
         HS_CS = [25.836, 11.211, 3.502, 7.211]
-        difkn = diffusive_knudsen(
+        diff_knu = diffusive_knudsen(
             self.radius, self.other_radius,
             self.density, self.other_density,
             self.charge, self.other_charge,

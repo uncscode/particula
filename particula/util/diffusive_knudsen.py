@@ -19,6 +19,20 @@ def diff_knu(**kwargs):
             - denominator: effective length scale of
                 particle--particle Coulombic interaction
 
+        Examples:
+        ```
+        >>> from particula import u
+        >>> from particula.util.diffusive_knudsen import diff_knu
+        >>> # with only one radius
+        >>> diff_knu(radius=1e-9)
+        <Quantity(29.6799, 'dimensionless')>
+        >>> # with two radii
+        >>> diff_knu(radius=1e-9, other_radius=1e-8)
+        <Quantity(3.85387845, 'dimensionless')>
+        >>> # with radii and charges
+        >>> diff_knu(radius=1e-9, other_radius=1e-8, charge=-1, other_charge=1)
+        <Quantity(4.58204028, 'dimensionless')>
+        ```
         Parameters:
             radius          (float) [m]
             other_radius    (float) [m]             (default: radius)
@@ -75,6 +89,9 @@ def diff_knu(**kwargs):
 
     cekl_val = cekl(**kwargs)
     cecl_val = cecl(**kwargs)
+
+    print(cekl_val.u)
+    print(cecl_val.u)
 
     boltz_const = BOLTZMANN_CONSTANT
 
