@@ -39,10 +39,10 @@ def in_viscosity(vis):
     """ Handles viscosity input
 
         Parameters:
-            vis     (float) [Pa*s | dimensionless]
+            vis     (float) [kg/m/s | dimensionless]
 
         Returns:
-            vis     (float) [Pa*s]
+            vis     (float) [kg/m/s]
 
         Notes:
             * If unit is correct, take to base units in Pa*s
@@ -71,10 +71,10 @@ def in_pressure(pressure):
     """ Handles pressure input
 
         Parameters:
-            pressure    (float) [Pa | dimensionless]
+            pressure    (float) [kg/m/s^2 | dimensionless]
 
         Returns:
-            pressure    (float) [Pa]
+            pressure    (float) [kg/m/s^2]
 
         Notes:
             * If unit is correct, take to base units in Pa
