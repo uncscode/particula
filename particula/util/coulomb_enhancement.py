@@ -104,3 +104,37 @@ class CoulombEnhancement:
             ratio/(1-np.exp(-1*ratio)) if ratio != 0
             else u.Quantity(1, u.dimensionless)
         )
+
+
+def cekl(**kwargs):
+    """ Calculate coulombic enhancement kinetic limit
+
+        Parameters:
+            radius          (float) [m]
+            other_radius    (float) [m]             (default: radius)
+            charge          (float) [dimensionless] (default: 0)
+            other_charge    (float) [dimensionless] (default: 0)
+            temperature     (float) [K]             (default: 298)
+
+        Returns:
+                                (float) [dimensionless]
+    """
+
+    return CoulombEnhancement(**kwargs).coulomb_enhancement_kinetic_limit()
+
+
+def cecm(**kwargs):
+    """ Calculate coulombic enhancement continuum limit
+
+        Parameters:
+            radius          (float) [m]
+            other_radius    (float) [m]             (default: radius)
+            charge          (float) [dimensionless] (default: 0)
+            other_charge    (float) [dimensionless] (default: 0)
+            temperature     (float) [K]             (default: 298)
+
+        Returns:
+                                (float) [dimensionless]
+    """
+
+    return CoulombEnhancement(**kwargs).coulomb_enhancement_continuum_limit()
