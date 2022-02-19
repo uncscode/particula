@@ -133,3 +133,99 @@ def in_molecular_weight(molec_wt):
         molec_wt = u.Quantity(molec_wt, u.kg / u.mol)
 
     return molec_wt
+
+
+def in_radius(radius):
+    """ Handles radius input
+
+        Parameters:
+            radius    (float) [m | dimensionless]
+
+        Returns:
+            radius    (float) [m]
+
+        Notes:
+            * If unit is correct, take to base units in m
+            * Throws ValueError if unit is wrong
+            * Assigning m units to scalar input
+    """
+
+    if isinstance(radius, u.Quantity):
+        if radius.to_base_units().u == u.m:
+            radius = radius.to_base_units()
+        else:
+            raise ValueError(
+                f"\n\t"
+                f"Input {radius} has unsupported units.\n\t"
+                f"Input must have radius units of\n\t"
+                f"'meters';\n\t"
+                f"otherwise, if dimensionless, it will\n\t"
+                f"be assigned a m unit.\n"
+            )
+    else:
+        radius = u.Quantity(radius, u.m)
+
+    return radius
+
+
+def in_density(density):
+    """ Handles density input
+
+        Parameters:
+            density    (float) [kg/m^3 | dimensionless]
+
+        Returns:
+            density    (float) [kg/m^3]
+
+        Notes:
+            * If unit is correct, take to base units in kg/m^3
+            * Throws ValueError if unit is wrong
+            * Assigning kg/m^3 units to scalar input
+    """
+
+    if isinstance(density, u.Quantity):
+        if density.to_base_units().u == u.kg/u.m**3:
+            density = density.to_base_units()
+        else:
+            raise ValueError(
+                f"\n\t"
+                f"Input {density} has unsupported units.\n\t"
+                f"Input must have density units of\n\t"
+                f"'kg/m^3';\n\t"
+                f"otherwise, if dimensionless, it will\n\t"
+                f"be assigned a kg/m^3 unit.\n"
+            )
+    else:
+        density = u.Quantity(density, u.kg/u.m**3)
+
+    return density
+
+
+def in_scalar(scalar):
+    """ Handles scalar input
+
+        Parameters:
+            scalar    (float) [dimensionless]
+
+        Returns:
+            scalar    (float) [dimensionless]
+
+        Notes:
+            * If unit is correct, take to base units in dimensionless
+            * Throws ValueError if unit is wrong
+            * Assigning dimensionless units to scalar input
+    """
+
+    if isinstance(scalar, u.Quantity):
+        if scalar.to_base_units().u == u.dimensionless:
+            scalar = scalar.to_base_units()
+        else:
+            raise ValueError(
+                f"\n\t"
+                f"Input {scalar} has unsupported units.\n\t"
+                f"Input must have dimensionless units;\n\""
+            )
+    else:
+        scalar = u.Quantity(scalar, u.dimensionless)
+
+    return scalar

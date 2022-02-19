@@ -2,11 +2,10 @@
 """
 
 import numpy as np
+from particula.util.input_handling import in_density, in_radius, in_scalar
 
-from particula import u
 
-
-def particle_mass(radius, density=1000, shape_factor=1, vol_void=0):
+def mass(**kwargs):
     """ Returns particle's mass: 4/3 pi r^3 * density.
 
         Examples:
@@ -29,41 +28,24 @@ def particle_mass(radius, density=1000, shape_factor=1, vol_void=0):
             radius       (float) [m]
             density      (float) [kg/m^3] (default: 1000)
             shape_factor (float) [ ]      (default: 1)
-            vol_void     (float) [ ]      (default: 0)
+            volume_void  (float) [ ]      (default: 0)
 
         Returns:
                          (float) [kg]
     """
 
-    if isinstance(radius, u.Quantity):
-        if radius.to_base_units().u == u.m:
-            radius = radius.to_base_units()
-        else:
-            raise ValueError(
-                f"input {radius} must be in meters."
-            )
-    else:
-        radius = u.Quantity(radius, u.m)
+    radius = kwargs.get("radius", "None")
+    density = kwargs.get("density", 1000)
+    shape_factor = kwargs.get("shape_factor", 1)
+    vol_void = kwargs.get("volume_void", 0)
 
-    if isinstance(density, u.Quantity):
-        if density.to_base_units().u == u.kg / u.m**3:
-            density = density.to_base_units()
-        else:
-            raise ValueError(
-                f"input {density} must be in kg/m^3."
-            )
-    else:
-        density = u.Quantity(density, u.kg/u.m**3)
+    if radius == "None":
+        raise ValueError(f"You must provide a radius!")
 
-    if isinstance(shape_factor, u.Quantity):
-        raise ValueError(
-            f"input {shape_factor} must be a scalar."
-        )
-
-    if isinstance(vol_void, u.Quantity):
-        raise ValueError(
-            f"input {vol_void} must be a scalar."
-        )
+    radius = in_radius(radius)
+    density = in_density(density)
+    shape_factor = in_scalar(shape_factor)
+    vol_void = in_scalar(vol_void)
 
     return (
         density * (4*np.pi/3) * (radius**3)

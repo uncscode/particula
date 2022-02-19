@@ -4,7 +4,8 @@
 import pytest
 from particula import u
 from particula.util.input_handling import (in_molecular_weight, in_pressure,
-                                           in_temperature, in_viscosity)
+                                           in_temperature, in_viscosity,
+                                           in_radius, in_density, in_scalar)
 
 
 def test_in_temp():
@@ -133,3 +134,101 @@ def test_in_pres():
 
     pres = in_pressure(u.Quantity(5, u.mbar))
     assert pres.units == u.kg / u.m / u.s**2
+
+
+def test_in_radius():
+    """ Testing the in_radius function
+    """
+
+    radius = in_radius(5)
+    assert radius.units == u.m
+    assert radius.magnitude == 5
+
+    radius = in_radius(5 * u.m)
+    assert radius.units == u.m
+    assert radius.magnitude == 5
+
+    radius = in_radius(u.Quantity(5, u.mm))
+    assert radius.units == u.m
+    assert radius.magnitude == u.Quantity(5, u.mm).m_as("m")
+
+    radius = in_radius(u.Quantity(5, u.cm))
+    assert radius.units == u.m
+    assert radius.magnitude == u.Quantity(5, u.cm).m_as("m")
+
+    radius = in_radius(u.Quantity(5, u.m))
+    assert radius.units == u.m
+    assert radius.magnitude == u.Quantity(5, u.m).m_as("m")
+
+    radius = in_radius(u.Quantity(5, u.km))
+    assert radius.units == u.m
+    assert radius.magnitude == u.Quantity(5, u.km).m_as("m")
+
+    radius = in_radius(u.Quantity(5, u.inch))
+    assert radius.units == u.m
+    assert radius.magnitude == u.Quantity(5, u.inch).m_as("m")
+
+    radius = in_radius(u.Quantity(5, u.ft))
+    assert radius.units == u.m
+    assert radius.magnitude == u.Quantity(5, u.ft).m_as("m")
+
+    radius = in_radius(u.Quantity(5, u.mi))
+    assert radius.units == u.m
+    assert radius.magnitude == u.Quantity(5, u.mi).m_as("m")
+
+    radius = in_radius(u.Quantity(5, u.nmi))
+    assert radius.units == u.m
+    assert radius.magnitude == u.Quantity(5, u.nmi).m_as("m")
+
+
+def test_in_density():
+    """ Testing the in_density function
+    """
+
+    density = in_density(5)
+    assert density.units == u.kg / u.m**3
+    assert density.magnitude == 5
+
+    density = in_density(5 * u.kg / u.m**3)
+    assert density.units == u.kg / u.m**3
+    assert density.magnitude == 5
+
+    density = in_density(u.Quantity(5, u.g / u.cm**3))
+    assert density.units == u.kg / u.m**3
+    assert density.magnitude == u.Quantity(5, u.g / u.cm**3).m_as("kg/m^3")
+
+    density = in_density(u.Quantity(5, u.kg / u.m**3))
+    assert density.units == u.kg / u.m**3
+    assert density.magnitude == u.Quantity(5, u.kg / u.m**3).m_as("kg/m^3")
+
+    density = in_density(u.Quantity(5, u.kg / u.cm**3))
+    assert density.units == u.kg / u.m**3
+    assert density.magnitude == u.Quantity(5, u.kg / u.cm**3).m_as("kg/m^3")
+
+    density = in_density(u.Quantity(5, u.kg / u.cm**3))
+    assert density.units == u.kg / u.m**3
+    assert density.magnitude == u.Quantity(5, u.kg / u.cm**3).m_as("kg/m^3")
+
+    density = in_density(u.Quantity(5, u.g / u.cm**3))
+    assert density.units == u.kg / u.m**3
+    assert density.magnitude == u.Quantity(5, u.g / u.cm**3).m_as("kg/m^3")
+
+    density = in_density(u.Quantity(5, u.lb / u.ft**3))
+    assert density.units == u.kg / u.m**3
+    assert density.magnitude == u.Quantity(5, u.lb / u.ft**3).m_as("kg/m^3")
+
+
+def test_in_scalar():
+    """ Testing the in_scalar function
+    """
+
+    scalar = in_scalar(5)
+    assert scalar.units == u.dimensionless
+    assert scalar.magnitude == 5
+
+    scalar = in_scalar(5 * u.dimensionless)
+    assert scalar.units == u.dimensionless
+    assert scalar.magnitude == 5
+
+    with pytest.raises(ValueError):
+        in_scalar(u.Quantity(5, u.m))
