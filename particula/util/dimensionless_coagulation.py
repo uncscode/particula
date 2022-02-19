@@ -2,7 +2,7 @@
 """
 
 import numpy as np
-from particula.util.diffusive_knudsen import diff_knu
+from particula.util.diffusive_knudsen import diff_knu as dknu
 
 
 class DimensionlessCoagulation:
@@ -23,7 +23,7 @@ class DimensionlessCoagulation:
                     - particula.util.diffusive_knudsen.diff_knu(**kwargs)
         """
 
-        self.diff_knudsen = diff_knu(**kwargs)
+        self.diff_knu = dknu(**kwargs)
         self.authors = kwargs.get("authors", "hardsphere")
 
     def hardsphere_coag(self):
@@ -31,7 +31,7 @@ class DimensionlessCoagulation:
         """
 
         hsa_consts = [25.836, 11.211, 3.502, 7.211]
-        diff_knu = self.diff_knudsen
+        diff_knu = self.diff_knu
 
         upstairs = (
             (4 * np.pi * diff_knu**2) +
