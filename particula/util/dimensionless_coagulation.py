@@ -2,7 +2,7 @@
 """
 
 import numpy as np
-from particula.util.diffusive_knudsen import diff_knu as dknu
+from particula.util.diffusive_knudsen import diff_knu as dknu, red_mass, red_frifac, celimits, rxr
 
 
 class DimensionlessCoagulation:
@@ -25,8 +25,9 @@ class DimensionlessCoagulation:
 
         self.diff_knu = dknu(**kwargs)
         self.authors = kwargs.get("authors", "hardsphere")
+        self.kwargs = kwargs
 
-    def hardsphere_coag(self):
+    def hardsphere_coag_less(self):
         """ Dimensionless particle--particle coagulation kernel.
         """
 
@@ -48,19 +49,33 @@ class DimensionlessCoagulation:
 
         return upstairs / downstairs
 
-    def coag(self):
+    def coag_less(self):
         """ Return the dimensionless coagulation kernel.
         """
 
         if self.authors == "hardsphere":
-            result = self.hardsphere_coag()
+            result = self.hardsphere_coag_less()
         else:
             raise ValueError(f"{self.authors} not recognized!")
 
         return result
 
+    def coag_full(self):
+        """ Retrun the dimensioned coagulation kernel
+        """
 
-def hardsphere_coag(**kwargs):
+        coag = self.coag_less()
+        redff = red_frifac(**self.kwargs)
+        redm = red_mass(**self.kwargs)
+        cekl, cecl = celimits(**self.kwargs)
+        xrxr = rxr(**self.kwargs)
+
+        return (
+            coag * redff * xrxr**3 * cekl**2 / (redm * cecl)
+        )
+
+
+def hsdl_coag_less(**kwargs):
     """ Return the dimensionless coagulation kernel.
 
         The dimensionless coagulation kernel is defined as
@@ -71,23 +86,50 @@ def hardsphere_coag(**kwargs):
         Examples:
         ```
         >>> from particula import u
-        >>> from particula.util.dimensionless_coagulation import hardsphere_coag as hsc
+        >>> from particula.util.dimensionless_coagulation import hsdl_coag
         >>> # with only one radius
-        >>> hsc(radius=1e-9)
+        >>> hsdl_coag(radius=1e-9)
         <Quantity(147.877572, 'dimensionless')>
         >>> # with two radii
-        >>> hsc(radius=1e-9, other_radius=1e-8)
+        >>> hsdl_coag(radius=1e-9, other_radius=1e-8)
         <Quantity(18.4245966, 'dimensionless')>
         >>> # with two radii and charges
-        >>> hsc(radius=1e-9, other_radius=1e-8, charge=1, other_charge=-1)
+        >>> hsdl_coag(radius=1e-9, other_radius=1e-8, charge=1, other_charge=-1)
         <Quantity(22.0727435, 'dimensionless')>
     """
 
-    return DimensionlessCoagulation(**kwargs).hardsphere_coag()
+    return DimensionlessCoagulation(**kwargs).hardsphere_coag_less()
 
 
-def coag(**kwargs):
+def less_coag(**kwargs):
     """ Return the dimensionless coagulation kernel.
+
+        The dimensionless coagulation kernel is defined as
+        a function of the diffusive knudsen number; for more info,
+        please see the documentation of the respective function:
+            - particula.util.diffusive_knudsen.diff_knu(**kwargs)
+
+        Examples:
+        ```
+        >>> from particula import u
+        >>> from particula.util.dimensionless_coagulation import less_coag
+        >>> # only for hardsphere coagulation for now
+        >>> # with only one radius
+        >>> less_coag(radius=1e-9)
+        <Quantity(147.877572, 'dimensionless')>
+        >>> # with two radii
+        >>> less_coag(radius=1e-9, other_radius=1e-8)
+        <Quantity(18.4245966, 'dimensionless')>
+        >>> # with two radii and charges
+        >>> less_coag(radius=1e-9, other_radius=1e-8, charge=1, other_charge=-1)
+        <Quantity(22.0727435, 'dimensionless')>
     """
 
-    return DimensionlessCoagulation(**kwargs).coag()
+    return DimensionlessCoagulation(**kwargs).coag_less()
+
+
+def full_coag(**kwargs):
+    """ Return the dimensioned coagulation kernel
+    """
+
+    return DimensionlessCoagulation(**kwargs).coag_full()

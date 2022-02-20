@@ -9,6 +9,77 @@ from particula.util.input_handling import (in_density, in_radius, in_scalar,
 from particula.util.particle_mass import mass
 from particula.util.reduced_quantity import reduced_quantity
 
+class DiffusiveKnudsen:
+    """ A class for Diff..Knu
+    """
+
+    def __init__(self, **kwargs):
+        """ define properties """
+
+        radius = kwargs.get("radius", "None")
+        other_radius = kwargs.get("other_radius", radius)
+        density = kwargs.get("density", 1000)
+        other_density = kwargs.get("other_density", density)
+        charge = kwargs.get("charge", 0)
+        other_charge = kwargs.get("other_charge", charge)
+        temperature = kwargs.get("temperature", 298)
+
+        self.radius = in_radius(radius)
+        self.other_radius = in_radius(other_radius)
+        self.density = in_density(density)
+        self.other_density = in_density(other_density)
+        self.charge = in_scalar(charge)
+        self.other_charge = in_scalar(other_charge)
+        self.temperature = in_temperature(temperature)
+        self.kwargs = kwargs
+
+    def get_red_mass(self):
+        """ get the reduced mass
+        """
+        return reduced_quantity(
+            mass(radius=self.radius, density=self.density),
+            mass(radius=self.other_radius, density=self.other_density)
+        )
+    def get_rxr(self):
+        """ add two radii
+        """
+        return self.radius + self.other_radius
+
+    def get_red_frifac(self):
+        """ get the reduced friction factor
+        """
+
+        frifac_kwargs = self.kwargs.copy()
+        other_frifac_kwargs = self.kwargs.copy()
+
+        frifac_kwargs.pop("radius", None)
+        other_frifac_kwargs.pop("radius", None)
+
+        return reduced_quantity(
+            frifac(radius=self.radius, **frifac_kwargs),
+            frifac(radius=self.other_radius, **other_frifac_kwargs)
+        )
+
+    def get_celimits(self):
+        """ get coag enh limits
+        """
+
+        lkwargs = self.kwargs.copy()
+        return (cekl(**lkwargs), cecl(**lkwargs))
+
+    def get_diff_knu(self):
+        """ calculate it
+        """
+        boltz_const = BOLTZMANN_CONSTANT
+        rmass = self.get_red_mass()
+        rfrifac = self.get_red_frifac()
+        (cekl_val, cecl_val) = self.get_celimits()
+        temp = self.temperature
+        return (
+            ((temp * boltz_const * rmass)**0.5 / rfrifac) /
+            ((self.radius + self.other_radius) * cecl_val / cekl_val)
+        )
+
 
 def diff_knu(**kwargs):
     """ Diffusive Knudsen number.
@@ -55,44 +126,32 @@ def diff_knu(**kwargs):
 
     """
 
-    radius = kwargs.get("radius", "None")
-    other_radius = kwargs.get("other_radius", radius)
-    density = kwargs.get("density", 1000)
-    other_density = kwargs.get("other_density", density)
-    charge = kwargs.get("charge", 0)
-    other_charge = kwargs.get("other_charge", charge)
-    temperature = kwargs.get("temperature", 298)
+    return DiffusiveKnudsen(**kwargs).get_diff_knu()
 
-    radius = in_radius(radius)
-    other_radius = in_radius(other_radius)
-    density = in_density(density)
-    other_density = in_density(other_density)
-    charge = in_scalar(charge)
-    other_charge = in_scalar(other_charge)
-    temperature = in_temperature(temperature)
 
-    red_mass = reduced_quantity(
-        mass(radius=radius, density=density),
-        mass(radius=other_radius, density=other_density)
-    )
+def red_mass(**kwargs):
+    """ get the reduced mass
+    """
 
-    frifac_kwargs = kwargs.copy()
-    other_frifac_kwargs = kwargs.copy()
+    return DiffusiveKnudsen(**kwargs).get_red_mass()
 
-    frifac_kwargs.pop("radius", None)
-    other_frifac_kwargs.pop("radius", None)
 
-    red_frifac = reduced_quantity(
-        frifac(radius=radius, **frifac_kwargs),
-        frifac(radius=other_radius, **other_frifac_kwargs)
-    )
+def red_frifac(**kwargs):
+    """ get the reduced friction factor
+    """
 
-    cekl_val = cekl(**kwargs)
-    cecl_val = cecl(**kwargs)
+    return DiffusiveKnudsen(**kwargs).get_red_frifac()
 
-    boltz_const = BOLTZMANN_CONSTANT
 
-    return (
-        ((temperature * boltz_const * red_mass)**0.5 / red_frifac) /
-        ((radius + other_radius) * cecl_val / cekl_val)
-    )
+def celimits(**kwargs):
+    """ get coag enh limits
+    """
+
+    return DiffusiveKnudsen(**kwargs).get_celimits()
+
+
+def rxr(**kwargs):
+    """ add two radii
+    """
+
+    return DiffusiveKnudsen(**kwargs).get_rxr()
