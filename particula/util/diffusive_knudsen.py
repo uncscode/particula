@@ -21,16 +21,12 @@ class DiffusiveKnudsen:
         other_radius = kwargs.get("other_radius", radius)
         density = kwargs.get("density", 1000)
         other_density = kwargs.get("other_density", density)
-        # charge = kwargs.get("charge", 0)
-        # other_charge = kwargs.get("other_charge", charge)
         temperature = kwargs.get("temperature", 298)
 
         self.radius = in_radius(radius)
         self.other_radius = in_radius(other_radius)
         self.density = in_density(density)
         self.other_density = in_density(other_density)
-        # self.charge = in_scalar(charge)
-        # self.other_charge = in_scalar(other_charge)
         self.temperature = in_temperature(temperature)
         self.kwargs = kwargs
 
