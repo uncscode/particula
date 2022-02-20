@@ -2,7 +2,9 @@
 """
 
 import numpy as np
-from particula.util.diffusive_knudsen import diff_knu as dknu, red_mass, red_frifac, celimits, rxr
+from particula.util.diffusive_knudsen import celimits
+from particula.util.diffusive_knudsen import diff_knu as dknu
+from particula.util.diffusive_knudsen import red_frifac, red_mass, rxr
 
 
 class DimensionlessCoagulation:
@@ -86,7 +88,7 @@ def hsdl_coag_less(**kwargs):
         Examples:
         ```
         >>> from particula import u
-        >>> from particula.util.dimensionless_coagulation import hsdl_coag
+        >>> from particula.util.dimensionless_coagulation import hsdl_coag_less
         >>> # with only one radius
         >>> hsdl_coag(radius=1e-9)
         <Quantity(147.877572, 'dimensionless')>
@@ -94,7 +96,9 @@ def hsdl_coag_less(**kwargs):
         >>> hsdl_coag(radius=1e-9, other_radius=1e-8)
         <Quantity(18.4245966, 'dimensionless')>
         >>> # with two radii and charges
-        >>> hsdl_coag(radius=1e-9, other_radius=1e-8, charge=1, other_charge=-1)
+        >>> hsdl_coag(
+        ... radius=1e-9, other_radius=1e-8, charge=1, other_charge=-1
+        ... )
         <Quantity(22.0727435, 'dimensionless')>
     """
 
@@ -121,7 +125,9 @@ def less_coag(**kwargs):
         >>> less_coag(radius=1e-9, other_radius=1e-8)
         <Quantity(18.4245966, 'dimensionless')>
         >>> # with two radii and charges
-        >>> less_coag(radius=1e-9, other_radius=1e-8, charge=1, other_charge=-1)
+        >>> less_coag(
+        ... radius=1e-9, other_radius=1e-8, charge=1, other_charge=-1
+        ... )
         <Quantity(22.0727435, 'dimensionless')>
     """
 
