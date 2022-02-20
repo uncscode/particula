@@ -153,5 +153,5 @@ def celimits(**kwargs):
 def rxr(**kwargs):
     """ add two radii
     """
-
+    print(kwargs)
     return DiffusiveKnudsen(**kwargs).get_rxr()

@@ -80,7 +80,7 @@ class CoulombEnhancement:
         ratio = self.coulomb_potential_ratio()
 
         return (
-            1 + ratio if ratio >= 0
+            (1 + ratio) if ratio >= 0
             else np.exp(ratio)
         ).to_base_units()
 
