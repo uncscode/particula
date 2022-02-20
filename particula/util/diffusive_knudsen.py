@@ -4,8 +4,7 @@
 from particula.constants import BOLTZMANN_CONSTANT
 from particula.util.coulomb_enhancement import cecl, cekl
 from particula.util.friction_factor import frifac
-from particula.util.input_handling import (in_density, in_radius,
-                                           in_temperature)
+from particula.util.input_handling import in_density, in_radius, in_temperature
 from particula.util.particle_mass import mass
 from particula.util.reduced_quantity import reduced_quantity
 
