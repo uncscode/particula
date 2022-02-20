@@ -28,6 +28,10 @@ def test_particle_mass():
     assert a_mass.units == u.kg
     assert b_mass == a_mass
 
+    assert mass(radius=[1e-9, 1e-8]).m.shape == (2,)
+    assert mass(radius=1-9, density=[1e3, 1e4]).m.shape == (2,)
+    assert mass(radius=[1e-9, 1e-8], density=[1e3, 1e4]).m.shape == (2,)
+
     with pytest.raises(ValueError):
         mass(radius=1*u.kg)
 

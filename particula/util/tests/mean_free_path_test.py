@@ -25,9 +25,9 @@ def test_mfp():
     assert a_mfp.magnitude == pytest.approx(66.4e-9, rel=1e-1)
     assert c_mfp <= a_mfp
 
-    assert mfp(temperature=[200,300]).m.shape == (2,)
-    assert mfp(pressure=[1e5,1.1e5]).m.shape == (2,)
-    assert mfp(temperature=[200,300], pressure=[1e5,1.1e5]).m.shape == (2,)
+    assert mfp(temperature=[200, 300]).m.shape == (2,)
+    assert mfp(pressure=[1e5, 1.1e5]).m.shape == (2,)
+    assert mfp(temperature=[200, 300], pressure=[1e5, 1.1e5]).m.shape == (2,)
 
     with pytest.raises(ValueError):
         mfp(temperature=5*u.m, pressure=101325*u.Pa)
