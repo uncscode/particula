@@ -20,7 +20,7 @@ def mean_free_path(
     temperature=298,
     pressure=101325,
     molec_wt=MOL_WT_AIR,
-) -> float:
+):
     """ Returns the mean free path of in air.
 
         Examples:
