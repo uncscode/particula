@@ -45,6 +45,8 @@ def test_dyn_vis():
         REF_VIS_AIR/2
     )
 
+    assert dyn_vis(temperature=[250,255,260]).m.shape == (3,)
+
     with pytest.raises(ValueError):
         dyn_vis(temperature=5*u.m)
 

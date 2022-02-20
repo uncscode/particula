@@ -7,6 +7,13 @@
     The expeected mean free path of air is approx.
     65 nm at 298 K and 101325 Pa.
 
+    TODO:
+        add size checks for pressure--temperature pairs
+        to ensure that they match; otherwise, an error will occur
+        or use broadcast (though this is likely not a good idea)?
+        perhaps allow for a height--temperature--pressure dependency
+        somewhere? this could be import for @Gorkowski's parcels...
+        (likely through a different utility function...)
 """
 
 import numpy as np
@@ -55,6 +62,15 @@ def mfp(**kwargs):
         ... reference_temperature=273.15
         ... )
         <Quantity(3.90466241e-08, 'meter')>
+        >>> # specifying a list of temperatures
+        >>> mfp(temperature=[200, 250, 300, 400]).m
+        array([3.93734886e-08, 5.29859655e-08, 6.70040069e-08, 9.57800224e-08])
+        >>> # specifying a list of pressures
+        >>> mfp(pressure=[1.0e5, 1.1e5, 1.2e5, 1.3e5]).m
+        array([6.73607078e-08, 6.12370071e-08, 5.61339232e-08, 5.18159291e-08])
+        >>> # specifying a list of pressures and temperatures
+        >>> mfp(temperature=[300,310], pressure=[1e5, 1.1e5])
+        <Quantity([6.78918100e-08 6.43354325e-08], 'meter')>
         ```
 
         Parameters: (either # or $)

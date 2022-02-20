@@ -13,9 +13,8 @@
 
 """
 
-from particula.constants import REF_TEMPERATURE_STP
-from particula.constants import REF_VISCOSITY_AIR_STP
-from particula.constants import SUTHERLAND_CONSTANT
+from particula.constants import (REF_TEMPERATURE_STP, REF_VISCOSITY_AIR_STP,
+                                 SUTHERLAND_CONSTANT)
 from particula.util.input_handling import in_temperature, in_viscosity
 
 
@@ -47,6 +46,9 @@ def dyn_vis(**kwargs):
         ... reference_temperature=273.15
         ... )
         <Quantity(1.83714937e-05, 'kilogram / meter / second')>
+        >>> # for a list of temperatures
+        >>> dyn_vis(temperature=[200, 250, 300, 400]).m
+        array([1.32849751e-05, 1.59905239e-05, 1.84591625e-05, 2.28516090e-05])
         ```
 
         Inputs:
