@@ -142,6 +142,7 @@ def test_cecl():
         pytest.approx(1, rel=1e0)
     )
 
+
 def test_arrays():
     """ testing if enhancements accept arrays
     """

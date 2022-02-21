@@ -30,14 +30,6 @@ class DiffusiveKnudsen:
         self.temperature = in_temperature(temperature)
         self.kwargs = kwargs
 
-        if np.array(self.temperature.m).size > 1:
-            raise ValueError(
-                f"\t\n"
-                f"\tTemperature {self.temperature} must be scalar for this!\n"
-                f"\tThis is to allow calculation of the coagulation kernel.\n"
-                f"\tYou can repeat this routine for different temperatures."
-            )
-
     def get_red_mass(self):
         """ get the reduced mass
         """

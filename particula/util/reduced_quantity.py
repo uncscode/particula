@@ -4,7 +4,6 @@
         quantity_1 * quantity_2 / (quantity_1 + quantity_2)
 """
 
-import numpy as np
 from particula import u
 
 

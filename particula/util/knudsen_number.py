@@ -15,7 +15,7 @@ from particula.util.input_handling import in_radius, in_length
 from particula.util.mean_free_path import mfp
 
 
-def knu(**kwargs) -> float:
+def knu(**kwargs):
     """ Returns particle's Knudsen number.
 
         The Knudsen number reflects the relative length scales of
