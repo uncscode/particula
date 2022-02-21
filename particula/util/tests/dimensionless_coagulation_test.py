@@ -132,4 +132,4 @@ def test_dimensions():
     assert coag_ions.m_as(u.cm**3/u.s).shape == (
         len(ion_rad_new),
         len(par_rad_new)
-        )
+    )

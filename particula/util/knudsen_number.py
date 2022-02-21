@@ -11,7 +11,7 @@
 """
 
 import numpy as np
-from particula.util.input_handling import in_radius, in_length
+from particula.util.input_handling import in_length, in_radius
 from particula.util.mean_free_path import mfp
 
 
