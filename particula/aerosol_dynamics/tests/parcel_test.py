@@ -150,4 +150,3 @@ def test_remove_all_particles():
     '''
     simple_parcel.remove_all_particles()
     assert len(simple_parcel.particle_classes_list()) == 0
-
