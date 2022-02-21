@@ -49,7 +49,6 @@ class ParticleDistribution:
         density,
         charge,
         number,
-        name: str = 'Distribution',
     ):
         """Constructs particle objects.
 
@@ -59,64 +58,57 @@ class ParticleDistribution:
             density     (np array)     [kg/m**3]
             charge      (np array)     [dimensionless]
             number      (np array)     [#/m**3]
-            name        (str)          [no units]       default = Distribution
         """
 
-        self._name = name
         self._radii = radii
         self._density = density
         self._charge = charge
         self._number = number
         self._mass = density * (4*np.pi/3) * (radii**3)
 
-    def name(self) -> str:
-        """Returns the name of the distribution.
-        """
-        return self._name
-
-    def radii(self) -> float:
+    def radii(self):
         """Returns radii of particle.
 
         units: [m]
         """
         return self._radii
 
-    def densities(self) -> int:
+    def densities(self):
         """Returns density of particle.
 
         units: [kg/m**3]
         """
         return self._density
 
-    def charges(self) -> int:
+    def charges(self):
         """Returns number of charges on each particle.
 
         units: [dimensionless]
         """
         return self._charge
 
-    def number(self) -> int:
+    def number(self):
         """Returns number of particles.
 
         units: [dimensionless]
         """
         return self._number
 
-    def number_concentration(self) -> int:
+    def number_concentration(self):
         """" Returns the number of distribution of particles.
 
         units: [#/m**3]
         """
         return np.sum(self._number)
 
-    def masses(self) -> float:
+    def masses(self):
         """Returns total mass of particles of that radii.
 
         units: [kg]
         """
         return self._mass * self._number
 
-    def mass_concentration(self) -> int:
+    def mass_concentration(self):
         """" Returns the mass of the distribution.
 
         units: [kg/m**3]
@@ -228,8 +220,6 @@ class ParticleDistribution:
         new_mass = self.mass_concentration()
         self._number = rasterized_number * old_mass/new_mass
 
-        return
-
     def rasterization_and_update(self, bins):
         """ Bins the radii and number using numpy histogram methods, and updates
         the class data
@@ -288,5 +278,3 @@ class ParticleDistribution:
 
         particle_number, radii = self.rasterization(bins)
         self.update_distribution(radii, particle_number)
-
-        return

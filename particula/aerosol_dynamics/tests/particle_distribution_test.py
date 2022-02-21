@@ -20,7 +20,6 @@ def test_getters():
     """
     Tests the getters for the Environment class.
     """
-    assert particle_dist.name() == 'Distribution'
     assert len(particle_dist.radii()) == SIZE
     assert len(particle_dist.densities()) == SIZE
     assert len(particle_dist.charges()) == SIZE
