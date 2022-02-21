@@ -31,13 +31,18 @@
 		"python.linting.pycodestylePath": "/usr/local/py-utils/bin/pycodestyle",
 		"python.linting.pydocstylePath": "/usr/local/py-utils/bin/pydocstyle",
 		"python.linting.pylintPath": "/usr/local/py-utils/bin/pylint",
-        "breadcrumbs.enabled": true,
-        "editor.stablePeek": true,
+		"breadcrumbs.enabled": true,
+		"editor.stablePeek": true,
 		// "editor.tabSize": 2, // Add this to override the default of 4.
 		// "editor.detectIndentation": false, // Add this to disable automatic indentation detection.
-        "editor.bracketPairColorization.enabled": true,
-        "editor.lightbulb.enable": true,
-        "python.defaultInterpreterPath": "/usr/local/bin/python"
+		"editor.bracketPairColorization.enabled": true,
+		"editor.lightbulb.enable": true,
+		"python.defaultInterpreterPath": "/usr/local/bin/python",
+		// add to list any words you want ignored when spellchecking
+		"cSpell.words": [
+			"particula",
+			"conda",
+		]
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
@@ -78,9 +83,8 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "pip3 install --user -r requirements.txt",
-    "postCreateCommand": "pip3 install --prefix=~/.local -e '.[dev]'",
-
-    // can add container envs here like dask later
+	// "postCreateCommand": "pip3 install --prefix=~/.local -e '.[dev]'",
+	// can add container envs here like dask later
 
 	// "containerEnv": {
 	// }

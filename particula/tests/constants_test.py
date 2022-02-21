@@ -1,15 +1,15 @@
-""" Testing getting constants from the get_constants.py file
+""" testing getting constants from the get_constants.py file
 """
 
 from particula import u
-from particula.get_constants import (
+from particula.constants import (
     BOLTZMANN_CONSTANT,
     AVOGADRO_NUMBER,
     GAS_CONSTANT,
 )
 
 
-def test_get_constants():
+def test_constants():
 
     """ simple tests are conducted as follows:
 
