@@ -4,7 +4,6 @@
         quantity_1 * quantity_2 / (quantity_1 + quantity_2)
 """
 
-import numpy as np
 from particula import u
 
 
@@ -73,9 +72,9 @@ def reduced_quantity(a_quantity, b_quantity):
                 f"Try: {b_q} and {a_q} {b_q.units} for example"
             )
 
-    if isinstance(a_q, list):
-        a_q = np.array(a_q)
-    if isinstance(b_q, list):
-        b_q = np.array(b_q)
+    if not isinstance(a_q, u.Quantity):
+        a_q = u.Quantity(a_q, " ")
+    if not isinstance(b_q, u.Quantity):
+        b_q = u.Quantity(b_q, " ")
 
-    return a_q * b_q / (a_q + b_q)
+    return (a_q * b_q / (a_q + b_q)).to_base_units()

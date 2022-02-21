@@ -21,41 +21,37 @@ def test_dyn_vis():
 
     assert dyn_vis().units == REF_VIS_AIR.to_base_units().units
 
-    assert dyn_vis(temp=REF_TEMP) == REF_VIS_AIR
+    assert dyn_vis(temperature=REF_TEMP) == REF_VIS_AIR
 
-    assert dyn_vis(temp=REF_TEMP) == REF_VIS_AIR
+    assert dyn_vis(temperature=REF_TEMP) == REF_VIS_AIR
 
-    assert dyn_vis(temp=REF_TEMP/2) <= REF_VIS_AIR
+    assert dyn_vis(temperature=REF_TEMP/2) <= REF_VIS_AIR
 
-    assert dyn_vis(temp=REF_TEMP*2) >= REF_VIS_AIR
+    assert dyn_vis(temperature=REF_TEMP*2) >= REF_VIS_AIR
 
     assert (
-        dyn_vis(temp=REF_TEMP.to("degC")).to_base_units()
+        dyn_vis(temperature=REF_TEMP.to("degC")).to_base_units()
         ==
         REF_VIS_AIR.to_base_units()
     )
 
     assert (
         dyn_vis(
-            temp=REF_TEMP,
-            mu_ref=REF_VIS_AIR/2,
-            t_ref=REF_TEMP,
+            temperature=REF_TEMP,
+            reference_viscosity=REF_VIS_AIR/2,
+            reference_temperature=REF_TEMP,
         )
         ==
         REF_VIS_AIR/2
     )
 
-    with pytest.raises(ValueError):
-        dyn_vis(
-            temp=5*u.m,
-        )
+    assert dyn_vis(temperature=[250, 255, 260]).m.shape == (3,)
 
     with pytest.raises(ValueError):
-        dyn_vis(
-            mu_ref=5*u.m,
-        )
+        dyn_vis(temperature=5*u.m)
 
     with pytest.raises(ValueError):
-        dyn_vis(
-            t_ref=5*u.m,
-        )
+        dyn_vis(reference_viscosity=5*u.m)
+
+    with pytest.raises(ValueError):
+        dyn_vis(reference_temperature=5*u.m)
