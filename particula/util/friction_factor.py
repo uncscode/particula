@@ -67,7 +67,7 @@ def frifac(**kwargs):
             see respective documentation for more information.
     """
 
-    radius = kwargs.get("radius", "None")
+    radius = kwargs.get("radius", None)
     dyn_vis_val = kwargs.get("dynamic_viscosity", dyn_vis(**kwargs))
     sfc_val = kwargs.get("sfc", scf(**kwargs))
 
@@ -75,4 +75,10 @@ def frifac(**kwargs):
     dyn_vis_val = in_viscosity(dyn_vis_val)
     sfc_val = in_scalar(sfc_val)
 
-    return (6 * np.pi * dyn_vis_val * radius / sfc_val).to_base_units()
+    return (
+        6 *
+        np.pi *
+        np.transpose([dyn_vis_val.m])*dyn_vis_val.u *
+        radius /
+        sfc_val
+    ).to_base_units()

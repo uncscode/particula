@@ -44,3 +44,7 @@ def test_friction_factor():
         frifac(radius=1e-10).magnitude ==
         pytest.approx(8.39*1.36e-20 * (dva/mfp).magnitude)
     )
+
+    assert frifac(radius=[1, 2, 3]).m.shape == (3,)
+    assert frifac(radius=[1, 2, 3], temperature=[1, 2, 3]).m.shape == (3, 3)
+    assert frifac(radius=[1, 2, 3], pressure=[1, 2, 3]).m.shape == (3, 3)

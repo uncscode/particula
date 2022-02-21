@@ -56,7 +56,7 @@ def scf(**kwargs):
 
     """
 
-    radius = kwargs.get("radius", "None")
+    radius = kwargs.get("radius", None)
     knu_val = kwargs.get("knu", knu(**kwargs))
 
     radius = in_radius(radius)

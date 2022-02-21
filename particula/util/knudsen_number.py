@@ -1,6 +1,16 @@
 """ calculating Knudsen number
+
+    TODO:
+        add a sanity check for mixing radius shapes and temperature shapes
+        for example, someone may want to calculate knu for [1e-9, 2e-9, 3e-9]
+        but only at two different temperatures [290, 300].
+        A solution is to broadcast into a new shape, e.g. (3, 2) with the
+        leading dim being the radius; or we could simply ban this entirely.
+
+        -- implementing tranpose for now.
 """
 
+import numpy as np
 from particula.util.input_handling import in_radius, in_length
 from particula.util.mean_free_path import mfp
 
@@ -51,10 +61,10 @@ def knu(**kwargs) -> float:
 
     """
 
-    radius = kwargs.get("radius", "None")
+    radius = kwargs.get("radius", None)
     mfp_val = kwargs.get("mfp", mfp(**kwargs))
 
     radius = in_radius(radius)
     mfp_val = in_length(mfp_val)
 
-    return mfp_val / radius
+    return np.transpose([mfp_val.m])*mfp_val.u / radius

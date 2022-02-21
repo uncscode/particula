@@ -35,3 +35,8 @@ def test_slip_correction():
         scf(radius=radius_micron, knu=knu_val) ==
         pytest.approx(1, rel=1e-1)
     )
+
+    assert scf(radius=[1, 2, 3]).m.shape == (3,)
+    assert scf(radius=1, mfp=[1, 2, 3]).m.shape == (3, 1)
+    assert scf(radius=[1, 2, 3], mfp=[1, 2, 3]).m.shape == (3, 3)
+    assert scf(radius=[1, 2, 3], temperature=[1, 2, 3]).m.shape == (3, 3)

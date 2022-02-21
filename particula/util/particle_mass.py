@@ -34,7 +34,7 @@ def mass(**kwargs):
                          (float) [kg]
     """
 
-    radius = kwargs.get("radius", "None")
+    radius = kwargs.get("radius", None)
     density = kwargs.get("density", 1000)
     shape_factor = kwargs.get("shape_factor", 1)
     vol_void = kwargs.get("volume_void", 0)

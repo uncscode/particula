@@ -150,7 +150,7 @@ def in_radius(radius):
             * Assigning m units to scalar input
     """
 
-    if radius == "None":
+    if radius is None:
         raise ValueError("You must provide a radius!")
 
     if isinstance(radius, u.Quantity):

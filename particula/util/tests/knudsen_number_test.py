@@ -36,3 +36,14 @@ def test_kn():
         knu(radius=1e-20) ==
         pytest.approx(5e12, rel=1e0)
     )
+
+    assert knu(radius=[1, 2, 3]).m.shape == (3,)
+    assert knu(radius=1, mfp=[1, 2, 3]).m.shape == (3, 1)
+    assert knu(radius=[1, 2, 3], mfp=[1, 2, 3]).m.shape == (3, 3)
+    assert knu(radius=[1, 2, 3], temperature=[1, 2, 3]).m.shape == (3, 3)
+    assert knu(radius=[1, 2, 3], pressure=[1, 2, 3]).m.shape == (3, 3)
+    assert knu(radius=[1, 2, 3], molecular_weight=[1, 2, 3]).m.shape == (3, 3)
+
+    assert knu(
+        radius=[1, 2, 3], temperature=[1, 2, 3], pressure=[1, 2, 3]
+    ).m.shape == (3, 3)

@@ -2,6 +2,7 @@
 """
 
 import pytest
+import numpy as np
 from particula import u
 from particula.util.coulomb_enhancement import CoulombEnhancement as CE
 from particula.util.coulomb_enhancement import cecl, cekl
@@ -140,3 +141,23 @@ def test_cecl():
         ce_extreme.to_base_units().magnitude ==
         pytest.approx(1, rel=1e0)
     )
+
+def test_arrays():
+    """ testing if enhancements accept arrays
+    """
+
+    assert CE(
+        radius=np.array([1, 2, 3]), other_radius=np.array([1, 2])
+    ).coulomb_potential_ratio().m.shape == (3, 2)
+
+    with pytest.raises(ValueError):
+        CE(
+            radius=[1, 2, 3],
+            temperature=[1, 2, 3, 4],
+        ).coulomb_potential_ratio()
+
+    with pytest.raises(ValueError):
+        CE(
+            radius=[1, 2, 3],
+            charge=[1, 2, 3, 4],
+        ).coulomb_potential_ratio()

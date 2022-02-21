@@ -1,6 +1,7 @@
 """ Calculate the diffusive knudsen number
 """
 
+import numpy as np
 from particula.constants import BOLTZMANN_CONSTANT
 from particula.util.coulomb_enhancement import cecl, cekl
 from particula.util.friction_factor import frifac
@@ -16,7 +17,7 @@ class DiffusiveKnudsen:
     def __init__(self, **kwargs):
         """ define properties """
 
-        radius = kwargs.get("radius", "None")
+        radius = kwargs.get("radius", None)
         other_radius = kwargs.get("other_radius", radius)
         density = kwargs.get("density", 1000)
         other_density = kwargs.get("other_density", density)
@@ -29,18 +30,29 @@ class DiffusiveKnudsen:
         self.temperature = in_temperature(temperature)
         self.kwargs = kwargs
 
+        if np.array(self.temperature.m).size > 1:
+            raise ValueError(
+                f"\t\n"
+                f"\tTemperature {self.temperature} must be scalar for this!\n"
+                f"\tThis is to allow calculation of the coagulation kernel.\n"
+                f"\tYou can repeat this routine for different temperatures."
+            )
+
     def get_red_mass(self):
         """ get the reduced mass
         """
+
+        mass_dummy = mass(radius=self.radius, density=self.density)
+
         return reduced_quantity(
-            mass(radius=self.radius, density=self.density),
+            np.transpose([mass_dummy.m])*mass_dummy.u,
             mass(radius=self.other_radius, density=self.other_density)
         )
 
     def get_rxr(self):
         """ add two radii
         """
-        return self.radius + self.other_radius
+        return np.transpose([self.radius.m])*self.radius.u + self.other_radius
 
     def get_red_frifac(self):
         """ get the reduced friction factor
@@ -52,8 +64,9 @@ class DiffusiveKnudsen:
         frifac_kwargs.pop("radius", None)
         other_frifac_kwargs.pop("radius", None)
 
+        dummy_frifac = frifac(radius=self.radius, **frifac_kwargs)
         return reduced_quantity(
-            frifac(radius=self.radius, **frifac_kwargs),
+            np.transpose([dummy_frifac.m])*dummy_frifac.u,
             frifac(radius=self.other_radius, **other_frifac_kwargs)
         )
 
@@ -74,7 +87,7 @@ class DiffusiveKnudsen:
         temp = self.temperature
         return (
             ((temp * boltz_const * rmass)**0.5 / rfrifac) /
-            ((self.radius + self.other_radius) * cecl_val / cekl_val)
+            (self.get_rxr() * cecl_val / cekl_val)
         )
 
 
