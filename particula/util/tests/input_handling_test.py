@@ -6,7 +6,8 @@ from particula import u
 from particula.util.input_handling import (in_density, in_length,
                                            in_molecular_weight, in_pressure,
                                            in_radius, in_scalar,
-                                           in_temperature, in_viscosity, in_volume)
+                                           in_temperature, in_viscosity,
+                                           in_volume)
 
 
 def test_in_temp():

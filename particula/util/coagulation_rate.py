@@ -2,8 +2,8 @@
 """
 
 import numpy as np
-
-from particula.aerosol_dynamics.particle_distribution import ParticleDistribution
+from particula.aerosol_dynamics.particle_distribution import \
+    ParticleDistribution
 from particula.util.dimensionless_coagulation import full_coag
 
 
@@ -48,4 +48,28 @@ class CoagulationRate(ParticleDistribution):
 
         nums, rads, kern = self.coag_prep()
 
-        return nums*np.trapz(kern*nums, rads)
+        dps = rads
+
+    # dpd = np.linspace(0, dps/2**(1/3), fine)
+    # dpi = (dps**3 - dpd**3)**(1/3)
+    # num_oth = np.triu(np.interp(dpi, dps, nums), k=1) + np.tril(nums)
+    # ker_oth = interp(dpi, dps, kern)
+
+        gain = np.zeros_like(dps)
+
+        for i, dpa in enumerate(dps):
+            dpd = np.linspace(0, dpa/2**(1/3), 1000)
+            dpi = (dpa**3 - dpd**3)**(1/3)
+
+            num_rep = np.interp(dpd, dps, nums)
+            num_oth = np.interp(dpi, dps, nums)
+
+            ker_oth = np.interp(dpi, dps, kern[:, i])
+
+            dss = (dpa**3 - dpd**3)**(2/3)
+
+            test = dpa*np.trapz(ker_oth*num_oth*num_rep/dss, dpd)
+
+            gain[i] = test.m
+
+        return gain*test.u
