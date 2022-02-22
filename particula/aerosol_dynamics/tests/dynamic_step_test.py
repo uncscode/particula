@@ -20,3 +20,8 @@ def test_dyns():
     assert dyns.coag_loss().u == u.m**-3/u.s
     assert dyns.coag_gain().u == u.m**-3/u.s
     assert dyns.coag_rate().u == u.m**-3/u.s
+
+    assert dyns.coag_kern().m.shape == (100, 100)
+    assert dyns.coag_loss().m.shape == (100,)
+    assert dyns.coag_gain().m.shape == (100,)
+    assert dyns.coag_rate().m.shape == (100,)
