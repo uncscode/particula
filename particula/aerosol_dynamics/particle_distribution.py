@@ -26,6 +26,8 @@ class ParticleDistribution:
 
     def rad(self):
         """ construct the radius
+
+            this gets 99.99% of the distribution, then makes a radius from it
         """
 
         (rad_start, rad_end) = lognorm.interval(
@@ -41,7 +43,7 @@ class ParticleDistribution:
         """
 
         return lognorm.pdf(
-            x=self.rad(), 
-            s=np.log(self.gsigma), 
+            x=self.rad(),
+            s=np.log(self.gsigma),
             scale=self.mode,
         )
