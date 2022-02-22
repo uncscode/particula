@@ -5,9 +5,8 @@
     distribution of the particle sizes, etc
 """
 
-import numpy as np
 from scipy.stats import lognorm
-
+import numpy as np
 from particula.util.radius_cutoff import cut_rad
 
 

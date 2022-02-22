@@ -1,9 +1,9 @@
 """ test the particle dist
 """
-
 import numpy as np
-from scipy.stats import lognorm
 import pytest
+from scipy.stats import lognorm
+
 from particula.aerosol_dynamics.particle_distribution import \
     ParticleDistribution
 
@@ -39,7 +39,6 @@ def test_lnd():
     assert 0 <= pdist.lnd()[-1]
     assert np.trapz(pdist.lnd(), pdist.rad()) == pytest.approx(.9999, rel=1e-1)
     assert len(pdist.lnd()) == len(pdist.rad())
-    # assert lognorm.fit(pdist.lnd()) == 11
     assert lognorm.fit(pdist.lnd())[0] <= 3.75
     assert lognorm.fit(pdist.lnd())[1] <= 1e-5
 
