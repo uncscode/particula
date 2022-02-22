@@ -8,6 +8,8 @@
 import numpy as np
 from scipy.stats import lognorm
 
+from particula.util.radius_cutoff import cut_rad
+
 
 class ParticleDistribution:
     """ make a class
@@ -30,11 +32,7 @@ class ParticleDistribution:
             this gets 99.99% of the distribution, then makes a radius from it
         """
 
-        (rad_start, rad_end) = lognorm.interval(
-            alpha=.9999,
-            s=np.log(self.gsigma),
-            scale=self.mode,
-        )
+        (rad_start, rad_end) = cut_rad(.9999, np.log(self.gsigma), self.mode)
 
         return np.linspace(rad_start, rad_end, self.nbins)
 
