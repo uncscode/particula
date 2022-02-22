@@ -6,7 +6,7 @@ from particula import u
 from particula.util.input_handling import (in_density, in_length,
                                            in_molecular_weight, in_pressure,
                                            in_radius, in_scalar,
-                                           in_temperature, in_viscosity)
+                                           in_temperature, in_viscosity, in_volume)
 
 
 def test_in_temp():
@@ -278,3 +278,44 @@ def test_in_length():
     length = in_length(u.Quantity(5, u.nmi))
     assert length.units == u.m
     assert length.magnitude == u.Quantity(5, u.nmi).m_as("m")
+
+
+def test_in_volume():
+    """ Testing the in_volume function
+    """
+
+    volume = in_volume(5)
+    assert volume.units == u.m**3
+    assert volume.magnitude == 5
+
+    volume = in_volume(5 * u.m**3)
+    assert volume.units == u.m**3
+    assert volume.magnitude == 5
+
+    volume = in_volume(u.Quantity(5, u.mm**3))
+    assert volume.units == u.m**3
+    assert volume.magnitude == u.Quantity(5, u.mm**3).m_as("m^3")
+
+    volume = in_volume(u.Quantity(5, u.cm**3))
+    assert volume.units == u.m**3
+    assert volume.magnitude == u.Quantity(5, u.cm**3).m_as("m^3")
+
+    volume = in_volume(u.Quantity(5, u.m**3))
+    assert volume.units == u.m**3
+    assert volume.magnitude == u.Quantity(5, u.m**3).m_as("m^3")
+
+    volume = in_volume(u.Quantity(5, u.km**3))
+    assert volume.units == u.m**3
+    assert volume.magnitude == u.Quantity(5, u.km**3).m_as("m^3")
+
+    volume = in_volume(u.Quantity(5, u.inch**3))
+    assert volume.units == u.m**3
+    assert volume.magnitude == u.Quantity(5, u.inch**3).m_as("m^3")
+
+    volume = in_volume(u.Quantity(5, u.ft**3))
+    assert volume.units == u.m**3
+    assert volume.magnitude == u.Quantity(5, u.ft**3).m_as("m^3")
+
+    volume = in_volume(u.Quantity(5, u.mi**3))
+    assert volume.units == u.m**3
+    assert volume.magnitude == u.Quantity(5, u.mi**3).m_as("m^3")

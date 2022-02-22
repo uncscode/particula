@@ -7,6 +7,7 @@
 
 from scipy.stats import lognorm
 import numpy as np
+from particula.util.input_handling import in_scalar, in_volume
 from particula.util.radius_cutoff import cut_rad
 
 
@@ -20,7 +21,8 @@ class ParticleDistribution:
 
         self.mode = kwargs.get("mode", None)
         self.nbins = kwargs.get("nbins", 1000)
-        self.nparticles = kwargs.get("nparticles", 1e5)
+        self.nparticles = in_scalar(kwargs.get("nparticles", 1e5))
+        self.volume = in_volume(kwargs.get("volume", 1e-6))
         self.gsigma = kwargs.get("gsigma", 1.25)
 
         self.kwargs = kwargs
