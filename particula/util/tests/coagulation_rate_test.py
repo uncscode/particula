@@ -1,11 +1,12 @@
 """ testing the coagulation rate
 """
 import numpy as np
+import pytest
 from particula import u
 from particula.util.coagulation_rate import CoagulationRate
 
 CoagRate = CoagulationRate(
-    mode=100,
+    mode=100e-9,
     nbins=1000,
     nparticles=1e5,
     gsigma=1.25,
@@ -52,3 +53,4 @@ def test_mass():
     """
 
     assert np.trapz((gain - loss)*rads**2*u.m**2, rads*u.m).u == u.s**-1
+    assert np.trapz((gain - loss)*rads**2*u.m**2, rads*u.m).m == pytest.approx(1e-7, rel=1e1)

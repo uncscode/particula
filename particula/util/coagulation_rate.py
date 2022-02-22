@@ -68,7 +68,7 @@ class CoagulationRate(ParticleDistribution):
 
             dss = (dpa**3 - dpd**3)**(2/3)
 
-            test = dpa*np.trapz(ker_oth*num_oth*num_rep/dss, dpd)
+            test = (dpa**2)*np.trapz(ker_oth*num_oth*num_rep/dss, dpd)
 
             gain[i] = test.m
 
