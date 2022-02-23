@@ -81,5 +81,5 @@ def test_mass():
     assert np.trapz((gain - loss)*rads**3, rads).u == u.s**-1
     assert np.trapz((gain - loss)*rads**3, rads) <= 0.2 * u.s**-1
     assert np.trapz(
-        (gain - loss).to(u.cm**-4/u.s)*rads**3,rads
+        (gain - loss).to(u.cm**-4/u.s)*rads**3, rads
     ).m == pytest.approx(0.0, abs=1e-8)
