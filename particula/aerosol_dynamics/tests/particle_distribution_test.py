@@ -2,10 +2,11 @@
 """
 import numpy as np
 import pytest
+from scipy.stats import lognorm
+
 from particula import u
 from particula.aerosol_dynamics.particle_distribution import \
     ParticleDistribution
-from scipy.stats import lognorm
 
 
 def test_rad():
