@@ -1,5 +1,6 @@
-""" test the particle distribution class
+""" Test the particle distribution class
 """
+
 import numpy as np
 import pytest
 from scipy.stats import lognorm
@@ -11,6 +12,10 @@ from particula.aerosol_dynamics.particle_distribution import \
 
 def test_rad():
     """ testing the radius properties
+
+        * starting radius is smaller than mean
+        * ending radius is larger than mean
+        * size of radius is equal to number of bins
     """
 
     pdist = ParticleDistribution(
@@ -29,6 +34,11 @@ def test_rad():
 
 def test_discretize():
     """ testing the discretization
+
+        * all values of discretization >= 0
+        * integral of discretization is equal to 1 (pdf)
+        * shape of distribution depends on shape of radius
+        * recovering the distribution properties from discretization
     """
 
     pdist = ParticleDistribution(
@@ -49,6 +59,10 @@ def test_discretize():
 
 def test_dist():
     """ test distribution properties
+
+        * able to recover the distribution properties from discretization
+        * distribution units are okay
+        * distribution shape is okay
     """
 
     pdist = ParticleDistribution(
@@ -73,5 +87,5 @@ def test_dist():
         lognorm.fit(samples, floc=0)[-1] <= 105
     )
 
-    assert pdist.distribution().u == u.m**-3
+    assert pdist.distribution().u == u.m**-4
     assert pdist.distribution().m.shape == (1000,)

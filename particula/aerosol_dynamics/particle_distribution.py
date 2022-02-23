@@ -100,4 +100,4 @@ class ParticleDistribution:
                 mode    : geometric mean radius of the particles
         """
 
-        return self.nparticles*self.discretize()/self.volume
+        return self.nparticles*self.discretize()/self.volume/self.radius()
