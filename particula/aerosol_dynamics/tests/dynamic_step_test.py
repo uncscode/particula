@@ -1,4 +1,4 @@
-""" test the dynamic step
+""" testing the DynamicStep class
 """
 
 from particula import u
@@ -6,7 +6,7 @@ from particula.aerosol_dynamics.dynamic_step import DynamicStep
 
 
 def test_dyns():
-    """ test dyn steps
+    """ test the dynamic step functionalities
     """
 
     dyns = DynamicStep(
