@@ -2,11 +2,10 @@
 """
 import numpy as np
 import pytest
-from scipy.stats import lognorm
-
 from particula import u
 from particula.aerosol_dynamics.particle_distribution import \
     ParticleDistribution
+from scipy.stats import lognorm
 
 
 def test_rad():
@@ -40,7 +39,8 @@ def test_discretize():
 
     assert 0 <= pdist.discretize()[0]
     assert 0 <= pdist.discretize()[-1]
-    assert np.trapz(pdist.discretize(), pdist.radius().m) == pytest.approx(.9999, rel=1e-1)
+    assert np.trapz(pdist.discretize(), pdist.radius(
+    ).m) == pytest.approx(.9999, rel=1e-1)
     assert len(pdist.discretize()) == len(pdist.radius().m)
     assert lognorm.fit(pdist.discretize())[0] <= 3.75
     assert lognorm.fit(pdist.discretize())[1] <= 1e-5

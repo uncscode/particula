@@ -2,35 +2,27 @@
 """
 
 import numpy as np
-from particula.aerosol_dynamics.particle_distribution import \
-    ParticleDistribution
-from particula.util.dimensionless_coagulation import full_coag
 
 
-class CoagulationRate(ParticleDistribution):
+class CoagulationRate:
     """ calculate the coag rate
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, distribution, radius, kernel):
         """ constructing
         """
 
-        super().__init__(**kwargs)
-        self.kwargs = kwargs
-
-    def coag_kern(self):
-        """ get coag kernel
-        """
-
-        return full_coag(radius=self.rad(), **self.kwargs)
+        self.distribution = distribution
+        self.radius = radius
+        self.kernel = kernel
 
     def coag_prep(self):
         """ return vals for integration
         """
 
-        nums = self.lnd()*self.nparticles/self.volume
-        rads = self.rad()
-        kern = self.coag_kern()
+        nums = self.distribution
+        rads = self.radius
+        kern = self.kernel
 
         return nums, rads, kern
 
@@ -49,11 +41,6 @@ class CoagulationRate(ParticleDistribution):
         nums, rads, kern = self.coag_prep()
 
         dps = rads
-
-    # dpd = np.linspace(0, dps/2**(1/3), fine)
-    # dpi = (dps**3 - dpd**3)**(1/3)
-    # num_oth = np.triu(np.interp(dpi, dps, nums), k=1) + np.tril(nums)
-    # ker_oth = interp(dpi, dps, kern)
 
         gain = np.zeros_like(dps)
 

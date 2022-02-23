@@ -1,6 +1,7 @@
 """ step dynamically
 """
 
+
 from particula.aerosol_dynamics.particle_distribution import \
     ParticleDistribution
 from particula.util.coagulation_rate import CoagulationRate
@@ -17,26 +18,33 @@ class DynamicStep(ParticleDistribution):
 
         super().__init__(**kwargs)
 
-        self.radius = self.rad()
         self.kwargs = kwargs
 
     def coag_kern(self):
         """ get coag kernel
         """
 
-        return full_coag(radius=self.rad(), **self.kwargs)
+        return full_coag(radius=self.radius(), **self.kwargs)
 
     def coag_loss(self):
         """ get coag loss
         """
 
-        return CoagulationRate(**self.kwargs).coag_loss()
+        return CoagulationRate(
+            distribution=self.distribution(),
+            radius=self.radius(),
+            kernel=self.coag_kern(),
+        ).coag_loss()
 
     def coag_gain(self):
         """ get coag gain
         """
 
-        return CoagulationRate(**self.kwargs).coag_gain()
+        return CoagulationRate(
+            distribution=self.distribution(),
+            radius=self.radius(),
+            kernel=self.coag_kern(),
+        ).coag_gain()
 
     def coag_rate(self):
         """ get coag rate

@@ -16,9 +16,9 @@
 
 import numpy as np
 from particula import u
+from particula.util.distribution_discretization import discretize
 from particula.util.input_handling import in_scalar, in_volume
 from particula.util.radius_cutoff import cut_rad
-from particula.util.distribution_discretization import discretize
 
 
 class ParticleDistribution:
@@ -61,13 +61,13 @@ class ParticleDistribution:
 
         (rad_start, rad_end) = cut_rad(**self.kwargs)
 
-        if self.spacing=="logspace":
+        if self.spacing == "logspace":
             radius = np.linspace(
                 np.log10(rad_start),
                 np.log10(rad_end),
                 self.nbins
             )
-        elif self.spacing=="linspace":
+        elif self.spacing == "linspace":
             radius = np.linspace(
                 rad_start,
                 rad_end,

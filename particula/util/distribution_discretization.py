@@ -5,6 +5,7 @@ from scipy.stats import lognorm
 
 from particula.util.input_handling import in_scalar, in_radius
 
+
 def discretize(**kwargs):
     """ discretize the distribution of the particles
 
