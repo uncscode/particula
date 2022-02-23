@@ -12,7 +12,7 @@ CoagRate = CoagulationRate(
     gsigma=1.25,
 )
 
-rads = CoagRate.rad()
+rads = CoagRate.radius().m
 
 lnds = CoagRate.lnd()
 
