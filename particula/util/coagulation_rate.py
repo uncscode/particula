@@ -3,8 +3,6 @@
 
 import numpy as np
 
-from particula import u
-
 
 class CoagulationRate:
     """ A class to calculate the coagulation rate.
@@ -58,7 +56,7 @@ class CoagulationRate:
 
         nums, rads, kern = self.coag_prep()
 
-        return nums*np.trapz(kern*nums, rads.m_as(u.m))
+        return nums*np.trapz(kern*nums, rads)
 
     def coag_gain(self):
         """ Returns the coagulation gain rate
@@ -121,8 +119,7 @@ class CoagulationRate:
             dss = (dpa**3 - dpd**3)**(2/3)
 
             # calculate the gain
-            # pylint: disable=no-member
-            test = (dpa**2)*np.trapz(ker_oth*num_oth*num_rep/dss, dpd.m_as(u.m))
+            test = (dpa**2)*np.trapz(ker_oth*num_oth*num_rep/dss, dpd)
 
             # store the gain
             gain[i] = test.m

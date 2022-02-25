@@ -88,7 +88,7 @@ class ParticleDistribution:
                 mode    : geometric mean radius of the particles
         """
 
-        return discretize(interval=self.radius().m, **self.kwargs)
+        return discretize(interval=self.radius(), **self.kwargs)
 
     def distribution(self):
         """ Returns a distribution pdf of the particles

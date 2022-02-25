@@ -51,10 +51,10 @@ def test_discretize():
     assert 0 <= pdist.discretize()[0]
     assert 0 <= pdist.discretize()[-1]
     assert np.trapz(pdist.discretize(), pdist.radius(
-    ).m) == pytest.approx(.9999, rel=1e-1)
-    assert len(pdist.discretize()) == len(pdist.radius().m)
-    assert lognorm.fit(pdist.discretize())[0] <= 3.75
-    assert lognorm.fit(pdist.discretize())[1] <= 1e-5
+    )) == pytest.approx(.9999, rel=1e-1)
+    assert len(pdist.discretize().m) == len(pdist.radius().m)
+    assert lognorm.fit(pdist.discretize().m)[0] <= 3.75
+    assert lognorm.fit(pdist.discretize().m)[1] <= 1e-5
 
 
 def test_dist():
@@ -75,7 +75,7 @@ def test_dist():
     dps = pdist.radius().m
     wts = pdist.discretize()/np.sum(pdist.discretize())
 
-    samples = np.random.choice(dps, size=len(dps), p=wts)
+    samples = np.random.choice(dps, size=len(dps), p=wts.m)
 
     assert (
         lognorm.fit(samples, floc=0)[0] >= np.log(1.20) and
@@ -87,5 +87,5 @@ def test_dist():
         lognorm.fit(samples, floc=0)[-1] <= 105
     )
 
-    assert pdist.distribution().u == u.m**-3
+    assert pdist.distribution().u == u.m**-4
     assert pdist.distribution().m.shape == (1000,)

@@ -2,7 +2,7 @@
 """
 import numpy as np
 from scipy.stats import lognorm
-
+from particula import u
 from particula.util.input_handling import in_scalar, in_radius
 
 
@@ -23,12 +23,15 @@ def discretize(**kwargs):
     if interval is None:
         raise ValueError("the 'interval' must be specified!")
 
+    if not isinstance(interval, u.Quantity):
+        interval = u.Quantity(interval, " ")
+
     if disttype == "lognormal":
         dist = lognorm.pdf(
-            x=interval,
+            x=interval.m,
             s=np.log(gsigma),
             scale=mode,
-        )
+        )/interval.u
     else:
         raise ValueError("the 'disttype' must be 'lognormal' for now!")
 
