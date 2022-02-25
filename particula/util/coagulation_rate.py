@@ -66,7 +66,7 @@ class CoagulationRate:
             gain_rate(other_radius) = (
                 other_radius**2 *
                 integral( # from some_radius=0 to other_radius/2**(1/3)
-                    kernel(some_radius, (other_radius**3-some_radius**3)*(1/3) *
+                    kernel(some_radius, (other_radius**3-some_radius**3)*(1/3)*
                     dist(some_radius) *
                     dist((other_radius**3 - some_radius**3)*(1/3)) /
                     (other_radius**3 - some_radius**3)*(2/3),
