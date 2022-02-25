@@ -61,7 +61,7 @@ def test_loss():
     """ test the loss
     """
 
-    assert loss.u == u.m**-4/u.s
+    assert loss.u == u.m**-3/u.s
     assert loss.m.shape == rads.shape
     assert loss.m.shape == lnds.shape
 
@@ -71,15 +71,22 @@ def test_gain():
     """
 
     assert gain.size == rads.size
-    assert gain.u == u.m**-4/u.s
+    assert gain.u == u.m**-3/u.s
 
 
 def test_mass():
     """ test mass conservation
     """
 
-    assert np.trapz((gain - loss)*rads**3, rads).u == u.s**-1
-    assert np.trapz((gain - loss)*rads**3, rads) <= 0.2 * u.s**-1
+    assert np.trapz((gain - loss)*rads**3, rads.m_as(u.m)).u == u.s**-1
+    assert np.trapz((gain - loss)*rads**3, rads.m_as(u.m)) <= 0.2 * u.s**-1
     assert np.trapz(
-        (gain - loss).to(u.cm**-4/u.s)*rads**3, rads
-    ).m == pytest.approx(0.0, abs=1e-8)
+        (gain - loss).to(u.cm**-3/u.s)*rads**3, rads.m_as(u.m)
+    ).m == pytest.approx(0.0)
+
+
+def test_rads():
+    """ test radii
+    """
+
+    assert rads.u == u.m

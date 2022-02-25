@@ -87,5 +87,5 @@ def test_dist():
         lognorm.fit(samples, floc=0)[-1] <= 105
     )
 
-    assert pdist.distribution().u == u.m**-4
+    assert pdist.distribution().u == u.m**-3
     assert pdist.distribution().m.shape == (1000,)
