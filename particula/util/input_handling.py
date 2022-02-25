@@ -265,3 +265,36 @@ def in_length(length):
         length = u.Quantity(length, u.m)
 
     return length
+
+
+def in_volume(volume):
+    """ Handles volume input
+
+        Parameters:
+            volume    (float) [m^3 | dimensionless]
+
+        Returns:
+            volume    (float) [m^3]
+
+        Notes:
+            * If unit is correct, take to base units in m^3
+            * Throws ValueError if unit is wrong
+            * Assigning m^3 units to scalar input
+    """
+
+    if isinstance(volume, u.Quantity):
+        if volume.to_base_units().u == u.m**3:
+            volume = volume.to_base_units()
+        else:
+            raise ValueError(
+                f"\n\t"
+                f"Input {volume} has unsupported units.\n\t"
+                f"Input must have volume units of\n\t"
+                f"'meters^3';\n\t"
+                f"otherwise, if dimensionless, it will\n\t"
+                f"be assigned a m^3 unit.\n"
+            )
+    else:
+        volume = u.Quantity(volume, u.m**3)
+
+    return volume
