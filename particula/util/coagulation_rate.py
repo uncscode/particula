@@ -5,6 +5,7 @@ import numpy as np
 
 from particula import u
 
+
 class CoagulationRate:
     """ A class to calculate the coagulation rate.
 
