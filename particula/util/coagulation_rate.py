@@ -104,7 +104,7 @@ class CoagulationRate:
         for i, dpa in enumerate(rads):
 
             # make the dummy radius for integration
-            dpd = np.linspace(0, dpa/2**(1/3), rads.m.size)
+            dpd = np.linspace(0, dpa.m/2**(1/3), rads.m.size)*rads.u
 
             # get the dummy radius for interpolation
             dpi = (dpa**3 - dpd**3)**(1/3)
@@ -114,13 +114,13 @@ class CoagulationRate:
             num_oth = np.interp(dpi, rads, nums)
 
             # interpolate the kernel to the dummy radius
-            ker_oth = interp.ev(dpi.m, rads.m) * kern.u
+            ker_oth = interp.ev(dpi.m, dpd.m) * kern.u
 
             # calculate last term
             dss = (dpa**3 - dpd**3)**(2/3)
 
             # calculate the gain
-            test = 0.5*(dpa**2)*np.trapz(ker_oth*num_oth*num_rep/dss, dpd)
+            test = (dpa**2)*np.trapz(ker_oth*num_oth*num_rep/dss, dpd)
 
             # store the gain
             gain[i] = test.m
