@@ -2,6 +2,7 @@
 """
 
 import numpy as np
+from scipy.interpolate import RectBivariateSpline
 
 
 class CoagulationRate:
@@ -90,36 +91,36 @@ class CoagulationRate:
         # get the parameters
         nums, rads, kern = self.coag_prep()
 
-        # set a radius value
-        dps = rads
-
         # make a sekeloton array for the gain
-        gain = np.zeros_like(dps)
+        gain = np.zeros_like(rads)
 
-        # loop over the radius of interest (dps above)
-        for i, dpa in enumerate(dps):
+        interp = RectBivariateSpline(
+            rads.m,
+            rads.m,
+            kern.m
+        )
+
+        # loop over the radius of interest (rads above)
+        for i, dpa in enumerate(rads):
 
             # make the dummy radius for integration
-            dpd = np.linspace(0, dpa/2**(1/3), 1000)
+            dpd = np.linspace(0, dpa/2**(1/3), rads.m.size)
 
             # get the dummy radius for interpolation
             dpi = (dpa**3 - dpd**3)**(1/3)
 
             # interpolate the distribution to the dummy radii
-            num_rep = np.interp(dpd, dps, nums)
-            num_oth = np.interp(dpi, dps, nums)
+            num_rep = np.interp(dpd, rads, nums)
+            num_oth = np.interp(dpi, rads, nums)
 
             # interpolate the kernel to the dummy radius
-            # this is WRONG, it needs to be fixed...
-            # ker_oth = np.interp(dpd, dps, kern[:, i])
-            # PLACEHOLDER FOR NOW... (error is managable)
-            ker_oth = np.interp(dpi, dps, kern[i, :])
+            ker_oth = interp.ev(dpi.m, rads.m) * kern.u
 
             # calculate last term
             dss = (dpa**3 - dpd**3)**(2/3)
 
             # calculate the gain
-            test = (dpa**2)*np.trapz(ker_oth*num_oth*num_rep/dss, dpd)
+            test = 0.5*(dpa**2)*np.trapz(ker_oth*num_oth*num_rep/dss, dpd)
 
             # store the gain
             gain[i] = test.m
