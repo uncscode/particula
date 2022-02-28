@@ -2,6 +2,7 @@
 """
 
 import numpy as np
+from scipy.interpolate import RectBivariateSpline
 
 
 class CoagulationRate:
@@ -84,45 +85,22 @@ class CoagulationRate:
             (other_radius**3 - some_radius**3)*(1/3)
             we use interporlation techniques.
 
-            This could be made better in the future.
+            Using `RectBivariateSpline` accelerates this significantly.
         """
 
-        # get the parameters
         nums, rads, kern = self.coag_prep()
 
-        # set a radius value
-        dps = rads
+        interp = RectBivariateSpline(
+            rads.m, rads.m, kern.m * nums.m * np.transpose([nums.m])
+        )
 
-        # make a sekeloton array for the gain
-        gain = np.zeros_like(dps)
+        dpd = np.linspace(0, rads.m/2**(1/3), rads.m.size)*rads.u
+        dpi = (rads**3 - (np.transpose(dpd.m)*dpd.u)**3)**(1/3)
 
-        # loop over the radius of interest (dps above)
-        for i, dpa in enumerate(dps):
+        gain = rads**2 * np.trapz(
+            interp.ev(dpd.m, dpi.m) * kern.u * nums.u * nums.u / dpi**2,
+            dpd,
+            axis=0
+        )
 
-            # make the dummy radius for integration
-            dpd = np.linspace(0, dpa/2**(1/3), 1000)
-
-            # get the dummy radius for interpolation
-            dpi = (dpa**3 - dpd**3)**(1/3)
-
-            # interpolate the distribution to the dummy radii
-            num_rep = np.interp(dpd, dps, nums)
-            num_oth = np.interp(dpi, dps, nums)
-
-            # interpolate the kernel to the dummy radius
-            # this is WRONG, it needs to be fixed...
-            # ker_oth = np.interp(dpd, dps, kern[:, i])
-            # PLACEHOLDER FOR NOW... (error is managable)
-            ker_oth = np.interp(dpi, dps, kern[i, :])
-
-            # calculate last term
-            dss = (dpa**3 - dpd**3)**(2/3)
-
-            # calculate the gain
-            test = (dpa**2)*np.trapz(ker_oth*num_oth*num_rep/dss, dpd)
-
-            # store the gain
-            gain[i] = test.m
-
-        # return it
-        return gain*test.u
+        return gain
