@@ -29,6 +29,11 @@
     dn/ds = g --> dn/dt = g(t,d,n) --> g(t,d,n)
 
     MEANING: simultaneously solve
-    1. d(radius)/d(time) = f(radius,time,denisty) with d(0) = d0
-    2. d(density)/d(time) = g(radius,time,density) with n(0) = n0(d0)
+    1. d(radius)/d(time) = f(radius,time,denisty) with radius(0) = d0
+    2. d(density)/d(time) = g(radius,time,density) with density(0) = n0(d0)
 """
+
+# def solver(f, g, d0, n0, t0, dt):
+#     """ solve it!
+#     """
+#     pass
