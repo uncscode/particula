@@ -52,7 +52,7 @@ class InitSolver(PreSolver):
         return self.init_time / kwargs.get("steps", 0)
 
 class LxWfSolver(InitSolver):
-    """ Lax Wendroff's solver for balance equation: 
+    """ Lax Wendroff's solver for balance equation:
 
         ∂n/∂t + f(t,d,n) ∂n/∂d = g(t,d,n)
     """
