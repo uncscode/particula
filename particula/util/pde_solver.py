@@ -1,6 +1,7 @@
 """ PDE solvers for balance equation: ∂n/∂t + f(t,d,n) ∂n/∂d = g(t,d,n)
 """
 
+
 class PreSolver:
     """ generic solver class
     """
@@ -19,7 +20,6 @@ class PreSolver:
 
             call input methods here to ensure units, etc.
         """
-
 
     def input_fix(self, **kwargs):
         """ fixing any problems with shapes, etc.
@@ -50,6 +50,7 @@ class InitSolver(PreSolver):
         """ set the time step to avoid problems
         """
         return self.init_time / kwargs.get("steps", 0)
+
 
 class LxWfSolver(InitSolver):
     """ Lax Wendroff's solver for balance equation:
