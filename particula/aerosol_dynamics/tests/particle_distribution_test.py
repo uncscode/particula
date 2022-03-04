@@ -20,17 +20,29 @@ def test_rad():
 
     pdist = ParticleDistribution(
         cutoff=.9999,
-        mode=100,
+        mode=100e-9,
         nbins=1000,
         nparticles=1e5,
         gsigma=1.25,
         volume=1e-6,
     )
 
-    assert 100 >= pdist.radius()[0].m
-    assert 100 <= pdist.radius()[-1].m
-    assert 1000 == len(pdist.radius())
+    pdist_log = ParticleDistribution(
+        cutoff=.9999,
+        mode=100e-9,
+        nbins=1000,
+        nparticles=1e5,
+        gsigma=1.25,
+        volume=1e-6,
+        spacing="logspace",
+    )
 
+    assert 100 >= pdist.radius()[0].m_as('nm')
+    assert 100 <= pdist.radius()[-1].m_as('nm')
+    assert 1000 == len(pdist.radius())
+    assert 100 >= pdist_log.radius()[0].m_as('nm')
+    assert 100 <= pdist_log.radius()[-1].m_as('nm')
+    assert 1000 == len(pdist_log.radius())
 
 def test_discretize():
     """ testing the discretization
@@ -48,6 +60,14 @@ def test_discretize():
         gsigma=1.25,
     )
 
+    pdist_log = ParticleDistribution(
+        mode=100,
+        nbins=100,
+        nparticles=1e5,
+        gsigma=1.25,
+        spacing="logspace",
+    )
+
     assert 0 <= pdist.discretize()[0]
     assert 0 <= pdist.discretize()[-1]
     assert np.trapz(pdist.discretize(), pdist.radius(
@@ -55,6 +75,14 @@ def test_discretize():
     assert len(pdist.discretize().m) == len(pdist.radius().m)
     assert lognorm.fit(pdist.discretize().m)[0] <= 3.75
     assert lognorm.fit(pdist.discretize().m)[1] <= 1e-5
+
+    assert 0 <= pdist_log.discretize()[0]
+    assert 0 <= pdist_log.discretize()[-1]
+    assert np.trapz(pdist_log.discretize(), pdist_log.radius(
+    )) == pytest.approx(.9999, rel=1e-1)
+    assert len(pdist_log.discretize().m) == len(pdist_log.radius().m)
+    assert lognorm.fit(pdist_log.discretize().m)[0] <= 3.75
+    assert lognorm.fit(pdist_log.discretize().m)[1] <= 1e-5
 
 
 def test_dist():
@@ -70,6 +98,14 @@ def test_dist():
         nbins=1000,
         nparticles=1e5,
         gsigma=1.25,
+    )
+
+    pdist_log = ParticleDistribution(
+        mode=100,
+        nbins=1000,
+        nparticles=1e5,
+        gsigma=1.25,
+        spacing="logspace",
     )
 
     dps = pdist.radius().m
@@ -89,3 +125,21 @@ def test_dist():
 
     assert pdist.distribution().u == u.m**-4
     assert pdist.distribution().m.shape == (1000,)
+
+    dps_log = pdist_log.radius().m
+    wts_log = pdist_log.discretize()/np.sum(pdist_log.discretize())
+
+    samples_log = np.random.choice(dps_log, size=len(dps_log), p=wts_log.m)
+
+    assert (
+        lognorm.fit(samples_log, floc=0)[0] >= np.log(1.20) and
+        lognorm.fit(samples_log, floc=0)[0] <= np.log(1.30)
+    )
+
+    assert (
+        lognorm.fit(samples_log, floc=0)[-1] >= 95 and
+        lognorm.fit(samples_log, floc=0)[-1] <= 105
+    )
+
+    assert pdist_log.distribution().u == u.m**-4
+    assert pdist_log.distribution().m.shape == (1000,)
