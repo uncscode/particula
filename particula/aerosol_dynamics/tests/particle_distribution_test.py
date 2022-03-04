@@ -19,7 +19,7 @@ def test_rad():
     """
 
     pdist = ParticleDistribution(
-        cutoff=.9999,
+        cutoff=.99999,
         mode=100e-9,
         nbins=1000,
         nparticles=1e5,
@@ -28,7 +28,7 @@ def test_rad():
     )
 
     pdist_log = ParticleDistribution(
-        cutoff=.9999,
+        cutoff=.99999,
         mode=100e-9,
         nbins=1000,
         nparticles=1e5,
@@ -102,7 +102,7 @@ def test_dist():
     )
 
     pdist_log = ParticleDistribution(
-        mode=100,
+        mode=100e-9,
         nbins=1000,
         nparticles=1e5,
         gsigma=1.25,
@@ -139,8 +139,8 @@ def test_dist():
     )
 
     assert (
-        lognorm.fit(samples_log, floc=0)[-1] >= 95 and
-        lognorm.fit(samples_log, floc=0)[-1] <= 105
+        lognorm.fit(samples_log, floc=0)[-1] >= 95e-9 and
+        lognorm.fit(samples_log, floc=0)[-1] <= 105e-9
     )
 
     assert pdist_log.distribution().u == u.m**-4
