@@ -62,7 +62,7 @@ class ParticleDistribution:
         (rad_start, rad_end) = cut_rad(**self.kwargs)
 
         if self.spacing == "logspace":
-            radius = np.linspace(
+            radius = np.logspace(
                 np.log10(rad_start),
                 np.log10(rad_end),
                 self.nbins
