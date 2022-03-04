@@ -44,6 +44,7 @@ def test_rad():
     assert 100 <= pdist_log.radius()[-1].m_as('nm')
     assert 1000 == len(pdist_log.radius())
 
+
 def test_discretize():
     """ testing the discretization
 
@@ -105,6 +106,7 @@ def test_dist():
         nbins=1000,
         nparticles=1e5,
         gsigma=1.25,
+        cutoff=.999999,
         spacing="logspace",
     )
 
