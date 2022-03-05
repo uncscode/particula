@@ -16,6 +16,16 @@ distribution = ParticleDistribution(
     gsigma=1.25,
 ).distribution()
 
+
+fine_distribution = ParticleDistribution(
+    cutoff=.9999,
+    mode=100e-9,
+    nbins=3000,
+    nparticles=1e5,
+    gsigma=1.25,
+).distribution()
+
+
 radius = ParticleDistribution(
     cutoff=.9999,
     mode=100e-9,
@@ -24,10 +34,27 @@ radius = ParticleDistribution(
     gsigma=1.25,
 ).radius()
 
+fine_radius = ParticleDistribution(
+    cutoff=.9999,
+    mode=100e-9,
+    nbins=3000,
+    nparticles=1e5,
+    gsigma=1.25,
+).radius()
+
+
 kernel = full_coag(
     radius=radius,
     mode=100e-9,
     nbins=1000,
+    nparticles=1e5,
+    gsigma=1.25,
+)
+
+fine_kernel = full_coag(
+    radius=fine_radius,
+    mode=100e-9,
+    nbins=3000,
     nparticles=1e5,
     gsigma=1.25,
 )
@@ -38,15 +65,26 @@ CoagRate = CoagulationRate(
     kernel=kernel,
 )
 
+fine_CoagRate = CoagulationRate(
+    distribution=fine_distribution,
+    radius=fine_radius,
+    kernel=fine_kernel,
+)
+
 rads = radius
+fine_rads = fine_radius
 
 lnds = distribution
+fine_lnds = fine_distribution
 
 kern = kernel
+fine_kern = fine_kernel
 
 loss = CoagRate.coag_loss()
+fine_loss = fine_CoagRate.coag_loss()
 
 gain = CoagRate.coag_gain()
+fine_gain = fine_CoagRate.coag_gain()
 
 
 def test_kern():
@@ -55,6 +93,7 @@ def test_kern():
 
     assert kern.u == u.m**3/u.s
     assert kern.m.shape == rads.shape + rads.shape
+    assert fine_kern.m.shape == fine_rads.shape + fine_rads.shape
 
 
 def test_loss():
@@ -64,6 +103,8 @@ def test_loss():
     assert loss.u == u.m**-4/u.s
     assert loss.m.shape == rads.shape
     assert loss.m.shape == lnds.shape
+    assert fine_loss.m.shape == fine_rads.shape
+    assert fine_loss.m.shape == fine_lnds.shape
 
 
 def test_gain():
@@ -71,6 +112,7 @@ def test_gain():
     """
 
     assert gain.size == rads.size
+    assert fine_gain.size == fine_rads.size
     assert gain.u == u.m**-4/u.s
 
 
@@ -84,9 +126,32 @@ def test_mass():
         (gain - loss).to(u.cm**-4/u.s)*rads**3, rads
     ).m == pytest.approx(0.0)
 
+    assert (
+        np.absolute(np.trapz((gain - loss)*rads**3, rads))
+        <=
+        0.005*np.trapz(gain*rads**3, rads)
+    )
+
+    assert (
+        np.absolute(np.trapz((gain - loss)*rads**3, rads))
+        <=
+        0.005*np.trapz(loss*rads**3, rads)
+    )
+
 
 def test_rads():
     """ test radii
     """
 
     assert rads.u == u.m
+
+
+def test_res():
+    """ testing that mass conservation improves with resolution
+    """
+
+    assert (
+        np.absolute(np.trapz((gain - loss)*rads**3, rads))
+        >=
+        np.absolute(np.trapz((fine_gain - fine_loss)*fine_rads**3, fine_rads))
+    )

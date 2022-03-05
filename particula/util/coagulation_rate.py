@@ -95,7 +95,7 @@ class CoagulationRate:
         )
 
         dpd = np.linspace(0, rads.m/2**(1/3), rads.m.size)*rads.u
-        dpi = (rads**3 - (np.transpose(dpd.m)*dpd.u)**3)**(1/3)
+        dpi = ((np.transpose(rads.m)*rads.u)**3 - dpd**3)**(1/3)
 
         gain = rads**2 * np.trapz(
             interp.ev(dpd.m, dpi.m) * kern.u * nums.u * nums.u / dpi**2,
