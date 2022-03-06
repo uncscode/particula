@@ -3,7 +3,9 @@
 
 import numpy as np
 from particula import u
-from particula import physical_parameters as pp
+from particula.constants import (
+    GAS_CONSTANT
+)
 
 
 class Environment:
@@ -62,7 +64,7 @@ class Environment:
                 / (
                     8*molecular_weight
                     / (
-                        np.pi*pp.GAS_CONSTANT*self.temperature()
+                        np.pi*GAS_CONSTANT*self.temperature()
                     )
                 )**0.5
             ).to_base_units()
