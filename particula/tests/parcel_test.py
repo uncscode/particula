@@ -2,7 +2,7 @@
 """
 
 from particula import u
-from particula.aerosol_dynamics import environment, parcel, particle
+from particula import environment, parcel, particle
 
 small_particle = particle.Particle(
     name="small_particle",

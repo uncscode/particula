@@ -2,7 +2,7 @@
 """
 
 from particula import u
-from particula.aerosol_dynamics.dynamic_step import DynamicStep
+from particula.dynamic_step import DynamicStep
 
 
 def test_dyns():

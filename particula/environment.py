@@ -3,7 +3,7 @@
 
 import numpy as np
 from particula import u
-from particula.aerosol_dynamics import physical_parameters as pp
+from particula import physical_parameters as pp
 
 
 class Environment:

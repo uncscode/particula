@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 from particula import u
-from particula.aerosol_dynamics.particle_distribution import \
+from particula.particle_distribution import \
     ParticleDistribution
 from particula.util.coagulation_rate import CoagulationRate
 from particula.util.dimensionless_coagulation import full_coag
