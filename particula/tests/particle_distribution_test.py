@@ -3,9 +3,9 @@
 
 import numpy as np
 import pytest
+from scipy.stats import lognorm
 from particula import u
 from particula.particle_distribution import ParticleDistribution
-from scipy.stats import lognorm
 
 pdist_lin = ParticleDistribution(
     cutoff=.9999,
