@@ -121,9 +121,9 @@ def test_particle_dimensioned_coagulation_kernel_list():
     Test that the dimensioned coagulation kernel list is returned in m^3/s
     '''
     assert sum(i.check(u.m ** 3 / u.s) for i in
-                simple_parcel.particle_dimensioned_coagulation_kernel_list(
-                    large_particle
-                )) == 9
+               simple_parcel.particle_dimensioned_coagulation_kernel_list(
+                   large_particle
+               )) == 9
 
 
 def test_particle_dimensionless_coagulation_kernel_list():
@@ -132,9 +132,9 @@ def test_particle_dimensionless_coagulation_kernel_list():
     in dimensionless
     '''
     assert sum(i.check(u.dimensionless) for i in
-                simple_parcel.particle_dimensionless_coagulation_kernel_list(
-                    large_particle
-                )) == 9
+               simple_parcel.particle_dimensionless_coagulation_kernel_list(
+                   large_particle
+               )) == 9
 
 
 def test_remove_particle():
