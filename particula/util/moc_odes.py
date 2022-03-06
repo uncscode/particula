@@ -33,7 +33,67 @@
     2. d(density)/d(time) = g(radius,time,density) with density(0) = n0(d0)
 """
 
-# def solver(f, g, d0, n0, t0, dt):
-#     """ solve it!
-#     """
-#     pass
+from scipy.integrate import odeint
+from particula.util.coagulation_rate import CoagulationRate
+
+
+class SolveODE:
+    """ a class to solve the ODE:
+
+        Need:
+        1. initial distribution     nums_init
+        2. initial radius           rads_init
+        3. time span                time_span
+
+        Also:
+        1. coagulation kernel       coag_kern
+    """
+    def __init__(self, **kwargs):
+        """ constructor
+        """
+        self.nums_init = kwargs.get("nums_init", None)
+        self.rads_init = kwargs.get("rads_init", None)
+        self.time_span = kwargs.get("time_span", None)
+        self.kwargs = kwargs
+
+    def ode_func(self, _nums, _, _rads, _phys):
+        """ function to integrate
+        """
+
+        coag = CoagulationRate(
+            distribution=_nums,
+            radius=_rads,
+            **_phys.kwargs
+        )
+
+        return coag.coag_gain().m - coag.coag_loss().m
+
+    def solve_ode(self):
+        """ utilize scipy.integrate.odeint
+        """
+
+        def _func(_nums, _, _rads):
+            """ internal function to integrate
+
+                Here:
+                1. _nums: the distribution as it evolves
+                2. _    : the time as it evolves
+                3. _rads: the radius as it evolves
+                4. _coag: the coagulation kernel
+
+                Note: it is okay that _ (_time) is not used below.
+            """
+
+            vals = CoagulationRate(
+                distribution=_nums,
+                radius=_rads,
+                kernel=_coag,
+            )
+
+            return vals.coag_gain().m - vals.coag_loss().m
+
+        return odeint(
+            _func,
+            self.nums_init,
+            self.time_span,
+        )
