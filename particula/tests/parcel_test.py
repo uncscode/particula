@@ -1,8 +1,7 @@
 """tests for the parcel module.
 """
 
-from particula import u
-from particula import environment, parcel, particle
+from particula import environment, parcel, particle, u
 
 small_particle = particle.Particle(
     name="small_particle",
@@ -123,7 +122,7 @@ def test_particle_dimensioned_coagulation_kernel_list():
     assert sum(i.check(u.m ** 3 / u.s) for i in
                simple_parcel.particle_dimensioned_coagulation_kernel_list(
                    large_particle
-               )) == 9
+    )) == 9
 
 
 def test_particle_dimensionless_coagulation_kernel_list():
@@ -134,7 +133,7 @@ def test_particle_dimensionless_coagulation_kernel_list():
     assert sum(i.check(u.dimensionless) for i in
                simple_parcel.particle_dimensionless_coagulation_kernel_list(
                    large_particle
-               )) == 9
+    )) == 9
 
 
 def test_remove_particle():

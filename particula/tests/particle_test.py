@@ -4,8 +4,7 @@
 import numpy as np
 import pint
 import pytest
-from particula import u
-from particula import environment, particle
+from particula import environment, particle, u
 
 small_particle = particle.Particle(
     name="small_particle",

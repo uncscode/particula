@@ -26,13 +26,10 @@
 """
 
 import numpy as np
-from particula import u
-from particula.constants import (
-    ELEMENTARY_CHARGE_VALUE,
-    ELECTRIC_PERMITTIVITY,
-    BOLTZMANN_CONSTANT,
 
-)
+from particula import u
+from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
+                                 ELEMENTARY_CHARGE_VALUE)
 from particula.environment import Environment
 
 

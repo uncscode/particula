@@ -2,10 +2,9 @@
 """
 
 import numpy as np
+
 from particula import u
-from particula.constants import (
-    GAS_CONSTANT
-)
+from particula.constants import GAS_CONSTANT
 
 
 class Environment:
@@ -14,6 +13,7 @@ class Environment:
     with properties such as temperature and pressure
     and derived properties such as air viscosity.
     """
+
     def __init__(self, temperature, pressure):
         """Function calls for enviornment class."""
         self._temperature = temperature
