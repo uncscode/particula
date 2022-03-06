@@ -3,6 +3,8 @@
 
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
+from particula import u
+from particula.units import strip
 
 
 class CoagulationRate:
@@ -21,11 +23,19 @@ class CoagulationRate:
             * the distribution has units of m**-4
             * the radius has units of m
             * the kernel has units of m**3/s
+
+            Note: we strip the units first because we want
+                  to allow solvers to use this without issue.
+                  These solvers often need pure ndarrays.
+                  It would work fine with the units, but
+                  it will be throwing warning about stripping
+                  them, which is annoying and maybe not good
+                  for performance.
         """
 
-        self.distribution = distribution
-        self.radius = radius
-        self.kernel = kernel
+        self.distribution = strip(distribution) * u.m**-4
+        self.radius = strip(radius) * u.m
+        self.kernel = strip(kernel) * u.m**3 / u.s
 
     def coag_prep(self):
         """ Repackage the parameters
