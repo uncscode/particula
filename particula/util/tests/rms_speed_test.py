@@ -6,7 +6,7 @@ from particula import u
 from particula.util.rms_speed import cbar
 
 
-def test_mfp():
+def test_cbar():
     """ Testing the mean speed of molecules:
 
         1. test unitless and unit inputs
