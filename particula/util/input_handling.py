@@ -298,3 +298,36 @@ def in_volume(volume):
         volume = u.Quantity(volume, u.m**3)
 
     return volume
+
+
+def in_concentration(conc):
+    """ Handles concentration input
+
+        Parameters:
+            conc    (float) [kg/m^3 | dimensionless]
+
+        Returns:
+            conc    (float) [kg/m^3]
+
+        Notes:
+            * If unit is correct, take to base units in kg/m^3
+            * Throws ValueError if unit is wrong
+            * Assigning kg/m^3 units to scalar input
+    """
+
+    if isinstance(conc, u.Quantity):
+        if conc.to_base_units().u == u.kg/u.m**3:
+            conc = conc.to_base_units()
+        else:
+            raise ValueError(
+                f"\n\t"
+                f"Input {conc} has unsupported units.\n\t"
+                f"Input must have concentration units of\n\t"
+                f"'kg/m^3';\n\t"
+                f"otherwise, if dimensionless, it will\n\t"
+                f"be assigned a kg/m^3 unit.\n"
+            )
+    else:
+        conc = u.Quantity(conc, u.kg/u.m**3)
+
+    return conc

@@ -10,7 +10,6 @@ def area(**kwargs):
 
         Parameters:
             radius       (float) [m]
-            density      (float) [kg/m^3] (default: 1000)
             area_factor  (float) [ ]      (default: 1)
 
         Returns:
