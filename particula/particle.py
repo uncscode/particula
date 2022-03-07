@@ -26,9 +26,11 @@
 """
 
 import numpy as np
+
 from particula import u
-from particula.aerosol_dynamics import physical_parameters as pp
-from particula.aerosol_dynamics.environment import Environment
+from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
+                                 ELEMENTARY_CHARGE_VALUE)
+from particula.environment import Environment
 
 
 class Particle:
@@ -202,14 +204,14 @@ class Particle:
         """
 
         numerator = -1 * self.charge() * other.charge() * (
-            pp.ELEMENTARY_CHARGE_VALUE ** 2
+            ELEMENTARY_CHARGE_VALUE ** 2
         )
-        denominator = 4 * np.pi * pp.ELECTRIC_PERMITTIVITY * (
+        denominator = 4 * np.pi * ELECTRIC_PERMITTIVITY * (
             self.radius() + other.radius()
         )
         return (
             numerator /
-            (denominator * pp.BOLTZMANN_CONSTANT * environment.temperature())
+            (denominator * BOLTZMANN_CONSTANT * environment.temperature())
         )
 
     @u.wraps(u.dimensionless, [None, None, None])
@@ -264,7 +266,7 @@ class Particle:
 
         numerator = (
             (
-                environment.temperature() * pp.BOLTZMANN_CONSTANT
+                environment.temperature() * BOLTZMANN_CONSTANT
                 * self.reduced_mass(other)
             )**0.5
             / self.reduced_friction_factor(other, environment)
