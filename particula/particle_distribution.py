@@ -15,6 +15,7 @@
 """
 
 import numpy as np
+
 from particula import u
 from particula.util.distribution_discretization import discretize
 from particula.util.input_handling import in_scalar, in_volume

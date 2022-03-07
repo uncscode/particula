@@ -2,7 +2,8 @@
 """
 
 import numpy as np
-from particula.aerosol_dynamics import particle
+
+from particula import particle
 
 
 class Parcel:

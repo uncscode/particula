@@ -2,15 +2,11 @@
 """
 
 from particula import u
-from particula.constants import (
-    BOLTZMANN_CONSTANT,
-    AVOGADRO_NUMBER,
-    GAS_CONSTANT,
-)
+from particula.constants import (AVOGADRO_NUMBER, BOLTZMANN_CONSTANT,
+                                 GAS_CONSTANT)
 
 
 def test_constants():
-
     """ simple tests are conducted as follows:
 
             * see if GAS_CONSTANT maniuplation is good

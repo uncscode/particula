@@ -2,8 +2,7 @@
 """
 
 import pytest
-from particula import u
-from particula.aerosol_dynamics import environment
+from particula import environment, u
 
 standard_environment = environment.Environment(
     temperature=298,  # * u.K,

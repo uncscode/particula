@@ -2,8 +2,7 @@
 """
 
 
-from particula.aerosol_dynamics.particle_distribution import \
-    ParticleDistribution
+from particula.particle_distribution import ParticleDistribution
 from particula.util.coagulation_rate import CoagulationRate
 from particula.util.dimensionless_coagulation import full_coag
 

@@ -4,10 +4,8 @@
 import numpy as np
 import pytest
 from scipy.stats import lognorm
-
 from particula import u
-from particula.aerosol_dynamics.particle_distribution import \
-    ParticleDistribution
+from particula.particle_distribution import ParticleDistribution
 
 pdist_lin = ParticleDistribution(
     cutoff=.9999,

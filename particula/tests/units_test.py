@@ -6,7 +6,6 @@ from particula.units import strip as us
 
 
 def test_units():
-
     """ Testing getting rid of units of an input quantity:
             * see if a quantity with units is stripped
             * see if a quantity without units is returned
