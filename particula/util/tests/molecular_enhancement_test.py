@@ -19,7 +19,9 @@ def test_mol_enh():
 
     assert mol_enh(vapor_size=1, particle_size=[1, 2]).m.shape == (2,)
     assert mol_enh(vapor_size=[1, 2], particle_size=1).m.shape == (1, 2)
-    assert mol_enh(vapor_size=[1, 2], particle_size=[1, 2, 3]).m.shape == (3, 2)
+    assert mol_enh(
+        vapor_size=[1, 2], particle_size=[1, 2, 3]
+    ).m.shape == (3, 2)
 
     with pytest.raises(ValueError):
         mol_enh(vapor_size=5*u.m, particle_size=5*u.s)

@@ -45,7 +45,7 @@ def scf(**kwargs):
 
         Parameters:
             radius  (float) [m]
-            knu     (float) [m] (default: util)
+            knu     (float) [ ] (default: util)
 
         Returns:
                     (float) [dimensionless]
