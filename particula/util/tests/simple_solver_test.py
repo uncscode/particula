@@ -64,9 +64,10 @@ def test_solution():
     """ test the solution
     """
 
-    assert solution.shape == (100, 1000)
-    assert fine_sols.shape == (1000, 1000)
-    assert solution[0, :].all() == fine_sols[0, :].all()
+    assert solution.m.shape == (100, 1000)
+    assert solution.u == particle_dist.distribution().u
+    assert fine_sols.m.shape == (1000, 1000)
+    assert solution.m[0, :].all() == fine_sols.m[0, :].all()
 
 
 def test_conservation():
@@ -74,15 +75,15 @@ def test_conservation():
     """
 
     assert (
-        np.trapz((solution[0, :]-solution[-1, :])*radius**3, radius) /
-        np.trapz((solution[0, :])*radius**3, radius)
+        np.trapz((solution.m[0, :]-solution.m[-1, :])*radius**3, radius) /
+        np.trapz((solution.m[0, :])*radius**3, radius)
         ==
         pytest.approx(0, abs=1e-3)
     )
 
     assert (
-        np.trapz((fine_sols[0, :]-fine_sols[-1, :])*radius**3, radius) /
-        np.trapz((fine_sols[0, :])*radius**3, radius)
+        np.trapz((fine_sols.m[0, :]-fine_sols.m[-1, :])*radius**3, radius) /
+        np.trapz((fine_sols.m[0, :])*radius**3, radius)
         ==
         pytest.approx(0, abs=1e-3)
     )

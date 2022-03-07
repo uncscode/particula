@@ -1,4 +1,14 @@
-""" a simple solver
+""" a simple solver.
+
+    For now, this takes as input:
+    - the initial distribution (m**-4)
+    - the radius of said distribution (m)
+    - the coagulation kernel associated with it (m**3/s)
+    - a desired time span in the form of ndarray (unitless, assumed in seconds)
+
+    It returns an array of the with the dimensions
+    (time_span, distribution)
+    with the units of distribution (m**-4).
 """
 
 import numpy as np
@@ -25,15 +35,21 @@ class SimpleSolver:
 
         Need:
         1. initial distribution
-        2. initial radius
-        3. time span
+        2. associated radius
+        3. associated coagulation kernel
 
         Also:
-        1. coagulation kernel
+        1. desired time span in seconds (given unitless)
     """
 
     def __init__(self, **kwargs):
         """ constructor
+
+            kwargs:
+            - distribution: initial distribution (m**-4)
+            - radius: associated radius (m)
+            - kernel: associated coagulation kernel (m**3/s)
+            - tspan: desired time span (s)
         """
         self.nums_init = kwargs.get("distribution", None)
         self.rads_init = kwargs.get("radius", None)
@@ -49,7 +65,7 @@ class SimpleSolver:
             strip(self.nums_init),
             strip(self.rads_init),
             strip(self.coag_kern),
-            strip(self.time_span)
+            strip(self.time_span),
         )
 
     def solution(self):
@@ -63,4 +79,4 @@ class SimpleSolver:
             nums,
             time,
             args=(rads, kern)
-        )
+        )*self.nums_init.u
