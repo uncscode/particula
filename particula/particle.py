@@ -211,7 +211,7 @@ class Particle:
         )
         return (
             numerator /
-            (denominator * BOLTZMANN_CONSTANT * environment.temperature())
+            (denominator * BOLTZMANN_CONSTANT * environment.temperature)
         )
 
     @u.wraps(u.dimensionless, [None, None, None])
@@ -266,7 +266,7 @@ class Particle:
 
         numerator = (
             (
-                environment.temperature() * BOLTZMANN_CONSTANT
+                environment.temperature * BOLTZMANN_CONSTANT
                 * self.reduced_mass(other)
             )**0.5
             / self.reduced_friction_factor(other, environment)
