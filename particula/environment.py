@@ -1,71 +1,40 @@
-"""environment class
+""" defining the environment class
 """
 
-import numpy as np
-
-from particula import u
-from particula.constants import GAS_CONSTANT
+from particula.util.dynamic_viscosity import dyn_vis
+from particula.util.input_handling import in_pressure, in_temperature
+from particula.util.mean_free_path import mfp
 
 
 class Environment:
+    """ creating the environment class
+
+        For now, the environment class takes properties such as
+        temperature and pressure to calculate derived properties
+        such as viscosity.
     """
-    Sets the environment class
-    with properties such as temperature and pressure
-    and derived properties such as air viscosity.
-    """
 
-    def __init__(self, temperature, pressure):
-        """Function calls for enviornment class."""
-        self._temperature = temperature
-        self._pressure = pressure
-
-    @u.wraps(u.K, [None])
-    def temperature(self) -> float:
-        """Returns the temperature of the environment."""
-        return self._temperature
-
-    @u.wraps(u.Pa, [None])
-    def pressure(self) -> float:
-        """Returns the pressure of the environment."""
-        return self._pressure
-
-    @u.wraps(u.kg / u.m / u.s, [None])
-    def dynamic_viscosity_air(self) -> float:
-        """Returns the dynamic viscosity of air. [kg/m/s]
-
-        The dynamic viscosity is calculated using the 3 parameter
-        Sutherland Viscosity Law.
+    def __init__(self, **kwargs):
+        """ Function calls for enviornment class.
         """
-        mu_ref = 1.716e-5 * u.Pa * u.s  # Viscosity at T_REF
-        t_ref = 273.15 * u.K
-        suth_const = 110.4 * u.K  # Sutherland constant
+        self.kwargs = kwargs
 
-        return (
-            mu_ref *
-            (self.temperature()/t_ref)**(3/2) *
-            (t_ref + suth_const) / (self.temperature() + suth_const)
-        )
-
-    # mean free path of air in m
-    @u.wraps(u.m, [None])
-    def mean_free_path_air(self) -> float:
-        """Returns the mean free path of this environment. [m]
-
-        The mean free path is the average distance traveled by a molecule
-        between collisions with other molecules.
+    def temperature(self):
+        """ Returns the temperature in the environment.
         """
-        # Molecular weight of air in kg/mol
-        molecular_weight = (28.9644 * u.g / u.mol).to_base_units()
+        return in_temperature(self.kwargs.get("temperature", 298.15))
 
-        return (
-            (
-                2 * self.dynamic_viscosity_air()
-                / self.pressure()
-                / (
-                    8*molecular_weight
-                    / (
-                        np.pi*GAS_CONSTANT*self.temperature()
-                    )
-                )**0.5
-            ).to_base_units()
-        )
+    def pressure(self):
+        """ Returns the pressure in the environment.
+        """
+        return in_pressure(self.kwargs.get("pressure", 101325))
+
+    def dynamic_viscosity(self):
+        """ Returns the dynamic viscosity of air.
+        """
+        return dyn_vis(**self.kwargs)
+
+    def mean_free_path(self):
+        """ Returns the mean free path of this environment.
+        """
+        return mfp(**self.kwargs)
