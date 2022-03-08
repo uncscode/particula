@@ -120,7 +120,7 @@ class Particle:
         divided by the particle radius.
         """
 
-        return environment.mean_free_path_air() / self.radius()
+        return environment.mean_free_path() / self.radius()
 
     @u.wraps(u.dimensionless, [None, None])
     def slip_correction_factor(self, environment: Environment) -> float:
@@ -156,7 +156,7 @@ class Particle:
             environment
         )
         return (
-            6 * np.pi * environment.dynamic_viscosity_air() * self.radius() /
+            6 * np.pi * environment.dynamic_viscosity() * self.radius() /
             slip_correction_factor
         )
 
