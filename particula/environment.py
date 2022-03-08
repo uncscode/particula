@@ -41,15 +41,15 @@ class Environment:
         """
         self.kwargs = kwargs
 
-    # def temperature(self):
-    #     """ Returns the temperature in the environment.
-    #     """
-    #     return in_temperature(self.kwargs.get("temperature", 298.15))
+    def temperature(self):
+        """ Returns the temperature in the environment.
+        """
+        return in_temperature(self.kwargs.get("temperature", 298.15))
 
-    # def pressure(self):
-    #     """ Returns the pressure in the environment.
-    #     """
-    #     return in_pressure(self.kwargs.get("pressure", 101325))
+    def pressure(self):
+        """ Returns the pressure in the environment.
+        """
+        return in_pressure(self.kwargs.get("pressure", 101325))
 
     def dynamic_viscosity(self):
         """ Returns the dynamic viscosity of air.
