@@ -8,14 +8,6 @@ inputs = {
     "temperature": 298.15,
     "pressure": 101325
 }
-inputs21 = {
-    "temperature": [298.15, 300],
-    "pressure": 101325
-}
-inputs12 = {
-    "temperature": [298.15],
-    "pressure": [101325, 101325]
-}
 inputs33 = {
     "temperature": [298.15, 299, 300],
     "pressure": [101325, 101330, 101335]
