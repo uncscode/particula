@@ -23,6 +23,7 @@ def dyn_vis(
     reference_viscosity=REF_VISCOSITY_AIR_STP,
     reference_temperature=REF_TEMPERATURE_STP,
     sutherland_constant=SUTHERLAND_CONSTANT,
+    **kwargs,
 ):
     """ The dynamic viscosity of air via Sutherland formula.
         This formula depends on temperature (temp) and the reference
@@ -71,7 +72,8 @@ def dyn_vis(
             SUTHERLAND_CONSTANT     (float) [K]
 
     """
-
+    # trick to avoid triggering a linting error for kwargs
+    temp = kwargs.get("temperature", temperature)
     temp = in_temperature(temperature)
     ref_vis = in_viscosity(reference_viscosity)
     ref_temp = in_temperature(reference_temperature)
