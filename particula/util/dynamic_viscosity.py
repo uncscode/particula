@@ -12,13 +12,18 @@
         https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
 
 """
-
+from particula import u
 from particula.constants import (REF_TEMPERATURE_STP, REF_VISCOSITY_AIR_STP,
                                  SUTHERLAND_CONSTANT)
 from particula.util.input_handling import in_temperature, in_viscosity
 
 
-def dyn_vis(**kwargs):
+def dyn_vis(
+    temperature=298.15 * u.K,
+    reference_viscosity=REF_VISCOSITY_AIR_STP,
+    reference_temperature=REF_TEMPERATURE_STP,
+    sutherland_constant=SUTHERLAND_CONSTANT,
+):
     """ The dynamic viscosity of air via Sutherland formula.
         This formula depends on temperature (temp) and the reference
         temperature (t_ref) as well as the reference viscosity (mu_ref).
@@ -55,6 +60,7 @@ def dyn_vis(**kwargs):
             temperature             (float) [K]     (default: 298.15)
             reference_viscosity     (float) [Pa*s]  (default: constants)
             reference_temperature   (float) [K]     (default: constants)
+            sutherland_constant     (float) [K]     (default: constants)
 
         Returns:
                                     (float) [Pa*s]
@@ -66,17 +72,12 @@ def dyn_vis(**kwargs):
 
     """
 
-    temp = kwargs.get("temperature", 298.15)
-    ref_vis = kwargs.get("reference_viscosity", REF_VISCOSITY_AIR_STP)
-    ref_temp = kwargs.get("reference_temperature", REF_TEMPERATURE_STP)
-
-    temp = in_temperature(temp)
-    ref_vis = in_viscosity(ref_vis)
-    ref_temp = in_temperature(ref_temp)
-
-    suth_const = SUTHERLAND_CONSTANT
+    temp = in_temperature(temperature)
+    ref_vis = in_viscosity(reference_viscosity)
+    ref_temp = in_temperature(reference_temperature)
+    suth_const = in_temperature(sutherland_constant)
 
     return (
         ref_vis * (temp/ref_temp)**(3/2) * (ref_temp + suth_const) /
         (temp + suth_const)
-    )
+    ).to_base_units()

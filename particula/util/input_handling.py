@@ -298,3 +298,36 @@ def in_volume(volume):
         volume = u.Quantity(volume, u.m**3)
 
     return volume
+
+
+def in_gas_constant(gas_con):
+    """ Handles gas costant input
+
+        Parameters:
+            gas_con    (float) [J/mol/K | dimensionless]
+
+        Returns:
+            gas_con    (float) [J/mol/K]
+
+        Notes:
+            * If unit is correct, take to base units in J/mol/K
+            * Throws ValueError if unit is wrong
+            * Assigning J/mol/K units to scalar input
+    """
+
+    if isinstance(gas_con, u.Quantity):
+        if gas_con.to_base_units().u == (1*u.J/u.mol/u.K).to_base_units():
+            gas_con = gas_con.to_base_units()
+        else:
+            raise ValueError(
+                f"\n\t"
+                f"Input {gas_con} has unsupported units.\n\t"
+                f"Input must have gas costant units of\n\t"
+                f"'J/mol/K';\n\t"
+                f"otherwise, if dimensionless, it will\n\t"
+                f"be assigned a J/mol/K unit.\n"
+            )
+    else:
+        gas_con = u.Quantity(gas_con, u.J/u.mol/u.K)
+
+    return gas_con.to_base_units()

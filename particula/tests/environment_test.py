@@ -20,8 +20,8 @@ standard_environment = environment.Environment(
 def test_getters():
     """ Tests the getters for the Environment class.
     """
-    assert standard_environment.temperature() == inputs["temperature"] * u.K
-    assert standard_environment.pressure() == inputs["pressure"] * u.Pa
+    assert standard_environment.temperature == inputs["temperature"] * u.K
+    assert standard_environment.pressure == inputs["pressure"] * u.Pa
 
 
 def test_dynamic_viscosity_air():
@@ -47,7 +47,7 @@ def test_shapes():
     """
 
     assert (
-        environment.Environment(**inputs33).pressure().m.shape
+        environment.Environment(**inputs33).pressure.m.shape
         ==
         (len(inputs33["pressure"]),)
     )
