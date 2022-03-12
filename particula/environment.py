@@ -23,7 +23,7 @@
     Notes:
       # stands for an optional util override
       $ stands for an optional constants override
-        
+
 """
 
 from particula.constants import (GAS_CONSTANT, MOLECULAR_WEIGHT_AIR,
