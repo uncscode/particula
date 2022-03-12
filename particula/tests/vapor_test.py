@@ -53,3 +53,5 @@ def test_inheritance():
     assert vaps.pressure.u == u.kg/u.m/u.s**2
     assert vaps.temperature.m == inputs["temperature"]
     assert vaps.pressure.m == inputs["pressure"]
+    assert vaps.dynamic_viscosity().u == (1 * u.Pa * u.s).to_base_units()
+    assert vaps.mean_free_path().u == u.m
