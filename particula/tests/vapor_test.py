@@ -7,6 +7,8 @@ from particula.vapor import Vapor
 inputs = {
     "vapor_radius": 1.5e-9,
     "vapor_density": 1500,
+    "temperature": 300,
+    "pressure": 1e5,
 }
 
 inputs2 = {
@@ -42,3 +44,12 @@ def test_units():
     assert vaps2.vapor_density.u == u.kg/u.m**3
     assert vaps2.vapor_molec_wt.u == u.kg/u.mol
     assert vaps2.driving_force().u == u.kg/u.m**3
+
+
+def test_inheritance():
+    """ testing inheritance from Environment class
+    """
+    assert vaps.temperature.u == u.K
+    assert vaps.pressure.u == u.kg/u.m/u.s**2
+    assert vaps.temperature.m == inputs["temperature"]
+    assert vaps.pressure.m == inputs["pressure"]
