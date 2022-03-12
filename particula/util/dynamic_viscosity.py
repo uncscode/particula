@@ -80,6 +80,8 @@ def dyn_vis(
     suth_const = in_temperature(sutherland_constant)
 
     return (
-        ref_vis * (temp/ref_temp)**(3/2) * (ref_temp + suth_const) /
+        ref_vis *
+        (temp/ref_temp)**(3/2) *
+        (ref_temp + suth_const) /
         (temp + suth_const)
     ).to_base_units()

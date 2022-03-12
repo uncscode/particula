@@ -20,7 +20,8 @@ import numpy as np
 from particula import u
 from particula.constants import GAS_CONSTANT, MOLECULAR_WEIGHT_AIR
 from particula.util.dynamic_viscosity import dyn_vis
-from particula.util.input_handling import (in_molecular_weight, in_pressure,
+from particula.util.input_handling import (in_gas_constant,
+                                           in_molecular_weight, in_pressure,
                                            in_temperature, in_viscosity)
 
 
@@ -119,7 +120,7 @@ def mfp(
     else:
         dyn_vis_val = in_viscosity(dynamic_viscosity)
 
-    gas_con = gas_constant
+    gas_con = in_gas_constant(gas_constant)
 
     return (
         (2 * dyn_vis_val / pres) /

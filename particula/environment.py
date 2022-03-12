@@ -23,6 +23,7 @@
     Notes:
       # stands for an optional util override
       $ stands for an optional constants override
+        
 """
 
 from particula.constants import (GAS_CONSTANT, MOLECULAR_WEIGHT_AIR,
@@ -40,11 +41,11 @@ class Environment:  # pylint: disable=too-many-instance-attributes
 
         For now, the environment class takes properties such as
         temperature and pressure to calculate derived properties
-        such as viscosity.
+        such as viscosity and mean free path.
     """
 
     def __init__(self, **kwargs):
-        """ Function calls for enviornment class.
+        """ Initiate the environment class with base attrs.
         """
 
         self.temperature = in_temperature(
@@ -72,7 +73,7 @@ class Environment:  # pylint: disable=too-many-instance-attributes
         self.kwargs = kwargs
 
     def dynamic_viscosity(self):
-        """ Returns the dynamic viscosity of air.
+        """ Returns the dynamic viscosity in Pa*s.
         """
         return dyn_vis(
             temperature=self.temperature,
@@ -82,7 +83,7 @@ class Environment:  # pylint: disable=too-many-instance-attributes
         )
 
     def mean_free_path(self):
-        """ Returns the mean free path of this environment.
+        """ Returns the mean free path in m.
         """
         return mfp(
             temperature=self.temperature,
