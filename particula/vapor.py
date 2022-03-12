@@ -1,4 +1,4 @@
-""" a class to initiate vapors
+""" a class to initiate vapors condensing onto particles
 """
 import numpy as np
 
@@ -10,11 +10,11 @@ from particula.util.input_handling import (in_concentration, in_density,
 
 
 class Vapor(Environment):
-    """ the env class
+    """ based on the Environment class
     """
 
     def __init__(self, **kwargs):
-        """ init
+        """ initiating the vapor class
         """
         super().__init__(**kwargs)
 
