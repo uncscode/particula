@@ -1,71 +1,94 @@
-"""environment class
+""" defining the environment class
+
+    kwargs:
+        temperature             (float) [K]      (default: 298.15)
+        pressure                (float) [Pa]     (default: 101325)
+      # dynamic_viscosity       (float) [Pa*s]   (default: util)
+      $ molecular_weight        (float) [kg/mol] (default: constants)
+      $ reference_viscosity     (float) [Pa*s]   (default: constants)
+      $ reference_temperature   (float) [K]      (default: constants)
+      $ sutherland_constant     (float) [K]      (default: constants)
+      $ gas_constant            (float) [J/mol/K](default: constants)
+
+      Using particula.util:
+        dynamic_viscosity       (float) [Pa*s]
+
+      Using particula.constants:
+        GAS_CONSTANT            (float) [J/mol/K]
+        MOLECULAR_WEIGHT_AIR    (float) [kg/mol]
+        REF_VISCOSITY_AIR_STP   (float) [Pa*s]
+        REF_TEMPERATURE_STP     (float) [K]
+        SUTHERLAND_CONSTANT     (float) [K]
+
+    Notes:
+      # stands for an optional util override
+      $ stands for an optional constants override
+
 """
 
-import numpy as np
+from particula.constants import (GAS_CONSTANT, MOLECULAR_WEIGHT_AIR,
+                                 REF_TEMPERATURE_STP, REF_VISCOSITY_AIR_STP,
+                                 SUTHERLAND_CONSTANT)
+from particula.util.dynamic_viscosity import dyn_vis
+from particula.util.input_handling import (in_gas_constant,
+                                           in_molecular_weight, in_pressure,
+                                           in_temperature, in_viscosity)
+from particula.util.mean_free_path import mfp
 
-from particula import u
-from particula.constants import GAS_CONSTANT
 
+class Environment:  # pylint: disable=too-many-instance-attributes
+    """ creating the environment class
 
-class Environment:
+        For now, the environment class takes properties such as
+        temperature and pressure to calculate derived properties
+        such as viscosity and mean free path.
     """
-    Sets the environment class
-    with properties such as temperature and pressure
-    and derived properties such as air viscosity.
-    """
 
-    def __init__(self, temperature, pressure):
-        """Function calls for enviornment class."""
-        self._temperature = temperature
-        self._pressure = pressure
-
-    @u.wraps(u.K, [None])
-    def temperature(self) -> float:
-        """Returns the temperature of the environment."""
-        return self._temperature
-
-    @u.wraps(u.Pa, [None])
-    def pressure(self) -> float:
-        """Returns the pressure of the environment."""
-        return self._pressure
-
-    @u.wraps(u.kg / u.m / u.s, [None])
-    def dynamic_viscosity_air(self) -> float:
-        """Returns the dynamic viscosity of air. [kg/m/s]
-
-        The dynamic viscosity is calculated using the 3 parameter
-        Sutherland Viscosity Law.
+    def __init__(self, **kwargs):
+        """ Initiate the environment class with base attrs.
         """
-        mu_ref = 1.716e-5 * u.Pa * u.s  # Viscosity at T_REF
-        t_ref = 273.15 * u.K
-        suth_const = 110.4 * u.K  # Sutherland constant
 
-        return (
-            mu_ref *
-            (self.temperature()/t_ref)**(3/2) *
-            (t_ref + suth_const) / (self.temperature() + suth_const)
+        self.temperature = in_temperature(
+            kwargs.get("temperature", 298.15)
+        )
+        self.reference_viscosity = in_viscosity(
+            kwargs.get("reference_viscosity", REF_VISCOSITY_AIR_STP)
+        )
+        self.reference_temperature = in_temperature(
+            kwargs.get("reference_temperature", REF_TEMPERATURE_STP)
+        )
+        self.pressure = in_pressure(
+            kwargs.get("pressure", 101325)
+        )
+        self.molecular_weight = in_molecular_weight(
+            kwargs.get("molecular_weight", MOLECULAR_WEIGHT_AIR)
+        )
+        self.sutherland_constant = in_temperature(
+            kwargs.get("sutherland_constant", SUTHERLAND_CONSTANT)
+        )
+        self.gas_constant = in_gas_constant(
+            kwargs.get("gas_constant", GAS_CONSTANT)
         )
 
-    # mean free path of air in m
-    @u.wraps(u.m, [None])
-    def mean_free_path_air(self) -> float:
-        """Returns the mean free path of this environment. [m]
+        self.kwargs = kwargs
 
-        The mean free path is the average distance traveled by a molecule
-        between collisions with other molecules.
+    def dynamic_viscosity(self):
+        """ Returns the dynamic viscosity in Pa*s.
         """
-        # Molecular weight of air in kg/mol
-        molecular_weight = (28.9644 * u.g / u.mol).to_base_units()
+        return dyn_vis(
+            temperature=self.temperature,
+            reference_viscosity=self.reference_viscosity,
+            reference_temperature=self.reference_temperature,
+            sutherland_constant=self.sutherland_constant,
+        )
 
-        return (
-            (
-                2 * self.dynamic_viscosity_air()
-                / self.pressure()
-                / (
-                    8*molecular_weight
-                    / (
-                        np.pi*GAS_CONSTANT*self.temperature()
-                    )
-                )**0.5
-            ).to_base_units()
+    def mean_free_path(self):
+        """ Returns the mean free path in m.
+        """
+        return mfp(
+            temperature=self.temperature,
+            pressure=self.pressure,
+            molecular_weight=self.molecular_weight,
+            dynamic_viscosity=self.dynamic_viscosity(),
+            gas_constant=self.gas_constant,
         )
