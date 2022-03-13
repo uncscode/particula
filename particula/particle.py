@@ -1,176 +1,87 @@
-""" to instantiate particles and calculate their properties.
-
-    This module contains the Particle class, which is used to
-    instantiate the particles and calculate their properties.
-    Particles are introduced and defined by calling Particle
-    class, for example:
-
-    >>> from particula import Particle
-    >>> p1 = Particle(name='my_particle', radius=1e-9, density=1e3, charge=1)
-
-    Then, it is possible to return the properties of the particle p1:
-
-    >>> p1.mass()
-
-    The environment is defined by the following parameters:
-    >>> from particula.aerosol_dynamics import environment
-    >>> env = environment.Environment(temperature=300, pressure=1e5)
-
-    If another particle is introduced, it is possible to calculate
-    the binary coagulation coefficient:
-
-    >>> p2 = Particle(name='my_particle2', radius=1e-9, density=1e3, charge=1)
-    >>> p1.dimensioned_coagulation_kernel(p2, env)
-
-    For more details, see below. More information to follow.
+""" the particule class
 """
 
 import numpy as np
 
 from particula import u
+from particula.vapor import Vapor
+from particula.util.particle_mass import mass
+from particula.util.knudsen_number import knu
+from particula.util.slip_correction import scf
+from particula.util.friction_factor import frifac
+from particula.util.input_handling import (in_concentration, in_density,
+                                           in_length, in_molecular_weight,
+                                           in_scalar, in_radius)
+
 from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
                                  ELEMENTARY_CHARGE_VALUE)
 from particula.environment import Environment
 
 
-class Particle:
-    """Class to instantiate particles and calculate their properties.
-
-    This class represents the underlying framework for both
-    particle--particle and gas--particle interactions. See detailed
-    methods and functions below.
-
-    Attributes:
-
-        name    (str)   [no units]
-        radius  (float) [m]
-        density (float) [kg/m**3]
-        charge  (int)   [dimensionless]
-        mass    (float) [kg]
+class Particle(Vapor):
+    """ based on the Vapor(Environment) class
     """
 
-    def __init__(self, name: str, radius, density, charge):
-        """Constructs particle objects.
+    def __init__(self, **kwargs):
+        """  particle objects.
+        """
+        super().__init__(**kwargs)
 
-        Parameters:
+        self.particle_radius = in_radius(
+            kwargs.get('particle_radius', None)
+        )
+        self.particle_density = in_density(
+            kwargs.get('particle_density', 1000)
+        )
+        self.shape_factor = in_scalar(
+            kwargs.get('shape_factor', 1)
+        )
+        self.volume_void = in_scalar(
+            kwargs.get('volume_void', 0)
+        )
+        self.particle_charge = in_scalar(
+            kwargs.get('particle_charge', 0)
+        )
+        self.kwargs = kwargs
 
-            name    (str)   [no units]
-            radius  (float) [m]
-            density (float) [kg/m**3]
-            charge  (int)   [dimensionless]
+    def mass(self):
+        """ Returns mass of particle.
         """
 
-        self._name = name
-        self._radius = radius
-        self._density = density
-        self._charge = charge
-        self._mass = density * (4*np.pi/3) * (radius**3)
-
-    def name(self) -> str:
-        """Returns the name of particle.
-        """
-
-        return self._name
-
-    @u.wraps(u.kg, [None])
-    def mass(self) -> float:
-        """Returns mass of particle.
-
-        Checks units: [kg]
-        """
-
-        return self._mass
-
-    @u.wraps(u.m, [None])
-    def radius(self) -> float:
-        """Returns radius of particle.
-
-        Checks units: [m]
-        """
-
-        return self._radius
-
-    @u.wraps(u.kg / u.m**3, [None])
-    def density(self) -> int:
-        """Returns density of particle.
-
-        Checks units: [kg/m**3]
-        """
-
-        return self._density
-
-    @u.wraps(u.dimensionless, [None])
-    def charge(self) -> int:
-        """Returns number of charges on particle.
-
-        Checks units: [dimensionless]
-        """
-
-        return self._charge
-
-    @u.wraps(u.dimensionless, [None, None])
-    def knudsen_number(self, environment: Environment) -> float:
-        """Returns particle's Knudsen number.
-
-        Checks units: [dimensionless]
-
-        The Knudsen number reflects the relative length scales of
-        the particle and the suspending fluid (air, water, etc.).
-        This is calculated by the mean free path of the medium
-        divided by the particle radius.
-        """
-
-        return environment.mean_free_path() / self.radius()
-
-    @u.wraps(u.dimensionless, [None, None])
-    def slip_correction_factor(self, environment: Environment) -> float:
-        """Returns particle's Cunningham slip correction factor.
-
-        Checks units: [dimensionless]
-
-        Dimensionless quantity accounting for non-continuum effects
-        on small particles. It is a deviation from Stokes' Law.
-        Stokes assumes a no-slip condition that is not correct at
-        high Knudsen numbers. The slip correction factor is used to
-        calculate the friction factor.
-
-        See Eq 9.34 in Atmos. Chem. & Phys. (2016) for more informatiom."""
-
-        knudsen_number: float = self.knudsen_number(environment)
-        return 1 + knudsen_number * (
-            1.257 + 0.4*np.exp(-1.1/knudsen_number)
+        return mass(
+            radius=self.particle_radius,
+            density=self.particle_density,
+            shape_factor=self.shape_factor,
+            volume_void=self.volume_void,
         )
 
-    @u.wraps(u.kg / u.s, [None, None])
-    def friction_factor(self, environment: Environment) -> float:
-        """Returns a particle's friction factor.
-
-        Checks units: [N*s/m]
-
-        Property of the particle's size and surrounding medium.
-        Multiplying the friction factor by the fluid velocity
-        yields the drag force on the particle.
+    def knudsen_number(self):
+        """ Returns particle's Knudsen number.
         """
 
-        slip_correction_factor: float = self.slip_correction_factor(
-            environment
-        )
-        return (
-            6 * np.pi * environment.dynamic_viscosity() * self.radius() /
-            slip_correction_factor
+        return knu(
+            radius=self.particle_radius,
+            mfp=self.mean_free_path(),
         )
 
-    @u.wraps(u.kg, [None, None])
-    def reduced_mass(self, other) -> float:
-        """Returns the reduced mass of two particles.
-
-        Checks units: [kg]
-
-        The reduced mass is an "effective inertial" mass.
-        Allows a two-body problem to be solved as a one-body problem.
+    def slip_correction_factor(self):
+        """ Returns particle's Cunningham slip correction factor.
         """
 
-        return self.mass() * other.mass() / (self.mass() + other.mass())
+        return scf(
+            radius=self.particle_radius,
+            knu=self.knudsen_number(),
+        )
+
+    def friction_factor(self):
+        """ Returns a particle's friction factor.
+        """
+
+        return frifac(
+            radius=self.particle_radius,
+            dynamic_viscosity=self.dynamic_viscosity(),
+            scf=self.slip_correction_factor(),
+        )
 
     @u.wraps(u.kg / u.s, [None, None, None])
     def reduced_friction_factor(
