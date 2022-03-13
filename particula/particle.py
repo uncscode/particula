@@ -4,7 +4,6 @@
 from particula import u
 from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
                                  ELEMENTARY_CHARGE_VALUE)
-from particula.util.diffusive_knudsen import DiffusiveKnudsen
 from particula.util.dimensionless_coagulation import DimensionlessCoagulation
 from particula.util.friction_factor import frifac
 from particula.util.input_handling import (in_density, in_handling, in_radius,
@@ -108,7 +107,7 @@ class Particle(BaseParticle):
     def _coag_prep(self, other: "Particle"):
         """ get all related quantities to coulomb enhancement
         """
-        return DiffusiveKnudsen(
+        return DimensionlessCoagulation(
             radius=self.particle_radius,
             other_radius=other.particle_radius,
             density=self.particle_density,
@@ -154,15 +153,9 @@ class Particle(BaseParticle):
     def dimensionless_coagulation(self, other: "Particle"):
         """ Dimensionless particle--particle coagulation kernel.
         """
-        return DimensionlessCoagulation(
-            dkn_val=self.diffusive_knudsen_number(other),
-            authors=self.coagulation_approximation,
-        ).coag_less()
+        return self._coag_prep(other).coag_less()
 
     def coagulation(self, other: "Particle"):
         """ Dimensioned particle--particle coagulation kernel
         """
-        return DimensionlessCoagulation(
-            dkn_val=self.diffusive_knudsen_number(other),
-            authors=self.coagulation_approximation,
-        ).coag_full()
+        return self._coag_prep(other).coag_full()

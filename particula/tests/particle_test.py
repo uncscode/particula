@@ -62,6 +62,14 @@ def test_getters():
     )
     assert small_particle.particle_charge == 1.0
 
+def test_individual_shapes():
+    """ test individual shapes
+    """
+    assert particle.Particle(particle_radius=[1, 2]).particle_radius.m.shape == (2,)
+    assert particle.Particle(particle_radius=[1, 2]).mass().m.shape == (2,)
+    assert particle.Particle(particle_radius=[1, 2]).knudsen_number().m.shape == (2,)
+    assert particle.Particle(particle_radius=[1, 2]).friction_factor().m.shape == (2,)
+
 
 def test_knudsen_number():
     """Test that the knudsen number is calculated correctly.
@@ -108,6 +116,92 @@ def test_friction_factor():
     )
 
     assert small_particle.friction_factor().check("[mass]/[time]")
+
+
+def test_multiple_shapes():
+    """ testing multiple shapes when two dists exist
+    """
+
+    assert particle.Particle(
+        particle_radius=[1, 2],
+    ).reduced_mass(
+        other=particle.Particle(particle_radius=[1])
+    ).m.shape == (2, 1)
+    assert particle.Particle(
+        particle_radius=[1],
+    ).reduced_mass(
+        other=particle.Particle(particle_radius=[1, 2])
+    ).m.shape == (1, 2)
+
+    assert particle.Particle(
+        particle_radius=[1, 2],
+    ).reduced_friction_factor(
+        other=particle.Particle(particle_radius=[1])
+    ).m.shape == (2, 1)
+    assert particle.Particle(
+        particle_radius=[1],
+    ).reduced_friction_factor(
+        other=particle.Particle(particle_radius=[1, 2])
+    ).m.shape == (1, 2)
+
+    assert particle.Particle(
+        particle_radius=[1, 2],
+    ).coulomb_potential_ratio(
+        other=particle.Particle(particle_radius=[1])
+    ).m.shape == (2, 1)
+    assert particle.Particle(
+        particle_radius=[1],
+    ).coulomb_potential_ratio(
+        other=particle.Particle(particle_radius=[1, 2])
+    ).m.shape == (1, 2)
+
+    assert particle.Particle(
+        particle_radius=[1, 2],
+    ).diffusive_knudsen_number(
+        other=particle.Particle(particle_radius=[1])
+    ).m.shape == (2, 1)
+    assert particle.Particle(
+        particle_radius=[1],
+    ).diffusive_knudsen_number(
+        other=particle.Particle(particle_radius=[1, 2])
+    ).m.shape == (1, 2)
+
+    assert particle.Particle(
+        particle_radius=[1, 2],
+    ).dimensionless_coagulation(
+        other=particle.Particle(particle_radius=[1])
+    ).m.shape == (2, 1)
+    assert particle.Particle(
+        particle_radius=[1],
+    ).dimensionless_coagulation(
+        other=particle.Particle(particle_radius=[1, 2])
+    ).m.shape == (1, 2)
+
+    assert particle.Particle(
+        particle_radius=[1, 2],
+    ).coagulation(
+        other=particle.Particle(particle_radius=[1])
+    ).m.shape == (2, 1)
+    assert particle.Particle(
+        particle_radius=[1],
+    ).coagulation(
+        other=particle.Particle(particle_radius=[1, 2])
+    ).m.shape == (1, 2)
+
+
+def test_big_shapes():
+    """ testing big shapes
+    """
+    assert particle.Particle(
+        particle_radius=np.linspace(1, 100, 100),
+    ).dimensionless_coagulation(
+        other=particle.Particle(particle_radius=[1])
+    ).m.shape == (100, 1)
+    assert particle.Particle(
+        particle_radius=np.linspace(1, 100, 1000),
+    ).dimensionless_coagulation(
+        other=particle.Particle(particle_radius=np.linspace(1, 100, 500))
+    ).m.shape == (1000, 500)
 
 
 def test_reduced_mass():
