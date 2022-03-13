@@ -26,6 +26,9 @@
 
 """
 
+import numpy as np
+
+from particula import u
 from particula.constants import (GAS_CONSTANT, MOLECULAR_WEIGHT_AIR,
                                  REF_TEMPERATURE_STP, REF_VISCOSITY_AIR_STP,
                                  SUTHERLAND_CONSTANT)
@@ -49,7 +52,10 @@ class Environment:  # pylint: disable=too-many-instance-attributes
         """
 
         self.temperature = in_temperature(
-            kwargs.get("temperature", 298.15)
+            np.array([kwargs.get("temperature", 298.15)], ndmin=3)
+        )
+        self.pressure = in_pressure(
+            np.array([kwargs.get("pressure", 101325)], ndmin=3)
         )
         self.reference_viscosity = in_viscosity(
             kwargs.get("reference_viscosity", REF_VISCOSITY_AIR_STP)
@@ -57,10 +63,8 @@ class Environment:  # pylint: disable=too-many-instance-attributes
         self.reference_temperature = in_temperature(
             kwargs.get("reference_temperature", REF_TEMPERATURE_STP)
         )
-        self.pressure = in_pressure(
-            kwargs.get("pressure", 101325)
-        )
         self.molecular_weight = in_molecular_weight(
+
             kwargs.get("molecular_weight", MOLECULAR_WEIGHT_AIR)
         )
         self.sutherland_constant = in_temperature(
@@ -71,6 +75,13 @@ class Environment:  # pylint: disable=too-many-instance-attributes
         )
 
         self.kwargs = kwargs
+
+        if self.temperature.m.shape != self.pressure.m.shape:
+            assert (
+                self.temperature.m.size == 1
+                or
+                self.pressure.m.size == 1
+            )
 
     def dynamic_viscosity(self):
         """ Returns the dynamic viscosity in Pa*s.

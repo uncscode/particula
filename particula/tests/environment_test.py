@@ -49,10 +49,17 @@ def test_shapes():
     assert (
         environment.Environment(**inputs33).pressure.m.shape
         ==
-        (len(inputs33["pressure"]),)
+        (1, 1, len(inputs33["pressure"]))
     )
     assert (
         environment.Environment(**inputs33).dynamic_viscosity().m.shape
         ==
-        (len(inputs33["pressure"]),)
+        (1, 1, len(inputs33["pressure"]))
     )
+
+
+def test_bad_inputs():
+    """ testing mismatch in inputs of temps and pressures
+    """
+    with pytest.raises(AssertionError):
+        environment.Environment(pressure=[1, 3], temperature=[1, 5, 5])
