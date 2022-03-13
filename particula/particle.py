@@ -4,18 +4,15 @@
 import numpy as np
 
 from particula import u
-from particula.vapor import Vapor
-from particula.util.particle_mass import mass
-from particula.util.knudsen_number import knu
-from particula.util.slip_correction import scf
-from particula.util.friction_factor import frifac
-from particula.util.input_handling import (in_concentration, in_density,
-                                           in_length, in_molecular_weight,
-                                           in_scalar, in_radius)
-
 from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
                                  ELEMENTARY_CHARGE_VALUE)
 from particula.environment import Environment
+from particula.util.friction_factor import frifac
+from particula.util.input_handling import in_density, in_radius, in_scalar
+from particula.util.knudsen_number import knu
+from particula.util.particle_mass import mass
+from particula.util.slip_correction import scf
+from particula.vapor import Vapor
 
 
 class Particle(Vapor):
