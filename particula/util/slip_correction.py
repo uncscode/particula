@@ -3,10 +3,14 @@
 
 import numpy as np
 from particula.util.input_handling import in_radius, in_scalar
-from particula.util.knudsen_number import knu
+from particula.util.knudsen_number import knu as knu_func
 
 
-def scf(**kwargs):
+def scf(
+    radius=None,
+    knu=None,
+    **kwargs
+):
     """ Returns particle's Cunningham slip correction factor.
 
         Dimensionless quantity accounting for non-continuum effects
@@ -55,12 +59,12 @@ def scf(**kwargs):
             refer to particula.util.knudsen_number.knu for more info.
 
     """
-
-    radius = kwargs.get("radius", None)
-    knu_val = kwargs.get("knu", knu(**kwargs))
-
     radius = in_radius(radius)
-    knu_val = in_scalar(knu_val)
+
+    if knu is None:
+        knu_val = knu_func(radius=radius, **kwargs)
+    else:
+        knu_val = in_scalar(knu)
 
     return 1 + knu_val * (
         1.257 + 0.4*np.exp(-1.1/knu_val)
