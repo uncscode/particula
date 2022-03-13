@@ -10,10 +10,11 @@ import numpy as np
 from particula import u
 from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
                                  ELEMENTARY_CHARGE_VALUE)
-from particula.util.input_handling import in_radius, in_scalar, in_temperature
+from particula.util.input_handling import (in_handling, in_radius, in_scalar,
+                                           in_temperature)
 
 
-class CoulombEnhancement:
+class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
 
     """ Calculate coulomb-related enhancements
 
@@ -25,23 +26,35 @@ class CoulombEnhancement:
             temperature     (float) [K]             (default: 298)
     """
 
-    def __init__(self, **kwargs):
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        radius=None,
+        other_radius=None,
+        charge=0,
+        other_charge=0,
+        temperature=298,
+        elementary_charge_value=ELEMENTARY_CHARGE_VALUE,
+        electric_permittivity=ELECTRIC_PERMITTIVITY,
+        boltzmann_constant=BOLTZMANN_CONSTANT,
+        **kwargs
+    ):
+        """ Initialize CoulombEnhancement object
+        """
 
-        radius = kwargs.get("radius", "None")
-        other_radius = kwargs.get("other_radius", radius)
-        charge = kwargs.get("charge", 0)
-        other_charge = kwargs.get("other_charge", 0)
-        temperature = kwargs.get("temperature", 298)
+        other_radius = radius if other_radius is None else other_radius
 
         self.radius = in_radius(radius)
         self.other_radius = in_radius(other_radius)
         self.charge = in_scalar(charge)
         self.other_charge = in_scalar(other_charge)
         self.temperature = in_temperature(temperature)
+        self.elem_char_val = in_handling(elementary_charge_value, u.C)
+        self.elec_perm = in_handling(electric_permittivity, u.F/u.m)
+        self.boltz_const = in_handling(
+            boltzmann_constant, u.m**2*u.kg/u.s**2/u.K
+        )
 
-        # self.elem_char_val = ELEMENTARY_CHARGE_VALUE
-        # self.elec_perm = ELECTRIC_PERMITTIVITY
-        # self.boltz_const = BOLTZMANN_CONSTANT
+        self.kwargs = kwargs
 
         if np.array(self.temperature.m).size > 1:
             raise ValueError(
@@ -75,20 +88,16 @@ class CoulombEnhancement:
                                 (float) [dimensionless]
         """
 
-        elem_char_val = ELEMENTARY_CHARGE_VALUE
-        elec_perm = ELECTRIC_PERMITTIVITY
-        boltz_const = BOLTZMANN_CONSTANT
-
         numerator = -1 * self.charge * self.other_charge * (
-            elem_char_val ** 2
+            self.elem_char_val ** 2
         )
-        denominator = 4 * np.pi * elec_perm * (
+        denominator = 4 * np.pi * self.elec_perm * (
             np.transpose([self.radius.m])*self.radius.u +
             self.other_radius
         )
 
         return numerator / (
-            denominator * boltz_const * self.temperature
+            denominator * self.boltz_const * self.temperature
         )
 
     def coulomb_enhancement_kinetic_limit(self):
@@ -134,35 +143,30 @@ class CoulombEnhancement:
         ).to_base_units()
 
 
+def cpr(**kwargs):
+    """ Calculate coulomb potential ratio
+    """
+    return CoulombEnhancement(**kwargs).coulomb_potential_ratio()
+
+
 def cekl(**kwargs):
     """ Calculate coulombic enhancement kinetic limit
-
-        Parameters:
-            radius          (float) [m]
-            other_radius    (float) [m]             (default: radius)
-            charge          (float) [dimensionless] (default: 0)
-            other_charge    (float) [dimensionless] (default: 0)
-            temperature     (float) [K]             (default: 298)
-
-        Returns:
-                                (float) [dimensionless]
     """
-
     return CoulombEnhancement(**kwargs).coulomb_enhancement_kinetic_limit()
 
 
 def cecl(**kwargs):
     """ Calculate coulombic enhancement continuum limit
-
-        Parameters:
-            radius          (float) [m]
-            other_radius    (float) [m]             (default: radius)
-            charge          (float) [dimensionless] (default: 0)
-            other_charge    (float) [dimensionless] (default: 0)
-            temperature     (float) [K]             (default: 298)
-
-        Returns:
-                                (float) [dimensionless]
     """
-
     return CoulombEnhancement(**kwargs).coulomb_enhancement_continuum_limit()
+
+
+def coulomb_enhancement_all(**kwargs):
+    """ Return all the values above in one call
+    """
+    cea = CoulombEnhancement(**kwargs)
+    return (
+        cea.coulomb_potential_ratio(),
+        cea.coulomb_enhancement_kinetic_limit(),
+        cea.coulomb_enhancement_continuum_limit()
+    )

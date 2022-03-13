@@ -2,15 +2,17 @@
 """
 
 import numpy as np
+from particula import u
 
 from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
                                  ELEMENTARY_CHARGE_VALUE)
 from particula.util.friction_factor import frifac
-from particula.util.input_handling import in_density, in_radius, in_scalar
+from particula.util.input_handling import in_handling, in_density, in_radius, in_scalar
 from particula.util.knudsen_number import knu
 from particula.util.particle_mass import mass
 from particula.util.reduced_quantity import reduced_quantity
 from particula.util.slip_correction import scf
+from particula.util.coulomb_enhancement import coulomb_enhancement_all as cea
 from particula.vapor import Vapor
 
 
@@ -90,6 +92,18 @@ class Particle(BaseParticle):
 
         super().__init__(**kwargs)
 
+        self.elementary_charge_value = in_handling(
+            kwargs.get('elementary_charge_value', ELEMENTARY_CHARGE_VALUE),
+            u.C
+        )
+        self.electric_permittivity = in_handling(
+            kwargs.get('electric_permittivity', ELECTRIC_PERMITTIVITY),
+            u.F/u.m
+        )
+        self.boltzmann_constant = in_handling(
+            kwargs.get('boltzmann_constant', BOLTZMANN_CONSTANT),
+            u.m**2*u.kg/u.s**2/u.K
+        )
         self.kwargs = kwargs
 
     def reduced_mass(self, other: 'Particle'):
@@ -110,56 +124,42 @@ class Particle(BaseParticle):
             b_quantity=other.friction_factor(),
         )
 
-    def coulomb_potential_ratio(
-        self, other,
-    ) -> float:
-        """Calculates the Coulomb potential ratio.
-
-        Checks units: [dimensionless]
+    def _coulomb_enhancement(self, other):
+        """ get all related quantities to coulomb enhancement
         """
 
-        numerator = -1 * self.particle_charge * other.particle_charge * (
-            ELEMENTARY_CHARGE_VALUE ** 2
+        return cea(
+            radius=self.particle_radius,
+            other_radius=other.particle_radius,
+            charge=self.particle_charge,
+            other_charge=other.particle_charge,
+            temperature=self.temperature,
+            elementary_charge_value=self.elementary_charge_value,
+            electric_permittivity=self.electric_permittivity,
+            boltzmann_constant=self.boltzmann_constant,
         )
-        denominator = 4 * np.pi * ELECTRIC_PERMITTIVITY * (
-            self.particle_radius + other.particle_radius
-        )
-        return (
-            numerator /
-            (denominator * BOLTZMANN_CONSTANT * self.temperature)
-        )
+
+    def coulomb_potential_ratio(
+        self, other,
+    ):
+        """ Calculates the Coulomb potential ratio.
+        """
+        return self._coulomb_enhancement(other)[0]
 
     def coulomb_enhancement_kinetic_limit(
         self, other,
-    ) -> float:
-        """Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
-
-        Checks units: [dimensionless]
+    ):
+        """ Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
         """
-
-        coulomb_potential_ratio = self.coulomb_potential_ratio(
-            other,
-        )
-        return (
-            1 + coulomb_potential_ratio if coulomb_potential_ratio >= 0
-
-            else np.exp(coulomb_potential_ratio)
-        )
+        return self._coulomb_enhancement(other)[1]
 
     def coulomb_enhancement_continuum_limit(
         self, other,
-    ) -> float:
-        """Continuum limit of Coulomb enhancement for particle--particle coagulation.
-
-        Checks units: [dimensionless]
+    ):
+        """ Continuum limit of Coulomb enhancement for particle--particle coagulation.
         """
+        return self._coulomb_enhancement(other)[2]
 
-        coulomb_potential_ratio = self.coulomb_potential_ratio(
-            other
-        )
-        return coulomb_potential_ratio / (
-            1 - np.exp(-1*coulomb_potential_ratio)
-        ) if coulomb_potential_ratio != 0 else 1
 
     def diffusive_knudsen_number(
         self, other,

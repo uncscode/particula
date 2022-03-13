@@ -120,17 +120,24 @@ def test_reduced_friction_factor():
     assert reduced_friction_factor_1_2.check("[mass]/[time]")
 
 
-def test_dimensionless_coagulation_kernel_parameterized():
-    """Test that the paramaterized dimensionless coagulation kernel
-    is calculated correctly.
+def test_coulomb_enh():
+    """ testing coulomb enh
     """
+    assert (
+        small_particle.coulomb_potential_ratio(large_particle).u
+        == u.dimensionless
+    )
+# def test_dimensionless_coagulation_kernel_parameterized():
+#     """Test that the paramaterized dimensionless coagulation kernel
+#     is calculated correctly.
+#     """
 
-    assert small_particle.dimensionless_coagulation_kernel_parameterized(
-        large_particle,
-    ) == pytest.approx(0.003, rel=10)
-    assert small_particle.dimensionless_coagulation_kernel_parameterized(
-        large_particle,
-    ).check(["None"])
+#     assert small_particle.dimensionless_coagulation_kernel_parameterized(
+#         large_particle,
+#     ) == pytest.approx(0.003, rel=10)
+#     assert small_particle.dimensionless_coagulation_kernel_parameterized(
+#         large_particle,
+#     ).check(["None"])
 
 
 # def test_dimensioned_coagulation_kernel():
