@@ -3,31 +3,31 @@
 
 import numpy as np
 from particula.constants import BOLTZMANN_CONSTANT
-from particula.util.coulomb_enhancement import cecl, cekl
+from particula.util.coulomb_enhancement import CoulombEnhancement, coulomb_enhancement_all
 from particula.util.friction_factor import frifac
-from particula.util.input_handling import in_density, in_radius, in_temperature
+from particula.util.input_handling import in_density
 from particula.util.particle_mass import mass
 from particula.util.reduced_quantity import reduced_quantity
 
 
-class DiffusiveKnudsen:
+class DiffusiveKnudsen(CoulombEnhancement):
     """ A class for Diff..Knu
     """
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        density=1000,
+        other_density=None,
+        **kwargs
+    ):
         """ define properties """
 
-        radius = kwargs.get("radius", None)
-        other_radius = kwargs.get("other_radius", radius)
-        density = kwargs.get("density", 1000)
-        other_density = kwargs.get("other_density", density)
-        temperature = kwargs.get("temperature", 298)
+        super().__init__(**kwargs)
 
-        self.radius = in_radius(radius)
-        self.other_radius = in_radius(other_radius)
         self.density = in_density(density)
-        self.other_density = in_density(other_density)
-        self.temperature = in_temperature(temperature)
+        self.other_density = self.density if other_density is None \
+            else in_density(other_density)
+
         self.kwargs = kwargs
 
     def get_red_mass(self):
@@ -62,12 +62,18 @@ class DiffusiveKnudsen:
             frifac(radius=self.other_radius, **other_frifac_kwargs)
         )
 
+    def get_ces(self):
+        """ get coulomb enhancement parameters
+        """
+        lkwargs = self.kwargs.copy()
+        return coulomb_enhancement_all(**lkwargs)
+
     def get_celimits(self):
         """ get coag enh limits
         """
 
         lkwargs = self.kwargs.copy()
-        return (cekl(**lkwargs), cecl(**lkwargs))
+        return coulomb_enhancement_all(**lkwargs)[1:]
 
     def get_diff_knu(self):
         """ calculate it
@@ -143,6 +149,13 @@ def red_frifac(**kwargs):
     """
 
     return DiffusiveKnudsen(**kwargs).get_red_frifac()
+
+
+def ces(**kwargs):
+    """ get the coulomb enhancement limits
+    """
+
+    return DiffusiveKnudsen(**kwargs).get_ces()
 
 
 def celimits(**kwargs):

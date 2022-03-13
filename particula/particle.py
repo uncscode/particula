@@ -10,9 +10,8 @@ from particula.util.friction_factor import frifac
 from particula.util.input_handling import in_handling, in_density, in_radius, in_scalar
 from particula.util.knudsen_number import knu
 from particula.util.particle_mass import mass
-from particula.util.reduced_quantity import reduced_quantity
 from particula.util.slip_correction import scf
-from particula.util.coulomb_enhancement import coulomb_enhancement_all as cea
+from particula.util.diffusive_knudsen import DiffusiveKnudsen
 from particula.vapor import Vapor
 
 
@@ -106,31 +105,15 @@ class Particle(BaseParticle):
         )
         self.kwargs = kwargs
 
-    def reduced_mass(self, other: 'Particle'):
-        """ Returns the reduced mass.
-        """
-
-        return reduced_quantity(
-            a_quantity=self.mass(),
-            b_quantity=other.mass(),
-        )
-
-    def reduced_friction_factor(self, other: 'Particle'):
-        """ Returns the reduced friction factor between two particles.
-        """
-
-        return reduced_quantity(
-            a_quantity=self.friction_factor(),
-            b_quantity=other.friction_factor(),
-        )
-
-    def _coulomb_enhancement(self, other):
+    def _coag_prep(self, other: 'Particle'):
         """ get all related quantities to coulomb enhancement
         """
 
-        return cea(
+        return DiffusiveKnudsen(
             radius=self.particle_radius,
             other_radius=other.particle_radius,
+            density=self.particle_density,
+            other_density=other.particle_density,
             charge=self.particle_charge,
             other_charge=other.particle_charge,
             temperature=self.temperature,
@@ -139,56 +122,38 @@ class Particle(BaseParticle):
             boltzmann_constant=self.boltzmann_constant,
         )
 
-    def coulomb_potential_ratio(
-        self, other,
-    ):
+    def reduced_mass(self, other: 'Particle'):
+        """ Returns the reduced mass.
+        """
+
+        return self._coag_prep(other).get_red_mass()
+
+    def reduced_friction_factor(self, other: 'Particle'):
+        """ Returns the reduced friction factor between two particles.
+        """
+
+        return self._coag_prep(other).get_red_frifac()
+
+    def coulomb_potential_ratio(self, other: 'Particle'):
         """ Calculates the Coulomb potential ratio.
         """
-        return self._coulomb_enhancement(other)[0]
+        return self._coag_prep(other).get_ces()[0]
 
-    def coulomb_enhancement_kinetic_limit(
-        self, other,
-    ):
+    def coulomb_enhancement_kinetic_limit(self, other: 'Particle'):
         """ Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
         """
-        return self._coulomb_enhancement(other)[1]
+        return self._coag_prep(other).get_ces()[1]
 
-    def coulomb_enhancement_continuum_limit(
-        self, other,
-    ):
+    def coulomb_enhancement_continuum_limit(self, other: 'Particle'):
         """ Continuum limit of Coulomb enhancement for particle--particle coagulation.
         """
-        return self._coulomb_enhancement(other)[2]
+        return self._coag_prep(other).get_ces()[2]
 
 
-    def diffusive_knudsen_number(
-        self, other,
-    ) -> float:
-        """Diffusive Knudsen number.
-
-        Checks units: [dimensionless]
-
-        The *diffusive* Knudsen number is different from Knudsen number.
-        Ratio of:
-
-            - numerator: mean persistence of one particle
-            - denominator: effective length scale of
-                particle--particle Coulombic interaction
+    def diffusive_knudsen_number(self, other: 'Particle'):
+        """ Diffusive Knudsen number.
         """
-
-        numerator = (
-            (
-                self.temperature * BOLTZMANN_CONSTANT
-                * self.reduced_mass(other)
-            )**0.5
-            / self.reduced_friction_factor(other)
-        )
-        denominator = (
-            (self.particle_radius + other.particle_radius)
-            * self.coulomb_enhancement_kinetic_limit(other)
-            / self.coulomb_enhancement_continuum_limit(other)
-        )
-        return numerator / denominator
+        return self._coag_prep(other).get_diff_knu()
 
     def dimensionless_coagulation_kernel_hard_sphere(
         self, other,
