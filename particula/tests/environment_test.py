@@ -12,6 +12,10 @@ inputs33 = {
     "temperature": [298.15, 299, 300],
     "pressure": [101325, 101330, 101335]
 }
+inputs31 = {
+    "temperature": [298.15, 299, 300],
+    "pressure": [101325]
+}
 standard_environment = environment.Environment(
     **inputs
 )
@@ -53,6 +57,11 @@ def test_shapes():
     )
     assert (
         environment.Environment(**inputs33).dynamic_viscosity().m.shape
+        ==
+        (1, 1, len(inputs33["pressure"]))
+    )
+    assert (
+        environment.Environment(**inputs31).mean_free_path().m.shape
         ==
         (1, 1, len(inputs33["pressure"]))
     )
