@@ -3,19 +3,18 @@
 
 import numpy as np
 
-from particula import u
 from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
                                  ELEMENTARY_CHARGE_VALUE)
-from particula.environment import Environment
 from particula.util.friction_factor import frifac
 from particula.util.input_handling import in_density, in_radius, in_scalar
 from particula.util.knudsen_number import knu
 from particula.util.particle_mass import mass
+from particula.util.reduced_quantity import reduced_quantity
 from particula.util.slip_correction import scf
 from particula.vapor import Vapor
 
 
-class Particle(Vapor):
+class BaseParticle(Vapor):
     """ based on the Vapor(Environment) class
     """
 
@@ -80,51 +79,58 @@ class Particle(Vapor):
             scf=self.slip_correction_factor(),
         )
 
-    @u.wraps(u.kg / u.s, [None, None, None])
-    def reduced_friction_factor(
-        self, other, environment: Environment
-    ) -> float:
-        """Returns the reduced friction factor between two particles.
 
-        Checks units: [N*s/m]
+class Particle(BaseParticle):
+    """ expanding on BaseParticle
+    """
 
-        Similar to the reduced mass.
-        The reduced friction factor allows a two-body problem
-        to be solved as a one-body problem.
+    def __init__(self, **kwargs):
+        """ particle objects.
         """
 
-        return (
-            self.friction_factor(environment)
-            * other.friction_factor(environment)
-            / (
-                self.friction_factor(environment)
-                + other.friction_factor(environment)
-            )
+        super().__init__(**kwargs)
+
+        self.kwargs = kwargs
+
+    def reduced_mass(self, other: 'Particle'):
+        """ Returns the reduced mass.
+        """
+
+        return reduced_quantity(
+            a_quantity=self.mass(),
+            b_quantity=other.mass(),
         )
 
-    @u.wraps(u.dimensionless, [None, None, None])
+    def reduced_friction_factor(self, other: 'Particle'):
+        """ Returns the reduced friction factor between two particles.
+        """
+
+        return reduced_quantity(
+            a_quantity=self.friction_factor(),
+            b_quantity=other.friction_factor(),
+        )
+
     def coulomb_potential_ratio(
-        self, other, environment: Environment
+        self, other,
     ) -> float:
         """Calculates the Coulomb potential ratio.
 
         Checks units: [dimensionless]
         """
 
-        numerator = -1 * self.charge() * other.charge() * (
+        numerator = -1 * self.particle_charge * other.particle_charge * (
             ELEMENTARY_CHARGE_VALUE ** 2
         )
         denominator = 4 * np.pi * ELECTRIC_PERMITTIVITY * (
-            self.radius() + other.radius()
+            self.particle_radius + other.particle_radius
         )
         return (
             numerator /
-            (denominator * BOLTZMANN_CONSTANT * environment.temperature)
+            (denominator * BOLTZMANN_CONSTANT * self.temperature)
         )
 
-    @u.wraps(u.dimensionless, [None, None, None])
     def coulomb_enhancement_kinetic_limit(
-        self, other, environment: Environment
+        self, other,
     ) -> float:
         """Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
 
@@ -132,7 +138,7 @@ class Particle(Vapor):
         """
 
         coulomb_potential_ratio = self.coulomb_potential_ratio(
-            other, environment
+            other,
         )
         return (
             1 + coulomb_potential_ratio if coulomb_potential_ratio >= 0
@@ -140,9 +146,8 @@ class Particle(Vapor):
             else np.exp(coulomb_potential_ratio)
         )
 
-    @u.wraps(u.dimensionless, [None, None, None])
     def coulomb_enhancement_continuum_limit(
-        self, other, environment: Environment
+        self, other,
     ) -> float:
         """Continuum limit of Coulomb enhancement for particle--particle coagulation.
 
@@ -150,15 +155,14 @@ class Particle(Vapor):
         """
 
         coulomb_potential_ratio = self.coulomb_potential_ratio(
-            other, environment
+            other
         )
         return coulomb_potential_ratio / (
             1 - np.exp(-1*coulomb_potential_ratio)
         ) if coulomb_potential_ratio != 0 else 1
 
-    @u.wraps(u.dimensionless, [None, None, None])
     def diffusive_knudsen_number(
-        self, other, environment: Environment
+        self, other,
     ) -> float:
         """Diffusive Knudsen number.
 
@@ -174,21 +178,20 @@ class Particle(Vapor):
 
         numerator = (
             (
-                environment.temperature * BOLTZMANN_CONSTANT
+                self.temperature * BOLTZMANN_CONSTANT
                 * self.reduced_mass(other)
             )**0.5
-            / self.reduced_friction_factor(other, environment)
+            / self.reduced_friction_factor(other)
         )
         denominator = (
-            (self.radius() + other.radius())
-            * self.coulomb_enhancement_kinetic_limit(other, environment)
-            / self.coulomb_enhancement_continuum_limit(other, environment)
+            (self.particle_radius + other.particle_radius)
+            * self.coulomb_enhancement_kinetic_limit(other)
+            / self.coulomb_enhancement_continuum_limit(other)
         )
         return numerator / denominator
 
-    @u.wraps(u.dimensionless, [None, None, None])
     def dimensionless_coagulation_kernel_hard_sphere(
-        self, other, environment: Environment
+        self, other,
     ) -> float:
         """Dimensionless particle--particle coagulation kernel.
 
@@ -202,7 +205,7 @@ class Particle(Vapor):
         hsc3 = 3.502
         hsc4 = 7.211
         diffusive_knudsen_number = self.diffusive_knudsen_number(
-            other, environment
+            other
         )
 
         numerator = (
@@ -218,9 +221,8 @@ class Particle(Vapor):
         )
         return numerator / denominator
 
-    @u.wraps(u.dimensionless, [None, None, None])
     def collision_kernel_continuum_limit(
-        self, other, environment: Environment
+        self, other,
     ) -> float:
         """Continuum limit of collision kernel.
 
@@ -228,13 +230,12 @@ class Particle(Vapor):
         """
 
         diffusive_knudsen_number = self.diffusive_knudsen_number(
-            other, environment
+            other,
         )
         return 4 * np.pi * (diffusive_knudsen_number**2)
 
-    @u.wraps(u.dimensionless, [None, None, None])
     def collision_kernel_kinetic_limit(
-        self, other, environment: Environment
+        self, other,
     ) -> float:
         """Kinetic limit of collision kernel.
 
@@ -242,15 +243,13 @@ class Particle(Vapor):
         """
 
         diffusive_knudsen_number = self.diffusive_knudsen_number(
-            other, environment
+            other,
         )
         return np.sqrt(8 * np.pi) * diffusive_knudsen_number
 
-    @u.wraps(u.dimensionless, [None, None, None, None])
     def dimensionless_coagulation_kernel_parameterized(
         self,
         other,
-        environment: Environment,
         authors: str = "cg2019",
     ) -> float:
         """Dimensionless particle--particle coagulation kernel.
@@ -274,29 +273,29 @@ class Particle(Vapor):
             corra = 2.5
             corrb = (
                 4.528*np.exp(-1.088*self.coulomb_potential_ratio(
-                    other, environment
+                    other,
                 ))
             ) + (
                 0.7091*np.log(1 + 1.527*self.coulomb_potential_ratio(
-                    other, environment
+                    other,
                 ))
             )
 
             corrc = (11.36)*(self.coulomb_potential_ratio(
-                other, environment
+                other,
             )**0.272) - 10.33
             corrk = - 0.003533*self.coulomb_potential_ratio(
-                other, environment
+                other,
             ) + 0.05971
 
             # mu for the parameterization
             corr_mu = (corrc/corra)*(
                 (1 + corrk*((np.log(
-                    self.diffusive_knudsen_number(other, environment)
+                    self.diffusive_knudsen_number(other,)
                 ) - corrb)/corra))**((-1/corrk) - 1)
             ) * (
                 np.exp(-(1 + corrk*(np.log(
-                    self.diffusive_knudsen_number(other, environment)
+                    self.diffusive_knudsen_number(other,)
                 ) - corrb)/corra)**(- 1/corrk))
             )
 
@@ -307,33 +306,33 @@ class Particle(Vapor):
                 #     other, environment
                 # ) <= 0 else
                 self.dimensionless_coagulation_kernel_hard_sphere(
-                    other, environment
+                    other,
                 )*np.exp(corr_mu)
             )
 
         elif authors == "gh2012":
             numerator = self.coulomb_enhancement_continuum_limit(
-                other, environment
+                other,
             )
 
             denominator = 1 + 1.598*(np.minimum(
-                self.diffusive_knudsen_number(other, environment),
-                3*self.diffusive_knudsen_number(other, environment)/2
-                / self.coulomb_potential_ratio(other, environment)
+                self.diffusive_knudsen_number(other,),
+                3*self.diffusive_knudsen_number(other,)/2
+                / self.coulomb_potential_ratio(other,)
             ))**1.1709
 
             answer = (
                 self.dimensionless_coagulation_kernel_hard_sphere(
-                    other, environment
+                    other,
                 ) if self.coulomb_potential_ratio(
-                    other, environment
+                    other,
                 ) <= 0.5 else
                 numerator / denominator
             )
 
         elif authors == "hard_sphere":
             answer = self.dimensionless_coagulation_kernel_hard_sphere(
-                other, environment
+                other,
             )
 
         if authors not in ["gh2012", "hard_sphere", "cg2019"]:
@@ -341,11 +340,9 @@ class Particle(Vapor):
 
         return answer
 
-    @u.wraps(u.m**3 / u.s, [None, None, None, None])
     def dimensioned_coagulation_kernel(
         self,
         other,
-        environment: Environment,
         authors: str = "cg2019",
     ) -> float:
         """Dimensioned particle--particle coagulation kernel.
@@ -366,16 +363,16 @@ class Particle(Vapor):
 
         return (
             self.dimensionless_coagulation_kernel_parameterized(
-                other, environment, authors
+                other, authors
             ) * self.reduced_friction_factor(
-                other, environment
+                other,
             ) * (
-                self.radius() + other.radius()
+                self.particle_radius + other.particle_radius
             )**3 * self.coulomb_enhancement_kinetic_limit(
-                other, environment
+                other,
             )**2 / self.reduced_mass(
                 other
             ) / self.coulomb_enhancement_continuum_limit(
-                other, environment
+                other,
             )
         )
