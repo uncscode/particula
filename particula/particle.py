@@ -39,12 +39,12 @@ class BaseParticle(Vapor):
         self.particle_charge = in_scalar(
             kwargs.get("particle_charge", 0)
         )
+
         self.kwargs = kwargs
 
     def mass(self):
         """ Returns mass of particle.
         """
-
         return mass(
             radius=self.particle_radius,
             density=self.particle_density,
@@ -55,7 +55,6 @@ class BaseParticle(Vapor):
     def knudsen_number(self):
         """ Returns particle's Knudsen number.
         """
-
         return knu(
             radius=self.particle_radius,
             mfp=self.mean_free_path(),
@@ -64,7 +63,6 @@ class BaseParticle(Vapor):
     def slip_correction_factor(self):
         """ Returns particle's Cunningham slip correction factor.
         """
-
         return scf(
             radius=self.particle_radius,
             knu=self.knudsen_number(),
@@ -73,7 +71,6 @@ class BaseParticle(Vapor):
     def friction_factor(self):
         """ Returns a particle's friction factor.
         """
-
         return frifac(
             radius=self.particle_radius,
             dynamic_viscosity=self.dynamic_viscosity(),
@@ -88,7 +85,6 @@ class Particle(BaseParticle):
     def __init__(self, **kwargs):
         """ particle objects.
         """
-
         super().__init__(**kwargs)
 
         self.elementary_charge_value = in_handling(
@@ -106,12 +102,12 @@ class Particle(BaseParticle):
         self.coagulation_approximation = str(
             kwargs.get("coagulation_approximation", "hardsphere")
         )
+
         self.kwargs = kwargs
 
     def _coag_prep(self, other: "Particle"):
         """ get all related quantities to coulomb enhancement
         """
-
         return DiffusiveKnudsen(
             radius=self.particle_radius,
             other_radius=other.particle_radius,
@@ -128,13 +124,11 @@ class Particle(BaseParticle):
     def reduced_mass(self, other: "Particle"):
         """ Returns the reduced mass.
         """
-
         return self._coag_prep(other).get_red_mass()
 
     def reduced_friction_factor(self, other: "Particle"):
         """ Returns the reduced friction factor between two particles.
         """
-
         return self._coag_prep(other).get_red_frifac()
 
     def coulomb_potential_ratio(self, other: "Particle"):
