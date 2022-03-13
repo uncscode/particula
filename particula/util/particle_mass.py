@@ -39,9 +39,7 @@ def mass(
         Returns:
                          (float) [kg]
     """
-    if kwargs:
-        pass
-
+    _ = kwargs.get("something", None)
     radius = in_radius(radius)
     density = in_density(density)
     shape_factor = in_scalar(shape_factor)

@@ -61,10 +61,8 @@ def scf(
     """
     radius = in_radius(radius)
 
-    if knu is None:
-        knu_val = knu_func(radius=radius, **kwargs)
-    else:
-        knu_val = in_scalar(knu)
+    knu_val = knu_func(radius=radius, **kwargs) if knu is None \
+        else in_scalar(knu)
 
     return 1 + knu_val * (
         1.257 + 0.4*np.exp(-1.1/knu_val)

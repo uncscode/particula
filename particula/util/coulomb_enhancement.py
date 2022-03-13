@@ -39,6 +39,10 @@ class CoulombEnhancement:
         self.other_charge = in_scalar(other_charge)
         self.temperature = in_temperature(temperature)
 
+        # self.elem_char_val = ELEMENTARY_CHARGE_VALUE
+        # self.elec_perm = ELECTRIC_PERMITTIVITY
+        # self.boltz_const = BOLTZMANN_CONSTANT
+
         if np.array(self.temperature.m).size > 1:
             raise ValueError(
                 f"\t\n"
