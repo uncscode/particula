@@ -62,13 +62,21 @@ def test_getters():
     )
     assert small_particle.particle_charge == 1.0
 
+
 def test_individual_shapes():
     """ test individual shapes
     """
-    assert particle.Particle(particle_radius=[1, 2]).particle_radius.m.shape == (2,)
-    assert particle.Particle(particle_radius=[1, 2]).mass().m.shape == (2,)
-    assert particle.Particle(particle_radius=[1, 2]).knudsen_number().m.shape == (2,)
-    assert particle.Particle(particle_radius=[1, 2]).friction_factor().m.shape == (2,)
+    assert particle.Particle(
+        particle_radius=[1, 2]
+    ).particle_radius.m.shape == (2,)
+    assert particle.Particle(
+        particle_radius=[1, 2]
+    ).mass().m.shape == (2,)
+    assert particle.Particle(
+        particle_radius=[1, 2]
+    ).knudsen_number().m.shape == (2,)
+    assert particle.Particle(
+        particle_radius=[1, 2]).friction_factor().m.shape == (2,)
 
 
 def test_knudsen_number():
