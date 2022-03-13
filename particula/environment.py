@@ -28,7 +28,6 @@
 
 import numpy as np
 
-from particula import u
 from particula.constants import (GAS_CONSTANT, MOLECULAR_WEIGHT_AIR,
                                  REF_TEMPERATURE_STP, REF_VISCOSITY_AIR_STP,
                                  SUTHERLAND_CONSTANT)
@@ -51,12 +50,12 @@ class Environment:  # pylint: disable=too-many-instance-attributes
         """ Initiate the environment class with base attrs.
         """
 
-        self.temperature = in_temperature(
-            np.array([kwargs.get("temperature", 298.15)], ndmin=3)
-        )
-        self.pressure = in_pressure(
-            np.array([kwargs.get("pressure", 101325)], ndmin=3)
-        )
+        self.temperature = np.array([in_temperature(
+            kwargs.get("temperature", 298.15)
+        ).m], ndmin=3) * in_temperature(1).u
+        self.pressure = np.array([in_pressure(
+            kwargs.get("pressure", 101325)
+        ).m], ndmin=3) * in_pressure(1).u
         self.reference_viscosity = in_viscosity(
             kwargs.get("reference_viscosity", REF_VISCOSITY_AIR_STP)
         )
