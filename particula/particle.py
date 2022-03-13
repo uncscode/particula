@@ -1,17 +1,17 @@
 """ the particule class
 """
 
-import numpy as np
 from particula import u
-
 from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
                                  ELEMENTARY_CHARGE_VALUE)
+from particula.util.diffusive_knudsen import DiffusiveKnudsen
+from particula.util.dimensionless_coagulation import DimensionlessCoagulation
 from particula.util.friction_factor import frifac
-from particula.util.input_handling import in_handling, in_density, in_radius, in_scalar
+from particula.util.input_handling import (in_density, in_handling, in_radius,
+                                           in_scalar)
 from particula.util.knudsen_number import knu
 from particula.util.particle_mass import mass
 from particula.util.slip_correction import scf
-from particula.util.diffusive_knudsen import DiffusiveKnudsen
 from particula.vapor import Vapor
 
 
@@ -149,7 +149,6 @@ class Particle(BaseParticle):
         """
         return self._coag_prep(other).get_ces()[2]
 
-
     def diffusive_knudsen_number(self, other: 'Particle'):
         """ Diffusive Knudsen number.
         """
@@ -157,187 +156,168 @@ class Particle(BaseParticle):
 
     def dimensionless_coagulation_kernel_hard_sphere(
         self, other,
-    ) -> float:
+    ):
         """Dimensionless particle--particle coagulation kernel.
-
-        Checks units: [dimensionless]
         """
-
-        # Constants for the chargeless hard-sphere limit
-        # see doi:
-        hsc1 = 25.836
-        hsc2 = 11.211
-        hsc3 = 3.502
-        hsc4 = 7.211
-        diffusive_knudsen_number = self.diffusive_knudsen_number(
-            other
+        return DimensionlessCoagulation(
+            dkn_val=self.diffusive_knudsen_number(other),
+            authors="hardshpere",
         )
 
-        numerator = (
-            (4 * np.pi * diffusive_knudsen_number**2)
-            + (hsc1 * diffusive_knudsen_number**3)
-            + ((8 * np.pi)**(1/2) * hsc2 * diffusive_knudsen_number**4)
-        )
-        denominator = (
-            1
-            + hsc3 * diffusive_knudsen_number
-            + hsc4 * diffusive_knudsen_number**2
-            + hsc2 * diffusive_knudsen_number**3
-        )
-        return numerator / denominator
+    # TO BE UPDATED LATER IN UTIL FIRST:
+    # THEN WILL BE UPDATED HERE.
+    # def collision_kernel_continuum_limit(
+    #     self, other,
+    # ) -> float:
+    #     """Continuum limit of collision kernel.
 
-    def collision_kernel_continuum_limit(
-        self, other,
-    ) -> float:
-        """Continuum limit of collision kernel.
+    #     Checks units: [dimensionless]
+    #     """
 
-        Checks units: [dimensionless]
-        """
+    #     diffusive_knudsen_number = self.diffusive_knudsen_number(
+    #         other,
+    #     )
+    #     return 4 * np.pi * (diffusive_knudsen_number**2)
 
-        diffusive_knudsen_number = self.diffusive_knudsen_number(
-            other,
-        )
-        return 4 * np.pi * (diffusive_knudsen_number**2)
+    # def collision_kernel_kinetic_limit(
+    #     self, other,
+    # ) -> float:
+    #     """Kinetic limit of collision kernel.
 
-    def collision_kernel_kinetic_limit(
-        self, other,
-    ) -> float:
-        """Kinetic limit of collision kernel.
+    #     Checks units: [dimensionless]
+    #     """
 
-        Checks units: [dimensionless]
-        """
+    #     diffusive_knudsen_number = self.diffusive_knudsen_number(
+    #         other,
+    #     )
+    #     return np.sqrt(8 * np.pi) * diffusive_knudsen_number
 
-        diffusive_knudsen_number = self.diffusive_knudsen_number(
-            other,
-        )
-        return np.sqrt(8 * np.pi) * diffusive_knudsen_number
+    # def dimensionless_coagulation_kernel_parameterized(
+    #     self,
+    #     other,
+    #     authors: str = "cg2019",
+    # ) -> float:
+    #     """Dimensionless particle--particle coagulation kernel.
 
-    def dimensionless_coagulation_kernel_parameterized(
-        self,
-        other,
-        authors: str = "cg2019",
-    ) -> float:
-        """Dimensionless particle--particle coagulation kernel.
+    #     Checks units: [dimensionless]
 
-        Checks units: [dimensionless]
+    #     Paramaters:
 
-        Paramaters:
+    #         self:           particle 1
+    #         other:          particle 2
+    #         environment:    environment conditions
+    #         authors:        authors of the parameterization
+    #             - gh2012    doi.org:10.1103/PhysRevE.78.046402
+    #             - cg2019    doi:10.1080/02786826.2019.1614522
+    #             - hard_sphere
+    #             (default: cg2019)
+    #     """
 
-            self:           particle 1
-            other:          particle 2
-            environment:    environment conditions
-            authors:        authors of the parameterization
-                - gh2012    doi.org:10.1103/PhysRevE.78.046402
-                - cg2019    doi:10.1080/02786826.2019.1614522
-                - hard_sphere
-                (default: cg2019)
-        """
+    #     if authors == "cg2019":
+    #         # some parameters
+    #         corra = 2.5
+    #         corrb = (
+    #             4.528*np.exp(-1.088*self.coulomb_potential_ratio(
+    #                 other,
+    #             ))
+    #         ) + (
+    #             0.7091*np.log(1 + 1.527*self.coulomb_potential_ratio(
+    #                 other,
+    #             ))
+    #         )
 
-        if authors == "cg2019":
-            # some parameters
-            corra = 2.5
-            corrb = (
-                4.528*np.exp(-1.088*self.coulomb_potential_ratio(
-                    other,
-                ))
-            ) + (
-                0.7091*np.log(1 + 1.527*self.coulomb_potential_ratio(
-                    other,
-                ))
-            )
+    #         corrc = (11.36)*(self.coulomb_potential_ratio(
+    #             other,
+    #         )**0.272) - 10.33
+    #         corrk = - 0.003533*self.coulomb_potential_ratio(
+    #             other,
+    #         ) + 0.05971
 
-            corrc = (11.36)*(self.coulomb_potential_ratio(
-                other,
-            )**0.272) - 10.33
-            corrk = - 0.003533*self.coulomb_potential_ratio(
-                other,
-            ) + 0.05971
+    #         # mu for the parameterization
+    #         corr_mu = (corrc/corra)*(
+    #             (1 + corrk*((np.log(
+    #                 self.diffusive_knudsen_number(other,)
+    #             ) - corrb)/corra))**((-1/corrk) - 1)
+    #         ) * (
+    #             np.exp(-(1 + corrk*(np.log(
+    #                 self.diffusive_knudsen_number(other,)
+    #             ) - corrb)/corra)**(- 1/corrk))
+    #         )
 
-            # mu for the parameterization
-            corr_mu = (corrc/corra)*(
-                (1 + corrk*((np.log(
-                    self.diffusive_knudsen_number(other,)
-                ) - corrb)/corra))**((-1/corrk) - 1)
-            ) * (
-                np.exp(-(1 + corrk*(np.log(
-                    self.diffusive_knudsen_number(other,)
-                ) - corrb)/corra)**(- 1/corrk))
-            )
+    #         answer = (
+    #             # self.dimensionless_coagulation_kernel_hard_sphere(
+    #             #     other, environment
+    #             # ) if self.coulomb_potential_ratio(
+    #             #     other, environment
+    #             # ) <= 0 else
+    #             self.dimensionless_coagulation_kernel_hard_sphere(
+    #                 other,
+    #             )*np.exp(corr_mu)
+    #         )
 
-            answer = (
-                # self.dimensionless_coagulation_kernel_hard_sphere(
-                #     other, environment
-                # ) if self.coulomb_potential_ratio(
-                #     other, environment
-                # ) <= 0 else
-                self.dimensionless_coagulation_kernel_hard_sphere(
-                    other,
-                )*np.exp(corr_mu)
-            )
+    #     elif authors == "gh2012":
+    #         numerator = self.coulomb_enhancement_continuum_limit(
+    #             other,
+    #         )
 
-        elif authors == "gh2012":
-            numerator = self.coulomb_enhancement_continuum_limit(
-                other,
-            )
+    #         denominator = 1 + 1.598*(np.minimum(
+    #             self.diffusive_knudsen_number(other,),
+    #             3*self.diffusive_knudsen_number(other,)/2
+    #             / self.coulomb_potential_ratio(other,)
+    #         ))**1.1709
 
-            denominator = 1 + 1.598*(np.minimum(
-                self.diffusive_knudsen_number(other,),
-                3*self.diffusive_knudsen_number(other,)/2
-                / self.coulomb_potential_ratio(other,)
-            ))**1.1709
+    #         answer = (
+    #             self.dimensionless_coagulation_kernel_hard_sphere(
+    #                 other,
+    #             ) if self.coulomb_potential_ratio(
+    #                 other,
+    #             ) <= 0.5 else
+    #             numerator / denominator
+    #         )
 
-            answer = (
-                self.dimensionless_coagulation_kernel_hard_sphere(
-                    other,
-                ) if self.coulomb_potential_ratio(
-                    other,
-                ) <= 0.5 else
-                numerator / denominator
-            )
+    #     elif authors == "hard_sphere":
+    #         answer = self.dimensionless_coagulation_kernel_hard_sphere(
+    #             other,
+    #         )
 
-        elif authors == "hard_sphere":
-            answer = self.dimensionless_coagulation_kernel_hard_sphere(
-                other,
-            )
+    #     if authors not in ["gh2012", "hard_sphere", "cg2019"]:
+    #         raise ValueError("We don't have this parameterization.")
 
-        if authors not in ["gh2012", "hard_sphere", "cg2019"]:
-            raise ValueError("We don't have this parameterization.")
+    #     return answer
 
-        return answer
+    # def dimensioned_coagulation_kernel(
+    #     self,
+    #     other,
+    #     authors: str = "cg2019",
+    # ) -> float:
+    #     """Dimensioned particle--particle coagulation kernel.
 
-    def dimensioned_coagulation_kernel(
-        self,
-        other,
-        authors: str = "cg2019",
-    ) -> float:
-        """Dimensioned particle--particle coagulation kernel.
+    #     Checks units: [m**3/s]
 
-        Checks units: [m**3/s]
+    #     Paramaters:
 
-        Paramaters:
+    #         self:           particle 1
+    #         other:          particle 2
+    #         environment:    environment conditions
+    #         authors:        authors of the parameterization
+    #             - gh2012    https://doi.org/10.1103/PhysRevE.78.046402
+    #             - cg2020    https://doi.org/XXXXXXXXXXXXXXXXXXXXXXXXXX
+    #             - hard_sphere (from above)
+    #             (default: cg2019)
+    #     """
 
-            self:           particle 1
-            other:          particle 2
-            environment:    environment conditions
-            authors:        authors of the parameterization
-                - gh2012    https://doi.org/10.1103/PhysRevE.78.046402
-                - cg2020    https://doi.org/XXXXXXXXXXXXXXXXXXXXXXXXXX
-                - hard_sphere (from above)
-                (default: cg2019)
-        """
-
-        return (
-            self.dimensionless_coagulation_kernel_parameterized(
-                other, authors
-            ) * self.reduced_friction_factor(
-                other,
-            ) * (
-                self.particle_radius + other.particle_radius
-            )**3 * self.coulomb_enhancement_kinetic_limit(
-                other,
-            )**2 / self.reduced_mass(
-                other
-            ) / self.coulomb_enhancement_continuum_limit(
-                other,
-            )
-        )
+    #     return (
+    #         self.dimensionless_coagulation_kernel_parameterized(
+    #             other, authors
+    #         ) * self.reduced_friction_factor(
+    #             other,
+    #         ) * (
+    #             self.particle_radius + other.particle_radius
+    #         )**3 * self.coulomb_enhancement_kinetic_limit(
+    #             other,
+    #         )**2 / self.reduced_mass(
+    #             other
+    #         ) / self.coulomb_enhancement_continuum_limit(
+    #             other,
+    #         )
+    #     )

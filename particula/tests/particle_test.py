@@ -82,9 +82,15 @@ def test_slip_correction_factor():
     """"Test that the slip correction factor is calculated correctly.
     """
 
-    assert small_particle.slip_correction_factor() == pytest.approx(110.7, rel=1e-3)
+    assert (
+        small_particle.slip_correction_factor() ==
+        pytest.approx(110.7, rel=1e-3)
+    )
 
-    assert large_particle.slip_correction_factor() == pytest.approx(1.886, rel=1e-3)
+    assert (
+        large_particle.slip_correction_factor() ==
+        pytest.approx(1.886, rel=1e-3)
+    )
 
     assert small_particle.slip_correction_factor().check(["None"])
 
@@ -96,7 +102,10 @@ def test_friction_factor():
     assert small_particle.friction_factor(
     ).magnitude == pytest.approx(3.181e-15, rel=1e-3)
 
-    assert large_particle.friction_factor().magnitude == pytest.approx(1.84e-11)
+    assert (
+        large_particle.friction_factor().magnitude ==
+        pytest.approx(1.84e-11)
+    )
 
     assert small_particle.friction_factor().check("[mass]/[time]")
 
