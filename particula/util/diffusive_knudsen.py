@@ -3,7 +3,8 @@
 
 import numpy as np
 from particula.constants import BOLTZMANN_CONSTANT
-from particula.util.coulomb_enhancement import CoulombEnhancement, coulomb_enhancement_all
+from particula.util.coulomb_enhancement import (CoulombEnhancement,
+                                                coulomb_enhancement_all)
 from particula.util.friction_factor import frifac
 from particula.util.input_handling import in_density
 from particula.util.particle_mass import mass
