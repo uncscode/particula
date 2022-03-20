@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>6. FAQ &#8212; Particula Book</title>
+    <title>FAQ &#8212; Particula Book</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -37,21 +37,23 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/togglebutton.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
-    <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
-    <script>
-        const thebe_selector = ".thebe,.cell"
-        const thebe_selector_input = "pre,.cell_input div.highlight"
-        const thebe_selector_output = ".output,.cell_output"
-    </script>
+    <script src="_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="5. Contributor Covenant Code of Conduct" href="CODE_OF_CONDUCT.html" />
+    <link rel="prev" title="Contributor Covenant Code of Conduct" href="CODE_OF_CONDUCT.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -103,7 +105,7 @@
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="getting_started.html">
-   1. Installing
+   Installing
    <code class="docutils literal notranslate">
     <span class="pre">
      particula
@@ -120,7 +122,7 @@
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="tutorials/001_ParticleClass.html">
-   2. Particle Class
+   Particle Class
   </a>
  </li>
 </ul>
@@ -131,8 +133,14 @@
 </p>
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="documentation/d000_detailed_documentation.html">
-   3. Documentation and Reference
+  <a class="reference internal" href="documentation/environment.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Environment
+    </span>
+   </code>
+   Class
   </a>
  </li>
 </ul>
@@ -144,12 +152,12 @@
 <ul class="nav bd-sidenav">
  <li class="toctree-l1">
   <a class="reference internal" href="CONTRIBUTING.html">
-   4. Contributor Guidelines
+   Contributor Guidelines
   </a>
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="CODE_OF_CONDUCT.html">
-   5. Contributor Covenant Code of Conduct
+   Contributor Covenant Code of Conduct
   </a>
  </li>
 </ul>
@@ -161,7 +169,7 @@
 <ul class="current nav bd-sidenav">
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   6. FAQ
+   FAQ
   </a>
  </li>
 </ul>
@@ -210,7 +218,7 @@
                 data-placement="left">.md</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -246,7 +254,7 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
@@ -255,7 +263,7 @@
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#coming-soon">
-   6.1. Coming soon
+   Coming soon
   </a>
  </li>
 </ul>
@@ -266,13 +274,36 @@
 </div>
     <div id="main-content" class="row">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>FAQ</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#coming-soon">
+   Coming soon
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
               <div>
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="faq">
-<h1><span class="section-number">6. </span>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline">¶</a></h1>
+<h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="coming-soon">
-<h2><span class="section-number">6.1. </span>Coming soon<a class="headerlink" href="#coming-soon" title="Permalink to this headline">¶</a></h2>
+<h2>Coming soon<a class="headerlink" href="#coming-soon" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -298,30 +329,28 @@
 
               </div>
               
-        
-            <!-- Previous / next buttons -->
+            
+                <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
     <a class='left-prev' id="prev-link" href="CODE_OF_CONDUCT.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">5. </span>Contributor Covenant Code of Conduct</p>
+            <p class="prev-next-title">Contributor Covenant Code of Conduct</p>
         </div>
     </a>
 </div>
-        
+            
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By particula contributors<br/>
-        
-            &copy; Copyright 2021.<br/>
-      </p>
-    </div>
-  </footer>
+  <p>
+    
+      By particula contributors<br/>
+    
+        &copy; Copyright 2021.<br/>
+  </p>
+</footer>
 </main>
 
 
