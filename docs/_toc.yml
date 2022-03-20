@@ -2,23 +2,23 @@ format: jb-book
 root: intro
 parts:
 - caption: Installation
-  numbered: true
+  numbered: false
   chapters:
   - file: getting_started.ipynb
 - caption: Tutorials
-  numbered: true
+  numbered: false
   chapters:
   - file: tutorials/001_ParticleClass.md
 - caption: Documentation
-  numbered: true
+  numbered: false
   chapters:
-  - file: documentation/d000_detailed_documentation.md
+  - file: documentation/environment.ipynb
 - caption: Community
-  numbered: true
+  numbered: false
   chapters:
   - file: CONTRIBUTING.md
   - file: CODE_OF_CONDUCT.md
 - caption: FAQ
-  numbered: true
+  numbered: false
   chapters:
   - file: FAQ.md
