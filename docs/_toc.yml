@@ -8,11 +8,12 @@ parts:
 - caption: Tutorials
   numbered: false
   chapters:
-  - file: tutorials/001_ParticleClass.md
+  - file: tutorials/001_ParticleClass.ipynb
 - caption: Documentation
   numbered: false
   chapters:
   - file: documentation/environment.ipynb
+  - file: documentation/vapor.ipynb
 - caption: Community
   numbered: false
   chapters:
