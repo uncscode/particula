@@ -4,16 +4,16 @@ parts:
 - caption: Installation
   numbered: false
   chapters:
-  - file: getting_started.ipynb
+  - file: getting_started.md
 - caption: Tutorials
   numbered: false
   chapters:
-  - file: tutorials/001_ParticleClass.ipynb
+  - file: tutorials/001_ParticleClass.md
 - caption: Documentation
   numbered: false
   chapters:
-  - file: documentation/environment.ipynb
-  - file: documentation/vapor.ipynb
+  - file: documentation/environment.md
+  - file: documentation/vapor.md
 - caption: Community
   numbered: false
   chapters:
