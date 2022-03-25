@@ -7,7 +7,12 @@ from particula.util.input_handling import in_radius, in_scalar, in_viscosity
 from particula.util.slip_correction import scf
 
 
-def frifac(**kwargs):
+def frifac(
+    radius=None,
+    dynamic_viscosity=None,
+    scf_val=None,
+    **kwargs
+):
     """ Returns a particle's friction factor.
 
         Property of the particle's size and surrounding medium.
@@ -67,18 +72,22 @@ def frifac(**kwargs):
             see respective documentation for more information.
     """
 
-    radius = kwargs.get("radius", None)
-    dyn_vis_val = kwargs.get("dynamic_viscosity", dyn_vis(**kwargs))
-    sfc_val = kwargs.get("sfc", scf(**kwargs))
-
     radius = in_radius(radius)
-    dyn_vis_val = in_viscosity(dyn_vis_val)
-    sfc_val = in_scalar(sfc_val)
+
+    if dynamic_viscosity is None:
+        dyn_vis_val = dyn_vis(radius=radius, **kwargs)
+    else:
+        dyn_vis_val = in_viscosity(dynamic_viscosity)
+
+    if scf_val is None:
+        scf_val = scf(radius=radius, **kwargs)
+    else:
+        scf_val = in_scalar(scf_val)
 
     return (
         6 *
         np.pi *
         np.transpose([dyn_vis_val.m])*dyn_vis_val.u *
         radius /
-        sfc_val
+        scf_val
     ).to_base_units()

@@ -2,17 +2,24 @@
 """
 
 import numpy as np
+from particula.util.input_handling import in_scalar
+from particula.util.diffusive_knudsen import DiffusiveKnudsen as DKn
 from particula.util.diffusive_knudsen import celimits
-from particula.util.diffusive_knudsen import diff_knu as dknu
+# from particula.util.diffusive_knudsen import diff_knu as dknu
 from particula.util.diffusive_knudsen import red_frifac, red_mass, rxr
 
 
-class DimensionlessCoagulation:
+class DimensionlessCoagulation(DKn):
 
     """ dimensionless coagulation
     """
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        dkn_val=None,
+        authors="hardsphere",
+        **kwargs
+    ):
         """ Dimensionless particle--particle coagulation kernel.
 
             Attributes:
@@ -24,9 +31,13 @@ class DimensionlessCoagulation:
                 please see the documentation of the respective function:
                     - particula.util.diffusive_knudsen.diff_knu(**kwargs)
         """
+        super().__init__(**kwargs)
 
-        self.diff_knu = dknu(**kwargs)
-        self.authors = kwargs.get("authors", "hardsphere")
+        self.diff_knu = DKn(**kwargs).get_diff_knu() if dkn_val is None \
+            else in_scalar(dkn_val)
+
+        self.authors = authors
+
         self.kwargs = kwargs
 
     def hardsphere_coag_less(self):
