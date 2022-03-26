@@ -14,15 +14,10 @@
 
 """
 
-import numpy as np
-
-from particula import u
-from particula.util.distribution_discretization import discretize
-from particula.util.input_handling import in_scalar, in_volume
-from particula.util.radius_cutoff import cut_rad
+from particula.particle import BasePreParticle
 
 
-class ParticleDistribution:
+class ParticleDistribution(BasePreParticle):
     """ Constructing the ParticleDistribution class
     """
 
@@ -41,11 +36,7 @@ class ParticleDistribution:
                   (kwargs: gsigma, mode)
 
         """
-
-        self.spacing = kwargs.get("spacing", "linspace")
-        self.nbins = in_scalar(kwargs.get("nbins", 1000)).m
-        self.nparticles = in_scalar(kwargs.get("nparticles", 1e5))
-        self.volume = in_volume(kwargs.get("volume", 1e-6))
+        super().__init__(**kwargs)
 
         self.kwargs = kwargs
 
@@ -60,24 +51,8 @@ class ParticleDistribution:
             particles, but much coarser resolution for larger particles).
         """
 
-        (rad_start, rad_end) = cut_rad(**self.kwargs)
 
-        if self.spacing == "logspace":
-            radius = np.logspace(
-                np.log10(rad_start),
-                np.log10(rad_end),
-                self.nbins
-            )
-        elif self.spacing == "linspace":
-            radius = np.linspace(
-                rad_start,
-                rad_end,
-                self.nbins
-            )
-        else:
-            raise ValueError("Spacing must be 'logspace' or 'linspace'!")
-
-        return radius*u.m
+        return self.pre_radius()
 
     def discretize(self):
         """ Returns a distribution pdf of the particles
@@ -89,7 +64,7 @@ class ParticleDistribution:
                 mode    : geometric mean radius of the particles
         """
 
-        return discretize(interval=self.radius(), **self.kwargs)
+        return self.pre_discretize()
 
     def distribution(self):
         """ Returns a distribution pdf of the particles
@@ -101,4 +76,4 @@ class ParticleDistribution:
                 mode    : geometric mean radius of the particles
         """
 
-        return self.nparticles*self.discretize()/self.volume
+        return self.pre_distribution()
