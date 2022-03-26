@@ -16,6 +16,7 @@ simple_dic_kwargs = {
     "vapor_concentration": 1,  # 1 ug/m^3
     "vapor_attachment": 1,  # 1
     "vapor_molec_wt": 200,  # 200 g/mol
+    "something_something": None
 }
 
 cond = CondensationGrowth(**simple_dic_kwargs)
