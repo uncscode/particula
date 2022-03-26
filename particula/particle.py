@@ -1,20 +1,106 @@
 """ the particule class
 """
 
+import numpy as np
+
 from particula import u
 from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
                                  ELEMENTARY_CHARGE_VALUE)
 from particula.util.dimensionless_coagulation import DimensionlessCoagulation
 from particula.util.friction_factor import frifac
 from particula.util.input_handling import (in_density, in_handling, in_radius,
-                                           in_scalar)
+                                           in_scalar, in_volume)
 from particula.util.knudsen_number import knu
 from particula.util.particle_mass import mass
 from particula.util.slip_correction import scf
 from particula.vapor import Vapor
+from particula.util.radius_cutoff import cut_rad
+from particula.util.distribution_discretization import discretize
 
 
-class BaseParticle(Vapor):
+class BasePreParticle(Vapor):
+    """ the pre-particle class
+    """
+    def __init__(self, **kwargs):
+        """  particle distribution objects.
+        """
+        super().__init__(**kwargs)
+
+        self.spacing = kwargs.get("spacing", "linspace")
+        self.nbins = in_scalar(kwargs.get("nbins", 1000)).m
+        self.nparticles = in_scalar(kwargs.get("nparticles", 1e5))
+        self.volume = in_volume(kwargs.get("volume", 1e-6))
+        self.cutoff = in_scalar(kwargs.get("cutoff", 0.9999)).m
+        self.gsigma = in_scalar(kwargs.get("gsigma", 1.25)).m
+        self.mode = in_radius(kwargs.get("mode", 100e-9)).m
+        self.kwargs = kwargs
+
+    def pre_radius(self):
+        """ Returns the radius space of the particles
+
+            Utilizing the utility cut_rad to get 99.99% of the distribution.
+            From this interval, radius is made on a linspace with nbins points.
+            Note: linspace is used here to practical purposes --- often, the
+            logspace treatment will return errors in the discretization due
+            to the asymmetry across the interval (finer resolution for smaller
+            particles, but much coarser resolution for larger particles).
+        """
+
+        (rad_start, rad_end) = cut_rad(
+            cutoff=self.cutoff,
+            gsigma=self.gsigma,
+            mode=self.mode,
+            **self.kwargs
+        )
+
+        if self.spacing == "logspace":
+            radius = np.logspace(
+                np.log10(rad_start),
+                np.log10(rad_end),
+                self.nbins
+            )
+        elif self.spacing == "linspace":
+            radius = np.linspace(
+                rad_start,
+                rad_end,
+                self.nbins
+            )
+        else:
+            raise ValueError("Spacing must be 'logspace' or 'linspace'!")
+
+        return radius*u.m
+
+    def pre_discretize(self):
+        """ Returns a distribution pdf of the particles
+
+            Utilizing the utility discretize to get make a lognorm distribution
+            via scipy.stats.lognorm.pdf:
+                interval: the size interval of the distribution
+                gsigma  : geometric standard deviation of distribution
+                mode    : geometric mean radius of the particles
+        """
+
+        return discretize(
+            interval=self.pre_radius(),
+            disttype="lognormal",
+            gsigma=self.gsigma,
+            mode=self.mode,
+            **self.kwargs)
+
+    def pre_distribution(self):
+        """ Returns a distribution pdf of the particles
+
+            Utilizing the utility discretize to get make a lognorm distribution
+            via scipy.stats.lognorm.pdf:
+                interval: the size interval of the distribution
+                gsigma  : geometric standard deviation of distribution
+                mode    : geometric mean radius of the particles
+        """
+
+        return self.nparticles*self.pre_discretize()/self.volume
+
+
+class BaseParticle(BasePreParticle):
     """ based on the Vapor(Environment) class
     """
 
@@ -23,9 +109,12 @@ class BaseParticle(Vapor):
         """
         super().__init__(**kwargs)
 
-        self.particle_radius = in_radius(
+        self.particle_radius = self.pre_radius() if kwargs.get(
+            "particle_radius", None
+        ) is None else in_radius(
             kwargs.get("particle_radius", None)
         )
+
         self.particle_density = in_density(
             kwargs.get("particle_density", 1000)
         )
