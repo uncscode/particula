@@ -13,14 +13,12 @@
     aerosol dynamics literature.
 
 """
-
 from particula.particle import BasePreParticle
 
 
 class ParticleDistribution(BasePreParticle):
     """ Constructing the ParticleDistribution class
     """
-
     def __init__(self, **kwargs):
         """ creating the particle distribution via **kwargs
 
@@ -50,8 +48,6 @@ class ParticleDistribution(BasePreParticle):
             to the asymmetry across the interval (finer resolution for smaller
             particles, but much coarser resolution for larger particles).
         """
-
-
         return self.pre_radius()
 
     def discretize(self):
@@ -63,7 +59,6 @@ class ParticleDistribution(BasePreParticle):
                 gsigma  : geometric standard deviation of distribution
                 mode    : geometric mean radius of the particles
         """
-
         return self.pre_discretize()
 
     def distribution(self):
@@ -75,5 +70,4 @@ class ParticleDistribution(BasePreParticle):
                 gsigma  : geometric standard deviation of distribution
                 mode    : geometric mean radius of the particles
         """
-
         return self.pre_distribution()

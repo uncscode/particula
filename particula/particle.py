@@ -7,20 +7,21 @@ from particula import u
 from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
                                  ELEMENTARY_CHARGE_VALUE)
 from particula.util.dimensionless_coagulation import DimensionlessCoagulation
+from particula.util.distribution_discretization import discretize
 from particula.util.friction_factor import frifac
 from particula.util.input_handling import (in_density, in_handling, in_radius,
                                            in_scalar, in_volume)
 from particula.util.knudsen_number import knu
 from particula.util.particle_mass import mass
+from particula.util.radius_cutoff import cut_rad
 from particula.util.slip_correction import scf
 from particula.vapor import Vapor
-from particula.util.radius_cutoff import cut_rad
-from particula.util.distribution_discretization import discretize
 
 
-class BasePreParticle(Vapor):
+class BasePreParticle(Vapor):  # pylint: disable=too-many-instance-attributes
     """ the pre-particle class
     """
+
     def __init__(self, **kwargs):
         """  particle distribution objects.
         """
