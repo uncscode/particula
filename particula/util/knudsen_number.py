@@ -12,10 +12,14 @@
 
 import numpy as np
 from particula.util.input_handling import in_length, in_radius
-from particula.util.mean_free_path import mfp
+from particula.util.mean_free_path import mfp as mfp_func
 
 
-def knu(**kwargs):
+def knu(
+    radius=None,
+    mfp=None,
+    **kwargs
+):
     """ Returns particle's Knudsen number.
 
         The Knudsen number reflects the relative length scales of
@@ -61,10 +65,7 @@ def knu(**kwargs):
 
     """
 
-    radius = kwargs.get("radius", None)
-    mfp_val = kwargs.get("mfp", mfp(**kwargs))
-
+    mfp_val = mfp_func(**kwargs) if mfp is None else in_length(mfp)
     radius = in_radius(radius)
-    mfp_val = in_length(mfp_val)
 
     return np.transpose([mfp_val.m])*mfp_val.u / radius

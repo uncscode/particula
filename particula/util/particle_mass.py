@@ -5,7 +5,13 @@ import numpy as np
 from particula.util.input_handling import in_density, in_radius, in_scalar
 
 
-def mass(**kwargs):
+def mass(
+    radius=None,
+    density=1000,
+    shape_factor=1,
+    volume_void=0,
+    **kwargs,
+):
     """ Returns particle's mass: 4/3 pi r^3 * density.
 
         Examples:
@@ -33,18 +39,13 @@ def mass(**kwargs):
         Returns:
                          (float) [kg]
     """
-
-    radius = kwargs.get("radius", None)
-    density = kwargs.get("density", 1000)
-    shape_factor = kwargs.get("shape_factor", 1)
-    vol_void = kwargs.get("volume_void", 0)
-
+    _ = kwargs.get("something", None)
     radius = in_radius(radius)
     density = in_density(density)
     shape_factor = in_scalar(shape_factor)
-    vol_void = in_scalar(vol_void)
+    vol_void = in_scalar(volume_void)
 
     return (
         density * (4*np.pi/3) * (radius**3)
         * shape_factor * (1 - vol_void)
-    )
+    ).to_base_units()

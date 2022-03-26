@@ -17,13 +17,22 @@
 """
 
 import numpy as np
+from particula import u
 from particula.constants import GAS_CONSTANT, MOLECULAR_WEIGHT_AIR
 from particula.util.dynamic_viscosity import dyn_vis
-from particula.util.input_handling import (in_molecular_weight, in_pressure,
+from particula.util.input_handling import (in_gas_constant,
+                                           in_molecular_weight, in_pressure,
                                            in_temperature, in_viscosity)
 
 
-def mfp(**kwargs):
+def mfp(
+    temperature=298.15*u.K,
+    pressure=101325*u.Pa,
+    molecular_weight=MOLECULAR_WEIGHT_AIR,
+    dynamic_viscosity=None,
+    gas_constant=GAS_CONSTANT,
+    **kwargs,
+):
     """ Returns the mean free path of in air.
 
         The mean free path is the average distance
@@ -100,17 +109,18 @@ def mfp(**kwargs):
             it overrides the calculated value.
     """
 
-    temp = kwargs.get("temperature", 298.15)
-    pres = kwargs.get("pressure", 101325)
-    molec_wt = kwargs.get("molecular_weight", MOLECULAR_WEIGHT_AIR)
-    dyn_vis_val = kwargs.get("dynamic_viscosity", dyn_vis(**kwargs))
+    temp = in_temperature(temperature)
+    pres = in_pressure(pressure)
+    molec_wt = in_molecular_weight(molecular_weight)
 
-    temp = in_temperature(temp)
-    pres = in_pressure(pres)
-    molec_wt = in_molecular_weight(molec_wt)
-    dyn_vis_val = in_viscosity(dyn_vis_val)
+    if dynamic_viscosity is None:
+        dyn_vis_val = in_viscosity(
+            dyn_vis(temperature=temp, **kwargs)
+        )
+    else:
+        dyn_vis_val = in_viscosity(dynamic_viscosity)
 
-    gas_con = GAS_CONSTANT
+    gas_con = in_gas_constant(gas_constant)
 
     return (
         (2 * dyn_vis_val / pres) /
