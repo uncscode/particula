@@ -18,7 +18,7 @@ from particula.util.radius_cutoff import cut_rad
 from particula.util.distribution_discretization import discretize
 
 
-class BasePreParticle(Vapor):  # pylint: disable=too-many-instance-attributes
+class BasePreParticle(Vapor):
     """ the pre-particle class
     """
     def __init__(self, **kwargs):
