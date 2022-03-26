@@ -19,25 +19,6 @@ from particula.particle import BasePreParticle
 class ParticleDistribution(BasePreParticle):
     """ Constructing the ParticleDistribution class
     """
-    def __init__(self, **kwargs):
-        """ creating the particle distribution via **kwargs
-
-            Parameters:
-                spacing (str): "logspace" or "linspace" gradation
-
-            Utilizes:
-                - particula.util.radius_cutoff.cut_rad(**kwargs)
-                  (rad_start, rad_end) = cut_rad(**kwargs)
-                  (kwargs: cutoff, gsigma, mode)
-                - particula.util.distribution_discretization.discretize
-                  distribution = discretize(interval, **kwargs)
-                  (kwargs: gsigma, mode)
-
-        """
-        super().__init__(**kwargs)
-
-        self.kwargs = kwargs
-
     def radius(self):
         """ Returns the radius space of the particles
 

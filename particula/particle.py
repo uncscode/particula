@@ -51,7 +51,6 @@ class BasePreParticle(Vapor):  # pylint: disable=too-many-instance-attributes
             cutoff=self.cutoff,
             gsigma=self.gsigma,
             mode=self.mode,
-            **self.kwargs
         )
 
         if self.spacing == "logspace":
@@ -85,8 +84,8 @@ class BasePreParticle(Vapor):  # pylint: disable=too-many-instance-attributes
             interval=self.pre_radius(),
             disttype="lognormal",
             gsigma=self.gsigma,
-            mode=self.mode,
-            **self.kwargs)
+            mode=self.mode
+        )
 
     def pre_distribution(self):
         """ Returns a distribution pdf of the particles
