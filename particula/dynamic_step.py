@@ -2,7 +2,7 @@
 """
 
 
-from particula.particle_distribution import ParticleDistribution
+from particula.particle import BasePreParticle as ParticleDistribution
 from particula.util.coagulation_rate import CoagulationRate
 from particula.util.dimensionless_coagulation import full_coag
 
@@ -31,7 +31,7 @@ class DynamicStep(ParticleDistribution):
             function full_coag
         """
 
-        return full_coag(radius=self.radius(), **self.kwargs)
+        return full_coag(radius=self.pre_radius(), **self.kwargs)
 
     def coag_loss(self):
         """ get the coagulation loss rate from:
@@ -42,8 +42,8 @@ class DynamicStep(ParticleDistribution):
         """
 
         return CoagulationRate(
-            distribution=self.distribution(),
-            radius=self.radius(),
+            distribution=self.pre_distribution(),
+            radius=self.pre_radius(),
             kernel=self.coag_kern(),
         ).coag_loss()
 
@@ -56,8 +56,8 @@ class DynamicStep(ParticleDistribution):
         """
 
         return CoagulationRate(
-            distribution=self.distribution(),
-            radius=self.radius(),
+            distribution=self.pre_distribution(),
+            radius=self.pre_radius(),
             kernel=self.coag_kern(),
         ).coag_gain()
 
