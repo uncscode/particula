@@ -23,7 +23,7 @@ class CondensationGrowth(ParticleDistribution):
             - Add extra dim for the condensing vapor (redq is problematic).
     """
 
-    def __init__( # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         vapor_radius=1.6e-9*u.m,
         vapor_density=1400*u.kg/u.m**3,
