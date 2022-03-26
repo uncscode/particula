@@ -23,27 +23,25 @@ class CondensationGrowth(ParticleDistribution):
             - Add extra dim for the condensing vapor (redq is problematic).
     """
 
-    def __init__(self, **kwargs):
+    def __init__( # pylint: disable=too-many-arguments
+        self,
+        vapor_radius=1.6e-9*u.m,
+        vapor_density=1400*u.kg/u.m**3,
+        vapor_concentration=1*u.kg/u.m**3,
+        vapor_attachment=1,
+        vapor_molecular_weight=200*u.g/u.mol,
+        **kwargs
+    ):
         """ initializing the class
         """
 
         super().__init__(**kwargs)
 
-        self.vapor_radius = in_length(
-            kwargs.get('vapor_radius', 1.6e-9)
-        )
-        self.vapor_density = in_density(
-            kwargs.get('vapor_density', 1400)
-        )
-        self.vapor_concentration = in_concentration(
-            kwargs.get('vapor_concentration', 1)
-        )
-        self.vapor_attachment = in_scalar(
-            kwargs.get('vapor_attachment', 1)
-        )
-        self.vapor_molec_wt = in_molecular_weight(
-            kwargs.get('vapor_molecular_weight', 200*u.g/u.mol)
-        )
+        self.vapor_radius = in_length(vapor_radius)
+        self.vapor_density = in_density(vapor_density)
+        self.vapor_concentration = in_concentration(vapor_concentration)
+        self.vapor_attachment = in_scalar(vapor_attachment)
+        self.vapor_molec_wt = in_molecular_weight(vapor_molecular_weight)
 
         self.kwargs = kwargs
 
@@ -51,9 +49,7 @@ class CondensationGrowth(ParticleDistribution):
         """ condensation driving force
         """
 
-        return np.array(
-            [self.vapor_concentration.m]
-        )*self.vapor_concentration.u
+        return self.vapor_concentration
 
     def molecular_enhancement(self):
         """ molecular enhancement
