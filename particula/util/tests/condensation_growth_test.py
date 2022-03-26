@@ -7,9 +7,9 @@ from particula.util.condensation_growth import CondensationGrowth
 simple_dic_kwargs = {
     "mode": 200e-9,  # 200 nm median
     "nbins": 1000,  # 1000 bins
-    "nparticles": 1e6,  # 1e4 #
+    "nparticles": 2e6,  # 1e4 #
     "volume": 1e-6,  # per 1e-6 m^3 (or 1 cc)
-    "gsigma": 1.2,  # relatively narrow
+    "gsigma": 1.25,  # relatively narrow
     "cutoff": .99999,  # let's take it all lol
     "vapor_radius": 1.6e-9,  # 1.6 nm
     "vapor_density": 1400,  # 1400 kg/m^3

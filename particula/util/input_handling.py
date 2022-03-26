@@ -68,7 +68,6 @@ def in_handling(value, units: u.Quantity):
                 f"be assigned {units}.\n"
             )
     else:
-
         value = u.Quantity(value, (1*units).to_base_units().u)
 
     return value
