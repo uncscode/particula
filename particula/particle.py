@@ -135,12 +135,11 @@ class BaseParticle(BasePreParticle):
     def particle_distribution(self):
         """ distribution
         """
-        if kwargs.get("particle_radius", None) is None:
-            result = self.pre_distribution()
-        else:
-            result = self.particle_number*self.particle_radius/self.volume
-
-        return result
+        return (
+            self.pre_distribution()
+            if kwargs.get("particle_radius", None) is None
+            else self.particle_number * self.particle_radius / self.volume
+        )
 
     def mass(self):
         """ Returns mass of particle.
