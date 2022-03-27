@@ -137,7 +137,7 @@ class BaseParticle(BasePreParticle):
         """
         return (
             self.pre_distribution()
-            if kwargs.get("particle_radius", None) is None
+            if self.kwargs.get("particle_radius", None) is None
             else self.particle_number * self.particle_radius / self.volume
         )
 
