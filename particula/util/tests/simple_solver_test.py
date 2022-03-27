@@ -3,7 +3,7 @@
 
 import pytest
 import numpy as np
-from particula import particle_distribution, dynamic_step, u
+from particula import particle_distribution, dynamic_step
 from particula.util import simple_solver
 
 simple_dic_kwargs = {

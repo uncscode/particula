@@ -17,7 +17,7 @@ from particula.util.coagulation_rate import CoagulationRate
 from particula import u
 
 
-def ode_func(_nums, _, _rads, _coag, **kwargs):
+def ode_func(_nums, _, _rads, _coag):
     """ function to integrate
     """
     coag = CoagulationRate(

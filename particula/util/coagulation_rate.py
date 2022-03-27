@@ -3,7 +3,6 @@
 
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
-from particula import u
 
 
 class CoagulationRate:
