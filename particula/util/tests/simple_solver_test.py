@@ -3,7 +3,7 @@
 
 import pytest
 import numpy as np
-from particula import particle_distribution, dynamic_step
+from particula import particle_distribution, dynamic_step, u
 from particula.util import simple_solver
 
 simple_dic_kwargs = {
@@ -36,7 +36,6 @@ FinerSolver = simple_solver.SimpleSolver(
 radius = particle_dist.radius().m
 solution = Solver.solution()
 fine_sols = FinerSolver.solution()
-
 
 def test_dims():
     """ test the dimensions

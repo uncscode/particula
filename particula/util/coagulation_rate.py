@@ -33,9 +33,9 @@ class CoagulationRate:
                   for performance.
         """
 
-        self.distribution = strip(distribution) * u.m**-4
-        self.radius = strip(radius) * u.m
-        self.kernel = strip(kernel) * u.m**3 / u.s
+        self.distribution = distribution
+        self.radius = radius
+        self.kernel = kernel
 
     def coag_prep(self):
         """ Repackage the parameters
