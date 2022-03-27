@@ -114,7 +114,9 @@ class BaseParticle(BasePreParticle):
         ) is None else in_radius(
             kwargs.get("particle_radius", None)
         )
-
+        self.particle_number = in_scalar(
+            kwargs.get("particle_number", 1)
+        )
         self.particle_density = in_density(
             kwargs.get("particle_density", 1000)
         )
@@ -129,6 +131,16 @@ class BaseParticle(BasePreParticle):
         )
 
         self.kwargs = kwargs
+
+    def particle_distribution(self):
+        """ distribution
+        """
+        if kwargs.get("particle_radius", None) is None:
+            result = self.pre_distribution()
+        else:
+            result = self.particle_number*self.particle_radius/self.volume
+
+        return result
 
     def mass(self):
         """ Returns mass of particle.
