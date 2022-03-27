@@ -34,7 +34,6 @@ class BasePreParticle(Vapor):  # pylint: disable=too-many-instance-attributes
         self.cutoff = in_scalar(kwargs.get("cutoff", 0.9999)).m
         self.gsigma = in_scalar(kwargs.get("gsigma", 1.25)).m
         self.mode = in_radius(kwargs.get("mode", 100e-9)).m
-        self.kwargs = kwargs
 
     def pre_radius(self):
         """ Returns the radius space of the particles

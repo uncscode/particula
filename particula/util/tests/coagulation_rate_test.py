@@ -3,44 +3,44 @@
 import numpy as np
 import pytest
 from particula import u
-from particula.particle_distribution import \
-    ParticleDistribution
+from particula.particle import \
+    Particle
 from particula.util.coagulation_rate import CoagulationRate
 from particula.util.dimensionless_coagulation import full_coag
 
-distribution = ParticleDistribution(
+distribution = Particle(
     cutoff=.9999,
     mode=100e-9,
     nbins=1000,
     nparticles=1e5,
     gsigma=1.25,
-).distribution()
+).particle_distribution()
 
 
-fine_distribution = ParticleDistribution(
+fine_distribution = Particle(
     cutoff=.9999,
     mode=100e-9,
     nbins=3000,
     nparticles=1e5,
     gsigma=1.25,
-).distribution()
+).particle_distribution()
 
 
-radius = ParticleDistribution(
+radius = Particle(
     cutoff=.9999,
     mode=100e-9,
     nbins=1000,
     nparticles=1e5,
     gsigma=1.25,
-).radius()
+).particle_radius
 
-fine_radius = ParticleDistribution(
+fine_radius = Particle(
     cutoff=.9999,
     mode=100e-9,
     nbins=3000,
     nparticles=1e5,
     gsigma=1.25,
-).radius()
+).particle_radius
 
 
 kernel = full_coag(

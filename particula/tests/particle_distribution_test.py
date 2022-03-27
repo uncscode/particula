@@ -5,9 +5,9 @@ import numpy as np
 import pytest
 from scipy.stats import lognorm
 from particula import u
-from particula.particle_distribution import ParticleDistribution
+from particula.particle import Particle
 
-pdist_lin = ParticleDistribution(
+pdist_lin = Particle(
     cutoff=.9999,
     mode=100e-9,
     nbins=10000,
@@ -17,7 +17,7 @@ pdist_lin = ParticleDistribution(
     spacing="linspace",
 )
 
-pdist_log = ParticleDistribution(
+pdist_log = Particle(
     cutoff=.9999,
     mode=100e-9,
     nbins=10000,
@@ -37,9 +37,9 @@ def test_rad():
     """
 
     for pdist in [pdist_lin, pdist_log]:
-        assert 100 >= pdist.radius()[0].m_as('nm')
-        assert 100 <= pdist.radius()[-1].m_as('nm')
-        assert 10000 == len(pdist.radius())
+        assert 100 >= pdist.particle_radius[0].m_as('nm')
+        assert 100 <= pdist.particle_radius[-1].m_as('nm')
+        assert 10000 == len(pdist.particle_radius)
 
 
 def test_discretize():
@@ -51,11 +51,12 @@ def test_discretize():
     """
 
     for pdist in [pdist_lin, pdist_log]:
-        assert 0 <= pdist.discretize()[0]
-        assert 0 <= pdist.discretize()[-1]
-        assert np.trapz(pdist.discretize(), pdist.radius(
-        )) == pytest.approx(.9999, rel=1e-1)
-        assert len(pdist.discretize().m) == len(pdist.radius().m)
+        assert 0 <= pdist.pre_discretize()[0]
+        assert 0 <= pdist.pre_discretize()[-1]
+        assert np.trapz(
+            pdist.pre_discretize(), pdist.particle_radius
+        ) == pytest.approx(.9999, rel=1e-1)
+        assert len(pdist.pre_discretize().m) == len(pdist.particle_radius.m)
 
 
 def test_dist():
@@ -68,8 +69,8 @@ def test_dist():
 
     for pdist in [pdist_lin, pdist_log]:
 
-        dps = pdist.radius().m
-        wts = pdist.discretize()/np.sum(pdist.discretize())
+        dps = pdist.particle_radius.m
+        wts = pdist.pre_discretize()/np.sum(pdist.pre_discretize())
         samples = np.random.choice(dps, size=len(dps), p=wts.m)
 
         assert (
@@ -82,5 +83,5 @@ def test_dist():
             lognorm.fit(samples, floc=0)[-1] <= 110e-9
         )
 
-        assert pdist.distribution().u == u.m**-4
-        assert pdist.distribution().m.shape == (10000,)
+        assert pdist.particle_distribution().u == u.m**-4
+        assert pdist.particle_distribution().m.shape == (10000,)
