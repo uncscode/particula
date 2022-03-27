@@ -37,6 +37,7 @@ radius = particle_dist.radius().m
 solution = Solver.solution()
 fine_sols = FinerSolver.solution()
 
+
 def test_dims():
     """ test the dimensions
     """
