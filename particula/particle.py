@@ -18,8 +18,8 @@ from particula.util.slip_correction import scf
 from particula.vapor import Vapor
 
 
-class BasePreParticle(Vapor):  # pylint: disable=too-many-instance-attributes
-    """ the pre-particle class
+class ParticleDistribution(Vapor):  # pylint: disable=too-many-instance-attributes
+    """ starting a particle distribution from continuous pdf
     """
 
     def __init__(self, **kwargs):
@@ -99,8 +99,8 @@ class BasePreParticle(Vapor):  # pylint: disable=too-many-instance-attributes
         return self.nparticles*self.pre_discretize()/self.volume
 
 
-class BaseParticle(BasePreParticle):
-    """ based on the Vapor(Environment) class
+class ParticleInstances(ParticleDistribution):
+    """ starting a particle distribution from single particles
     """
 
     def __init__(self, **kwargs):
@@ -176,8 +176,8 @@ class BaseParticle(BasePreParticle):
         )
 
 
-class Particle(BaseParticle):
-    """ expanding on BaseParticle
+class Particle(ParticleInstances):
+    """ the Particle class!
     """
 
     def __init__(self, **kwargs):
@@ -219,42 +219,42 @@ class Particle(BaseParticle):
             boltzmann_constant=self.boltzmann_constant,
         )
 
-    def reduced_mass(self, other: "Particle"):
+    def reduced_mass(self, other: "Particle" = None):
         """ Returns the reduced mass.
         """
-        return self._coag_prep(other).get_red_mass()
+        return self._coag_prep(other or self).get_red_mass()
 
-    def reduced_friction_factor(self, other: "Particle"):
+    def reduced_friction_factor(self, other: "Particle" = None):
         """ Returns the reduced friction factor between two particles.
         """
-        return self._coag_prep(other).get_red_frifac()
+        return self._coag_prep(other or self).get_red_frifac()
 
-    def coulomb_potential_ratio(self, other: "Particle"):
+    def coulomb_potential_ratio(self, other: "Particle" = None):
         """ Calculates the Coulomb potential ratio.
         """
-        return self._coag_prep(other).get_ces()[0]
+        return self._coag_prep(other or self).get_ces()[0]
 
-    def coulomb_enhancement_kinetic_limit(self, other: "Particle"):
+    def coulomb_enhancement_kinetic_limit(self, other: "Particle" = None):
         """ Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
         """
-        return self._coag_prep(other).get_ces()[1]
+        return self._coag_prep(other or self).get_ces()[1]
 
-    def coulomb_enhancement_continuum_limit(self, other: "Particle"):
+    def coulomb_enhancement_continuum_limit(self, other: "Particle" = None):
         """ Continuum limit of Coulomb enhancement for particle--particle coagulation.
         """
-        return self._coag_prep(other).get_ces()[2]
+        return self._coag_prep(other or self).get_ces()[2]
 
-    def diffusive_knudsen_number(self, other: "Particle"):
+    def diffusive_knudsen_number(self, other: "Particle" = None):
         """ Diffusive Knudsen number.
         """
-        return self._coag_prep(other).get_diff_knu()
+        return self._coag_prep(other or self).get_diff_knu()
 
-    def dimensionless_coagulation(self, other: "Particle"):
+    def dimensionless_coagulation(self, other: "Particle" = None):
         """ Dimensionless particle--particle coagulation kernel.
         """
-        return self._coag_prep(other).coag_less()
+        return self._coag_prep(other or self).coag_less()
 
-    def coagulation(self, other: "Particle"):
+    def coagulation(self, other: "Particle" = None):
         """ Dimensioned particle--particle coagulation kernel
         """
-        return self._coag_prep(other).coag_full()
+        return self._coag_prep(other or self).coag_full()
