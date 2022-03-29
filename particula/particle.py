@@ -1,21 +1,106 @@
 """ the particule class
 """
 
+import numpy as np
+
 from particula import u
 from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
                                  ELEMENTARY_CHARGE_VALUE)
 from particula.util.dimensionless_coagulation import DimensionlessCoagulation
+from particula.util.distribution_discretization import discretize
 from particula.util.friction_factor import frifac
 from particula.util.input_handling import (in_density, in_handling, in_radius,
-                                           in_scalar)
+                                           in_scalar, in_volume)
 from particula.util.knudsen_number import knu
 from particula.util.particle_mass import mass
+from particula.util.radius_cutoff import cut_rad
 from particula.util.slip_correction import scf
 from particula.vapor import Vapor
 
 
-class BaseParticle(Vapor):
-    """ based on the Vapor(Environment) class
+class ParticleDistribution(Vapor):  # pylint: disable=too-many-instance-attributes
+    """ starting a particle distribution from continuous pdf
+    """
+
+    def __init__(self, **kwargs):
+        """  particle distribution objects.
+        """
+        super().__init__(**kwargs)
+
+        self.spacing = kwargs.get("spacing", "linspace")
+        self.nbins = in_scalar(kwargs.get("nbins", 1000)).m
+        self.nparticles = in_scalar(kwargs.get("nparticles", 1e5))
+        self.volume = in_volume(kwargs.get("volume", 1e-6))
+        self.cutoff = in_scalar(kwargs.get("cutoff", 0.9999)).m
+        self.gsigma = in_scalar(kwargs.get("gsigma", 1.25)).m
+        self.mode = in_radius(kwargs.get("mode", 100e-9)).m
+
+    def pre_radius(self):
+        """ Returns the radius space of the particles
+
+            Utilizing the utility cut_rad to get 99.99% of the distribution.
+            From this interval, radius is made on a linspace with nbins points.
+            Note: linspace is used here to practical purposes --- often, the
+            logspace treatment will return errors in the discretization due
+            to the asymmetry across the interval (finer resolution for smaller
+            particles, but much coarser resolution for larger particles).
+        """
+
+        (rad_start, rad_end) = cut_rad(
+            cutoff=self.cutoff,
+            gsigma=self.gsigma,
+            mode=self.mode,
+        )
+
+        if self.spacing == "logspace":
+            radius = np.logspace(
+                np.log10(rad_start),
+                np.log10(rad_end),
+                self.nbins
+            )
+        elif self.spacing == "linspace":
+            radius = np.linspace(
+                rad_start,
+                rad_end,
+                self.nbins
+            )
+        else:
+            raise ValueError("Spacing must be 'logspace' or 'linspace'!")
+
+        return radius*u.m
+
+    def pre_discretize(self):
+        """ Returns a distribution pdf of the particles
+
+            Utilizing the utility discretize to get make a lognorm distribution
+            via scipy.stats.lognorm.pdf:
+                interval: the size interval of the distribution
+                gsigma  : geometric standard deviation of distribution
+                mode    : geometric mean radius of the particles
+        """
+
+        return discretize(
+            interval=self.pre_radius(),
+            disttype="lognormal",
+            gsigma=self.gsigma,
+            mode=self.mode
+        )
+
+    def pre_distribution(self):
+        """ Returns a distribution pdf of the particles
+
+            Utilizing the utility discretize to get make a lognorm distribution
+            via scipy.stats.lognorm.pdf:
+                interval: the size interval of the distribution
+                gsigma  : geometric standard deviation of distribution
+                mode    : geometric mean radius of the particles
+        """
+
+        return self.nparticles*self.pre_discretize()/self.volume
+
+
+class ParticleInstances(ParticleDistribution):
+    """ starting a particle distribution from single particles
     """
 
     def __init__(self, **kwargs):
@@ -23,8 +108,13 @@ class BaseParticle(Vapor):
         """
         super().__init__(**kwargs)
 
-        self.particle_radius = in_radius(
+        self.particle_radius = self.pre_radius() if kwargs.get(
+            "particle_radius", None
+        ) is None else in_radius(
             kwargs.get("particle_radius", None)
+        )
+        self.particle_number = in_scalar(
+            kwargs.get("particle_number", 1)
         )
         self.particle_density = in_density(
             kwargs.get("particle_density", 1000)
@@ -40,6 +130,15 @@ class BaseParticle(Vapor):
         )
 
         self.kwargs = kwargs
+
+    def particle_distribution(self):
+        """ distribution
+        """
+        return (
+            self.pre_distribution()
+            if self.kwargs.get("particle_radius", None) is None
+            else self.particle_number * self.particle_radius / self.volume
+        )
 
     def mass(self):
         """ Returns mass of particle.
@@ -77,8 +176,8 @@ class BaseParticle(Vapor):
         )
 
 
-class Particle(BaseParticle):
-    """ expanding on BaseParticle
+class Particle(ParticleInstances):
+    """ the Particle class!
     """
 
     def __init__(self, **kwargs):
@@ -120,42 +219,42 @@ class Particle(BaseParticle):
             boltzmann_constant=self.boltzmann_constant,
         )
 
-    def reduced_mass(self, other: "Particle"):
+    def reduced_mass(self, other: "Particle" = None):
         """ Returns the reduced mass.
         """
-        return self._coag_prep(other).get_red_mass()
+        return self._coag_prep(other or self).get_red_mass()
 
-    def reduced_friction_factor(self, other: "Particle"):
+    def reduced_friction_factor(self, other: "Particle" = None):
         """ Returns the reduced friction factor between two particles.
         """
-        return self._coag_prep(other).get_red_frifac()
+        return self._coag_prep(other or self).get_red_frifac()
 
-    def coulomb_potential_ratio(self, other: "Particle"):
+    def coulomb_potential_ratio(self, other: "Particle" = None):
         """ Calculates the Coulomb potential ratio.
         """
-        return self._coag_prep(other).get_ces()[0]
+        return self._coag_prep(other or self).get_ces()[0]
 
-    def coulomb_enhancement_kinetic_limit(self, other: "Particle"):
+    def coulomb_enhancement_kinetic_limit(self, other: "Particle" = None):
         """ Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
         """
-        return self._coag_prep(other).get_ces()[1]
+        return self._coag_prep(other or self).get_ces()[1]
 
-    def coulomb_enhancement_continuum_limit(self, other: "Particle"):
+    def coulomb_enhancement_continuum_limit(self, other: "Particle" = None):
         """ Continuum limit of Coulomb enhancement for particle--particle coagulation.
         """
-        return self._coag_prep(other).get_ces()[2]
+        return self._coag_prep(other or self).get_ces()[2]
 
-    def diffusive_knudsen_number(self, other: "Particle"):
+    def diffusive_knudsen_number(self, other: "Particle" = None):
         """ Diffusive Knudsen number.
         """
-        return self._coag_prep(other).get_diff_knu()
+        return self._coag_prep(other or self).get_diff_knu()
 
-    def dimensionless_coagulation(self, other: "Particle"):
+    def dimensionless_coagulation(self, other: "Particle" = None):
         """ Dimensionless particle--particle coagulation kernel.
         """
-        return self._coag_prep(other).coag_less()
+        return self._coag_prep(other or self).coag_less()
 
-    def coagulation(self, other: "Particle"):
+    def coagulation(self, other: "Particle" = None):
         """ Dimensioned particle--particle coagulation kernel
         """
-        return self._coag_prep(other).coag_full()
+        return self._coag_prep(other or self).coag_full()

@@ -7,7 +7,12 @@ from scipy.stats import lognorm
 from particula.util.input_handling import in_scalar, in_radius
 
 
-def cut_rad(**kwargs):
+def cut_rad(
+    cutoff=in_scalar(0.9999).m,
+    gsigma=in_scalar(1.25).m,
+    mode=in_radius(100e-9).m,
+    **kwargs
+):
     """ This routine determins the radius cutoff for the particle distribution
 
         Inputs:
@@ -19,9 +24,7 @@ def cut_rad(**kwargs):
             (starting radius, ending radius) float tuple
     """
 
-    cutoff = in_scalar(kwargs.get("cutoff", .9999)).m
-    gsigma = in_scalar(kwargs.get("gsigma", 1.25)).m
-    mode = in_radius(kwargs.get("mode", 100e-9)).m
+    _ = kwargs.get("something", None)
 
     (rad_start, rad_end) = lognorm.interval(
         alpha=cutoff,
