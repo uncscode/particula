@@ -3,7 +3,7 @@
 
 import pytest
 import numpy as np
-from particula import particle_distribution, dynamic_step
+from particula import particle, dynamic_step
 from particula.util import simple_solver
 
 simple_dic_kwargs = {
@@ -15,25 +15,25 @@ simple_dic_kwargs = {
     "cutoff": .99999,  # let's take it all lol
 }
 
-particle_dist = particle_distribution.ParticleDistribution(**simple_dic_kwargs)
+particle_dist = particle.Particle(**simple_dic_kwargs)
 
 coag_kern = dynamic_step.DynamicStep(**simple_dic_kwargs).coag_kern()
 
 Solver = simple_solver.SimpleSolver(
-    distribution=particle_dist.distribution(),
-    radius=particle_dist.radius(),
+    distribution=particle_dist.particle_distribution(),
+    radius=particle_dist.particle_radius,
     kernel=coag_kern,
     tspan=np.linspace(0, 100, 100),
 )
 
 FinerSolver = simple_solver.SimpleSolver(
-    distribution=particle_dist.distribution(),
-    radius=particle_dist.radius(),
+    distribution=particle_dist.particle_distribution(),
+    radius=particle_dist.particle_radius,
     kernel=coag_kern,
     tspan=np.linspace(0, 100, 1000),
 )
 
-radius = particle_dist.radius().m
+radius = particle_dist.particle_radius.m
 solution = Solver.solution()
 fine_sols = FinerSolver.solution()
 
@@ -44,11 +44,11 @@ def test_dims():
 
     assert (
         Solver.prep_inputs()[0].shape ==
-        particle_dist.distribution().m.shape
+        particle_dist.particle_distribution().m.shape
     )
     assert (
         Solver.prep_inputs()[1].shape ==
-        particle_dist.radius().m.shape
+        particle_dist.particle_radius.m.shape
     )
     assert (
         Solver.prep_inputs()[2].shape ==
@@ -65,7 +65,7 @@ def test_solution():
     """
 
     assert solution.m.shape == (100, 1000)
-    assert solution.u == particle_dist.distribution().u
+    assert solution.u == particle_dist.particle_distribution().u
     assert fine_sols.m.shape == (1000, 1000)
     assert solution.m[0, :].all() == fine_sols.m[0, :].all()
 
