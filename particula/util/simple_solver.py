@@ -14,17 +14,16 @@
 import numpy as np
 from scipy.integrate import odeint
 from particula.util.coagulation_rate import CoagulationRate
-from particula.units import strip
+from particula import u
 
 
 def ode_func(_nums, _, _rads, _coag):
     """ function to integrate
     """
-
     coag = CoagulationRate(
-        distribution=_nums,
-        radius=_rads,
-        kernel=_coag,
+        distribution=_nums * u.m**-4,
+        radius=_rads * u.m,
+        kernel=_coag * u.m**-4,
     )
 
     return coag.coag_gain().m - coag.coag_loss().m
@@ -62,10 +61,10 @@ class SimpleSolver:
         """
 
         return (
-            strip(self.nums_init),
-            strip(self.rads_init),
-            strip(self.coag_kern),
-            strip(self.time_span),
+            self.nums_init.m,
+            self.rads_init.m,
+            self.coag_kern.m,
+            self.time_span,
         )
 
     def solution(self):
