@@ -9,7 +9,7 @@ from particula.util.input_handling import in_molecular_weight, in_temperature
 def cbar(**kwargs):
     """ Returns the mean speed of molecules in an ideal gas.
 
-        Parameters: (either # or $)
+        Parameters:
             temperature           (float) [K]      (default: 298.15)
             molecular_weight      (float) [kg/mol] (default: constants)
 
