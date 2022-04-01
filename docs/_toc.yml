@@ -14,6 +14,11 @@ parts:
   chapters:
   - file: documentation/environment
   - file: documentation/vapor
+- caption: Utilities
+  numbered: false
+  chapters:
+  - file: utilities/dynamic_viscosity
+  - file: utilities/mean_free_path
 - caption: Community
   numbered: false
   chapters:
