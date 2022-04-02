@@ -22,6 +22,7 @@ parts:
   - file: documentation/utilities/knudsen_number
   - file: documentation/utilities/slip_correction
   - file: documentation/utilities/friction_factor
+  - file: documentation/utilities/dimensionless_coagulation
 - caption: Community
   numbered: false
   chapters:
