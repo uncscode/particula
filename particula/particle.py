@@ -113,7 +113,7 @@ class ParticleInstances(ParticleDistribution):
         ) is None else in_radius(
             kwargs.get("particle_radius", None)
         )
-        self.particle_number = self.nparticles() if kwargs.get(
+        self.particle_number = self.nparticles if kwargs.get(
             "particle_radius", None
         ) is None else in_scalar(
             kwargs.get("particle_number", 1)
