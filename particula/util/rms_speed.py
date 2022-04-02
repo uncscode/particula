@@ -3,10 +3,14 @@
 
 import numpy as np
 from particula.constants import GAS_CONSTANT, MOLECULAR_WEIGHT_AIR
-from particula.util.input_handling import in_molecular_weight, in_temperature
+from particula.util.input_handling import in_molecular_weight, in_temperature, in_gas_constant
 
 
-def cbar(**kwargs):
+def cbar(
+    temperature=298.15,
+    molecular_weight=MOLECULAR_WEIGHT_AIR,
+    gas_constant=GAS_CONSTANT,
+):
     """ Returns the mean speed of molecules in an ideal gas.
 
         Parameters:
@@ -22,14 +26,10 @@ def cbar(**kwargs):
 
     """
 
-    temp = kwargs.get("temperature", 298.15)
-    molec_wt = kwargs.get("molecular_weight", MOLECULAR_WEIGHT_AIR)
-
-    temp = in_temperature(temp)
-    molec_wt = in_molecular_weight(molec_wt)
-
-    gas_con = GAS_CONSTANT
+    temperature=in_temperature(temperature)
+    molecular_weight=in_molecular_weight(molecular_weight)
+    gas_constant=in_gas_constant(gas_constant)
 
     return (
-        (8 * gas_con * temp/(np.pi * molec_wt))**0.5
+        (8 * gas_constant * temperature/(np.pi * molecular_weight))**0.5
     ).to_base_units()

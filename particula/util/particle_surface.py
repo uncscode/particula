@@ -5,7 +5,10 @@ import numpy as np
 from particula.util.input_handling import in_radius, in_scalar
 
 
-def area(**kwargs):
+def area(
+    radius=None,
+    area_factor=1,
+):
     """ Returns particle's surface area: 4 pi r^2 .
 
         Parameters:
@@ -16,13 +19,7 @@ def area(**kwargs):
                          (float) [m^2]
     """
 
-    radius = kwargs.get("radius", None)
-    area_factor = kwargs.get("area_factor", 1)
-
     radius = in_radius(radius)
     area_factor = in_scalar(area_factor)
 
-    return (
-        (4*np.pi) * (radius**2)
-        * area_factor
-    )
+    return 4*np.pi*(radius**2)*area_factor

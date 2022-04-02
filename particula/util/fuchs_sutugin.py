@@ -6,7 +6,11 @@ from particula.util.knudsen_number import knu
 from particula.util.input_handling import in_scalar
 
 
-def fsc(**kwargs):
+def fsc(
+    knu_val=None,
+    alpha=1,
+    **kwargs
+):
     """ Returns the Fuchs-Sutugin model transition regime correction.
 
         Parameters:
@@ -21,10 +25,7 @@ def fsc(**kwargs):
             refer to particula.util.knudsen_number.knu for more info.
     """
 
-    knu_val = kwargs.get("knu", knu(**kwargs))
-    alpha = kwargs.get("alpha", 1.0)
-
-    knu_val = in_scalar(knu_val)
+    knu_val = knu(**kwargs) if knu_val is None else in_scalar(knu_val)
     alpha = np.transpose([in_scalar(alpha).m])*in_scalar(alpha).u
 
     return np.transpose(
