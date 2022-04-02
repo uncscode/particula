@@ -20,7 +20,7 @@ parts:
   - file: documentation/utilities/radius_cutoff
   - file: documentation/utilities/particle_mass
   - file: documentation/utilities/knudsen_number
-  - file: documentation/utilities/slip_correction_factor
+  - file: documentation/utilities/slip_correction
   - file: documentation/utilities/friction_factor
 - caption: Community
   numbered: false
