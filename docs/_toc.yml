@@ -5,15 +5,24 @@ parts:
   numbered: false
   chapters:
   - file: getting_started
-- caption: Tutorials
-  numbered: false
-  chapters:
-  - file: tutorials/001_ParticleClass
 - caption: Documentation
   numbered: false
   chapters:
   - file: documentation/environment
   - file: documentation/vapor
+  - file: documentation/particle
+- caption: Utilities
+  numbered: false
+  chapters:
+  - file: documentation/utilities/dynamic_viscosity
+  - file: documentation/utilities/mean_free_path
+  - file: documentation/utilities/distribution_discretization
+  - file: documentation/utilities/radius_cutoff
+  - file: documentation/utilities/particle_mass
+  - file: documentation/utilities/knudsen_number
+  - file: documentation/utilities/slip_correction
+  - file: documentation/utilities/friction_factor
+  - file: documentation/utilities/dimensionless_coagulation
 - caption: Community
   numbered: false
   chapters:
