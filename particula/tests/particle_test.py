@@ -55,7 +55,7 @@ def test_getters():
     """
 
     assert small_particle.particle_radius == 1.0e-9 * u.m
-    assert small_particle.mass() == (
+    assert small_particle.particle_mass() == (
         4.0/3.0 * np.pi * (1.0e-9 ** 3 * u.m ** 3) * (
             1.0 * u.kg / u.m**3
         )
@@ -71,7 +71,7 @@ def test_individual_shapes():
     ).particle_radius.m.shape == (2,)
     assert particle.Particle(
         particle_radius=[1, 2]
-    ).mass().m.shape == (2,)
+    ).particle_mass().m.shape == (2,)
     assert particle.Particle(
         particle_radius=[1, 2]
     ).knudsen_number().m.shape == (2,)
