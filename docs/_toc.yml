@@ -13,8 +13,8 @@ parts:
 - caption: Utilities
   numbered: false
   chapters:
-  - file: utilities/dynamic_viscosity
-  - file: utilities/mean_free_path
+  - file: documentation/utilities/dynamic_viscosity
+  - file: documentation/utilities/mean_free_path
 - caption: Community
   numbered: false
   chapters:
