@@ -5,10 +5,6 @@ parts:
   numbered: false
   chapters:
   - file: getting_started
-- caption: Tutorials
-  numbered: false
-  chapters:
-  - file: tutorials/001_ParticleClass
 - caption: Documentation
   numbered: false
   chapters:
