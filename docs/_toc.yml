@@ -17,6 +17,7 @@ parts:
   - file: documentation/utilities/dynamic_viscosity
   - file: documentation/utilities/mean_free_path
   - file: documentation/utilities/distribution_discretization
+  - file: documentation/utilities/radius_cutoff
 - caption: Community
   numbered: false
   chapters:
