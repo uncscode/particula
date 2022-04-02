@@ -1,0 +1,603 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mean_free_path &#8212; Particula Book</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="distribution_discretization" href="distribution_discretization.html" />
+    <link rel="prev" title="dynamic_viscosity" href="dynamic_viscosity.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../_static/placeholder.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">Particula Book</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro.html">
+   The particula JupyterBook
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Installation
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../getting_started.html">
+   Installing
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     particula
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Documentation
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../environment.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Environment
+    </span>
+   </code>
+   Class
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../vapor.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Vapor
+    </span>
+   </code>
+   Class
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../particle.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Particle
+    </span>
+   </code>
+   Classes
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Utilities
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="dynamic_viscosity.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     dynamic_viscosity
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     mean_free_path
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="distribution_discretization.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     distribution_discretization
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="radius_cutoff.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     radius_cutoff
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="particle_mass.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     particle_mass
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="knudsen_number.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     knudsen_number
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="slip_correction.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     slip_correction
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="friction_factor.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     friction_factor
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="dimensionless_coagulation.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     dimensionless_coagulation
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Community
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../CONTRIBUTING.html">
+   Contributor Guidelines
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../CODE_OF_CONDUCT.html">
+   Contributor Covenant Code of Conduct
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  FAQ
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../FAQ.html">
+   FAQ
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/documentation/utilities/mean_free_path.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/uncscode/particula"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fdocumentation/utilities/mean_free_path.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        <a class="edit-button" href="https://github.com/uncscode/particula/edit/v0.0.3/docs/documentation/utilities/mean_free_path.ipynb"><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
+    </div>
+</div>
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.3?urlpath=lab/tree/docs/documentation/utilities/mean_free_path.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.3/docs/documentation/utilities/mean_free_path.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        <button type="button" class="btn btn-secondary topbarbtn"
+            onclick="initThebeSBT()" title="Launch Thebe" data-toggle="tooltip" data-placement="left"><i
+                class="fas fa-play"></i><span style="margin-left: .4em;">Live Code</span></button>
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>mean_free_path</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
+            </div>
+            
+              <div>
+                
+  <div class="tex2jax_ignore mathjax_ignore section" id="mean-free-path">
+<h1><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code><a class="headerlink" href="#mean-free-path" title="Permalink to this headline">¶</a></h1>
+<p>The mean free path is the average distance of a molecule between collisions with other molecules present in the medium. We use the kinetic theory of gases to calculate the mean free path in an ideal gas as</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda = \frac{2 \mu / p}{(8 \, \mathrm{MW} / (\pi R T))^{1/2}} 
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lambda\)</span> is the mean free path, <span class="math notranslate nohighlight">\(\mu\)</span> is the dynamic viscosity, <span class="math notranslate nohighlight">\(p\)</span> is the pressure, <span class="math notranslate nohighlight">\(\mathrm{MW}\)</span> is the molecular weight, <span class="math notranslate nohighlight">\(R\)</span> is the gas constant, <span class="math notranslate nohighlight">\(T\)</span> is the temperature. As noted above, the user can provide an explicit value for <span class="math notranslate nohighlight">\(\mu\)</span> or it can be calculated using the above formula (that is, the user can provide the inputs to the above formula for <span class="math notranslate nohighlight">\(\mu\)</span>). At default conditions, <span class="math notranslate nohighlight">\(\lambda\)</span> is about 66.5 nm.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.environment</span> <span class="kn">import</span> <span class="n">Environment</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mean free path is &quot;</span><span class="p">,</span> <span class="n">Environment</span><span class="p">()</span><span class="o">.</span><span class="n">mean_free_path</span><span class="p">())</span> <span class="c1"># will produce approx 66.5 nm</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mean free path is  6.647984982685411e-08 meter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">mean_free_path</span>
+<span class="n">help</span><span class="p">(</span><span class="n">mean_free_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on module particula.util.mean_free_path in particula.util:
+
+NAME
+    particula.util.mean_free_path - calculating the mean free path of air
+
+DESCRIPTION
+    The mean free path is the average distance
+    traveled by a molecule between collisions
+    with other molecules present in a medium (air).
+    
+    The expeected mean free path of air is approx.
+    65 nm at 298 K and 101325 Pa.
+    
+    TODO:
+        add size checks for pressure--temperature pairs
+        to ensure that they match; otherwise, an error will occur
+        or use broadcast (though this is likely not a good idea)?
+        perhaps allow for a height--temperature--pressure dependency
+        somewhere? this could be import for @Gorkowski&#39;s parcels...
+        (likely through a different utility function...)
+
+FUNCTIONS
+    mfp(temperature=&lt;Quantity(298.15, &#39;kelvin&#39;)&gt;, pressure=&lt;Quantity(101325, &#39;pascal&#39;)&gt;, molecular_weight=&lt;Quantity(0.0289644, &#39;kilogram / mole&#39;)&gt;, dynamic_viscosity=None, gas_constant=&lt;Quantity(8.31446275, &#39;kilogram * meter ** 2 / kelvin / mole / second ** 2&#39;)&gt;, **kwargs)
+        Returns the mean free path of in air.
+        
+        The mean free path is the average distance
+        traveled by a molecule between collisions
+        with other molecules present in a medium (air).
+        
+        The expeected mean free path of air is approx.
+        65 nm at 298 K and 101325 Pa.
+        
+        Examples:
+        ```
+        &gt;&gt;&gt; from particula import u
+        &gt;&gt;&gt; from particula.util.mean_free_path import mfp
+        &gt;&gt;&gt; # with no inputs, it defaults to 298 K and 101325 Pa
+        &gt;&gt;&gt; mfp()
+        &lt;Quantity(6.64373669e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; # specifying a temperature of 300 K
+        &gt;&gt;&gt; mfp(temperature=300*u.K).magnitude
+        6.700400687925813e-08
+        &gt;&gt;&gt; # specifying 300 K and  pressure of 1e5 Pa
+        &gt;&gt;&gt; mfp(temperature=300*u.K, pressure=1e5*u.Pa)
+        &lt;Quantity(6.789181e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; mfp(
+        ... temperature=300,
+        ... pressure=1e5,
+        ... molecular_weight=0.03
+        ... )
+        &lt;Quantity(6.67097062e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; # specifying explicit value for dynamic viscosity
+        &gt;&gt;&gt; mfp(dynamic_viscosity=1e-5)
+        &lt;Quantity(3.61864151e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; # specifying implicit value for dynamic viscosity
+        &gt;&gt;&gt; mfp(
+        ... temperature=300,
+        ... reference_viscosity=1e-5,
+        ... reference_temperature=273.15
+        ... )
+        &lt;Quantity(3.90466241e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; # specifying a list of temperatures
+        &gt;&gt;&gt; mfp(temperature=[200, 250, 300, 400]).m
+        array([3.93734886e-08, 5.29859655e-08, 6.70040069e-08, 9.57800224e-08])
+        &gt;&gt;&gt; # specifying a list of pressures
+        &gt;&gt;&gt; mfp(pressure=[1.0e5, 1.1e5, 1.2e5, 1.3e5]).m
+        array([6.73607078e-08, 6.12370071e-08, 5.61339232e-08, 5.18159291e-08])
+        &gt;&gt;&gt; # specifying a list of pressures and temperatures
+        &gt;&gt;&gt; mfp(temperature=[300,310], pressure=[1e5, 1.1e5])
+        &lt;Quantity([6.78918100e-08 6.43354325e-08], &#39;meter&#39;)&gt;
+        ```
+        
+        Parameters: (either # or $)
+            temperature           (float) [K]      (default: 298)
+            pressure              (float) [Pa]     (default: 101325)
+            molecular_weight      (float) [kg/mol] (default: constants)
+        
+        #   dynamic_viscosity     (float) [Pa*s]   (default: util)
+        $   reference_viscosity   (float) [Pa*s]   (default: constants)
+        $   reference_temperature (float) [K]      (default: constants)
+        
+        Returns:
+                        (float) [m]
+        
+        Using particula.constants:
+            GAS_CONSTANT            (float) [J/mol/K]
+            MOLECULAR_WEIGHT_AIR    (float) [kg/mol]
+        
+            REF_VISCOSITY_AIR_STP   (float) [Pa*s]
+            REF_TEMPERATURE_STP     (float) [K]
+            SUTHERLAND_CONSTANT     (float) [K]
+        
+        Notes:
+            dynamic_viscosity can be calculated independently via
+            particula.util.dynamic_viscosity.dyn_vis(**kwargs), but
+            if the value of dynamic_viscosity is provided directly,
+            it overrides the calculated value.
+
+DATA
+    GAS_CONSTANT = &lt;Quantity(8.31446275, &#39;kilogram * meter ** 2 / kelvin /...
+    MOLECULAR_WEIGHT_AIR = &lt;Quantity(0.0289644, &#39;kilogram / mole&#39;)&gt;
+    u = &lt;pint.registry.UnitRegistry object&gt;
+
+FILE
+    /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages/particula/util/mean_free_path.py
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "uncscode/particula",
+            ref: "v0.0.3",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./documentation/utilities"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="dynamic_viscosity.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="distribution_discretization.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            
+        </div>
+    </div>
+    <footer class="footer">
+  <p>
+    
+      By particula contributors<br/>
+    
+        &copy; Copyright 2021.<br/>
+  </p>
+</footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+
+  </body>
+</html>

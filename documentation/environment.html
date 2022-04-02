@@ -51,12 +51,10 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The Vapor class" href="vapor.html" />
-    <link rel="prev" title="Particle Class" href="../tutorials/001_ParticleClass.html" />
+    <link rel="next" title="The Vapor Class" href="vapor.html" />
+    <link rel="prev" title="Installing particula" href="../getting_started.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -119,18 +117,6 @@ const thebe_selector_output = ".output, .cell_output"
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
-  Tutorials
- </span>
-</p>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="../tutorials/001_ParticleClass.html">
-   Particle Class
-  </a>
- </li>
-</ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
   Documentation
  </span>
 </p>
@@ -154,7 +140,106 @@ const thebe_selector_output = ".output, .cell_output"
      Vapor
     </span>
    </code>
-   class
+   Class
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="particle.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Particle
+    </span>
+   </code>
+   Classes
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Utilities
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/dynamic_viscosity.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     dynamic_viscosity
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/mean_free_path.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     mean_free_path
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/distribution_discretization.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     distribution_discretization
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/radius_cutoff.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     radius_cutoff
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/particle_mass.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     particle_mass
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/knudsen_number.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     knudsen_number
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/slip_correction.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     slip_correction
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/friction_factor.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     friction_factor
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/dimensionless_coagulation.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     dimensionless_coagulation
+    </span>
+   </code>
   </a>
  </li>
 </ul>
@@ -264,6 +349,31 @@ const thebe_selector_output = ".output, .cell_output"
             class="fas fa-expand"></i></button></a>
 
             <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.3?urlpath=lab/tree/docs/documentation/environment.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.3/docs/documentation/environment.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        <button type="button" class="btn btn-secondary topbarbtn"
+            onclick="initThebeSBT()" title="Launch Thebe" data-toggle="tooltip" data-placement="left"><i
+                class="fas fa-play"></i><span style="margin-left: .4em;">Live Code</span></button>
+        
+    </div>
+</div>
 
         </div>
 
@@ -418,11 +528,11 @@ const thebe_selector_output = ".output, .cell_output"
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">temperature</span></code></p></td>
 <td><p>K</p></td>
-<td><p>298.15</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">298.15</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pressure</span></code></p></td>
 <td><p>Pa</p></td>
-<td><p>101325</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">101325</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></p></td>
 <td><p>Pa s</p></td>
@@ -491,12 +601,12 @@ pressure is  101325 kilogram / meter / second ** 2
 <span class="kn">from</span> <span class="nn">particula.environment</span> <span class="kn">import</span> <span class="n">Environment</span>
 
 <span class="n">EnvThree</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;temperature is &quot;</span><span class="p">,</span> <span class="n">EnvTwo</span><span class="o">.</span><span class="n">temperature</span><span class="p">)</span> <span class="c1"># will print 298.15 K (the default value)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;temperature is &quot;</span><span class="p">,</span> <span class="n">EnvThree</span><span class="o">.</span><span class="n">temperature</span><span class="p">)</span> <span class="c1"># will print 298.15 K (the default value)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>temperature is  300 kelvin
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>temperature is  298.15 kelvin
 </pre></div>
 </div>
 </div>
@@ -506,83 +616,47 @@ pressure is  101325 kilogram / meter / second ** 2
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula</span> <span class="kn">import</span> <span class="n">u</span>
 <span class="kn">from</span> <span class="nn">particula.environment</span> <span class="kn">import</span> <span class="n">Environment</span>
 
-<span class="n">EnvWrong</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mi">300</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="p">)</span> <span class="c1"># will raise an error</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_2064</span><span class="o">/</span><span class="mf">3153459865.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">particula.environment</span> <span class="kn">import</span> <span class="n">Environment</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> 
-<span class="ne">----&gt; </span><span class="mi">4</span> <span class="n">EnvWrong</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mi">300</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="p">)</span> <span class="c1"># will raise an error</span>
-
-<span class="nn">/opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages/particula/environment.py</span> in <span class="ni">__init__</span><span class="nt">(self, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">50</span> 
-<span class="g g-Whitespace">     </span><span class="mi">51</span>         <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">in_temperature</span><span class="p">(</span>
-<span class="ne">---&gt; </span><span class="mi">52</span>             <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">53</span>         <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">54</span>         <span class="bp">self</span><span class="o">.</span><span class="n">reference_viscosity</span> <span class="o">=</span> <span class="n">in_viscosity</span><span class="p">(</span>
-
-<span class="nn">/opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages/particula/util/input_handling.py</span> in <span class="ni">in_temperature</span><span class="nt">(temp)</span>
-<span class="g g-Whitespace">     </span><span class="mi">75</span> 
-<span class="g g-Whitespace">     </span><span class="mi">76</span> <span class="c1"># pylint: disable=missing-docstring, multiple-statements</span>
-<span class="ne">---&gt; </span><span class="mi">77</span> <span class="k">def</span> <span class="nf">in_temperature</span><span class="p">(</span><span class="n">temp</span><span class="p">):</span> <span class="k">return</span> <span class="n">in_handling</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">78</span> <span class="k">def</span> <span class="nf">in_viscosity</span><span class="p">(</span><span class="n">vis</span><span class="p">):</span> <span class="k">return</span> <span class="n">in_handling</span><span class="p">(</span><span class="n">vis</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">kg</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">79</span> <span class="k">def</span> <span class="nf">in_pressure</span><span class="p">(</span><span class="n">pres</span><span class="p">):</span> <span class="k">return</span> <span class="n">in_handling</span><span class="p">(</span><span class="n">pres</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Pa</span><span class="p">)</span>
-
-<span class="nn">/opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages/particula/util/input_handling.py</span> in <span class="ni">in_handling</span><span class="nt">(value, units)</span>
-<span class="g g-Whitespace">     </span><span class="mi">62</span>         <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">     </span><span class="mi">63</span>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="ne">---&gt; </span><span class="mi">64</span>                 <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">65</span>                 <span class="sa">f</span><span class="s2">&quot;Input has unsupported units.</span><span class="se">\n\t</span><span class="s2">&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">66</span>                 <span class="sa">f</span><span class="s2">&quot;Input must have units equivlanet to </span><span class="si">{</span><span class="n">units</span><span class="si">}</span><span class="s2">;</span><span class="se">\n\t</span><span class="s2">&quot;</span>
-
-<span class="ne">ValueError</span>: 
-	<span class="n">Input</span> <span class="n">has</span> <span class="n">unsupported</span> <span class="n">units</span><span class="o">.</span>
-	<span class="n">Input</span> <span class="n">must</span> <span class="n">have</span> <span class="n">units</span> <span class="n">equivlanet</span> <span class="n">to</span> <span class="n">kelvin</span><span class="p">;</span>
-	<span class="n">otherwise</span><span class="p">,</span> <span class="k">if</span> <span class="n">dimensionless</span><span class="p">,</span> <span class="n">it</span> <span class="n">will</span>
-	<span class="n">be</span> <span class="n">assigned</span> <span class="n">kelvin</span><span class="o">.</span>
+<span class="c1"># EnvWrong = Environment(temperature=300*u.m) # will raise an error</span>
 </pre></div>
 </div>
 </div>
 </div>
 <p>In the table above, a variety of attributes have default values from <code class="docutils literal notranslate"><span class="pre">particula.constants</span></code>, like the gas constant and Sutherland constant. This is to allow the user flexibility, but, if not provided, they all fall on default values from the literature as discussed below.</p>
-<p>Finally, one attribute has a default value from <code class="docutils literal notranslate"><span class="pre">particula.util</span></code>. As explained below, we calculate the dynamic viscosity via the Sutherland formula using the temperature (as well as the reference values of temperature, visocsity, and Sutherland constant). The user can override this calculating by offering a different dynamic viscosity with the attribute <code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code>.</p>
+<p>Finally, one attribute has a default value from <code class="docutils literal notranslate"><span class="pre">particula.util</span></code>. As explained below, we calculate the dynamic viscosity via the Sutherland formula using the temperature (as well as the reference values of temperature, viscosity, and Sutherland constant). The user can override this calculating by offering a different dynamic viscosity with the attribute <code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code>.</p>
 </div>
 <div class="section" id="environment-methods">
 <h2><code class="docutils literal notranslate"><span class="pre">Environment</span></code> methods<a class="headerlink" href="#environment-methods" title="Permalink to this headline">¶</a></h2>
 <p>As discussed above, the <code class="docutils literal notranslate"><span class="pre">Environment</span></code> class enables us to calculate the dynamic viscosity as well as the mean free path.</p>
 <div class="section" id="environment-dynamic-viscosity">
 <h3><code class="docutils literal notranslate"><span class="pre">Environment.dynamic_viscosity()</span></code><a class="headerlink" href="#environment-dynamic-viscosity" title="Permalink to this headline">¶</a></h3>
-<p>The dynamic viscosity is a property of the fluid, defining the resistance of the fluid to its own movement. The dynamic viscosity is calculated using the Sutherland formula (<a class="reference external" href="https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula">reference</a>). The function can be found and is documented in <code class="docutils literal notranslate"><span class="pre">util.dynamic_vicosity.py</span></code>. It takes inputs of <code class="docutils literal notranslate"><span class="pre">temperature</span></code>, <code class="docutils literal notranslate"><span class="pre">reference_viscosity</span></code>, <code class="docutils literal notranslate"><span class="pre">reference_temperature</span></code>, and <code class="docutils literal notranslate"><span class="pre">sutherland_constant</span></code>. It returns a value for the dynamic viscosity at those variables. At default conditions (298.15 K and 101325 Pa), the dynamic viscosity is approximately 1.84e-5 kg/m/s. The Sutherland formula is</p>
-<div class="math notranslate nohighlight">
-\[
-\mu = \frac{\mu_{0}\, (T/T_{0})^{3/2}\, (T_{0} + C)}{C + T}
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(\mu\)</span> is the dynamic viscosity, <span class="math notranslate nohighlight">\(\mu_{0}\)</span> is the reference dynamic viscosity, <span class="math notranslate nohighlight">\(T\)</span> is temperature, <span class="math notranslate nohighlight">\(T_{0}\)</span> is the reference temperature, and <span class="math notranslate nohighlight">\(C\)</span> is the Sutherland constant.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="utilities/dynamic_viscosity.html"><span class="doc std std-doc"><code class="docutils literal notranslate"><span class="pre">particula.util.dynamic_viscosity</span></code></span></a></p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.environment</span> <span class="kn">import</span> <span class="n">Environment</span>
-<span class="n">Environment</span><span class="p">()</span><span class="o">.</span><span class="n">dynamic_viscoity</span><span class="p">()</span> <span class="c1"># will produce approx 1.84e-5 kg/m/s</span>
+<span class="n">Environment</span><span class="p">()</span><span class="o">.</span><span class="n">dynamic_viscosity</span><span class="p">()</span> <span class="c1"># will produce approx 1.84e-5 kg/m/s</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html">1.8371493734583912×10<sup>-5</sup> kilogram/(meter second)</div></div>
 </div>
 </div>
 <div class="section" id="environment-mean-free-path">
 <h3><code class="docutils literal notranslate"><span class="pre">Environment.mean_free_path()</span></code><a class="headerlink" href="#environment-mean-free-path" title="Permalink to this headline">¶</a></h3>
-<p>The mean free path is the average distance of a molecule between collisions with other molecules present in the medium. We use the kinetic theory of gases to calculate the mean free path in an ideal gas as</p>
-<div class="math notranslate nohighlight">
-\[
-\lambda = \frac{2 \mu / p}{(8 \, \mathrm{MW} / (\pi R T))^{1/2}} 
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(\lambda\)</span> is the mean free path, <span class="math notranslate nohighlight">\(\mu\)</span> is the dynamic viscosity, <span class="math notranslate nohighlight">\(p\)</span> is the pressure, <span class="math notranslate nohighlight">\(\mathrm{MW}\)</span> is the molecular weight, <span class="math notranslate nohighlight">\(R\)</span> is the gas constant, <span class="math notranslate nohighlight">\(T\)</span> is the temperature. As noted above, the user can provide an explicit value for <span class="math notranslate nohighlight">\(\mu\)</span> or it can be calculated using the above formula (that is, the user can provide the inputs to the above formula for <span class="math notranslate nohighlight">\(\mu\)</span>). At default conditions, <span class="math notranslate nohighlight">\(\lambda\)</span> is about 66.5 nm.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="utilities/mean_free_path.html"><span class="doc std std-doc"><code class="docutils literal notranslate"><span class="pre">particula.util.mean_free_path</span></code></span></a></p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.environment</span> <span class="kn">import</span> <span class="n">Environment</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mean free path is &quot;</span><span class="p">,</span> <span class="n">Environment</span><span class="p">()</span><span class="o">.</span><span class="n">mean_free_path</span><span class="p">())</span> <span class="c1"># will produce approx 66.5 nm</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mean free path is  6.647984982685411e-08 meter
 </pre></div>
 </div>
 </div>
@@ -593,8 +667,8 @@ pressure is  101325 kilogram / meter / second ** 2
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>While technically allowed, we discourage the users from using vectored temperature and pressure quantities for now. We design <code class="docutils literal notranslate"><span class="pre">particula</span></code> with the intention of having each point in time (calculation) having a unique set of conditions.</p></li>
-<li><p>Attributes are called without parantheses, e.g. <code class="docutils literal notranslate"><span class="pre">Environment().temperature</span></code>.</p></li>
-<li><p>Methods are called with parantheses, e.g. <code class="docutils literal notranslate"><span class="pre">Environment().mean_free_path()</span></code>.</p></li>
+<li><p>Attributes are called without parentheses, e.g. <code class="docutils literal notranslate"><span class="pre">Environment().temperature</span></code>.</p></li>
+<li><p>Methods are called with parentheses, e.g. <code class="docutils literal notranslate"><span class="pre">Environment().mean_free_path()</span></code>.</p></li>
 </ul>
 </div>
 </div>
@@ -624,17 +698,17 @@ pressure is  101325 kilogram / meter / second ** 2
             
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="../tutorials/001_ParticleClass.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="../getting_started.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Particle Class</p>
+            <p class="prev-next-title">Installing <code class="docutils literal notranslate"><span class="pre">particula</span></code></p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="vapor.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> class</p>
+        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

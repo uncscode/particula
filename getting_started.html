@@ -51,11 +51,11 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Particle Class" href="tutorials/001_ParticleClass.html" />
+    <link rel="next" title="The Environment Class" href="documentation/environment.html" />
     <link rel="prev" title="The particula JupyterBook" href="intro.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -119,18 +119,6 @@ const thebe_selector_output = ".output, .cell_output"
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
-  Tutorials
- </span>
-</p>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="tutorials/001_ParticleClass.html">
-   Particle Class
-  </a>
- </li>
-</ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
   Documentation
  </span>
 </p>
@@ -154,7 +142,106 @@ const thebe_selector_output = ".output, .cell_output"
      Vapor
     </span>
    </code>
-   class
+   Class
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="documentation/particle.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Particle
+    </span>
+   </code>
+   Classes
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Utilities
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="documentation/utilities/dynamic_viscosity.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     dynamic_viscosity
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="documentation/utilities/mean_free_path.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     mean_free_path
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="documentation/utilities/distribution_discretization.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     distribution_discretization
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="documentation/utilities/radius_cutoff.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     radius_cutoff
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="documentation/utilities/particle_mass.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     particle_mass
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="documentation/utilities/knudsen_number.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     knudsen_number
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="documentation/utilities/slip_correction.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     slip_correction
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="documentation/utilities/friction_factor.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     friction_factor
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="documentation/utilities/dimensionless_coagulation.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     dimensionless_coagulation
+    </span>
+   </code>
   </a>
  </li>
 </ul>
@@ -411,15 +498,15 @@ In a notebook like this, one would run the following command: <code class="docut
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: particula in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (0.0.4.dev5)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: scipy in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (1.7.3)
-Requirement already satisfied: numpy in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (1.21.5)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: numpy in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (1.21.5)
 Requirement already satisfied: pint in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (0.18)
-Requirement already satisfied: importlib-metadata in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (4.11.3)
-Requirement already satisfied: packaging in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (21.3)
+Requirement already satisfied: scipy in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (1.7.3)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: zipp&gt;=0.5 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (3.7.0)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: packaging in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (21.3)
+Requirement already satisfied: importlib-metadata in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (4.2.0)
 Requirement already satisfied: typing-extensions&gt;=3.6.4 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (4.1.1)
+Requirement already satisfied: zipp&gt;=0.5 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (3.7.0)
 Requirement already satisfied: pyparsing!=3.0.5,&gt;=2.0.2 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from packaging-&gt;pint-&gt;particula) (3.0.7)
 </pre></div>
 </div>
@@ -480,10 +567,10 @@ We will be providing more information soon.</p>
             <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">particula</span></code> JupyterBook</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="tutorials/001_ParticleClass.html" title="next page">
+    <a class='right-next' id="next-link" href="documentation/environment.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Particle Class</p>
+        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

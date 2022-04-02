@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Vapor class &#8212; Particula Book</title>
+    <title>The Vapor Class &#8212; Particula Book</title>
     
   <link href="../_static/css/theme.css" rel="stylesheet">
   <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -53,7 +53,7 @@ const thebe_selector_output = ".output, .cell_output"
     <script async="async" src="../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Contributor Guidelines" href="../CONTRIBUTING.html" />
+    <link rel="next" title="The Particle Classes" href="particle.html" />
     <link rel="prev" title="The Environment Class" href="environment.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -117,18 +117,6 @@ const thebe_selector_output = ".output, .cell_output"
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
-  Tutorials
- </span>
-</p>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="../tutorials/001_ParticleClass.html">
-   Particle Class
-  </a>
- </li>
-</ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
   Documentation
  </span>
 </p>
@@ -152,7 +140,106 @@ const thebe_selector_output = ".output, .cell_output"
      Vapor
     </span>
    </code>
-   class
+   Class
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="particle.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Particle
+    </span>
+   </code>
+   Classes
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Utilities
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/dynamic_viscosity.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     dynamic_viscosity
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/mean_free_path.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     mean_free_path
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/distribution_discretization.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     distribution_discretization
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/radius_cutoff.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     radius_cutoff
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/particle_mass.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     particle_mass
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/knudsen_number.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     knudsen_number
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/slip_correction.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     slip_correction
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/friction_factor.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     friction_factor
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/dimensionless_coagulation.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     dimensionless_coagulation
+    </span>
+   </code>
   </a>
  </li>
 </ul>
@@ -263,6 +350,31 @@ const thebe_selector_output = ".output, .cell_output"
 
             <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.3?urlpath=lab/tree/docs/documentation/vapor.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.3/docs/documentation/vapor.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        <button type="button" class="btn btn-secondary topbarbtn"
+            onclick="initThebeSBT()" title="Launch Thebe" data-toggle="tooltip" data-placement="left"><i
+                class="fas fa-play"></i><span style="margin-left: .4em;">Live Code</span></button>
+        
+    </div>
+</div>
+
         </div>
 
         <!-- Table of contents -->
@@ -314,7 +426,7 @@ const thebe_selector_output = ".output, .cell_output"
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>The Vapor class</h1>
+                <h1>The Vapor Class</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -365,8 +477,8 @@ const thebe_selector_output = ".output, .cell_output"
               <div>
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="the-vapor-class">
-<h1>The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> class<a class="headerlink" href="#the-vapor-class" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> class links the <code class="docutils literal notranslate"><span class="pre">Environment</span></code> class with the <code class="docutils literal notranslate"><span class="pre">Particle</span></code> class by defining condensing vapor that are precursors to particles. The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> class is defined in <code class="docutils literal notranslate"><span class="pre">paritcula/vapor.py</span></code>. It inherits everything from the <code class="docutils literal notranslate"><span class="pre">Environment</span></code> class, including attributes and methods. It can be imported as,</p>
+<h1>The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class<a class="headerlink" href="#the-vapor-class" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> class links the <code class="docutils literal notranslate"><span class="pre">Environment</span></code> class with the <code class="docutils literal notranslate"><span class="pre">Particle</span></code> class by defining condensing vapor that are precursors to particles. The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> class is defined in <code class="docutils literal notranslate"><span class="pre">particula/vapor.py</span></code>. It inherits everything from the <code class="docutils literal notranslate"><span class="pre">Environment</span></code> class, including attributes and methods. It can be imported as,</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.vapor</span> <span class="kn">import</span> <span class="n">Vapor</span>
@@ -387,23 +499,23 @@ const thebe_selector_output = ".output, .cell_output"
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vapor_radius</span></code></p></td>
 <td><p>m</p></td>
-<td><p>1.6e-9</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.6e-9</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vapor_density</span></code></p></td>
 <td><p>kg / m^3</p></td>
-<td><p>1400</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1400</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vapor_concentration</span></code></p></td>
 <td><p>kg / m^3</p></td>
-<td><p>1e-5</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1e-5</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vapor_attachment</span></code></p></td>
 <td><p></p></td>
-<td><p>1</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vapor_molec_wt</span></code></p></td>
 <td><p>kg / mol</p></td>
-<td><p>0.2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.2</span></code></p></td>
 </tr>
 </tbody>
 </table>
@@ -414,7 +526,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula</span> <span class="kn">import</span> <span class="n">u</span>
 <span class="kn">from</span> <span class="nn">particula.vapor</span> <span class="kn">import</span> <span class="n">Vapor</span>
 
-<span class="n">VapOne</span> <span class="o">=</span> <span class="n">Vapo</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span> 
+<span class="n">VapOne</span> <span class="o">=</span> <span class="n">Vapor</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span> 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;temperature is &quot;</span><span class="p">,</span> <span class="n">VapOne</span><span class="o">.</span><span class="n">temperature</span><span class="p">)</span> <span class="c1"># will print 300 K</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pressure is &quot;</span><span class="p">,</span> <span class="n">VapOne</span><span class="o">.</span><span class="n">pressure</span><span class="p">)</span> <span class="c1"># will print 101325 Pa (kg/m/s^2)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;vapor radius is &quot;</span><span class="p">,</span> <span class="n">VapOne</span><span class="o">.</span><span class="n">vapor_radius</span><span class="p">)</span>  <span class="c1"># will print 1.6 nm</span>
@@ -422,16 +534,9 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_2084</span><span class="o">/</span><span class="mf">2950159680.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">particula.vapor</span> <span class="kn">import</span> <span class="n">Vapor</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> 
-<span class="ne">----&gt; </span><span class="mi">4</span> <span class="n">VapOne</span> <span class="o">=</span> <span class="n">Vapo</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;temperature is &quot;</span><span class="p">,</span> <span class="n">VapOne</span><span class="o">.</span><span class="n">temperature</span><span class="p">)</span> <span class="c1"># will print 300 K</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pressure is &quot;</span><span class="p">,</span> <span class="n">VapOne</span><span class="o">.</span><span class="n">pressure</span><span class="p">)</span> <span class="c1"># will print 101325 Pa (kg/m/s^2)</span>
-
-<span class="ne">NameError</span>: name &#39;Vapo&#39; is not defined
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>temperature is  300 kelvin
+pressure is  101325 kilogram / meter / second ** 2
+vapor radius is  1.6e-09 meter
 </pre></div>
 </div>
 </div>
@@ -479,10 +584,10 @@ const thebe_selector_output = ".output, .cell_output"
             <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../CONTRIBUTING.html" title="next page">
+    <a class='right-next' id="next-link" href="particle.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Contributor Guidelines</p>
+        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
