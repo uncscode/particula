@@ -10,12 +10,12 @@ parts:
   chapters:
   - file: documentation/environment
   - file: documentation/vapor
+  - file: documentation/particle
 - caption: Utilities
   numbered: false
   chapters:
   - file: documentation/utilities/dynamic_viscosity
   - file: documentation/utilities/mean_free_path
-  - file: documentation/utilities/cutoff_radius
   - file: documentation/utilities/distribution_discretization
 - caption: Community
   numbered: false

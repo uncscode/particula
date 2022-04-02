@@ -2,7 +2,7 @@ title: "Particula Book"
 author: "particula contributors"
 logo: images/placeholder.png
 execute:
-  execute_notebooks: "auto"
+  execute_notebooks: "force"
 
 launch_buttons:
   notebook_interface: jupyterlab
