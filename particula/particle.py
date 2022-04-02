@@ -18,7 +18,7 @@ from particula.util.slip_correction import scf
 from particula.vapor import Vapor
 
 
-class ParticleDistribution(Vapor):  # pylint: disable=too-many-instance-attributes
+class ParticleDistribution(Vapor):
     """ starting a particle distribution from continuous pdf
     """
 
@@ -139,10 +139,10 @@ class ParticleInstances(ParticleDistribution):
         return (
             self.pre_distribution()
             if self.kwargs.get("particle_radius", None) is None
-            else self.particle_number * self.particle_radius / self.volume
+            else self.particle_number / self.particle_radius / self.volume
         )
 
-    def mass(self):
+    def particle_mass(self):
         """ Returns mass of particle.
         """
         return mass(
