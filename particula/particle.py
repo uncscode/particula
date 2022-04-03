@@ -5,7 +5,7 @@ import numpy as np
 
 from particula import u
 from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
-                                 ELEMENTARY_CHARGE_VALUE)
+                                 ELEMENTARY_CHARGE_VALUE, AVOGADRO_NUMBER)
 from particula.util.dimensionless_coagulation import DimensionlessCoagulation
 from particula.util.distribution_discretization import discretize
 from particula.util.friction_factor import frifac
@@ -16,6 +16,11 @@ from particula.util.particle_mass import mass
 from particula.util.radius_cutoff import cut_rad
 from particula.util.slip_correction import scf
 from particula.vapor import Vapor
+from particula.util.molecular_enhancement import mol_enh
+from particula.util.reduced_quantity import reduced_quantity as redq
+from particula.util.rms_speed import cbar
+from particula.util.particle_surface import area
+from particula.util.fuchs_sutugin import fsc
 
 
 class ParticleDistribution(Vapor):
@@ -178,7 +183,66 @@ class ParticleInstances(ParticleDistribution):
         )
 
 
-class Particle(ParticleInstances):
+class ParticleCondensation(ParticleInstances):
+    """ calculate some condensation stuff
+    """
+    def __init__(self, **kwargs):
+        """ more particle objects.
+        """
+        super().__init__(**kwargs)
+        self.kwargs = kwargs
+
+    def molecular_enhancement(self):
+        """ molecular enhancement
+        """
+        return mol_enh(
+            vapor_size=self.vapor_radius,
+            particle_size=self.particle_radius
+        )
+
+    def condensation_redmass(self):
+        """ red mass
+        """
+        return redq(
+            np.transpose([self.vapor_molec_wt.m])*self.vapor_molec_wt.u,
+            mass(radius=self.particle_radius, **self.kwargs)*AVOGADRO_NUMBER
+        )
+
+    def vapor_speed(self):
+        """ vapor speed
+        """
+        return cbar(
+            temperature=self.temperature,
+            molecular_weight=self.condensation_redmass(),
+            gas_constant=self.gas_constant,
+        )/4
+
+    def vapor_flux(self):
+        """ vapor flux
+        """
+        return (
+            area(radius=self.particle_radius, area_factor=1) *
+            self.molecular_enhancement() *
+            self.vapor_attachment *
+            self.vapor_speed() *
+            self.driving_force() *
+            fsc(knu_val=self.knudsen_number(), alpha=1)
+        )
+
+    def particle_growth(self):
+        """ particle growth in m/s
+        """
+        return (
+            self.vapor_flux() * 2 / (
+                self.vapor_density *
+                self.particle_radius**2 *
+                np.pi *
+                self.shape_factor
+            )
+        )
+
+
+class Particle(ParticleCondensation):
     """ the Particle class!
     """
 
