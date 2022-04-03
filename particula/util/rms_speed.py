@@ -3,7 +3,8 @@
 
 import numpy as np
 from particula.constants import GAS_CONSTANT, MOLECULAR_WEIGHT_AIR
-from particula.util.input_handling import in_molecular_weight, in_temperature, in_gas_constant
+from particula.util.input_handling import (in_gas_constant,
+                                           in_molecular_weight, in_temperature)
 
 
 def cbar(
@@ -26,9 +27,9 @@ def cbar(
 
     """
 
-    temperature=in_temperature(temperature)
-    molecular_weight=in_molecular_weight(molecular_weight)
-    gas_constant=in_gas_constant(gas_constant)
+    temperature = in_temperature(temperature)
+    molecular_weight = in_molecular_weight(molecular_weight)
+    gas_constant = in_gas_constant(gas_constant)
 
     return (
         (8 * gas_constant * temperature/(np.pi * molecular_weight))**0.5
