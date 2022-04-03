@@ -28,9 +28,3 @@ In general, you should feel free to open and issue or submit a pull request with
 ---
 
 ## Quick links
-
-### [Startup and Installation](https://uncscode.github.io/particula/000_beginnings.html)
-
-### [Particle Class](https://uncscode.github.io/particula/001_ParticleClass.html)
-
-### [Contribution documentation](https://uncscode.github.io/particula/contrib_docs.html)
