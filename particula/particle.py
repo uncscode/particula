@@ -4,23 +4,24 @@
 import numpy as np
 
 from particula import u
-from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
-                                 ELEMENTARY_CHARGE_VALUE, AVOGADRO_NUMBER)
+from particula.constants import (AVOGADRO_NUMBER, BOLTZMANN_CONSTANT,
+                                 ELECTRIC_PERMITTIVITY,
+                                 ELEMENTARY_CHARGE_VALUE)
 from particula.util.dimensionless_coagulation import DimensionlessCoagulation
 from particula.util.distribution_discretization import discretize
 from particula.util.friction_factor import frifac
+from particula.util.fuchs_sutugin import fsc
 from particula.util.input_handling import (in_density, in_handling, in_radius,
                                            in_scalar, in_volume)
 from particula.util.knudsen_number import knu
-from particula.util.particle_mass import mass
-from particula.util.radius_cutoff import cut_rad
-from particula.util.slip_correction import scf
-from particula.vapor import Vapor
 from particula.util.molecular_enhancement import mol_enh
+from particula.util.particle_mass import mass
+from particula.util.particle_surface import area
+from particula.util.radius_cutoff import cut_rad
 from particula.util.reduced_quantity import reduced_quantity as redq
 from particula.util.rms_speed import cbar
-from particula.util.particle_surface import area
-from particula.util.fuchs_sutugin import fsc
+from particula.util.slip_correction import scf
+from particula.vapor import Vapor
 
 
 class ParticleDistribution(Vapor):
@@ -186,6 +187,7 @@ class ParticleInstances(ParticleDistribution):
 class ParticleCondensation(ParticleInstances):
     """ calculate some condensation stuff
     """
+
     def __init__(self, **kwargs):
         """ more particle objects.
         """
