@@ -35,7 +35,7 @@ class ParticleDistribution(Vapor):
 
         self.spacing = kwargs.get("spacing", "linspace")
         self.nbins = in_scalar(kwargs.get("nbins", 1000)).m
-        self.nparticles = in_scalar(kwargs.get("nparticles", 1e5))
+        self.nparticles = in_scalar(kwargs.get("nparticles", 1e5)).m
         self.volume = in_volume(kwargs.get("volume", 1e-6))
         self.cutoff = in_scalar(kwargs.get("cutoff", 0.9999)).m
         self.gsigma = in_scalar(kwargs.get("gsigma", 1.25)).m
@@ -62,15 +62,13 @@ class ParticleDistribution(Vapor):
             radius = np.logspace(
                 np.log10(rad_start),
                 np.log10(rad_end),
-                self.nbins *
-                np.array([self.mode]).size * np.array([self.gsigma]).size
+                self.nbins
             )
         elif self.spacing == "linspace":
             radius = np.linspace(
                 rad_start,
                 rad_end,
-                self.nbins *
-                np.array([self.mode]).size * np.array([self.gsigma]).size
+                self.nbins
             )
         else:
             raise ValueError("Spacing must be 'logspace' or 'linspace'!")
@@ -92,7 +90,7 @@ class ParticleDistribution(Vapor):
             disttype="lognormal",
             gsigma=self.gsigma,
             mode=self.mode,
-            nparticles=self.nparticles.m
+            nparticles=self.nparticles
         )
 
     def pre_distribution(self):
