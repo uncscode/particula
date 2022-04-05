@@ -11,7 +11,7 @@ def discretize(
     disttype="lognormal",
     gsigma=in_scalar(1.25).m,
     mode=in_radius(100e-9).m,
-    nparticles=np.array([1e5]),
+    nparticles=in_scalar(1e5).m,
     **kwargs
 ):
     """ discretize the distribution of the particles
@@ -34,19 +34,16 @@ def discretize(
     if disttype != "lognormal":
         raise ValueError("the 'disttype' must be 'lognormal' for now!")
 
-    if np.array([mode]).size == 1:
-        return (
-            lognorm.pdf(
-                x=interval.m,
-                s=np.log(gsigma),
-                scale=mode,
-            )
-            / interval.u
+    return ((
+        lognorm.pdf(
+            x=interval.m,
+            s=np.reshape(np.log(gsigma), (np.array([gsigma]).size, 1)),
+            scale=np.reshape([mode], (np.array([mode]).size, 1)),
         )
-    dist_pre = lognorm.pdf(
-        x=interval.m,
-        s=np.log(gsigma),
-        scale=np.reshape(mode, (np.array([mode]).size, 1)),
-    )/interval.u
-
-    return (nparticles*dist_pre).sum(axis=0)/nparticles.sum()
+        / interval.u
+        * np.reshape([nparticles], (np.array([nparticles]).size, 1))
+    ).sum(axis=0) /
+    np.array(
+        [nparticles]).sum() /
+        np.max([np.array([mode]).size, np.array([gsigma]).size])
+    )
