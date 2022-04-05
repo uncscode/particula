@@ -26,10 +26,19 @@ def cut_rad(
 
     _ = kwargs.get("something", None)
 
-    (rad_start, rad_end) = lognorm.interval(
-        alpha=cutoff,
-        s=np.log(gsigma),
-        scale=mode,
-    )
+    if np.array([mode]).size == 1:
+        (rad_start, rad_end) = lognorm.interval(
+            alpha=cutoff,
+            s=np.log(gsigma),
+            scale=mode,
+        )
+    else:
+        (rad_start_pre, rad_end_pre) = lognorm.interval(
+            alpha=cutoff,
+            s=np.log(gsigma),
+            scale=mode,
+        )
+        rad_start = rad_start_pre.min()
+        rad_end = rad_end_pre.max()
 
     return (rad_start, rad_end)
