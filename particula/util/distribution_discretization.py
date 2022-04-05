@@ -30,23 +30,22 @@ def discretize(
     if not isinstance(interval, u.Quantity):
         interval = u.Quantity(interval, " ")
 
-    if np.array([mode]).size == 1:
-        if disttype == "lognormal":
+    if disttype == "lognormal":
+
+        if np.array([mode]).size == 1:
             dist = lognorm.pdf(
                 x=interval.m,
                 s=np.log(gsigma),
                 scale=mode,
             )/interval.u
         else:
-            raise ValueError("the 'disttype' must be 'lognormal' for now!")
-    else:
-        if disttype == "lognormal":
             dist_pre = lognorm.pdf(
                 x=interval.m,
                 s=np.log(gsigma),
                 scale=np.reshape(mode, (np.array([mode]).size, 1)),
             )/interval.u
             dist = dist_pre.sum(axis=0)/np.array([mode]).size
-        else:
-            raise ValueError("the 'disttype' must be 'lognormal' for now!")
+    else:
+        raise ValueError("the 'disttype' must be 'lognormal' for now!")
+
     return dist
