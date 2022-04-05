@@ -11,6 +11,7 @@ def discretize(
     disttype="lognormal",
     gsigma=in_scalar(1.25).m,
     mode=in_radius(100e-9).m,
+    nparticles=np.array([1e5]),
     **kwargs
 ):
     """ discretize the distribution of the particles
@@ -48,4 +49,4 @@ def discretize(
         scale=np.reshape(mode, (np.array([mode]).size, 1)),
     )/interval.u
 
-    return dist_pre.sum(axis=0)/np.array([mode]).size
+    return (nparticles*dist_pre).sum(axis=0)/nparticles.sum()

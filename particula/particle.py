@@ -89,7 +89,8 @@ class ParticleDistribution(Vapor):
             interval=self.pre_radius(),
             disttype="lognormal",
             gsigma=self.gsigma,
-            mode=self.mode
+            mode=self.mode,
+            nparticles=self.nparticles
         )
 
     def pre_distribution(self):
