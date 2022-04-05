@@ -39,11 +39,9 @@ def discretize(
             x=interval.m,
             s=np.reshape(np.log(gsigma), (np.array([gsigma]).size, 1)),
             scale=np.reshape([mode], (np.array([mode]).size, 1)),
-        )
-        / interval.u
+        ) / interval.u
         * np.reshape([nparticles], (np.array([nparticles]).size, 1))
-    ).sum(axis=0) /
-    np.array(
-        [nparticles]).sum() /
+        ).sum(axis=0) /
+        np.array([nparticles]).sum() /
         np.max([np.array([mode]).size, np.array([gsigma]).size])
     )

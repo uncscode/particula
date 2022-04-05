@@ -62,13 +62,15 @@ class ParticleDistribution(Vapor):
             radius = np.logspace(
                 np.log10(rad_start),
                 np.log10(rad_end),
-                self.nbins * np.array([self.mode]).size * np.array([self.gsigma]).size
+                self.nbins *
+                np.array([self.mode]).size * np.array([self.gsigma]).size
             )
         elif self.spacing == "linspace":
             radius = np.linspace(
                 rad_start,
                 rad_end,
-                self.nbins * np.array([self.mode]).size * np.array([self.gsigma]).size
+                self.nbins *
+                np.array([self.mode]).size * np.array([self.gsigma]).size
             )
         else:
             raise ValueError("Spacing must be 'logspace' or 'linspace'!")
@@ -103,7 +105,9 @@ class ParticleDistribution(Vapor):
                 mode    : geometric mean radius of the particles
         """
 
-        return np.array([self.nparticles]).sum()*self.pre_discretize()/self.volume
+        return np.array(
+            [self.nparticles]
+        ).sum()*self.pre_discretize()/self.volume
 
 
 class ParticleInstances(ParticleDistribution):
