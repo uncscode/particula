@@ -76,7 +76,7 @@ def test_particle_distribution():
         return np.trapz(y=pdf_distribution, x=radius)
 
     # single mode
-    particle_distribution_1 = particle.particle_distribution(
+    particle_distribution_1 = particle.ParticleDistribution(
         **single_mode
     )
     total_number = pdf_total(
@@ -86,7 +86,7 @@ def test_particle_distribution():
     assert total_number == pytest.approx(1e12, rel=1e10)
 
     # multi mode
-    particle_distribution_2 = particle.particle_distribution(
+    particle_distribution_2 = particle.ParticleDistribution(
         **multi_mode
     )
     total_number = pdf_total(
