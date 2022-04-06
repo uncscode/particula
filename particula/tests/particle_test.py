@@ -49,6 +49,52 @@ standard_environment_ip = environment.Environment(
     pressure=101325 * u.Pa,
 )
 
+single_mode = {
+    "mode": 500e-9,  # 500 nm median
+    "nbins": 1000,  # 1000 bins
+    "nparticles": 1e6,  # 1e4 #
+    "volume": 1e-6,  # per 1e-6 m^3 (or 1 cc)
+    "gsigma": 1.5,  # relatively narrow
+    "spacing": "linspace",  # bin spacing,
+}
+
+multi_mode = {
+    "mode": [500e-9, 500e-9],  # 500 nm median
+    "nbins": 1000,  # 1000 bins
+    "nparticles": [1e6, 1e6],  # 1e4 #
+    "volume": 1e-6,  # per 1e-6 m^3 (or 1 cc)
+    "gsigma": [1.2, 1.2],  # relatively narrow
+    "spacing": "linspace",  # bin spacing,
+}
+
+
+def test_particle_distribution():
+    """"Test that the particle distribution is calculated for single mode and
+    multi mode.
+    """
+    def pdf_total(radius, pdf_distribution):
+        return np.trapz(y=pdf_distribution, x=radius)
+
+    # single mode
+    particle_distribution_1 = particle.ParticleDistribution(
+        **single_mode
+    )
+    total_number = pdf_total(
+        particle_distribution_1.pre_radius().m,
+        particle_distribution_1.pre_distribution().m,
+    )
+    assert total_number == pytest.approx(1e12, rel=1e10)
+
+    # multi mode
+    particle_distribution_2 = particle.ParticleDistribution(
+        **multi_mode
+    )
+    total_number2 = pdf_total(
+        particle_distribution_2.pre_radius().m,
+        particle_distribution_2.pre_distribution().m
+    )
+    assert total_number2 == pytest.approx(2e12, rel=1e10)
+
 
 def test_getters():
     """Test that the getters work.

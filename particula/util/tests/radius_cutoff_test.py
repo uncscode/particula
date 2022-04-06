@@ -41,3 +41,56 @@ def test_cuts():
         <=
         cut_rad(cutoff=.9999, gsigma=1.35, mode=1e-7)[1]
     )
+
+
+def test_multi_cuts():
+    """ test case for different modes
+    """
+
+    assert (
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7, 1e-8])[0]
+        <=
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7, 1e-8])[1]
+    )
+
+    assert (
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7, 1e-8])[0]
+        <=
+        cut_rad(cutoff=.9990, gsigma=1.25, mode=[1e-7, 1e-8])[0]
+    )
+
+    assert (
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7, 1e-8])[1]
+        >=
+        cut_rad(cutoff=.9990, gsigma=1.25, mode=[1e-7, 1e-8])[1]
+    )
+
+    assert (
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7, 1e-8])[1]
+        <=
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7, 1e-8])[1]
+    )
+
+    assert (
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7, 1e-8])[1]
+        ==
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7])[1]
+    )
+
+    assert (
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7, 1e-8])[1]
+        >=
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-8])[1]
+    )
+
+    assert (
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7, 1e-8])[0]
+        ==
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-8])[0]
+    )
+
+    assert (
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7, 1e-8])[0]
+        <=
+        cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7])[0]
+    )

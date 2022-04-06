@@ -35,7 +35,7 @@ class ParticleDistribution(Vapor):
 
         self.spacing = kwargs.get("spacing", "linspace")
         self.nbins = in_scalar(kwargs.get("nbins", 1000)).m
-        self.nparticles = in_scalar(kwargs.get("nparticles", 1e5))
+        self.nparticles = in_scalar(kwargs.get("nparticles", 1e5)).m
         self.volume = in_volume(kwargs.get("volume", 1e-6))
         self.cutoff = in_scalar(kwargs.get("cutoff", 0.9999)).m
         self.gsigma = in_scalar(kwargs.get("gsigma", 1.25)).m
@@ -89,7 +89,8 @@ class ParticleDistribution(Vapor):
             interval=self.pre_radius(),
             disttype="lognormal",
             gsigma=self.gsigma,
-            mode=self.mode
+            mode=self.mode,
+            nparticles=self.nparticles
         )
 
     def pre_distribution(self):
@@ -102,7 +103,9 @@ class ParticleDistribution(Vapor):
                 mode    : geometric mean radius of the particles
         """
 
-        return self.nparticles*self.pre_discretize()/self.volume
+        return np.array(
+            [self.nparticles]
+        ).sum()*self.pre_discretize()/self.volume
 
 
 class ParticleInstances(ParticleDistribution):
