@@ -80,8 +80,8 @@ def test_particle_distribution():
         **single_mode
     )
     total_number = pdf_total(
-        particle_distribution_1.pre_radius,
-        particle_distribution_1.pre_distribution
+        particle_distribution_1.pre_radius().m,
+        particle_distribution_1.pre_distribution().m,
     )
     assert total_number == pytest.approx(1e12, rel=1e10)
 
@@ -89,13 +89,9 @@ def test_particle_distribution():
     particle_distribution_2 = particle.ParticleDistribution(
         **multi_mode
     )
-    total_number = pdf_total(
-        particle_distribution_2.pre_radius,
-        particle_distribution_2.pre_distribution
-    )
     total_number2 = pdf_total(
-        particle_distribution_1.pre_radius,
-        particle_distribution_1.pre_distribution
+        particle_distribution_2.pre_radius().m,
+        particle_distribution_2.pre_distribution().m
     )
     assert total_number2 == pytest.approx(2e12, rel=1e10)
 
