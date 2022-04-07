@@ -69,8 +69,8 @@ multi_mode = {
 
 
 def test_particle_distribution():
-    """"Test that the particle distribution is calculated for single mode and
-    multi mode.
+    """ Test that the particle distribution is calculated
+        for single mode and multi mode.
     """
     def pdf_total(radius, pdf_distribution):
         return np.trapz(y=pdf_distribution, x=radius)
@@ -95,9 +95,17 @@ def test_particle_distribution():
     )
     assert total_number2 == pytest.approx(2e12, rel=1e10)
 
+def test_multi_mode_bins():
+    """ testing the multi mode stuff for bins
+    """
+
+    assert particle.Particle(nbins=1000).particle_radius.shape == (1000,)
+    assert particle.Particle(nbins=[2000]).particle_radius.shape == (2000,)
+    assert particle.Particle(nbins=[1000, 2000]).particle_radius.shape == (3000,)
+
 
 def test_getters():
-    """Test that the getters work.
+    """ Test that the getters work.
     """
 
     assert small_particle.particle_radius == 1.0e-9 * u.m
@@ -126,7 +134,7 @@ def test_individual_shapes():
 
 
 def test_knudsen_number():
-    """Test that the knudsen number is calculated correctly.
+    """ Test that the knudsen number is calculated correctly.
     """
 
     assert small_particle.knudsen_number() == pytest.approx(66.44, rel=1e-3)
@@ -141,7 +149,7 @@ def test_knudsen_number():
 
 
 def test_slip_correction_factor():
-    """"Test that the slip correction factor is calculated correctly.
+    """ Test that the slip correction factor is calculated correctly.
     """
 
     assert (
@@ -158,7 +166,7 @@ def test_slip_correction_factor():
 
 
 def test_friction_factor():
-    """Test that the friction factor is calculated correctly.
+    """ Test that the friction factor is calculated correctly.
     """
 
     assert small_particle.friction_factor(
@@ -259,7 +267,7 @@ def test_big_shapes():
 
 
 def test_reduced_mass():
-    """Test that the reduced mass is calculated correctly.
+    """ Test that the reduced mass is calculated correctly.
     """
 
     reduced_mass_1_2 = small_particle.reduced_mass(large_particle)
@@ -268,7 +276,7 @@ def test_reduced_mass():
 
 
 def test_reduced_friction_factor():
-    """Test that the reduced friction factor is calculated correctly.
+    """ Test that the reduced friction factor is calculated correctly.
     """
 
     reduced_friction_factor_1_2 = small_particle.reduced_friction_factor(

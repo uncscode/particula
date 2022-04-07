@@ -62,13 +62,13 @@ class ParticleDistribution(Vapor):
             radius = np.logspace(
                 np.log10(rad_start),
                 np.log10(rad_end),
-                self.nbins
+                np.array([self.nbins]).sum()
             )
         elif self.spacing == "linspace":
             radius = np.linspace(
                 rad_start,
                 rad_end,
-                self.nbins
+                np.array([self.nbins]).sum()
             )
         else:
             raise ValueError("Spacing must be 'logspace' or 'linspace'!")
