@@ -95,6 +95,7 @@ def test_particle_distribution():
     )
     assert total_number2 == pytest.approx(2e12, rel=1e10)
 
+
 def test_multi_mode_bins():
     """ testing the multi mode stuff for bins
     """
