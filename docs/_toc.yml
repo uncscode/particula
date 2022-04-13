@@ -11,6 +11,7 @@ parts:
   - file: documentation/environment
   - file: documentation/vapor
   - file: documentation/particle
+  - file: documentation/coagulation
 - caption: Utilities
   numbered: false
   chapters:
