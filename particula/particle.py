@@ -139,8 +139,9 @@ class ParticleInstances(ParticleDistribution):
         self.particle_charge = in_scalar(
             kwargs.get("particle_charge", 0)
         )
-
-        self.kwargs = kwargs
+        self.particle_area_factor = in_scalar(
+            kwargs.get("particle_area_factor", 1)
+        )
 
     def particle_distribution(self):
         """ distribution
@@ -159,6 +160,14 @@ class ParticleInstances(ParticleDistribution):
             density=self.particle_density,
             shape_factor=self.shape_factor,
             volume_void=self.volume_void,
+        )
+
+    def particle_area(self):
+        """ Returns particle's surface area
+        """
+        return area(
+            radius=self.particle_radius,
+            area_factor=self.particle_area_factor,
         )
 
     def knudsen_number(self):
@@ -210,7 +219,7 @@ class ParticleCondensation(ParticleInstances):
         """
         return redq(
             np.transpose([self.vapor_molec_wt.m])*self.vapor_molec_wt.u,
-            mass(radius=self.particle_radius, **self.kwargs)*AVOGADRO_NUMBER
+            self.particle_mass()*AVOGADRO_NUMBER
         )
 
     def vapor_speed(self):
