@@ -21,6 +21,7 @@ from particula.util.radius_cutoff import cut_rad
 from particula.util.reduced_quantity import reduced_quantity as redq
 from particula.util.rms_speed import cbar
 from particula.util.slip_correction import scf
+from particula.util.vapor_flux import phi
 from particula.vapor import Vapor
 
 
@@ -231,29 +232,35 @@ class ParticleCondensation(ParticleInstances):
             gas_constant=self.gas_constant,
         )/4
 
+    def fuchs_sutugin(self):
+        """ the fuchs-sutugin correction
+        """
+        return fsc(
+            knu_val=self.knudsen_number(), alpha=1
+        )
+
     def vapor_flux(self):
         """ vapor flux
         """
-        return (
-            area(radius=self.particle_radius, area_factor=1) *
-            self.molecular_enhancement() *
-            self.vapor_attachment *
-            self.vapor_speed() *
-            self.driving_force() *
-            fsc(knu_val=self.knudsen_number(), alpha=1)
+        return phi(
+            particle_area=self.particle_area(),
+            molecular_enhancement=self.molecular_enhancement(),
+            vapor_attachment=self.vapor_attachment,
+            vapor_speed=self.vapor_speed(),
+            driving_force=self.driving_force(),
+            fsc=self.fuchs_sutugin(),
         )
 
     def particle_growth(self):
         """ particle growth in m/s
         """
-        return (
-            self.vapor_flux() * 2 / (
+        result = self.vapor_flux() * 2 / (
                 self.vapor_density *
-                self.particle_radius**2 *
+                np.transpose([self.particle_radius.m**2])*self.particle_radius.u**2 *
                 np.pi *
                 self.shape_factor
-            )
         )
+        return result if result.shape == self.particle_radius.shape else result.sum(axis=1)
 
 
 class Particle(ParticleCondensation):
