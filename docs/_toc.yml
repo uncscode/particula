@@ -13,6 +13,7 @@ parts:
   - file: documentation/particle
 - caption: Examples
   numbered: false
+  chapters:
   - file: documentation/coagulation
 - caption: Utilities
   numbered: false
