@@ -157,6 +157,18 @@ const thebe_selector_output = ".output, .cell_output"
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
+  Examples
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../coagulation.html">
+   Making a particle distribution.
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
   Utilities
  </span>
 </p>
@@ -402,9 +414,128 @@ FUNCTIONS
 
 DATA
     lognorm = &lt;scipy.stats._continuous_distns.lognorm_gen object&gt;
+        A lognormal continuous random variable.
+        
+        As an instance of the `rv_continuous` class, `lognorm` object inherits from it
+        a collection of generic methods (see below for the full list),
+        and completes them with details specific for this particular distribution.
+        
+        Methods
+        -------
+        rvs(s, loc=0, scale=1, size=1, random_state=None)
+            Random variates.
+        pdf(x, s, loc=0, scale=1)
+            Probability density function.
+        logpdf(x, s, loc=0, scale=1)
+            Log of the probability density function.
+        cdf(x, s, loc=0, scale=1)
+            Cumulative distribution function.
+        logcdf(x, s, loc=0, scale=1)
+            Log of the cumulative distribution function.
+        sf(x, s, loc=0, scale=1)
+            Survival function  (also defined as ``1 - cdf``, but `sf` is sometimes more accurate).
+        logsf(x, s, loc=0, scale=1)
+            Log of the survival function.
+        ppf(q, s, loc=0, scale=1)
+            Percent point function (inverse of ``cdf`` --- percentiles).
+        isf(q, s, loc=0, scale=1)
+            Inverse survival function (inverse of ``sf``).
+        moment(n, s, loc=0, scale=1)
+            Non-central moment of order n
+        stats(s, loc=0, scale=1, moments=&#39;mv&#39;)
+            Mean(&#39;m&#39;), variance(&#39;v&#39;), skew(&#39;s&#39;), and/or kurtosis(&#39;k&#39;).
+        entropy(s, loc=0, scale=1)
+            (Differential) entropy of the RV.
+        fit(data)
+            Parameter estimates for generic data.
+            See `scipy.stats.rv_continuous.fit &lt;https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.rv_continuous.fit.html#scipy.stats.rv_continuous.fit&gt;`__ for detailed documentation of the
+            keyword arguments.
+        expect(func, args=(s,), loc=0, scale=1, lb=None, ub=None, conditional=False, **kwds)
+            Expected value of a function (of one argument) with respect to the distribution.
+        median(s, loc=0, scale=1)
+            Median of the distribution.
+        mean(s, loc=0, scale=1)
+            Mean of the distribution.
+        var(s, loc=0, scale=1)
+            Variance of the distribution.
+        std(s, loc=0, scale=1)
+            Standard deviation of the distribution.
+        interval(alpha, s, loc=0, scale=1)
+            Endpoints of the range that contains fraction alpha [0, 1] of the
+            distribution
+        
+        Notes
+        -----
+        The probability density function for `lognorm` is:
+        
+        .. math::
+        
+            f(x, s) = \frac{1}{s x \sqrt{2\pi}}
+                      \exp\left(-\frac{\log^2(x)}{2s^2}\right)
+        
+        for :math:`x &gt; 0`, :math:`s &gt; 0`.
+        
+        `lognorm` takes ``s`` as a shape parameter for :math:`s`.
+        
+        The probability density above is defined in the &quot;standardized&quot; form. To shift
+        and/or scale the distribution use the ``loc`` and ``scale`` parameters.
+        Specifically, ``lognorm.pdf(x, s, loc, scale)`` is identically
+        equivalent to ``lognorm.pdf(y, s) / scale`` with
+        ``y = (x - loc) / scale``. Note that shifting the location of a distribution
+        does not make it a &quot;noncentral&quot; distribution; noncentral generalizations of
+        some distributions are available in separate classes.
+        
+        A common parametrization for a lognormal random variable ``Y`` is in
+        terms of the mean, ``mu``, and standard deviation, ``sigma``, of the
+        unique normally distributed random variable ``X`` such that exp(X) = Y.
+        This parametrization corresponds to setting ``s = sigma`` and ``scale =
+        exp(mu)``.
+        
+        Examples
+        --------
+        &gt;&gt;&gt; from scipy.stats import lognorm
+        &gt;&gt;&gt; import matplotlib.pyplot as plt
+        &gt;&gt;&gt; fig, ax = plt.subplots(1, 1)
+        
+        Calculate the first four moments:
+        
+        &gt;&gt;&gt; s = 0.954
+        &gt;&gt;&gt; mean, var, skew, kurt = lognorm.stats(s, moments=&#39;mvsk&#39;)
+        
+        Display the probability density function (``pdf``):
+        
+        &gt;&gt;&gt; x = np.linspace(lognorm.ppf(0.01, s),
+        ...                 lognorm.ppf(0.99, s), 100)
+        &gt;&gt;&gt; ax.plot(x, lognorm.pdf(x, s),
+        ...        &#39;r-&#39;, lw=5, alpha=0.6, label=&#39;lognorm pdf&#39;)
+        
+        Alternatively, the distribution object can be called (as a function)
+        to fix the shape, location and scale parameters. This returns a &quot;frozen&quot;
+        RV object holding the given parameters fixed.
+        
+        Freeze the distribution and display the frozen ``pdf``:
+        
+        &gt;&gt;&gt; rv = lognorm(s)
+        &gt;&gt;&gt; ax.plot(x, rv.pdf(x), &#39;k-&#39;, lw=2, label=&#39;frozen pdf&#39;)
+        
+        Check accuracy of ``cdf`` and ``ppf``:
+        
+        &gt;&gt;&gt; vals = lognorm.ppf([0.001, 0.5, 0.999], s)
+        &gt;&gt;&gt; np.allclose([0.001, 0.5, 0.999], lognorm.cdf(vals, s))
+        True
+        
+        Generate random numbers:
+        
+        &gt;&gt;&gt; r = lognorm.rvs(s, size=1000)
+        
+        And compare the histogram:
+        
+        &gt;&gt;&gt; ax.hist(r, density=True, histtype=&#39;stepfilled&#39;, alpha=0.2)
+        &gt;&gt;&gt; ax.legend(loc=&#39;best&#39;, frameon=False)
+        &gt;&gt;&gt; plt.show()
 
 FILE
-    /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages/particula/util/radius_cutoff.py
+    /opt/hostedtoolcache/Python/3.9.12/x64/lib/python3.9/site-packages/particula/util/radius_cutoff.py
 </pre></div>
 </div>
 </div>

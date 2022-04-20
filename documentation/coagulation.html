@@ -1,0 +1,1144 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Making a particle distribution. &#8212; Particula Book</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet">
+  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="dynamic_viscosity" href="utilities/dynamic_viscosity.html" />
+    <link rel="prev" title="The Particle Classes" href="particle.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/placeholder.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">Particula Book</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../intro.html">
+   The particula JupyterBook
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Installation
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../getting_started.html">
+   Installing
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     particula
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Documentation
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="environment.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Environment
+    </span>
+   </code>
+   Class
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="vapor.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Vapor
+    </span>
+   </code>
+   Class
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="particle.html">
+   The
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Particle
+    </span>
+   </code>
+   Classes
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Examples
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Making a particle distribution.
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Utilities
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/dynamic_viscosity.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     dynamic_viscosity
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/mean_free_path.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     mean_free_path
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/distribution_discretization.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     distribution_discretization
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/radius_cutoff.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     radius_cutoff
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/particle_mass.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     particle_mass
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/knudsen_number.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     knudsen_number
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/slip_correction.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     slip_correction
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/friction_factor.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     friction_factor
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/dimensionless_coagulation.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     dimensionless_coagulation
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Community
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../CONTRIBUTING.html">
+   Contributor Guidelines
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../CODE_OF_CONDUCT.html">
+   Contributor Covenant Code of Conduct
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  FAQ
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../FAQ.html">
+   FAQ
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/documentation/coagulation.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/uncscode/particula"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fdocumentation/coagulation.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        <a class="edit-button" href="https://github.com/uncscode/particula/edit/v0.0.4/docs/documentation/coagulation.ipynb"><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
+    </div>
+</div>
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.4?urlpath=lab/tree/docs/documentation/coagulation.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.4/docs/documentation/coagulation.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        <button type="button" class="btn btn-secondary topbarbtn"
+            onclick="initThebeSBT()" title="Launch Thebe" data-toggle="tooltip" data-placement="left"><i
+                class="fas fa-play"></i><span style="margin-left: .4em;">Live Code</span></button>
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Making a particle distribution.
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#particledistribution">
+     ParticleDistribution
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#summary-statistics-of-a-particle-pdf">
+     Summary statistics of a particle PDF.
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#coagulation-kernel">
+     Coagulation Kernel
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#time-steps">
+   Time Steps
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#for-loop-graph">
+     For loop Graph
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#ode-solver">
+     ODE solver
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#summary-on-stepping">
+     summary on stepping
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#fine-coarse-mode">
+   Fine + Coarse Mode
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#combined-distributions">
+     combined distributions
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#number-vs-time">
+     Number vs Time
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Making a particle distribution.</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Making a particle distribution.
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#particledistribution">
+     ParticleDistribution
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#summary-statistics-of-a-particle-pdf">
+     Summary statistics of a particle PDF.
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#coagulation-kernel">
+     Coagulation Kernel
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#time-steps">
+   Time Steps
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#for-loop-graph">
+     For loop Graph
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#ode-solver">
+     ODE solver
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#summary-on-stepping">
+     summary on stepping
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#fine-coarse-mode">
+   Fine + Coarse Mode
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#combined-distributions">
+     combined distributions
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#number-vs-time">
+     Number vs Time
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+              <div>
+                
+  <div class="tex2jax_ignore mathjax_ignore section" id="making-a-particle-distribution">
+<h1>Making a particle distribution.<a class="headerlink" href="#making-a-particle-distribution" title="Permalink to this headline">¶</a></h1>
+<p>We are going to look at two classes in particula, for this notebook. The first is <code class="docutils literal notranslate"><span class="pre">particle_distribution</span></code> and the second (<code class="docutils literal notranslate"><span class="pre">dynamic_step</span></code>) we’ll use to move forward in time.</p>
+<p>So lets get those imported along with numpy and plotting.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># from particula import u</span>
+<span class="kn">from</span> <span class="nn">particula</span> <span class="kn">import</span> <span class="n">particle</span><span class="p">,</span> <span class="n">dynamic_step</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="nn">Input In [1],</span> in <span class="ni">&lt;cell line: 4&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">particula</span> <span class="kn">import</span> <span class="n">particle</span><span class="p">,</span> <span class="n">dynamic_step</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="ne">----&gt; </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">matplotlib</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;matplotlib&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="particledistribution">
+<h2>ParticleDistribution<a class="headerlink" href="#particledistribution" title="Permalink to this headline">¶</a></h2>
+<p>Lets just call this and see what we get.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">default_distribution</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">ParticleDistribution</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Radii&quot;</span><span class="p">)</span> 
+<span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Radii
+</pre></div>
+</div>
+<div class="output text_html"><table><tbody><tr><th>Magnitude</th><td style='text-align:left;'><pre>[4.1972292396604054e-08 4.216876899517281e-08 4.236524559374157e-08<br> 4.256172219231033e-08 4.275819879087909e-08 4.295467538944785e-08<br> 4.315115198801661e-08 4.3347628586585377e-08 4.3544105185154136e-08<br> 4.3740581783722896e-08]</pre></td></tr><tr><th>Units</th><td style='text-align:left;'>meter</td></tr></tbody></table></div></div>
+</div>
+<p>At every radius listed in <code class="docutils literal notranslate"><span class="pre">_.pre_radius()</span></code> is a probability of the particles at that radius. Thus, we have probability distribution function (PDF) of particles.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Particles PFD given radii.&quot;</span><span class="p">)</span>
+<span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Particles PFD given radii.
+</pre></div>
+</div>
+<div class="output text_html"><table><tbody><tr><th>Magnitude</th><td style='text-align:left;'><pre>[2200235960693703.8 2375247794883328.5 2562153632216260.0<br> 2761608050637125.5 2974291484346663.0 3200910665710347.5<br> 3442199044624819.5 3698917183754246.5 3971853128059254.0<br> 4261822747056273.0]</pre></td></tr><tr><th>Units</th><td style='text-align:left;'>1/meter<sup>4</sup></td></tr></tbody></table></div></div>
+</div>
+<p>##Plot of particle PDF
+Let’s see what this particle PDF looks like now.</p>
+<p>Note using <code class="docutils literal notranslate"><span class="pre">_.m</span></code> returns just the magnitude and drops the units.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span><span class="mi">6</span><span class="p">])</span>
+
+<span class="c1">#linear scale</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number, </span><span class="si">{</span><span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radius, </span><span class="si">{</span><span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1">#log x</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number, </span><span class="si">{</span><span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radius, </span><span class="si">{</span><span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/coagulation_7_0.png" src="../_images/coagulation_7_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="summary-statistics-of-a-particle-pdf">
+<h2>Summary statistics of a particle PDF.<a class="headerlink" href="#summary-statistics-of-a-particle-pdf" title="Permalink to this headline">¶</a></h2>
+<p>As the keen eyed reader may have notice this is not a typical PDF and the maximunm is very large (<span class="math notranslate nohighlight">\(1.75*10^{18}\)</span>). Lets define some diagnostic functions and see what we get for the integral area.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pdf_total</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">pdf_distribution</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">pdf_distribution</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">pdf_volume_total</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">pdf_distribution</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">pdf_distribution</span><span class="o">*</span> <span class="mi">4</span><span class="o">/</span><span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total number of the PDF, </span><span class="si">{</span><span class="n">pdf_total</span><span class="p">(</span><span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">(),</span> <span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">())</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total volume of the PDF, </span><span class="si">{</span><span class="n">pdf_volume_total</span><span class="p">(</span><span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">(),</span> <span class="n">default_distribution</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">())</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total number of the PDF, 99989997132.11078 / meter ** 3
+Total volume of the PDF, 5.237475060187453e-10 dimensionless
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>The integral area of the particle PDF is the total number of the distribution, <span class="math notranslate nohighlight">\(0.99*10^{12}~\#/m^3\)</span>.</p></li>
+<li><p>Converting to volume PDF, the integral is the total volume of the particle distribution, <span class="math notranslate nohighlight">\(5*10^{-10}~m^3/m^3\)</span>.</p></li>
+</ul>
+<p>That was defaults but, those might not work for you case so you can change the distribution properties using keyword argument.</p>
+<p>Note the line spacing is how the bin widths are space, for numerical efficiently in the coagulation calculation <code class="docutils literal notranslate"><span class="pre">linspace</span></code> is preferred over <code class="docutils literal notranslate"><span class="pre">logspace</span></code>.</p>
+<p>For a complete list of the <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> you can look at the XXX document.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># around here, just define a kwargs</span>
+
+<span class="n">fine_mode</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="mf">150e-9</span><span class="p">,</span> <span class="c1"># 200 nm median</span>
+    <span class="s2">&quot;nbins&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="c1"># 1000 bins</span>
+    <span class="s2">&quot;nparticles&quot;</span><span class="p">:</span> <span class="mf">1e8</span><span class="p">,</span> <span class="c1"># 1e4 #</span>
+    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="c1"># per 1e-6 m^3 (or 1 cc)</span>
+    <span class="s2">&quot;gsigma&quot;</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">,</span> <span class="c1"># relatively narrow</span>
+    <span class="s2">&quot;spacing&quot;</span><span class="p">:</span> <span class="s2">&quot;linspace&quot;</span><span class="p">,</span> <span class="c1"># bin spacing, </span>
+<span class="p">}</span>
+
+<span class="n">coarse_mode</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="mf">2000e-9</span><span class="p">,</span> <span class="c1"># 200 nm median</span>
+    <span class="s2">&quot;nbins&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="c1"># 1000 bins</span>
+    <span class="s2">&quot;nparticles&quot;</span><span class="p">:</span> <span class="mf">1e5</span><span class="p">,</span> <span class="c1"># 1e4 #</span>
+    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="c1"># per 1e-6 m^3 (or 1 cc)</span>
+    <span class="s2">&quot;gsigma&quot;</span><span class="p">:</span> <span class="mf">1.4</span><span class="p">,</span> <span class="c1"># relatively narrow</span>
+    <span class="s2">&quot;spacing&quot;</span><span class="p">:</span> <span class="s2">&quot;linspace&quot;</span><span class="p">,</span> <span class="c1"># bin spacing, </span>
+<span class="p">}</span>
+
+<span class="n">multi_mode</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5000e-9</span><span class="p">,</span> <span class="mf">50e-9</span><span class="p">,</span> <span class="mf">300e-9</span><span class="p">],</span> <span class="c1"># 200 nm median</span>
+    <span class="s2">&quot;nbins&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="c1"># 1000 bins</span>
+    <span class="s2">&quot;nparticles&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e6</span><span class="p">,</span><span class="mf">1e9</span><span class="p">,</span><span class="mf">1e7</span><span class="p">],</span> <span class="c1"># 1e4 #</span>
+    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="c1"># per 1e-6 m^3 (or 1 cc)</span>
+    <span class="s2">&quot;gsigma&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span><span class="mf">1.2</span><span class="p">,</span><span class="mf">1.5</span><span class="p">],</span> <span class="c1"># relatively narrow</span>
+    <span class="s2">&quot;spacing&quot;</span><span class="p">:</span> <span class="s2">&quot;logspace&quot;</span><span class="p">,</span> <span class="c1"># bin spacing, </span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fine_mode_dist</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">ParticleDistribution</span><span class="p">(</span><span class="o">**</span><span class="n">fine_mode</span><span class="p">)</span> <span class="c1"># pass the kwargs using ** prefix</span>
+<span class="n">coarse_mode_dist</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">ParticleDistribution</span><span class="p">(</span><span class="o">**</span><span class="n">coarse_mode</span><span class="p">)</span> 
+<span class="n">multi_mode</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">ParticleDistribution</span><span class="p">(</span><span class="o">**</span><span class="n">multi_mode</span><span class="p">)</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total number of the PDF, </span><span class="si">{</span><span class="n">pdf_total</span><span class="p">(</span><span class="n">fine_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">(),</span> <span class="n">fine_mode_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">())</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total volume of the PDF, </span><span class="si">{</span><span class="n">pdf_volume_total</span><span class="p">(</span><span class="n">fine_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">(),</span> <span class="n">fine_mode_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">())</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total volume of the PDF, </span><span class="si">{</span><span class="n">pdf_volume_total</span><span class="p">(</span><span class="n">coarse_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">(),</span> <span class="n">coarse_mode_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">())</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total volume of the PDF, </span><span class="si">{</span><span class="n">pdf_volume_total</span><span class="p">(</span><span class="n">multi_mode</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">(),</span> <span class="n">multi_mode</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">())</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total number of the PDF, 99989997132110.78 / meter ** 3
+Total volume of the PDF, 1.7676478328132657e-06 dimensionless
+Total volume of the PDF, 5.566386043732607e-06 dimensionless
+Total volume of the PDF, 0.0003653651719983997 dimensionless
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s see what we just made.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span><span class="mi">6</span><span class="p">])</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fine_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">fine_mode_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">coarse_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">coarse_mode_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number, </span><span class="si">{</span><span class="n">fine_mode_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radius, </span><span class="si">{</span><span class="n">fine_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">fine_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">fine_mode_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">coarse_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">coarse_mode_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number, </span><span class="si">{</span><span class="n">coarse_mode_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radius, </span><span class="si">{</span><span class="n">coarse_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span><span class="mi">6</span><span class="p">])</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">multi_mode</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">multi_mode</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number, </span><span class="si">{</span><span class="n">multi_mode</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radius, </span><span class="si">{</span><span class="n">multi_mode</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">multi_mode</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">multi_mode</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number, </span><span class="si">{</span><span class="n">multi_mode</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radius, </span><span class="si">{</span><span class="n">multi_mode</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/coagulation_16_0.png" src="../_images/coagulation_16_0.png" />
+<img alt="../_images/coagulation_16_1.png" src="../_images/coagulation_16_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="coagulation-kernel">
+<h2>Coagulation Kernel<a class="headerlink" href="#coagulation-kernel" title="Permalink to this headline">¶</a></h2>
+<p>Now with particle number distribution we can calculated the coagulation rate, both the loss and gain in particle number.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coarse_coag_loss</span> <span class="o">=</span> <span class="n">dynamic_step</span><span class="o">.</span><span class="n">DynamicStep</span><span class="p">(</span><span class="o">**</span><span class="n">coarse_mode</span><span class="p">)</span><span class="o">.</span><span class="n">coag_loss</span><span class="p">()</span>
+<span class="n">coarse_coag_gain</span> <span class="o">=</span> <span class="n">dynamic_step</span><span class="o">.</span><span class="n">DynamicStep</span><span class="p">(</span><span class="o">**</span><span class="n">coarse_mode</span><span class="p">)</span><span class="o">.</span><span class="n">coag_gain</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then plotting the results, we see that smaller particles are lost and larger particles gain number</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">6</span><span class="p">])</span>
+
+<span class="c1"># (2*(peak of original distribution)**3)**(1/3)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">coarse_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="n">coarse_coag_loss</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;particles Lost&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">coarse_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">coarse_coag_gain</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;particles Gained&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">coarse_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">coarse_coag_gain</span><span class="o">.</span><span class="n">m</span><span class="o">-</span><span class="n">coarse_coag_loss</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;--k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span> <span class="s1">&#39;Net change&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;radius, </span><span class="si">{</span><span class="n">coarse_mode_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;coagulation rates, </span><span class="si">{</span><span class="n">coarse_coag_gain</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/coagulation_20_0.png" src="../_images/coagulation_20_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="tex2jax_ignore mathjax_ignore section" id="time-steps">
+<h1>Time Steps<a class="headerlink" href="#time-steps" title="Permalink to this headline">¶</a></h1>
+<p>Now that we can make a distribution and calculate coagulation rates, lets move that forward in time.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.util.coagulation_rate</span> <span class="kn">import</span> <span class="n">CoagulationRate</span>
+<span class="kn">from</span> <span class="nn">particula.util.dimensionless_coagulation</span> <span class="kn">import</span> <span class="n">full_coag</span>
+<span class="kn">from</span> <span class="nn">particula.util.input_handling</span> <span class="kn">import</span> <span class="n">in_time</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can do this in a simple way by using a for loop to march through the time steps.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Time steps</span>
+
+<span class="n">simple_dic_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="mf">200e-9</span><span class="p">,</span> <span class="c1"># 200 nm median</span>
+    <span class="s2">&quot;nbins&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span> <span class="c1"># 1000 bins</span>
+    <span class="s2">&quot;nparticles&quot;</span><span class="p">:</span> <span class="mf">1e6</span><span class="p">,</span> <span class="c1"># 1e4 #</span>
+    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="c1"># per 1e-6 m^3 (or 1 cc)</span>
+    <span class="s2">&quot;gsigma&quot;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="c1"># relatively narrow</span>
+<span class="p">}</span>
+<span class="n">particle_dist2</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">ParticleDistribution</span><span class="p">(</span><span class="o">**</span><span class="n">simple_dic_kwargs</span><span class="p">)</span> <span class="c1"># pass the kwargs using ** prefix</span>
+
+<span class="c1">#inital distribution</span>
+<span class="n">p_distribution_0</span> <span class="o">=</span> <span class="n">particle_dist2</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span>
+<span class="n">p_radius</span> <span class="o">=</span> <span class="n">particle_dist2</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span>
+<span class="n">coag_kernel</span> <span class="o">=</span> <span class="n">full_coag</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">p_radius</span><span class="p">)</span>
+
+<span class="n">p_distribution_i</span> <span class="o">=</span> <span class="n">p_distribution_0</span>
+
+<span class="n">time_interval</span> <span class="o">=</span> <span class="n">in_time</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">time_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">time_interval</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
+
+<span class="n">distribution_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">time_array</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_distribution_0</span><span class="p">)])</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dpa</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time_array</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># calculate coagulations</span>
+        <span class="n">coag_gain_i</span> <span class="o">=</span> <span class="n">CoagulationRate</span><span class="p">(</span><span class="n">p_distribution_i</span><span class="p">,</span> <span class="n">p_radius</span><span class="p">,</span> <span class="n">coag_kernel</span><span class="p">)</span><span class="o">.</span><span class="n">coag_gain</span><span class="p">()</span>
+        <span class="n">coag_loss_i</span> <span class="o">=</span> <span class="n">CoagulationRate</span><span class="p">(</span><span class="n">p_distribution_i</span><span class="p">,</span> <span class="n">p_radius</span><span class="p">,</span> <span class="n">coag_kernel</span><span class="p">)</span><span class="o">.</span><span class="n">coag_loss</span><span class="p">()</span>
+
+        <span class="n">net_change</span> <span class="o">=</span> <span class="p">(</span><span class="n">coag_gain_i</span><span class="o">-</span><span class="n">coag_loss_i</span><span class="p">)</span><span class="o">*</span><span class="n">time_interval</span>
+        <span class="n">p_distribution_i</span> <span class="o">=</span> <span class="n">p_distribution_i</span><span class="o">+</span><span class="n">net_change</span>
+
+    <span class="n">distribution_time</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">p_distribution_i</span><span class="o">.</span><span class="n">m</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="for-loop-graph">
+<h2>For loop Graph<a class="headerlink" href="#for-loop-graph" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">6</span><span class="p">])</span>
+
+<span class="n">radius</span> <span class="o">=</span> <span class="n">p_radius</span><span class="o">.</span><span class="n">m</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">p_distribution_0</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Inital&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">distribution_time</span><span class="p">[</span><span class="mi">49</span><span class="p">,:],</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t=50&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">distribution_time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:],</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t=end&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number, </span><span class="si">{</span><span class="n">particle_dist2</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radius, </span><span class="si">{</span><span class="n">particle_dist2</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/coagulation_26_0.png" src="../_images/coagulation_26_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="ode-solver">
+<h2>ODE solver<a class="headerlink" href="#ode-solver" title="Permalink to this headline">¶</a></h2>
+<p>Instead of prescribing the time steps, which can make the problem solution unstable, lets let the code handle that with an ODE solver.</p>
+<p>Lets import that solver class</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.util.simple_solver</span> <span class="kn">import</span> <span class="n">SimpleSolver</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then let us run the same dynamic problem again</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simple_dic_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="mf">200e-9</span><span class="p">,</span> <span class="c1"># 200 nm median</span>
+    <span class="s2">&quot;nbins&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span> <span class="c1"># 1000 bins</span>
+    <span class="s2">&quot;nparticles&quot;</span><span class="p">:</span> <span class="mf">1e6</span><span class="p">,</span> <span class="c1"># 1e4 #</span>
+    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="c1"># per 1e-6 m^3 (or 1 cc)</span>
+    <span class="s2">&quot;gsigma&quot;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="c1"># relatively narrow</span>
+<span class="p">}</span>
+<span class="n">particle_dist2</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">ParticleDistribution</span><span class="p">(</span><span class="o">**</span><span class="n">simple_dic_kwargs</span><span class="p">)</span> <span class="c1"># pass the kwargs using ** prefix</span>
+
+<span class="c1">#inital distribution coag kernel</span>
+<span class="n">coag_kernel</span> <span class="o">=</span> <span class="n">full_coag</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">particle_dist2</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">())</span>
+<span class="n">time_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="c1">#setup the inital state of the distribution</span>
+<span class="n">problem</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;distribution&quot;</span><span class="p">:</span> <span class="n">particle_dist2</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">(),</span>
+    <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="n">particle_dist2</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">(),</span>
+    <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="n">coag_kernel</span><span class="p">,</span>
+    <span class="s2">&quot;tspan&quot;</span><span class="p">:</span> <span class="n">time_array</span>
+<span class="p">}</span>
+
+<span class="c1">#call the solver</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">SimpleSolver</span><span class="p">(</span><span class="o">**</span><span class="n">problem</span><span class="p">)</span><span class="o">.</span><span class="n">solution</span><span class="p">()</span>
+
+<span class="c1">#plot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="mi">6</span><span class="p">])</span>
+
+<span class="n">radius</span> <span class="o">=</span> <span class="n">p_radius</span><span class="o">.</span><span class="n">m</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">particle_dist2</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Inital&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">solution</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="mi">49</span><span class="p">,:],</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t=50&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">solution</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:],</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t=end&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number, </span><span class="si">{</span><span class="n">particle_dist2</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radius, </span><span class="si">{</span><span class="n">particle_dist2</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/coagulation_30_0.png" src="../_images/coagulation_30_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="summary-on-stepping">
+<h2>summary on stepping<a class="headerlink" href="#summary-on-stepping" title="Permalink to this headline">¶</a></h2>
+<p>As we walked through, using the ODE solver is quite a nice way to get to the answer, without figuring out what time-step you might need.</p>
+</div>
+</div>
+<div class="tex2jax_ignore mathjax_ignore section" id="fine-coarse-mode">
+<h1>Fine + Coarse Mode<a class="headerlink" href="#fine-coarse-mode" title="Permalink to this headline">¶</a></h1>
+<p>Usually in the ambient air there are at least two modes of aerosol particles. Fine mode (150 nm mode) generated from atmospheric chemistry and combustion emissions. Coarse mode (10 microns mode) generated from windblown dust, sea salt, or wildfire ash.</p>
+<p>So lets make a multi-modal distribution an progress that forward in time.</p>
+<div class="section" id="combined-distributions">
+<h2>combined distributions<a class="headerlink" href="#combined-distributions" title="Permalink to this headline">¶</a></h2>
+<p>As we saw in the mulit-mode distribution call above, you can use keywards to get multiple distributions. Let’s see how those fine and coarse mode distributions interact.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ambient_dist</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">100e-9</span><span class="p">,</span> <span class="mf">2000e-9</span><span class="p">],</span> <span class="c1"># 100 nm and 2000 nm </span>
+    <span class="s2">&quot;nbins&quot;</span><span class="p">:</span> <span class="mi">250</span><span class="p">,</span> <span class="c1"># cut the bins down for speed</span>
+    <span class="s2">&quot;nparticles&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e7</span><span class="p">,</span> <span class="mf">1e4</span><span class="p">],</span> <span class="c1"># 1e4 #</span>
+    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="c1"># per 1e-6 m^3 (or 1 cc)</span>
+    <span class="s2">&quot;gsigma&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.25</span><span class="p">,</span><span class="mf">1.4</span><span class="p">],</span> <span class="c1"># relatively narrow</span>
+    <span class="s2">&quot;spacing&quot;</span><span class="p">:</span> <span class="s2">&quot;logspace&quot;</span><span class="p">,</span> <span class="c1"># bin spacing,</span>
+<span class="p">}</span>
+
+<span class="n">ambient_dist</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">ParticleDistribution</span><span class="p">(</span><span class="o">**</span><span class="n">ambient_dist</span><span class="p">)</span> 
+
+<span class="c1">#inital distribution coag kernel</span>
+<span class="n">coag_kernel</span> <span class="o">=</span> <span class="n">full_coag</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">ambient_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">())</span>
+<span class="n">time_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1">#setup the inital state of the distribution</span>
+<span class="n">problem</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;distribution&quot;</span><span class="p">:</span> <span class="n">ambient_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">(),</span>
+    <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="n">ambient_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">(),</span>
+    <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="n">coag_kernel</span><span class="p">,</span>
+    <span class="s2">&quot;tspan&quot;</span><span class="p">:</span> <span class="n">time_array</span>
+<span class="p">}</span>
+
+<span class="n">problem2</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;distribution&quot;</span><span class="p">:</span> <span class="n">ambient_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">(),</span>
+    <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="n">ambient_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">(),</span>
+    <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="n">coag_kernel</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span> <span class="c1"># 10x increase to approximate soot</span>
+    <span class="s2">&quot;tspan&quot;</span><span class="p">:</span> <span class="n">time_array</span>
+<span class="p">}</span>
+
+
+<span class="c1">#call the solver</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">SimpleSolver</span><span class="p">(</span><span class="o">**</span><span class="n">problem</span><span class="p">)</span><span class="o">.</span><span class="n">solution</span><span class="p">()</span>
+<span class="n">solution2</span> <span class="o">=</span> <span class="n">SimpleSolver</span><span class="p">(</span><span class="o">**</span><span class="n">problem2</span><span class="p">)</span><span class="o">.</span><span class="n">solution</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>So we ran the simulation, and lets plot a couple slices for each. Solution 2 is an 10x increase in the coagulation kernel, which is a rough approximation for the coagulation enhancement due to a chain-like soot structure over the base spherical particle model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#plot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>
+
+<span class="n">radius</span> <span class="o">=</span> <span class="n">ambient_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;nm&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">m</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">ambient_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;-k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Inital&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">solution</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="mi">29</span><span class="p">,:],</span> <span class="s1">&#39;--b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t=30 sec spheres&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">solution</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:],</span> <span class="s1">&#39;-.b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t=30 min spheres&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">solution2</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="mi">29</span><span class="p">,:],</span> <span class="s1">&#39;--r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t=30 sec soot&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">solution2</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:],</span> <span class="s1">&#39;-.r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t=30 min soot&#39;</span><span class="p">)</span>
+
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mf">1e11</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span> <span class="mi">10000</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number, </span><span class="si">{</span><span class="n">ambient_dist</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radius, </span><span class="si">{</span><span class="n">ambient_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/coagulation_36_0.png" src="../_images/coagulation_36_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="number-vs-time">
+<h2>Number vs Time<a class="headerlink" href="#number-vs-time" title="Permalink to this headline">¶</a></h2>
+<p>Now lets plot the integrated number vs time. We should see the fine mode decrease, and the coarse mode increase a little depending on how fast the coagulational growth is moving the distribution.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">radius</span> <span class="o">=</span> <span class="n">ambient_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">m</span>
+<span class="n">radius_withunits</span><span class="o">=</span> <span class="n">ambient_dist</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span>
+<span class="n">split</span> <span class="o">=</span> <span class="mf">600e-9</span> <span class="c1"># fine to coarse cut off we are using.</span>
+
+<span class="n">split_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">radius</span><span class="o">-</span><span class="n">split</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">split_index</span><span class="p">)</span>
+
+<span class="n">fine_mode</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">time_array</span><span class="p">)</span>
+<span class="n">coarse_mode</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">time_array</span><span class="p">)</span>
+
+<span class="n">fine_mode2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">time_array</span><span class="p">)</span>
+<span class="n">coarse_mode2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">time_array</span><span class="p">)</span>
+
+<span class="n">fine_mode_vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">time_array</span><span class="p">)</span>
+<span class="n">coarse_mode_vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">time_array</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time_array</span><span class="p">):</span>
+  <span class="n">fine_mode</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdf_total</span><span class="p">(</span><span class="n">radius</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">split_index</span><span class="p">],</span> <span class="n">solution</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">split_index</span><span class="p">]</span> <span class="p">)</span>
+  <span class="n">coarse_mode</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdf_total</span><span class="p">(</span><span class="n">radius</span><span class="p">[</span><span class="n">split_index</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">solution</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">split_index</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+  <span class="n">fine_mode2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdf_total</span><span class="p">(</span><span class="n">radius</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">split_index</span><span class="p">],</span> <span class="n">solution2</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">split_index</span><span class="p">]</span> <span class="p">)</span>
+  <span class="n">coarse_mode2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdf_total</span><span class="p">(</span><span class="n">radius</span><span class="p">[</span><span class="n">split_index</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">solution2</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">split_index</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+
+  <span class="n">fine_mode_vol</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdf_volume_total</span><span class="p">(</span><span class="n">radius_withunits</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">split_index</span><span class="p">],</span> <span class="n">solution</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">split_index</span><span class="p">]</span> <span class="p">)</span>
+  <span class="n">coarse_mode_vol</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdf_volume_total</span><span class="p">(</span><span class="n">radius_withunits</span><span class="p">[</span><span class="n">split_index</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">solution</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">split_index</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">fine_mode</span><span class="p">,</span> <span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;fine sphere&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">coarse_mode</span><span class="p">,</span> <span class="s1">&#39;--b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;coarse sphere&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">fine_mode2</span><span class="p">,</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;fine soot&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">coarse_mode2</span><span class="p">,</span> <span class="s1">&#39;--r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;coarse soot&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;number, #/m3 &quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;time, &quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;coagulation_number.png&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;coagulation_number.pdf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>128
+</pre></div>
+</div>
+<img alt="../_images/coagulation_38_1.png" src="../_images/coagulation_38_1.png" />
+</div>
+</div>
+<p>#Summary
+So we covered how to make a distribution, and how to progress a distribution forward in time with coagulation. This is just one of the three key processes (nucleation, condensation, and coagulation) happening to particles in the atmosphere; all of which can be simulated with <code class="docutils literal notranslate"><span class="pre">Particula</span></code>!</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "uncscode/particula",
+            ref: "v0.0.4",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./documentation"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="particle.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="utilities/dynamic_viscosity.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            
+        </div>
+    </div>
+    <footer class="footer">
+  <p>
+    
+      By particula contributors<br/>
+    
+        &copy; Copyright 2021.<br/>
+  </p>
+</footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+
+  </body>
+</html>

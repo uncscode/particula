@@ -51,8 +51,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="The Environment Class" href="documentation/environment.html" />
@@ -154,6 +154,18 @@ const thebe_selector_output = ".output, .cell_output"
     </span>
    </code>
    Classes
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Examples
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="documentation/coagulation.html">
+   Making a particle distribution.
   </a>
  </li>
 </ul>
@@ -495,24 +507,14 @@ In a notebook like this, one would run the following command: <code class="docut
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: particula in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (0.0.5.dev0)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: particula in /opt/hostedtoolcache/Python/3.9.12/x64/lib/python3.9/site-packages (0.0.5.dev1)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: pint in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (0.18)
-Requirement already satisfied: numpy in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (1.21.5)
-Requirement already satisfied: scipy in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from particula) (1.7.3)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: scipy in /opt/hostedtoolcache/Python/3.9.12/x64/lib/python3.9/site-packages (from particula) (1.8.0)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: packaging in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (21.3)
-Requirement already satisfied: importlib-metadata in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from pint-&gt;particula) (4.2.0)
-Requirement already satisfied: zipp&gt;=0.5 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (3.7.0)
-Requirement already satisfied: typing-extensions&gt;=3.6.4 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from importlib-metadata-&gt;pint-&gt;particula) (4.1.1)
-Requirement already satisfied: pyparsing!=3.0.5,&gt;=2.0.2 in /opt/hostedtoolcache/Python/3.7.12/x64/lib/python3.7/site-packages (from packaging-&gt;pint-&gt;particula) (3.0.7)
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Yellow">WARNING: You are using pip version 22.0.3; however, version 22.0.4 is available.</span>
-<span class=" -Color -Color-Yellow">You should consider upgrading via the &#39;/opt/hostedtoolcache/Python/3.7.12/x64/bin/python -m pip install --upgrade pip&#39; command.</span>
-
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Requirement already satisfied: pint in /opt/hostedtoolcache/Python/3.9.12/x64/lib/python3.9/site-packages (from particula) (0.19.1)
+Requirement already satisfied: numpy in /opt/hostedtoolcache/Python/3.9.12/x64/lib/python3.9/site-packages (from particula) (1.22.3)
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Note: you may need to restart the kernel to use updated packages.
