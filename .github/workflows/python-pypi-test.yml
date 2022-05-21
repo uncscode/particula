@@ -6,14 +6,14 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: PyPI package
+name: package
 
 on:
-  release:
-    types: [published]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  deployment:
+  testing:
 
     runs-on: ubuntu-latest
 
@@ -29,8 +29,3 @@ jobs:
         pip install build
     - name: Build package
       run: python -m build
-    - name: Publish package
-      uses: pypa/gh-action-pypi-publish@717ba43cfbb0387f6ce311b169a825772f54d295
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
