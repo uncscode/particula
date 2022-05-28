@@ -23,20 +23,30 @@ def phi(  # pylint: disable=too-many-arguments
     """ vapor flux
     """
     particle_area = area(
-        **kwargs) if particle_area is None else in_handling(particle_area, u.m**2)
+        **kwargs) if particle_area is None else in_handling(
+            particle_area, u.m**2)
     molecular_enhancement_val = mol_enh(
-        **kwargs) if molecular_enhancement is None else in_scalar(molecular_enhancement)
-    vapor_attachment = in_scalar(vapor_attachment)
+        **kwargs) if molecular_enhancement is None else in_scalar(
+            molecular_enhancement)
+    vapor_attachment = in_scalar(
+        np.array(
+            [vapor_attachment.m]
+            )*vapor_attachment.u)
     vapor_speed_val = cbar(
-        **kwargs)/4 if vapor_speed is None else in_handling(vapor_speed, u.m/u.s)
+        **kwargs)/4 if vapor_speed is None else in_handling(
+            vapor_speed, u.m/u.s)
     driving_force = in_concentration(driving_force)
     fsc_val = fsc_func(**kwargs) if fsc is None else in_scalar(fsc)
 
-    return (
+    result = (
         np.transpose([particle_area.m])*particle_area.u *
-        np.transpose([molecular_enhancement_val.m])*molecular_enhancement_val.u *
-        vapor_attachment *
+        np.transpose(
+            [molecular_enhancement_val.m]
+            )*molecular_enhancement_val.u *
+        np.transpose([vapor_attachment.m])*vapor_attachment.u *
         np.transpose([vapor_speed_val.m])*vapor_speed_val.u *
-        driving_force *
+        np.transpose([driving_force.m])*driving_force.u *
         np.transpose([fsc_val.m])*fsc_val.u
     ).squeeze()
+
+    return np.transpose(result.m)*result.u

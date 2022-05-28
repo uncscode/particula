@@ -219,9 +219,10 @@ class ParticleCondensation(ParticleInstances):
         """ red mass
         """
         return redq(
-            np.transpose([self.vapor_molec_wt.m])*self.vapor_molec_wt.u,
-            self.particle_mass()*AVOGADRO_NUMBER
-        )
+            self.vapor_molec_wt,
+            np.transpose([self.particle_mass().m]) *
+            self.particle_mass().u*AVOGADRO_NUMBER
+        ).squeeze()
 
     def vapor_speed(self):
         """ vapor speed
@@ -255,12 +256,17 @@ class ParticleCondensation(ParticleInstances):
         """ particle growth in m/s
         """
         result = self.vapor_flux() * 2 / (
-                self.vapor_density *
-                np.transpose([self.particle_radius.m**2])*self.particle_radius.u**2 *
-                np.pi *
-                self.shape_factor
+            self.vapor_density *
+            np.transpose(
+                [self.particle_radius.m**2]
+                )*self.particle_radius.u**2 *
+            np.pi *
+            self.shape_factor
         )
-        return result if result.shape == self.particle_radius.shape else result.sum(axis=1)
+        return (
+            result if result.shape == self.particle_radius.shape
+            else result.sum(axis=1)
+        )
 
 
 class Particle(ParticleCondensation):
