@@ -25,7 +25,6 @@ def dy2007_coag_less(
     diff_knu = in_scalar(diff_knu)
     cpr = in_scalar(cpr)
 
-    assert cpr.m >= 0  # gk2008 is only valid for positive cpr
     assert diff_knu > 0  # by definition
 
     cekl = 1 + cpr
