@@ -17,7 +17,7 @@ class DimensionlessCoagulation(DKn):
     def __init__(
         self,
         dkn_val=None,
-        authors="hardsphere",
+        coag_approx="hardsphere",
         **kwargs
     ):
         """ Dimensionless particle--particle coagulation kernel.
@@ -36,7 +36,7 @@ class DimensionlessCoagulation(DKn):
         self.diff_knu = DKn(**kwargs).get_diff_knu() if dkn_val is None \
             else in_scalar(dkn_val)
 
-        self.authors = authors
+        self.coag_approx = coag_approx
 
         self.kwargs = kwargs
 
@@ -66,10 +66,10 @@ class DimensionlessCoagulation(DKn):
         """ Return the dimensionless coagulation kernel.
         """
 
-        if self.authors == "hardsphere":
+        if self.coag_approx == "hardsphere":
             result = self.hardsphere_coag_less()
         else:
-            raise ValueError(f"{self.authors} not recognized!")
+            raise ValueError(f"{self.coag_approx} not recognized!")
 
         return result
 
