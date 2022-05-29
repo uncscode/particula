@@ -6,16 +6,21 @@ from particula.util.input_handling import in_scalar
 
 
 def gk2008_coag_less(
-        diff_knu=None,
-        cpr=None,
-    ):
+    diff_knu=None,
+    cpr=None,
+):
     """ gk2008 approx.
         Dimensionless particle--particle coagulation kernel.
+
+        gk2008:
+            https://journals.aps.org/pre/abstract/10.1103/PhysRevE.78.046402
+        gh2012: (keep gh2012 because using modified expression from it)
+            https://journals.aps.org/pre/abstract/10.1103/PhysRevE.85.026410
     """
 
     if diff_knu is None or cpr is None:
         raise ValueError(
-            "Please provide an explicit value for diff_knu, cpr, cekl, and cecl")
+            "Please provide explicit values: diff_knu, cpr")
 
     diff_knu = in_scalar(diff_knu)
     cpr = in_scalar(cpr)

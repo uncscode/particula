@@ -102,7 +102,8 @@ def test_multi_mode_bins():
 
     assert particle.Particle(nbins=1000).particle_radius.shape == (1000,)
     assert particle.Particle(nbins=[2000]).particle_radius.shape == (2000,)
-    assert particle.Particle(nbins=[1000, 2000]).particle_radius.shape == (3000,)
+    assert particle.Particle(
+        nbins=[1000, 2000]).particle_radius.shape == (3000,)
 
 
 def test_getters():
