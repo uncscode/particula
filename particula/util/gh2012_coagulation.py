@@ -24,7 +24,7 @@ def gh2012_coag_less(
     diff_knu = in_scalar(diff_knu)
     cpr = in_scalar(cpr)
 
-    cpr = cpr if cpr.m > 0 else cpr + 1e-32  # avoid division by zero
+    cpr = cpr + 1e-32 if cpr.m == 0  # avoid division by zero
     return (4 * np.pi * diff_knu**2) / (
         1 + 1.598 * np.min([diff_knu.m, 3*diff_knu.m/(2*cpr.m)])**1.1709
     )
