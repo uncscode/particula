@@ -13,3 +13,4 @@ def test_hardsphere_coag_less():
 
     assert hardsphere_coag_less(diff_knu=1e-9).u == u.dimensionless
     assert hardsphere_coag_less(diff_knu=0).m == pytest.approx(0)
+    assert hardsphere_coag_less(diff_knu=1e-32).m == pytest.approx(0)
