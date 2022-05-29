@@ -6,7 +6,7 @@ from particula.util.diffusive_knudsen import DiffusiveKnudsen as DKn
 from particula.util.diffusive_knudsen import celimits
 # from particula.util.diffusive_knudsen import diff_knu as dknu
 from particula.util.diffusive_knudsen import red_frifac, red_mass, rxr
-from particula.util.hardsphere_coagulation import hardsphere_coag_less
+from particula.util.approx_coagulation import approx_coag_less
 
 
 class DimensionlessCoagulation(DKn):
@@ -43,7 +43,8 @@ class DimensionlessCoagulation(DKn):
     def hardsphere_coagless(self):
         """ Dimensionless particle--particle coagulation kernel.
         """
-        return hardsphere_coag_less(diff_knu=self.diff_knu)
+        return approx_coag_less(
+            diff_knu=self.diff_knu, approx=self.coag_approx)
 
     def coag_less(self):
         """ Return the dimensionless coagulation kernel.
