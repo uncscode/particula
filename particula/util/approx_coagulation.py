@@ -33,7 +33,7 @@ def approx_coag_less(
         if cpr is None:
             raise ValueError("Please provide explicit value for cpr")
         cpr = in_scalar(cpr)
-        cpr = cpr + 1e-32 if cpr.m == 0 else cpr  # avoid division by zero
+        cpr = cpr + 1e-16 if cpr.m == 0 else cpr  # avoid division by zero
 
         cekl = 1 + cpr
         cecl = 1 * cpr.u if cpr.m == 0 else cpr / (1 - np.exp(-cpr))
@@ -42,24 +42,26 @@ def approx_coag_less(
 
     coag_clim = 4 * np.pi * diff_knu**2
 
+    hsa_consts = [25.836, 11.211, 3.502, 7.211]
+
+    upstairs = (
+        coag_clim +
+        (hsa_consts[0] * diff_knu**3) +
+        ((8 * np.pi)**(1/2) * hsa_consts[1] * diff_knu**4)
+    )
+
+    downstairs = (
+        1 +
+        (hsa_consts[2] * diff_knu) +
+        (hsa_consts[3] * diff_knu**2) +
+        (hsa_consts[1] * diff_knu**3)
+    )
+
+    hscoag = upstairs / downstairs
+
     if approx == "hardsphere":
 
-        hsa_consts = [25.836, 11.211, 3.502, 7.211]
-
-        upstairs = (
-            coag_clim +
-            (hsa_consts[0] * diff_knu**3) +
-            ((8 * np.pi)**(1/2) * hsa_consts[1] * diff_knu**4)
-        )
-
-        downstairs = (
-            1 +
-            (hsa_consts[2] * diff_knu) +
-            (hsa_consts[3] * diff_knu**2) +
-            (hsa_consts[1] * diff_knu**3)
-        )
-
-        return upstairs / downstairs
+        return hscoag
 
     if approx == "gh2012":
 
@@ -106,5 +108,35 @@ def approx_coag_less(
             (1 - np.exp(-1*cpr/(1+diff_knu*cekl/cecl))) /
             (1 - np.exp(-1*cpr))
         )
+
+    if approx == "cg2019":
+
+        assert cpr > 0
+        assert diff_knu > 0
+        # # # for later: cutoff_value
+        #   this is simply a numerical issue
+        #   authors only show down to 1e-2, but should be applicable
+        #   to a much wider interval, but idk... fix later
+        #   could be something for more testing later
+        cutoff_value = 1e-5
+        diff_knu = cutoff_value if diff_knu.m < cutoff_value else diff_knu
+
+        corr = [
+            2.5,
+            (4.528*np.exp(-1.088*cpr)) + (.7091*np.log(1+1.527*cpr)),
+            11.36*(cpr**0.272) - 10.33,
+            -0.003533*cpr + 0.05971
+        ]
+
+        corr_mu = (corr[2]/corr[0])*(
+            (1+corr[3]*(np.log(diff_knu)-corr[1])/corr[0])**(
+                -1/corr[3]-1) *
+            np.exp(-1*(1+corr[3]*(np.log(diff_knu)-corr[1])/corr[0])**(
+                -1/corr[3]))
+            )
+
+        return (
+            hscoag.m * (cpr.m <= 0) + np.exp(corr_mu.m) * hscoag.m * (cpr > 0)
+        ) * hscoag.u
 
     return None

@@ -35,3 +35,8 @@ def test_hardsphere_coag_less():
         diff_knu=0, cpr=1, approx="gh2012").m == pytest.approx(0)
     assert approx_coag_less(
         diff_knu=1e-32, cpr=1, approx="gh2012").m == pytest.approx(0)
+
+    assert approx_coag_less(
+        diff_knu=1e-9, cpr=1, approx="cg2019").u == u.dimensionless
+    assert approx_coag_less(
+        diff_knu=1e-32, cpr=1, approx="cg2019").m == pytest.approx(0)
