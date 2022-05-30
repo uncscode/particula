@@ -33,12 +33,11 @@ def lf2013_coag_full(  # pylint: disable=too-many-arguments, too-many-locals
         else:
             raise ValueError("Invalid combination")
     elif ion_type=="air" and particle_type=="polystyrene":
-        if temperature_val==298.15 and pressure_val==101325:
-            negfn = "S13.txt"
-            posfn = "S14.txt"
-        else:
+        if temperature_val != 298.15 or pressure_val != 101325:
             raise ValueError("Invalid combination")
 
+        negfn = "S13.txt"
+        posfn = "S14.txt"
     # expand dims to account for size
     negdata = np.expand_dims(
         np.loadtxt(negfn, skiprows=1), axis=0)
