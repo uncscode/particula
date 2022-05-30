@@ -40,22 +40,17 @@ class DimensionlessCoagulation(DKn):
 
         self.kwargs = kwargs
 
-    def hardsphere_coagless(self):
-        """ Dimensionless particle--particle coagulation kernel.
-        """
-        return approx_coag_less(
-            diff_knu=self.diff_knu, approx=self.coag_approx)
-
     def coag_less(self):
         """ Return the dimensionless coagulation kernel.
         """
 
-        if self.coag_approx == "hardsphere":
-            result = self.hardsphere_coagless()
-        else:
+        impls = ["hardsphere", "gh2012", "cg2019", "dy2007", "gk2008"]
+
+        if self.coag_approx not in impls:
             raise ValueError(f"{self.coag_approx} not recognized!")
 
-        return result
+        return approx_coag_less(
+            diff_knu=self.diff_knu, approx=self.coag_approx)
 
     def coag_full(self):
         """ Retrun the dimensioned coagulation kernel
