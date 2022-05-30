@@ -14,25 +14,25 @@ def lf2013_coag_full(  # pylint: disable=too-many-arguments, too-many-locals
 ):
     """ calculate ion--particle coagulation according to lf2013
     """
-    if ion_type=="air" and particle_type=="conductive":
-        if temperature_val==298.15 and pressure_val==101325:
+    if ion_type == "air" and particle_type == "conductive":
+        if temperature_val == 298.15 and pressure_val == 101325:
             negfn = "S1.txt"
             posfn = "S2.txt"
-        elif temperature_val==218.15 and pressure_val==4480:
+        elif temperature_val == 218.15 and pressure_val == 4480:
             negfn = "S7.txt"
             posfn = "S8.txt"
         else:
             raise ValueError("Invalid combination")
-    elif ion_type=="water" and particle_type=="conductive":
-        if temperature_val==298.15 and pressure_val==101325:
+    elif ion_type == "water" and particle_type == "conductive":
+        if temperature_val == 298.15 and pressure_val == 101325:
             negfn = "S4.txt"
             posfn = "S5.txt"
-        elif temperature_val==218.15 and pressure_val==4480:
+        elif temperature_val == 218.15 and pressure_val == 4480:
             negfn = "S10.txt"
             posfn = "S11.txt"
         else:
             raise ValueError("Invalid combination")
-    elif ion_type=="air" and particle_type=="polystyrene":
+    elif ion_type == "air" and particle_type == "polystyrene":
         if temperature_val != 298.15 and pressure_val != 101325:
             raise ValueError("Invalid combination")
 
@@ -53,21 +53,21 @@ def lf2013_coag_full(  # pylint: disable=too-many-arguments, too-many-locals
     powers = np.linspace(0, coeffs-1, coeffs)
 
     neg = 10**np.sum(
-        (rads>=negdata[:, :, -2:-1]) *
-        (rads<=negdata[:, :, -1:]) *
+        (rads >= negdata[:, :, -2:-1]) *
+        (rads <= negdata[:, :, -1:]) *
         negdata[:, :, 1:coeffs+1] *
         (np.log10(rads))**powers,
         axis=-1)
 
     pos = 10**np.sum(
-        (rads>=posdata[:, :, -2:-1]) *
-        (rads<=posdata[:, :, -1:]) *
+        (rads >= posdata[:, :, -2:-1]) *
+        (rads <= posdata[:, :, -1:]) *
         posdata[:, :, 1:coeffs+1] *
         (np.log10(rads))**powers,
         axis=-1)
 
-    neg[neg==1] = np.nan
-    pos[pos==1] = np.nan
+    neg[neg == 1] = np.nan
+    pos[pos == 1] = np.nan
 
     _ = charge_vals
 
