@@ -24,6 +24,10 @@ def approx_coag_less(
 
         cg2019:
         https://www.tandfonline.com/doi/suppl/10.1080/02786826.2019.1614522
+
+        todolater:
+        - quick fixes for corner cases
+        - examine better solutions?
     """
 
     if diff_knu is None:
@@ -65,18 +69,16 @@ def approx_coag_less(
 
     if approx == "gh2012":
 
-        return (4 * np.pi * diff_knu**2) / (
-            1 + 1.598 * np.min(
-                [diff_knu.m, 3*diff_knu.m/(2*cpr.m)]
-            )**1.1709
-        )
+        min_fxn = np.min([diff_knu.m, 3*diff_knu.m/(2*cpr.m)])
+        result = (4 * np.pi * diff_knu**2) / (
+            1 + 1.598 * min_fxn**1.1709
+        ) if cpr.m > 0.5 and min_fxn < 2.5 else hscoag
+
+        return result
 
     if approx == "gk2008":
 
-        assert cpr.m >= 0
-        assert diff_knu > 0
-
-        return coag_clim * (
+        result = coag_clim * (
             1 -
             (1 + (np.sqrt(np.pi)*cecl*cpr*1.22) / (
                 2*cekl*diff_knu)) *
@@ -90,9 +92,9 @@ def approx_coag_less(
                 2*cekl*diff_knu))
         )
 
-    if approx == "dy2007":
+        return result * (cpr.m >=0) + hscoag * (cpr.m < 0)
 
-        assert diff_knu > 0
+    if approx == "dy2007":
 
         return coag_clim / (
             np.sqrt(2*np.pi)*diff_knu*cekl *
@@ -111,20 +113,15 @@ def approx_coag_less(
 
     if approx == "cg2019":
 
-        assert cpr > 0
-        assert diff_knu > 0
-        # # # for later: cutoff_value
-        #   this is simply a numerical issue
-        #   authors only show down to 1e-2, but should be applicable
-        #   to a much wider interval, but idk... fix later
-        #   could be something for more testing later
-        cutoff_value = 1e-5
-        diff_knu = cutoff_value if diff_knu.m < cutoff_value else diff_knu
+        tricky_corr = 1 if cpr.m <= 0 else (
+            4.528*np.exp(-1.088*cpr)) + (.7091*np.log(1+1.527*cpr))
 
+        tricky_corr_again = 0 if cpr.m <= 0 else (
+            11.36*(cpr**0.272) - 10.33)
         corr = [
             2.5,
-            (4.528*np.exp(-1.088*cpr)) + (.7091*np.log(1+1.527*cpr)),
-            11.36*(cpr**0.272) - 10.33,
+            tricky_corr,
+            tricky_corr_again,
             -0.003533*cpr + 0.05971
         ]
 

@@ -50,7 +50,10 @@ class DimensionlessCoagulation(DKn):
             raise ValueError(f"{self.coag_approx} not recognized!")
 
         return approx_coag_less(
-            diff_knu=self.diff_knu, approx=self.coag_approx)
+            diff_knu=self.diff_knu,
+            cpr=self.coulomb_potential_ratio(),
+            approx=self.coag_approx
+        )
 
     def coag_full(self):
         """ Retrun the dimensioned coagulation kernel
