@@ -8,7 +8,7 @@ from particula.util.approx_coagulation import approx_coag_less
 from particula import u
 
 
-def test_hardsphere_coag_less():
+def test_approx_coag_less():
     """ testing
     """
 

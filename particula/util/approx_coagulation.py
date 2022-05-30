@@ -5,7 +5,7 @@ import numpy as np
 from particula.util.input_handling import in_scalar
 
 
-def approx_coag_less(
+def approx_coag_less(  # pylint: disable=too-many-locals
     diff_knu=None,
     cpr=None,
     approx="hardsphere"
@@ -92,7 +92,9 @@ def approx_coag_less(
                 2*cekl*diff_knu))
         )
 
-        return result * (cpr.m >=0) + hscoag * (cpr.m < 0)
+        return (
+            result.m * (cpr.m >= 0) + hscoag.m * (cpr.m < 0)
+        ) * result.u
 
     if approx == "dy2007":
 
@@ -112,12 +114,15 @@ def approx_coag_less(
         )
 
     if approx == "cg2019":
+        # fix later: 1e-12 is arbitrary, pure numerics issue here
+        diff_knu = diff_knu if diff_knu.m > 1e-12 else 1e-12
 
         tricky_corr = 1 if cpr.m <= 0 else (
             4.528*np.exp(-1.088*cpr)) + (.7091*np.log(1+1.527*cpr))
 
         tricky_corr_again = 0 if cpr.m <= 0 else (
             11.36*(cpr**0.272) - 10.33)
+
         corr = [
             2.5,
             tricky_corr,
