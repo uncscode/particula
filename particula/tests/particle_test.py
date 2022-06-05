@@ -102,7 +102,8 @@ def test_multi_mode_bins():
 
     assert particle.Particle(nbins=1000).particle_radius.shape == (1000,)
     assert particle.Particle(nbins=[2000]).particle_radius.shape == (2000,)
-    assert particle.Particle(nbins=[1000, 2000]).particle_radius.shape == (3000,)
+    assert particle.Particle(
+        nbins=[1000, 2000]).particle_radius.shape == (3000,)
 
 
 def test_getters():
@@ -351,11 +352,23 @@ def test_condensation_stuff():
         "vapor_density": 1400,  # 1400 kg/m^3
         "vapor_concentration": 1,  # 1 ug/m^3
         "vapor_attachment": 1,  # 1
-        "vapor_molec_wt": 200,  # 200 g/mol
+        "vapor_molecular_weight": 200,  # 200 g/mol
         "something_something": None
     }
 
+    two_cond_vaps = simple_cond_kwargs.copy()
+    two_cond_vaps["vapor_radius"] = [1.6e-9, 1.6e-9]
+
+    two_cond_oths = simple_cond_kwargs.copy()
+    two_cond_oths["vapor_radius"] = [1.6e-9, 1.7e-9]
+    two_cond_oths["vapor_density"] = [1400, 1500]
+    two_cond_oths["vapor_concentration"] = [1, 2]
+    two_cond_oths["vapor_attachment"] = [1, 2]
+    two_cond_oths["vapor_molecular_weight"] = [200, 300]
+
     cond = particle.Particle(**simple_cond_kwargs)
+    cond2vap = particle.Particle(**two_cond_vaps)
+    cond2oth = particle.Particle(**two_cond_oths)
 
     assert cond.particle_radius.m.shape == (1000,)
     assert cond.driving_force().u == u.kg/u.m**3
@@ -370,3 +383,18 @@ def test_condensation_stuff():
     assert cond.vapor_flux().m.shape == (1000,)
     assert cond.particle_growth().u == u.m/u.s
     assert cond.particle_growth().m.shape == (1000,)
+
+    assert cond2vap.molecular_enhancement().m.shape == (1000, 2)
+    assert cond2vap.vapor_flux().m.shape == (1000, 2)
+    assert cond2vap.particle_growth().m.shape == (1000,)
+
+    assert cond2oth.molecular_enhancement().m.shape == (1000, 2)
+    assert cond2oth.condensation_redmass().m.shape == (1000, 2)
+    assert cond2oth.vapor_speed().m.shape == (1000, 2)
+
+    assert cond2oth.particle_area().m.shape == (1000,)
+    assert cond2oth.vapor_attachment.m.shape == (2,)
+    assert cond2oth.driving_force().m.shape == (1, 2)
+
+    assert cond2oth.vapor_flux().m.shape == (1000, 2)
+    assert cond2oth.particle_growth().m.shape == (1000,)
