@@ -21,6 +21,7 @@ from particula.util.radius_cutoff import cut_rad
 from particula.util.reduced_quantity import reduced_quantity as redq
 from particula.util.rms_speed import cbar
 from particula.util.slip_correction import scf
+from particula.util.vapor_flux import phi
 from particula.vapor import Vapor
 
 
@@ -139,8 +140,9 @@ class ParticleInstances(ParticleDistribution):
         self.particle_charge = in_scalar(
             kwargs.get("particle_charge", 0)
         )
-
-        self.kwargs = kwargs
+        self.particle_area_factor = in_scalar(
+            kwargs.get("particle_area_factor", 1)
+        )
 
     def particle_distribution(self):
         """ distribution
@@ -159,6 +161,14 @@ class ParticleInstances(ParticleDistribution):
             density=self.particle_density,
             shape_factor=self.shape_factor,
             volume_void=self.volume_void,
+        )
+
+    def particle_area(self):
+        """ Returns particle's surface area
+        """
+        return area(
+            radius=self.particle_radius,
+            area_factor=self.particle_area_factor,
         )
 
     def knudsen_number(self):
@@ -209,9 +219,10 @@ class ParticleCondensation(ParticleInstances):
         """ red mass
         """
         return redq(
-            np.transpose([self.vapor_molec_wt.m])*self.vapor_molec_wt.u,
-            mass(radius=self.particle_radius, **self.kwargs)*AVOGADRO_NUMBER
-        )
+            self.vapor_molec_wt,
+            np.transpose([self.particle_mass().m]) *
+            self.particle_mass().u*AVOGADRO_NUMBER
+        ).squeeze()
 
     def vapor_speed(self):
         """ vapor speed
@@ -222,28 +233,39 @@ class ParticleCondensation(ParticleInstances):
             gas_constant=self.gas_constant,
         )/4
 
+    def fuchs_sutugin(self):
+        """ the fuchs-sutugin correction
+        """
+        return fsc(
+            knu_val=self.knudsen_number(), alpha=1
+        )
+
     def vapor_flux(self):
         """ vapor flux
         """
-        return (
-            area(radius=self.particle_radius, area_factor=1) *
-            self.molecular_enhancement() *
-            self.vapor_attachment *
-            self.vapor_speed() *
-            self.driving_force() *
-            fsc(knu_val=self.knudsen_number(), alpha=1)
+        return phi(
+            particle_area=self.particle_area(),
+            molecular_enhancement=self.molecular_enhancement(),
+            vapor_attachment=self.vapor_attachment,
+            vapor_speed=self.vapor_speed(),
+            driving_force=self.driving_force(),
+            fsc=self.fuchs_sutugin(),
         )
 
     def particle_growth(self):
         """ particle growth in m/s
         """
+        result = self.vapor_flux() * 2 / (
+            self.vapor_density *
+            np.transpose(
+                [self.particle_radius.m**2]
+                )*self.particle_radius.u**2 *
+            np.pi *
+            self.shape_factor
+        )
         return (
-            self.vapor_flux() * 2 / (
-                self.vapor_density *
-                self.particle_radius**2 *
-                np.pi *
-                self.shape_factor
-            )
+            result if result.shape == self.particle_radius.shape
+            else result.sum(axis=1)
         )
 
 
