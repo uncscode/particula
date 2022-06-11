@@ -310,6 +310,7 @@ class Particle(ParticleCondensation):
             elementary_charge_value=self.elementary_charge_value,
             electric_permittivity=self.electric_permittivity,
             boltzmann_constant=self.boltzmann_constant,
+            coag_approx=self.coagulation_approximation,
         )
 
     def reduced_mass(self, other: "Particle" = None):
