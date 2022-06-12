@@ -11,4 +11,4 @@ from particula.util.lf2013_coagulation import lf2013_coag_full
 def test_approx_coag_less():
     """ testing
     """
-    assert 1 == 1
+    pass
