@@ -8,7 +8,7 @@ import numpy as np
 
 # flake8: noqa: C901
 # pylint: disable=too-many-arguments, too-many-locals, too-many-branches
-def lf2013_coag_full( 
+def lf2013_coag_full(
     ion_type="air",
     particle_type="conductive",
     temperature_val=298.15,
