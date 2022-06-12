@@ -1,6 +1,8 @@
 """ calculate ion--particle coagulation according to lf2013
 """
 
+import os
+
 import numpy as np
 
 
@@ -14,6 +16,11 @@ def lf2013_coag_full(  # pylint: disable=too-many-arguments, too-many-locals
 ):
     """ calculate ion--particle coagulation according to lf2013
     """
+
+    if charge_vals is not None and (
+        max(charge_vals) > 100 or min(charge_vals) < -100):
+        raise ValueError("charge_vals must be between -100 and 100")
+
     if ion_type == "air" and particle_type == "conductive":
         if temperature_val == 298.15 and pressure_val == 101325:
             negfn = "S1.txt"
@@ -39,13 +46,18 @@ def lf2013_coag_full(  # pylint: disable=too-many-arguments, too-many-locals
         negfn = "S13.txt"
         posfn = "S14.txt"
 
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+
     # expand dims to account for size
     negdata = np.expand_dims(
-        np.loadtxt(negfn, skiprows=1), axis=0)
+        np.loadtxt(os.path.join(dir_path, negfn), skiprows=1), axis=0)
     posdata = np.expand_dims(
-        np.loadtxt(posfn, skiprows=1), axis=0)
+        np.loadtxt(os.path.join(dir_path, posfn), skiprows=1), axis=0)
 
     coeffs = negdata.shape[-1]-5  # take 5 out (metdata)
+
+    if isinstance(radius_vals, float):
+        radius_vals = np.array([radius_vals])
 
     rads = np.expand_dims(
         np.expand_dims(
@@ -69,6 +81,10 @@ def lf2013_coag_full(  # pylint: disable=too-many-arguments, too-many-locals
     neg[neg == 1] = np.nan
     pos[pos == 1] = np.nan
 
-    _ = charge_vals
 
-    return neg, pos
+    if isinstance(charge_vals, list):
+        charges = [i+100 for i in charge_vals]
+    else:
+        charges = [charge_vals + 100]
+
+    return neg[:, charges], pos[:, charges]
