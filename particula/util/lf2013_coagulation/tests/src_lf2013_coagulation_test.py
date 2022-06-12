@@ -4,7 +4,7 @@
 # import pytest
 import numpy as np
 
-from particula.util.lf2013_coagulation.src_lf2013_coagulation import lf2013_coag_full
+from particula.util.lf2013_coagulation import lf2013_coag_full
 
 # from particula import u
 

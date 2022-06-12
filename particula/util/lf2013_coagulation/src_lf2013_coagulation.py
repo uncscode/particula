@@ -18,7 +18,7 @@ def lf2013_coag_full(  # pylint: disable=too-many-arguments, too-many-locals
     """
 
     if charge_vals is not None and (
-        max(charge_vals) > 100 or min(charge_vals) < -100):
+            max(charge_vals) > 100 or min(charge_vals) < -100):
         raise ValueError("charge_vals must be between -100 and 100")
 
     if ion_type == "air" and particle_type == "conductive":
@@ -80,7 +80,6 @@ def lf2013_coag_full(  # pylint: disable=too-many-arguments, too-many-locals
 
     neg[neg == 1] = np.nan
     pos[pos == 1] = np.nan
-
 
     if isinstance(charge_vals, list):
         charges = [i+100 for i in charge_vals]
