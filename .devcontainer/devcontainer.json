@@ -1,19 +1,9 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.202.5/containers/python-3
 {
 	"name": "particula",
 	"runArgs": ["--init"],
 	"build": {
 		"dockerfile": "Dockerfile",
-		"context": "..",
-		"args": { 
-			// Update 'VARIANT' to pick a Python version: 3, 3.10, 3.9, 3.8, 3.7, 3.6
-			// Append -bullseye or -buster to pin to an OS version.
-			// Use -bullseye variants on local on arm64/Apple Silicon.
-			"VARIANT": "3.9",
-			// Options
-			"NODE_VERSION": "lts/*"
-		}
+		"context": ".."
 	},
 
 	// Set *default* container specific settings.json values on container create.
@@ -37,12 +27,7 @@
 		// "editor.detectIndentation": false, // Add this to disable automatic indentation detection.
 		"editor.bracketPairColorization.enabled": true,
 		"editor.lightbulb.enable": true,
-		"python.defaultInterpreterPath": "/usr/local/bin/python",
-		// add to list any words you want ignored when spellchecking
-		"cSpell.words": [
-			"particula",
-			"conda",
-		]
+		"python.defaultInterpreterPath": "/usr/local/bin/python"
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
@@ -54,28 +39,14 @@
 		"ms-toolsai.jupyter-renderers",
 		"ms-vscode.vscode-github-issue-notebooks",
 		"ms-vscode.vscode-markdown-notebook",
-		"streetsidesoftware.code-spell-checker",
 		"ms-python.gather",
 		"github.copilot",
 		"github.vscode-pull-request-github",
-		"james-yu.latex-workshop",
-		"gimly81.matlab",
 		"visualstudioexptteam.vscodeintellicode",
-		"mhutchie.git-graph",
 		"ms-vscode.github-issues-prs",
-		"davidanson.vscode-markdownlint",
-		"streetsidesoftware.code-spell-checker",
-		"streetsidesoftware.code-spell-checker-scientific-terms",
 		"visualstudioexptteam.intellicode-api-usage-examples",
-		"redhat.vscode-yaml",
 		"sourcery.sourcery",
-		"ms-vscode.github-issues-prs",
-		"davidanson.vscode-markdownlint",
-		// for viewing pandas dataframes (must have pandas)
-		"msrvida.vscode-sanddance",
-		"analytic-signal.preview-pdf",
-		"eamodio.gitlens",
-		"ms-vsliveshare.vsliveshare-pack"
+		"ms-vscode.github-issues-prs"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
