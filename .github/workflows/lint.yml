@@ -45,4 +45,4 @@ jobs:
       if: ${{ matrix.linter == 'pytype' }}
       name: Lint with pytype
       run: |
-        pytype -k
+        pytype -k .
