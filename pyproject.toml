@@ -34,6 +34,7 @@ repository = "https://github.com/uncscode/particula"
 dev = [
     "pylint", "pytest", "autopep8", "jupyterlab", "pytype",
     "typing", "build", "flake8", "jupyter-book", "ghp-import",
+    "matplotlib",
 ]
 
 [build-system]
