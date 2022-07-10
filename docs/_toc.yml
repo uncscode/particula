@@ -14,7 +14,8 @@ parts:
 - caption: Examples
   numbered: false
   chapters:
-  - file: documentation/coagulation
+  - file: examples/distribution_demo
+  - file: examples/coagulation_demo
 - caption: Utilities
   numbered: false
   chapters:
