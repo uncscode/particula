@@ -566,7 +566,7 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="comparing-different-coagulation-calculations">
 <h1>Comparing different coagulation calculations.<a class="headerlink" href="#comparing-different-coagulation-calculations" title="Permalink to this headline">#</a></h1>
-<p>The problem here: positive particles (1 to 9 charges) of radius 3 nm colliding with a negative ion of radius 0.9 nm.</p>
+<p>The problem here: positive particles (1 to 9 charges) of radius 3 nm colliding with a negative ion of radius 0.45 nm.</p>
 <p>Several coagulation approximations:</p>
 <ul class="simple">
 <li><p>hard shpere</p></li>
@@ -626,7 +626,7 @@ title="Print to PDF"
         <span class="n">temperature_val</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
         <span class="n">pressure_val</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span>
         <span class="n">charge_vals</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
-        <span class="n">radius_vals</span><span class="o">=</span><span class="mf">10e-9</span><span class="p">,)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">radius_vals</span><span class="o">=</span><span class="mf">3e-9</span><span class="p">,)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># [0] returns negative, [1] returns positive ions</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ret</span><span class="o">*</span><span class="mf">1e6</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;lf2013&quot;</span><span class="p">);</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mf">1e-7</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">]);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Attachment coefficient, cc/s&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;# charges&quot;</span><span class="p">);</span> 
 </pre></div>
