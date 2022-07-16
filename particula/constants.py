@@ -8,15 +8,16 @@
 
 from particula import u
 
-BOLTZMANN_CONSTANT = 1.380649e-23 * u.m**2 * u.kg / u.s**2 / u.K
+BOLTZMANN_CONSTANT = (1*u.k_B).to_base_units()
 
-AVOGADRO_NUMBER = 6.022140857e23 / u.mol
+AVOGADRO_NUMBER = (1*u.avogadro_constant).to_base_units()
 
 # Gas constant in J mol^-1 K^-1 = m^2 kg mol^-1 s^-2 K^-1
 # J = kg m^2 s^-2
+# or (1*u.molar_gas_constant).to_base_units()
 GAS_CONSTANT = BOLTZMANN_CONSTANT * AVOGADRO_NUMBER
 
-ELEMENTARY_CHARGE_VALUE = 1.60217662e-19 * u.C
+ELEMENTARY_CHARGE_VALUE = (1*u.elementary_charge).to_base_units()
 
 # Relative permittivity of air at approx.
 # 296.15 K and 101325 Pa and 40% RH
@@ -34,7 +35,7 @@ RELATIVE_PERMITTIVITY_AIR = RELATIVE_PERMITTIVITY_AIR_ROOM
 # Permittivity of free space in F/m
 # Also known as the electric constant, permittivity of free space
 # Often denoted by epsilon_0
-VACUUM_PERMITTIVITY = 8.85418782e-12 * u.F / u.m
+VACUUM_PERMITTIVITY = (1*u.vacuum_permittivity).to_base_units()
 
 ELECTRIC_PERMITTIVITY = RELATIVE_PERMITTIVITY_AIR * VACUUM_PERMITTIVITY
 
