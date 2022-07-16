@@ -291,7 +291,6 @@ class Particle(ParticleCondensation):
             u.m**2*u.kg/u.s**2/u.K
         )
 
-
         self.kwargs = kwargs
 
     def _coag_prep(self, other: "Particle"):
