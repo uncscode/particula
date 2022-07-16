@@ -290,9 +290,7 @@ class Particle(ParticleCondensation):
             kwargs.get("boltzmann_constant", BOLTZMANN_CONSTANT),
             u.m**2*u.kg/u.s**2/u.K
         )
-        self.coagulation_approximation = str(
-            kwargs.get("coagulation_approximation", "hardsphere")
-        )
+
 
         self.kwargs = kwargs
 

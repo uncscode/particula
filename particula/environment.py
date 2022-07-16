@@ -36,7 +36,21 @@ from particula.util.input_handling import (in_gas_constant,
 from particula.util.mean_free_path import mfp
 
 
-class Environment:  # pylint: disable=too-many-instance-attributes
+class SharedProperties:  # pylint: disable=too-few-public-methods
+    """ a hidden class for sharing properties like
+        coagulation_approximation
+    """
+
+    def __init__(self, **kwargs):
+        """ initiate
+        """
+
+        self.coagulation_approximation = str(
+            kwargs.get("coagulation_approximation", "hardsphere")
+        )
+
+
+class Environment(SharedProperties):  # pylint: disable=too-many-instance-attributes
     """ creating the environment class
 
         For now, the environment class takes properties such as
@@ -47,6 +61,8 @@ class Environment:  # pylint: disable=too-many-instance-attributes
     def __init__(self, **kwargs):
         """ Initiate the environment class with base attrs.
         """
+
+        super().__init__(**kwargs)
 
         self.temperature = in_temperature(
             kwargs.get("temperature", 298.15)
