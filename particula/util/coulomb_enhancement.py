@@ -116,9 +116,9 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
 
         ratio = self.coulomb_potential_ratio()
 
+        # return 1 + ratio if ratio >=0, otherwise np.exp(ratio)
         return (
-            (1 + ratio) if (ratio >= 0).all()
-            else np.exp(ratio)
+            (1 + ratio) * (ratio >= 0) + np.exp(ratio) * (ratio < 0)
         ).to_base_units()
 
     def coulomb_enhancement_continuum_limit(self):
@@ -137,9 +137,10 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
 
         ratio = self.coulomb_potential_ratio()
 
+        # return ratio/(1-np.exp(-1*ratio)) if ratio != 0, otherwise 1
         return (
-            ratio/(1-np.exp(-1*ratio)) if (ratio != 0).all()
-            else u.Quantity(1, u.dimensionless)
+            (ratio*(ratio != 0)+1*(ratio == 0))
+            / (1-np.exp(-1*ratio)*(ratio != 0))
         ).to_base_units()
 
 
