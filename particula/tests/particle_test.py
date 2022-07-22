@@ -398,3 +398,18 @@ def test_condensation_stuff():
 
     assert cond2oth.vapor_flux().m.shape == (1000, 2)
     assert cond2oth.particle_growth().m.shape == (1000,)
+
+
+def test_likelike_coagulation():
+    """ see https://github.com/uncscode/particula/issues/239
+    """
+    approx_list = ["gk2008", "gh2012", "dy2007", "cg2019", "hardsphere",]
+    for approx in approx_list:
+        ppart = particle.Particle(
+            coagulation_approximation = approx,
+            particle_radius=3e-9 * u.m,
+            particle_density=1.7e3 * u.kg / u.m**3,
+            particle_charge=1
+        )
+
+        assert ppart.coagulation().m >= 0

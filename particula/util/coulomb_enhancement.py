@@ -117,7 +117,7 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
         ratio = self.coulomb_potential_ratio()
 
         return (
-            (1 + ratio) if ratio.all() >= 0
+            (1 + ratio) if (ratio >=0 ).all()
             else np.exp(ratio)
         ).to_base_units()
 
@@ -138,7 +138,7 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
         ratio = self.coulomb_potential_ratio()
 
         return (
-            ratio/(1-np.exp(-1*ratio)) if ratio.all() != 0
+            ratio/(1-np.exp(-1*ratio)) if (ratio != 0).all()
             else u.Quantity(1, u.dimensionless)
         ).to_base_units()
 
