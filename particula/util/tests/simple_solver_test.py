@@ -67,7 +67,7 @@ def test_solution():
     assert solution.m.shape == (100, 1000)
     assert solution.u == particle_dist.particle_distribution().u
     assert fine_sols.m.shape == (1000, 1000)
-    assert solution.m[0, :].all() == fine_sols.m[0, :].all()
+    assert (solution.m[0, :] == fine_sols.m[0, :]).all()
 
 
 def test_conservation():
