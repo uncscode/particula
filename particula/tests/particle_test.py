@@ -409,7 +409,7 @@ def test_likelike_coagulation():
             coagulation_approximation = approx,
             particle_radius=3e-9 * u.m,
             particle_density=1.7e3 * u.kg / u.m**3,
-            particle_charge=1
+            particle_charge=1,
         )
 
         assert ppart.coagulation().m >= 0
