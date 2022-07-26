@@ -22,9 +22,11 @@ def test_dyns():
     assert dyns.coagulation_loss().u == u.m**-4/u.s
     assert dyns.coagulation_gain().u == u.m**-4/u.s
     assert dyns.coagulation_rate().u == u.m**-4/u.s
-    assert dyns.condensation_growth_rate().u == u.m/u.s
+    assert dyns.condensation_growth_speed().u == u.m/u.s
+    assert dyns.condensation_growth_rate().u == u.m**-4/u.s
 
     assert dyns.coagulation_loss().m.shape == (100,)
     assert dyns.coagulation_gain().m.shape == (100,)
     assert dyns.coagulation_rate().m.shape == (100,)
+    assert dyns.condensation_growth_speed().m.shape == (100,)
     assert dyns.condensation_growth_rate().m.shape == (100,)

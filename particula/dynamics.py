@@ -23,7 +23,7 @@ class Solver(Rates):
 
         self.time_span = time_span
 
-    def _ode_func(self, _nums, _, _rads, _coag):
+    def _ode_func(self, _nums, _,):
         """ ode_func
         """
         setattr(
@@ -31,18 +31,8 @@ class Solver(Rates):
             'particle_distribution',
             _nums*self.particle_distribution.u
         )
-        setattr(
-            self,
-            'particle_coagulation',
-            _coag*self.particle_coagulation.u
-        )
-        setattr(
-            self,
-            'particle_coagulation',
-            _rads*self.particle_radius.u
-        )
 
-        return self.coagulation_gain().m - self.coagulation_loss().m
+        return self.sum_rates().m
 
     def solution(self):
         """ solve the equation
@@ -52,8 +42,4 @@ class Solver(Rates):
             func=self._ode_func,
             y0=self.particle.particle_distribution().m,
             t=self.time_span,
-            args=(
-                self.particle_radius,
-                self.particle_coagulation,
-            ),
         )*self.particle.particle_distribution().u

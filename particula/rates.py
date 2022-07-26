@@ -1,6 +1,8 @@
 """ statics -> dynamics
 """
 
+import numpy as np
+
 from particula.particle import Particle
 from particula.util.coagulation_rate import CoagulationRate
 
@@ -51,8 +53,22 @@ class Rates:
 
         return self.coagulation_gain() - self.coagulation_loss()
 
-    def condensation_growth_rate(self):
-        """ condensation
+    def condensation_growth_speed(self):
+        """ condensation speed
         """
 
         return self.particle.particle_growth()
+
+    def condensation_growth_rate(self):
+        """ condensation rate
+        """
+        return np.gradient(
+            - self.condensation_growth_speed() * self.particle_distribution,
+            self.particle_radius
+        )
+
+    def sum_rates(self):
+        """ sum rates
+        """
+
+        return self.coagulation_rate() + self.condensation_growth_rate()
