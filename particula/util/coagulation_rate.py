@@ -99,7 +99,7 @@ class CoagulationRate:
         nums, rads, kern = self.coag_prep()
 
         interp = RectBivariateSpline(
-            rads.m, rads.m, kern.m * nums.m * np.transpose(nums.m)
+            rads.m, rads.m, kern.m * nums.m * np.transpose([nums.m])
         )
 
         dpd = np.linspace(0, rads.m/2**(1/3), rads.m.size)*rads.u

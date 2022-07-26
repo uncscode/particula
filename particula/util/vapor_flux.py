@@ -39,14 +39,14 @@ def phi(  # pylint: disable=too-many-arguments
     fsc_val = fsc_func(**kwargs) if fsc is None else in_scalar(fsc)
 
     result = (
-        np.transpose(particle_area.m)*particle_area.u *
+        np.transpose([particle_area.m])*particle_area.u *
         np.transpose(
-            molecular_enhancement_val.m
+            [molecular_enhancement_val.m]
             )*molecular_enhancement_val.u *
-        np.transpose(vapor_attachment.m)*vapor_attachment.u *
-        np.transpose(vapor_speed_val.m)*vapor_speed_val.u *
-        np.transpose(driving_force.m)*driving_force.u *
-        np.transpose(fsc_val.m)*fsc_val.u
+        np.transpose([vapor_attachment.m])*vapor_attachment.u *
+        np.transpose([vapor_speed_val.m])*vapor_speed_val.u *
+        np.transpose([driving_force.m])*driving_force.u *
+        np.transpose([fsc_val.m])*fsc_val.u
     ).squeeze()
 
     return np.transpose(result.m)*result.u
