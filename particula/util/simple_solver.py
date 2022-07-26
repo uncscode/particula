@@ -23,7 +23,7 @@ def ode_func(_nums, _, _rads, _coag):
     coag = CoagulationRate(
         distribution=_nums * u.m**-4,
         radius=_rads * u.m,
-        kernel=_coag * u.m**-4,
+        kernel=_coag * u.m**3/u.s,
     )
 
     return coag.coag_gain().m - coag.coag_loss().m
