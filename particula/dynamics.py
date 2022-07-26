@@ -2,8 +2,6 @@
 """
 from scipy.integrate import odeint
 
-from particula.particle import Particle
-from particula.util.coagulation_rate import CoagulationRate
 from particula.rates import Rates
 
 
@@ -28,6 +26,22 @@ class Solver(Rates):
     def _ode_func(self, _nums, _, _rads, _coag):
         """ ode_func
         """
+        setattr(
+            self,
+            'particle_distribution',
+            _nums*self.particle_distribution.u
+        )
+        setattr(
+            self,
+            'particle_coagulation',
+            _coag*self.particle_coagulation.u
+        )
+        setattr(
+            self,
+            'particle_coagulation',
+            _rads*self.particle_radius.u
+        )
+
         return self.coagulation_gain().m - self.coagulation_loss().m
 
     def solution(self):
@@ -36,10 +50,10 @@ class Solver(Rates):
 
         return odeint(
             func=self._ode_func,
-            y0=self.particle.particle_distribution(),
+            y0=self.particle.particle_distribution().m,
             t=self.time_span,
             args=(
-                self.particle.particle_radius,
-                self.particle.coagulation(),
+                self.particle_radius,
+                self.particle_coagulation,
             ),
         )*self.particle.particle_distribution().u
