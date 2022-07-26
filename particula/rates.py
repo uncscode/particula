@@ -1,6 +1,5 @@
 """ statics -> dynamics
 """
-from scipy.integrate import odeint
 
 from particula.particle import Particle
 from particula.util.coagulation_rate import CoagulationRate
