@@ -17,6 +17,6 @@
 from pint import UnitRegistry
 
 # u is the unit registry name.
-u = UnitRegistry()
+u = UnitRegistry(force_ndarray=True)
 
 __version__ = "0.0.9.dev0"
