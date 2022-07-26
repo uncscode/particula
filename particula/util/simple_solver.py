@@ -15,6 +15,7 @@ import numpy as np
 from scipy.integrate import odeint
 from particula.util.coagulation_rate import CoagulationRate
 from particula import u
+from particula.util.input_handling import in_handling
 
 
 def ode_func(_nums, _, _rads, _coag):
@@ -50,9 +51,15 @@ class SimpleSolver:
             - kernel: associated coagulation kernel (m**3/s)
             - tspan: desired time span (s)
         """
-        self.nums_init = kwargs.get("distribution", None)
-        self.rads_init = kwargs.get("radius", None)
-        self.coag_kern = kwargs.get("kernel", None)
+        self.nums_init = in_handling(
+            kwargs.get("distribution"), u.m**-4
+        )
+        self.rads_init = in_handling(
+            kwargs.get("radius"), u.m
+        )
+        self.coag_kern = in_handling(
+            kwargs.get("kernel"), u.m**3/u.s
+        )
         self.time_span = kwargs.get("tspan", np.linspace(0, 10, 1000))
         self.kwargs = kwargs
 
