@@ -92,7 +92,7 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
             self.elem_char_val ** 2
         )
         denominator = 4 * np.pi * self.elec_perm * (
-            np.transpose([self.radius.m])*self.radius.u +
+            np.transpose(self.radius.m)*self.radius.u +
             self.other_radius
         )
 

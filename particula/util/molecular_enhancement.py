@@ -27,5 +27,5 @@ def mol_enh(vapor_size, particle_size):
     b_q = in_length(particle_size)
 
     return np.transpose(
-        (np.transpose([a_q.m])*a_q.u + b_q) / (b_q)
+        (np.transpose(a_q.m)*a_q.u + b_q) / (b_q)
     )**2

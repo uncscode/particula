@@ -220,7 +220,7 @@ class ParticleCondensation(ParticleInstances):
         """
         return redq(
             self.vapor_molec_wt,
-            np.transpose([self.particle_mass().m]) *
+            np.transpose(self.particle_mass().m) *
             self.particle_mass().u*AVOGADRO_NUMBER
         ).squeeze()
 

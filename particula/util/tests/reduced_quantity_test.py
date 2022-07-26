@@ -23,7 +23,7 @@ def test_reduced_quantity():
     assert reduced_quantity([1, 2], [2, 3]).shape == (2, )
 
     assert reduced_quantity(
-        np.array([1, 2]), np.transpose([np.array([2, 3])])
+        np.array([1, 2]), np.transpose(np.array([2, 3]))
     ).shape == (2, 2)
 
     with pytest.raises(TypeError):
