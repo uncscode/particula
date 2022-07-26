@@ -32,7 +32,7 @@ class Solver(Rates):
             _nums*self.particle_distribution.u
         )
 
-        return self.sum_rates().m
+        return self.coagulation_rate().m
 
     def solution(self):
         """ solve the equation
