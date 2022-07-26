@@ -3,7 +3,7 @@
 
 from particula import u
 from particula.particle import Particle
-from particula.dynamics import Rates
+from particula.rates import Rates
 
 
 def test_dyns():
@@ -11,7 +11,7 @@ def test_dyns():
     """
 
     some_particle = Particle(
-        mode=100,
+        mode=100e-9,
         nbins=100,
         nparticles=1e5,
         gsigma=1.25,
