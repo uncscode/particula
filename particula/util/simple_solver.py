@@ -50,15 +50,17 @@ class SimpleSolver:
             - kernel: associated coagulation kernel (m**3/s)
             - tspan: desired time span (s)
         """
-        self.nums_init = kwargs.get("distribution", None)
-        self.rads_init = kwargs.get("radius", None)
-        self.coag_kern = kwargs.get("kernel", None)
+        self.nums_init = kwargs.get("distribution")
+        self.rads_init = kwargs.get("radius")
+        self.coag_kern = kwargs.get("kernel")
         self.time_span = kwargs.get("tspan", np.linspace(0, 10, 1000))
         self.kwargs = kwargs
 
     def prep_inputs(self):
         """ strip units, etc.
         """
+        if self.nums_init or self.rads_init or self.coag_kern is None:
+            raise ValueError("Please provide inputs!")
 
         return (
             self.nums_init.m,
