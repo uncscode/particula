@@ -10,14 +10,14 @@ def test_dyns():
     """ test the dynamic step functionalities
     """
 
-    p1 = Particle(
+    some_particle = Particle(
         mode=100,
         nbins=100,
         nparticles=1e5,
         gsigma=1.25,
     )
 
-    dyns = Rates(p1)
+    dyns = Rates(some_particle)
 
     assert dyns.coagulation_loss().u == u.m**-4/u.s
     assert dyns.coagulation_gain().u == u.m**-4/u.s

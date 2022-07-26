@@ -11,12 +11,12 @@ class Rates:
 
     def __init__(
         self,
-        particle: Particle = None,
+        particle=None,
     ):
         """ setting up the class
         """
 
-        if particle is None:
+        if particle is None or not isinstance(particle, Particle):
             raise ValueError("You must provide a baseline Particle object!")
 
         self.particle = particle
