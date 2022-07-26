@@ -66,12 +66,6 @@ class SimpleSolver:
     def prep_inputs(self):
         """ strip units, etc.
         """
-        if (
-            self.nums_init is None or
-            self.rads_init is None or
-            self.coag_kern is None
-        ):
-            raise ValueError("Please provide inputs!")
 
         return (
             self.nums_init.m,
