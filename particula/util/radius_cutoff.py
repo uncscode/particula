@@ -25,7 +25,7 @@ def cut_rad(
             (starting radius, ending radius) float tuple
     """
 
-    _ = kwargs.get("something", None)
+    _ = kwargs.get("something")
     if not isinstance(mode, u.Quantity):
         mode = in_radius(mode)
 
