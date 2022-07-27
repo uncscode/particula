@@ -26,7 +26,9 @@ from particula.util.wall_loss import wlc
 from particula.vapor import Vapor
 
 
-class ParticleDistribution(Vapor):  # pylint: disable=too-many-instance-attributes
+class ParticleDistribution(
+    Vapor
+):  # pylint: disable=too-many-instance-attributes
     """ starting a particle distribution from continuous pdf
     """
 
@@ -161,9 +163,6 @@ class ParticleInstances(ParticleDistribution):
         self.particle_area_factor = in_scalar(
             kwargs.get("particle_area_factor", 1)
         )
-        self.wall_loss_approximation = str(
-            kwargs.get("wall_loss_approximation", "none")
-        )
 
     def particle_distribution(self):
         """ distribution
@@ -217,12 +216,6 @@ class ParticleInstances(ParticleDistribution):
             scf=self.slip_correction_factor(),
         )
 
-    def wall_loss_coefficient(self):
-        """ Returns a particle's wall loss coefficient.
-        """
-        return wlc(
-            type=self.wall_loss_approximation
-        )
 
 class ParticleCondensation(ParticleInstances):
     """ calculate some condensation stuff
@@ -235,6 +228,9 @@ class ParticleCondensation(ParticleInstances):
         self.particle_formation_rate = in_handling(
             kwargs.get("particle_formation_rate", 0),
             u.m**-4/u.s
+        )
+        self.wall_loss_approximation = str(
+            kwargs.get("wall_loss_approximation", "none")
         )
         self.kwargs = kwargs
 
@@ -295,6 +291,13 @@ class ParticleCondensation(ParticleInstances):
         return (
             result if result.shape == self.particle_radius.shape
             else result.sum(axis=1)
+        )
+
+    def wall_loss_coefficient(self):
+        """ Returns a particle's wall loss coefficient.
+        """
+        return wlc(
+            approx=self.wall_loss_approximation
         )
 
 

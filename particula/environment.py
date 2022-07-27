@@ -35,7 +35,7 @@ from particula.util.input_handling import (in_gas_constant, in_handling,
                                            in_molecular_weight, in_pressure,
                                            in_temperature, in_viscosity)
 from particula.util.mean_free_path import mfp
-from particula.util.dilution_rate_coefficient import drc
+from particula.util.dilution_loss import drc
 
 
 class SharedProperties:  # pylint: disable=too-few-public-methods
@@ -63,7 +63,10 @@ class SharedProperties:  # pylint: disable=too-few-public-methods
             value=self.dilution_rate_constant
         )
 
-class Environment(SharedProperties):  # pylint: disable=too-many-instance-attributes
+
+class Environment(
+    SharedProperties
+):  # pylint: disable=too-many-instance-attributes
     """ creating the environment class
 
         For now, the environment class takes properties such as

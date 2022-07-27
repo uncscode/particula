@@ -1,6 +1,7 @@
 """ calculate the wall loss coefficient
 """
 
+
 def wlc(
     approx="none",
 ):
