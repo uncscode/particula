@@ -6,12 +6,10 @@ import numpy as np
 from particula import particle, dynamics
 
 some_kwargs = {
-    "mode": 200e-9,  # 200 nm median
+    "vapor_concentration": 1e-15,
+    "mode": 20e-8,  # 200 nm median
     "nbins": 1000,  # 1000 bins
-    "nparticles": 1e6,  # 1e4 #
-    "volume": 1e-6,  # per 1e-6 m^3 (or 1 cc)
-    "gsigma": 1.2,  # relatively narrow
-    "cutoff": .99999,  # let's take it all lol
+    "cutoff": .9999999,
 }
 
 particle_dist = particle.Particle(**some_kwargs)
