@@ -32,5 +32,5 @@ def cbar(
     gas_constant = in_gas_constant(gas_constant)
 
     return (
-        (8 * gas_constant * temperature/(np.pi * molecular_weight))**0.5
+        (8 * gas_constant * temperature / (np.pi * molecular_weight)) ** 0.5
     ).to_base_units()

@@ -17,7 +17,7 @@ def test_mol_enh():
     assert a_mol_enh == b_mol_enh
     assert a_mol_enh.units == u.dimensionless
 
-    assert mol_enh(vapor_size=1, particle_size=[1, 2]).m.shape == (2,)
+    assert mol_enh(vapor_size=1, particle_size=[1, 2]).m.shape == (2, 1)
     assert mol_enh(vapor_size=[1, 2], particle_size=1).m.shape == (1, 2)
     assert mol_enh(
         vapor_size=[1, 2], particle_size=[1, 2, 3]

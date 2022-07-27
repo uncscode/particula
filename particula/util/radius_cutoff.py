@@ -4,13 +4,14 @@
 import numpy as np
 from scipy.stats import lognorm
 
+from particula import u
 from particula.util.input_handling import in_scalar, in_radius
 
 
 def cut_rad(
     cutoff=in_scalar(0.9999).m,
     gsigma=in_scalar(1.25).m,
-    mode=in_radius(100e-9).m,
+    mode=in_radius(100e-9),
     **kwargs
 ):
     """ This routine determins the radius cutoff for the particle distribution
@@ -24,19 +25,21 @@ def cut_rad(
             (starting radius, ending radius) float tuple
     """
 
-    _ = kwargs.get("something", None)
+    _ = kwargs.get("something")
+    if not isinstance(mode, u.Quantity):
+        mode = in_radius(mode)
 
-    if np.array([mode]).size == 1:
+    if np.array([mode.m]).size == 1:
         (rad_start, rad_end) = lognorm.interval(
             alpha=cutoff,
             s=np.log(gsigma),
-            scale=mode,
+            scale=mode.m,
         )
     else:
         (rad_start_pre, rad_end_pre) = lognorm.interval(
             alpha=cutoff,
             s=np.log(gsigma),
-            scale=mode,
+            scale=mode.m,
         )
         rad_start = rad_start_pre.min()
         rad_end = rad_end_pre.max()

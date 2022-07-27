@@ -115,19 +115,20 @@ def approx_coag_less(  # pylint: disable=too-many-locals
 
     if approx == "cg2019":
         # fix later: 1e-12 is arbitrary, pure numerics issue here
-        diff_knu = diff_knu if diff_knu.m > 1e-12 else 1e-12
+        # diff_knu < 1e-12 leads to nan somewhere downstream
+        diff_knu = diff_knu if diff_knu > 1e-12 else 1e-12*diff_knu.u
 
-        tricky_corr = 1 if cpr.m <= 0 else (
+        tricky_corr = 1 if cpr <= 0 else (
             4.528*np.exp(-1.088*cpr)) + (.7091*np.log(1+1.527*cpr))
 
-        tricky_corr_again = 0 if cpr.m <= 0 else (
+        tricky_corr_again = 0 if cpr <= 0 else (
             11.36*(cpr**0.272) - 10.33)
 
         corr = [
             2.5,
             tricky_corr,
             tricky_corr_again,
-            -0.003533*cpr + 0.05971
+            -0.003533*cpr.m + 0.05971
         ]
 
         corr_mu = (corr[2]/corr[0])*(
@@ -138,7 +139,7 @@ def approx_coag_less(  # pylint: disable=too-many-locals
             )
 
         return (
-            hscoag.m * (cpr.m <= 0) + np.exp(corr_mu.m) * hscoag.m * (cpr > 0)
+            hscoag.m * (cpr <= 0) + np.exp(corr_mu.m) * hscoag.m * (cpr > 0)
         ) * hscoag.u
 
     return None
