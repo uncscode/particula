@@ -515,7 +515,7 @@ NAME
     particula.util.radius_cutoff - determing the radius cutoff for particle distribution
 
 FUNCTIONS
-    cut_rad(cutoff=0.9999, gsigma=1.25, mode=1e-07, **kwargs)
+    cut_rad(cutoff=array(0.9999), gsigma=array(1.25), mode=&lt;Quantity(1e-07, &#39;meter&#39;)&gt;, **kwargs)
         This routine determins the radius cutoff for the particle distribution
         
         Inputs:
@@ -647,6 +647,8 @@ DATA
         &gt;&gt;&gt; ax.hist(r, density=True, histtype=&#39;stepfilled&#39;, alpha=0.2)
         &gt;&gt;&gt; ax.legend(loc=&#39;best&#39;, frameon=False)
         &gt;&gt;&gt; plt.show()
+    
+    u = &lt;pint.registry.UnitRegistry object&gt;
 
 FILE
     /opt/hostedtoolcache/Python/3.10.5/x64/lib/python3.10/site-packages/particula/util/radius_cutoff.py
