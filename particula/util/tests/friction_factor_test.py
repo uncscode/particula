@@ -46,5 +46,5 @@ def test_friction_factor():
     )
 
     assert frifac(radius=[1, 2, 3]).m.shape == (3,)
-    assert frifac(radius=[1, 2, 3], temperature=[1, 2, 3]).m.shape == (3, 3)
-    assert frifac(radius=[1, 2, 3], pressure=[1, 2, 3]).m.shape == (3, 3)
+    assert frifac(radius=[1, 2, 3], temperature=[1, 2, 3]).m.shape == (3,)
+    assert frifac(radius=[1, 2, 3], pressure=[1, 2, 3]).m.shape == (3,)

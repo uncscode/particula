@@ -115,7 +115,8 @@ def approx_coag_less(  # pylint: disable=too-many-locals
 
     if approx == "cg2019":
         # fix later: 1e-12 is arbitrary, pure numerics issue here
-        diff_knu = max(diff_knu, 1e-12)
+        # diff_knu < 1e-12 leads to nan somewhere downstream
+        diff_knu = diff_knu if diff_knu > 1e-12 else 1e-12*diff_knu.u
 
         tricky_corr = 1 if cpr <= 0 else (
             4.528*np.exp(-1.088*cpr)) + (.7091*np.log(1+1.527*cpr))

@@ -10,7 +10,7 @@ def discretize(
     interval=None,
     disttype="lognormal",
     gsigma=in_scalar(1.25).m,
-    mode=in_radius(100e-9).m,
+    mode=in_radius(100e-9),
     nparticles=in_scalar(1e5).m,
     **kwargs
 ):
@@ -38,10 +38,10 @@ def discretize(
         lognorm.pdf(
             x=interval.m,
             s=np.reshape(np.log(gsigma), (np.array([gsigma]).size, 1)),
-            scale=np.reshape([mode], (np.array([mode]).size, 1)),
+            scale=np.reshape([mode.m], (np.array([mode.m]).size, 1)),
         ) / interval.u
         * np.reshape([nparticles], (np.array([nparticles]).size, 1))
         ).sum(axis=0) /
         np.array([nparticles]).sum() /
-        np.max([np.array([mode]).size, np.array([gsigma]).size])
+        np.max([np.array([mode.m]).size, np.array([gsigma]).size])
     )

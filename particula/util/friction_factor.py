@@ -87,7 +87,7 @@ def frifac(
     return (
         6 *
         np.pi *
-        np.transpose(dyn_vis_val.m)*dyn_vis_val.u *
+        dyn_vis_val *
         radius /
         scf_val
     ).to_base_units()
