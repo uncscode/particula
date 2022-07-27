@@ -22,6 +22,7 @@ from particula.util.reduced_quantity import reduced_quantity as redq
 from particula.util.rms_speed import cbar
 from particula.util.slip_correction import scf
 from particula.util.vapor_flux import phi
+from particula.util.wall_loss import wlc
 from particula.vapor import Vapor
 
 
@@ -160,6 +161,9 @@ class ParticleInstances(ParticleDistribution):
         self.particle_area_factor = in_scalar(
             kwargs.get("particle_area_factor", 1)
         )
+        self.wall_loss_approximation = str(
+            kwargs.get("wall_loss_approximation", "none")
+        )
 
     def particle_distribution(self):
         """ distribution
@@ -213,6 +217,12 @@ class ParticleInstances(ParticleDistribution):
             scf=self.slip_correction_factor(),
         )
 
+    def wall_loss_coefficient(self):
+        """ Returns a particle's wall loss coefficient.
+        """
+        return wlc(
+            type=self.wall_loss_approximation
+        )
 
 class ParticleCondensation(ParticleInstances):
     """ calculate some condensation stuff
