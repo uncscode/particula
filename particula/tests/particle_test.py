@@ -396,6 +396,8 @@ def test_condensation_stuff():
     assert cond2oth.vapor_attachment.m.shape == (2,)
     assert cond2oth.driving_force().m.shape == (1, 2)
 
+    assert cond2oth.fuchs_sutugin().m.shape == (1000, 2)
+
     assert cond2oth.vapor_flux().m.shape == (1000, 2)
     assert cond2oth.particle_growth().m.shape == (1000,)
 

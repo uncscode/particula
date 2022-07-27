@@ -24,6 +24,8 @@ def discretize(
     """
 
     _ = kwargs.get("something", None)
+    if not isinstance(mode, u.Quantity):
+        mode = in_radius(mode)
 
     if interval is None:
         raise ValueError("the 'interval' must be specified!")

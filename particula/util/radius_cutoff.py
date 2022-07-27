@@ -4,6 +4,7 @@
 import numpy as np
 from scipy.stats import lognorm
 
+from particula import u
 from particula.util.input_handling import in_scalar, in_radius
 
 
@@ -25,6 +26,8 @@ def cut_rad(
     """
 
     _ = kwargs.get("something", None)
+    if not isinstance(mode, u.Quantity):
+        mode = in_radius(mode)
 
     if np.array([mode.m]).size == 1:
         (rad_start, rad_end) = lognorm.interval(
