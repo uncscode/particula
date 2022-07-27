@@ -374,13 +374,13 @@ def test_condensation_stuff():
     assert cond.driving_force().u == u.kg/u.m**3
     # assert cond.driving_force().m.shape == (1,)
     assert cond.molecular_enhancement().u == u.dimensionless
-    assert cond.molecular_enhancement().m.shape == (1000,)
+    assert cond.molecular_enhancement().m.shape == (1000, 1)
     assert cond.condensation_redmass().u == u.kg/u.mol
-    assert cond.condensation_redmass().m.shape == (1000,)
+    assert cond.condensation_redmass().m.shape == (1000, 1)
     assert cond.vapor_speed().u == u.m/u.s
-    assert cond.vapor_speed().m.shape == (1000,)
+    assert cond.vapor_speed().m.shape == (1000, 1)
     assert cond.vapor_flux().u == u.kg/u.s
-    assert cond.vapor_flux().m.shape == (1000,)
+    assert cond.vapor_flux().m.shape == (1000, 1)
     assert cond.particle_growth().u == u.m/u.s
     assert cond.particle_growth().m.shape == (1000,)
 
@@ -395,6 +395,8 @@ def test_condensation_stuff():
     assert cond2oth.particle_area().m.shape == (1000,)
     assert cond2oth.vapor_attachment.m.shape == (2,)
     assert cond2oth.driving_force().m.shape == (1, 2)
+
+    assert cond2oth.fuchs_sutugin().m.shape == (1000, 2)
 
     assert cond2oth.vapor_flux().m.shape == (1000, 2)
     assert cond2oth.particle_growth().m.shape == (1000,)

@@ -40,7 +40,7 @@ class ParticleDistribution(Vapor):
         self.volume = in_volume(kwargs.get("volume", 1e-6))
         self.cutoff = in_scalar(kwargs.get("cutoff", 0.9999)).m
         self.gsigma = in_scalar(kwargs.get("gsigma", 1.25)).m
-        self.mode = in_radius(kwargs.get("mode", 100e-9)).m
+        self.mode = in_radius(kwargs.get("mode", 100e-9))
 
     def pre_radius(self):
         """ Returns the radius space of the particles
@@ -63,13 +63,13 @@ class ParticleDistribution(Vapor):
             radius = np.logspace(
                 np.log10(rad_start),
                 np.log10(rad_end),
-                np.array([self.nbins]).sum()
+                np.array(self.nbins).sum()
             )
         elif self.spacing == "linspace":
             radius = np.linspace(
                 rad_start,
                 rad_end,
-                np.array([self.nbins]).sum()
+                np.array(self.nbins).sum()
             )
         else:
             raise ValueError("Spacing must be 'logspace' or 'linspace'!")
@@ -104,9 +104,7 @@ class ParticleDistribution(Vapor):
                 mode    : geometric mean radius of the particles
         """
 
-        return np.array(
-            [self.nparticles]
-        ).sum()*self.pre_discretize()/self.volume
+        return self.nparticles.sum()*self.pre_discretize()/self.volume
 
 
 class ParticleInstances(ParticleDistribution):
@@ -222,7 +220,7 @@ class ParticleCondensation(ParticleInstances):
             self.vapor_molec_wt,
             np.transpose([self.particle_mass().m]) *
             self.particle_mass().u*AVOGADRO_NUMBER
-        ).squeeze()
+        ).reshape(self.particle_radius.size, -1)
 
     def vapor_speed(self):
         """ vapor speed
@@ -237,7 +235,7 @@ class ParticleCondensation(ParticleInstances):
         """ the fuchs-sutugin correction
         """
         return fsc(
-            knu_val=self.knudsen_number(), alpha=1
+            knu_val=self.knudsen_number(), alpha=self.vapor_attachment
         )
 
     def vapor_flux(self):
@@ -257,9 +255,7 @@ class ParticleCondensation(ParticleInstances):
         """
         result = self.vapor_flux() * 2 / (
             self.vapor_density *
-            np.transpose(
-                [self.particle_radius.m**2]
-                )*self.particle_radius.u**2 *
+            self.particle_radius.reshape(-1, 1)**2 *
             np.pi *
             self.shape_factor
         )
