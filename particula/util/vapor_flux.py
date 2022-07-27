@@ -41,7 +41,7 @@ def phi(  # pylint: disable=too-many-arguments
     return (
         particle_area.reshape(-1, 1) *
         molecular_enhancement_val *
-        np.transpose(vapor_attachment) *  # FIXME: fix previous instance
+        np.transpose(vapor_attachment) *
         vapor_speed_val *
         driving_force *
         fsc_val.reshape(rxd, -1)
