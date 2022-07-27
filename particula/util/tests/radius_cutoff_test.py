@@ -94,3 +94,16 @@ def test_multi_cuts():
         <=
         cut_rad(cutoff=.9999, gsigma=1.25, mode=[1e-7])[0]
     )
+
+
+def test_custom_radius():
+    """ testing customizing the radius
+    """
+    assert cut_rad(
+        cutoff=.9999, gsigma=1.25, mode=1e-7,
+        force_radius_start=1e-8, force_radius_end=1e-6
+    ) == (1e-8, 1e-6)
+    assert cut_rad(
+        cutoff=.9999, gsigma=1.25, mode=[1e-7, 2e-9],
+        force_radius_start=1e-8, force_radius_end=1e-6
+    ) == (1e-8, 1e-6)

@@ -25,7 +25,7 @@ from particula.util.vapor_flux import phi
 from particula.vapor import Vapor
 
 
-class ParticleDistribution(Vapor):
+class ParticleDistribution(Vapor):  # pylint: disable=too-many-instance-attributes
     """ starting a particle distribution from continuous pdf
     """
 
@@ -41,6 +41,13 @@ class ParticleDistribution(Vapor):
         self.cutoff = in_scalar(kwargs.get("cutoff", 0.9999)).m
         self.gsigma = in_scalar(kwargs.get("gsigma", 1.25)).m
         self.mode = in_radius(kwargs.get("mode", 100e-9))
+        # customize the radius
+        self.force_radius_start = in_radius(
+            kwargs.get("radius_start", 8392))
+        self.force_radius_end = in_radius(
+            kwargs.get("radius_end", 8392))
+        self.force_radius_step = in_radius(
+            kwargs.get("radius_step", 8392))
 
     def pre_radius(self):
         """ Returns the radius space of the particles
@@ -53,23 +60,35 @@ class ParticleDistribution(Vapor):
             particles, but much coarser resolution for larger particles).
         """
 
+        forcing_radius_start = None if self.force_radius_start.m == 8392 else (
+            self.force_radius_start.m)
+        forcing_radius_end = None if self.force_radius_end.m == 8392 else (
+            self.force_radius_end.m)
+
         (rad_start, rad_end) = cut_rad(
             cutoff=self.cutoff,
             gsigma=self.gsigma,
             mode=self.mode,
+            force_radius_start=forcing_radius_start,
+            force_radius_end=forcing_radius_end,
         )
+        if self.force_radius_step.m != 8392:
+            nbins = int((rad_end-rad_start)/self.force_radius_step.m) + 2
+            rad_end = rad_start + (nbins-1)*self.force_radius_step.m
+        else:
+            nbins = self.nbins
 
         if self.spacing == "logspace":
             radius = np.logspace(
                 np.log10(rad_start),
                 np.log10(rad_end),
-                np.array(self.nbins).sum()
+                np.array(nbins).sum()
             )
         elif self.spacing == "linspace":
             radius = np.linspace(
                 rad_start,
                 rad_end,
-                np.array(self.nbins).sum()
+                np.array(nbins).sum()
             )
         else:
             raise ValueError("Spacing must be 'logspace' or 'linspace'!")
