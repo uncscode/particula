@@ -25,7 +25,7 @@ from particula.util.vapor_flux import phi
 from particula.vapor import Vapor
 
 
-class ParticleDistribution(Vapor):
+class ParticleDistribution(Vapor):  # pylint: disable=too-many-instance-attributes
     """ starting a particle distribution from continuous pdf
     """
 
@@ -73,7 +73,8 @@ class ParticleDistribution(Vapor):
             force_radius_end=forcing_radius_end,
         )
         if self.force_radius_step.m != 8392:
-            nbins = int((rad_end-rad_start)/self.force_radius_step.m)
+            nbins = int((rad_end-rad_start)/self.force_radius_step.m) + 2
+            rad_end = rad_start + (nbins-1)*self.force_radius_step.m
         else:
             nbins = self.nbins
 
