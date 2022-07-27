@@ -23,7 +23,7 @@ def discretize(
             mode        (float) pdf scale (corresponds to mode in lognormal)
     """
 
-    _ = kwargs.get("something", None)
+    _ = kwargs.get("something")
     if not isinstance(mode, u.Quantity):
         mode = in_radius(mode)
 
