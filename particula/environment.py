@@ -26,14 +26,16 @@
 
 """
 
+from particula import u
 from particula.constants import (GAS_CONSTANT, MOLECULAR_WEIGHT_AIR,
                                  REF_TEMPERATURE_STP, REF_VISCOSITY_AIR_STP,
                                  SUTHERLAND_CONSTANT)
 from particula.util.dynamic_viscosity import dyn_vis
-from particula.util.input_handling import (in_gas_constant,
+from particula.util.input_handling import (in_gas_constant, in_handling,
                                            in_molecular_weight, in_pressure,
                                            in_temperature, in_viscosity)
 from particula.util.mean_free_path import mfp
+from particula.util.dilution_loss import drc
 
 
 class SharedProperties:  # pylint: disable=too-few-public-methods
@@ -48,9 +50,23 @@ class SharedProperties:  # pylint: disable=too-few-public-methods
         self.coagulation_approximation = str(
             kwargs.get("coagulation_approximation", "hardsphere")
         )
+        self.dilution_rate_constant = in_handling(
+            kwargs.get("dilution_rate_coefficient", 0.0),
+            u.s**-1
+        )
+
+    def dilution_rate_coefficient(self):
+        """ get the dilution rate coefficient
+        """
+
+        return drc(
+            value=self.dilution_rate_constant
+        )
 
 
-class Environment(SharedProperties):  # pylint: disable=too-many-instance-attributes
+class Environment(
+    SharedProperties
+):  # pylint: disable=too-many-instance-attributes
     """ creating the environment class
 
         For now, the environment class takes properties such as
