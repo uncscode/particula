@@ -82,7 +82,7 @@ class Rates:
         coagulation=1,
         condensation=1,
         nucleation=1,
-        ):
+    ):
         """ sum rates
         """
 
