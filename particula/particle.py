@@ -222,6 +222,10 @@ class ParticleCondensation(ParticleInstances):
         """ more particle objects.
         """
         super().__init__(**kwargs)
+        self.particle_formation_rate = in_handling(
+            kwargs.get("particle_formation_rate", 0),
+            u.m**-4/u.s
+        )
         self.kwargs = kwargs
 
     def molecular_enhancement(self):

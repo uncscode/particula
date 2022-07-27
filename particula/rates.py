@@ -25,6 +25,7 @@ class Rates:
         self.particle_distribution = self.particle.particle_distribution()
         self.particle_radius = self.particle.particle_radius
         self.particle_coagulation = self.particle.coagulation()
+        self.particle_formation_rate = self.particle.particle_formation_rate
 
     def _coag_loss_gain(self):
         """ get both loss and gain
@@ -67,8 +68,26 @@ class Rates:
             self.particle_radius
         )
 
-    def sum_rates(self):
+    def nucleation_rate(self):
+        """ nucleation rate
+        """
+        result = np.zeros(
+            self.condensation_growth_rate().m.shape
+        )*self.particle_formation_rate.u
+        result[0] = self.particle_formation_rate
+        return result
+
+    def sum_rates(
+        self,
+        coagulation=1,
+        condensation=1,
+        nucleation=1,
+        ):
         """ sum rates
         """
 
-        return self.coagulation_rate() + self.condensation_growth_rate()
+        return (
+            self.coagulation_rate() * coagulation +
+            self.condensation_growth_rate() * condensation +
+            self.nucleation_rate() * nucleation
+        )
