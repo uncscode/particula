@@ -25,7 +25,7 @@ class Vapor(Environment):
             kwargs.get('vapor_density', 1400)
         )
         self.vapor_concentration = in_concentration(
-            kwargs.get('vapor_concentration', 1)
+            kwargs.get('vapor_concentration', 0.025e-9)
         )
         self.vapor_attachment = in_scalar(
             kwargs.get('vapor_attachment', 1)
