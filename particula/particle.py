@@ -11,7 +11,7 @@ from particula.util.dimensionless_coagulation import DimensionlessCoagulation
 from particula.util.distribution_discretization import discretize
 from particula.util.friction_factor import frifac
 from particula.util.fuchs_sutugin import fsc
-from particula.util.input_handling import (in_density, in_handling, in_radius,
+from particula.util.input_handling import (in_density, in_handling, in_length, in_radius,
                                            in_scalar, in_volume)
 from particula.util.knudsen_number import knu
 from particula.util.molecular_enhancement import mol_enh
@@ -229,9 +229,6 @@ class ParticleCondensation(ParticleInstances):
             kwargs.get("particle_formation_rate", 0),
             u.m**-4/u.s
         )
-        self.wall_loss_approximation = str(
-            kwargs.get("wall_loss_approximation", "none")
-        )
         self.kwargs = kwargs
 
     def molecular_enhancement(self):
@@ -293,6 +290,24 @@ class ParticleCondensation(ParticleInstances):
             else result.sum(axis=1)
         )
 
+
+
+class ParticleWallLoss(ParticleCondensation):
+    """ continuing...
+    """
+
+    def __init__(self, **kwargs):
+        """ more particle objects.
+        """
+        super().__init__(**kwargs)
+        self.wall_loss_approximation = str(
+            kwargs.get("wall_loss_approximation", "none")
+        )
+        self.chamber_radius = in_length(
+            kwargs.get("chamber_radius", 3)
+        )
+        self.kwargs = kwargs
+
     def wall_loss_coefficient(self):
         """ Returns a particle's wall loss coefficient.
         """
@@ -301,7 +316,7 @@ class ParticleCondensation(ParticleInstances):
         )
 
 
-class Particle(ParticleCondensation):
+class Particle(ParticleWallLoss):
     """ the Particle class!
     """
 
