@@ -95,6 +95,27 @@ def test_particle_distribution():
     )
     assert total_number2 == pytest.approx(2e12, rel=1e10)
 
+def test_custom_radius():
+    """ test custom radius
+    """
+    assert particle.Particle(radius_start=1e-9).particle_radius.m[0] == 1e-9
+    assert particle.Particle(radius_end=1e-8).particle_radius.m[-1] == 1e-8
+    assert particle.Particle(
+        radius_start=1e-9, radius_end=1e-8).particle_radius.m[0] == 1e-9
+    assert particle.Particle(
+        radius_start=1e-9, radius_end=1e-8).particle_radius.m[-1] == 1e-8
+    fine_spacing = particle.Particle(radius_step=1e-10)
+    finer_spacing = particle.Particle(
+        radius_start=1e-9, radius_end=1e-8, radius_step=1e-10
+    )
+    assert (
+        fine_spacing.particle_radius.m[0] -
+        fine_spacing.particle_radius.m[1]
+    ) == pytest.approx(-1e-10)
+    assert (
+        finer_spacing.particle_radius.m[0] -
+        finer_spacing.particle_radius.m[1]
+    ) == pytest.approx(-1e-10)
 
 def test_multi_mode_bins():
     """ testing the multi mode stuff for bins
