@@ -41,7 +41,7 @@ def wlc(
         return (
             6 * np.sqrt(ktp_val * pdc_val) / (np.pi * crad) *
             df1(
-                np.pi * psv_val / ( 2 * np.sqrt(ktp_val * pdc_val) )
+                np.pi * psv_val / (2 * np.sqrt(ktp_val * pdc_val))
             ) +
             psv_val / (4 * crad / 3)
         )

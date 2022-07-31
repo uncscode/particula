@@ -7,7 +7,7 @@ from particula.util.coagulation_rate import CoagulationRate
 from particula.util.dimensionless_coagulation import full_coag
 
 
-class DynamicStep(Particle):
+class DynamicStep(Particle):  # pylint: disable=too-many-ancestors
     """ The class to calculate the rate at one step
     """
 
