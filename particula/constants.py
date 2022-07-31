@@ -46,3 +46,5 @@ REF_VISCOSITY_AIR_STP = 1.716e-5 * u.Pa * u.s
 REF_TEMPERATURE_STP = 273.15 * u.K
 SUTHERLAND_CONSTANT = 110.4 * u.K
 MOLECULAR_WEIGHT_AIR = (28.9644 * u.g / u.mol).to_base_units()
+
+STANDARD_GRAVITY = (1*u.gravity).to_base_units()
