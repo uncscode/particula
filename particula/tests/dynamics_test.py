@@ -6,7 +6,7 @@ import numpy as np
 from particula import particle, dynamics
 
 some_kwargs = {
-    "vapor_concentration": 1e-15,
+    "vapor_concentration": 0.025e-9,
     "mode": 20e-8,  # 200 nm median
     "nbins": 1000,  # 1000 bins
     "cutoff": .9999999,
@@ -47,12 +47,12 @@ def test_conservation():
         np.trapz((solution.m[0, :]-solution.m[-1, :])*radius**3, radius) /
         np.trapz((solution.m[0, :])*radius**3, radius)
         ==
-        pytest.approx(0, abs=1e-4)
+        pytest.approx(0, abs=5e-3)
     )
 
     assert (
         np.trapz((fine_sols.m[0, :]-fine_sols.m[-1, :])*radius**3, radius) /
         np.trapz((fine_sols.m[0, :])*radius**3, radius)
         ==
-        pytest.approx(0, abs=1e-4)
+        pytest.approx(0, abs=5e-3)  # allow for 0.5% each direction (1% total)
     )

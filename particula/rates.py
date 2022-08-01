@@ -5,6 +5,7 @@ import numpy as np
 
 from particula.particle import Particle
 from particula.util.coagulation_rate import CoagulationRate
+from particula.util.accurate_derivative import acc4_derivative
 
 
 class Rates:
@@ -63,9 +64,9 @@ class Rates:
     def condensation_growth_rate(self):
         """ condensation rate
         """
-        return np.gradient(
+        return acc4_derivative(
             - self.condensation_growth_speed() * self.particle_distribution,
-            self.particle_radius
+            self.particle_radius,
         )
 
     def nucleation_rate(self):
