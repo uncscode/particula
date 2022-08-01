@@ -410,7 +410,7 @@ title="Open an issue"
       </li>
       
       <li>
-        <a href="https://github.com/uncscode/particula/edit/v0.0.8/docs/documentation/utilities/distribution_discretization.ipynb"
+        <a href="https://github.com/uncscode/particula/edit/v0.0.9/docs/documentation/utilities/distribution_discretization.ipynb"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -552,8 +552,8 @@ DATA
             Percent point function (inverse of ``cdf`` --- percentiles).
         isf(q, s, loc=0, scale=1)
             Inverse survival function (inverse of ``sf``).
-        moment(n, s, loc=0, scale=1)
-            Non-central moment of order n
+        moment(order, s, loc=0, scale=1)
+            Non-central moment of the specified order.
         stats(s, loc=0, scale=1, moments=&#39;mv&#39;)
             Mean(&#39;m&#39;), variance(&#39;v&#39;), skew(&#39;s&#39;), and/or kurtosis(&#39;k&#39;).
         entropy(s, loc=0, scale=1)
@@ -572,9 +572,8 @@ DATA
             Variance of the distribution.
         std(s, loc=0, scale=1)
             Standard deviation of the distribution.
-        interval(alpha, s, loc=0, scale=1)
-            Endpoints of the range that contains fraction alpha [0, 1] of the
-            distribution
+        interval(confidence, s, loc=0, scale=1)
+            Confidence interval with equal areas around the median.
         
         Notes
         -----
@@ -597,11 +596,9 @@ DATA
         does not make it a &quot;noncentral&quot; distribution; noncentral generalizations of
         some distributions are available in separate classes.
         
-        A common parametrization for a lognormal random variable ``Y`` is in
-        terms of the mean, ``mu``, and standard deviation, ``sigma``, of the
-        unique normally distributed random variable ``X`` such that exp(X) = Y.
-        This parametrization corresponds to setting ``s = sigma`` and ``scale =
-        exp(mu)``.
+        Suppose a normally distributed random variable ``X`` has  mean ``mu`` and
+        standard deviation ``sigma``. Then ``Y = exp(X)`` is lognormally
+        distributed with ``s = sigma`` and ``scale = exp(mu)``.
         
         Examples
         --------
@@ -661,7 +658,7 @@ FILE
         requestKernel: true,
         binderOptions: {
             repo: "uncscode/particula",
-            ref: "v0.0.8",
+            ref: "v0.0.9",
         },
         codeMirrorConfig: {
             theme: "abcdef",
