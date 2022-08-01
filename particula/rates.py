@@ -78,6 +78,22 @@ class Rates:
         result[0] = self.particle_formation_rate
         return result
 
+    def dilution_rate(self):
+        """ dilution rate
+        """
+        return (
+            - self.particle.dilution_rate_coefficient() *
+            self.particle_distribution
+        )
+
+    def wall_loss_rate(self):
+        """ wall loss rate
+        """
+        return (
+            - self.particle.wall_loss_coefficient() *
+            self.particle_distribution
+        )
+
     def sum_rates(
         self,
         coagulation=1,
