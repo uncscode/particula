@@ -7,6 +7,7 @@ from particula.util.accurate_derivative import acc4_derivative
 p1 = particle.Particle()
 r1 = rates.Rates(particle=p1)
 
+
 def test_derivative():
     """ test derivative """
     assert r1.condensation_growth_speed().m.shape == p1.particle_radius.m.shape
