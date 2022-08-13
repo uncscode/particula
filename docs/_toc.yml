@@ -5,6 +5,9 @@ parts:
   numbered: false
   chapters:
   - file: documentation/environment
+    sections:
+    - file: documentation/utilities/dynamic_viscosity
+    - file: documentation/utilities/mean_free_path
   - file: documentation/vapor
   - file: documentation/particle
 - caption: Examples
@@ -15,8 +18,6 @@ parts:
 - caption: Utilities
   numbered: false
   chapters:
-  - file: documentation/utilities/dynamic_viscosity
-  - file: documentation/utilities/mean_free_path
   - file: documentation/utilities/distribution_discretization
   - file: documentation/utilities/radius_cutoff
   - file: documentation/utilities/particle_mass
