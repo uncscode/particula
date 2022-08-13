@@ -1,6 +1,11 @@
 format: jb-book
 root: intro
 parts:
+- caption: Examples
+  numbered: false
+  chapters:
+  - file: examples/distribution_demo
+  - file: examples/coagulation_demo
 - caption: Documentation
   numbered: false
   chapters:
@@ -19,11 +24,6 @@ parts:
     - file: documentation/utilities/slip_correction
     - file: documentation/utilities/friction_factor
     - file: documentation/utilities/dimensionless_coagulation
-- caption: Examples
-  numbered: false
-  chapters:
-  - file: examples/distribution_demo
-  - file: examples/coagulation_demo
 - caption: Community
   numbered: false
   chapters:
