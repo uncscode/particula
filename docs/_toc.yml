@@ -6,6 +6,7 @@ parts:
   chapters:
   - file: documentation/environment
     sections:
+    - file: documentation/utilities/dilution_loss
     - file: documentation/utilities/dynamic_viscosity
     - file: documentation/utilities/mean_free_path
   - file: documentation/vapor

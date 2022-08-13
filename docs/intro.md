@@ -30,6 +30,5 @@ python -m pip install particula
 We are open to and we welcome contributions from anyone who wants to contribute to this project.
 We have a short contributing document in the root of the repository, which you can read [here](https://uncscode.github.io/particula/CONTRIBUTING.html).
 However, feel free to reach out with any questions or comments!
----
 
 ## Quick links
