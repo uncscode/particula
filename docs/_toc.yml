@@ -1,10 +1,6 @@
 format: jb-book
 root: intro
 parts:
-- caption: Installation
-  numbered: false
-  chapters:
-  - file: getting_started
 - caption: Documentation
   numbered: false
   chapters:
