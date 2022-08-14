@@ -29,7 +29,4 @@ parts:
   chapters:
   - file: CONTRIBUTING
   - file: CODE_OF_CONDUCT
-- caption: FAQ
-  numbered: false
-  chapters:
-  - file: FAQ
+
