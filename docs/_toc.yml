@@ -7,7 +7,8 @@ parts:
   - file: examples/distribution_demo
   - file: examples/coagulation_demo
 - caption: Documentation
-  file: documentation/intro
+  chapters:
+  - file: documentation/intro
   sections:
     - file: documentation/environment
       sections:
