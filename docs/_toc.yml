@@ -8,7 +8,7 @@ parts:
   - file: examples/coagulation_demo
 - caption: Documentation
   file: documentation/intro
-    sections:
+  sections:
     - file: documentation/environment
       sections:
       - file: documentation/utilities/dilution_loss
