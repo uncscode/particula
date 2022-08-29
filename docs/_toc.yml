@@ -16,23 +16,21 @@ parts:
 - caption: Documentation
   numbered: false
   chapters:
-  - file: documentation/intro
-  sections:
-    - file: documentation/environment
-      sections:
-      - file: documentation/utilities/dilution_loss
-      - file: documentation/utilities/dynamic_viscosity
-      - file: documentation/utilities/mean_free_path
-    - file: documentation/vapor
-    - file: documentation/particle
-      sections:
-      - file: documentation/utilities/distribution_discretization
-      - file: documentation/utilities/radius_cutoff
-      - file: documentation/utilities/particle_mass
-      - file: documentation/utilities/knudsen_number
-      - file: documentation/utilities/slip_correction
-      - file: documentation/utilities/friction_factor
-      - file: documentation/utilities/dimensionless_coagulation
+  - file: documentation/environment
+    sections:
+    - file: documentation/utilities/dilution_loss
+    - file: documentation/utilities/dynamic_viscosity
+    - file: documentation/utilities/mean_free_path
+  - file: documentation/vapor
+  - file: documentation/particle
+    sections:
+    - file: documentation/utilities/distribution_discretization
+    - file: documentation/utilities/radius_cutoff
+    - file: documentation/utilities/particle_mass
+    - file: documentation/utilities/knudsen_number
+    - file: documentation/utilities/slip_correction
+    - file: documentation/utilities/friction_factor
+    - file: documentation/utilities/dimensionless_coagulation
 - caption: Community
   numbered: false
   chapters:
