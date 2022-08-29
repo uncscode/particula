@@ -1,6 +1,10 @@
 format: jb-book
 root: intro
 parts:
+- caption: Tour
+  numbered: false
+  chapters:
+  - file: tour/part-tour
 - caption: Examples
   numbered: false
   chapters:
