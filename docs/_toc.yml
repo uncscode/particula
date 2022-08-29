@@ -14,6 +14,7 @@ parts:
   - file: examples/distribution_ambient
   - file: examples/ionparticle_coagulation
 - caption: Documentation
+  numbered: false
   chapters:
   - file: documentation/intro
   sections:
