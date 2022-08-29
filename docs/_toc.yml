@@ -9,6 +9,7 @@ parts:
   numbered: false
   chapters:
   - file: examples/distribution_statistics
+  - file: examples/distribution_coagulation
   - file: examples/distribution_demo
   - file: examples/coagulation_demo
 - caption: Documentation
