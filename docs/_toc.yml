@@ -1,11 +1,18 @@
 format: jb-book
 root: intro
 parts:
+- caption: Tour
+  numbered: false
+  chapters:
+  - file: tour/part-tour
 - caption: Examples
   numbered: false
   chapters:
-  - file: examples/distribution_demo
-  - file: examples/coagulation_demo
+  - file: examples/distribution_statistics
+  - file: examples/distribution_coagulation
+  - file: examples/distribution_evolution
+  - file: examples/distribution_ambient
+  - file: examples/ionparticle_coagulation
 - caption: Documentation
   numbered: false
   chapters:
