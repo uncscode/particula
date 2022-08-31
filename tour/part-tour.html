@@ -583,11 +583,224 @@ title="Print to PDF"
 <p>We have designed <code class="docutils literal notranslate"><span class="pre">particula</span></code> around object-oriented programming principles where physics entities inherit from each other.</p>
 <ol class="simple">
 <li><p>It all starts with an <code class="docutils literal notranslate"><span class="pre">Environment</span></code> object (class) where temperature, pressure, and other derived properties are defined. For now, the two main derived properties are the dynamic viscosity and mean free path.</p></li>
-<li><p>Then, the <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> object inherits from <code class="docutils literal notranslate"><span class="pre">Environemnt</span></code> and adds its own properties, mainly vapor properties like radius and density, but also derived properties like the driving force of condensation.</p></li>
-<li><p>The most involved object <code class="docutils literal notranslate"><span class="pre">Particle</span></code> builds on <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> (and thus <code class="docutils literal notranslate"><span class="pre">Environemnt</span></code>). It is split into steps to isolate different components (e.g. making a distribution, making particle instances, calculating condensation, and calculating coagulation are all split into different objects that build on each other). In <code class="docutils literal notranslate"><span class="pre">Particle</span></code>, the idea is to form a fully equipped particle distribution, whose properties are readily available and calculated.</p></li>
+<li><p>Then, the <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> object inherits from <code class="docutils literal notranslate"><span class="pre">Environment</span></code> and adds its own properties, mainly vapor properties like radius and density, but also derived properties like the driving force of condensation.</p></li>
+<li><p>The most involved object <code class="docutils literal notranslate"><span class="pre">Particle</span></code> builds on <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> (and thus <code class="docutils literal notranslate"><span class="pre">Environment</span></code>). It is split into steps to isolate different components (e.g. making a distribution, making particle instances, calculating condensation, and calculating coagulation are all split into different objects that build on each other). In <code class="docutils literal notranslate"><span class="pre">Particle</span></code>, the idea is to form a fully equipped particle distribution, whose properties are readily available and calculated.</p></li>
 <li><p>Up to <code class="docutils literal notranslate"><span class="pre">Particle</span></code>, there is no sense of a time dimension. To add one, we create the <code class="docutils literal notranslate"><span class="pre">Rates</span></code> object who takes as input the <code class="docutils literal notranslate"><span class="pre">Particle</span></code> object, thus explicitly allowing dynamics-specific calculations, or “rates”.</p></li>
 <li><p>Finally, a dynamic <code class="docutils literal notranslate"><span class="pre">Solver</span></code> object builds on <code class="docutils literal notranslate"><span class="pre">Rates</span></code> and propagates the <code class="docutils literal notranslate"><span class="pre">Particle</span></code> object in time.</p></li>
 </ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.particle</span> <span class="kn">import</span> <span class="n">Particle</span>
+<span class="kn">from</span> <span class="nn">particula.rates</span> <span class="kn">import</span> <span class="n">Rates</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">deets</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">10e-9</span><span class="p">,</span> <span class="mf">70e-9</span><span class="p">],</span>
+    <span class="s2">&quot;gsigma&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.6</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+    <span class="s2">&quot;nbins&quot;</span><span class="p">:</span> <span class="mi">4000</span><span class="p">,</span>
+    <span class="s2">&quot;particle_number&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">17</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="mi">3</span><span class="o">/</span><span class="mi">20</span><span class="p">],</span>
+<span class="p">}</span>
+<span class="n">part_dist</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="o">**</span><span class="n">deets</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">Rates</span><span class="p">(</span><span class="n">particle</span><span class="o">=</span><span class="n">part_dist</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_some</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="s2">&quot;semilogx&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; plot y vs x with grid, providing title and label &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">grid</span> <span class="o">==</span> <span class="s2">&quot;loglog&quot;</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">);</span>
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">(),</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Particle distribution density&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/part-tour_4_0.png" src="../_images/part-tour_4_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">part_dist</span><span class="o">.</span><span class="n">coagulation</span><span class="p">(),</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Particle coagulation kernel&quot;</span><span class="p">,</span>
+    <span class="n">grid</span><span class="o">=</span><span class="s2">&quot;loglog&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/part-tour_5_0.png" src="../_images/part-tour_5_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=-</span><span class="n">r</span><span class="o">.</span><span class="n">coagulation_loss</span><span class="p">(),</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Particle coagulation loss rate&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/part-tour_6_0.png" src="../_images/part-tour_6_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">coagulation_gain</span><span class="p">(),</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Particle coagulation gain rate&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/part-tour_7_0.png" src="../_images/part-tour_7_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">coagulation_rate</span><span class="p">(),</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Particle coagulation net rate&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/part-tour_8_0.png" src="../_images/part-tour_8_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">condensation_growth_speed</span><span class="p">(),</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Particle condensation growth speed&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/part-tour_9_0.png" src="../_images/part-tour_9_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">condensation_growth_rate</span><span class="p">(),</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Particle condensation growth rate&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/part-tour_10_0.png" src="../_images/part-tour_10_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">condensation_growth_rate</span><span class="p">()</span><span class="o">*</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Particle condensation growth rate (volume)&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/part-tour_11_0.png" src="../_images/part-tour_11_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">coagulation_rate</span><span class="p">()</span><span class="o">*</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Particle coagulation net rate (volume)&quot;</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;integrated: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">coagulation_rate</span><span class="p">()</span><span class="o">*</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span> <span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/part-tour_12_0.png" src="../_images/part-tour_12_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.dynamics</span> <span class="kn">import</span> <span class="n">Solver</span>
+<span class="n">deets</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">10e-9</span><span class="p">,</span> <span class="mf">70e-9</span><span class="p">],</span>
+    <span class="s2">&quot;gsigma&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.6</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+    <span class="s2">&quot;nbins&quot;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
+    <span class="s2">&quot;particle_number&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">17</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="mi">3</span><span class="o">/</span><span class="mi">20</span><span class="p">],</span>
+<span class="p">}</span>
+<span class="n">part_dist</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="o">**</span><span class="n">deets</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">Rates</span><span class="p">(</span><span class="n">particle</span><span class="o">=</span><span class="n">part_dist</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">time_span</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">]</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span><span class="n">particle</span><span class="o">=</span><span class="n">part_dist</span><span class="p">,</span> <span class="n">time_span</span><span class="o">=</span><span class="n">time_span</span><span class="p">)</span>
+<span class="n">sols</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">solution</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">sols</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Initial at </span><span class="si">{</span><span class="n">time_span</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">sols</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Final after </span><span class="si">{</span><span class="n">time_span</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sols</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;The evolution of the size distribution&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
+    <span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">m</span><span class="p">,</span>
+    <span class="n">sols</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">*</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">m</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Initial at </span><span class="si">{</span><span class="n">time_span</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> seconds&quot;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
+    <span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">m</span><span class="p">,</span>
+    <span class="n">sols</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">*</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">m</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Final after </span><span class="si">{</span><span class="n">time_span</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> seconds&quot;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sols</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="o">*</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">u</span><span class="o">**</span><span class="mi">3</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;The evolution of the size distribution (volume)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mf">1e-7</span><span class="p">,</span> <span class="mf">5e-7</span><span class="p">]);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mf">35e-5</span><span class="p">,</span> <span class="mf">37e-5</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 
     <script type="text/x-thebe-config">
