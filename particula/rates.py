@@ -15,6 +15,7 @@ class Rates:
     def __init__(
         self,
         particle=None,
+        lazy=True,
     ):
         """ setting up the class
         """
@@ -23,10 +24,19 @@ class Rates:
             raise ValueError("You must provide a baseline Particle object!")
 
         self.particle = particle
+        self.lazy = lazy
         self.particle_distribution = self.particle.particle_distribution()
         self.particle_radius = self.particle.particle_radius
         self.particle_coagulation = self.particle.coagulation()
         self.particle_formation_rate = self.particle.particle_formation_rate
+
+        if not self.lazy:
+            self.eager_coags = CoagulationRate(
+                distribution=self.particle_distribution,
+                radius=self.particle_radius,
+                kernel=self.particle_coagulation,
+                lazy=self.lazy
+            ).eager_coags
 
     def _coag_loss_gain(self):
         """ get both loss and gain
@@ -40,14 +50,14 @@ class Rates:
     def coagulation_loss(self):
         """ get the coagulation loss rate
         """
-
-        return self._coag_loss_gain().coag_loss()
+        return self._coag_loss_gain().coag_loss() if self.lazy \
+            else self.eager_coags[0]
 
     def coagulation_gain(self):
         """ get coagulation gain rate
         """
-
-        return self._coag_loss_gain().coag_gain()
+        return self._coag_loss_gain().coag_gain() if self.lazy \
+            else self.eager_coags[1]
 
     def coagulation_rate(self):
         """ get the coagulation rate by summing the loss and gain rates
