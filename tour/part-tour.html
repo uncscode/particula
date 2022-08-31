@@ -376,7 +376,7 @@ title="Toggle navigation"
   <div class="menu-dropdown__content">
     <ul>
       <li>
-        <a href="https://mybinder.org/v2/gh/uncscode/particula/main?urlpath=lab/tree/docs/tour/part-tour.ipynb"
+        <a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/tour/part-tour.ipynb"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -394,7 +394,7 @@ title="Launch on Binder"
       </li>
       
       <li>
-        <a href="https://colab.research.google.com/github/uncscode/particula/blob/main/docs/tour/part-tour.ipynb"
+        <a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/tour/part-tour.ipynb"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -489,7 +489,7 @@ title="Open an issue"
       </li>
       
       <li>
-        <a href="https://github.com/uncscode/particula/edit/main/docs/tour/part-tour.ipynb"
+        <a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/tour/part-tour.ipynb"
    class="headerbtn"
    data-toggle="tooltip"
 data-placement="left"
@@ -554,12 +554,93 @@ title="Print to PDF"
     </ul>
   </div>
 </div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
 
     </div>
 </div>
 
 <!-- Table of contents -->
 <div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#setup">
+   Setup
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#defining-a-distribution">
+   Defining a distribution
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#particle-number-concentration-density">
+     Particle number concentration density
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-coagulation-kernel">
+     The coagulation kernel
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-coagulation-loss-rate">
+     The coagulation loss rate
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-coagulation-gain-rate">
+     The coagulation gain rate
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-coagulation-net-rate">
+     The coagulation net rate
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-condensation-growth-speed">
+     The condensation growth speed
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-condensation-growth-rate">
+     The condensation growth rate
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-condensation-growth-rate-volume-wise">
+     The condensation growth rate (volume-wise)
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-coagulation-net-rate-volume-wise">
+     The coagulation net rate (volume-wise)
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-solver">
+     A solver
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </nav>
 </div>
     </div>
     <div class="article row">
@@ -571,6 +652,76 @@ title="Print to PDF"
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#setup">
+   Setup
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#defining-a-distribution">
+   Defining a distribution
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#particle-number-concentration-density">
+     Particle number concentration density
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-coagulation-kernel">
+     The coagulation kernel
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-coagulation-loss-rate">
+     The coagulation loss rate
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-coagulation-gain-rate">
+     The coagulation gain rate
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-coagulation-net-rate">
+     The coagulation net rate
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-condensation-growth-speed">
+     The condensation growth speed
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-condensation-growth-rate">
+     The condensation growth rate
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-condensation-growth-rate-volume-wise">
+     The condensation growth rate (volume-wise)
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-coagulation-net-rate-volume-wise">
+     The coagulation net rate (volume-wise)
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-solver">
+     A solver
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -588,9 +739,19 @@ title="Print to PDF"
 <li><p>Up to <code class="docutils literal notranslate"><span class="pre">Particle</span></code>, there is no sense of a time dimension. To add one, we create the <code class="docutils literal notranslate"><span class="pre">Rates</span></code> object who takes as input the <code class="docutils literal notranslate"><span class="pre">Particle</span></code> object, thus explicitly allowing dynamics-specific calculations, or “rates”.</p></li>
 <li><p>Finally, a dynamic <code class="docutils literal notranslate"><span class="pre">Solver</span></code> object builds on <code class="docutils literal notranslate"><span class="pre">Rates</span></code> and propagates the <code class="docutils literal notranslate"><span class="pre">Particle</span></code> object in time.</p></li>
 </ol>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">#</a></h2>
+<p>Let’s first get the needed packages and set up our computational environment.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.particle</span> <span class="kn">import</span> <span class="n">Particle</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">particula</span><span class="o">,</span> <span class="nn">matplotlib</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting up computational environment...&quot;</span><span class="p">)</span>
+    <span class="o">%</span><span class="k">pip</span> install -U particula -qqq
+    <span class="o">%</span><span class="k">pip</span> install matplotlib -qqq
+
+<span class="kn">from</span> <span class="nn">particula.particle</span> <span class="kn">import</span> <span class="n">Particle</span>
 <span class="kn">from</span> <span class="nn">particula.rates</span> <span class="kn">import</span> <span class="n">Rates</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -598,6 +759,10 @@ title="Print to PDF"
 </div>
 </div>
 </div>
+</section>
+<section id="defining-a-distribution">
+<h2>Defining a distribution<a class="headerlink" href="#defining-a-distribution" title="Permalink to this headline">#</a></h2>
+<p>Defining a distribution in <code class="docutils literal notranslate"><span class="pre">particula</span></code> is easy! Simply import the <code class="docutils literal notranslate"><span class="pre">Particle</span></code> class and pass some keyword arguments to it. Here we interested in a bimodal particle distribution, with different modes and different geometric standard deviations (<code class="docutils literal notranslate"><span class="pre">gsigma</span></code>) and different amplitude (<code class="docutils literal notranslate"><span class="pre">particle_number</span></code>). While at it, we might as well calculate rates and disabling the <code class="docutils literal notranslate"><span class="pre">lazy</span></code> execution so that we do not recalculate the rates at every call.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">deets</span> <span class="o">=</span> <span class="p">{</span>
@@ -612,6 +777,7 @@ title="Print to PDF"
 </div>
 </div>
 </div>
+<p>We define a simple plot utility to plot some of the properties of this distribution.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_some</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="s2">&quot;semilogx&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -628,6 +794,12 @@ title="Print to PDF"
 </div>
 </div>
 </div>
+<section id="particle-number-concentration-density">
+<h3>Particle number concentration density<a class="headerlink" href="#particle-number-concentration-density" title="Permalink to this headline">#</a></h3>
+<p>One way to think about this is to integrate the curve, that yields exactly 1e5 /cc which is the total number concentration. Try it! (Copy the code block below and execute it after or before the next cell.)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">(),</span> <span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -639,9 +811,12 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/part-tour_4_0.png" src="../_images/part-tour_4_0.png" />
+<img alt="../_images/part-tour_8_0.png" src="../_images/part-tour_8_0.png" />
 </div>
 </div>
+</section>
+<section id="the-coagulation-kernel">
+<h3>The coagulation kernel<a class="headerlink" href="#the-coagulation-kernel" title="Permalink to this headline">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -654,9 +829,12 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/part-tour_5_0.png" src="../_images/part-tour_5_0.png" />
+<img alt="../_images/part-tour_10_0.png" src="../_images/part-tour_10_0.png" />
 </div>
 </div>
+</section>
+<section id="the-coagulation-loss-rate">
+<h3>The coagulation loss rate<a class="headerlink" href="#the-coagulation-loss-rate" title="Permalink to this headline">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -668,9 +846,12 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/part-tour_6_0.png" src="../_images/part-tour_6_0.png" />
+<img alt="../_images/part-tour_12_0.png" src="../_images/part-tour_12_0.png" />
 </div>
 </div>
+</section>
+<section id="the-coagulation-gain-rate">
+<h3>The coagulation gain rate<a class="headerlink" href="#the-coagulation-gain-rate" title="Permalink to this headline">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -682,9 +863,12 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/part-tour_7_0.png" src="../_images/part-tour_7_0.png" />
+<img alt="../_images/part-tour_14_0.png" src="../_images/part-tour_14_0.png" />
 </div>
 </div>
+</section>
+<section id="the-coagulation-net-rate">
+<h3>The coagulation net rate<a class="headerlink" href="#the-coagulation-net-rate" title="Permalink to this headline">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -696,9 +880,12 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/part-tour_8_0.png" src="../_images/part-tour_8_0.png" />
+<img alt="../_images/part-tour_16_0.png" src="../_images/part-tour_16_0.png" />
 </div>
 </div>
+</section>
+<section id="the-condensation-growth-speed">
+<h3>The condensation growth speed<a class="headerlink" href="#the-condensation-growth-speed" title="Permalink to this headline">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -710,9 +897,12 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/part-tour_9_0.png" src="../_images/part-tour_9_0.png" />
+<img alt="../_images/part-tour_18_0.png" src="../_images/part-tour_18_0.png" />
 </div>
 </div>
+</section>
+<section id="the-condensation-growth-rate">
+<h3>The condensation growth rate<a class="headerlink" href="#the-condensation-growth-rate" title="Permalink to this headline">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -724,9 +914,12 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/part-tour_10_0.png" src="../_images/part-tour_10_0.png" />
+<img alt="../_images/part-tour_20_0.png" src="../_images/part-tour_20_0.png" />
 </div>
 </div>
+</section>
+<section id="the-condensation-growth-rate-volume-wise">
+<h3>The condensation growth rate (volume-wise)<a class="headerlink" href="#the-condensation-growth-rate-volume-wise" title="Permalink to this headline">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -738,24 +931,32 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/part-tour_11_0.png" src="../_images/part-tour_11_0.png" />
+<img alt="../_images/part-tour_22_0.png" src="../_images/part-tour_22_0.png" />
 </div>
 </div>
+</section>
+<section id="the-coagulation-net-rate-volume-wise">
+<h3>The coagulation net rate (volume-wise)<a class="headerlink" href="#the-coagulation-net-rate-volume-wise" title="Permalink to this headline">#</a></h3>
+<p>Note the integration yields a small number, meaning the mass is conserved!</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
     <span class="n">x</span><span class="o">=</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span>
     <span class="n">y</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">coagulation_rate</span><span class="p">()</span><span class="o">*</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Particle coagulation net rate (volume)&quot;</span><span class="p">,</span>
-    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;integrated: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">coagulation_rate</span><span class="p">()</span><span class="o">*</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span> <span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Integral: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">coagulation_rate</span><span class="p">()</span><span class="o">*</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span> <span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/part-tour_12_0.png" src="../_images/part-tour_12_0.png" />
+<img alt="../_images/part-tour_24_0.png" src="../_images/part-tour_24_0.png" />
 </div>
 </div>
+</section>
+<section id="a-solver">
+<h3>A solver<a class="headerlink" href="#a-solver" title="Permalink to this headline">#</a></h3>
+<p>If you are adventurous, you can even propagate the define distribution in time! We use a rather simple solver here, but it still takes time as it has to recalculate all the rates at every time step. We reduce the <code class="docutils literal notranslate"><span class="pre">nbins</span></code> to make it slightly faster, but it may not even run on a super tiny (free) machine.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.dynamics</span> <span class="kn">import</span> <span class="n">Solver</span>
@@ -779,6 +980,9 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/part-tour_26_0.png" src="../_images/part-tour_26_0.png" />
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -800,7 +1004,12 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/part-tour_27_0.png" src="../_images/part-tour_27_0.png" />
 </div>
+</div>
+</section>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -808,7 +1017,7 @@ title="Print to PDF"
         requestKernel: true,
         binderOptions: {
             repo: "uncscode/particula",
-            ref: "main",
+            ref: "v0.0.10",
         },
         codeMirrorConfig: {
             theme: "abcdef",
