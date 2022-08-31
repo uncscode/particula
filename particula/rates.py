@@ -50,16 +50,14 @@ class Rates:
     def coagulation_loss(self):
         """ get the coagulation loss rate
         """
-        if not self.lazy:
-            return self.eager_coags[0]
-        return self._coag_loss_gain().coag_loss()
+        return self._coag_loss_gain().coag_loss() if self.lazy \
+            else self.eager_coags[0]
 
     def coagulation_gain(self):
         """ get coagulation gain rate
         """
-        if not self.lazy:
-            return self.eager_coags[1]
-        return self._coag_loss_gain().coag_gain()
+        return self._coag_loss_gain().coag_gain() if self.lazy \
+            else self.eager_coags[1]
 
     def coagulation_rate(self):
         """ get the coagulation rate by summing the loss and gain rates
