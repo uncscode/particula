@@ -3,7 +3,7 @@
 
 import pytest
 import numpy as np
-from particula import particle, dynamic_step
+from particula import particle, rates
 from particula.util import simple_solver
 
 simple_dic_kwargs = {
@@ -17,7 +17,7 @@ simple_dic_kwargs = {
 
 particle_dist = particle.Particle(**simple_dic_kwargs)
 
-coag_kern = dynamic_step.DynamicStep(**simple_dic_kwargs).coag_kern()
+coag_kern = rates.Rates(particle=particle_dist).particle_coagulation
 
 Solver = simple_solver.SimpleSolver(
     distribution=particle_dist.particle_distribution(),
