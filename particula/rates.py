@@ -76,8 +76,11 @@ class Rates:
         """ condensation rate
         """
         return ord1_acc4(
-            - self.condensation_growth_speed() * self.particle_distribution,
-            self.particle_radius,
+            - self.condensation_growth_speed().m * self.particle_distribution.m,
+            self.particle_radius.m
+        ) * (
+            self.condensation_growth_speed().u * self.particle_distribution.u /
+            self.particle_radius.u
         )
 
     def nucleation_rate(self):
