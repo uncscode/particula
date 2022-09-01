@@ -33,13 +33,13 @@ def cut_rad(
 
     if np.array([mode.m]).size == 1:
         (rad_start, rad_end) = lognorm.interval(
-            alpha=cutoff,
+            cutoff,
             s=np.log(gsigma),
             scale=mode.m,
         )
     else:
         (rad_start_pre, rad_end_pre) = lognorm.interval(
-            alpha=cutoff,
+            cutoff,
             s=np.log(gsigma),
             scale=mode.m,
         )
