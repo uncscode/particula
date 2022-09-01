@@ -14,7 +14,7 @@ class CoagulationRate:
             kernel       (float): The kernel of the particles.
     """
 
-    def __init__(self, distribution, radius, kernel):
+    def __init__(self, distribution, radius, kernel, lazy=True):
         """ Constructing the class, needing already built
             distribution, radius and kernel.
 
@@ -34,6 +34,12 @@ class CoagulationRate:
         self.distribution = distribution
         self.radius = radius
         self.kernel = kernel
+        self.lazy = lazy
+
+        if not self.lazy:
+            self.eager_coags = (
+                self.coag_loss(), self.coag_gain()
+            )
 
     def coag_prep(self):
         """ Repackage the parameters

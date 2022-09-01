@@ -1,14 +1,16 @@
 """ defining the environment class
 
     kwargs:
+        coagulation_approx...   (string)         (default: "hardsphere")
+        dilution_rate_constant  (float) [1/s]    (default: 0.)
         temperature             (float) [K]      (default: 298.15)
         pressure                (float) [Pa]     (default: 101325)
-      # dynamic_viscosity       (float) [Pa*s]   (default: util)
-      $ molecular_weight        (float) [kg/mol] (default: constants)
-      $ reference_viscosity     (float) [Pa*s]   (default: constants)
-      $ reference_temperature   (float) [K]      (default: constants)
-      $ sutherland_constant     (float) [K]      (default: constants)
-      $ gas_constant            (float) [J/mol/K](default: constants)
+        dynamic_viscosity       (float) [Pa*s]   (default: util)
+        molecular_weight        (float) [kg/mol] (default: constants)
+        reference_viscosity     (float) [Pa*s]   (default: constants)
+        reference_temperature   (float) [K]      (default: constants)
+        sutherland_constant     (float) [K]      (default: constants)
+        gas_constant            (float) [J/mol/K](default: constants)
 
       Using particula.util:
         dynamic_viscosity       (float) [Pa*s]
@@ -19,10 +21,6 @@
         REF_VISCOSITY_AIR_STP   (float) [Pa*s]
         REF_TEMPERATURE_STP     (float) [K]
         SUTHERLAND_CONSTANT     (float) [K]
-
-    Notes:
-      # stands for an optional util override
-      $ stands for an optional constants override
 
 """
 
