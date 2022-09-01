@@ -21,7 +21,7 @@ keywords = [
     "atmospheric", "particles", "climate", "aerosol", "particulate"
 ]
 
-dependencies = ["numpy", "scipy", "pint", "hypersolver>=0.0.7"]
+dependencies = ["numpy", "scipy", "pint", "hypersolver==0.0.8"]
 
 # This is set automatically by flit using `particula.__version__`
 dynamic = ["version"]

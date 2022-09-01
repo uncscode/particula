@@ -3,9 +3,10 @@
 
 import numpy as np
 
+from hypersolver.derivative import ord1_acc4
+
 from particula.particle import Particle
 from particula.util.coagulation_rate import CoagulationRate
-from particula.util.accurate_derivative import acc4_derivative
 
 
 class Rates:
@@ -74,7 +75,7 @@ class Rates:
     def condensation_growth_rate(self):
         """ condensation rate
         """
-        return acc4_derivative(
+        return ord1_acc4(
             - self.condensation_growth_speed() * self.particle_distribution,
             self.particle_radius,
         )
