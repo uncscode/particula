@@ -4,7 +4,7 @@ from collections import Counter
 
 
 class PreGame:
-    """ PreGame """
+    """ Attendance """
     def __init__(self, radius):
         self.radius = radius if isinstance(radius, list) else [radius]
 
