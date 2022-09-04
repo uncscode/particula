@@ -33,7 +33,7 @@ class PreGame:
         if isinstance(other, int):
             new_radius = self.radius.copy() * other
             return PreGame(radius=new_radius)
-        raise TypeError("only int type for now")
+        raise TypeError("Only 'int' type for now.")
 
     def __rmul__(self, other):
         return self * other
