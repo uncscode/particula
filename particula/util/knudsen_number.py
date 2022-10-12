@@ -16,7 +16,7 @@ from particula.util.mean_free_path import mfp as mfp_func
 
 
 def knu(
-    particle_radius=None,
+    radius=None,
     mfp=None,
     **kwargs
 ):
@@ -66,6 +66,6 @@ def knu(
     """
 
     mfp_val = mfp_func(**kwargs) if mfp is None else in_length(mfp)
-    radius = in_radius(particle_radius)
+    radius = in_radius(radius)
 
     return np.transpose([mfp_val.m])*mfp_val.u / radius

@@ -7,7 +7,7 @@ from particula.util.knudsen_number import knu as knu_func
 
 
 def scf(
-    particle_radius=None,
+    radius=None,
     knu=None,
     **kwargs
 ):
@@ -59,9 +59,9 @@ def scf(
             refer to particula.util.knudsen_number.knu for more info.
 
     """
-    radius = in_radius(particle_radius)
+    radius = in_radius(radius)
 
-    knu_val = knu_func(particle_radius=radius, **kwargs) if knu is None \
+    knu_val = knu_func(radius=radius, **kwargs) if knu is None \
         else in_scalar(knu)
 
     return 1 + knu_val * (
