@@ -8,14 +8,14 @@ from particula.util.dynamic_viscosity import dyn_vis
 
 
 def pam(
-    rad=None,
+    radius=None,
     scf_val=None,
     vis_val=None,
     **kwargs
 ):
     """ particle aerodynamic mobility
     """
-    rad = in_radius(rad)
+    rad = in_radius(radius)
     scf_val = in_scalar(
         scf_val) if scf_val is not None else scf(**kwargs)
     vis_val = in_viscosity(
