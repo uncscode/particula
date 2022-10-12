@@ -18,32 +18,34 @@ def test_kn():
     mfp_air = 66 * u.nm
 
     assert (
-        knu(radius=radius, mfp=mfp_air) ==
+        knu(particle_radius=radius, mfp=mfp_air) ==
         pytest.approx(66)
     )
 
     assert (
-        knu(radius=1e-10) ==
+        knu(particle_radius=1e-10) ==
         pytest.approx(664, rel=1e-1)
     )
 
     assert (
-        knu(radius=1e-3) ==
+        knu(particle_radius=1e-3) ==
         pytest.approx(5e-5, rel=1e0)
     )
 
     assert (
-        knu(radius=1e-20) ==
+        knu(particle_radius=1e-20) ==
         pytest.approx(5e12, rel=1e0)
     )
 
-    assert knu(radius=[1, 2, 3]).m.shape == (3,)
-    assert knu(radius=1, mfp=[1, 2, 3]).m.shape == (3, 1)
-    assert knu(radius=[1, 2, 3], mfp=[1, 2, 3]).m.shape == (3, 3)
-    assert knu(radius=[1, 2, 3], temperature=[1, 2, 3]).m.shape == (3, 3)
-    assert knu(radius=[1, 2, 3], pressure=[1, 2, 3]).m.shape == (3, 3)
-    assert knu(radius=[1, 2, 3], molecular_weight=[1, 2, 3]).m.shape == (3, 3)
+    assert knu(particle_radius=[1, 2, 3]).m.shape == (3,)
+    assert knu(particle_radius=1, mfp=[1, 2, 3]).m.shape == (3, 1)
+    assert knu(particle_radius=[1, 2, 3], mfp=[1, 2, 3]).m.shape == (3, 3)
+    assert knu(particle_radius=[1, 2, 3], temperature=[
+               1, 2, 3]).m.shape == (3, 3)
+    assert knu(particle_radius=[1, 2, 3], pressure=[1, 2, 3]).m.shape == (3, 3)
+    assert knu(particle_radius=[1, 2, 3], molecular_weight=[
+               1, 2, 3]).m.shape == (3, 3)
 
     assert knu(
-        radius=[1, 2, 3], temperature=[1, 2, 3], pressure=[1, 2, 3]
+        particle_radius=[1, 2, 3], temperature=[1, 2, 3], pressure=[1, 2, 3]
     ).m.shape == (3, 3)
