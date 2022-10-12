@@ -19,7 +19,7 @@ def pam(
     scf_val = in_scalar(
         scf_val) if scf_val is not None else scf(radius=rad, **kwargs)
     vis_val = in_viscosity(
-        vis_val) if vis_val is not None else dyn_vis(radius=rad, *kwargs)
+        vis_val) if vis_val is not None else dyn_vis(radius=rad, **kwargs)
 
     return (
         scf_val / (3 * np.pi * vis_val * rad * 2)
