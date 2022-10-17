@@ -12,7 +12,9 @@ class Solver(Rates):
     def __init__(
         self,
         time_span=None,
-        **kwargs,
+        do_coag=1,
+        do_cond=1,
+        do_nucl=1,
     ):
         """ constructor
         """
@@ -22,7 +24,9 @@ class Solver(Rates):
             raise ValueError("You must provide a time span!")
 
         self.time_span = time_span
-        self.kwargs = kwargs
+        self.do_coag = do_coag
+        self.do_cond = do_cond
+        self.do_nucl = do_nucl
 
     def _ode_func(self, _nums, _,):
         """ ode_func
@@ -33,7 +37,11 @@ class Solver(Rates):
             _nums*self.particle_distribution.u
         )
 
-        return self.sum_rates(**self.kwargs).m
+        return self.sum_rates(
+            coagulation=self.do_coag,
+            condensation=self.do_cond,
+            nucleation=self.do_nucl,
+        ).m
 
     def solution(self):
         """ solve the equation
