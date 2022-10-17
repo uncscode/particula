@@ -15,6 +15,7 @@ class Solver(Rates):
         do_coag=1,
         do_cond=1,
         do_nucl=1,
+        **kwargs
     ):
         """ constructor
         """
