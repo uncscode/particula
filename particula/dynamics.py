@@ -22,6 +22,7 @@ class Solver(Rates):
             raise ValueError("You must provide a time span!")
 
         self.time_span = time_span
+        self.kwargs = kwargs
 
     def _ode_func(self, _nums, _,):
         """ ode_func
@@ -32,7 +33,7 @@ class Solver(Rates):
             _nums*self.particle_distribution.u
         )
 
-        return self.sum_rates().m
+        return self.sum_rates(**self.kwargs).m
 
     def solution(self):
         """ solve the equation
