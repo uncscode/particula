@@ -3,7 +3,7 @@
     https://www.nature.com/articles/nature18271
 """
 
-import numpy as np
+from particula.util.kelvin_correction import kelvin_term
 
 
 def condensation_force(
@@ -25,33 +25,15 @@ def condensation_force(
 def particle_activity(
     mass_fraction,
     activity_coefficient,
-    the_kelvin_term,
+    the_kelvin_term=kelvin_term(),
 ):
     """ calculate the particle activity
 
         Equation (9--10) in https://www.nature.com/articles/nature18271
     """
+
     return (
         mass_fraction *
         activity_coefficient *
         the_kelvin_term
-    )
-
-
-def kelvin_term(
-    surface_tension,
-    molar_weight,
-    gas_constant,
-    temperature,
-    density,
-    radius,
-):
-    """ calculate the kelvin term
-
-        Equation (10) in https://www.nature.com/articles/nature18271
-    """
-    return np.exp(
-        4 * surface_tension * molar_weight / (
-            gas_constant * temperature * density * radius * 2
-        )
     )
