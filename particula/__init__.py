@@ -16,6 +16,14 @@
 # Import pint here to avoid using a different registry in each module.
 from pint import UnitRegistry
 
+# import main items to expose
+from particula.environment import Environment
+from particula.vapor import Vapor
+from particula.particle import Particle
+from particula.rates import Rates
+from particula.dynamics import Solver
+
+
 # u is the unit registry name.
 u = UnitRegistry(force_ndarray=True)
 
