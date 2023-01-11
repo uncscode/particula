@@ -34,7 +34,7 @@ def knu(
 
         Examples:
         ```
-        >>> from particula import u
+        >>> from particula.units import u
         >>> from particula.util.knudsen_number import knu
         >>> # with radius 1e-9 m
         >>> knu(radius=1e-9)

@@ -1,7 +1,7 @@
 """ testing the DynamicStep class
 """
 
-from particula import u
+from particula.units import u
 from particula.particle import Particle
 from particula.rates import Rates
 

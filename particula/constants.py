@@ -6,7 +6,7 @@
 
 """
 
-from particula import u
+from particula.units import u
 
 BOLTZMANN_CONSTANT = (1*u.k_B).to_base_units()
 

@@ -1,7 +1,7 @@
 """ testing for the vapor class
 """
 
-from particula import u
+from particula.units import u
 from particula.vapor import Vapor
 
 inputs = {

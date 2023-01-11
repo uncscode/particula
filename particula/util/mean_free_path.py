@@ -17,7 +17,7 @@
 """
 
 import numpy as np
-from particula import u
+from particula.units import u
 from particula.constants import GAS_CONSTANT, MOLECULAR_WEIGHT_AIR
 from particula.util.dynamic_viscosity import dyn_vis
 from particula.util.input_handling import (in_gas_constant,
@@ -44,7 +44,7 @@ def mfp(
 
         Examples:
         ```
-        >>> from particula import u
+        >>> from particula.units import u
         >>> from particula.util.mean_free_path import mfp
         >>> # with no inputs, it defaults to 298 K and 101325 Pa
         >>> mfp()

@@ -2,7 +2,7 @@
 """
 import numpy as np
 
-from particula import u
+from particula.units import u
 from particula.util.input_handling import in_handling
 from particula.util.debye_function import df1
 from particula.util.settling_velocity import psv

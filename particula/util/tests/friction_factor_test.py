@@ -2,7 +2,7 @@
 """
 
 import pytest
-from particula import u
+from particula.units import u
 from particula.util.friction_factor import frifac
 
 

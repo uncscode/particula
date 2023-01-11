@@ -4,7 +4,7 @@
         quantity_1 * quantity_2 / (quantity_1 + quantity_2)
 """
 
-from particula import u
+from particula.units import u
 
 
 def reduced_quantity(a_quantity, b_quantity):

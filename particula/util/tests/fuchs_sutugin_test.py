@@ -3,7 +3,7 @@
 
 import pytest
 from particula.util.fuchs_sutugin import fsc
-from particula import u
+from particula.units import u
 
 
 def test_fuchs_sutugin():

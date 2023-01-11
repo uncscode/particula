@@ -6,7 +6,7 @@ import numpy as np
 
 from particula.util.lf2013_coagulation import lf2013_coag_full
 
-# from particula import u
+# from particula.units import u
 
 
 def test_approx_coag_less():

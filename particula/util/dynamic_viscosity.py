@@ -12,7 +12,7 @@
         https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
 
 """
-from particula import u
+from particula.units import u
 from particula.constants import (REF_TEMPERATURE_STP, REF_VISCOSITY_AIR_STP,
                                  SUTHERLAND_CONSTANT)
 from particula.util.input_handling import in_temperature, in_viscosity
@@ -31,7 +31,7 @@ def dyn_vis(
 
         Examples:
         ```
-        >>> from particula import u
+        >>> from particula.units import u
         >>> from particula.util.dynamic_viscosity import dyn_vis
         >>> # with units
         >>> dyn_vis(

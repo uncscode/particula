@@ -2,7 +2,7 @@
 """
 import numpy as np
 
-from particula import u
+from particula.units import u
 from particula.util.fuchs_sutugin import fsc as fsc_func
 from particula.util.input_handling import (in_concentration, in_handling,
                                            in_scalar)

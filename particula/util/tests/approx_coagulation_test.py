@@ -5,7 +5,7 @@
 import pytest
 
 from particula.util.approx_coagulation import approx_coag_less
-from particula import u
+from particula.units import u
 
 
 def test_approx_coag_less():

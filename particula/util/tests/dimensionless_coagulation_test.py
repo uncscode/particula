@@ -2,7 +2,7 @@
 """
 
 import pytest
-from particula import u
+from particula.units import u
 from particula.util.dimensionless_coagulation import full_coag, less_coag
 
 

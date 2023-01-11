@@ -2,7 +2,7 @@
 """
 
 import pytest
-from particula import u
+from particula.units import u
 from particula.util.knudsen_number import knu
 from particula.util.slip_correction import scf
 

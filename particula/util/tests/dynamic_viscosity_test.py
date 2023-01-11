@@ -2,7 +2,7 @@
 """
 
 import pytest
-from particula import u
+from particula.units import u
 from particula.constants import REF_TEMPERATURE_STP as REF_TEMP
 from particula.constants import REF_VISCOSITY_AIR_STP as REF_VIS_AIR
 from particula.util.dynamic_viscosity import dyn_vis

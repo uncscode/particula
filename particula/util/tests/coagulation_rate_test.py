@@ -2,7 +2,7 @@
 """
 import numpy as np
 import pytest
-from particula import u
+from particula.units import u
 from particula.particle import \
     Particle
 from particula.util.coagulation_rate import CoagulationRate

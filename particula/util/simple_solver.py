@@ -14,7 +14,7 @@
 import numpy as np
 from scipy.integrate import odeint
 from particula.util.coagulation_rate import CoagulationRate
-from particula import u
+from particula.units import u
 from particula.util.input_handling import in_handling
 
 

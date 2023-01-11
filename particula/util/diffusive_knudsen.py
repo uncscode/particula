@@ -101,7 +101,7 @@ def diff_knu(**kwargs):
 
         Examples:
         ```
-        >>> from particula import u
+        >>> from particula.units import u
         >>> from particula.util.diffusive_knudsen import diff_knu
         >>> # with only one radius
         >>> diff_knu(radius=1e-9)

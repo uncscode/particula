@@ -1,6 +1,6 @@
 """ test kelvin correct """
 
-from particula import u
+from particula.units import u
 
 from particula.util.kelvin_correction import kelvin_radius, kelvin_term
 

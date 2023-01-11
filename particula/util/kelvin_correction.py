@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from particula import u
+from particula.units import u
 from particula.util.input_handling import in_temperature, in_density, in_radius
 from particula.util.input_handling import in_handling, in_molecular_weight
 from particula.constants import GAS_CONSTANT

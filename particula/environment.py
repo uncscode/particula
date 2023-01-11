@@ -24,7 +24,7 @@
 
 """
 
-from particula import u
+from particula.units import u
 from particula.constants import (GAS_CONSTANT, MOLECULAR_WEIGHT_AIR,
                                  REF_TEMPERATURE_STP, REF_VISCOSITY_AIR_STP,
                                  SUTHERLAND_CONSTANT)

@@ -2,7 +2,7 @@
 """
 
 import pytest
-from particula import u
+from particula.units import u
 from particula.util.input_handling import (in_density, in_length,
                                            in_molecular_weight, in_pressure,
                                            in_radius, in_scalar,

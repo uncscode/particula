@@ -2,7 +2,7 @@
 """
 import numpy as np
 from scipy.stats import lognorm
-from particula import u
+from particula.units import u
 from particula.util.input_handling import in_scalar, in_radius
 
 

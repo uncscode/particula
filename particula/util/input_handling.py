@@ -1,7 +1,7 @@
 """ handling inputs
 """
 
-from particula import u
+from particula.units import u
 
 
 def in_radius(radius):

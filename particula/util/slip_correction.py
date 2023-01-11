@@ -26,7 +26,7 @@ def scf(
 
         Examples:
         ```
-        >>> from particula import u
+        >>> from particula.units import u
         >>> from particula.util.slip_correction import scf
         >>> # with radius 1e-9 m
         >>> scf(radius=1e-9)

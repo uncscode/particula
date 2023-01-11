@@ -2,7 +2,7 @@
 """
 import numpy as np
 
-from particula import u
+from particula.units import u
 
 
 def df1(var):

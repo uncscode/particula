@@ -80,7 +80,7 @@ def less_coag(**kwargs):
 
         Examples:
         ```
-        >>> from particula import u
+        >>> from particula.units import u
         >>> from particula.util.dimensionless_coagulation import less_coag
         >>> # only for hardsphere coagulation for now
         >>> # with only one radius

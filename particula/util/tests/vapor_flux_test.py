@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from particula import u
+from particula.units import u
 from particula.util.vapor_flux import phi
 
 

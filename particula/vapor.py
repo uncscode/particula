@@ -2,7 +2,7 @@
 """
 import numpy as np
 
-from particula import u
+from particula.units import u
 from particula.environment import Environment
 from particula.util.input_handling import (in_concentration, in_density,
                                            in_length, in_molecular_weight,

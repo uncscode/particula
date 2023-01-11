@@ -7,7 +7,7 @@
 """
 
 import numpy as np
-from particula import u
+from particula.units import u
 from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
                                  ELEMENTARY_CHARGE_VALUE)
 from particula.util.input_handling import (in_handling, in_radius, in_scalar,

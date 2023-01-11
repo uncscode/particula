@@ -36,7 +36,7 @@ def frifac(
 
         Examples:
         ```
-        >>> from particula import u
+        >>> from particula.units import u
         >>> from particula.util.friction_factor import frifac
         >>> # with 1e-9 m radius
         >>> frifac(radius=1e-9)

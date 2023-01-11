@@ -1,7 +1,7 @@
 """ testing getting constants from the get_constants.py file
 """
 
-from particula import u
+from particula.units import u
 from particula.constants import (AVOGADRO_NUMBER, BOLTZMANN_CONSTANT,
                                  GAS_CONSTANT)
 
