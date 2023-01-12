@@ -15,17 +15,24 @@
 
 # Import pint here to avoid using a different registry in each module.
 # from pint import UnitRegistry
-
+from particula import units
 
 # import main items to expose
-from particula.environment import Environment  # noqa: F401
-from particula.vapor import Vapor  # noqa: F401
-from particula.particle import Particle  # noqa: F401
-from particula.rates import Rates  # noqa: F401
-from particula.dynamics import Solver  # noqa: F401
+from particula import environment
+from particula import vapor
+from particula import particle
+from particula import rates
+from particula import dynamics
 
-from particula.units import u  # noqa: F401
+
 # u is the unit registry name.
 # u = UnitRegistry(force_ndarray=True)
+u = units.u
+
+Environment = environment.Environment
+Vapor = vapor.Vapor
+Particle = particle.Particle
+Rates = rates.Rates
+Solver = dynamics.Solver
 
 __version__ = "0.0.12"
