@@ -146,10 +146,9 @@ class Rates:
             gain = self.coagulation_gain()
 
             if self.particle_radius[-1].m > 600e-9:
-                # this is the quick option, have a slower option TODO
+                # this is the quick option, I need ot add a shift to it too
                 index_start = np.argmin(np.abs(self.particle_radius.m-600e-9))
-                gain[index_start:] = gain[index_start:] \
-                    * loss[index_start:].m / gain[index_start:].m
+                gain[index_start:] = loss[index_start:]
 
             return gain - loss
         else:
