@@ -112,47 +112,44 @@ class Rates:
     def coagulation_loss(self):
         """ get the coagulation loss rate. If sparse, use scipy interpolation
         """
-        if self.sparse_coagulation:
-            sparse_loss = interp1d(
-                    self._coag_loss_gain().radius.m,
-                    self._coag_loss_gain().coag_loss().m,
-                    kind="cubic"
-                )
-            return sparse_loss(self.particle_radius.m) * self.particle_radius.u
-        else:
+        if not self.sparse_coagulation:
             return self._coag_loss_gain().coag_loss() if self.lazy \
-                else self.eager_coags[0]
+                    else self.eager_coags[0]
+        sparse_loss = interp1d(
+                self._coag_loss_gain().radius.m,
+                self._coag_loss_gain().coag_loss().m,
+                kind="cubic"
+            )
+        return sparse_loss(self.particle_radius.m) * self.particle_radius.u
 
     def coagulation_gain(self):
         """ get coagulation gain rate. If sparse, use scipy interpolation
         """
-        if self.sparse_coagulation:
-            sparse_gain = interp1d(
-                    self._coag_loss_gain().radius.m,
-                    self._coag_loss_gain().coag_gain().m,
-                    kind="cubic"
-                )
-            return sparse_gain(self.particle_radius.m) * self.particle_radius.u
-        else:
+        if not self.sparse_coagulation:
             return self._coag_loss_gain().coag_gain() if self.lazy \
-                else self.eager_coags[1]
+                    else self.eager_coags[1]
+        sparse_gain = interp1d(
+                self._coag_loss_gain().radius.m,
+                self._coag_loss_gain().coag_gain().m,
+                kind="cubic"
+            )
+        return sparse_gain(self.particle_radius.m) * self.particle_radius.u
 
     def coagulation_rate(self):
         """ get the coagulation rate by summing the loss and gain rates
         """
-        if self.sparse_error_adjust and self.sparse_coagulation:
-            # there is an error in gain for large particles
-            loss = self.coagulation_loss()
-            gain = self.coagulation_gain()
-
-            if self.particle_radius[-1].m > 600e-9:
-                # this is the quick option, I need ot add a shift to it too
-                index_start = np.argmin(np.abs(self.particle_radius.m-600e-9))
-                gain[index_start:] = loss[index_start:]
-
-            return gain - loss
-        else:
+        if not self.sparse_error_adjust or not self.sparse_coagulation:
             return self.coagulation_gain() - self.coagulation_loss()
+        # there is an error in gain for large particles
+        loss = self.coagulation_loss()
+        gain = self.coagulation_gain()
+
+        if self.particle_radius[-1].m > 600e-9:
+            # this is the quick option, I need ot add a shift to it too
+            index_start = np.argmin(np.abs(self.particle_radius.m-600e-9))
+            gain[index_start:] = loss[index_start:]
+
+        return gain - loss
 
     def condensation_growth_speed(self):
         """ condensation speed
