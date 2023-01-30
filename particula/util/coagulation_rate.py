@@ -35,6 +35,7 @@ class CoagulationRate:
         self.radius = radius
         self.kernel = kernel
         self.lazy = lazy
+        # print(f'size of radius array in rates: {self.radius.m.size}')
 
         if not self.lazy:
             self.eager_coags = (
@@ -70,6 +71,7 @@ class CoagulationRate:
         """
 
         nums, rads, kern = self.coag_prep()
+        # print(f'size of radius array in rates loss: {rads.m.size}')
 
         return nums*np.trapz(kern*nums, rads)
 
