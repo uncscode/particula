@@ -11,8 +11,8 @@ from particula.util.dimensionless_coagulation import DimensionlessCoagulation
 from particula.util.distribution_discretization import discretize
 from particula.util.friction_factor import frifac
 from particula.util.fuchs_sutugin import fsc
-from particula.util.input_handling import (in_density, in_handling, in_length, in_radius,
-                                           in_scalar, in_volume)
+from particula.util.input_handling import (in_density, in_handling, in_length,
+                                           in_radius, in_scalar, in_volume)
 from particula.util.knudsen_number import knu
 from particula.util.molecular_enhancement import mol_enh
 from particula.util.particle_mass import mass
@@ -372,12 +372,14 @@ class Particle(ParticleWallLoss):
         return self._coag_prep(other or self).get_ces()[0]
 
     def coulomb_enhancement_kinetic_limit(self, other: "Particle" = None):
-        """ Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
+        """ Kinetic limit of Coulomb enhancement for particle--particle
+        cooagulation.
         """
         return self._coag_prep(other or self).get_ces()[1]
 
     def coulomb_enhancement_continuum_limit(self, other: "Particle" = None):
-        """ Continuum limit of Coulomb enhancement for particle--particle coagulation.
+        """ Continuum limit of Coulomb enhancement for particle--particle
+        coagulation.
         """
         return self._coag_prep(other or self).get_ces()[2]
 
