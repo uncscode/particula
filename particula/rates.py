@@ -108,17 +108,42 @@ class Rates:
             self.particle_distribution
         )
 
-    def sum_rates(
-        self,
-        coagulation=1,
-        condensation=1,
-        nucleation=1,
-    ):
-        """ sum rates
+    def sum_rates(self, coagulation=True, condensation=True, nucleation=True):
+        """Sum rates, with options to disable individual rate terms.
+
+        Parameters
+        ----------
+        coagulation : bool, optional
+            does the coagulation calcuation, by default True
+        condensation : bool, optional
+            does the condensation calculation, by default True
+        nucleation : bool, optional
+            does the nucleation calculation, by default True
+
+        TODO: add wall and dilution loss rates
         """
 
-        return (
-            self.coagulation_rate() * coagulation +
-            self.condensation_growth_rate() * condensation +
-            self.nucleation_rate() * nucleation
-        )
+        # Define a dictionary that maps option names to rate functions
+        rates = {
+            'coagulation': self.coagulation_rate,
+            'condensation': self.condensation_growth_rate,
+            'nucleation': self.nucleation_rate
+        }
+
+        # Define a dictionary that maps option names to their Boolean values
+        options = {
+            'coagulation': coagulation,
+            'condensation': condensation,
+            'nucleation': nucleation
+        }
+
+        # Compute the sum of rates based on the selected options
+        rate_sum = sum(
+                rates[key]() if option else 0 for key,
+                option in options.items()
+            )
+
+        # Return the total rate sum
+        return rate_sum
+
+
