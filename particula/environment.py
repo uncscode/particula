@@ -31,9 +31,11 @@ from particula.constants import (GAS_CONSTANT, MOLECULAR_WEIGHT_AIR,
 from particula.util.dynamic_viscosity import dyn_vis
 from particula.util.input_handling import (in_gas_constant, in_handling,
                                            in_molecular_weight, in_pressure,
-                                           in_temperature, in_viscosity)
+                                           in_temperature, in_viscosity,
+                                           in_scalar)
 from particula.util.mean_free_path import mfp
 from particula.util.dilution_loss import drc
+from particula.util.species_properties import water
 
 
 class SharedProperties:  # pylint: disable=too-few-public-methods
@@ -99,6 +101,9 @@ class Environment(
         self.gas_constant = in_gas_constant(
             kwargs.get("gas_constant", GAS_CONSTANT)
         )
+        self.water_saturation_ratio = in_scalar(
+            kwargs.get("water_activity", 0.0)
+        )  # saturation ratio = water activity = relative humidity / 100
 
         self.kwargs = kwargs
 
@@ -122,3 +127,8 @@ class Environment(
             dynamic_viscosity=self.dynamic_viscosity(),
             gas_constant=self.gas_constant,
         )
+
+    def water_vapor_concentration(self):
+        """ Returns the water vapor concentration in kg/m^3.
+        """
+        # todo
