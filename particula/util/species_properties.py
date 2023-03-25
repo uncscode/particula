@@ -7,76 +7,143 @@
 
 import numpy as np
 from particula import u
-from particula.environment import Environment
-from input_handling import in_latent_heat
+from input_handling import (in_latent_heat, in_temperature,
+                            in_pressure, in_concentration, in_scalar
+                            )
+from particula.constants import GAS_CONSTANT
 
 
-class water(Environment):
-    """ based on the Environment class
+class MaterialProperties:
+    def __init__(self, species_properties):
+        self.species_properties = species_properties
+
+    def __getitem__(self, species):
+        return self.species_properties[species]
+
+    def saturation_pressure(self, temperature, species):
+        temperature = in_temperature(temperature)
+        try:
+            return self[species]['saturation_pressure'](temperature)
+        except KeyError:
+            raise ValueError("Species not implemented")
+
+    def latent_heat(self, temperature, species):
+        temperature = in_temperature(temperature)
+        try:
+            return in_latent_heat(self[species]['latent_heat'](temperature))
+        except KeyError:
+            raise ValueError("Species not implemented")
+
+
+def water_buck_psat(temperature):
+    """ Buck equation for water vapor pressure
+        https://en.wikipedia.org/wiki/Arden_Buck_equation
     """
+    temperature = in_temperature(temperature)
+    temp = temperature.m_as("degC")
 
-    def __init__(self, **kwargs):
-        """ initiating the vapor class
-        """
-        super().__init__(**kwargs)
-
-        self.kwargs = kwargs
-
-    def saturation_pressure0(self,):
-        """Calculate the saturation vapour pressure for a given temperature.
-
-        Parameters
-        ----------
-        temperature : K
-            Temperature of the air.
-        """
-
-        # # Latent heat
-        # L = self.latent_heat()
-        # # Saturation vapour pressure # not clear where this comes from.
-        # es = es0*np.exp((L/Rv)*(1/283 - 1/self.temperature))
-
-        saturation_pressure = self.buck_wvpsat(self.temperature)
-
-        return saturation_pressure
-
-    def buck_wvpsat(self):
-        """ Buck equation for water vapor pressure
-            https://en.wikipedia.org/wiki/Arden_Buck_equation
-        """
-
-        temp = self.temperature.m_as("degC")
-
-        return 6.1115 * np.exp(
+    return in_pressure(
+        6.1115 * np.exp(
             (23.036-temp/333.7)*(temp/(279.82+temp))
         )*u.hPa * (temp < 0.0) + 6.1121 * np.exp(
             (18.678-temp/234.5)*(temp/(257.14+temp))
         )*u.hPa * (temp >= 0.0)
+    )
 
-    def latent_heat(self):
-        """Calculate the latent heat of condensation for a given temperature.
-        Polynomial for the latent heat of condensation from Rogers and Yau
-        Table 2.1. https://en.wikipedia.org/wiki/Latent_heat
 
-        range: -25 °C to 40 °C
+# maybe this should be loaded from a file, or for an option of the user to
+# add their own species or load files with species properties
+species_properties = {
+    "water": {
+        "molecular_weight": 18.01528 * u.g / u.mol,
+        "surface_tension": 0.072 * u.N / u.m,
+        "density": 1000.0 * u.kg / u.m ** 3,
+        "vapor_radius": 1.6e-9 * u.m,
+        "vapor_attachment": 1.0 * u.dimensionless,
+        "saturation_pressure": water_buck_psat,
+        "latent_heat": lambda T: (
+                2500.8 - 2.36*T.m_as('degC')
+                + 0.0016*T.m_as('degC')**2
+                - 0.00006*T.m_as('degC')**3
+            ) * u.J/u.g,
+        "kappa": 0.2 * u.dimensionless,
+    }
+}
 
-        Parameters
-        ----------
-        temperature : K
-            Temperature of the air.
 
-        Returns
-        -------
-        latent_heat : J/kg"""
+def material_properties(property, species="water", temperature=298.15 * u.K):
+    """Return the material properties for a given species.
 
-        # Convert Kelvin to Celsius
-        temperatureC = self.temperature.to('u.C').m
+    Parameters
+    ----------
+    property : str
+        Property to return. Options are: 'all', 'molecular_weight',
+        'surface_tension', 'density', 'vapor_radius', 'vapor_attachment',
+        'kappa'.
+    species : str
+        Species for which to return the material properties.
+    temperature : K
+        Temperature of the material.
 
-        # Latent heat of condensation
-        latent_heat = (
-                2500.8 - 2.36*temperatureC
-                + 0.0016*temperatureC**2
-                - 0.00006*temperatureC**3
-            ) * u.J/u.g
+    Returns
+    -------
+    material_properties : value
+        The material property for the given species.
+    """
 
-        return in_latent_heat(latent_heat)
+    if species in species_properties:
+        material_props = MaterialProperties(species_properties)
+
+    if property == 'all':
+        return material_props[species]
+    elif property in material_props[species]:
+        if property == 'saturation_pressure':
+            return material_props.saturation_pressure(temperature, species)
+        elif property == 'latent_heat':
+            return material_props.latent_heat(temperature, species)
+        else:
+            # no temperature dependence implemented
+            return material_props[species][property]
+    else:
+        raise ValueError("Property not implemented")
+
+
+def vapor_concentration(
+        saturation_ratio,
+        temperature=298.15 * u.K,
+        species="water"
+        ):
+    """Convert saturation ratio to mass concentration at a given temperature.
+
+    Parameters
+    ----------
+    sat_ratio : float
+        saturation ratio.
+    temperature : K
+        Air temperature.
+    species : str, optional
+        Species for which to calculate the saturation vapor pressure.
+        Default is "water".
+
+    Returns
+    -------
+    concentration : concentration units
+        Concentration vapor.
+
+    TODO: check values for different species
+    """
+    saturation_ratio = in_scalar(saturation_ratio)
+    # Calculate saturation vapor pressure
+    saturation_pressure = material_properties(
+            'saturation_pressure',
+            species,
+            temperature
+        )
+
+    # Calculate concentration of vapor
+    concentration = in_concentration(
+            saturation_ratio * saturation_pressure
+            / (GAS_CONSTANT * temperature)
+            * material_properties('molecular_weight', species)
+        )
+    return concentration

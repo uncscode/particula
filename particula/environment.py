@@ -35,7 +35,7 @@ from particula.util.input_handling import (in_gas_constant, in_handling,
                                            in_scalar)
 from particula.util.mean_free_path import mfp
 from particula.util.dilution_loss import drc
-from particula.util.species_properties import water
+from particula.util.species_properties import (vapor_concentration)
 
 
 class SharedProperties:  # pylint: disable=too-few-public-methods
@@ -131,4 +131,8 @@ class Environment(
     def water_vapor_concentration(self):
         """ Returns the water vapor concentration in kg/m^3.
         """
-        # todo
+        return vapor_concentration(
+                saturation_ratio=self.water_saturation_ratio,
+                temperature=self.temperature,
+                species="water"
+            )
