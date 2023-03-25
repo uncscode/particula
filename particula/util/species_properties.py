@@ -7,7 +7,7 @@
 
 import numpy as np
 from particula import u
-from input_handling import (in_latent_heat, in_temperature,
+from particula.util.input_handling import (in_latent_heat, in_temperature,
                             in_pressure, in_concentration, in_scalar
                             )
 from particula.constants import GAS_CONSTANT
