@@ -24,14 +24,22 @@ class MaterialProperties:
     def saturation_pressure(self, temperature, species):
         temperature = in_temperature(temperature)
         try:
-            return self[species]['saturation_pressure'](temperature)
+            if species == 'water':
+                return self[species]['saturation_pressure'](temperature)
+            else:
+                return in_pressure(self[species]['saturation_pressure'])
         except KeyError:
             raise ValueError("Species not implemented")
 
     def latent_heat(self, temperature, species):
         temperature = in_temperature(temperature)
         try:
-            return in_latent_heat(self[species]['latent_heat'](temperature))
+            if species == 'water':
+                return in_latent_heat(
+                        self[species]['latent_heat'](temperature)
+                    )
+            else:
+                return in_latent_heat(self[species]['latent_heat'])
         except KeyError:
             raise ValueError("Species not implemented")
 
@@ -52,9 +60,54 @@ def water_buck_psat(temperature):
     )
 
 
+def clausius_clapeyron(
+            temperature,
+            vapor_pressure,
+            temperature_new,
+            heat_vaporization
+        ):
+    """
+    Calculates the vapor pressure of a substance at a given temperature
+    using the Clausius-Clapeyron equation.
+
+    Parameters
+    ----------
+        temperature (float): Temperature reference in Kelvin
+        vapor_pressure (float): Vapor pressure reference in Pa
+        temperature_new (float): Temperature new in Kelvin
+        heat_vaporization (float): Heat of vaporization in J/kg
+
+    Returns
+    -------
+        vapor_pressure_new: Vapor pressure in Pa
+    """
+    temperature = in_temperature(temperature)
+    temperature_new = in_temperature(temperature_new)
+    vapor_pressure = in_pressure(vapor_pressure)
+    heat_vaporization = in_latent_heat(heat_vaporization)
+
+    vapor_pressure_new = vapor_pressure * np.exp(
+            (-heat_vaporization / GAS_CONSTANT)
+            * ((1 / temperature_new) - (1 / temperature))
+        )
+    return vapor_pressure_new
+
+
 # maybe this should be loaded from a file, or for an option of the user to
 # add their own species or load files with species properties
 species_properties = {
+    "generic": {
+        "molecular_weight": 200.0 * u.g / u.mol,
+        "surface_tension": 0.072 * u.N / u.m,
+        "density": 1000.0 * u.kg / u.m ** 3,
+        "vapor_radius": 1e-14 * u.Pa,
+        "vapor_attachment": 1.0 * u.dimensionless,
+        "saturation_pressure": 1.0 * u.Pa,
+        "latent_heat": 1.0 * u.J / u.g,
+        "heat_vaporization": 1.0 * u.J / u.kg,
+        "kappa": 0.2 * u.dimensionless,
+    },
+
     "water": {
         "molecular_weight": 18.01528 * u.g / u.mol,
         "surface_tension": 0.072 * u.N / u.m,
@@ -67,7 +120,20 @@ species_properties = {
                 + 0.0016*T.m_as('degC')**2
                 - 0.00006*T.m_as('degC')**3
             ) * u.J/u.g,
+        "heat_vaporization": 2.257e6 * u.J / u.kg,
         "kappa": 0.2 * u.dimensionless,
+    },
+
+    "ammonium sulfate": {
+        "molecular_weight": 132.14 * u.g / u.mol,
+        "surface_tension": 0.072 * u.N / u.m,
+        "density": 1770.0 * u.kg / u.m ** 3,
+        "vapor_radius": 1.6e-9 * u.m,
+        "vapor_attachment": 1.0 * u.dimensionless,
+        "saturation_pressure": 1e-14 * u.Pa,
+        "latent_heat": 0.0 * u.J/u.g,
+        "heat_vaporization": 0.0 * u.J / u.kg,
+        "kappa": 0.53 * u.dimensionless,
     }
 }
 

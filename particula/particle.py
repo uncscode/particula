@@ -12,7 +12,8 @@ from particula.util.distribution_discretization import discretize
 from particula.util.friction_factor import frifac
 from particula.util.fuchs_sutugin import fsc
 from particula.util.input_handling import (in_density, in_handling, in_length,
-                                           in_radius, in_scalar, in_volume)
+                                           in_radius, in_scalar, in_volume,
+                                           in_mass)
 from particula.util.knudsen_number import knu
 from particula.util.molecular_enhancement import mol_enh
 from particula.util.particle_mass import mass
@@ -164,6 +165,9 @@ class ParticleInstances(ParticleDistribution):
         self.particle_area_factor = in_scalar(
             kwargs.get("particle_area_factor", 1)
         )
+        self.species_mass_fraction = in_mass(
+            kwargs.get("species_mass_fraction", [1])
+        )  # maybe here for speices masses, sulfate, water etc, not sure
 
     def particle_distribution(self):
         """ distribution

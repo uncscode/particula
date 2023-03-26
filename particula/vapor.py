@@ -35,9 +35,7 @@ class Vapor(Environment):
         self.vapor_molec_wt = in_molecular_weight(
             kwargs.get('vapor_molecular_weight', 200*u.g/u.mol)
         )
-        self.kappa = in_scalar(
-            kwargs.get('kappa', 0.2)
-        )
+        self.species = kwargs.get('species_list', ['generic'])
 
         self.kwargs = kwargs
 

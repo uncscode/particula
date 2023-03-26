@@ -7,7 +7,7 @@ from particula.util.input_handling import in_surface_tension, in_temperature, \
 
 def water(
         temperature,
-        CritTemp=647.15):
+        critical_temperature=647.15):
     """Calculate the surface tension of water using the equation from Kalova
     and Mares (2018).
 
@@ -21,9 +21,9 @@ def water(
         sigma : float, Surface tension of water at the given temperature
     """
     temperature = in_temperature(temperature)
-    CritTemp = in_temperature(CritTemp)
+    critical_temperature = in_temperature(critical_temperature)
     # Dimensionless parameter from fitting equation
-    tau = 1 - temperature/CritTemp
+    tau = 1 - temperature/critical_temperature
 
     # Surface tension in mN/m
     sigma = 241.322 * (tau.m ** 1.26) * (
