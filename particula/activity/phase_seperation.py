@@ -1,21 +1,496 @@
+# linting disabled until reformatting of this file
+# pylint: disable=all
+# flake8: noqa
+# pytype: skip-file
 
+# %% 
 
 
 import numpy as np
+import matplotlib.pyplot as plt
 
-def single_phase_o2c_point_kgv3(molar_mass_ratio):
+plt.rcParams.update({'text.color': "#333333",
+                     'axes.labelcolor': "#333333",
+                     "figure.figsize": (6,4),
+                     "font.size": 14,
+                     "axes.edgecolor": "#333333",
+                     "axes.labelcolor": "#333333",
+                     "xtick.color": "#333333",
+                     "ytick.color": "#333333",
+                     "pdf.fonttype": 42,
+                     "ps.fonttype": 42})
+
+# Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
+# Relative-humidity-dependent organic aerosol thermodynamics
+# via an efficient reduced-complexity model.
+# Atmospheric Chemistry and Physics
+# https://doi.org/10.5194/acp-19-13383-2019
+
+# %%
+
+
+def organic_water_single_phase(molar_mass_ratio):
     """
-    Convert the given molar mass ratio to a single phase cross point value using a sigmoid equivalent function.
+    Convert the given molar mass ratio (MW water / MW organic) to a
+    and O2C value were above is a single phase with water and below
+    phase separation is possible.
 
     Parameters:
-    molar_mass_ratio (float): The molar mass ratio.
+    molar_mass_ratio np.: The molar mass ratio with respect to water.
 
     Returns:
-    float: The single phase cross point value.
+    float: The single phase cross point.
     """
-    o2c_single_phase_cross_point = 0.205 / (1 + np.exp(26.6 * (molar_mass_ratio - 0.12))) ** 0.843 + 0.225
+
+    o2c_single_phase_cross_point = 0.205 / (
+        1 + np.exp(26.6 * (molar_mass_ratio - 0.12))
+        )**0.843 + 0.225
     return o2c_single_phase_cross_point
 
+# %% Plot Example curve
+
+
+organic_molecular_weight = np.linspace(50, 500, 500)
+
+o2c_value = organic_water_single_phase(18.01528 / organic_molecular_weight)
+
+fig, ax = plt.subplots()
+ax.plot(
+    organic_molecular_weight,
+    o2c_value,
+    label="initial",
+    linestyle='dashed'
+    )
+ax.set_xlabel("Organic molecular weight (g/mol)")
+ax.set_ylabel("O:C ratio")
+ax.set_title("Organic Phase separation")
+ax.legend()
+fig.show
+
+# %% activity calc
+
+# function [ln_func1, ln_func2, ycalc1, ycalc2, activity_calc1, activity_calc2, mass_fraction1, mass_fraction2, Gibbs_RT, dGibbs_RTdx2]=BAT_properties_calculation_v1(...
+#     org_mole_fraction, O2C, H2C, molarmass_ratio, BAT_functional_group, special_options, N2C_values_denistyOnly)
+import numpy as np
+
+def exp_wlimiter(x):
+    # Define the limiting function for the exponent here
+    return np.exp(x)
+
+def convert_to_OH_eqivelent(O2C, molarmass_ratio, BAT_functional_group):
+    # Define this function
+    return O2C, molarmass_ratio
+
+def organic_density_estimate(M, O2C, H2C=None, N2C=None):
+    """
+    Function to estimate the density of organic compounds based on the simple
+    model by Girolami (1994). The input parameters include molar mass, O:C
+    and H:C ratios. If the H:C ratio is unknown at input, enter a negative
+    value. The actual H:C will then be estimated based on an initial assumption
+    of H:C = 2. The model also estimates the number of carbon atoms per
+    molecular structure based on molar mass, O:C, and H:C.
+    The density is then approximated by the formula of Girolami.
+
+    Reference:
+    Girolami, G. S.: A Simple 'Back of the Envelope' Method for Estimating
+    the Densities and Molecular Volumes of Liquids and Solids,
+    J. Chem. Educ., 71(11), 962, doi:10.1021/ed071p962, 1994.
+
+    Parameters:
+        M (float): Molar mass.
+        O2C (float): O:C ratio.
+        H2C (float): H:C ratio. If unknown, provide a negative value.
+        N2C (float, optional): N:C ratio. Defaults to None.
+
+    Returns:
+        densityEst (float): Estimated density in g/cm^3.
+    """
+    if N2C is None:
+        N2C = M * 0
+    if H2C is None:
+        H2C = M * 0
+
+    mass_C = 12.01  # the molar masses in [g/mol]
+    mass_O = 16.0
+    mass_H = 1.008
+    mass_N = 14.0067
+
+    # 1) Estimate the H2C value if not provided from input
+    if H2C < 0.1:
+        # Estimate H2C assuming an aliphatic compound with H2C = 2 in the absence of oxygen functional groups,
+        # then correct for oxygen content assuming a -1 slope (Van Krevelen Diagram of typical SOA).
+        H2Cest = 2.0 - O2C
+    else:
+        H2Cest = H2C
+
+    # 2) Compute the approximate number of carbon atoms per organic molecule
+    NC = M / (mass_C + H2Cest * mass_H + O2C * mass_O + N2C * mass_N)
+
+    # 3) Compute density estimate based on method by Girolami (1994)
+    # Here no correction is applied for rings and aromatic compounds
+    # (due to limited info at input)
+    rho1 = M / (5.0 * NC * (2.0 + H2Cest + O2C * 2.0 + N2C * 2.0))
+    density = rho1 * (1.0 + min(NC * O2C * 0.1 + NC * N2C * 0.1, 0.3))
+    # density in [g/cm^3];
+    # Here it is scaled assuming that most of the oxygen atoms are able to
+    # make H-bonds (donor or acceptor).
+
+    return density
+
+
+def single_phase_O2C_point_KGv3(Mr):
+    # Define this function
+    return Onephase_O2C
+
+def replace_data_A_to_B_KGv1(x2, A, B):
+    return np.where(x2 == A, B, x2)
+
+# %%
+
+org_mole_fraction = np.linspace(0, 1, 100)
+molarmass_ratio = 18.016/250
+O2C = 0.2
+H2C = 0
+N2C = 0
+
+
+O2C, molarmass_ratio = convert_to_OH_eqivelent(
+        O2C,
+        molarmass_ratio,
+        BAT_functional_group=None
+    )
+
+# check the limits of possible mole fractions
+org_mole_fraction = np.where(org_mole_fraction>1, 1, org_mole_fraction)
+org_mole_fraction = np.where(org_mole_fraction<=0, 10**-20, org_mole_fraction)
+
+density = organic_density_estimate(18.016/molarmass_ratio, O2C, H2C, N2C)
+
+
+#%%
+
+def bat_blending_weights(molarmass_ratio, O2C):
+    """
+    Function to estimate the blending weights for the BAT model.
+
+    Parameters:
+    -----------
+    molarmass_ratio (float): Molar mass ratio of the organic compound.
+
+    Returns:
+    --------
+    blending_weights (array): List of blending weights for the BAT model
+        in the low, mid, and high O2C regions.
+    """
+
+    Onephase_O2C = organic_water_single_phase(molarmass_ratio)
+    mid_transition = Onephase_O2C * 0.75
+
+    blending_weights = np.zeros(3)  # [low, mid, high] O2C regions
+
+    if O2C <= mid_transition:  # lower to mid O2C region
+        tran_lowO2C_fractionOne_phase = 0.189974476118418
+        tran_lowO2C_sigmoid_bend = 79.2606902175984
+        tran_lowO2C_sigmoid_shift = 0.0604293454322489
+
+        O2C_1phase_delta = O2C - Onephase_O2C * tran_lowO2C_fractionOne_phase
+        weight_1phase = 1 / (1 + np.exp(
+            -tran_lowO2C_sigmoid_bend
+            *(O2C_1phase_delta - tran_lowO2C_sigmoid_shift)
+        ))  # logistic transfer function
+
+        O2C_1phase_delta_norm = O2C - (
+                mid_transition * tran_lowO2C_fractionOne_phase
+            )
+        weight_1phase_norm = 1 / (1 + np.exp(
+            -tran_lowO2C_sigmoid_bend
+            *(O2C_1phase_delta_norm - tran_lowO2C_sigmoid_shift)
+        ))
+
+        blending_weights[1] = weight_1phase / weight_1phase_norm
+        blending_weights[0] = 1 - weight_1phase
+
+    elif O2C <= Onephase_O2C * 2:  # mid to high O2C region
+        tran_midO2C_sigmoid_bend = 75.0159268221068
+        tran_midO2C_sigmoid_shift = 0.000947111285750515
+
+        O2C_1phase_delta = O2C - Onephase_O2C
+        blending_weights[1] = 1 / (1 + np.exp(
+            -tran_midO2C_sigmoid_bend
+            *(O2C_1phase_delta - tran_midO2C_sigmoid_shift)
+        ))  # logistic transfer function
+
+        blending_weights[2] = 1 - blending_weights[1]
+
+    else:  # high only region
+        blending_weights[2] = 1
+
+    return blending_weights
+
+#%%
+
+O2C_array = np.linspace(0, 0.6, 100)
+weights_matrix = np.zeros((100, 3))
+
+for index, O2C in enumerate(O2C_array):
+    weights_matrix[index, :] = bat_blending_weights(molarmass_ratio, O2C)
+
+fig, ax = plt.subplots()
+ax.plot(
+    O2C_array,
+    weights_matrix,
+    )
+
+ax.set_xlabel("O:C")
+ax.set_ylabel("weights")
+ax.legend()
+fig.show
+
+
+#%%
+FIT_lowO2C = {'a1':[7.089476E+00, -7.711860E+00, -3.885941E+01, -1.000000E+02],
+              'a2':[-6.226781E-01, -1.000000E+02, 3.081244E-09, 6.188812E+01],
+              's':[-5.988895E+00, 6.940689E+00]}
+FIT_midO2C = {'a1':[5.872214E+00, -4.535007E+00, -5.129327E+00, -2.809232E+01],
+              'a2':[-9.740486E-01, -1.000000E+02, 2.109751E+00, -2.367683E+01,],
+              's':[-1.219164E+00, 4.742729E+00]}
+FIT_highO2C = {'a1':[5.921550E+00, -2.528295E+00, -3.883017E+00, -7.898128E+00,],
+               'a2':[-1.000000E+02, -1.000000E+02, 1.353916E+00, -1.160145E+01,],
+               's':[-7.868187E-02, 3.650860E+00]}
+
+def coefficents_c(
+        molarmass_ratio,
+        fit_values
+    ):
+
+    """
+    Coefficents for activity model, see Gorkowski (2019). equation S1 S2.
+
+    Paramters:
+    ---------
+        molar mass ratio (float): water MW / orgniac MW
+        fit_values (list): a_n1, a_n2, a_n3, a_n4
+    """
+    c = (fit_values[0] * np.exp(fit_values[1] * O2C)
+        + fit_values[2] * np.exp(fit_values[3] * molarmass_ratio))
+    return c
+
+
+# %%
+
+def gibbs_of_mixing(
+        molarmass_ratio,
+        org_mole_fraction,
+        O2C,
+        density,
+        fit_dict
+    ):
+    """
+    Gibbs free energy of mixing, see Gorkowski (2019). equation S4.
+
+    Paramters:
+    ---------
+        molar mass ratio (float): water MW / orgniac MW
+        org mole fraction (float): fraction of organic matter
+        O2C (float): oxygen to carbon ratio
+        density (float): density of mixture
+        fit_coefficent (dict): dictionary of fit values for low O2C region
+    """
+    c1 = coefficents_c(molarmass_ratio, fit_dict['a1'])
+    c2 = coefficents_c(molarmass_ratio, fit_dict['a2'])
+
+    rhor = 0.997 / density  # assumes water is the other fluid
+
+    # equation S3
+    scaledMr = molarmass_ratio * fit_dict['s'][1] * (1.0 + O2C) ** fit_dict['s'][0]  # scaledMr is the scaled molar mass ratio of this mixture's components.
+    phi2 = org_mole_fraction / (org_mole_fraction + (1.0 - org_mole_fraction) * scaledMr / rhor)  # phi2 is a scaled volume fraction
+
+    # equation S4
+    sum1 = c1 + c2*(1-2*phi2)
+    gibbs_mix = phi2 * (1.0 - phi2) * sum1
+
+    # equation s6 the derivative of phi2 with respect to orgnaic x2
+    dphi2dx2 = (scaledMr / rhor) * (phi2 / org_mole_fraction) ** 2
+
+    # equation S7
+    dervative_gibbs_mix = (
+        (1.0 - 2.0 * phi2) * sum1 - 2*c2*phi2 * (1.0 - phi2)
+        ) * dphi2dx2
+
+    return gibbs_mix, dervative_gibbs_mix
+
+gibbs_mix, dervative_gibbs = gibbs_of_mixing(
+    molarmass_ratio,
+    org_mole_fraction,
+    O2C,
+    density,
+    FIT_lowO2C
+)
+
+
+# %%
+
+def gibbs_mix_weight(
+        molarmass_ratio,
+        org_mole_fraction,
+        O2C,
+        density,
+        BAT_functional_group=None,
+    ):
+    """
+    Gibbs free energy of mixing, see Gorkowski (2019), with weighted
+    O2C regions
+
+    Paramters:
+    ---------
+        molar mass ratio (float): water MW / orgniac MW
+        org mole fraction (float): fraction of organic matter
+        O2C (float): oxygen to carbon ratio
+        density (float): density of mixture
+        fit_coefficent (dict): dictionary of fit values for low O2C region
+
+    Returns:
+    -------
+        gibbs_mix (float): Gibbs energy of mixing (including 1/RT)
+        dervative_gibbs (float): dervative of Gibbs energy with respect to 
+        mole fraction of orgnaics (includes 1/RT)
+    """
+    O2C, molarmass_ratio = convert_to_OH_eqivelent(
+        O2C,
+        molarmass_ratio,
+        BAT_functional_group=None
+    )
+
+    weights = bat_blending_weights(molarmass_ratio, O2C)
+
+    if weights[1]>0:  # if mid region is used
+        gibbs_mix_mid, dervative_gibbs_mid = gibbs_of_mixing(
+            molarmass_ratio,
+            org_mole_fraction,
+            O2C,
+            density,
+            FIT_midO2C
+        )
+
+        if weights[0]>0: # if paired with low O2C region
+            gibbs_mix_low, dervative_gibbs_low = gibbs_of_mixing(
+                molarmass_ratio,
+                org_mole_fraction,
+                O2C,
+                density,
+                FIT_lowO2C
+            )
+            gibbs_mix = weights[0]*gibbs_mix_low + weights[1]*gibbs_mix_mid
+            dervative_gibbs = weights[0]*dervative_gibbs_low \
+            + weights[1]*dervative_gibbs_mid
+        
+        else:  #else paired with high O2C region
+            gibbs_mix_high, dervative_gibbs_high = gibbs_of_mixing(
+                molarmass_ratio,
+                org_mole_fraction,
+                O2C,
+                density,
+                FIT_highO2C
+            )
+            gibbs_mix = weights[2]*gibbs_mix_high + weights[1]*gibbs_mix_mid
+            dervative_gibbs = weights[2]*dervative_gibbs_high \
+                + weights[1]*dervative_gibbs_mid
+    else:  # when only high 2OC region is used
+        gibbs_mix, dervative_gibbs = gibbs_of_mixing(
+            molarmass_ratio,
+            org_mole_fraction,
+            O2C,
+            density,
+            FIT_highO2C
+        )
+    return gibbs_mix, dervative_gibbs
+
+
+# %%
+O2C=0.225
+molarmass_ratio = 18.016/100
+density = organic_density_estimate(18.016/molarmass_ratio, O2C)
+
+gibbs_mix, dervative_gibbs= gibbs_mix_weight(
+        molarmass_ratio,
+        org_mole_fraction,
+        O2C,
+        density,
+    )
+
+# equations S8 S10
+ln_gamma_water = gibbs_mix - org_mole_fraction * dervative_gibbs  # the func value for component 1 = LOG(activity coeff. water)
+ln_gamma_org = gibbs_mix + (1.0 - org_mole_fraction) * dervative_gibbs  # the func value of the component 2 = LOG(activity coeff. of the organic)
+
+gamma_water = np.exp(np.where(ln_gamma_water>690, 690, ln_gamma_water))
+gamma_org = np.exp(np.where(ln_gamma_org>690, 690, ln_gamma_org))
+
+activity_water = gamma_org * (1.0 - org_mole_fraction)
+activity_organic = gamma_water * org_mole_fraction
+
+mass_water = (1.0 - org_mole_fraction) * molarmass_ratio / (
+        (1.0 - org_mole_fraction) * (molarmass_ratio - 1) + 1
+    )
+mass_organic = 1 - mass_water
+
+gibbs_ideal = (1-org_mole_fraction) * np.log(1-org_mole_fraction) \
+    +org_mole_fraction * np.log(org_mole_fraction)
+gibbs_real = gibbs_ideal + gibbs_mix
+
+fig, ax = plt.subplots()
+ax.plot(
+    1-org_mole_fraction,
+    gibbs_real,
+    label="gibbs",
+    linestyle='dashed'
+    )
+# ax.plot(
+#     1-org_mole_fraction,
+#     activity_water,
+#     label="water",
+#     linestyle='dashed'
+#     )
+
+# ax.plot(
+#     1-org_mole_fraction,
+#     activity_organic,
+#     label="organic",
+#     )
+# ax.set_ylim((0,2))
+ax.set_xlabel("water mole fraction")
+ax.set_ylabel("activity")
+ax.legend()
+fig.show
+
+
+#%%
+
+# gemix=gemix(:,1).*weight_1phase+gemix(:,2).*weight_2phase;
+# dgemix2dx=dgemix2dx(:,1).*weight_1phase+dgemix2dx(:,2).*weight_2phase;
+
+
+# %calculate the function value funcx1 (= y1(x2)) at point with w2:
+# ln_func1 = gemix -x2.*dgemix2dx; %the func value for component 1 = LOG(activity coeff. water)
+# ln_func2 = gemix +(1.0D0-x2).*dgemix2dx; %the func value of the component 2 = LOG(activity coeff. of the organic)
+
+
+# ycalc1 = exp_wlimiter(ln_func1); % exp with limiter for numerical overflow
+# ycalc2 = exp_wlimiter(ln_func2);
+
+# activity_calc1=ycalc1.*(1.0D0-x2);
+# activity_calc2=ycalc2.*(x2);
+
+# mass_fraction1=(1.0D0-x2).*Mr_massfrac_final./((1.0D0-x2).*(Mr_massfrac_final-1)+1);
+# mass_fraction2=1-mass_fraction1;
+# Gibbs_RT=gemix;
+# dGibbs_RTdx2=dgemix2dx;
+
+
+
+
+
+
+# %%
 
 def q_alpha_transfer_vs_aw_calc_v1(a_w_sep, aw_series, VBSBAT_options):
     """
@@ -313,3 +788,5 @@ def biphasic_to_single_phase_molfrac_org_NN_v5(x1):
     y1 = mapminmax_reverse(a2, y1_step1)
 
     return y1
+
+# %%

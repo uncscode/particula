@@ -1,3 +1,8 @@
+# linting disabled until reformatting of this file
+# pylint: disable=all
+# flake8: noqa
+# pytype: skip-file
+
 from scipy.optimize import minimize, Bounds
 from sklearn.model_selection import ParameterGrid
 from scipy.optimize import minimize, Bounds
@@ -149,8 +154,6 @@ def VBS_equilibration_withLLEpartition_KGv2(guess_C_OAalpha_ugPm3, guess_C_OAbet
 
     return partition_coefficients_AB, Coa_j_AB, Caq_j_AB, Cstar_j, Coa_AB, Caq_AB, Coa, q_alpha_water, fit_exit_flag, error_out
 
-
-import numpy as np
 
 def VBS_equilibration_extractCsat_withLLEpartition_KGv2(Cp_j_VBSold, Cstar_j_VBSold, aw_measurment, molecular_weight, O2C_values, H2C_values, BAT_functional_group, BAT_refinement_mode, N2C_values_denistyOnly=None):
     
