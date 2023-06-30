@@ -183,44 +183,39 @@ def bat_blending_weights(molarmass_ratio, O2C):
         in the low, mid, and high O2C regions.
     """
 
-    Onephase_O2C = organic_water_single_phase(molarmass_ratio)
-    mid_transition = Onephase_O2C * 0.75
+    O2C_ml = organic_water_single_phase(molarmass_ratio)
 
     blending_weights = np.zeros(3)  # [low, mid, high] O2C regions
 
-    if O2C <= mid_transition:  # lower to mid O2C region
-        tran_lowO2C_fractionOne_phase = 0.189974476118418
-        tran_lowO2C_sigmoid_bend = 79.2606902175984
-        tran_lowO2C_sigmoid_shift = 0.0604293454322489
+    if O2C <= O2C_ml * 0.75:  # lower to mid O2C region
+        b_ml = 0.189974476118418
+        b_1 = 79.2606902175984
+        b_2 = 0.0604293454322489
 
-        O2C_1phase_delta = O2C - Onephase_O2C * tran_lowO2C_fractionOne_phase
-        weight_1phase = 1 / (1 + np.exp(
-            -tran_lowO2C_sigmoid_bend
-            *(O2C_1phase_delta - tran_lowO2C_sigmoid_shift)
+        O2C_b = O2C - O2C_ml * b_ml
+        weight_b = 1 / (1 + np.exp(
+            - b_1 * (O2C_b - b_2)
         ))  # logistic transfer function
 
-        O2C_1phase_delta_norm = O2C - (
-                mid_transition * tran_lowO2C_fractionOne_phase
-            )
-        weight_1phase_norm = 1 / (1 + np.exp(
-            -tran_lowO2C_sigmoid_bend
-            *(O2C_1phase_delta_norm - tran_lowO2C_sigmoid_shift)
+        O2C_b_norm = O2C - (0.75 * O2C_ml * b_ml)
+
+        weight_norm = 1 / (1 + np.exp(
+            - b_1 * (O2C_b_norm - b_2)
         ))
 
-        blending_weights[1] = weight_1phase / weight_1phase_norm
-        blending_weights[0] = 1 - weight_1phase
+        blending_weights[1] = weight_b / weight_norm
+        blending_weights[0] = 1 - blending_weights[1]
 
-    elif O2C <= Onephase_O2C * 2:  # mid to high O2C region
-        tran_midO2C_sigmoid_bend = 75.0159268221068
-        tran_midO2C_sigmoid_shift = 0.000947111285750515
+    elif O2C <= O2C_ml * 2:  # mid to high O2C region
+        b_1 = 75.0159268221068
+        b_2 = 0.000947111285750515
 
-        O2C_1phase_delta = O2C - Onephase_O2C
-        blending_weights[1] = 1 / (1 + np.exp(
-            -tran_midO2C_sigmoid_bend
-            *(O2C_1phase_delta - tran_midO2C_sigmoid_shift)
+        O2C_b = O2C - O2C_ml
+        blending_weights[2] = 1 / (1 + np.exp(
+            - b_1 * (O2C_b - b_2)
         ))  # logistic transfer function
 
-        blending_weights[2] = 1 - blending_weights[1]
+        blending_weights[1] = 1 - blending_weights[2]
 
     else:  # high only region
         blending_weights[2] = 1
@@ -243,7 +238,7 @@ ax.plot(
 
 ax.set_xlabel("O:C")
 ax.set_ylabel("weights")
-ax.legend()
+# ax.legend()
 fig.show
 
 
@@ -425,8 +420,8 @@ ln_gamma_org = gibbs_mix + (1.0 - org_mole_fraction) * dervative_gibbs  # the fu
 gamma_water = np.exp(np.where(ln_gamma_water>690, 690, ln_gamma_water))
 gamma_org = np.exp(np.where(ln_gamma_org>690, 690, ln_gamma_org))
 
-activity_water = gamma_org * (1.0 - org_mole_fraction)
-activity_organic = gamma_water * org_mole_fraction
+activity_water = gamma_water * (1.0 - org_mole_fraction)
+activity_organic = gamma_org * org_mole_fraction
 
 mass_water = (1.0 - org_mole_fraction) * molarmass_ratio / (
         (1.0 - org_mole_fraction) * (molarmass_ratio - 1) + 1
@@ -437,53 +432,32 @@ gibbs_ideal = (1-org_mole_fraction) * np.log(1-org_mole_fraction) \
     +org_mole_fraction * np.log(org_mole_fraction)
 gibbs_real = gibbs_ideal + gibbs_mix
 
+# %%
 fig, ax = plt.subplots()
-ax.plot(
-    1-org_mole_fraction,
-    gibbs_real,
-    label="gibbs",
-    linestyle='dashed'
-    )
 # ax.plot(
 #     1-org_mole_fraction,
-#     activity_water,
-#     label="water",
+#     gibbs_real,
+#     label="gibbs",
 #     linestyle='dashed'
 #     )
+ax.plot(
+    1-org_mole_fraction,
+    activity_water,
+    label="water",
+    linestyle='dashed'
+    )
 
-# ax.plot(
-#     1-org_mole_fraction,
-#     activity_organic,
-#     label="organic",
-#     )
-# ax.set_ylim((0,2))
+ax.plot(
+    1-org_mole_fraction,
+    activity_organic,
+    label="organic",
+    )
+ax.set_ylim((0,1))
 ax.set_xlabel("water mole fraction")
 ax.set_ylabel("activity")
 ax.legend()
 fig.show
 
-
-#%%
-
-# gemix=gemix(:,1).*weight_1phase+gemix(:,2).*weight_2phase;
-# dgemix2dx=dgemix2dx(:,1).*weight_1phase+dgemix2dx(:,2).*weight_2phase;
-
-
-# %calculate the function value funcx1 (= y1(x2)) at point with w2:
-# ln_func1 = gemix -x2.*dgemix2dx; %the func value for component 1 = LOG(activity coeff. water)
-# ln_func2 = gemix +(1.0D0-x2).*dgemix2dx; %the func value of the component 2 = LOG(activity coeff. of the organic)
-
-
-# ycalc1 = exp_wlimiter(ln_func1); % exp with limiter for numerical overflow
-# ycalc2 = exp_wlimiter(ln_func2);
-
-# activity_calc1=ycalc1.*(1.0D0-x2);
-# activity_calc2=ycalc2.*(x2);
-
-# mass_fraction1=(1.0D0-x2).*Mr_massfrac_final./((1.0D0-x2).*(Mr_massfrac_final-1)+1);
-# mass_fraction2=1-mass_fraction1;
-# Gibbs_RT=gemix;
-# dGibbs_RTdx2=dgemix2dx;
 
 
 
