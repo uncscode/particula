@@ -273,6 +273,31 @@ def coefficents_c(
 
 # %%
 
+def exp_limited(value):
+    """
+    np.exp with limits for machine precision max input value of 690.
+
+    Parameters:
+    value (array): Input array.
+
+    Returns:
+    array: Exponential of the input array with a limit for machine precision.
+    """
+    return np.exp(np.where(value > 690, 690, value))
+
+def log_limited(value):
+    """
+    np.log with limits for machine precision min input value of 1e-300.
+
+    Parameters:
+    value (array): Input array.
+
+    Returns:
+    array: Log of the input array with a limit for machine precision.
+    """
+    return np.log(np.where(value < 1e-300, 1e-300, value))
+
+#%%
 def gibbs_of_mixing(
         molarmass_ratio,
         org_mole_fraction,
@@ -297,8 +322,12 @@ def gibbs_of_mixing(
     rhor = 0.997 / density  # assumes water is the other fluid
 
     # equation S3
-    scaledMr = molarmass_ratio * fit_dict['s'][1] * (1.0 + O2C) ** fit_dict['s'][0]  # scaledMr is the scaled molar mass ratio of this mixture's components.
-    phi2 = org_mole_fraction / (org_mole_fraction + (1.0 - org_mole_fraction) * scaledMr / rhor)  # phi2 is a scaled volume fraction
+    scaledMr = molarmass_ratio * fit_dict['s'][1] \
+        * (1.0 + O2C) ** fit_dict['s'][0]  
+    #the scaled molar mass ratio of this mixture's components.
+    phi2 = org_mole_fraction / (
+        org_mole_fraction + (1.0 - org_mole_fraction) * scaledMr / rhor
+        )  # phi2 is a scaled volume fraction
 
     # equation S4
     sum1 = c1 + c2*(1-2*phi2)
@@ -414,11 +443,13 @@ gibbs_mix, dervative_gibbs= gibbs_mix_weight(
     )
 
 # equations S8 S10
-ln_gamma_water = gibbs_mix - org_mole_fraction * dervative_gibbs  # the func value for component 1 = LOG(activity coeff. water)
-ln_gamma_org = gibbs_mix + (1.0 - org_mole_fraction) * dervative_gibbs  # the func value of the component 2 = LOG(activity coeff. of the organic)
+# the func value for component 1 = LOG(activity coeff. water)
+ln_gamma_water = gibbs_mix - org_mole_fraction * dervative_gibbs
+# the func value of the component 2 = LOG(activity coeff. of the organic)
+ln_gamma_org = gibbs_mix + (1.0 - org_mole_fraction) * dervative_gibbs
 
-gamma_water = np.exp(np.where(ln_gamma_water>690, 690, ln_gamma_water))
-gamma_org = np.exp(np.where(ln_gamma_org>690, 690, ln_gamma_org))
+gamma_water = exp_limited(ln_gamma_water)
+gamma_org = exp_limited(ln_gamma_org)
 
 activity_water = gamma_water * (1.0 - org_mole_fraction)
 activity_organic = gamma_org * org_mole_fraction
@@ -428,8 +459,8 @@ mass_water = (1.0 - org_mole_fraction) * molarmass_ratio / (
     )
 mass_organic = 1 - mass_water
 
-gibbs_ideal = (1-org_mole_fraction) * np.log(1-org_mole_fraction) \
-    +org_mole_fraction * np.log(org_mole_fraction)
+gibbs_ideal = (1-org_mole_fraction) * log_limited(1-org_mole_fraction) \
+    +org_mole_fraction * log_limited(org_mole_fraction)
 gibbs_real = gibbs_ideal + gibbs_mix
 
 # %%
@@ -466,10 +497,185 @@ fig.show
 
 # %%
 
-def q_alpha_transfer_vs_aw_calc_v1(a_w_sep, aw_series, VBSBAT_options):
+def find_phase_sep_index(activity_data):
     """
-    This function makes a squeezed logistic function to transfer for q_alpha ~0 to q_alpha ~1, 
-    described in VBSBAT_options.q_alpha.
+    This function finds phase separation using activity>1 and
+    inflections in the activity curve data.
+    In physical systems activity can not be above one and 
+    curve should be monotonic. Or else there will be phase separation.
+
+    Parameters:
+    activity_data (np.array): A numpy array of activity data.
+
+    Returns:
+    tuple: The phase separation via activity,
+    phase separation via activity curvature,
+    index phase separation starts, index phase separation end.
+    """
+
+    # Compute difference between consecutive elements in the array
+    activity_diff = np.diff(activity_data)
+    data_length = len(activity_data)
+
+    # Check if the data length is more than 3
+    if data_length > 3:
+        min_value = np.min(activity_diff)
+        max_value = np.max(activity_diff)
+
+        # Check if the min and max differences have the same sign
+        if np.sign(min_value) == np.sign(max_value):
+            # If so, no phase separation via activity curvature
+            phase_sep_curve = 0
+            index_phase_sep_starts = np.nan
+            index_phase_sep_end = np.nan
+        else:
+            # If signs differ, phase separation via activity curvature occurs
+            phase_sep_curve = 1
+
+            # Find where the sign changes in the activity difference
+            activity_diff_sign_change = np.sign(
+                np.concatenate(([activity_diff[0]], activity_diff))
+                ) != np.sign(activity_diff[0])
+
+            # Find the first change in sign
+            index_start = np.where(activity_diff_sign_change)[0][0]
+            # Find the last change in sign
+            back_index = index_start - 1 + np.where(
+                ~activity_diff_sign_change[index_start:])[0][0]
+
+            # Find closest match to restart the process
+            if back_index < data_length:
+                activity_data_gap = np.argmin(
+                    np.abs(
+                    activity_data[back_index:] - activity_data[index_start]
+                    ))
+                restart_match_index = activity_data_gap + back_index - 1
+            else:
+                restart_match_index = data_length
+
+            # Check if any activity data is greater than 1
+            if sum(activity_data > 1):
+                # Find minimum activity data and its corresponding index
+                min_value_idilute = np.min(activity_data[index_start:])
+                min_index_idilute = np.argmin(
+                    activity_data[index_start:]) + index_start - 1
+
+                # Find where activity data matches the minimum value
+                activity_data_gap_start = np.argmin(
+                    np.abs(
+                    activity_data[:index_start] \
+                        - activity_data[min_index_idilute]
+                    ))
+
+                # Assign appropriate indices for phase separation
+                if activity_data_gap_start < index_start:
+                    index_phase_sep_starts = activity_data_gap_start
+                else:
+                    index_phase_sep_starts = index_start
+
+                if min_index_idilute < restart_match_index:
+                    index_phase_sep_end = min_index_idilute
+                else:
+                    index_phase_sep_end = restart_match_index
+
+            else:
+                index_phase_sep_starts = index_start
+                index_phase_sep_end = restart_match_index
+
+    else:
+        phase_sep_activity = activity_data
+        phase_sep_curve = 0
+        index_phase_sep_starts = np.nan
+        index_phase_sep_end = np.nan
+
+    # Assign phase separation via activity based on data being greater than 1
+    if sum(activity_data > 1):
+        phase_sep_activity = 1
+    else:
+        phase_sep_activity = 0
+
+    return phase_sep_activity, phase_sep_curve, \
+        index_phase_sep_starts, index_phase_sep_end
+
+
+# out = finds_phase_sep_and_activity_curve_dips(activity_organic)
+
+#%%
+def find_phase_separation(activity_water, activity_org):
+    """
+    This function checks for phase separation in each activity curve.
+
+    Parameters:
+    activity_water (np.array): A numpy array of water activity values.
+    activity_org (np.array): A numpy array of organic activity values.
+
+    Returns:
+    tuple: The phase separation check, lower a_w separation index,
+    upper a_w separation index, matching upper a_w separation index.
+    """
+
+    # check for phase separation in each activity curve
+    _, phase_sep_curve_w, index_phase_sep_starts_w, index_phase_sep_end_w = find_phase_sep_index(activity_water)
+    _, phase_sep_curve_org, index_phase_sep_starts_org, index_phase_sep_end_org = find_phase_sep_index(activity_org)
+
+    # gather all the indexes into a list for easier access
+    indexes = [index_phase_sep_starts_w, index_phase_sep_end_w, index_phase_sep_starts_org, index_phase_sep_end_org]
+
+    # If there is a phase separation curve in the water activity data
+    if phase_sep_curve_w == 1:
+        phase_sep_check = 1
+
+        # Check for the direction of the curve (increasing or decreasing)
+        if activity_water[0] < activity_water[-1]:  # increasing a_w with index
+            # find the min and max indexes
+            lower_a_w_sep_index = min(indexes)
+            upper_a_w_sep_index = max(indexes)
+
+            # calculate the mid index
+            mid_sep_index = (lower_a_w_sep_index + upper_a_w_sep_index) // 2
+            # slice the data upto mid index
+            activity_water_beta = activity_water[:mid_sep_index]
+            match_a_w = activity_water[upper_a_w_sep_index]
+            # find the index where the difference is greater than 0
+            match_index_prime = np.where((activity_water_beta - match_a_w) > 0)
+
+            # if no such index found, assign the index where the max difference is located
+            if len(match_index_prime[0]) == 0:
+                match_index_prime = np.argmax(activity_water_beta - match_a_w)
+
+            matching_upper_a_w_sep_index = match_index_prime[0][0] - 1
+
+        else:  # decreasing a_w with index
+            lower_a_w_sep_index = max(indexes)
+            upper_a_w_sep_index = min(indexes)
+
+            mid_sep_index = (lower_a_w_sep_index + upper_a_w_sep_index) // 2
+            activity_water_beta = activity_water[mid_sep_index:]
+            match_a_w = activity_water[upper_a_w_sep_index]
+            match_index_prime = np.where(activity_water_beta <= match_a_w)
+
+            matching_upper_a_w_sep_index = mid_sep_index + match_index_prime[0][0] - 1
+
+    else:  # no phase separation
+        lower_a_w_sep_index = 1
+        upper_a_w_sep_index = 2
+        matching_upper_a_w_sep_index = 2
+        phase_sep_check = 0  # no phase sep
+
+    return phase_sep_check, lower_a_w_sep_index, upper_a_w_sep_index, matching_upper_a_w_sep_index
+
+phase_sep_check, lower_a_w_sep_index, upper_a_w_sep_index, matching_upper_a_w_sep_index = find_phase_separation(activity_water, activity_organic)
+#%%
+
+
+def phase_seperation_q_alpha(
+        a_w_sep,
+        aw_series,
+        VBSBAT_options=None
+    ):
+    """
+    This function makes a squeezed logistic function to transfer for 
+    q_alpha ~0 to q_alpha ~1, 
 
     Parameters:
     a_w_sep (np.array): A numpy array of values.
@@ -479,154 +685,35 @@ def q_alpha_transfer_vs_aw_calc_v1(a_w_sep, aw_series, VBSBAT_options):
     Returns:
     np.array: The q_alpha value.
     """
-    
+    min_spread_in_aw = 10**-6
+    q_alpha_at_1phase_aw = 0.99
+    q_alpha_bounds=[10**6, 1]
+    q_alpha_bounds_mean=[10**6, 1]
+
     mask_of_miscible_points = a_w_sep == 0  # values held for correction at the end
 
     # spread in transfer from 50/50 point
     delta_a_w_sep = 1 - a_w_sep
 
     # check min value allowed
-    above_min_delta_a_w_sep_value = delta_a_w_sep > VBSBAT_options['q_alpha']['min_spread_in_aw']
+    above_min_delta_a_w_sep_value = delta_a_w_sep > min_spread_in_aw
     delta_a_w_sep = delta_a_w_sep * above_min_delta_a_w_sep_value + \
-        ~above_min_delta_a_w_sep_value * VBSBAT_options['q_alpha']['min_spread_in_aw']
+        ~above_min_delta_a_w_sep_value * min_spread_in_aw
 
     # calculate curve parameter of sigmoid
-    sigmoid_curve_parameter = ln_zeropass(1. / (1 - VBSBAT_options['q_alpha']['q_alpha_at_1phase_aw']) - 1) / delta_a_w_sep
+    sigmoid_curve_parameter = log_limited(1 / (1 -q_alpha_at_1phase_aw) - 1) / delta_a_w_sep
 
     # calculate q_alpha value
-    q_alpha_value = 1 - 1. / (1 + exp_wlimiter(sigmoid_curve_parameter * (aw_series - a_w_sep + delta_a_w_sep)))
+    q_alpha_value = 1 - 1. / (1 + exp_limited(sigmoid_curve_parameter * (aw_series - a_w_sep + delta_a_w_sep)))
 
     # apply mask for complete miscibility, turns miscible organics to q_alpha=1 for all a_w
     q_alpha_value = q_alpha_value * ~mask_of_miscible_points + mask_of_miscible_points
 
     return q_alpha_value
 
+q_alpha = phase_seperation_q_alpha()
 
-
-def finds_phase_sep_w_and_org(activity_water, activity_org):
-    """
-    This function checks for phase separation in each activity curve.
-
-    Parameters:
-    activity_water (np.array): A numpy array of water activity values.
-    activity_org (np.array): A numpy array of organic activity values.
-
-    Returns:
-    tuple: The phase separation check, lower a_w separation index, upper a_w separation index, matching upper a_w separation index.
-    """
-
-    # check for phase separation in each activity curve
-    _, phase_sep_via_activity_curvature_w, index_phase_sep_starts_w, index_phase_sep_end_w = \
-        finds_phase_sep_and_activity_curve_dips_v2(activity_water)
-    _, phase_sep_via_activity_curvature_org, index_phase_sep_starts_org, index_phase_sep_end_org = \
-        finds_phase_sep_and_activity_curve_dips_v2(activity_org)
-
-    indexes = [index_phase_sep_starts_w, index_phase_sep_end_w, index_phase_sep_starts_org, index_phase_sep_end_org]
-
-    if phase_sep_via_activity_curvature_w == 1:
-        phase_sep_check = 1
-        if activity_water[0] < activity_water[-1]:  # increasing a_w with index
-            lower_a_w_sep_index = min(indexes)
-            upper_a_w_sep_index = max(indexes)
-
-            mid_sep_index = (lower_a_w_sep_index + upper_a_w_sep_index) // 2
-            activity_water_beta = activity_water[:mid_sep_index]
-            match_a_w = activity_water[upper_a_w_sep_index]
-            match_index_prime = np.where((activity_water_beta - match_a_w) > 0)
-
-            if len(match_index_prime[0]) == 0:
-                match_index_prime = np.argmax(activity_water_beta - match_a_w)
-            matching_Upper_a_w_sep_index = match_index_prime[0][0] - 1
-
-        else:
-            lower_a_w_sep_index = max(indexes)  # decreasing a_w with index
-            upper_a_w_sep_index = min(indexes)
-
-            mid_sep_index = (lower_a_w_sep_index + upper_a_w_sep_index) // 2
-            activity_water_beta = activity_water[mid_sep_index:]
-            match_a_w = activity_water[upper_a_w_sep_index]
-            match_index_prime = np.where(activity_water_beta <= match_a_w)
-            matching_Upper_a_w_sep_index = mid_sep_index + match_index_prime[0][0] - 1
-
-    else:
-        lower_a_w_sep_index = 1  # no phase sep
-        upper_a_w_sep_index = 2
-        matching_Upper_a_w_sep_index = 2
-        phase_sep_check = 0  # no phase sep
-
-    return phase_sep_check, lower_a_w_sep_index, upper_a_w_sep_index, matching_Upper_a_w_sep_index
-
-
-def finds_phase_sep_and_activity_curve_dips_v2(activity_data):
-    """
-    This function finds phase separation and activity curve dips.
-
-    Parameters:
-    activity_data (np.array): A numpy array of activity data.
-
-    Returns:
-    tuple: The phase separation via activity, phase separation via activity curvature, index phase separation starts, index phase separation end.
-    """
-
-    activity_diff = np.diff(activity_data)
-    L_m = len(activity_data)
-
-    if L_m > 3:
-        min_value = np.min(activity_diff)
-        max_value = np.max(activity_diff)
-        mean_sign = np.sign(np.mean(activity_diff))
-
-        if np.sign(min_value) == np.sign(max_value):
-            phase_sep_via_activity_curvature = 0
-            index_phase_sep_starts = np.nan
-            index_phase_sep_end = np.nan
-
-        elif np.sign(min_value) != np.sign(max_value):
-            phase_sep_via_activity_curvature = 1
-
-            activity_calc1_diff_sign_change = np.sign(np.concatenate(([activity_diff[0]], activity_diff))) != np.sign(activity_diff[0])
-
-            index_start = np.where(activity_calc1_diff_sign_change)[0][0]
-            back_index = index_start - 1 + np.where(~activity_calc1_diff_sign_change[index_start:])[0][0]
-
-            if back_index < L_m:
-                activity_data_gap = np.argmin(np.abs(activity_data[back_index:] - activity_data[index_start]))
-                restart_match_index = activity_data_gap + back_index - 1
-            else:
-                restart_match_index = L_m
-
-            if sum(activity_data > 1):
-                min_value_Idilute = np.min(activity_data[index_start:])
-                min_index_Idilute = np.argmin(activity_data[index_start:]) + index_start - 1
-                activity_data_gap_start = np.argmin(np.abs(activity_data[:index_start] - activity_data[min_index_Idilute]))
-
-                if activity_data_gap_start < index_start:
-                    index_phase_sep_starts = activity_data_gap_start
-                else:
-                    index_phase_sep_starts = index_start
-
-                if min_index_Idilute < restart_match_index:
-                    index_phase_sep_end = min_index_Idilute
-                else:
-                    index_phase_sep_end = restart_match_index
-
-            else:
-                index_phase_sep_starts = index_start
-                index_phase_sep_end = restart_match_index
-
-    else:
-        phase_sep_via_activity = activity_data
-        phase_sep_via_activity_curvature = 0
-        index_phase_sep_starts = np.nan
-        index_phase_sep_end = np.nan
-
-    if sum(activity_data > 1):
-        phase_sep_via_activity = 1
-    else:
-        phase_sep_via_activity = 0
-
-    return phase_sep_via_activity, phase_sep_via_activity_curvature, index_phase_sep_starts, index_phase_sep_end
-
+#%%
 
 def check_bat_functional_group_inputs_v1(O2C, shift_method):
     """
@@ -694,73 +781,5 @@ def biphasic_to_single_phase_RH_master_v4(O2C, H2C, Mratio, BAT_functional_group
 
     return RH_cross_point
 
-
-def mapminmax_apply(x, settings):
-    return (x - settings['xoffset']) * settings['gain'] + settings['ymin']
-
-def tansig_apply(n):
-    return 2 / (1 + np.exp(-2*n)) - 1
-
-def mapminmax_reverse(y, settings):
-    return (y - settings['ymin']) / settings['gain'] + settings['xoffset']
-
-def biphasic_to_single_phase_molfrac_org_NN_v5(x1):
-    # Neural Network Constants
-
-    # Input 1
-    x1_step1 = {'xoffset': np.array([0, 0.03]), 
-                'gain': np.array([4.85105461413554, 6.06060606060606]), 
-                'ymin': -1}
-
-    # Layer 1
-    b1 = np.array([5.8514275487869635839, 5.7010903702309043695, -4.223155231828595646, 3.8774900021515046333, -1.325265064433274409, 1.7576973644493769644,
-    -0.88991761674608715893, 3.1279829884292338349, 0.78794652837451617522, 0.43896968097298133538, 0.57708117017809135163, -3.0787608017900915947,
-    -0.40581098864752368494, 0.64373309554603275195, 1.7016326841051676588, 1.4946559455903600799, -1.9151891347855638514, -0.36222536287456474913,
-    1.7997779117047685293, 2.1894391519933469326, -4.8365290076330538227, -4.2267640672562194482, 11.037306029484762249, -12.465284279233749487])
-    IW1_1 = np.array([
-        [-2.9652369062270196309, 3.5456936036245476629],
-        [-5.3003896191163066831, 1.6107048934053527223],
-        [1.4490960942847532777, -4.4905963483778252865],
-        [-5.3604492963083165691, -1.9038162660993562803],
-        [3.5615591287827941258, -0.9760690759109916792],
-        [-7.4323704665484466858, 3.9952918221278448385],
-        [5.2436980487815443297, 0.26336330948747371794],
-        [-9.7224092904321945952, -3.3963153832437282809],
-        [-6.5939564893121698219, -0.86743278765059372848],
-        [-3.9566478027540843421, 6.2043545317513464354],
-        [-2.6933489710522580118, -5.3296776285599456457],
-        [15.078615754750318345, 7.5357195857930081573],
-        [8.5837138409899615965, 2.1781365767882316931],
-        [4.2753681534309269097, -1.2376866082237749644],
-        [-4.3694881192877721432, -4.1504032312908245572],
-        [-5.1076333577305517153, -4.2573773952093914019],
-        [3.9331831538436010653, 4.2383815452477779928],
-        [-3.3051366335726815038, -2.1527745655619221488],
-        [5.5102707313508449971, 0.6090289580711970574],
-        [4.0590106228932549826, -1.4537733443192657479],
-        [1.1330332610381823599, 7.987215295423046868],
-        [-1.4690914445681406697, 3.46783846307828858],
-        [1.7834488065629925391, 8.9409991055225059853],
-        [-2.3985373019045113097, -10.018658523996098353]
-    ])
-
-    # Layer 2
-    b2 = -0.23364831139900205104
-    LW2_1 = np.array([0.61668049433913207924, -0.3593912575055407399, -0.3266392699738256411, -1.6045946666158248384, -1.1739361061623092564, 0.087334561642434180295,
-    2.9371817317733741604, -0.38368295323950185605, 2.3343874738168426397, 0.031130301801809163315, -0.055017015768111438012, -0.2379118380584248349,
-    0.51580586145584794711, -0.35767521938020213623, -7.6921394249634440499, 3.3355022461024885772, -4.3095896749403888037, 0.29571381132244778378,
-    0.30910107924737867391, -0.25489989065848722705, 0.080905914998754310807, -0.17070806216025710689, 4.7037417262526615147, 3.0438085224819206864])
-
-    # Output 1
-    y1_step1 = {'ymin': -1, 'gain': 2.02204023860075, 'xoffset': 0.0109}
-
-    # Simulation
-    Q = x1.shape[1] # samples
-    xp1 = mapminmax_apply(x1, x1_step1)
-    a1 = tansig_apply(b1.reshape(-1, 1) + np.dot(IW1_1, xp1))
-    a2 = b2 + np.dot(LW2_1, a1)
-    y1 = mapminmax_reverse(a2, y1_step1)
-
-    return y1
 
 # %%
