@@ -87,8 +87,9 @@ def organic_density_estimate(M, O2C, H2C=None, N2C=None):
 
     # 1) Estimate the H2C value if not provided from input
     if H2C < 0.1:
-        # Estimate H2C assuming an aliphatic compound with H2C = 2 in the absence of oxygen functional groups,
-        # then correct for oxygen content assuming a -1 slope (Van Krevelen Diagram of typical SOA).
+        # Estimate H2C assuming an aliphatic compound with H2C = 2 in the
+        # absence of oxygen functional groups, then correct for oxygen content
+        # assuming a -1 slope (Van Krevelen Diagram of typical SOA).
         H2Cest = 2.0 - O2C
     else:
         H2Cest = H2C
@@ -107,37 +108,6 @@ def organic_density_estimate(M, O2C, H2C=None, N2C=None):
 
     return density
 
-
-def single_phase_O2C_point_KGv3(Mr):
-    # Define this function
-    return Onephase_O2C
-
-def replace_data_A_to_B_KGv1(x2, A, B):
-    return np.where(x2 == A, B, x2)
-
-# %%
-
-org_mole_fraction = np.linspace(0, 1, 100)
-molarmass_ratio = 18.016/250
-O2C = 0.2
-H2C = 0
-N2C = 0
-
-
-O2C, molarmass_ratio = convert_to_OH_eqivelent(
-        O2C,
-        molarmass_ratio,
-        BAT_functional_group=None
-    )
-
-# check the limits of possible mole fractions
-org_mole_fraction = np.where(org_mole_fraction>1, 1, org_mole_fraction)
-org_mole_fraction = np.where(org_mole_fraction<=0, 10**-20, org_mole_fraction)
-
-density = organic_density_estimate(18.016/molarmass_ratio, O2C, H2C, N2C)
-
-
-#%%
 
 def bat_blending_weights(molarmass_ratio, O2C):
     """
@@ -193,35 +163,15 @@ def bat_blending_weights(molarmass_ratio, O2C):
     return blending_weights
 
 #%%
-
-O2C_array = np.linspace(0, 0.6, 100)
-weights_matrix = np.zeros((100, 3))
-
-for index, O2C in enumerate(O2C_array):
-    weights_matrix[index, :] = bat_blending_weights(molarmass_ratio, O2C)
-
-fig, ax = plt.subplots()
-ax.plot(
-    O2C_array,
-    weights_matrix,
-    )
-
-ax.set_xlabel("O:C")
-ax.set_ylabel("weights")
-# ax.legend()
-fig.show
-
-
-#%%
-FIT_lowO2C = {'a1':[7.089476E+00, -7.711860E+00, -3.885941E+01, -1.000000E+02],
-              'a2':[-6.226781E-01, -1.000000E+02, 3.081244E-09, 6.188812E+01],
-              's':[-5.988895E+00, 6.940689E+00]}
-FIT_midO2C = {'a1':[5.872214E+00, -4.535007E+00, -5.129327E+00, -2.809232E+01],
-              'a2':[-9.740486E-01, -1.000000E+02, 2.109751E+00, -2.367683E+01,],
-              's':[-1.219164E+00, 4.742729E+00]}
-FIT_highO2C = {'a1':[5.921550E+00, -2.528295E+00, -3.883017E+00, -7.898128E+00,],
-               'a2':[-1.000000E+02, -1.000000E+02, 1.353916E+00, -1.160145E+01,],
-               's':[-7.868187E-02, 3.650860E+00]}
+FIT_LOW = {'a1': [7.089476E+00, -7.711860E+00, -3.885941E+01, -1.000000E+02],
+           'a2': [-6.226781E-01, -1.000000E+02, 3.081244E-09, 6.188812E+01],
+           's': [-5.988895E+00, 6.940689E+00]}
+FIT_MID = {'a1': [5.872214E+00, -4.535007E+00, -5.129327E+00, -2.809232E+01],
+           'a2': [-9.740486E-01, -1.000000E+02, 2.109751E+00, -2.367683E+01],
+           's': [-1.219164E+00, 4.742729E+00]}
+FIT_HIGH = {'a1': [5.921550E+00, -2.528295E+00, -3.883017E+00, -7.898128E+00],
+            'a2': [-1.000000E+02, -1.000000E+02, 1.353916E+00, -1.160145E+01],
+            's': [-7.868187E-02, 3.650860E+00]}
 
 
 def coefficents_c(
@@ -237,7 +187,7 @@ def coefficents_c(
         fit_values (list): a_n1, a_n2, a_n3, a_n4
     """
     c = (fit_values[0] * np.exp(fit_values[1] * O2C)
-        + fit_values[2] * np.exp(fit_values[3] * molarmass_ratio))
+         + fit_values[2] * np.exp(fit_values[3] * molarmass_ratio))
     return c
 
 
@@ -277,7 +227,7 @@ def gibbs_of_mixing(
         O2C,
         density,
         fit_dict
-    ):
+):
     """
     Gibbs free energy of mixing, see Gorkowski (2019). equation S4.
 
@@ -326,7 +276,7 @@ def gibbs_mix_weight(
         O2C,
         density,
         BAT_functional_group=None,
-    ):
+):
     """
     Gibbs free energy of mixing, see Gorkowski (2019), with weighted
     O2C regions
@@ -353,34 +303,33 @@ def gibbs_mix_weight(
 
     weights = bat_blending_weights(molarmass_ratio, O2C)
 
-    if weights[1]>0:  # if mid region is used
+    if weights[1] > 0:  # if mid region is used
         gibbs_mix_mid, dervative_gibbs_mid = gibbs_of_mixing(
             molarmass_ratio,
             org_mole_fraction,
             O2C,
             density,
-            FIT_midO2C
+            FIT_MID
         )
 
-        if weights[0]>0: # if paired with low O2C region
+        if weights[0] > 0:  # if paired with low O2C region
             gibbs_mix_low, dervative_gibbs_low = gibbs_of_mixing(
                 molarmass_ratio,
                 org_mole_fraction,
                 O2C,
                 density,
-                FIT_lowO2C
+                FIT_LOW
             )
             gibbs_mix = weights[0]*gibbs_mix_low + weights[1]*gibbs_mix_mid
             dervative_gibbs = weights[0]*dervative_gibbs_low \
-            + weights[1]*dervative_gibbs_mid
-        
-        else:  #else paired with high O2C region
+                + weights[1]*dervative_gibbs_mid
+        else:  # else paired with high O2C region
             gibbs_mix_high, dervative_gibbs_high = gibbs_of_mixing(
                 molarmass_ratio,
                 org_mole_fraction,
                 O2C,
                 density,
-                FIT_highO2C
+                FIT_HIGH
             )
             gibbs_mix = weights[2]*gibbs_mix_high + weights[1]*gibbs_mix_mid
             dervative_gibbs = weights[2]*dervative_gibbs_high \
@@ -391,15 +340,10 @@ def gibbs_mix_weight(
             org_mole_fraction,
             O2C,
             density,
-            FIT_highO2C
+            FIT_HIGH
         )
     return gibbs_mix, dervative_gibbs
 
-
-# %%
-O2C=0.225
-molarmass_ratio = 18.016/100
-density = organic_density_estimate(18.016/molarmass_ratio, O2C)
 
 def activity_coefficents(
         molarmass_ratio,
@@ -407,7 +351,7 @@ def activity_coefficents(
         O2C,
         density,
         BAT_functional_group=None,
-    ):
+):
     """
     Activity coefficents for water and organic matter, see Gorkowski (2019)
 
@@ -452,13 +396,13 @@ def activity_coefficents(
         )
     mass_organic = 1 - mass_water
 
-
     return activity_water, activity_organic, mass_water, mass_organic
+
 
 def gibbs_free_engery(
     org_mole_fraction,
-    gibbs_mix,    
-    ):
+    gibbs_mix,
+):
     """
     Calculate the gibbs free energy of the mixture. Ideal and non-ideal.
 
@@ -537,15 +481,14 @@ def find_phase_sep_index(activity_data):
 
             # Check if any activity data is greater than 1
             if sum(activity_data > 1):
-                # Find minimum activity data and its corresponding index
-                min_value_idilute = np.min(activity_data[index_start:])
+                # Find minimum activity corresponding index
                 min_index_idilute = np.argmin(
                     activity_data[index_start:]) + index_start - 1
 
                 # Find where activity data matches the minimum value
                 activity_data_gap_start = np.argmin(
                     np.abs(
-                    activity_data[:index_start] \
+                        activity_data[:index_start]
                         - activity_data[min_index_idilute]
                     ))
 
@@ -559,11 +502,9 @@ def find_phase_sep_index(activity_data):
                     index_phase_sep_end = min_index_idilute
                 else:
                     index_phase_sep_end = restart_match_index
-
             else:
                 index_phase_sep_starts = index_start
                 index_phase_sep_end = restart_match_index
-
     else:
         phase_sep_activity = activity_data
         phase_sep_curve = 0
@@ -576,13 +517,12 @@ def find_phase_sep_index(activity_data):
     else:
         phase_sep_activity = 0
 
-    return phase_sep_activity, phase_sep_curve, \
-        index_phase_sep_starts, index_phase_sep_end
+    return {'phase_sep_activity': phase_sep_activity,
+            'phase_sep_curve': phase_sep_curve,
+            'index_phase_sep_starts': index_phase_sep_starts,
+            'index_phase_sep_end': index_phase_sep_end}
 
 
-# out = finds_phase_sep_and_activity_curve_dips(activity_organic)
-
-#%%
 def find_phase_separation(activity_water, activity_org):
     """
     This function checks for phase separation in each activity curve.
@@ -597,14 +537,17 @@ def find_phase_separation(activity_water, activity_org):
     """
 
     # check for phase separation in each activity curve
-    _, phase_sep_curve_w, index_phase_sep_starts_w, index_phase_sep_end_w = find_phase_sep_index(activity_water)
-    _, phase_sep_curve_org, index_phase_sep_starts_org, index_phase_sep_end_org = find_phase_sep_index(activity_org)
+    water_sep = find_phase_sep_index(activity_water)
+    organic_sep = find_phase_sep_index(activity_org)
 
     # gather all the indexes into a list for easier access
-    indexes = [index_phase_sep_starts_w, index_phase_sep_end_w, index_phase_sep_starts_org, index_phase_sep_end_org]
+    indexes = [water_sep['index_phase_sep_starts'],
+               water_sep['index_phase_sep_end'],
+               organic_sep['index_phase_sep_starts'],
+               organic_sep['index_phase_sep_end']]
 
     # If there is a phase separation curve in the water activity data
-    if phase_sep_curve_w == 1:
+    if water_sep['phase_sep_curve'] == 1:
         phase_sep_check = 1
 
         # Check for the direction of the curve (increasing or decreasing)
@@ -621,34 +564,21 @@ def find_phase_separation(activity_water, activity_org):
             # find the index where the difference is greater than 0
             match_index_prime = np.where((activity_water_beta - match_a_w) > 0)
 
-            # if no such index found, assign the index where the max difference is located
+            # if no such index found, assign the index where the max
+            # difference is located
             if len(match_index_prime[0]) == 0:
                 match_index_prime = np.argmax(activity_water_beta - match_a_w)
 
-            matching_upper_a_w_sep_index = match_index_prime[0][0] - 1
-
-        else:  # decreasing a_w with index
-            lower_a_w_sep_index = max(indexes)
-            upper_a_w_sep_index = min(indexes)
-
-            mid_sep_index = (lower_a_w_sep_index + upper_a_w_sep_index) // 2
-            activity_water_beta = activity_water[mid_sep_index:]
-            match_a_w = activity_water[upper_a_w_sep_index]
-            match_index_prime = np.where(activity_water_beta <= match_a_w)
-
-            matching_upper_a_w_sep_index = mid_sep_index + match_index_prime[0][0] - 1
-
-    else:  # no phase separation
-        lower_a_w_sep_index = 1
         upper_a_w_sep_index = 2
         matching_upper_a_w_sep_index = 2
         phase_sep_check = 0  # no phase sep
 
-    return phase_sep_check, lower_a_w_sep_index, upper_a_w_sep_index, matching_upper_a_w_sep_index
+    return {'phase_sep_check': phase_sep_check,
+            'lower_a_w_sep_index': lower_a_w_sep_index,
+            'upper_a_w_sep_index': upper_a_w_sep_index,
+            'matching_upper_a_w_sep_index': matching_upper_a_w_sep_index}
 
-phase_sep_check, lower_a_w_sep_index, upper_a_w_sep_index, matching_upper_a_w_sep_index = find_phase_separation(activity_water, activity_organic)
 #%%
-
 
 def phase_seperation_q_alpha(
         a_w_sep,
