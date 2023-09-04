@@ -1,7 +1,3 @@
-# linting disabled until reformatting of this file
-# pylint: disable=all
-# flake8: noqa
-# pytype: skip-file
 
 # %% 
 
@@ -50,36 +46,10 @@ def organic_water_single_phase(molar_mass_ratio):
 # %% Plot Example curve
 
 
-organic_molecular_weight = np.linspace(50, 500, 500)
-
-o2c_value = organic_water_single_phase(18.01528 / organic_molecular_weight)
-
-fig, ax = plt.subplots()
-ax.plot(
-    organic_molecular_weight,
-    o2c_value,
-    label="initial",
-    linestyle='dashed'
-    )
-ax.set_xlabel("Organic molecular weight (g/mol)")
-ax.set_ylabel("O:C ratio")
-ax.set_title("Organic Phase separation")
-ax.legend()
-fig.show
-
-# %% activity calc
-
-# function [ln_func1, ln_func2, ycalc1, ycalc2, activity_calc1, activity_calc2, mass_fraction1, mass_fraction2, Gibbs_RT, dGibbs_RTdx2]=BAT_properties_calculation_v1(...
-#     org_mole_fraction, O2C, H2C, molarmass_ratio, BAT_functional_group, special_options, N2C_values_denistyOnly)
-import numpy as np
-
-def exp_wlimiter(x):
-    # Define the limiting function for the exponent here
-    return np.exp(x)
-
 def convert_to_OH_eqivelent(O2C, molarmass_ratio, BAT_functional_group):
     # Define this function
     return O2C, molarmass_ratio
+
 
 def organic_density_estimate(M, O2C, H2C=None, N2C=None):
     """
@@ -253,11 +223,11 @@ FIT_highO2C = {'a1':[5.921550E+00, -2.528295E+00, -3.883017E+00, -7.898128E+00,]
                'a2':[-1.000000E+02, -1.000000E+02, 1.353916E+00, -1.160145E+01,],
                's':[-7.868187E-02, 3.650860E+00]}
 
+
 def coefficents_c(
         molarmass_ratio,
         fit_values
-    ):
-
+        ):
     """
     Coefficents for activity model, see Gorkowski (2019). equation S1 S2.
 
@@ -285,6 +255,7 @@ def exp_limited(value):
     """
     return np.exp(np.where(value > 690, 690, value))
 
+
 def log_limited(value):
     """
     np.log with limits for machine precision min input value of 1e-300.
@@ -298,6 +269,8 @@ def log_limited(value):
     return np.log(np.where(value < 1e-300, 1e-300, value))
 
 #%%
+
+
 def gibbs_of_mixing(
         molarmass_ratio,
         org_mole_fraction,
@@ -343,13 +316,6 @@ def gibbs_of_mixing(
 
     return gibbs_mix, dervative_gibbs_mix
 
-gibbs_mix, dervative_gibbs = gibbs_of_mixing(
-    molarmass_ratio,
-    org_mole_fraction,
-    O2C,
-    density,
-    FIT_lowO2C
-)
 
 
 # %%
@@ -435,67 +401,83 @@ O2C=0.225
 molarmass_ratio = 18.016/100
 density = organic_density_estimate(18.016/molarmass_ratio, O2C)
 
-gibbs_mix, dervative_gibbs= gibbs_mix_weight(
+def activity_coefficents(
         molarmass_ratio,
         org_mole_fraction,
         O2C,
         density,
+        BAT_functional_group=None,
+    ):
+    """
+    Activity coefficents for water and organic matter, see Gorkowski (2019)
+
+    Paramters:
+    ---------
+        molar mass ratio (float): water MW / orgniac MW
+        org mole fraction (float): fraction of organic matter
+        O2C (float): oxygen to carbon ratio
+        density (float): density of mixture
+        fit_coefficent (dict): dictionary of fit values for low O2C region
+
+    Returns:
+    -------
+        activity_water (float): activity coefficent of water
+        activity_organic (float): activity coefficent of organic matter
+    """
+    O2C, molarmass_ratio = convert_to_OH_eqivelent(
+        O2C,
+        molarmass_ratio,
+        BAT_functional_group=None
     )
+    gibbs_mix, dervative_gibbs = gibbs_mix_weight(
+            molarmass_ratio,
+            org_mole_fraction,
+            O2C,
+            density,
+        )
+    # equations S8 S10
+    # the func value for component 1 = LOG(activity coeff. water)
+    ln_gamma_water = gibbs_mix - org_mole_fraction * dervative_gibbs
+    # the func value of the component 2 = LOG(activity coeff. of the organic)
+    ln_gamma_org = gibbs_mix + (1.0 - org_mole_fraction) * dervative_gibbs
 
-# equations S8 S10
-# the func value for component 1 = LOG(activity coeff. water)
-ln_gamma_water = gibbs_mix - org_mole_fraction * dervative_gibbs
-# the func value of the component 2 = LOG(activity coeff. of the organic)
-ln_gamma_org = gibbs_mix + (1.0 - org_mole_fraction) * dervative_gibbs
+    gamma_water = exp_limited(ln_gamma_water)
+    gamma_org = exp_limited(ln_gamma_org)
 
-gamma_water = exp_limited(ln_gamma_water)
-gamma_org = exp_limited(ln_gamma_org)
+    activity_water = gamma_water * (1.0 - org_mole_fraction)
+    activity_organic = gamma_org * org_mole_fraction
 
-activity_water = gamma_water * (1.0 - org_mole_fraction)
-activity_organic = gamma_org * org_mole_fraction
+    mass_water = (1.0 - org_mole_fraction) * molarmass_ratio / (
+            (1.0 - org_mole_fraction) * (molarmass_ratio - 1) + 1
+        )
+    mass_organic = 1 - mass_water
 
-mass_water = (1.0 - org_mole_fraction) * molarmass_ratio / (
-        (1.0 - org_mole_fraction) * (molarmass_ratio - 1) + 1
-    )
-mass_organic = 1 - mass_water
 
-gibbs_ideal = (1-org_mole_fraction) * log_limited(1-org_mole_fraction) \
-    +org_mole_fraction * log_limited(org_mole_fraction)
-gibbs_real = gibbs_ideal + gibbs_mix
+    return activity_water, activity_organic, mass_water, mass_organic
+
+def gibbs_free_engery(
+    org_mole_fraction,
+    gibbs_mix,    
+    ):
+    """
+    Calculate the gibbs free energy of the mixture. Ideal and non-ideal.
+
+    Parameters:
+    org_mole_fraction (np.array): A numpy array of organic mole fractions.
+    gibbs_mix (np.array): A numpy array of gibbs free energy of mixing.
+
+    Returns:
+    gibbs_ideal (np.array): The ideal gibbs free energy of mixing.
+    gibbs_real (np.array): The real gibbs free energy of mixing.
+    """
+
+    gibbs_ideal = (1-org_mole_fraction) * log_limited(1-org_mole_fraction) \
+        + org_mole_fraction * log_limited(org_mole_fraction)
+    gibbs_real = gibbs_ideal + gibbs_mix
+    return gibbs_ideal, gibbs_real
 
 # %%
-fig, ax = plt.subplots()
-# ax.plot(
-#     1-org_mole_fraction,
-#     gibbs_real,
-#     label="gibbs",
-#     linestyle='dashed'
-#     )
-ax.plot(
-    1-org_mole_fraction,
-    activity_water,
-    label="water",
-    linestyle='dashed'
-    )
 
-ax.plot(
-    1-org_mole_fraction,
-    activity_organic,
-    label="organic",
-    )
-ax.set_ylim((0,1))
-ax.set_xlabel("water mole fraction")
-ax.set_ylabel("activity")
-ax.legend()
-fig.show
-
-
-
-
-
-
-
-# %%
 
 def find_phase_sep_index(activity_data):
     """
