@@ -1,13 +1,13 @@
 
 # %% 
-
+# consider changing o2c to oxygen2carbon
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 plt.rcParams.update({'text.color': "#333333",
                      'axes.labelcolor': "#333333",
-                     "figure.figsize": (6,4),
+                     "figure.figsize": (6, 4),
                      "font.size": 14,
                      "axes.edgecolor": "#333333",
                      "axes.labelcolor": "#333333",
@@ -162,7 +162,9 @@ def bat_blending_weights(molarmass_ratio, O2C):
 
     return blending_weights
 
-#%%
+# %%
+
+
 FIT_LOW = {'a1': [7.089476E+00, -7.711860E+00, -3.885941E+01, -1.000000E+02],
            'a2': [-6.226781E-01, -1.000000E+02, 3.081244E-09, 6.188812E+01],
            's': [-5.988895E+00, 6.940689E+00]}
@@ -176,6 +178,7 @@ FIT_HIGH = {'a1': [5.921550E+00, -2.528295E+00, -3.883017E+00, -7.898128E+00],
 
 def coefficents_c(
         molarmass_ratio,
+        O2C,
         fit_values
         ):
     """
@@ -218,8 +221,6 @@ def log_limited(value):
     """
     return np.log(np.where(value < 1e-300, 1e-300, value))
 
-#%%
-
 
 def gibbs_of_mixing(
         molarmass_ratio,
@@ -239,15 +240,15 @@ def gibbs_of_mixing(
         density (float): density of mixture
         fit_coefficent (dict): dictionary of fit values for low O2C region
     """
-    c1 = coefficents_c(molarmass_ratio, fit_dict['a1'])
-    c2 = coefficents_c(molarmass_ratio, fit_dict['a2'])
+    c1 = coefficents_c(molarmass_ratio, O2C, fit_dict['a1'])
+    c2 = coefficents_c(molarmass_ratio, O2C, fit_dict['a2'])
 
     rhor = 0.997 / density  # assumes water is the other fluid
 
     # equation S3
     scaledMr = molarmass_ratio * fit_dict['s'][1] \
         * (1.0 + O2C) ** fit_dict['s'][0]  
-    #the scaled molar mass ratio of this mixture's components.
+    # the scaled molar mass ratio of this mixture's components.
     phi2 = org_mole_fraction / (
         org_mole_fraction + (1.0 - org_mole_fraction) * scaledMr / rhor
         )  # phi2 is a scaled volume fraction
@@ -267,8 +268,8 @@ def gibbs_of_mixing(
     return gibbs_mix, dervative_gibbs_mix
 
 
-
 # %%
+
 
 def gibbs_mix_weight(
         molarmass_ratio,
@@ -473,7 +474,7 @@ def find_phase_sep_index(activity_data):
             if back_index < data_length:
                 activity_data_gap = np.argmin(
                     np.abs(
-                    activity_data[back_index:] - activity_data[index_start]
+                        activity_data[back_index:] - activity_data[index_start]
                     ))
                 restart_match_index = activity_data_gap + back_index - 1
             else:
@@ -578,13 +579,12 @@ def find_phase_separation(activity_water, activity_org):
             'upper_a_w_sep_index': upper_a_w_sep_index,
             'matching_upper_a_w_sep_index': matching_upper_a_w_sep_index}
 
-#%%
 
 def phase_seperation_q_alpha(
         a_w_sep,
         aw_series,
         VBSBAT_options=None
-    ):
+):
     """
     This function makes a squeezed logistic function to transfer for 
     q_alpha ~0 to q_alpha ~1, 
@@ -597,36 +597,35 @@ def phase_seperation_q_alpha(
     Returns:
     np.array: The q_alpha value.
     """
-    min_spread_in_aw = 10**-6
-    q_alpha_at_1phase_aw = 0.99
-    q_alpha_bounds=[10**6, 1]
-    q_alpha_bounds_mean=[10**6, 1]
+    MIN_SPREAD_IN_AW = 10**-6
+    Q_ALPHA_AT_1PHASE_AW = 0.99
 
-    mask_of_miscible_points = a_w_sep == 0  # values held for correction at the end
+    if a_w_sep == 0:
+        q_alpha_value = np.ones_like(aw_series)
+    else:
+        # spread in transfer from 50/50 point
+        delta_a_w_sep = 1 - a_w_sep
 
-    # spread in transfer from 50/50 point
-    delta_a_w_sep = 1 - a_w_sep
+        # check min value allowed
+        above_min_delta_a_w_sep_value = delta_a_w_sep > MIN_SPREAD_IN_AW
+        delta_a_w_sep = delta_a_w_sep * above_min_delta_a_w_sep_value + \
+            ~above_min_delta_a_w_sep_value * MIN_SPREAD_IN_AW
 
-    # check min value allowed
-    above_min_delta_a_w_sep_value = delta_a_w_sep > min_spread_in_aw
-    delta_a_w_sep = delta_a_w_sep * above_min_delta_a_w_sep_value + \
-        ~above_min_delta_a_w_sep_value * min_spread_in_aw
+        # calculate curve parameter of sigmoid
+        sigmoid_curve_parameter = log_limited(
+            1 / (1 - Q_ALPHA_AT_1PHASE_AW) - 1) / delta_a_w_sep
 
-    # calculate curve parameter of sigmoid
-    sigmoid_curve_parameter = log_limited(1 / (1 -q_alpha_at_1phase_aw) - 1) / delta_a_w_sep
-
-    # calculate q_alpha value
-    q_alpha_value = 1 - 1. / (1 + exp_limited(sigmoid_curve_parameter * (aw_series - a_w_sep + delta_a_w_sep)))
-
-    # apply mask for complete miscibility, turns miscible organics to q_alpha=1 for all a_w
-    q_alpha_value = q_alpha_value * ~mask_of_miscible_points + mask_of_miscible_points
-
+        # calculate q_alpha value
+        q_alpha_value = 1 - 1 / (
+            1 + exp_limited(
+                sigmoid_curve_parameter
+                * (aw_series - a_w_sep + delta_a_w_sep)
+                )
+            )
     return q_alpha_value
 
-q_alpha = phase_seperation_q_alpha()
 
-#%%
-
+# not sure about these functions if they are needed.
 def check_bat_functional_group_inputs_v1(O2C, shift_method):
     """
     This function checks the inputs of the BAT functional group.

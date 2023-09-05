@@ -99,3 +99,19 @@ fig.show
 
 
 phase_sep_aw = find_phase_separation(activity_water, activity_organic)
+
+
+
+aw = np.linspace(0, 1, 100)
+q_alpha = phase_seperation_q_alpha(
+    a_w_sep=0.999,
+    aw_series=aw,
+)
+
+
+plt.plot(aw, q_alpha)
+plt.xlabel('water activity')
+plt.ylabel('q_alpha')
+plt.show()
+
+
