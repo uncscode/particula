@@ -25,6 +25,44 @@ plt.rcParams.update({'text.color': "#333333",
 # %%
 
 
+def to_molarmass_ratio(molar_mass, other_molar_mass=18.01528):
+    """
+    Convert the given molar mass to a molar mass ratio with respect to water.
+    (MW water / MW organic)
+
+    Parameters:
+    molar_mass (np.array): The molar mass of the organic compound.
+    other_molar_mass (float, optional): The molar mass of the other compound.
+        Defaults to 18.01528.
+
+    Returns:
+    np.array: The molar mass ratio with respect to water.
+    """
+    if isinstance(molar_mass, list):
+        return [other_molar_mass / mm for mm in molar_mass]
+    else:
+        return other_molar_mass / molar_mass
+
+
+def from_molarmass_ratio(molar_mass_ratio, other_molar_mass=18.01528):
+    """
+    Convert the given molar mass ratio (MW water / MW organic) to a
+    molar mass with respect to the other compound.
+
+    Parameters:
+    molar_mass_ratio (np.array): The molar mass ratio with respect to water.
+    other_molar_mass (float, optional): The molar mass of the other compound.
+        Defaults to 18.01528.
+
+    Returns:
+    np.array: The molar mass of the organic compound.
+    """
+    if isinstance(molar_mass_ratio, list):
+        return [other_molar_mass * mm for mm in molar_mass_ratio]
+    else:
+        return other_molar_mass * molar_mass_ratio
+
+
 def organic_water_single_phase(molar_mass_ratio):
     """
     Convert the given molar mass ratio (MW water / MW organic) to a
@@ -51,7 +89,13 @@ def convert_to_OH_eqivelent(O2C, molarmass_ratio, BAT_functional_group):
     return O2C, molarmass_ratio
 
 
-def organic_density_estimate(M, O2C, H2C=None, N2C=None):
+def organic_density_estimate(
+        M,
+        O2C,
+        H2C=None,
+        N2C=None,
+        mass_ratio_convert=False
+):
     """
     Function to estimate the density of organic compounds based on the simple
     model by Girolami (1994). The input parameters include molar mass, O:C
@@ -79,6 +123,8 @@ def organic_density_estimate(M, O2C, H2C=None, N2C=None):
         N2C = M * 0
     if H2C is None:
         H2C = M * 0
+    if mass_ratio_convert:
+        M = from_molarmass_ratio(M)
 
     mass_C = 12.01  # the molar masses in [g/mol]
     mass_O = 16.0
@@ -368,6 +414,8 @@ def activity_coefficents(
     -------
         activity_water (float): activity coefficent of water
         activity_organic (float): activity coefficent of organic matter
+        mass_water (float): mass fraction of water
+        mass_organic (float): mass fraction of organic matter
     """
     O2C, molarmass_ratio = convert_to_OH_eqivelent(
         O2C,
@@ -533,8 +581,10 @@ def find_phase_separation(activity_water, activity_org):
     activity_org (np.array): A numpy array of organic activity values.
 
     Returns:
-    tuple: The phase separation check, lower a_w separation index,
-    upper a_w separation index, matching upper a_w separation index.
+    dic: 'phase_sep_check': phase_sep_check,
+            'lower_a_w_sep_index': lower_a_w_sep_index,
+            'upper_a_w_sep_index': upper_a_w_sep_index,
+            'matching_upper_a_w_sep_index': matching_upper_a_w_sep_index
     """
 
     # check for phase separation in each activity curve
@@ -626,32 +676,37 @@ def phase_seperation_q_alpha(
 
 
 # not sure about these functions if they are needed.
-def check_bat_functional_group_inputs_v1(O2C, shift_method):
-    """
-    This function checks the inputs of the BAT functional group.
+# def check_bat_functional_group_inputs_v1(O2C, shift_method):
+#     """
+#     This function checks the inputs of the BAT functional group.
 
-    Parameters:
-    O2C (np.array): A numpy array representing O2C values.
-    shift_method (str/list): A string or list representing the shift method.
+#     Parameters:
+#     O2C (np.array): A numpy array representing O2C values.
+#     shift_method (str/list): A string or list representing the shift method.
 
-    Returns:
-    list: The shift method with size equal to O2C.
-    """
+#     Returns:
+#     list: The shift method with size equal to O2C.
+#     """
 
-    max_dim = max(len(O2C), len(shift_method))
+#     max_dim = max(len(O2C), len(shift_method))
     
-    if isinstance(shift_method, str):
-        shift_method = [shift_method for _ in range(max_dim)]
-    elif isinstance(shift_method, list):
-        if len(shift_method) == 1:
-            shift_method = [shift_method[0] for _ in range(max_dim)]
-        elif len(shift_method) < max_dim:
-            raise ValueError(f"shift_method has less points than O2C: {len(shift_method)} vs {max_dim}")
+#     if isinstance(shift_method, str):
+#         shift_method = [shift_method for _ in range(max_dim)]
+#     elif isinstance(shift_method, list):
+#         if len(shift_method) == 1:
+#             shift_method = [shift_method[0] for _ in range(max_dim)]
+#         elif len(shift_method) < max_dim:
+#             raise ValueError(f"shift_method has less points than O2C: {len(shift_method)} vs {max_dim}")
             
-    return shift_method
+#     return shift_method
 
 
-def biphasic_to_single_phase_RH_master_v4(O2C, H2C, Mratio, BAT_functional_group):
+def biphasic_to_single_phase_RH_point(
+    O2C,
+    H2C,
+    Mratio,
+    BAT_functional_group=None
+):
     """
     This function computes the biphasic to single phase RH.
 
@@ -670,27 +725,51 @@ def biphasic_to_single_phase_RH_master_v4(O2C, H2C, Mratio, BAT_functional_group
     interpolate_step_numb = 500  # interpolation points
     mole_frac = np.linspace(0, 1, interpolate_step_numb + 1)
 
-    for i in range(len(O2C)):  # loops through one compound at a time
-        func1, func2, ycal_water, ycalc_org, activity_water, activity_org, mass_fraction1, mass_fraction2, Gibbs_RT, dGibbs_RTdx2 \
-            = bat_properties_calculation_v1(mole_frac, O2C[i], H2C[i], Mratio[i], BAT_functional_group[i], [])
+    for i in range(len(O2C)):
+        density = organic_density_estimate(
+            Mratio[i],
+            O2C[i],
+            H2C[i],
+            mass_ratio_convert=True)
+            
+        activities = activity_coefficents(
+            molarmass_ratio=Mratio[i],
+            org_mole_fraction=mole_frac,
+            O2C=O2C[i],
+            density=density,
+            BAT_functional_group=BAT_functional_group
+        )
 
-        if np.isnan(activity_water):
+        if np.isnan(activities[0]).any():
             raise ValueError('water activity is NaN, check inputs')
 
-        phase_sep_check, _, upper_a_w_sep_index, _ = finds_phase_sep_w_and_org(activity_water, activity_org)  # finds a_w sep. point
+        phase_check = find_phase_separation(activities[0], activities[1])
 
-        if phase_sep_check == 1:  # checks if there is phase separation.
-            RH_cross_point[i] = activity_water[upper_a_w_sep_index]  # save phase sep RH
+        if phase_check['phase_sep_check'] == 1:
+            RH_cross_point[i] = phase_check['upper_a_w_sep_index']
         else:
             RH_cross_point[i] = 0  # no phase separation
 
     # Checks outputs with in physical limits 
-    #round to zero
+    # round to zero
     RH_cross_point[RH_cross_point < 0] = 0
     # round max to 1
     RH_cross_point[RH_cross_point > 1] = 1
 
     return RH_cross_point
+
+
+# %%
+o2c = [0.1, 0.2, 0.3, 0.4, 0.5]
+mweight = [100, 200, 300, 400, 500]
+mratio = to_molarmass_ratio(mweight)
+H2C = [2, 2, 2, 2, 2]
+RH_cross_point = biphasic_to_single_phase_RH_point(
+    o2c,
+    H2C,
+    mratio,
+    BAT_functional_group=None
+)
 
 
 # %%
