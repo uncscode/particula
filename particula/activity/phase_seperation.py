@@ -1,20 +1,7 @@
 
-# %% 
+# %%
 # consider changing o2c to oxygen2carbon
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-plt.rcParams.update({'text.color': "#333333",
-                     'axes.labelcolor': "#333333",
-                     "figure.figsize": (6, 4),
-                     "font.size": 14,
-                     "axes.edgecolor": "#333333",
-                     "axes.labelcolor": "#333333",
-                     "xtick.color": "#333333",
-                     "ytick.color": "#333333",
-                     "pdf.fonttype": 42,
-                     "ps.fonttype": 42})
+# define convert_to_OH_eqivelent
 
 # Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
 # Relative-humidity-dependent organic aerosol thermodynamics
@@ -22,7 +9,7 @@ plt.rcParams.update({'text.color': "#333333",
 # Atmospheric Chemistry and Physics
 # https://doi.org/10.5194/acp-19-13383-2019
 
-# %%
+import numpy as np
 
 
 def to_molarmass_ratio(molar_mass, other_molar_mass=18.01528):
@@ -81,10 +68,8 @@ def organic_water_single_phase(molar_mass_ratio):
         )**0.843 + 0.225
     return o2c_single_phase_cross_point
 
-# %% Plot Example curve
 
-
-def convert_to_OH_eqivelent(O2C, molarmass_ratio, BAT_functional_group):
+def convert_to_OH_eqivelent(O2C, molarmass_ratio, BAT_functional_group=None):
     # Define this function
     return O2C, molarmass_ratio
 
@@ -293,7 +278,7 @@ def gibbs_of_mixing(
 
     # equation S3
     scaledMr = molarmass_ratio * fit_dict['s'][1] \
-        * (1.0 + O2C) ** fit_dict['s'][0]  
+        * (1.0 + O2C) ** fit_dict['s'][0]
     # the scaled molar mass ratio of this mixture's components.
     phi2 = org_mole_fraction / (
         org_mole_fraction + (1.0 - org_mole_fraction) * scaledMr / rhor
@@ -339,7 +324,7 @@ def gibbs_mix_weight(
     Returns:
     -------
         gibbs_mix (float): Gibbs energy of mixing (including 1/RT)
-        dervative_gibbs (float): dervative of Gibbs energy with respect to 
+        dervative_gibbs (float): dervative of Gibbs energy with respect to
         mole fraction of orgnaics (includes 1/RT)
     """
     O2C, molarmass_ratio = convert_to_OH_eqivelent(
@@ -476,7 +461,7 @@ def find_phase_sep_index(activity_data):
     """
     This function finds phase separation using activity>1 and
     inflections in the activity curve data.
-    In physical systems activity can not be above one and 
+    In physical systems activity can not be above one and
     curve should be monotonic. Or else there will be phase separation.
 
     Parameters:
@@ -620,14 +605,37 @@ def find_phase_separation(activity_water, activity_org):
             if len(match_index_prime[0]) == 0:
                 match_index_prime = np.argmax(activity_water_beta - match_a_w)
 
+        else:  # decreasing a_w with index
+            # find the min and max indexes
+            lower_a_w_sep_index = max(indexes)
+            upper_a_w_sep_index = min(indexes)
+
+            # calculate the mid index
+            mid_sep_index = (lower_a_w_sep_index + upper_a_w_sep_index) // 2
+            # slice the data upto mid index
+            activity_water_beta = activity_water[mid_sep_index:]
+            match_a_w = activity_water[upper_a_w_sep_index]
+            # find the index where the difference is greater than 0
+            match_index_prime = np.where((activity_water_beta - match_a_w) > 0)
+
+            # if no such index found, assign the index where the max
+            # difference is located
+            if len(match_index_prime[0]) == 0:
+                match_index_prime = np.argmax(activity_water_beta - match_a_w)
+
+    else:
         upper_a_w_sep_index = 2
-        matching_upper_a_w_sep_index = 2
+        lower_a_w_sep_index = 2
+        match_index_prime = 2
         phase_sep_check = 0  # no phase sep
 
     return {'phase_sep_check': phase_sep_check,
             'lower_a_w_sep_index': lower_a_w_sep_index,
             'upper_a_w_sep_index': upper_a_w_sep_index,
-            'matching_upper_a_w_sep_index': matching_upper_a_w_sep_index}
+            'matching_upper_a_w_sep_index': match_index_prime,
+            'lower_a_w_sep': activity_water[lower_a_w_sep_index],
+            'upper_a_w_sep': activity_water[upper_a_w_sep_index],
+            'matching_upper_a_w_sep': activity_water[match_index_prime]}
 
 
 def phase_seperation_q_alpha(
@@ -636,8 +644,8 @@ def phase_seperation_q_alpha(
         VBSBAT_options=None
 ):
     """
-    This function makes a squeezed logistic function to transfer for 
-    q_alpha ~0 to q_alpha ~1, 
+    This function makes a squeezed logistic function to transfer for
+    q_alpha ~0 to q_alpha ~1,
 
     Parameters:
     a_w_sep (np.array): A numpy array of values.
@@ -675,32 +683,6 @@ def phase_seperation_q_alpha(
     return q_alpha_value
 
 
-# not sure about these functions if they are needed.
-# def check_bat_functional_group_inputs_v1(O2C, shift_method):
-#     """
-#     This function checks the inputs of the BAT functional group.
-
-#     Parameters:
-#     O2C (np.array): A numpy array representing O2C values.
-#     shift_method (str/list): A string or list representing the shift method.
-
-#     Returns:
-#     list: The shift method with size equal to O2C.
-#     """
-
-#     max_dim = max(len(O2C), len(shift_method))
-    
-#     if isinstance(shift_method, str):
-#         shift_method = [shift_method for _ in range(max_dim)]
-#     elif isinstance(shift_method, list):
-#         if len(shift_method) == 1:
-#             shift_method = [shift_method[0] for _ in range(max_dim)]
-#         elif len(shift_method) < max_dim:
-#             raise ValueError(f"shift_method has less points than O2C: {len(shift_method)} vs {max_dim}")
-            
-#     return shift_method
-
-
 def biphasic_to_single_phase_RH_point(
     O2C,
     H2C,
@@ -718,12 +700,15 @@ def biphasic_to_single_phase_RH_point(
 
     Returns:
     np.array: The RH cross point array.
+
+
     """
 
     RH_cross_point = np.zeros_like(O2C)
 
-    interpolate_step_numb = 500  # interpolation points
-    mole_frac = np.linspace(0, 1, interpolate_step_numb + 1)
+    interpolate_step_numb = 200  # interpolation points
+    # mole_frac = np.linspace(1e-12, 1, interpolate_step_numb + 1)
+    mole_frac = np.logspace(-6, 0, interpolate_step_numb + 1)
 
     for i in range(len(O2C)):
         density = organic_density_estimate(
@@ -731,7 +716,6 @@ def biphasic_to_single_phase_RH_point(
             O2C[i],
             H2C[i],
             mass_ratio_convert=True)
-            
         activities = activity_coefficents(
             molarmass_ratio=Mratio[i],
             org_mole_fraction=mole_frac,
@@ -746,11 +730,11 @@ def biphasic_to_single_phase_RH_point(
         phase_check = find_phase_separation(activities[0], activities[1])
 
         if phase_check['phase_sep_check'] == 1:
-            RH_cross_point[i] = phase_check['upper_a_w_sep_index']
+            RH_cross_point[i] = phase_check['upper_a_w_sep']
         else:
             RH_cross_point[i] = 0  # no phase separation
 
-    # Checks outputs with in physical limits 
+    # Checks outputs with in physical limits
     # round to zero
     RH_cross_point[RH_cross_point < 0] = 0
     # round max to 1
@@ -759,17 +743,27 @@ def biphasic_to_single_phase_RH_point(
     return RH_cross_point
 
 
-# %%
-o2c = [0.1, 0.2, 0.3, 0.4, 0.5]
-mweight = [100, 200, 300, 400, 500]
-mratio = to_molarmass_ratio(mweight)
-H2C = [2, 2, 2, 2, 2]
-RH_cross_point = biphasic_to_single_phase_RH_point(
-    o2c,
-    H2C,
-    mratio,
-    BAT_functional_group=None
-)
+# %
+# not sure about these functions if they are needed.
+# def check_bat_functional_group_inputs_v1(O2C, shift_method):
+#     """
+#     This function checks the inputs of the BAT functional group.
 
+#     Parameters:
+#     O2C (np.array): A numpy array representing O2C values.
+#     shift_method (str/list): A string or list representing the shift method.
 
-# %%
+#     Returns:
+#     list: The shift method with size equal to O2C.
+#     """
+
+#     max_dim = max(len(O2C), len(shift_method))
+#     if isinstance(shift_method, str):
+#         shift_method = [shift_method for _ in range(max_dim)]
+#     elif isinstance(shift_method, list):
+#         if len(shift_method) == 1:
+#             shift_method = [shift_method[0] for _ in range(max_dim)]
+#         elif len(shift_method) < max_dim:
+#             raise ValueError(f"shift_method has less points than O2C: \
+# {len(shift_method)} vs {max_dim}")
+#     return shift_method

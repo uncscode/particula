@@ -1,4 +1,19 @@
+# %%
 
+import numpy as np
+import matplotlib.pyplot as plt
+
+plt.rcParams.update({'text.color': "#333333",
+                     'axes.labelcolor': "#333333",
+                     "figure.figsize": (6, 4),
+                     "font.size": 14,
+                     "axes.edgecolor": "#333333",
+                     "axes.labelcolor": "#333333",
+                     "xtick.color": "#333333",
+                     "ytick.color": "#333333",
+                     "pdf.fonttype": 42,
+                     "ps.fonttype": 42})
+# %%
 
 org_mole_fraction = np.linspace(0, 1, 100)
 molarmass_ratio = 18.016/250
@@ -115,3 +130,15 @@ plt.ylabel('q_alpha')
 plt.show()
 
 
+# %%
+o2c = [0.1, 0.2, 0.3, 0.4, 0.5]
+mweight = [200, 200, 200, 200, 200]
+mratio = to_molarmass_ratio(mweight)
+H2C = [2, 2, 2, 2, 2]
+RH_cross_point = biphasic_to_single_phase_RH_point(
+    o2c,
+    H2C,
+    mratio,
+    BAT_functional_group=None
+)
+print(f'RH_cross_point: {RH_cross_point}')
