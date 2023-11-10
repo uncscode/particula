@@ -48,3 +48,10 @@ By adhering to this plan, we aim to boost Particula's adaptability, making it mo
 ## Conclusion
 
 The proposed refactoring strategy for FY24 is crafted to address the current limitations of Particula and Datacula. It prioritizes modularity, intuitive understanding, and efficient data handling to aid researchers and educators alike.
+
+# Long-Term Vision
+
+## GPU Acceleration
+
+Create a interface that uses, Pytourch, for GPU acceleration. This will allow for faster simulations of particle centric models.
+
