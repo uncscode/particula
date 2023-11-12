@@ -469,8 +469,8 @@ def list_to_dict(list_of_str: list) -> dict:
             the index of the string in the list.
     """
     assert all(list_of_str), "Input list_of_str must not be empty."
-    assert all(isinstance(item, str) for item in list_of_str), \
-        "Input list_of_str must contain only strings."
+    assert all(isinstance(item, str) for item in list_of_str), "Input \
+        list_of_str must contain only strings."
 
     # Create a dictionary from the list of strings using a dictionary
     # comprehension
