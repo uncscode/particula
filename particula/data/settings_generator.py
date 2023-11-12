@@ -24,8 +24,7 @@ def for_general_1d_load(
             "skip_rows": 0,
             "skip_end": 0,
         },
-    # combine into settings dictionary
-    settings = {
+    return {
         'relative_data_folder': relative_data_folder,
         'filename_regex': filename_regex,
         'MIN_SIZE_BYTES': file_min_size_bytes,
@@ -39,4 +38,3 @@ def for_general_1d_load(
         'Time_shift_seconds': time_shift_seconds,
         'timezone_identifier': timezone_identifier,
     }
-    return settings

@@ -145,18 +145,16 @@ def data_format_checks(data: List[str], data_checks: dict) -> List[str]:
                 ]
     if len(data) / length_initial < FILTER_WARNING_FRACTION:
         warnings.warn(
-            f"More than {FILTER_WARNING_FRACTION} of the rows have " +
-            'been filtered out based on the characters limit ' +
-            f"{data_checks['characters']} or skip rows.")
+            f"More than {FILTER_WARNING_FRACTION} of the rows have been filtered out based on the characters limit "
+            + f"{data_checks['characters']} or skip rows."
+        )
     if 'char_counts' in data_checks:
         char_counts = data_checks.get('char_counts', {})
         data = filter_list(data, char_counts)
-    # Strip any leading or trailing whitespace from the rows.
-    data = [x.strip() for x in data]
-    # raise ValueError('No data left in file')
-    if len(data) == 0:
+    if data := [x.strip() for x in data]:
+        return data
+    else:
         raise ValueError('No data left in file')
-    return data
 
 
 def parse_time_column(
@@ -195,35 +193,28 @@ def parse_time_column(
         If an invalid time column or format is specified.
     """
     if time_format == 'epoch':
-        # if the time is in epoch format
-        time_epoch = float(line[time_column]) + seconds_shift
-        return time_epoch
+        return float(line[time_column]) + seconds_shift
     if date_offset:
         # if the time is in one column, and the date is fixed
         time_str = f"{date_offset} {line[time_column]}"
-        time_epoch = time_str_to_epoch(
-                                    time_str,
-                                    time_format,
-                                    timezone_identifier
-                                ) + seconds_shift
-        return time_epoch
+        return (
+            time_str_to_epoch(time_str, time_format, timezone_identifier)
+            + seconds_shift
+        )
     if isinstance(time_column, int):
-        # if the time and date are in one column
-        time_epoch = time_str_to_epoch(
-                                    line[time_column],
-                                    time_format,
-                                    timezone_identifier
-                                ) + seconds_shift
-        return time_epoch
+        return (
+            time_str_to_epoch(
+                line[time_column], time_format, timezone_identifier
+            )
+            + seconds_shift
+        )
     if isinstance(time_column, list) and len(time_column) == 2:
         # if the time and date are in two column
         time_str = f"{line[time_column[0]]} {line[time_column[1]]}"
-        time_epoch = time_str_to_epoch(
-                                    time_str,
-                                    time_format,
-                                    timezone_identifier
-                                ) + seconds_shift
-        return time_epoch
+        return (
+            time_str_to_epoch(time_str, time_format, timezone_identifier)
+            + seconds_shift
+        )
     raise ValueError(
         f"Invalid time column or format: {time_column}, {time_format}")
 
@@ -296,12 +287,8 @@ def sample_data(
         )
 
         for j, col in enumerate(data_columns):
-            if col < len(line_array):
-                value = line_array[col].strip()
-            else:
-                value = ''
-
-            if value == '' or value == '.':  # no data
+            value = line_array[col].strip() if col < len(line_array) else ''
+            if value in ['', '.']:  # no data
                 data_array[i, j] = np.nan
             elif value.count('�') > 0:
                 data_array[i, j] = np.nan
@@ -459,7 +446,7 @@ def sizer_data_formatter(
                 data_header.index(data_sizer_reader["Dp_end_keyword"])
                 ]
     dp_columns = list(range(dp_range[0]+1, dp_range[1]))
-    dp_header = list([data_header[i] for i in dp_columns])
+    dp_header = [data_header[i] for i in dp_columns]
     # change from np.array
 
     # Get data columns
@@ -492,7 +479,7 @@ def sizer_data_formatter(
         timezone_identifier=timezone_identifier
     )
 
-    if "convert_scale_from" in data_sizer_reader.keys():
+    if "convert_scale_from" in data_sizer_reader:
         if data_sizer_reader["convert_scale_from"] == "dw":
             inverse = True
         elif data_sizer_reader["convert_scale_from"] == "dw/dlogdp":
@@ -541,15 +528,13 @@ def non_standard_date_location(
     ValueError
         If an unsupported or invalid method is specified in date_location.
     """
-    if date_location['method'] == 'file_header_block':
-        row_index = date_location['row']
-        delimiter = date_location['delimiter']
-        index = date_location['index']
-        date = data[row_index].split(delimiter)[index].strip()
-    else:
+    if date_location['method'] != 'file_header_block':
         raise ValueError('Invalid date location method specified')
 
-    return date
+    row_index = date_location['row']
+    delimiter = date_location['delimiter']
+    index = date_location['index']
+    return data[row_index].split(delimiter)[index].strip()
 
 
 def get_files_in_folder_with_size(
@@ -650,16 +635,12 @@ def load_datalake(path: str, sufix_name: str = None) -> object:
     data_lake : DataLake
         Loaded DataLake object.
     """
-    # add suffix to file name if present
     if sufix_name is not None:
+        file_name = f'datalake_{sufix_name}.pk'
         file_name = f'datalake_{sufix_name}.pk'
     else:
         file_name = 'datalake.pk'
 
-    # add suffix to file name if present
-    if sufix_name is not None:
-        file_name = f'datalake_{sufix_name}.pk'
-    else:
         file_name = 'datalake.pk'
 
     # path to load pickle file
@@ -744,11 +725,7 @@ def datalake_to_csv(
         keys = list(datalake.datastreams.keys())
 
     for key in keys:
-        if sufix_name is not None:
-            save_name = key + '_' + sufix_name
-        else:
-            save_name = key
-
+        save_name = key + '_' + sufix_name if sufix_name is not None else key
         datastream_to_csv(
             datastream=datalake.datastreams[key],
             path=path,
@@ -932,6 +909,5 @@ def netcdf_info_print(file_path, file_return=False):
 
     if file_return:
         return nc_file
-    else:
-        nc_file.close()
-        return None
+    nc_file.close()
+    return None

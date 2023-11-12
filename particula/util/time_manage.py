@@ -36,7 +36,4 @@ def time_str_to_epoch(
 
     time_obj = time_zone.localize(time_obj)
 
-    # Convert to UTC (epoch) time in seconds
-    time_epoch = time_obj.timestamp()
-
-    return time_epoch
+    return time_obj.timestamp()

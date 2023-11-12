@@ -59,7 +59,7 @@ def get_new_files(
         'relative_data_folder',
         'filename_regex',
         'MIN_SIZE_BYTES']
-    if not all(key in import_settings for key in required_keys):
+    if any(key not in import_settings for key in required_keys):
         raise KeyError(
             f"import_settings must contain the following keys: {required_keys}"
         )
@@ -70,7 +70,7 @@ def get_new_files(
                 f"loaded_list must be a list of lists. It is currently a \
                 list of {type(loaded_list[0])}"
             )
-        if not all(len(item) == 2 for item in loaded_list):
+        if any(len(item) != 2 for item in loaded_list):
             raise ValueError(
                 f"loaded_list must be a list of lists with 2 items. It is \
                 currently a list of lists with {len(loaded_list[0])} items"
@@ -210,7 +210,7 @@ def get_1d_stream(
     required_keys = ['data_checks', 'data_column', 'time_column',
                      'time_format', 'delimiter', 'Time_shift_seconds',
                      'timezone_identifier', 'data_header']
-    if not all(key in settings for key in required_keys):
+    if any(key not in settings for key in required_keys):
         raise KeyError(f"The settings dictionary is missing required keys: \
                        {required_keys}")
 
@@ -224,7 +224,7 @@ def get_1d_stream(
     # should should consolidate and abstract this
     data = loader.data_raw_loader(file_path=file_path)
 
-    if 'date_location' in settings.keys():
+    if 'date_location' in settings:
         date_offset = loader.non_standard_date_location(
                 data=data,
                 date_location=settings['date_location']
