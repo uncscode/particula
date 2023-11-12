@@ -311,12 +311,14 @@ class ParticleCondensation(ParticleInstances):
         # future: add dry radius to particle object
         dry_radius = self.particle_radius
 
-        particle_saturation_ratio = (
-                self.particle_radius**3 - dry_radius**3) / np.maximum(
-                self.particle_radius**3-dry_radius**3*(1.0-self.kappa),
-                1.e-30
-            ) * kelvin_term(self.particle_radius, **self.kwargs)
-        return particle_saturation_ratio
+        return (
+            (self.particle_radius**3 - dry_radius**3)
+            / np.maximum(
+                self.particle_radius**3 - dry_radius**3 * (1.0 - self.kappa),
+                1.0e-30,
+            )
+            * kelvin_term(self.particle_radius, **self.kwargs)
+        )
 
 
 class ParticleWallLoss(ParticleCondensation):

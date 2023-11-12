@@ -69,10 +69,9 @@ def organic_water_single_phase(molar_mass_ratio):
     float: The single phase cross point.
     """
 
-    o2c_single_phase_cross_point = 0.205 / (
-        1 + np.exp(26.6 * (molar_mass_ratio - 0.12))
-        )**0.843 + 0.225
-    return o2c_single_phase_cross_point
+    return (
+        0.205 / (1 + np.exp(26.6 * (molar_mass_ratio - 0.12))) ** 0.843 + 0.225
+    )
 
 
 def convert_to_OH_equivalent(O2C, molarmass_ratio, BAT_functional_group=None):
@@ -123,14 +122,7 @@ def organic_density_estimate(
     mass_N = 14.0067
 
     # 1) Estimate the H2C value if not provided from input
-    if H2C < 0.1:
-        # Estimate H2C assuming an aliphatic compound with H2C = 2 in the
-        # absence of oxygen functional groups, then correct for oxygen content
-        # assuming a -1 slope (Van Krevelen Diagram of typical SOA).
-        H2Cest = 2.0 - O2C
-    else:
-        H2Cest = H2C
-
+    H2Cest = 2.0 - O2C if H2C < 0.1 else H2C
     # 2) Compute the approximate number of carbon atoms per organic molecule
     NC = M / (mass_C + H2Cest * mass_H + O2C * mass_O + N2C * mass_N)
 
@@ -138,12 +130,7 @@ def organic_density_estimate(
     # Here no correction is applied for rings and aromatic compounds
     # (due to limited info at input)
     rho1 = M / (5.0 * NC * (2.0 + H2Cest + O2C * 2.0 + N2C * 2.0))
-    density = rho1 * (1.0 + min(NC * O2C * 0.1 + NC * N2C * 0.1, 0.3))
-    # density in [g/cm^3];
-    # Here it is scaled assuming that most of the oxygen atoms are able to
-    # make H-bonds (donor or acceptor).
-
-    return density
+    return rho1 * (1.0 + min(NC * O2C * 0.1 + NC * N2C * 0.1, 0.3))
 
 
 def bat_blending_weights(molarmass_ratio, O2C):
@@ -226,9 +213,9 @@ def coefficients_c(
         molar mass ratio (float): water MW / organic MW
         fit_values (list): a_n1, a_n2, a_n3, a_n4
     """
-    c = (fit_values[0] * np.exp(fit_values[1] * O2C)
-         + fit_values[2] * np.exp(fit_values[3] * molarmass_ratio))
-    return c
+    return fit_values[0] * np.exp(fit_values[1] * O2C) + fit_values[
+        2
+    ] * np.exp(fit_values[3] * molarmass_ratio)
 
 
 def exp_limited(value):
@@ -526,15 +513,8 @@ def find_phase_sep_index(activity_data):
                     ))
 
                 # Assign appropriate indices for phase separation
-                if activity_data_gap_start < index_start:
-                    index_phase_sep_starts = activity_data_gap_start
-                else:
-                    index_phase_sep_starts = index_start
-
-                if min_index_idilute < restart_match_index:
-                    index_phase_sep_end = min_index_idilute
-                else:
-                    index_phase_sep_end = restart_match_index
+                index_phase_sep_starts = min(activity_data_gap_start, index_start)
+                index_phase_sep_end = min(min_index_idilute, restart_match_index)
             else:
                 index_phase_sep_starts = index_start
                 index_phase_sep_end = restart_match_index
@@ -545,11 +525,7 @@ def find_phase_sep_index(activity_data):
         index_phase_sep_end = np.nan
 
     # Assign phase separation via activity based on data being greater than 1
-    if sum(activity_data > 1):
-        phase_sep_activity = 1
-    else:
-        phase_sep_activity = 0
-
+    phase_sep_activity = 1 if sum(activity_data > 1) else 0
     return {'phase_sep_activity': phase_sep_activity,
             'phase_sep_curve': phase_sep_curve,
             'index_phase_sep_starts': index_phase_sep_starts,
@@ -595,15 +571,6 @@ def find_phase_separation(activity_water, activity_org):
             mid_sep_index = (lower_a_w_sep_index + upper_a_w_sep_index) // 2
             # slice the data upto mid index
             activity_water_beta = activity_water[:mid_sep_index]
-            match_a_w = activity_water[upper_a_w_sep_index]
-            # find the index where the difference is greater than 0
-            match_index_prime = np.where((activity_water_beta - match_a_w) > 0)
-
-            # if no such index found, assign the index where the max
-            # difference is located
-            if len(match_index_prime[0]) == 0:
-                match_index_prime = np.argmax(activity_water_beta - match_a_w)
-
         else:  # decreasing a_w with index
             # find the min and max indexes
             lower_a_w_sep_index = max(indexes)
@@ -613,14 +580,14 @@ def find_phase_separation(activity_water, activity_org):
             mid_sep_index = (lower_a_w_sep_index + upper_a_w_sep_index) // 2
             # slice the data upto mid index
             activity_water_beta = activity_water[mid_sep_index:]
-            match_a_w = activity_water[upper_a_w_sep_index]
-            # find the index where the difference is greater than 0
-            match_index_prime = np.where((activity_water_beta - match_a_w) > 0)
+        match_a_w = activity_water[upper_a_w_sep_index]
+        # find the index where the difference is greater than 0
+        match_index_prime = np.where((activity_water_beta - match_a_w) > 0)
 
-            # if no such index found, assign the index where the max
-            # difference is located
-            if len(match_index_prime[0]) == 0:
-                match_index_prime = np.argmax(activity_water_beta - match_a_w)
+        # if no such index found, assign the index where the max
+        # difference is located
+        if len(match_index_prime[0]) == 0:
+            match_index_prime = np.argmax(activity_water_beta - match_a_w)
 
     else:
         upper_a_w_sep_index = 2
@@ -654,32 +621,27 @@ def phase_separation_q_alpha(
     Returns:
     np.array: The q_alpha value.
     """
-    MIN_SPREAD_IN_AW = 10**-6
-    Q_ALPHA_AT_1PHASE_AW = 0.99
-
     if a_w_sep == 0:
-        q_alpha_value = np.ones_like(aw_series)
-    else:
-        # spread in transfer from 50/50 point
-        delta_a_w_sep = 1 - a_w_sep
+        return np.ones_like(aw_series)
+    # spread in transfer from 50/50 point
+    delta_a_w_sep = 1 - a_w_sep
 
-        # check min value allowed
-        above_min_delta_a_w_sep_value = delta_a_w_sep > MIN_SPREAD_IN_AW
-        delta_a_w_sep = delta_a_w_sep * above_min_delta_a_w_sep_value + \
-            ~above_min_delta_a_w_sep_value * MIN_SPREAD_IN_AW
+    MIN_SPREAD_IN_AW = 10**-6
+    # check min value allowed
+    above_min_delta_a_w_sep_value = delta_a_w_sep > MIN_SPREAD_IN_AW
+    delta_a_w_sep = delta_a_w_sep * above_min_delta_a_w_sep_value + \
+        ~above_min_delta_a_w_sep_value * MIN_SPREAD_IN_AW
 
         # calculate curve parameter of sigmoid
-        sigmoid_curve_parameter = log_limited(
-            1 / (1 - Q_ALPHA_AT_1PHASE_AW) - 1) / delta_a_w_sep
+    sigmoid_curve_parameter = log_limited(1 / (1 - 0.99) - 1) / delta_a_w_sep
 
         # calculate q_alpha value
-        q_alpha_value = 1 - 1 / (
-            1 + exp_limited(
-                sigmoid_curve_parameter
-                * (aw_series - a_w_sep + delta_a_w_sep)
-                )
-            )
-    return q_alpha_value
+    return 1 - 1 / (
+        1
+        + exp_limited(
+            sigmoid_curve_parameter * (aw_series - a_w_sep + delta_a_w_sep)
+        )
+    )
 
 
 def biphasic_to_single_phase_RH_point(

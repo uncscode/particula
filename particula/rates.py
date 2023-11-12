@@ -137,11 +137,6 @@ class Rates:
             'nucleation': nucleation
         }
 
-        # Compute the sum of rates based on the selected options
-        rate_sum = sum(
-                rates[key]() if option else 0 for key,
-                option in options.items()
-            )
-
-        # Return the total rate sum
-        return rate_sum
+        return sum(
+            rates[key]() if option else 0 for key, option in options.items()
+        )

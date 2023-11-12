@@ -86,11 +86,10 @@ def clausius_clapeyron(
     vapor_pressure = in_pressure(vapor_pressure)
     heat_vaporization = in_latent_heat(heat_vaporization)
 
-    vapor_pressure_new = vapor_pressure * np.exp(
-            (-heat_vaporization / GAS_CONSTANT)
-            * ((1 / temperature_new) - (1 / temperature))
-        )
-    return vapor_pressure_new
+    return vapor_pressure * np.exp(
+        (-heat_vaporization / GAS_CONSTANT)
+        * ((1 / temperature_new) - (1 / temperature))
+    )
 
 
 # maybe this should be loaded from a file, or for an option of the user to
@@ -207,10 +206,9 @@ def vapor_concentration(
             temperature
         )
 
-    # Calculate concentration of vapor
-    concentration = in_concentration(
-            saturation_ratio * saturation_pressure
-            / (GAS_CONSTANT * temperature)
-            * material_properties('molecular_weight', species)
-        )
-    return concentration
+    return in_concentration(
+        saturation_ratio
+        * saturation_pressure
+        / (GAS_CONSTANT * temperature)
+        * material_properties('molecular_weight', species)
+    )
