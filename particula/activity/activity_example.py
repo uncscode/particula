@@ -1,6 +1,10 @@
 # %%
+# linting disabled until reformatting of this file
+# pylint: disable=all
+# flake8: noqa
+# pytype: skip-file
 
-# n3eed to convert this to a notebook
+# need to convert this to a notebook and add some more explanation
 
 import numpy as np
 import matplotlib.pyplot as plt
