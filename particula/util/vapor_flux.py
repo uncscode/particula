@@ -25,15 +25,19 @@ def phi(  # pylint: disable=too-many-arguments
     particle_area = area(
         **kwargs) if particle_area is None else in_handling(
             particle_area, u.m**2)
+
     molecular_enhancement_val = mol_enh(
         **kwargs) if molecular_enhancement is None else in_scalar(
             molecular_enhancement)
+
     vapor_attachment = np.transpose(
         [in_scalar(in_scalar(vapor_attachment)).m]
     )*in_scalar(in_scalar(vapor_attachment)).u
+
     vapor_speed_val = cbar(
         **kwargs)/4 if vapor_speed is None else in_handling(
             vapor_speed, u.m/u.s)
+
     driving_force = in_concentration(driving_force)
     fsc_val = fsc_func(**kwargs) if fsc is None else in_scalar(fsc)
 

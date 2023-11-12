@@ -8,7 +8,12 @@ from particula.util.input_handling import in_handling, in_molecular_weight
 from particula.constants import GAS_CONSTANT
 
 
-def kelvin_radius(surface_tension, molecular_weight, density, temperature):
+def kelvin_radius(
+    surface_tension=0.072 * u.N/u.m,
+    molecular_weight=0.01815 * u.kg/u.mol,
+    density=1000 * u.kg/u.m**3,
+    temperature=298.15 * u.K
+):
     """ Kelvin radius (Neil's definition)
         https://en.wikipedia.org/wiki/Kelvin_equation
     """
@@ -23,15 +28,13 @@ def kelvin_radius(surface_tension, molecular_weight, density, temperature):
     )
 
 
-def kelvin_term(surface_tension, molecular_weight, density, temperature, radius):
+def kelvin_term(radius=None, **kwargs):
     """ Kelvin term (Neil's definition)
         https://en.wikipedia.org/wiki/Kelvin_equation
     """
 
     rad = in_radius(radius)
 
-    kelvin_rad = kelvin_radius(
-        surface_tension, molecular_weight, density, temperature
-    )
+    kelvin_rad = kelvin_radius(**kwargs)
 
     return np.exp(kelvin_rad / rad)

@@ -32,7 +32,7 @@ repository = "https://github.com/uncscode/particula"
 
 [project.optional-dependencies]
 dev = [
-    "pylint", "pytest", "autopep8", "jupyterlab", "pytype",
+    "pylint", "pytest", "autopep8", "jupyterlab",
     "typing", "build", "flake8", "jupyter-book", "ghp-import",
     "matplotlib",
 ]

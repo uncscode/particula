@@ -1,6 +1,6 @@
 """ the particule class
 """
-
+# pylint: disable=too-many-instance-attributes
 import numpy as np
 
 from particula import u
@@ -11,8 +11,9 @@ from particula.util.dimensionless_coagulation import DimensionlessCoagulation
 from particula.util.distribution_discretization import discretize
 from particula.util.friction_factor import frifac
 from particula.util.fuchs_sutugin import fsc
-from particula.util.input_handling import (in_density, in_handling, in_length, in_radius,
-                                           in_scalar, in_volume)
+from particula.util.input_handling import (in_density, in_handling, in_length,
+                                           in_radius, in_scalar, in_volume,
+                                           in_mass)
 from particula.util.knudsen_number import knu
 from particula.util.molecular_enhancement import mol_enh
 from particula.util.particle_mass import mass
@@ -23,6 +24,7 @@ from particula.util.rms_speed import cbar
 from particula.util.slip_correction import scf
 from particula.util.vapor_flux import phi
 from particula.util.wall_loss import wlc
+from particula.util.kelvin_correction import kelvin_term
 from particula.vapor import Vapor
 
 
@@ -163,6 +165,9 @@ class ParticleInstances(ParticleDistribution):
         self.particle_area_factor = in_scalar(
             kwargs.get("particle_area_factor", 1)
         )
+        self.species_mass_fraction = in_mass(
+            kwargs.get("species_mass_fraction", [1])
+        )  # maybe here for speices masses, sulfate, water etc, not sure
 
     def particle_distribution(self):
         """ distribution
@@ -229,6 +234,9 @@ class ParticleCondensation(ParticleInstances):
             kwargs.get("particle_formation_rate", 0),
             u.m**-4/u.s
         )
+        self.kappa = in_scalar(
+            kwargs.get("kappa", 1)
+        )
         self.kwargs = kwargs
 
     def molecular_enhancement(self):
@@ -288,6 +296,28 @@ class ParticleCondensation(ParticleInstances):
         return (
             result if result.shape == self.particle_radius.shape
             else result.sum(axis=1)
+        )
+
+    def particle_saturation_ratio(self):
+        """
+        Calculates the saturation ratio of the particle at its surface,
+        accounting for the Kelvin effect.
+
+        Returns:
+        -------
+        float
+            The saturation ratio of the particle at its surface.
+        """
+        # future: add dry radius to particle object
+        dry_radius = self.particle_radius
+
+        return (
+            (self.particle_radius**3 - dry_radius**3)
+            / np.maximum(
+                self.particle_radius**3 - dry_radius**3 * (1.0 - self.kappa),
+                1.0e-30,
+            )
+            * kelvin_term(self.particle_radius, **self.kwargs)
         )
 
 
@@ -372,12 +402,14 @@ class Particle(ParticleWallLoss):
         return self._coag_prep(other or self).get_ces()[0]
 
     def coulomb_enhancement_kinetic_limit(self, other: "Particle" = None):
-        """ Kinetic limit of Coulomb enhancement for particle--particle cooagulation.
+        """ Kinetic limit of Coulomb enhancement for particle--particle
+            cooagulation.
         """
         return self._coag_prep(other or self).get_ces()[1]
 
     def coulomb_enhancement_continuum_limit(self, other: "Particle" = None):
-        """ Continuum limit of Coulomb enhancement for particle--particle coagulation.
+        """ Continuum limit of Coulomb enhancement for particle--particle
+            coagulation.
         """
         return self._coag_prep(other or self).get_ces()[2]
 
