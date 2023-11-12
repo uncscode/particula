@@ -4,7 +4,7 @@
     add a more general class, with a dictionary that can be added from
     a file or inputs.
 """
-
+# pylint: disable=all
 import numpy as np
 from particula import u
 from particula.util.input_handling import (in_latent_heat, in_temperature,

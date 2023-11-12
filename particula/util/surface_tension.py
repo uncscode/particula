@@ -1,4 +1,5 @@
 """ calculating the surface tension of a mixture of solutes and water """
+# pylint: disable=too-many-arguments
 
 import numpy as np
 from particula.util.input_handling import in_surface_tension, in_temperature, \
