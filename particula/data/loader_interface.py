@@ -1,7 +1,8 @@
 """interface to import data to a data stream"""
+# pytype: disable=attribute-error
+# pytype: disable=not-writable
 
-
-from typing import Optional, List
+from typing import Optional
 import os
 import numpy as np
 from particula.data import loader, merger
@@ -12,7 +13,7 @@ from particula.util import convert
 def get_new_files(
         path: str,
         import_settings: dict[str, any],
-        loaded_list: Optional[List] = None,
+        loaded_list: Optional[list] = None,
 ) -> tuple:
     """
     Scan a directory for new files based on import settings and stream status.
