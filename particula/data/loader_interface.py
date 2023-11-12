@@ -1,6 +1,5 @@
 """interface to import data to a data stream"""
-# pytype: disable=attribute-error
-# pytype: disable=not-writable
+# pytype: skip-file
 
 from typing import Optional
 import os
@@ -211,7 +210,7 @@ def get_1d_stream(
         raise TypeError("The setting parameters must be in a dictionary.")
 
     required_keys = ['data_checks', 'data_column', 'time_column',
-                     'time_format', 'delimiter', 'Time_shift_seconds',
+                     'time_format', 'delimiter', 'time_shift_seconds',
                      'timezone_identifier', 'data_header']
     if any(key not in settings for key in required_keys):
         raise KeyError(f"The settings dictionary is missing required keys: \
@@ -229,9 +228,9 @@ def get_1d_stream(
 
     if 'date_location' in settings:
         date_offset = loader.non_standard_date_location(
-                data=data,
-                date_location=settings['date_location']
-            )
+            data=data,
+            date_location=settings['date_location']
+        )
     else:
         date_offset = None
 
@@ -243,7 +242,7 @@ def get_1d_stream(
         time_format=settings['time_format'],
         delimiter=settings['delimiter'],
         date_offset=date_offset,
-        seconds_shift=settings['Time_shift_seconds'],
+        seconds_shift=settings['time_shift_seconds'],
         timezone_identifier=settings['timezone_identifier']
     )
 

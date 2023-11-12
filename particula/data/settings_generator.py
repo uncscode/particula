@@ -37,6 +37,6 @@ def for_general_1d_load(
         'time_column': time_column,
         'time_format': time_format,
         'delimiter': delimiter,
-        'Time_shift_seconds': time_shift_seconds,
+        'time_shift_seconds': time_shift_seconds,
         'timezone_identifier': timezone_identifier,
     }
