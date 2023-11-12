@@ -234,6 +234,9 @@ class ParticleCondensation(ParticleInstances):
             kwargs.get("particle_formation_rate", 0),
             u.m**-4/u.s
         )
+        self.kappa = in_scalar(
+            kwargs.get("kappa", 1)
+        )
         self.kwargs = kwargs
 
     def molecular_enhancement(self):
@@ -296,24 +299,24 @@ class ParticleCondensation(ParticleInstances):
         )
 
     def particle_saturation_ratio(self):
-            """
-            Calculates the saturation ratio of the particle at its surface,
-            accounting for the Kelvin effect.
+        """
+        Calculates the saturation ratio of the particle at its surface,
+        accounting for the Kelvin effect.
 
-            Returns:
-            -------
-            float
-                The saturation ratio of the particle at its surface.
-            """
-            # future: add dry radius to particle object
-            dry_radius = self.particle_radius
+        Returns:
+        -------
+        float
+            The saturation ratio of the particle at its surface.
+        """
+        # future: add dry radius to particle object
+        dry_radius = self.particle_radius
 
-            particle_saturation_ratio = (
-                    self.particle_radius**3 - dry_radius**3) / np.maximum(
-                    self.particle_radius**3-dry_radius**3*(1.0-self.kappa),
-                    1.e-30
-                ) * kelvin_term(self.particle_radius, **self.kwargs)
-            return particle_saturation_ratio
+        particle_saturation_ratio = (
+                self.particle_radius**3 - dry_radius**3) / np.maximum(
+                self.particle_radius**3-dry_radius**3*(1.0-self.kappa),
+                1.e-30
+            ) * kelvin_term(self.particle_radius, **self.kwargs)
+        return particle_saturation_ratio
 
 
 class ParticleWallLoss(ParticleCondensation):
