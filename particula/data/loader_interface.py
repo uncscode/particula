@@ -1,5 +1,7 @@
 """interface to import data to a data stream"""
-from typing import Dict, Any, List
+
+
+from typing import Optional, List
 import os
 import numpy as np
 from particula.data import loader, merger
@@ -9,8 +11,8 @@ from particula.util import convert
 
 def get_new_files(
         path: str,
-        import_settings: Dict[str, Any],
-        loaded_list: List[Any] = None,
+        import_settings: dict[str, any],
+        loaded_list: Optional[List] = None,
 ) -> tuple:
     """
     Scan a directory for new files based on import settings and stream status.
@@ -106,7 +108,7 @@ def get_new_files(
 def load_files_interface(
         path: str,
         settings: dict,
-        stream: object = None,
+        stream: Optional[object] = None,
 ) -> object:
     """
     Load files into a stream object based on settings.
@@ -157,7 +159,7 @@ def get_1d_stream(
     file_path: str,
     settings: dict,
     first_pass: bool = True,
-    stream: object = None,
+    stream: Optional[object] = None,
 ) -> object:
     """
     Loads and formats a 1D data stream from a file and initializes or updates
