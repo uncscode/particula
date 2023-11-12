@@ -1,48 +1,60 @@
 
+
 <!DOCTYPE html>
 
-<html>
+
+<html lang="en" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Contributor Guidelines &#8212; Particula Book</title>
-    
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
 
-    
-  <link rel="stylesheet"
-    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
-    
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="_static/togglebutton.js"></script>
-    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script src="_static/design-tabs.js"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
 const thebe_selector = ".thebe,.cell"
@@ -50,61 +62,103 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'CONTRIBUTING';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Code of Conduct" href="CODE_OF_CONDUCT.html" />
     <link rel="prev" title="dimensionless_coagulation" href="documentation/utilities/dimensionless_coagulation.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
-    
-
-    <!-- Google Analytics -->
-    
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-<!-- Checkboxes to toggle the left sidebar -->
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
-<label class="overlay overlay-navbar" for="__navigation">
-    <div class="visually-hidden">Toggle navigation sidebar</div>
-</label>
-<!-- Checkboxes to toggle the in-page toc -->
-<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
-<label class="overlay overlay-pagetoc" for="__page-toc">
-    <div class="visually-hidden">Toggle in-page Table of Contents</div>
-</label>
-<!-- Headers at the top -->
-<div class="announcement header-item noprint"></div>
-<div class="header header-item noprint"></div>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-    
-    <div class="container-fluid" id="banner"></div>
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
 
-    
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
 
-    <div class="container-xl">
-      <div class="row">
-          
-<!-- Sidebar -->
-<div class="bd-sidebar noprint" id="site-navigation">
-    <div class="bd-sidebar__content">
-        <div class="bd-sidebar__top"><div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="index.html">
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
       
-        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+      <div class="bd-sidebar-primary bd-sidebar">
         
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+    
+    
       
-      
-      <img src="_static/placeholder.png" class="logo" alt="logo">
-      
-      
-      <h1 class="site-logo" id="site-title">Particula Book</h1>
-      
-    </a>
-</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item active">
+    
+    
+    <img src="_static/placeholder.png" class="logo__image only-light" alt="Particula Book - Home"/>
+    <script>document.write(`<img src="_static/placeholder.png" class="logo__image only-dark" alt="Particula Book - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
@@ -113,567 +167,276 @@ const thebe_selector_output = ".output, .cell_output"
                 </a>
             </li>
         </ul>
-        <p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Tour
- </span>
-</p>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tour</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="tour/part-tour.html">
-   Particula tour
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="tour/part-tour.html">Particula tour</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Examples
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="examples/distribution_statistics.html">
-   Distribution statistics
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="examples/distribution_coagulation.html">
-   Distribution coagulation
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="examples/distribution_evolution.html">
-   Distribution evolution
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="examples/distribution_ambient.html">
-   Distributions
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="examples/ionparticle_coagulation.html">
-   Ion–particle coagulation
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="examples/distribution_statistics.html">Distribution statistics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/distribution_coagulation.html">Distribution coagulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/distribution_evolution.html">Distribution evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/distribution_ambient.html">Distributions</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="examples/ionparticle_coagulation.html">Ion–particle coagulation</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Documentation
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="documentation/environment.html">
-   The
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     Environment
-    </span>
-   </code>
-   Class
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="documentation/utilities/dilution_loss.html">
-     <code class="docutils literal notranslate">
-      <span class="pre">
-       dilution_loss
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="documentation/utilities/dynamic_viscosity.html">
-     <code class="docutils literal notranslate">
-      <span class="pre">
-       dynamic_viscosity
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="documentation/utilities/mean_free_path.html">
-     <code class="docutils literal notranslate">
-      <span class="pre">
-       mean_free_path
-      </span>
-     </code>
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="documentation/vapor.html">
-   The
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     Vapor
-    </span>
-   </code>
-   Class
-  </a>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="documentation/particle.html">
-   The
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     Particle
-    </span>
-   </code>
-   Classes
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-  <label for="toctree-checkbox-2">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="documentation/utilities/distribution_discretization.html">
-     <code class="docutils literal notranslate">
-      <span class="pre">
-       distribution_discretization
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="documentation/utilities/radius_cutoff.html">
-     <code class="docutils literal notranslate">
-      <span class="pre">
-       radius_cutoff
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="documentation/utilities/particle_mass.html">
-     <code class="docutils literal notranslate">
-      <span class="pre">
-       particle_mass
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="documentation/utilities/knudsen_number.html">
-     <code class="docutils literal notranslate">
-      <span class="pre">
-       knudsen_number
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="documentation/utilities/slip_correction.html">
-     <code class="docutils literal notranslate">
-      <span class="pre">
-       slip_correction
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="documentation/utilities/friction_factor.html">
-     <code class="docutils literal notranslate">
-      <span class="pre">
-       friction_factor
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="documentation/utilities/dimensionless_coagulation.html">
-     <code class="docutils literal notranslate">
-      <span class="pre">
-       dimensionless_coagulation
-      </span>
-     </code>
-    </a>
-   </li>
-  </ul>
- </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Community
- </span>
-</p>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation/utilities/knudsen_number.html"><code class="docutils literal notranslate"><span class="pre">knudsen_number</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation/utilities/slip_correction.html"><code class="docutils literal notranslate"><span class="pre">slip_correction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation/utilities/friction_factor.html"><code class="docutils literal notranslate"><span class="pre">friction_factor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation/utilities/dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
 <ul class="current nav bd-sidenav">
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
-   Contributor Guidelines
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="CODE_OF_CONDUCT.html">
-   Code of Conduct
-  </a>
- </li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Contributor Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CODE_OF_CONDUCT.html">Code of Conduct</a></li>
 </ul>
 
     </div>
 </nav></div>
-        <div class="bd-sidebar__bottom">
-             <!-- To handle the deprecated key -->
-            
-            <div class="navbar_extra_footer">
-            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
-            </div>
-            
-        </div>
     </div>
-    <div id="rtd-footer-container"></div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/CONTRIBUTING.md" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2FCONTRIBUTING.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
 </div>
 
 
-          
-
-
-          
-<!-- A tiny helper pixel to detect if we've scrolled -->
-<div class="sbt-scroll-pixel-helper"></div>
-<!-- Main content -->
-<div class="col py-0 content-container">
-    
-    <div class="header-article row sticky-top noprint">
-        
 
 
 
-<div class="col py-1 d-flex header-article-main">
-    <div class="header-article__left">
-        
-        <label for="__navigation"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="right"
-title="Toggle navigation"
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/CONTRIBUTING.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
-  <i class="fas fa-bars"></i>
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
   </span>
-
-</label>
-
-        
-    </div>
-    <div class="header-article__right">
-<button onclick="toggleFullScreen()"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="bottom"
-title="Fullscreen mode"
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
   <i class="fas fa-expand"></i>
   </span>
 
 </button>
 
-<div class="menu-dropdown menu-dropdown-repository-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Source repositories">
-      <i class="fab fa-github"></i>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="https://github.com/uncscode/particula"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Source repository"
->
-  
+`);
+</script>
 
-<span class="headerbtn__icon-container">
-  <i class="fab fa-github"></i>
-  </span>
-<span class="headerbtn__text-container">repository</span>
-</a>
-
-      </li>
-      
-      <li>
-        <a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2FCONTRIBUTING.html&body=Your%20issue%20content%20here."
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Open an issue"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-lightbulb"></i>
-  </span>
-<span class="headerbtn__text-container">open issue</span>
-</a>
-
-      </li>
-      
-      <li>
-        <a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/CONTRIBUTING.md"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Edit this page"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-pencil-alt"></i>
-  </span>
-<span class="headerbtn__text-container">suggest edit</span>
-</a>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-
-<div class="menu-dropdown menu-dropdown-download-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Download this page">
-      <i class="fas fa-download"></i>
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="_sources/CONTRIBUTING.md"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Download source file"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file"></i>
-  </span>
-<span class="headerbtn__text-container">.md</span>
-</a>
-
-      </li>
-      
-      <li>
-        
-<button onclick="printPdf(this)"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="left"
-title="Print to PDF"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file-pdf"></i>
-  </span>
-<span class="headerbtn__text-container">.pdf</span>
-</button>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-<label for="__page-toc"
-  class="headerbtn headerbtn-page-toc"
-  
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-list"></i>
-  </span>
-
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
 </label>
-
+</div></div>
+      
     </div>
+  
 </div>
-
-<!-- Table of contents -->
-<div class="col-md-3 bd-toc show noprint">
-    <div class="tocsection onthispage pt-5 pb-3">
-        <i class="fas fa-list"></i> Contents
-    </div>
-    <nav id="bd-toc-nav" aria-label="Page">
-        <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#github">
-   GitHub
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#vs-code">
-   VS Code
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#devcontainer">
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     .devcontainer
-    </span>
-   </code>
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#python-code-style">
-   Python code style
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#running-particula-locally">
-   Running
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     particula
-    </span>
-   </code>
-   locally
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#writing-tests">
-   Writing tests
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#running-testing-linting-locally">
-   Running testing/linting locally
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#building-particula-locally">
-   Building
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     particula
-    </span>
-   </code>
-   locally
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#documentation-writing">
-   Documentation writing
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#more-information">
-   More information
-  </a>
- </li>
-</ul>
-
-    </nav>
 </div>
-    </div>
-    <div class="article row">
-        <div class="col pl-md-3 pl-lg-5 content-container">
-            <!-- Table of contents that is only displayed when printing the page -->
-            <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Contributor Guidelines</h1>
-                <!-- Table of contents -->
-                <div id="print-main-content">
-                    <div id="jb-print-toc">
-                        
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#github">
-   GitHub
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#vs-code">
-   VS Code
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#devcontainer">
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     .devcontainer
-    </span>
-   </code>
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#python-code-style">
-   Python code style
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#running-particula-locally">
-   Running
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     particula
-    </span>
-   </code>
-   locally
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#writing-tests">
-   Writing tests
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#running-testing-linting-locally">
-   Running testing/linting locally
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#building-particula-locally">
-   Building
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     particula
-    </span>
-   </code>
-   locally
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#documentation-writing">
-   Documentation writing
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#more-information">
-   More information
-  </a>
- </li>
-</ul>
+              
+              
 
-                        </nav>
-                    </div>
-                </div>
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Contributor Guidelines</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
             </div>
-            <main id="main-content" role="main">
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#github">GitHub</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vs-code">VS Code</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#devcontainer"><code class="docutils literal notranslate"><span class="pre">.devcontainer</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-code-style">Python code style</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-particula-locally">Running <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-tests">Writing tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-testing-linting-locally">Running testing/linting locally</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-particula-locally">Building <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-writing">Documentation writing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#more-information">More information</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
                 
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
   <section class="tex2jax_ignore mathjax_ignore" id="contributor-guidelines">
-<h1>Contributor Guidelines<a class="headerlink" href="#contributor-guidelines" title="Permalink to this headline">#</a></h1>
+<h1>Contributor Guidelines<a class="headerlink" href="#contributor-guidelines" title="Permalink to this heading">#</a></h1>
 <p>First of all, thank you for considering contributing to this project!
 While we have specific guidelines below, <em>we also encourage you to
 contribute to the best of your ability and not let these guidelines
@@ -683,7 +446,7 @@ We are also open to any feedback, however small or large,
 and in any area (from documentation to calculation to presentation).</p>
 <hr class="docutils" />
 <p>The cycle of contribution goes something like this:</p>
-<ol>
+<ol class="arabic">
 <li><p>See if there is an issue open that you can help with.
 If there is not one, please open one.</p></li>
 <li><p>Create a personal fork of this repository;
@@ -716,13 +479,13 @@ Upon submission, standard automated tests will be run on your code.</p></li>
 feel free to mention one of us directly in the comments of the PR.
 Expect to have speedy feedback and help from us to finalize the PR.</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pylint <span class="k">$(</span>find particula/ -name <span class="s2">&quot;*.py&quot;</span> <span class="p">|</span> xargs<span class="k">)</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pylint<span class="w"> </span><span class="k">$(</span>find<span class="w"> </span>particula/<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.py&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="k">)</span>
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>flake8 particula/ --count
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>flake8<span class="w"> </span>particula/<span class="w"> </span>--count
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest particula/
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>particula/
 </pre></div>
 </div>
 <hr class="docutils" />
@@ -730,7 +493,7 @@ Expect to have speedy feedback and help from us to finalize the PR.</p></li>
 We are excited and looking forward to your contribution!</p>
 <hr class="docutils" />
 <section id="github">
-<h2>GitHub<a class="headerlink" href="#github" title="Permalink to this headline">#</a></h2>
+<h2>GitHub<a class="headerlink" href="#github" title="Permalink to this heading">#</a></h2>
 <p>We use GitHub to develop <code class="docutils literal notranslate"><span class="pre">particula</span></code> completely in the open. Our repository is available here: <a class="reference external" href="https://uncscode.github.io/particula/">https://uncscode.github.io/particula/</a>.
 There are several ways to use GitHub: through the command line via <code class="docutils literal notranslate"><span class="pre">git</span></code> and/or <code class="docutils literal notranslate"><span class="pre">gh</span></code>, through the web interface and/or the GitHub web editor, or through an IDE like PyCharm or a code editor like Visual Studio Code.
 In general, we recommend that you fork our repository, that you work with VS Code, and that submit a pull request based on an issue.
@@ -739,12 +502,12 @@ We look forward to getting you started and up to speed on this project with us!<
 <p>Links: <a class="reference external" href="https://docs.github.com/en/get-started">https://docs.github.com/en/get-started</a></p>
 </section>
 <section id="vs-code">
-<h2>VS Code<a class="headerlink" href="#vs-code" title="Permalink to this headline">#</a></h2>
+<h2>VS Code<a class="headerlink" href="#vs-code" title="Permalink to this heading">#</a></h2>
 <p>Visual Studio Code is a free and open-source code editor for writing code and it has a rich ecosystem of extensions that allow you to write code in a variety of languages with a lot of helpful features and tools.</p>
 <p>Links: <a class="reference external" href="https://code.visualstudio.com/">https://code.visualstudio.com/</a></p>
 </section>
 <section id="devcontainer">
-<h2><code class="docutils literal notranslate"><span class="pre">.devcontainer</span></code><a class="headerlink" href="#devcontainer" title="Permalink to this headline">#</a></h2>
+<h2><code class="docutils literal notranslate"><span class="pre">.devcontainer</span></code><a class="headerlink" href="#devcontainer" title="Permalink to this heading">#</a></h2>
 <p>In the root of our repository, we have a <code class="docutils literal notranslate"><span class="pre">.devcontainer</span></code> folder that contains the environment variables required for development.
 This is a convenient way to set up the environment for development.
 It requires Docker to be installed and running.
@@ -752,55 +515,55 @@ And the first time it runs it may take a few minutes to install the Docker image
 <p>Links: <a class="reference external" href="https://code.visualstudio.com/docs/remote/containers">https://code.visualstudio.com/docs/remote/containers</a></p>
 </section>
 <section id="python-code-style">
-<h2>Python code style<a class="headerlink" href="#python-code-style" title="Permalink to this headline">#</a></h2>
+<h2>Python code style<a class="headerlink" href="#python-code-style" title="Permalink to this heading">#</a></h2>
 <p>We follow the Google’s Python style guide.
 We encourage you to follow it too, but we also encourage you to contribute to the best of your ability and not let these guidelines hinder your productivity and creativity.</p>
 <p>Links: <a class="reference external" href="https://google.github.io/styleguide/pyguide.html">https://google.github.io/styleguide/pyguide.html</a></p>
 </section>
 <section id="running-particula-locally">
-<h2>Running <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally<a class="headerlink" href="#running-particula-locally" title="Permalink to this headline">#</a></h2>
+<h2>Running <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally<a class="headerlink" href="#running-particula-locally" title="Permalink to this heading">#</a></h2>
 <p>Once you are in the root directory, you will be able to import <code class="docutils literal notranslate"><span class="pre">particula</span></code> as a package/model and thus all documentation on website applies.
 You must be in the root directory.</p>
 </section>
 <section id="writing-tests">
-<h2>Writing tests<a class="headerlink" href="#writing-tests" title="Permalink to this headline">#</a></h2>
+<h2>Writing tests<a class="headerlink" href="#writing-tests" title="Permalink to this heading">#</a></h2>
 <p>It is essential that every piece of code has an associated test.
 This is a good way to ensure that the code is working as intended.
 It also ensures that the code is not broken and that the code is not too complex.
 However small or big, a test is always required.</p>
 </section>
 <section id="running-testing-linting-locally">
-<h2>Running testing/linting locally<a class="headerlink" href="#running-testing-linting-locally" title="Permalink to this headline">#</a></h2>
+<h2>Running testing/linting locally<a class="headerlink" href="#running-testing-linting-locally" title="Permalink to this heading">#</a></h2>
 <p>We use <code class="docutils literal notranslate"><span class="pre">pytest</span></code>, <code class="docutils literal notranslate"><span class="pre">pylint</span></code>, and <code class="docutils literal notranslate"><span class="pre">flake8</span></code> to run tests and linting.
 The command below can be run in the root directory like you’d run the package above.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pylint <span class="k">$(</span>find particula/ -name <span class="s2">&quot;*.py&quot;</span> <span class="p">|</span> xargs<span class="k">)</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pylint<span class="w"> </span><span class="k">$(</span>find<span class="w"> </span>particula/<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.py&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="k">)</span>
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>flake8 particula/ --count
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>flake8<span class="w"> </span>particula/<span class="w"> </span>--count
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest particula/
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>particula/
 </pre></div>
 </div>
 </section>
 <section id="building-particula-locally">
-<h2>Building <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally<a class="headerlink" href="#building-particula-locally" title="Permalink to this headline">#</a></h2>
+<h2>Building <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally<a class="headerlink" href="#building-particula-locally" title="Permalink to this heading">#</a></h2>
 <p>To build <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally, you must be in the root directory.
 You have two options, depending on your usage case.</p>
-<ol class="simple">
+<ol class="arabic simple">
 <li><p>You can use <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">build</span></code> to build the package wheels locally (note: you will need to install <code class="docutils literal notranslate"><span class="pre">build</span></code> too, via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">build</span></code>).</p></li>
-<li><p>You can build the conda recipe available at <a class="reference external" href="https://github.com/conda-forge/particula-feedstock">https://github.com/conda-forge/particula-feedstock</a> either via <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">build-locally.py</span></code> in the root of <code class="docutils literal notranslate"><span class="pre">particula-feedstock</span></code> or via <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">build</span> <span class="pre">recipe</span></code> (equivalently, but faster, <code class="docutils literal notranslate"><span class="pre">mamba</span> <span class="pre">build</span> <span class="pre">recipe</span></code>). For the latter, you will need to have <code class="docutils literal notranslate"><span class="pre">conda-build</span></code> installed (for <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">build</span></code> to work) or <code class="docutils literal notranslate"><span class="pre">boa</span></code> (for <code class="docutils literal notranslate"><span class="pre">mamba</span> <span class="pre">build</span></code> to work). In either case, you can install package with conda via, <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">conda-build</span></code> or <code class="docutils literal notranslate"><span class="pre">mamba</span> <span class="pre">install</span> <span class="pre">boa</span></code>.</p></li>
+<li><p>You can build the conda recipe available at <a class="github reference external" href="https://github.com/conda-forge/particula-feedstock">conda-forge/particula-feedstock</a> either via <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">build-locally.py</span></code> in the root of <code class="docutils literal notranslate"><span class="pre">particula-feedstock</span></code> or via <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">build</span> <span class="pre">recipe</span></code> (equivalently, but faster, <code class="docutils literal notranslate"><span class="pre">mamba</span> <span class="pre">build</span> <span class="pre">recipe</span></code>). For the latter, you will need to have <code class="docutils literal notranslate"><span class="pre">conda-build</span></code> installed (for <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">build</span></code> to work) or <code class="docutils literal notranslate"><span class="pre">boa</span></code> (for <code class="docutils literal notranslate"><span class="pre">mamba</span> <span class="pre">build</span></code> to work). In either case, you can install package with conda via, <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">conda-build</span></code> or <code class="docutils literal notranslate"><span class="pre">mamba</span> <span class="pre">install</span> <span class="pre">boa</span></code>.</p></li>
 </ol>
 <p>Links: <a class="reference external" href="https://packaging.python.org/en/latest/tutorials/packaging-projects/">https://packaging.python.org/en/latest/tutorials/packaging-projects/</a> and <a class="reference external" href="https://docs.conda.io/projects/conda-build/en/latest/user-guide/index.html">https://docs.conda.io/projects/conda-build/en/latest/user-guide/index.html</a></p>
 </section>
 <section id="documentation-writing">
-<h2>Documentation writing<a class="headerlink" href="#documentation-writing" title="Permalink to this headline">#</a></h2>
+<h2>Documentation writing<a class="headerlink" href="#documentation-writing" title="Permalink to this heading">#</a></h2>
 <p>We prefer that the tutorials are written in the form of Jupyter notebooks after the package is released and published.
 A convenient option is using Google’s Colaboratory to write the notebooks.</p>
 <p>Links: <a class="reference external" href="https://colab.research.google.com/">https://colab.research.google.com/</a></p>
 </section>
 <section id="more-information">
-<h2>More information<a class="headerlink" href="#more-information" title="Permalink to this headline">#</a></h2>
+<h2>More information<a class="headerlink" href="#more-information" title="Permalink to this heading">#</a></h2>
 <p>We will update this regularly with more information, but in the meanwhile, please feel free to contact us directly on GitHub.</p>
 </section>
 </section>
@@ -817,7 +580,7 @@ A convenient option is using Google’s Colaboratory to write the notebooks.</p>
             mode: "python"
         },
         kernelOptions: {
-            kernelName: "python3",
+            name: "python3",
             path: "./."
         },
         predefinedOutput: true
@@ -825,50 +588,110 @@ A convenient option is using Google’s Colaboratory to write the notebooks.</p>
     </script>
     <script>kernelName = 'python3'</script>
 
-              </div>
+                </article>
               
-            </main>
-            <footer class="footer-article noprint">
-                
-    <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="documentation/utilities/dimensionless_coagulation.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></p>
-        </div>
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="documentation/utilities/dimensionless_coagulation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></p>
+      </div>
     </a>
-    <a class='right-next' id="next-link" href="CODE_OF_CONDUCT.html" title="next page">
-    <div class="prev-next-info">
+    <a class="right-next"
+       href="CODE_OF_CONDUCT.html"
+       title="next page">
+      <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Code of Conduct</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
-            </footer>
-        </div>
-    </div>
-    <div class="footer-content row">
-        <footer class="col footer"><p>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#github">GitHub</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vs-code">VS Code</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#devcontainer"><code class="docutils literal notranslate"><span class="pre">.devcontainer</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-code-style">Python code style</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-particula-locally">Running <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-tests">Writing tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-testing-linting-locally">Running testing/linting locally</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-particula-locally">Building <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-writing">Documentation writing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#more-information">More information</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
   
-    By particula contributors<br/>
-  
-      &copy; Copyright 2022.<br/>
-</p>
-        </footer>
-    </div>
+  <div class="footer-item">
     
+<p class="component-author">
+By particula contributors
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
 </div>
+          </footer>
+        
 
-
-      </div>
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <script src="_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6"></script>
 
-
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>
