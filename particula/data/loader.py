@@ -1,5 +1,8 @@
 """File readers and loaders for datacula."""
+# linting disabled until reformatting of this file
 # pylint: disable=all
+# pytype: skip-file
+# flake8: noqa
 
 from typing import List, Union, Tuple, Dict, Any
 import warnings

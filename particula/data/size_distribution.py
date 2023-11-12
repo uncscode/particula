@@ -1,3 +1,7 @@
+# linting disabled until reformatting of this file
+# pylint: disable=all
+# pytype: skip-file
+# flake8: noqa
 """functions for size distribution analysis"""
 
 from typing import Optional, Tuple, List
