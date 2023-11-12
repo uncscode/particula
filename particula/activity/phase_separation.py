@@ -1,7 +1,8 @@
 
 # %%
 # consider changing o2c to oxygen2carbon
-# define convert_to_OH_eqivelent
+# define convert_to_OH_equivalent
+# add test
 
 # Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
 # Relative-humidity-dependent organic aerosol thermodynamics
@@ -69,7 +70,7 @@ def organic_water_single_phase(molar_mass_ratio):
     return o2c_single_phase_cross_point
 
 
-def convert_to_OH_eqivelent(O2C, molarmass_ratio, BAT_functional_group=None):
+def convert_to_OH_equivalent(O2C, molarmass_ratio, BAT_functional_group=None):
     # Define this function
     return O2C, molarmass_ratio
 
@@ -207,25 +208,23 @@ FIT_HIGH = {'a1': [5.921550E+00, -2.528295E+00, -3.883017E+00, -7.898128E+00],
             's': [-7.868187E-02, 3.650860E+00]}
 
 
-def coefficents_c(
+def coefficients_c(
         molarmass_ratio,
         O2C,
         fit_values
         ):
     """
-    Coefficents for activity model, see Gorkowski (2019). equation S1 S2.
+    Coefficients for activity model, see Gorkowski (2019). equation S1 S2.
 
-    Paramters:
+    Parameters:
     ---------
-        molar mass ratio (float): water MW / orgniac MW
+        molar mass ratio (float): water MW / organic MW
         fit_values (list): a_n1, a_n2, a_n3, a_n4
     """
     c = (fit_values[0] * np.exp(fit_values[1] * O2C)
          + fit_values[2] * np.exp(fit_values[3] * molarmass_ratio))
     return c
 
-
-# %%
 
 def exp_limited(value):
     """
@@ -263,16 +262,16 @@ def gibbs_of_mixing(
     """
     Gibbs free energy of mixing, see Gorkowski (2019). equation S4.
 
-    Paramters:
+    Parameters:
     ---------
-        molar mass ratio (float): water MW / orgniac MW
+        molar mass ratio (float): water MW / organic MW
         org mole fraction (float): fraction of organic matter
         O2C (float): oxygen to carbon ratio
         density (float): density of mixture
-        fit_coefficent (dict): dictionary of fit values for low O2C region
+        fit_coefficient (dict): dictionary of fit values for low O2C region
     """
-    c1 = coefficents_c(molarmass_ratio, O2C, fit_dict['a1'])
-    c2 = coefficents_c(molarmass_ratio, O2C, fit_dict['a2'])
+    c1 = coefficients_c(molarmass_ratio, O2C, fit_dict['a1'])
+    c2 = coefficients_c(molarmass_ratio, O2C, fit_dict['a2'])
 
     rhor = 0.997 / density  # assumes water is the other fluid
 
@@ -288,18 +287,15 @@ def gibbs_of_mixing(
     sum1 = c1 + c2*(1-2*phi2)
     gibbs_mix = phi2 * (1.0 - phi2) * sum1
 
-    # equation s6 the derivative of phi2 with respect to orgnaic x2
+    # equation s6 the derivative of phi2 with respect to organic x2
     dphi2dx2 = (scaledMr / rhor) * (phi2 / org_mole_fraction) ** 2
 
     # equation S7
-    dervative_gibbs_mix = (
+    derivative_gibbs_mix = (
         (1.0 - 2.0 * phi2) * sum1 - 2*c2*phi2 * (1.0 - phi2)
         ) * dphi2dx2
 
-    return gibbs_mix, dervative_gibbs_mix
-
-
-# %%
+    return gibbs_mix, derivative_gibbs_mix
 
 
 def gibbs_mix_weight(
@@ -313,21 +309,21 @@ def gibbs_mix_weight(
     Gibbs free energy of mixing, see Gorkowski (2019), with weighted
     O2C regions
 
-    Paramters:
+    Parameters:
     ---------
-        molar mass ratio (float): water MW / orgniac MW
+        molar mass ratio (float): water MW / organic MW
         org mole fraction (float): fraction of organic matter
         O2C (float): oxygen to carbon ratio
         density (float): density of mixture
-        fit_coefficent (dict): dictionary of fit values for low O2C region
+        fit_coefficient (dict): dictionary of fit values for low O2C region
 
     Returns:
     -------
         gibbs_mix (float): Gibbs energy of mixing (including 1/RT)
-        dervative_gibbs (float): dervative of Gibbs energy with respect to
-        mole fraction of orgnaics (includes 1/RT)
+        derivative_gibbs (float): derivative of Gibbs energy with respect to
+        mole fraction of organics (includes 1/RT)
     """
-    O2C, molarmass_ratio = convert_to_OH_eqivelent(
+    O2C, molarmass_ratio = convert_to_OH_equivalent(
         O2C,
         molarmass_ratio,
         BAT_functional_group=None
@@ -336,7 +332,7 @@ def gibbs_mix_weight(
     weights = bat_blending_weights(molarmass_ratio, O2C)
 
     if weights[1] > 0:  # if mid region is used
-        gibbs_mix_mid, dervative_gibbs_mid = gibbs_of_mixing(
+        gibbs_mix_mid, derivative_gibbs_mid = gibbs_of_mixing(
             molarmass_ratio,
             org_mole_fraction,
             O2C,
@@ -345,7 +341,7 @@ def gibbs_mix_weight(
         )
 
         if weights[0] > 0:  # if paired with low O2C region
-            gibbs_mix_low, dervative_gibbs_low = gibbs_of_mixing(
+            gibbs_mix_low, derivative_gibbs_low = gibbs_of_mixing(
                 molarmass_ratio,
                 org_mole_fraction,
                 O2C,
@@ -353,10 +349,10 @@ def gibbs_mix_weight(
                 FIT_LOW
             )
             gibbs_mix = weights[0]*gibbs_mix_low + weights[1]*gibbs_mix_mid
-            dervative_gibbs = weights[0]*dervative_gibbs_low \
-                + weights[1]*dervative_gibbs_mid
+            derivative_gibbs = weights[0]*derivative_gibbs_low \
+                + weights[1]*derivative_gibbs_mid
         else:  # else paired with high O2C region
-            gibbs_mix_high, dervative_gibbs_high = gibbs_of_mixing(
+            gibbs_mix_high, derivative_gibbs_high = gibbs_of_mixing(
                 molarmass_ratio,
                 org_mole_fraction,
                 O2C,
@@ -364,20 +360,20 @@ def gibbs_mix_weight(
                 FIT_HIGH
             )
             gibbs_mix = weights[2]*gibbs_mix_high + weights[1]*gibbs_mix_mid
-            dervative_gibbs = weights[2]*dervative_gibbs_high \
-                + weights[1]*dervative_gibbs_mid
+            derivative_gibbs = weights[2]*derivative_gibbs_high \
+                + weights[1]*derivative_gibbs_mid
     else:  # when only high 2OC region is used
-        gibbs_mix, dervative_gibbs = gibbs_of_mixing(
+        gibbs_mix, derivative_gibbs = gibbs_of_mixing(
             molarmass_ratio,
             org_mole_fraction,
             O2C,
             density,
             FIT_HIGH
         )
-    return gibbs_mix, dervative_gibbs
+    return gibbs_mix, derivative_gibbs
 
 
-def activity_coefficents(
+def activity_coefficients(
         molarmass_ratio,
         org_mole_fraction,
         O2C,
@@ -385,29 +381,29 @@ def activity_coefficents(
         BAT_functional_group=None,
 ):
     """
-    Activity coefficents for water and organic matter, see Gorkowski (2019)
+    Activity coefficients for water and organic matter, see Gorkowski (2019)
 
-    Paramters:
+    Parameters:
     ---------
-        molar mass ratio (float): water MW / orgniac MW
+        molar mass ratio (float): water MW / organic MW
         org mole fraction (float): fraction of organic matter
         O2C (float): oxygen to carbon ratio
         density (float): density of mixture
-        fit_coefficent (dict): dictionary of fit values for low O2C region
+        fit_coefficient (dict): dictionary of fit values for low O2C region
 
     Returns:
     -------
-        activity_water (float): activity coefficent of water
-        activity_organic (float): activity coefficent of organic matter
+        activity_water (float): activity coefficient of water
+        activity_organic (float): activity coefficient of organic matter
         mass_water (float): mass fraction of water
         mass_organic (float): mass fraction of organic matter
     """
-    O2C, molarmass_ratio = convert_to_OH_eqivelent(
+    O2C, molarmass_ratio = convert_to_OH_equivalent(
         O2C,
         molarmass_ratio,
         BAT_functional_group=None
     )
-    gibbs_mix, dervative_gibbs = gibbs_mix_weight(
+    gibbs_mix, derivative_gibbs = gibbs_mix_weight(
             molarmass_ratio,
             org_mole_fraction,
             O2C,
@@ -415,9 +411,9 @@ def activity_coefficents(
         )
     # equations S8 S10
     # the func value for component 1 = LOG(activity coeff. water)
-    ln_gamma_water = gibbs_mix - org_mole_fraction * dervative_gibbs
+    ln_gamma_water = gibbs_mix - org_mole_fraction * derivative_gibbs
     # the func value of the component 2 = LOG(activity coeff. of the organic)
-    ln_gamma_org = gibbs_mix + (1.0 - org_mole_fraction) * dervative_gibbs
+    ln_gamma_org = gibbs_mix + (1.0 - org_mole_fraction) * derivative_gibbs
 
     gamma_water = exp_limited(ln_gamma_water)
     gamma_org = exp_limited(ln_gamma_org)
@@ -453,8 +449,6 @@ def gibbs_free_engery(
         + org_mole_fraction * log_limited(org_mole_fraction)
     gibbs_real = gibbs_ideal + gibbs_mix
     return gibbs_ideal, gibbs_real
-
-# %%
 
 
 def find_phase_sep_index(activity_data):
@@ -638,7 +632,7 @@ def find_phase_separation(activity_water, activity_org):
             'matching_upper_a_w_sep': activity_water[match_index_prime]}
 
 
-def phase_seperation_q_alpha(
+def phase_separation_q_alpha(
         a_w_sep,
         aw_series,
         VBSBAT_options=None
@@ -716,7 +710,7 @@ def biphasic_to_single_phase_RH_point(
             O2C[i],
             H2C[i],
             mass_ratio_convert=True)
-        activities = activity_coefficents(
+        activities = activity_coefficients(
             molarmass_ratio=Mratio[i],
             org_mole_fraction=mole_frac,
             O2C=O2C[i],
@@ -741,29 +735,3 @@ def biphasic_to_single_phase_RH_point(
     RH_cross_point[RH_cross_point > 1] = 1
 
     return RH_cross_point
-
-
-# %
-# not sure about these functions if they are needed.
-# def check_bat_functional_group_inputs_v1(O2C, shift_method):
-#     """
-#     This function checks the inputs of the BAT functional group.
-
-#     Parameters:
-#     O2C (np.array): A numpy array representing O2C values.
-#     shift_method (str/list): A string or list representing the shift method.
-
-#     Returns:
-#     list: The shift method with size equal to O2C.
-#     """
-
-#     max_dim = max(len(O2C), len(shift_method))
-#     if isinstance(shift_method, str):
-#         shift_method = [shift_method for _ in range(max_dim)]
-#     elif isinstance(shift_method, list):
-#         if len(shift_method) == 1:
-#             shift_method = [shift_method[0] for _ in range(max_dim)]
-#         elif len(shift_method) < max_dim:
-#             raise ValueError(f"shift_method has less points than O2C: \
-# {len(shift_method)} vs {max_dim}")
-#     return shift_method
