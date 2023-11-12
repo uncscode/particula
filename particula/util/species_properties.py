@@ -1,7 +1,7 @@
 """ calculate the species properties, saturation vapor pressures,
     latent heats, etc.
 
-    TODO: add a more general class, with a dictionary that can be added from
+    add a more general class, with a dictionary that can be added from
     a file or inputs.
 """
 

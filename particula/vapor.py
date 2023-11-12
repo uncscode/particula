@@ -16,7 +16,7 @@ class Vapor(Environment):
 
     def __init__(self, **kwargs):
         """ initiating the vapor class
-        TODO: add ability for mulitple vapors, with different properties
+        to add ability for mulitple vapors, with different properties
         """
         super().__init__(**kwargs)
 
@@ -60,7 +60,6 @@ class Vapor(Environment):
             return np.array(
                 [driving_force.m]
             )*driving_force.u
-        else:
-            return np.array(
-                [self.vapor_concentration.m]
-            )*self.vapor_concentration.u
+        return np.array(
+            [self.vapor_concentration.m]
+        )*self.vapor_concentration.u

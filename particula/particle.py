@@ -1,6 +1,6 @@
 """ the particule class
 """
-
+# pylint: disable=too-many-instance-attributes
 import numpy as np
 
 from particula import u
@@ -296,17 +296,24 @@ class ParticleCondensation(ParticleInstances):
         )
 
     def particle_saturation_ratio(self):
-        # Saturation ratio at surface acounting for Kelvin effect
-        # using kappa (other option non-ideal mixing options in the future)
-        # TODO: add dry radius to particle object
-        dry_radius = self.particle_radius
+            """
+            Calculates the saturation ratio of the particle at its surface,
+            accounting for the Kelvin effect.
 
-        particle_saturation_ratio = (
-                self.particle_radius**3 - dry_radius**3) / np.maximum(
-                self.particle_radius**3-dry_radius**3*(1.0-self.kappa),
-                1.e-30
-            ) * kelvin_term(self.particle_radius, **self.kwargs)
-        return particle_saturation_ratio
+            Returns:
+            -------
+            float
+                The saturation ratio of the particle at its surface.
+            """
+            # future: add dry radius to particle object
+            dry_radius = self.particle_radius
+
+            particle_saturation_ratio = (
+                    self.particle_radius**3 - dry_radius**3) / np.maximum(
+                    self.particle_radius**3-dry_radius**3*(1.0-self.kappa),
+                    1.e-30
+                ) * kelvin_term(self.particle_radius, **self.kwargs)
+            return particle_saturation_ratio
 
 
 class ParticleWallLoss(ParticleCondensation):
