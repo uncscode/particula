@@ -10,6 +10,11 @@
 # Atmospheric Chemistry and Physics
 # https://doi.org/10.5194/acp-19-13383-2019
 
+# linting disabled until reformatting of this file
+# pylint: disable=all
+# flake8: noqa
+# pytype: skip-file
+
 import numpy as np
 
 
