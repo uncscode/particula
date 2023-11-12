@@ -118,7 +118,7 @@ def merge_formatting(
                 header_new.shape,
                 ' are not the same shape, check the data formatting'
             )
-
+    # check if the headers are numeric
     if list_of_numbers := np.all([x[0].isnumeric() for x in header_current]):
         # convert the headers to floats
         header_list_numeric = np.array(header_current).astype(float)
