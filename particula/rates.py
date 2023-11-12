@@ -136,7 +136,7 @@ class Rates:
             'condensation': condensation,
             'nucleation': nucleation
         }
-
+        # Return the sum of the rates that are enabled
         return sum(
             rates[key]() if option else 0 for key, option in options.items()
         )

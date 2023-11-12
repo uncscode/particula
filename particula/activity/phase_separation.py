@@ -122,6 +122,9 @@ def organic_density_estimate(
     mass_N = 14.0067
 
     # 1) Estimate the H2C value if not provided from input
+    # Assuming an aliphatic compound with H2C = 2.0 in the absence of
+    # functional groups, then correct for oxygen content assuming a linear
+    # -1 slope (Van Krevelen diagram for typical SOA)
     H2Cest = 2.0 - O2C if H2C < 0.1 else H2C
     # 2) Compute the approximate number of carbon atoms per organic molecule
     NC = M / (mass_C + H2Cest * mass_H + O2C * mass_O + N2C * mass_N)
@@ -130,6 +133,9 @@ def organic_density_estimate(
     # Here no correction is applied for rings and aromatic compounds
     # (due to limited info at input)
     rho1 = M / (5.0 * NC * (2.0 + H2Cest + O2C * 2.0 + N2C * 2.0))
+    # the returned denisty is in [g/cm^3]; and scaled assuming that most
+    # that most of the oxygen atoms are able to make H-bonds 
+    # (donor or acceptor)
     return rho1 * (1.0 + min(NC * O2C * 0.1 + NC * N2C * 0.1, 0.3))
 
 
@@ -513,8 +519,10 @@ def find_phase_sep_index(activity_data):
                     ))
 
                 # Assign appropriate indices for phase separation
-                index_phase_sep_starts = min(activity_data_gap_start, index_start)
-                index_phase_sep_end = min(min_index_idilute, restart_match_index)
+                index_phase_sep_starts = min(
+                    activity_data_gap_start, index_start)
+                index_phase_sep_end = min(
+                    min_index_idilute, restart_match_index)
             else:
                 index_phase_sep_starts = index_start
                 index_phase_sep_end = restart_match_index
@@ -632,10 +640,12 @@ def phase_separation_q_alpha(
     delta_a_w_sep = delta_a_w_sep * above_min_delta_a_w_sep_value + \
         ~above_min_delta_a_w_sep_value * MIN_SPREAD_IN_AW
 
-        # calculate curve parameter of sigmoid
-    sigmoid_curve_parameter = log_limited(1 / (1 - 0.99) - 1) / delta_a_w_sep
+    # calculate curve parameter of sigmoid
+    Q_ALPHA_AT_1PHASE_AW = 0.99  # can be changed
+    sigmoid_curve_parameter = log_limited(
+        1 / (1 - Q_ALPHA_AT_1PHASE_AW) - 1) / delta_a_w_sep
 
-        # calculate q_alpha value
+    # calculate q_alpha return value
     return 1 - 1 / (
         1
         + exp_limited(
