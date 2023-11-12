@@ -468,7 +468,7 @@ def list_to_dict(list_of_str: list) -> dict:
         dict: A dictionary where the keys are the strings and the values are
             the index of the string in the list.
     """
-    assert list_of_str, "Input list_of_str must not be empty."
+    assert all(list_of_str), "Input list_of_str must not be empty."
     assert all(isinstance(item, str) for item in list_of_str), \
         "Input list_of_str must contain only strings."
 
