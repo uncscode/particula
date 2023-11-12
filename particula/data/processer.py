@@ -755,12 +755,10 @@ def pass3_processing(
     babs_list = ['Babs405nm[1/Mm]', 'Babs532nm[1/Mm]', 'Babs781nm[1/Mm]']
     bsca_list = ['Bsca405nm[1/Mm]', 'Bsca532nm[1/Mm]', 'Bsca781nm[1/Mm]']
 
-    if 'raw_Babs405nm[1/Mm]' in index_dic:
-        pass
-    else:     # check if raw in dict
+    if 'raw_Babs405nm[1/Mm]' not in index_dic:
         print('Copy raw babs Pass-3')
-        for i, babs in enumerate(babs_list):
-            raw_name = 'raw_' + babs
+        for babs in babs_list:
+            raw_name = f'raw_{babs}'
 
             datalake.datastreams['pass3'].add_processed_data(
                 data_new=datalake.datastreams['pass3'].data_stream[
@@ -768,12 +766,10 @@ def pass3_processing(
                 time_new=time,
                 header_new=[raw_name],
             )
-    if 'raw_Bsca405nm[1/Mm]' in index_dic:
-        pass
-    else:
+    if 'raw_Bsca405nm[1/Mm]' not in index_dic:
         print('Copy raw bsca Pass-3')
-        for i, bsca in enumerate(bsca_list):
-            raw_name = 'raw_' + bsca
+        for bsca in bsca_list:
+            raw_name = f'raw_{bsca}'
 
             datalake.datastreams['pass3'].add_processed_data(
                 data_new=datalake.datastreams['pass3'].data_stream[
@@ -787,13 +783,13 @@ def pass3_processing(
     # calibration loop babs.
     print('Calibrated raw Pass-3')
     for i, babs in enumerate(babs_list):
-        raw_name = 'raw_' + babs
+        raw_name = f'raw_{babs}'
         datalake.datastreams['pass3'].data_stream[index_dic[babs], :] = \
             datalake.datastreams['pass3'].data_stream[index_dic[raw_name], :] \
             * babs_405_532_781[i]
     # calibration loop bsca
     for i, bsca in enumerate(bsca_list):
-        raw_name = 'raw_' + bsca
+        raw_name = f'raw_{bsca}'
         datalake.datastreams['pass3'].data_stream[index_dic[bsca], :] = \
             datalake.datastreams['pass3'].data_stream[index_dic[raw_name], :] \
             * bsca_405_532_781[i]
