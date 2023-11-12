@@ -13,7 +13,7 @@ interpolate the data to the data stream's time array.
 
 import numpy as np
 import warnings
-from typing import List, Tuple, Dict
+from typing import List, Tuple
 from particula.util import convert, stats
 
 
@@ -24,7 +24,7 @@ def combine_data(
         data_new: np.array,
         time_new: np.array,
         header_new: List[str],
-    ) -> Tuple[np.array, List[str], Dict[str, int]]:
+    ) -> Tuple[np.array, List[str], dict[str, int]]:
     """
     Merge or adds processed data together. Accounts for data shape
     miss matches and duplicate timestamps. If the data is a different shape than

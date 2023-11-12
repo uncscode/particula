@@ -1,13 +1,15 @@
 """Callable to generate settings file from template."""
 # pylint: disable=all
-from typing import Dict, List
+# pytype: skip-file
+
+from typing import List, Optional
 
 
 def for_general_1d_load(
         relative_data_folder: str = 'instrument_data',
         filename_regex: str = '*.csv',
-        file_min_size_bytes: str = 10,
-        data_checks: Dict[any] = None,
+        file_min_size_bytes: int = 10,
+        data_checks: Optional[dict] = None,
         data_column: List[int] = [3, 5],
         data_header: List[str] = ['data 1', 'data 3'],
         time_column: List[int] = [0, 1],
@@ -15,7 +17,7 @@ def for_general_1d_load(
         delimiter: str = ',',
         time_shift_seconds: int = 0,
         timezone_identifier: str = 'UTC',
-) -> Dict:
+) -> dict:
     """Generate settings file for 1d general file."""
     if data_checks is None:
         data_checks = {

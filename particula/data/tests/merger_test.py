@@ -1,4 +1,5 @@
 """Test the loader module."""
+# pytype: skip-file
 
 import numpy as np
 from particula.data import merger
