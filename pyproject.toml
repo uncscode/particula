@@ -21,7 +21,11 @@ keywords = [
     "atmospheric", "particles", "climate", "aerosol", "particulate"
 ]
 
-dependencies = ["numpy", "scipy", "pint", "hypersolver==0.0.8"]
+dependencies = [
+    "numpy", "scipy", "pint", "hypersolver==0.0.8", "pandas",
+    "netCDF4", "shapely", "PyMieScatt", "tqdm", "pytz", "typing",
+    "matplotlib"
+]
 
 # This is set automatically by flit using `particula.__version__`
 dynamic = ["version"]
@@ -34,7 +38,8 @@ repository = "https://github.com/uncscode/particula"
 dev = [
     "pylint", "pytest", "autopep8", "jupyterlab",
     "typing", "build", "flake8", "jupyter-book", "ghp-import",
-    "matplotlib",
+    "matplotlib", "pandas", "netCDF4", "shapely", "PyMieScatt",
+    "tqdm", "pytz",
 ]
 
 [build-system]
