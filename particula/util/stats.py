@@ -119,10 +119,7 @@ def merge_formatting(
                 ' are not the same shape, check the data formatting'
             )
 
-    # check if all the headers are numbers by checking the first element
-    list_of_numbers = np.all([x[0].isnumeric() for x in header_current])
-
-    if list_of_numbers:  # make it a sorted list of numbers
+    if list_of_numbers := np.all([x[0].isnumeric() for x in header_current]):
         # convert the headers to floats
         header_list_numeric = np.array(header_current).astype(float)
         header_new_numeric = np.array(header_new).astype(float)
@@ -135,14 +132,13 @@ def merge_formatting(
 
         # sort the data
         data_current = data_current[header_stored_indices, :]
-        data_new = data_new[header_new_indices, :]
     else:
         # match header_new to header_current and sort the data
         header_new_indices = [
                 header_new.index(x) for x in header_current
             ]
         header_new = [header_new[i] for i in header_new_indices]
-        data_new = data_new[header_new_indices, :]
+    data_new = data_new[header_new_indices, :]
     return data_current, header_current, data_new, header_new
 
 
@@ -199,10 +195,12 @@ def average_to_interval(
     # given average interval.
     if len(time_stream) > 100:
         time_lookup_span = round(
+            (
                 average_base_sec
                 * interval_look_buffer_multiple
-                / np.nanmean(np.diff(time_stream[0:100]))
+                / np.nanmean(np.diff(time_stream[:100]))
             )
+        )
     else:
         time_lookup_span = 100
 

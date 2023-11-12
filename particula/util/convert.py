@@ -12,9 +12,7 @@ def coerce_type(data, dtype):
     """
     if not isinstance(data, dtype):
         try:
-            if dtype == np.ndarray:
-                return np.array(data)
-            return dtype(data)
+            return np.array(data) if dtype == np.ndarray else dtype(data)
         except (ValueError, TypeError) as exc:
             raise ValueError(f'Could not coerce {data} to {dtype}') from exc
     return data
@@ -90,9 +88,7 @@ def radius_diameter(value: float, to_diameter: bool = True) -> float:
     -----------
         The converted value.
     """
-    if to_diameter:
-        return value * 2
-    return value / 2
+    return value * 2 if to_diameter else value / 2
 
 
 def volume_to_length(volume: float, length_type: str = 'radius') -> float:
@@ -115,9 +111,7 @@ def volume_to_length(volume: float, length_type: str = 'radius') -> float:
 
     radius = (volume * 3 / (4 * np.pi)) ** (1 / 3)
 
-    if length_type == 'radius':
-        return radius
-    return radius * 2
+    return radius if length_type == 'radius' else radius * 2
 
 
 def length_to_volume(length: float, length_type: str = 'radius') -> float:
@@ -135,10 +129,8 @@ def length_to_volume(length: float, length_type: str = 'radius') -> float:
         The volume.
     """
     if length_type == 'diameter':
-        length = length / 2
-    elif length_type == 'radius':
-        pass
-    else:
+        length /= 2
+    elif length_type != 'radius':
         raise ValueError('length_type must be radius or diameter')
     return (4/3)*np.pi*(length**3)
 
@@ -431,9 +423,7 @@ def convert_sizer_dn(
         # Convert from dn to dn/dlogdp
         return dn_dlogdp / np.log10(upper/lower)
 
-    # Convert from dn/dlogdp to dn
-    d_num = dn_dlogdp * np.log10(upper/lower)
-    return d_num
+    return dn_dlogdp * np.log10(upper/lower)
 
 
 def datetime64_from_epoch_array(
@@ -478,7 +468,7 @@ def list_to_dict(list_of_str: list) -> dict:
         dict: A dictionary where the keys are the strings and the values are
             the index of the string in the list.
     """
-    assert len(list_of_str) > 0, "Input list_of_str must not be empty."
+    assert list_of_str, "Input list_of_str must not be empty."
     assert all(isinstance(item, str) for item in list_of_str), \
         "Input list_of_str must contain only strings."
 
@@ -563,11 +553,8 @@ def data_shape_check(
             concatenate_axis_new = 0  # Default to the first axis
             # Check if the last axis of data matches the length of time
             if data.shape[-1] != len(time):
-                if data.shape[0] == len(time):
-                    warnings.warn("Square data with time shape assumes time \
+                warnings.warn("Square data with time shape assumes time \
                                   axis is the first axis in data.")
-                else:
-                    warnings.warn("Inconsistent shapes between data and time.")
         else:
             # Find the axis that doesn't match the length of time
             concatenate_axis_new = np.argwhere(
@@ -582,12 +569,11 @@ def data_shape_check(
             print(header)
             raise ValueError("Header list length must match the first \
                               dimension of data_new.")
-    else:
-        # check if header is a single entry
-        if len(header) != 1:
-            raise ValueError("Header list must be a single entry if data_new \
-                              is 1D.")
+    elif len(header) == 1:
         # Reshape new data so the concatenate axis is the first axis
         data = np.expand_dims(data, 0)
 
+    else:
+        raise ValueError("Header list must be a single entry if data_new \
+                              is 1D.")
     return data
