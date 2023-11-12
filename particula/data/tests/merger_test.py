@@ -5,13 +5,15 @@ from particula.data import merger
 
 
 def create_sample_data():
+    """Create sample data for testing."""
     data = np.array([[1, 1, 1, 1, 1], [2, 2, 2, 2, 2]])
     time = np.array([0, 1, 2, 3, 4])
     header_list = ['header1', 'header2']
     return data, time, header_list
 
 
-def test_combine_data_with_2D_data():
+def test_combine_data_with_2d_data():
+    """Test with 2d data."""
     # Setup
     data, time, header_list = create_sample_data()
     data_new = np.array([[7, 7], [8, 8]])
@@ -31,7 +33,8 @@ def test_combine_data_with_2D_data():
     assert np.all(merged_header_list == expected_header_list)
 
 
-def test_combine_data_with_1D_data():
+def test_combine_data_with_1d_data():
+    """Test with 1d data."""
     # Setup
     data, time, header_list = create_sample_data()
     data_new = np.array([7, 7])
@@ -52,6 +55,7 @@ def test_combine_data_with_1D_data():
 
 
 def test_combine_data_with_nan_values():
+    """Test with nan values."""
     # Setup
     data, time, header_list = create_sample_data()
     data_new = np.array([
@@ -77,6 +81,7 @@ def test_combine_data_with_nan_values():
 
 
 def test_combine_data_with_transposed_input():
+    """Test with transposed input."""
     # Setup
     data, time, header_list = create_sample_data()
     data_new = np.array([
@@ -100,7 +105,8 @@ def test_combine_data_with_transposed_input():
     assert np.all(merged_header_list == expected_header_list)
 
 
-def test_combine_data_same_time_2D_data():
+def test_combine_data_same_time_2d_data():
+    """Test with 2d data and same time."""
     # Setup
     data, time, header_list = create_sample_data()
     data_new = np.array([[7, 8], [7, 8], [7, 8], [7, 8], [7, 8]])
@@ -120,7 +126,8 @@ def test_combine_data_same_time_2D_data():
     assert np.all(merged_header_list == expected_header_list)
 
 
-def test_combine_data_same_time_1D_data():
+def test_combine_data_same_time_1d_data():
+    """Test with 1d data and same time."""
     # Setup
     data, time, header_list = create_sample_data()
     data_new = np.array([7, 7, 7, 7, 7])

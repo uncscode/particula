@@ -86,7 +86,7 @@ def test_average_to_interval():
             ]
         )
 
-    expeced_std = np.array(
+    expected_std = np.array(
             [
                 [0.0, 17.250, 17.250, 17.250, 17.250,
                     17.250, 17.250, 17.250, 17.250, 17.250,
@@ -104,53 +104,69 @@ def test_average_to_interval():
         )
 
     assert np.allclose(average_base_data, expected_data, rtol=1e-3)
-    assert np.allclose(average_base_data_std, expeced_std, rtol=1e-3)
+    assert np.allclose(average_base_data_std, expected_std, rtol=1e-3)
+
 
 def test_mask_outliers_bottom():
+    """Test the mask_outliers function."""
     data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     bottom = 3
 
-    expected_mask = np.array([False, False, True, True, True, True, True, True, True, True])
+    expected_mask = np.array(
+        [False, False, True, True, True, True, True, True, True, True])
 
     assert np.allclose(stats.mask_outliers(data, bottom=bottom), expected_mask)
 
 
 def test_mask_outliers_top():
+    """Test the mask_outliers function."""
     data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     top = 7
 
-    expected_mask = np.array([True, True, True, True, True, True, True, False, False, False])
+    expected_mask = np.array(
+        [True, True, True, True, True, True, True, False, False, False])
 
     assert np.allclose(stats.mask_outliers(data, top=top), expected_mask)
 
 
 def test_mask_outliers_value():
+    """Test the mask_outliers function."""
     data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     value = 5
 
-    expected_mask = np.array([True, True, True, True, False, True, True, True, True, True])
+    expected_mask = np.array(
+        [True, True, True, True, False, True, True, True, True, True])
 
     assert np.allclose(stats.mask_outliers(data, value=value), expected_mask)
 
 
 def test_mask_outliers_invert():
+    """Test the mask_outliers function."""
     data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     bottom = 3
     top = 7
     invert = True
 
-    expected_mask = np.array([True, True, False, False, False, False, False, True, True, True])
+    expected_mask = np.array(
+        [True, True, False, False, False, False, False, True, True, True])
 
-    assert np.allclose(stats.mask_outliers(data, bottom=bottom, top=top, invert=invert), expected_mask)
+    assert np.allclose(
+        stats.mask_outliers(data, bottom=bottom, top=top, invert=invert),
+        expected_mask)
 
 
 def test_threshold_outliers_all():
+    """Test the threshold_outliers function."""
     data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     bottom = 3
     top = 7
     value = 5
     invert = True
 
-    expected_mask = np.array([True, True, False, False, True, False, False, True, True, True])
+    expected_mask = np.array(
+        [True, True, False, False, True, False, False, True, True, True])
 
-    assert np.allclose(stats.mask_outliers(data, bottom=bottom, top=top, value=value, invert=invert), expected_mask)
+    assert np.allclose(
+        stats.mask_outliers(
+            data, bottom=bottom, top=top, value=value, invert=invert),
+        expected_mask)

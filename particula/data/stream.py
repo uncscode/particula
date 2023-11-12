@@ -81,7 +81,8 @@ class StreamAveraged(Stream):
     average_window: float = field(default_factory=float)
     start_time: float = field(default_factory=float)
     stop_time: float = field(default_factory=float)
-    standard_deviation: np.array = field(default_factory=np.array)
+    standard_deviation: np.ndarray = field(
+        default_factory=lambda: np.array([]))
 
     def __post_init__(self):
         super().__post_init__()
