@@ -351,6 +351,7 @@ def general_data_formatter(
     time_column: Union[int, List[int]],
     time_format: str,
     delimiter: str = ',',
+    header_row: int = 0,
     date_offset: str = None,
     seconds_shift: int = 0,
     timezone_identifier: str = 'UTC'
@@ -383,6 +384,14 @@ def general_data_formatter(
         A tuple containing two np.array objects: the first contains the
         epoch times, and the second contains the data.
     """
+
+    # find str matching in header row and gets index
+    if isinstance(data_column[0], str):
+        data_header = data[header_row].split(delimiter)
+        # Get data column indices
+        data_column = [data_header.index(x)
+                       for x in data_column]
+
     # Check the data format
     data = data_format_checks(data, data_checks)
 
@@ -408,6 +417,7 @@ def sizer_data_formatter(
             time_column: int,
             time_format: str,
             delimiter: str = ',',
+            header_row: int = 0,
             date_offset: str = None,
             seconds_shift: int = 0,
             timezone_identifier: str = 'UTC'
@@ -443,39 +453,24 @@ def sizer_data_formatter(
     """
 
     # Get Dp range and columns
-    data_header = data[data_sizer_reader["header_rows"]].split(delimiter)
+    data_header = data[header_row].split(delimiter)
     dp_range = [
                 data_header.index(data_sizer_reader["Dp_start_keyword"]),
                 data_header.index(data_sizer_reader["Dp_end_keyword"])
                 ]
     dp_columns = list(range(dp_range[0]+1, dp_range[1]))
-    dp_header = [data_header[i] for i in dp_columns]
+    header = [data_header[i] for i in dp_columns]
     # change from np.array
-
-    # Get data columns
-    data_column = [
-        data_header.index(x) for x in data_sizer_reader["list_of_data_headers"]
-        ]
 
     # Format data
     data = data_format_checks(data, data_checks)
 
     # Get data arrays
-    epoch_time, data_smps_2d = sample_data(
+    epoch_time, data_2d = sample_data(
         data,
         time_column,
         time_format,
         dp_columns,
-        delimiter,
-        date_offset,
-        seconds_shift=seconds_shift,
-        timezone_identifier=timezone_identifier
-    )
-    epoch_time, data_smps_1d = sample_data(
-        data,
-        time_column,
-        time_format,
-        data_column,
         delimiter,
         date_offset,
         seconds_shift=seconds_shift,
@@ -493,13 +488,13 @@ def sizer_data_formatter(
                 " Either dw/dlogdp or dw must be specified."
             )
         for i in range(len(epoch_time)):
-            data_smps_2d[i, :] = convert.convert_sizer_dn(
+            data_2d[i, :] = convert.convert_sizer_dn(
                 diameter=np.array(dp_header).astype(float),
-                dn_dlogdp=data_smps_2d[i, :],
+                dn_dlogdp=data_2d[i, :],
                 inverse=inverse
             )
 
-    return epoch_time, dp_header, data_smps_2d, data_smps_1d
+    return epoch_time, data_2d, header
 
 
 def non_standard_date_location(
