@@ -276,7 +276,7 @@ def mask_outliers(
         invert: bool=False
         ) -> np.ndarray:
     """
-    Creat a boolean mask for outliers in a data array. Outliers are defined as
+    Create a boolean mask for outliers in a data array. Outliers are defined as
     values that are either above or below a specified threshold, or that are
     equal to a specified value. Not all parameters need to be specified. If 
     `invert` is True, the mask will be inverted. The mask will be True for
