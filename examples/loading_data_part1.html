@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Loading Data from a File &#8212; Particula Book</title>
+    <title>Loading Data from a File Part 1 &#8212; Particula Book</title>
   
   
   
@@ -65,6 +65,8 @@ const thebe_selector_output = ".output, .cell_output"
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/loading_data_part1';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The Environment Class" href="../documentation/environment.html" />
+    <link rel="prev" title="Ion–particle coagulation" href="ionparticle_coagulation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -170,13 +172,17 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="../tour/part-tour.html">Particula tour</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="distribution_statistics.html">Distribution statistics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="distribution_coagulation.html">Distribution coagulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="distribution_evolution.html">Distribution evolution</a></li>
 <li class="toctree-l1"><a class="reference internal" href="distribution_ambient.html">Distributions</a></li>
 
 <li class="toctree-l1"><a class="reference internal" href="ionparticle_coagulation.html">Ion–particle coagulation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Loading Data from a File Part 1</a></li>
+
+
+
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="nav bd-sidenav">
@@ -469,7 +475,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Loading Data from a File</h1>
+    <h1>Loading Data from a File Part 1</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -479,7 +485,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Data from a File</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Data from a File Part 1</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-path">Working path</a></li>
 </ul>
 </li>
@@ -492,6 +498,7 @@ document.write(`
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#stream-object">Stream Object</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#settings-dictionary">Settings dictionary</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data-with-the-interface">Load the data with the interface</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
 </ul>
 </li>
 </ul>
@@ -506,11 +513,12 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="loading-data-from-a-file">
-<h1>Loading Data from a File<a class="headerlink" href="#loading-data-from-a-file" title="Permalink to this heading">#</a></h1>
-<p>This example shows how to load data from a file into a Stream object. These
-are usufull for doing some automated analysis, but you can just pull
-data from a file and do whatever you want with it.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="loading-data-from-a-file-part-1">
+<h1>Loading Data from a File Part 1<a class="headerlink" href="#loading-data-from-a-file-part-1" title="Permalink to this heading">#</a></h1>
+<p>This example shows how to load data from a file and automate the cleaning,
+formatting, and processing of the data.</p>
+<p>If you have a lot of data and repetitive tasks, you can use the scripts at
+the end of this example to clean up you import process.</p>
 <section id="working-path">
 <h2>Working path<a class="headerlink" href="#working-path" title="Permalink to this heading">#</a></h2>
 <p>Set the working path where the data is stored. For now we’ll use the
@@ -771,6 +779,7 @@ relative_data_folder: CPC_3010_data
 filename_regex: *.csv
 MIN_SIZE_BYTES: 10
 data_loading_function: general_1d_load
+header_row: 0
 data_checks: {&#39;characters&#39;: [10, 100], &#39;char_counts&#39;: {&#39;,&#39;: 4}, &#39;skip_rows&#39;: 0, &#39;skip_end&#39;: 0}
 data_column: [1, 2]
 data_header: [&#39;data 1&#39;, &#39;data 2&#39;]
@@ -803,6 +812,7 @@ Calling the relevant functions.</p>
     <span class="s1">&#39;filename_regex&#39;</span><span class="p">:</span> <span class="s1">&#39;*.csv&#39;</span><span class="p">,</span>
     <span class="s1">&#39;MIN_SIZE_BYTES&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
     <span class="s1">&#39;data_loading_function&#39;</span><span class="p">:</span><span class="s1">&#39;general_1d_load&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;header_row&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
     <span class="s1">&#39;data_checks&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;characters&#39;</span><span class="p">:</span> <span class="p">[</span>
             <span class="mi">10</span><span class="p">,</span>
             <span class="mi">100</span><span class="p">],</span>
@@ -867,7 +877,7 @@ Stream(header=[&#39;data 1&#39;, &#39;data 2&#39;], data=array([[3.3510e+04, 3.3
         <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
         <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">rotation</span><span class="o">=-</span><span class="mi">35</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (epoch)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (UTC)&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Data&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -879,6 +889,13 @@ Stream(header=[&#39;data 1&#39;, &#39;data 2&#39;], data=array([[3.3510e+04, 3.3
 <img alt="../_images/f758708c58ecf14105854601fef18da3ef4e679516699c7acef98c9eb1aa59e6.png" src="../_images/f758708c58ecf14105854601fef18da3ef4e679516699c7acef98c9eb1aa59e6.png" />
 </div>
 </div>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h2>
+<p>We covered how to load data from a file and automate the cleaning, formatting,
+and processing of the data. We then showed how to generate a settings
+dictionary and use that to load the data into a <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object. This is
+useful if you have a lot of data and repetitive tasks. Doing this method also loads and combines multiple files into one <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object.</p>
 </section>
 </section>
 
@@ -912,6 +929,24 @@ Stream(header=[&#39;data 1&#39;, &#39;data 2&#39;], data=array([[3.3510e+04, 3.3
                 <footer class="prev-next-footer">
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="ionparticle_coagulation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Ion–particle coagulation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../documentation/environment.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
@@ -927,7 +962,7 @@ Stream(header=[&#39;data 1&#39;, &#39;data 2&#39;], data=array([[3.3510e+04, 3.3
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Data from a File</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Data from a File Part 1</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-path">Working path</a></li>
 </ul>
 </li>
@@ -940,6 +975,7 @@ Stream(header=[&#39;data 1&#39;, &#39;data 2&#39;], data=array([[3.3510e+04, 3.3
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#stream-object">Stream Object</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#settings-dictionary">Settings dictionary</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data-with-the-interface">Load the data with the interface</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
 </ul>
 </li>
 </ul>
