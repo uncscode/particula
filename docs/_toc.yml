@@ -13,6 +13,7 @@ parts:
   - file: examples/distribution_evolution
   - file: examples/distribution_ambient
   - file: examples/ionparticle_coagulation
+  - file: examples/loading_data_part1
 - caption: Documentation
   numbered: false
   chapters:
