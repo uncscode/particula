@@ -454,6 +454,19 @@ def sizer_data_formatter(
 
     # Get Dp range and columns
     data_header = data[header_row].split(delimiter)
+    # check if start and end keywords are in the header
+    if data_sizer_reader["Dp_start_keyword"] not in data_header:
+        # rise error with snip of data header
+        raise ValueError(
+            f"Cannot find '{data_sizer_reader['Dp_start_keyword']}' in header"\
+            + f" {data_header[:20]}..."
+        )
+    if data_sizer_reader["Dp_end_keyword"] not in data_header:
+        # rise error with snip of data header
+        raise ValueError(
+            f"Cannot find '{data_sizer_reader['Dp_end_keyword']}' in header"\
+            + f" {data_header[:20]}..."
+        )
     dp_range = [
                 data_header.index(data_sizer_reader["Dp_start_keyword"]),
                 data_header.index(data_sizer_reader["Dp_end_keyword"])
@@ -489,7 +502,7 @@ def sizer_data_formatter(
             )
         for i in range(len(epoch_time)):
             data_2d[i, :] = convert.convert_sizer_dn(
-                diameter=np.array(dp_header).astype(float),
+                diameter=np.array(header).astype(float),
                 dn_dlogdp=data_2d[i, :],
                 inverse=inverse
             )

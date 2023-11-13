@@ -60,9 +60,15 @@ def for_general_sizer_1d_2d_load(
         delimiter: str = ',',
         time_shift_seconds: int = 0,
         timezone_identifier: str = 'UTC',
-) -> dict:
+) -> tuple:
     """Generate settings file for 1d general file loader and
-    2d general sizer file loader."""
+    2d general sizer file loader.
+
+    Returns
+    -------
+    Tuple[dict, dict]
+        The settings for the 1d loader and the 2d loader.
+    """
     if data_checks is None:
         data_checks = {
             "characters": [10, 100],
@@ -89,7 +95,7 @@ def for_general_sizer_1d_2d_load(
         'relative_data_folder': relative_data_folder,
         'filename_regex': filename_regex,
         'MIN_SIZE_BYTES': file_min_size_bytes,
-        'data_loading_function': 'general_sizer_2d_load',
+        'data_loading_function': 'general_2d_load',
         'header_row': header_row,
         'data_checks': data_checks,
         'data_sizer_reader': {

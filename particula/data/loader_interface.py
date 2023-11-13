@@ -153,7 +153,7 @@ def load_files_interface(
 
         # elif (self.settings[key]['data_loading_function'] ==
         #         'netcdf_load'):
-        #     self.initialise_netcdf_datastream(key, path, first_pass)
+        #     self.initialise_netcdf_stream(key, path, first_pass)
         #     first_pass = False
         else:
             raise ValueError('Data loading function not recognized',
@@ -211,7 +211,7 @@ def get_1d_stream(
             time=np.array([]),
             files=[]
         )
-    # Input validation
+    # Input validation, should it be abstracted?
     if not isinstance(settings, dict):
         raise TypeError("The setting parameters must be in a dictionary.")
 
@@ -219,8 +219,9 @@ def get_1d_stream(
                      'time_format', 'delimiter', 'time_shift_seconds',
                      'timezone_identifier', 'data_header', 'header_row']
     if any(key not in settings for key in required_keys):
-        raise KeyError(f"The settings dictionary is missing required keys: \
-                       {required_keys}")
+        missing_key = [key for key in required_keys if key not in settings]
+        raise KeyError(
+            f"The settings dictionary is missing required keys: {missing_key}")
 
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"The file path specified does not exist: \
@@ -273,18 +274,18 @@ def get_1d_stream(
     return stream
 
 
-def initialise_2d_datastream(
+def get_2d_stream(
     file_path: str,
     settings: dict,
     first_pass: bool = True,
     stream: Optional[object] = None,
 ) -> object:
     """
-    Initializes a 2D datastream using the settings in the DataLake object.
+    Initializes a 2D stream using the settings in the DataLake object.
 
     Parameters:
     ----------
-        key (str): The key of the datastream to initialise.
+        key (str): The key of the stream to initialise.
         path (str): The path of the file to load data from.
         first_pass (bool): Whether this is the first time loading data.
 
@@ -303,13 +304,14 @@ def initialise_2d_datastream(
     if not isinstance(settings, dict):
         raise TypeError("The setting parameters must be in a dictionary.")
 
-    required_keys = ['data_checks', 'data_column', 'time_column',
+    required_keys = ['data_checks', 'time_column',
                      'time_format', 'delimiter', 'time_shift_seconds',
-                     'timezone_identifier', 'data_header', 'data_sizer_reader'
+                     'timezone_identifier', 'data_sizer_reader',
                      'header_row']
     if any(key not in settings for key in required_keys):
-        raise KeyError(f"The settings dictionary is missing required keys: \
-                       {required_keys}")
+        missing_key = [key for key in required_keys if key not in settings]
+        raise KeyError(
+            f"The settings dictionary is missing required keys: {missing_key}")
 
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"The file path specified does not exist: \
@@ -361,19 +363,19 @@ def initialise_2d_datastream(
     return stream
 
 
-# def initialise_netcdf_datastream(
+# def initialise_netcdf_stream(
 #     self,
 #     key: str,
 #     path: str,
 #     first_pass: bool
 # ) -> None:
 #     """
-#     Initialise a netcdf datastream using the settings in the DataLake
+#     Initialise a netcdf stream using the settings in the DataLake
 #     object. This can load either 1D or 2D data, as specified in the
 #     settings.
 #     Parameters:
 #     ----------
-#         key (str): The key of the datastream to initialise.
+#         key (str): The key of the stream to initialise.
 #         path (str): The path of the file to load data from.
 #         first_pass (bool): Whether this is the first time loading data.
 
@@ -391,16 +393,16 @@ def initialise_2d_datastream(
 #             file_path=path,
 #             settings=self.settings[key])
 
-#         if first_pass:  # create the datastream
-#             self.datastreams[
+#         if first_pass:  # create the stream
+#             self.streams[
 #                 self.settings[key]['data_stream_name'][0]
-#             ] = DataStream(
+#             ] = stream(
 #                 header_list=header_1d,
 #                 average_times=[600],
 #                 average_base=self.settings[key]['base_interval_sec']
 #             )
 
-#         self.datastreams[
+#         self.streams[
 #             self.settings[key]['data_stream_name'][0]
 #         ].add_data(
 #             time_stream=epoch_time,
@@ -412,16 +414,16 @@ def initialise_2d_datastream(
 #             file_path=path,
 #             settings=self.settings[key])
 
-#         if first_pass:  # create the datastream
-#             self.datastreams[
+#         if first_pass:  # create the stream
+#             self.streams[
 #                 self.settings[key]['data_stream_name'][1]
-#             ] = DataStream(
+#             ] = stream(
 #                 header_list=header_2d,
 #                 average_times=[600],
 #                 average_base=self.settings[key]['base_interval_sec']
 #             )
 
-#         self.datastreams[
+#         self.streams[
 #             self.settings[key]['data_stream_name'][1]
 #         ].add_data(
 #             time_stream=epoch_time,
