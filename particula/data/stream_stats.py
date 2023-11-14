@@ -152,10 +152,8 @@ def filtering(
         # if any columns are then drop that whole column
         mask_sum = np.invert(np.sum(np.invert(mask), axis=0) > 0)
         stream = drop_masked(stream, mask_sum)
-    else:
-        # Replace filtered-out values with 'replace_with' if provided
-        if replace_with is not None:
-            stream.data = np.where(mask, stream.data, replace_with)
-            # No need to modify 'stream.time' as it remains consistent with
-            # 'stream.data'
+    elif replace_with is not None:
+        stream.data = np.where(mask, stream.data, replace_with)
+        # No need to modify 'stream.time' as it remains consistent with
+        # 'stream.data'
     return stream
