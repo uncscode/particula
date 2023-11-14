@@ -51,7 +51,7 @@ def test_stream_averaged_initialization():
     data = np.array([1, 2, 3])
     time = np.array([1.0, 2.0, 3.0])
     files = ['file1', 'file2']
-    average_window = 1.0
+    average_interval = 1.0
     start_time = 0.0
     stop_time = 2.0
     standard_deviation = np.array([0.1, 0.2, 0.3])
@@ -62,7 +62,7 @@ def test_stream_averaged_initialization():
         data=data,
         time=time,
         files=files,
-        average_window=average_window,
+        average_interval=average_interval,
         start_time=start_time,
         stop_time=stop_time,
         standard_deviation=standard_deviation)
@@ -72,7 +72,7 @@ def test_stream_averaged_initialization():
     assert np.array_equal(stream_averaged.data, data)
     assert np.array_equal(stream_averaged.time, time)
     assert stream_averaged.files == files
-    assert stream_averaged.average_window == average_window
+    assert stream_averaged.average_interval == average_interval
     assert stream_averaged.start_time == start_time
     assert stream_averaged.stop_time == stop_time
     assert np.array_equal(stream_averaged.standard_deviation,

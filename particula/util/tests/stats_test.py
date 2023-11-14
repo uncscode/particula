@@ -63,8 +63,12 @@ def test_average_to_interval():
 
     # Call the function
     average_base_data, average_base_data_std = stats.average_to_interval(
-        time_stream, average_base_sec, average_base_time,
-        data_stream, average_base_data, average_base_data_std
+        time_raw=time_stream,
+        data_raw=data_stream,
+        average_interval=average_base_sec,
+        average_interval_array=average_base_time,
+        average_data=average_base_data,
+        average_data_std=average_base_data_std
     )
     expected_data = np.array(
             [

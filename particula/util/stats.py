@@ -31,7 +31,7 @@ def drop_zeros(datastream_object: object, zero_keys: list) -> object:
             ),
             axis=0
         ) == 0
-    datastream_object.data_stream = datastream_object.data_stream[:, zeros]
+    datastream_object.data_raw = datastream_object.data_raw[:, zeros]
     datastream_object.time_stream = datastream_object.time_stream[zeros]
     datastream_object.reaverage()
     return datastream_object
@@ -143,34 +143,34 @@ def merge_formatting(
 
 
 def average_to_interval(
-            time_stream: np.ndarray,
-            average_base_sec: float,
-            average_base_time: np.ndarray,
-            data_stream: np.ndarray,
-            average_base_data: np.ndarray,
-            average_base_data_std: np.ndarray
+            time_raw: np.ndarray,
+            data_raw: np.ndarray,
+            average_interval: float,
+            average_interval_array: np.ndarray,
+            average_data: np.ndarray,
+            average_data_std: np.ndarray
         ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Calculate the average of the data stream over the specified time intervals.
 
     This function calculates the average of the data stream over a series of
-    time intervals specified by `average_base_time`. The average and standard
+    time intervals specified by `average_interval_array`. The average and standard
     deviation of the data are calculated for each interval, and the results
     are returned as two arrays.
 
     Parameters:
     ----------
-        time_stream (np.ndarray): An array of timestamps, sorted in ascending
+        time_raw (np.ndarray): An array of timestamps, sorted in ascending
             order.
-        average_base_sec (float): The length of each time interval in seconds.
-        average_base_time (np.ndarray): An array of timestamps representing
+        average_interval (float): The length of each time interval in seconds.
+        average_interval_array (np.ndarray): An array of timestamps representing
             the start times of each time interval.
-        data_stream (np.ndarray): An array of data points corresponding to the
-            timestamps in `time_stream`.
-        average_base_data (np.ndarray): An empty array of shape
+        data_raw (np.ndarray): An array of data points corresponding to the
+            timestamps in `time_raw`.
+        average_data (np.ndarray): An empty array of shape
             (num_channels, num_intervals)that will be filled with the
             average data for each time interval.
-        average_base_data_std (np.ndarray): An empty array of shape
+        average_data_std (np.ndarray): An empty array of shape
             (num_channels, num_intervals) that will be filled with the standard
             deviation of the data for each time interval.
 
@@ -179,40 +179,38 @@ def average_to_interval(
         Tuple[np.ndarray, np.ndarray]: A tuple containing the average data
             and the standard deviation of the data, both as arrays of shape
             (num_channels, num_intervals).
-
-    TODO: add custom average starting interval
     """
 
     # average the data in the time interval initialization
-    # find closet index in time_stream to the start time
-    start_index = np.argmin(np.abs(average_base_time[0] - time_stream))
+    # find closet index in time_raw to the start time
+    start_index = np.argmin(np.abs(average_interval_array[0] - time_raw))
     # start_index = 0
     stop_index = 0
     interval_look_buffer_multiple = 2
-    start_time = time_stream[0]
+    start_time = time_raw[0]
 
-    # estimating how much of the time_stream we would need to look at for a
+    # estimating how much of the time_raw we would need to look at for a
     # given average interval.
-    if len(time_stream) > 100:
+    if len(time_raw) > 100:
         time_lookup_span = round(
             (
-                average_base_sec
+                average_interval
                 * interval_look_buffer_multiple
-                / np.nanmean(np.diff(time_stream[:100]))
+                / np.nanmean(np.diff(time_raw[:100]))
             )
         )
     else:
         time_lookup_span = 100
 
     # loop through the average time intervals
-    for i, time_i in enumerate(average_base_time, start=1):
-        if (stop_index < len(time_stream)) and (start_time < time_i):
+    for i, time_i in enumerate(average_interval_array, start=1):
+        if (stop_index < len(time_raw)) and (start_time < time_i):
 
-            # trying to only look at the time_stream in the average time
+            # trying to only look at the time_raw in the average time
             # interval, assumes that the time stream is sorted
-            if start_index+time_lookup_span < len(time_stream):
+            if start_index+time_lookup_span < len(time_raw):
                 compare_bool = np.nonzero(
-                        time_stream[start_index:start_index+time_lookup_span]
+                        time_raw[start_index:start_index+time_lookup_span]
                         >= time_i
                     )
                 if len(compare_bool[0]) > 0:
@@ -220,19 +218,19 @@ def average_to_interval(
                 else:
                     # used it all for this iteration
                     compare_bool = np.nonzero(
-                            time_stream[start_index:]
+                            time_raw[start_index:]
                             >= time_i
                         )
                     stop_index = start_index+compare_bool[0][0]
                     # re-calculate time look up span,
                     # as timesteps have changed
-                    if len(time_stream[start_index:]) > 100:
+                    if len(time_raw[start_index:]) > 100:
                         time_lookup_span = round(
-                                average_base_sec
+                                average_interval
                                 * interval_look_buffer_multiple
                                 / np.nanmean(
                                     np.diff(
-                                        time_stream[
+                                        time_raw[
                                             start_index:start_index+100
                                         ]
                                     )
@@ -242,28 +240,28 @@ def average_to_interval(
                         time_lookup_span = 100
             else:
                 compare_bool = np.nonzero(
-                            time_stream[
+                            time_raw[
                                     start_index:start_index + time_lookup_span
                                 ] >= time_i
                         )
                 if len(compare_bool[0]) > 0:
                     stop_index = start_index + compare_bool[0][0]
                 else:
-                    stop_index = len(time_stream)
+                    stop_index = len(time_raw)
 
             if start_index < stop_index:
                 # average the data in the time interval
-                average_base_data[:, i-1] = np.nanmean(
-                    data_stream[:, start_index:stop_index], axis=1
+                average_data[:, i-1] = np.nanmean(
+                    data_raw[:, start_index:stop_index], axis=1
                     )  # the actual averaging of data is here
-                average_base_data_std[:, i-1] = np.nanstd(
-                    data_stream[:, start_index:stop_index], axis=1
+                average_data_std[:, i-1] = np.nanstd(
+                    data_raw[:, start_index:stop_index], axis=1
                     )  # the actual std data is here
             else:
-                start_time = time_stream[stop_index]
+                start_time = time_raw[stop_index]
             start_index = stop_index
 
-    return average_base_data, average_base_data_std
+    return average_data, average_data_std
 
 
 def mask_outliers(
@@ -290,7 +288,9 @@ def mask_outliers(
 
     Returns:
     -------
-        np.ndarray: A boolean mask for the outliers in the data array.
+        np.ndarray: A boolean mask for the outliers in the data array. Mask is
+            True for non-outliers and False for outliers, and the same shape as
+            the data array.
     """
 
     # initialize the mask
@@ -317,22 +317,3 @@ def mask_outliers(
     return mask
 
 
-def drop_mask(datastream_object: object, mask: np.ndarray) -> object:
-    """Drop rows where mask is false, and return data stream.
-
-    Parameters
-    ----------
-    datastream_object : object
-        data stream object
-    mask : np.ndarray
-        mask to apply to data stream
-
-    Returns
-    -------
-    object
-        data stream object
-    """
-    datastream_object.data_stream = datastream_object.data_stream[:, mask[0, :]]
-    datastream_object.time_stream = datastream_object.time_stream[mask[0, :]]
-    datastream_object.reaverage()
-    return datastream_object
