@@ -65,7 +65,7 @@ const thebe_selector_output = ".output, .cell_output"
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/loading_data_part2';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The Environment Class" href="../documentation/environment.html" />
+    <link rel="next" title="Stream Stats" href="stream_stats_part1.html" />
     <link rel="prev" title="Loading Data Part 1" href="loading_data_part1.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -184,6 +184,10 @@ const thebe_selector_output = ".output, .cell_output"
 
 
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Loading Data Part 2</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="stream_stats_part1.html">Stream Stats</a></li>
+
 
 
 </ul>
@@ -679,7 +683,7 @@ like.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/3f579838991edf660a549661924e93a948cb0e2efe62247434fb7eb964126c20.png" src="../_images/3f579838991edf660a549661924e93a948cb0e2efe62247434fb7eb964126c20.png" />
+<img alt="../_images/20792551dcaf367ec39f626da37bbb15fb3d088e15f5532aa56ddfafeb8d0b69.png" src="../_images/20792551dcaf367ec39f626da37bbb15fb3d088e15f5532aa56ddfafeb8d0b69.png" />
 </div>
 </div>
 </section>
@@ -712,7 +716,7 @@ This is done with the <code class="docutils literal notranslate"><span class="pr
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/40bc580d3cc981be7d8437e4d07b1f12dc962c34a7999f1c85706741f60ebea5.png" src="../_images/40bc580d3cc981be7d8437e4d07b1f12dc962c34a7999f1c85706741f60ebea5.png" />
+<img alt="../_images/3cb69d55b0034ceec60c48c83ca5d50a69ffa4a111d37ad1894847a9fd4f62b1.png" src="../_images/3cb69d55b0034ceec60c48c83ca5d50a69ffa4a111d37ad1894847a9fd4f62b1.png" />
 </div>
 </div>
 </section>
@@ -726,7 +730,7 @@ how the data changes over time.</p>
 <span class="c1"># to plot the concentration in log space</span>
 <span class="n">concentration</span> <span class="o">=</span> <span class="n">data</span>
 <span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">concentration</span> <span class="o">&lt;</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="n">concentration</span><span class="p">)</span>
-<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">concentration</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="o">**</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">concentration</span><span class="p">)</span>
+<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">concentration</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="o">**</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">5</span><span class="p">,</span> <span class="n">concentration</span><span class="p">)</span>
 <span class="c1"># concentration = np.log10(concentration)</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -745,7 +749,7 @@ how the data changes over time.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/0fb1ba111177b5cb4f6deb78c41c9f4b3b482382d46efdfdda3302f3afdf4c1a.png" src="../_images/0fb1ba111177b5cb4f6deb78c41c9f4b3b482382d46efdfdda3302f3afdf4c1a.png" />
+<img alt="../_images/61e68058f8385a581558047b804185e841aebd19d9bfa83c2e46ed96ea116573.png" src="../_images/61e68058f8385a581558047b804185e841aebd19d9bfa83c2e46ed96ea116573.png" />
 </div>
 </div>
 </section>
@@ -881,10 +885,10 @@ Calling the relevant functions.</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading data from: 2022-07-07_095151_SMPS.csv
+Loading data from: 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading data from: 2022-07-10_094659_SMPS.csv
-Loading data from: 2022-07-07_095151_SMPS.csv
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading data from: 2022-07-07_095151_SMPS.csv
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading data from: 2022-07-10_094659_SMPS.csv
@@ -924,19 +928,19 @@ Stream(header=[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample
        1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
 
 Data stream 2d summary:
-Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39;, &#39;22.27&#39;, &#39;22.67&#39;, &#39;23.08&#39;, &#39;23.50&#39;, &#39;23.93&#39;, &#39;24.36&#39;, &#39;24.80&#39;, &#39;25.25&#39;, &#39;25.71&#39;, &#39;26.18&#39;, &#39;26.66&#39;, &#39;27.14&#39;, &#39;27.63&#39;, &#39;28.13&#39;, &#39;28.64&#39;, &#39;29.16&#39;, &#39;29.69&#39;, &#39;30.23&#39;, &#39;30.78&#39;, &#39;31.34&#39;, &#39;31.91&#39;, &#39;32.49&#39;, &#39;33.08&#39;, &#39;33.68&#39;, &#39;34.29&#39;, &#39;34.91&#39;, &#39;35.55&#39;, &#39;36.19&#39;, &#39;36.85&#39;, &#39;37.52&#39;, &#39;38.20&#39;, &#39;38.89&#39;, &#39;39.60&#39;, &#39;40.32&#39;, &#39;41.05&#39;, &#39;41.79&#39;, &#39;42.55&#39;, &#39;43.32&#39;, &#39;44.11&#39;, &#39;44.91&#39;, &#39;45.73&#39;, &#39;46.56&#39;, &#39;47.40&#39;, &#39;48.26&#39;, &#39;49.14&#39;, &#39;50.03&#39;, &#39;50.94&#39;, &#39;51.86&#39;, &#39;52.80&#39;, &#39;53.76&#39;, &#39;54.74&#39;, &#39;55.73&#39;, &#39;56.74&#39;, &#39;57.77&#39;, &#39;58.82&#39;, &#39;59.89&#39;, &#39;60.98&#39;, &#39;62.08&#39;, &#39;63.21&#39;, &#39;64.36&#39;, &#39;65.52&#39;, &#39;66.71&#39;, &#39;67.93&#39;, &#39;69.16&#39;, &#39;70.41&#39;, &#39;71.69&#39;, &#39;72.99&#39;, &#39;74.32&#39;, &#39;75.67&#39;, &#39;77.04&#39;, &#39;78.44&#39;, &#39;79.86&#39;, &#39;81.31&#39;, &#39;82.79&#39;, &#39;84.29&#39;, &#39;85.82&#39;, &#39;87.38&#39;, &#39;88.96&#39;, &#39;90.58&#39;, &#39;92.22&#39;, &#39;93.90&#39;, &#39;95.60&#39;, &#39;97.34&#39;, &#39;99.10&#39;, &#39;100.90&#39;, &#39;102.74&#39;, &#39;104.60&#39;, &#39;106.50&#39;, &#39;108.43&#39;, &#39;110.40&#39;, &#39;112.40&#39;, &#39;114.44&#39;, &#39;116.52&#39;, &#39;118.64&#39;, &#39;120.79&#39;, &#39;122.98&#39;, &#39;125.21&#39;, &#39;127.49&#39;, &#39;129.80&#39;, &#39;132.16&#39;, &#39;134.56&#39;, &#39;137.00&#39;, &#39;139.49&#39;, &#39;142.02&#39;, &#39;144.60&#39;, &#39;147.22&#39;, &#39;149.89&#39;, &#39;152.61&#39;, &#39;155.38&#39;, &#39;158.20&#39;, &#39;161.08&#39;, &#39;164.00&#39;, &#39;166.98&#39;, &#39;170.01&#39;, &#39;173.09&#39;, &#39;176.24&#39;, &#39;179.43&#39;, &#39;182.69&#39;, &#39;186.01&#39;, &#39;189.38&#39;, &#39;192.82&#39;, &#39;196.32&#39;, &#39;199.89&#39;, &#39;203.51&#39;, &#39;207.21&#39;, &#39;210.97&#39;, &#39;214.80&#39;, &#39;218.70&#39;, &#39;222.67&#39;, &#39;226.71&#39;, &#39;230.82&#39;, &#39;235.01&#39;, &#39;239.28&#39;, &#39;243.62&#39;, &#39;248.05&#39;, &#39;252.55&#39;, &#39;257.13&#39;, &#39;261.80&#39;, &#39;266.55&#39;, &#39;271.39&#39;, &#39;276.32&#39;, &#39;281.33&#39;, &#39;286.44&#39;, &#39;291.64&#39;, &#39;296.93&#39;, &#39;302.32&#39;, &#39;307.81&#39;, &#39;313.40&#39;, &#39;319.08&#39;, &#39;324.88&#39;, &#39;330.77&#39;, &#39;336.78&#39;, &#39;342.89&#39;, &#39;349.12&#39;, &#39;355.45&#39;, &#39;361.90&#39;, &#39;368.47&#39;, &#39;375.16&#39;, &#39;381.97&#39;, &#39;388.91&#39;, &#39;395.96&#39;, &#39;403.15&#39;, &#39;410.47&#39;, &#39;417.92&#39;, &#39;425.51&#39;, &#39;433.23&#39;, &#39;441.09&#39;, &#39;449.10&#39;, &#39;457.25&#39;, &#39;465.55&#39;, &#39;474.00&#39;, &#39;482.61&#39;, &#39;491.37&#39;, &#39;500.29&#39;, &#39;509.37&#39;, &#39;518.61&#39;, &#39;528.03&#39;, &#39;537.61&#39;, &#39;547.37&#39;, &#39;557.31&#39;, &#39;567.42&#39;, &#39;577.72&#39;, &#39;588.21&#39;, &#39;598.89&#39;, &#39;609.76&#39;, &#39;620.82&#39;, &#39;632.09&#39;, &#39;643.57&#39;, &#39;655.25&#39;, &#39;667.14&#39;, &#39;679.25&#39;, &#39;691.58&#39;, &#39;704.14&#39;, &#39;716.92&#39;, &#39;729.93&#39;, &#39;743.18&#39;, &#39;756.67&#39;, &#39;770.40&#39;, &#39;784.39&#39;], data=array([[ 48.61238578,  44.77267394,  41.14076315, ...,  79.34844804,
-         69.82018511, 114.54210553],
-       [ 22.15597542,  45.89533787,  38.87339256, ...,  62.46996336,
-         87.41141628,  90.13918579],
-       [ 37.32620324,  49.15319788,  34.00511123, ...,  68.46352554,
-         64.25811167, 107.50020941],
+Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39;, &#39;22.27&#39;, &#39;22.67&#39;, &#39;23.08&#39;, &#39;23.50&#39;, &#39;23.93&#39;, &#39;24.36&#39;, &#39;24.80&#39;, &#39;25.25&#39;, &#39;25.71&#39;, &#39;26.18&#39;, &#39;26.66&#39;, &#39;27.14&#39;, &#39;27.63&#39;, &#39;28.13&#39;, &#39;28.64&#39;, &#39;29.16&#39;, &#39;29.69&#39;, &#39;30.23&#39;, &#39;30.78&#39;, &#39;31.34&#39;, &#39;31.91&#39;, &#39;32.49&#39;, &#39;33.08&#39;, &#39;33.68&#39;, &#39;34.29&#39;, &#39;34.91&#39;, &#39;35.55&#39;, &#39;36.19&#39;, &#39;36.85&#39;, &#39;37.52&#39;, &#39;38.20&#39;, &#39;38.89&#39;, &#39;39.60&#39;, &#39;40.32&#39;, &#39;41.05&#39;, &#39;41.79&#39;, &#39;42.55&#39;, &#39;43.32&#39;, &#39;44.11&#39;, &#39;44.91&#39;, &#39;45.73&#39;, &#39;46.56&#39;, &#39;47.40&#39;, &#39;48.26&#39;, &#39;49.14&#39;, &#39;50.03&#39;, &#39;50.94&#39;, &#39;51.86&#39;, &#39;52.80&#39;, &#39;53.76&#39;, &#39;54.74&#39;, &#39;55.73&#39;, &#39;56.74&#39;, &#39;57.77&#39;, &#39;58.82&#39;, &#39;59.89&#39;, &#39;60.98&#39;, &#39;62.08&#39;, &#39;63.21&#39;, &#39;64.36&#39;, &#39;65.52&#39;, &#39;66.71&#39;, &#39;67.93&#39;, &#39;69.16&#39;, &#39;70.41&#39;, &#39;71.69&#39;, &#39;72.99&#39;, &#39;74.32&#39;, &#39;75.67&#39;, &#39;77.04&#39;, &#39;78.44&#39;, &#39;79.86&#39;, &#39;81.31&#39;, &#39;82.79&#39;, &#39;84.29&#39;, &#39;85.82&#39;, &#39;87.38&#39;, &#39;88.96&#39;, &#39;90.58&#39;, &#39;92.22&#39;, &#39;93.90&#39;, &#39;95.60&#39;, &#39;97.34&#39;, &#39;99.10&#39;, &#39;100.90&#39;, &#39;102.74&#39;, &#39;104.60&#39;, &#39;106.50&#39;, &#39;108.43&#39;, &#39;110.40&#39;, &#39;112.40&#39;, &#39;114.44&#39;, &#39;116.52&#39;, &#39;118.64&#39;, &#39;120.79&#39;, &#39;122.98&#39;, &#39;125.21&#39;, &#39;127.49&#39;, &#39;129.80&#39;, &#39;132.16&#39;, &#39;134.56&#39;, &#39;137.00&#39;, &#39;139.49&#39;, &#39;142.02&#39;, &#39;144.60&#39;, &#39;147.22&#39;, &#39;149.89&#39;, &#39;152.61&#39;, &#39;155.38&#39;, &#39;158.20&#39;, &#39;161.08&#39;, &#39;164.00&#39;, &#39;166.98&#39;, &#39;170.01&#39;, &#39;173.09&#39;, &#39;176.24&#39;, &#39;179.43&#39;, &#39;182.69&#39;, &#39;186.01&#39;, &#39;189.38&#39;, &#39;192.82&#39;, &#39;196.32&#39;, &#39;199.89&#39;, &#39;203.51&#39;, &#39;207.21&#39;, &#39;210.97&#39;, &#39;214.80&#39;, &#39;218.70&#39;, &#39;222.67&#39;, &#39;226.71&#39;, &#39;230.82&#39;, &#39;235.01&#39;, &#39;239.28&#39;, &#39;243.62&#39;, &#39;248.05&#39;, &#39;252.55&#39;, &#39;257.13&#39;, &#39;261.80&#39;, &#39;266.55&#39;, &#39;271.39&#39;, &#39;276.32&#39;, &#39;281.33&#39;, &#39;286.44&#39;, &#39;291.64&#39;, &#39;296.93&#39;, &#39;302.32&#39;, &#39;307.81&#39;, &#39;313.40&#39;, &#39;319.08&#39;, &#39;324.88&#39;, &#39;330.77&#39;, &#39;336.78&#39;, &#39;342.89&#39;, &#39;349.12&#39;, &#39;355.45&#39;, &#39;361.90&#39;, &#39;368.47&#39;, &#39;375.16&#39;, &#39;381.97&#39;, &#39;388.91&#39;, &#39;395.96&#39;, &#39;403.15&#39;, &#39;410.47&#39;, &#39;417.92&#39;, &#39;425.51&#39;, &#39;433.23&#39;, &#39;441.09&#39;, &#39;449.10&#39;, &#39;457.25&#39;, &#39;465.55&#39;, &#39;474.00&#39;, &#39;482.61&#39;, &#39;491.37&#39;, &#39;500.29&#39;, &#39;509.37&#39;, &#39;518.61&#39;, &#39;528.03&#39;, &#39;537.61&#39;, &#39;547.37&#39;, &#39;557.31&#39;, &#39;567.42&#39;, &#39;577.72&#39;, &#39;588.21&#39;, &#39;598.89&#39;, &#39;609.76&#39;, &#39;620.82&#39;, &#39;632.09&#39;, &#39;643.57&#39;, &#39;655.25&#39;, &#39;667.14&#39;, &#39;679.25&#39;, &#39;691.58&#39;, &#39;704.14&#39;, &#39;716.92&#39;, &#39;729.93&#39;, &#39;743.18&#39;, &#39;756.67&#39;, &#39;770.40&#39;, &#39;784.39&#39;], data=array([[ 6103.186,  5621.118,  5165.139, ...,  9962.036,  8765.782,
+        14380.528],
+       [ 2832.655,  5867.747,  4969.987, ...,  7986.823, 11175.603,
+        11524.35 ],
+       [ 4733.553,  6233.403,  4312.386, ...,  8682.258,  8148.945,
+        13632.727],
        ...,
-       [  0.73615212,   0.        ,   0.        , ...,   0.        ,
-          0.        ,   0.        ],
-       [  0.97000629,   0.        ,   0.97000629, ...,   0.        ,
-          0.        ,   0.        ],
-       [  0.        ,   0.59493286,   0.9793736 , ...,   0.97991031,
-          2.93952571,   0.        ]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
+       [   93.413,     0.   ,     0.   , ...,     0.   ,     0.   ,
+            0.   ],
+       [  122.992,     0.   ,   122.992, ...,     0.   ,     0.   ,
+            0.   ],
+       [    0.   ,    75.377,   124.085, ...,   124.153,   372.433,
+            0.   ]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
        1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
 </pre></div>
 </div>
@@ -1042,7 +1046,7 @@ None
 <span class="c1"># to plot the concentration in log space</span>
 <span class="n">concentration</span> <span class="o">=</span> <span class="n">data_stream_2d</span><span class="o">.</span><span class="n">data</span>
 <span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">concentration</span> <span class="o">&lt;</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="n">concentration</span><span class="p">)</span>
-<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">concentration</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="o">**</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">concentration</span><span class="p">)</span>
+<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">concentration</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="o">**</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">5</span><span class="p">,</span> <span class="n">concentration</span><span class="p">)</span>
 <span class="c1"># concentration = np.log10(concentration)</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -1062,7 +1066,7 @@ None
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/97a234268b51b79936db5888ce46704f7c2dd0e01e4b9864ae25e13432acd767.png" src="../_images/97a234268b51b79936db5888ce46704f7c2dd0e01e4b9864ae25e13432acd767.png" />
+<img alt="../_images/f091420893b34f8dfd1950050471943e39031f7bc65be5af247f1ea9dbd2e1a4.png" src="../_images/f091420893b34f8dfd1950050471943e39031f7bc65be5af247f1ea9dbd2e1a4.png" />
 </div>
 </div>
 </section>
@@ -1079,6 +1083,122 @@ as a size distribution. It covered the following:</p>
 <li><p>Loading the data with the interface</p></li>
 <li><p>Plotting the data stream</p></li>
 </ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">loader_interface</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on module particula.data.loader_interface in particula.data:
+
+NAME
+    particula.data.loader_interface - interface to import data to a data stream
+
+FUNCTIONS
+    get_1d_stream(file_path: str, settings: dict, first_pass: bool = True, stream: Optional[object] = None) -&gt; object
+        Loads and formats a 1D data stream from a file and initializes or updates
+        a Stream object.
+        
+        Parameters:
+        ----------
+        file_path : str
+            The path of the file to load data from.
+        first_pass : bool
+            Whether this is the first time data is being loaded. If True, the
+            stream is initialized.
+            If False, raises an error as only one file can be loaded.
+        settings : dict
+            A dictionary containing data formatting settings such as data checks,
+            column names,
+            time format, delimiter, and timezone information.
+        stream : Stream, optional
+            An instance of Stream class to be updated with loaded data. Defaults
+            to a new Stream object.
+        
+        Returns:
+        -------
+        Stream
+            The Stream object updated with the loaded data and corresponding time
+            information.
+        
+        Raises:
+        ------
+        ValueError
+            If `first_pass` is False, indicating data has already been loaded.
+        TypeError
+            If `settings` is not a dictionary.
+        FileNotFoundError
+            If the file specified by `file_path` does not exist.
+        KeyError
+            If any required keys are missing in the `settings` dictionary.
+    
+    get_2d_stream(file_path: str, settings: dict, first_pass: bool = True, stream: Optional[object] = None) -&gt; object
+        Initializes a 2D stream using the settings in the DataLake object.
+        
+        Parameters:
+        ----------
+            key (str): The key of the stream to initialise.
+            path (str): The path of the file to load data from.
+            first_pass (bool): Whether this is the first time loading data.
+        
+        Returns:
+        ----------
+            None.
+    
+    get_new_files(path: str, import_settings: dict[str, any], loaded_list: Optional[list] = None) -&gt; tuple
+        Scan a directory for new files based on import settings and stream status.
+        
+        This function looks for files in a specified path using import settings.
+        It compares the new list of files with a pre-loaded list in the stream
+        object to determine which files are new. The comparison is made based on
+        file names and sizes. It returns a tuple with the paths of new files, a
+        boolean indicating if this was the first pass, and a list of file
+        information for new files.
+        
+        Parameters:
+        ----------
+        path : str
+            The top-level directory path to scan for files.
+        import_settings : dict
+            A dictionary with &#39;relative_data_folder&#39;, &#39;filename_regex&#39;,
+            and &#39;MIN_SIZE_BYTES&#39; as keys
+            used to specify the subfolder path and the regex pattern for filtering
+            file names. It should also include &#39;min_size&#39; key to specify the
+            minimum size of the files to be considered.
+        loaded_list : list of lists
+            A list of lists with file names and sizes that have already been
+            loaded. The default is None. If None, it will be assumed that no
+            files have been loaded.
+        
+        Returns:
+        -------
+        tuple of (list, bool, list)
+            A tuple containing a list of full paths of new files, a boolean
+            indicating if no previous files were loaded (True if it&#39;s the first
+            pass), and a list of lists with new file names and sizes.
+        
+        Returns:
+        Raises:
+        ------
+        YourErrorType
+            Explanation of when and why your error is raised and what it means.
+    
+    load_files_interface(path: str, settings: dict, stream: Optional[object] = None) -&gt; object
+        Load files into a stream object based on settings.
+
+DATA
+    Optional = typing.Optional
+        Optional type.
+        
+        Optional[X] is equivalent to Union[X, None].
+
+FILE
+    /opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/particula/data/loader_interface.py
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 </section>
 
@@ -1122,11 +1242,11 @@ as a size distribution. It covered the following:</p>
       </div>
     </a>
     <a class="right-next"
-       href="../documentation/environment.html"
+       href="stream_stats_part1.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</p>
+        <p class="prev-next-title">Stream Stats</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
