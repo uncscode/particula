@@ -73,13 +73,13 @@ class StreamAveraged(Stream):
     """A subclass of Stream with additional parameters related to averaging.
 
     Attributes:
-        average_window (float): The size of the window used for averaging.
+        average_interval (float): The size of the window used for averaging.
         start_time (float): The start time for averaging.
         stop_time (float): The stop time for averaging.
         standard_deviation (float): The standard deviation of the data.
     """
 
-    average_window: float = field(default_factory=float)
+    average_interval: float = field(default_factory=float)
     start_time: float = field(default_factory=float)
     stop_time: float = field(default_factory=float)
     standard_deviation: np.ndarray = field(
@@ -98,8 +98,8 @@ class StreamAveraged(Stream):
             start_time and stop_time are not numbers or if start_time is
             greater than or equal to stop_time.
         """
-        if not isinstance(self.average_window, (int, float)
-                          ) or self.average_window <= 0:
+        if not isinstance(self.average_interval, (int, float)
+                          ) or self.average_interval <= 0:
             raise ValueError("average_window must be a positive number")
         if not isinstance(self.start_time, (int, float)) or \
                 not isinstance(self.stop_time, (int, float)) or \
