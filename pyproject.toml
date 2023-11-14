@@ -23,7 +23,7 @@ keywords = [
 
 dependencies = [
     "numpy", "scipy", "pint", "hypersolver==0.0.8", "pandas",
-    "netCDF4", "shapely", "PyMieScatt", "tqdm", "pytz", "typing",
+    "netCDF4", "shapely", "PyMieScatt", "tqdm", "pytz",
     "matplotlib"
 ]
 
