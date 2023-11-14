@@ -1,3 +1,4 @@
+# pylint: disable=all
 """Functions to operate on stream objects."""
 
 from typing import Optional, Union
@@ -98,6 +99,7 @@ def average_std(
         )
 
 
+# pylint: disable=too-many-arguments
 def filtering(
     stream: object,
     bottom: Optional[float] = None,
