@@ -71,8 +71,6 @@ def caps_processing(
         data_new=kappa_fit.T,
         time_new=datalake.datastreams['CAPS_data'].return_time(
             datetime64=False),
-        time_new=datalake.datastreams['CAPS_data'].return_time(
-            datetime64=False),
         header_new=['kappa_fit', 'kappa_fit_lower', 'kappa_fit_upper'],
     )
     orignal_average = datalake.datastreams['CAPS_data'].average_base_sec
@@ -98,15 +96,11 @@ def caps_processing(
             interp_dry = interp1d(
                 datalake.datastreams['CAPS_data'].return_time(
                     datetime64=False),
-                datalake.datastreams['CAPS_data'].return_time(
-                    datetime64=False),
                 bsca_truncation_dry,
                 kind='linear',
                 fill_value='extrapolate'
             )
             interp_wet = interp1d(
-                datalake.datastreams['CAPS_data'].return_time(
-                    datetime64=False),
                 datalake.datastreams['CAPS_data'].return_time(
                     datetime64=False),
                 bsca_truncation_wet,
