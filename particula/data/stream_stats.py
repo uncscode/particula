@@ -2,13 +2,14 @@
 """Functions to operate on stream objects."""
 
 from typing import Optional, Union
+import copy
 import numpy as np
 
 from particula.util import stats
-from particula.data.stream import StreamAveraged
+from particula.data.stream import StreamAveraged, Stream
 
 
-def drop_masked(stream: object, mask: np.ndarray) -> object:
+def drop_masked(stream: Stream, mask: np.ndarray) -> Stream:
     """Drop rows where mask is false, and return data stream.
 
     Parameters
@@ -29,10 +30,10 @@ def drop_masked(stream: object, mask: np.ndarray) -> object:
 
 
 def average_std(
-        stream: object,
+        stream: Stream,
         average_interval: Union[float, int] = 60,
         new_time_array: Optional[np.ndarray] = None,
-) -> object:
+) -> StreamAveraged:
     """
     Calculate the average and standard deviation of data within a given
     'stream' object over specified intervals.
@@ -101,14 +102,15 @@ def average_std(
 
 # pylint: disable=too-many-arguments
 def filtering(
-    stream: object,
+    stream: Stream,
     bottom: Optional[float] = None,
     top: Optional[float] = None,
     value: Optional[float] = None,
     invert: bool = False,
+    clone: bool = True,
     replace_with: Optional[Union[float, int]] = None,
     drop: Optional[bool] = True,
-) -> object:
+) -> Stream:
     """
     Filters the data of the given 'stream' object based on the specified
     bounds or specific value. The filtered data can be either dropped or
@@ -126,6 +128,9 @@ def filtering(
         Defaults to None.
     - invert (bool): If True, inverts the filter criteria.
         Defaults to False.
+    - clone (bool): If True, returns a copy of the 'stream' object, with
+        filtered data. If False, modifies the 'stream' object in-place.
+        Defaults to True.
     - replace_with (float|int, optional): Value to replace filtered-out data.
         Defaults to None.
     - drop (bool, optional): If True, filtered-out data points are dropped
@@ -140,6 +145,9 @@ def filtering(
 
     add specific data row to filter on
     """
+    # copy of stream object to avoid modifying original
+    if clone:
+        stream = copy.copy(stream)
     # Create a mask for the data that should be retained or replaced
     mask = stats.mask_outliers(
         data=stream.data,
@@ -148,7 +156,6 @@ def filtering(
         value=value,
         invert=invert
     )
-
     if drop and replace_with is None:
         # Apply mask to data and time, dropping filtered values
         # if any columns are then drop that whole column
