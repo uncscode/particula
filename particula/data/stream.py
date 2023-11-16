@@ -46,7 +46,6 @@ class Stream:
     def validate_inputs(self):
         """
         Validates the inputs for the DataStream object.
-
         Raises:
             TypeError: If header is not a list.
         """
