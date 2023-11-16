@@ -2,7 +2,6 @@
 """Functions to operate on stream objects."""
 
 from typing import Optional, Union
-import copy
 import numpy as np
 
 from particula.data.lake import Lake
