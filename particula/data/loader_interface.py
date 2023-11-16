@@ -6,6 +6,7 @@ import os
 import numpy as np
 from particula.data import loader, merger
 from particula.data.stream import Stream
+from particula.data.lake import Lake
 from particula.util import convert
 
 
@@ -108,10 +109,27 @@ def get_new_files(
 def load_files_interface(
         path: str,
         settings: dict,
-        stream: Optional[object] = None,
-) -> object:
+        stream: Optional[Stream] = None,
+) -> Stream:
     """
     Load files into a stream object based on settings.
+
+    Parameters:
+    ----------
+    path : str
+        The top-level directory path to scan for folders of data.
+    folder_settings : dict
+        A dictionary with keys corresponding to the stream names and values
+        corresponding to the settings for each stream. The settings can
+        be generated using the settings_generator function.
+    stream : Stream, optional
+        An instance of Stream class to be updated with loaded data. Defaults
+        to a new Stream object.
+
+    Returns:
+    -------
+    Stream
+        The Stream object updated with the loaded data.
     """
     if stream is None:
         stream = Stream(
@@ -129,7 +147,7 @@ def load_files_interface(
 
     # load the data type
     for file_i, file_path in enumerate(full_paths):
-        print('Loading data from:', file_info[file_i][0])
+        print('  Loading file:', file_info[file_i][0])
 
         if settings['data_loading_function'] == 'general_1d_load':
             stream = get_1d_stream(
@@ -138,8 +156,6 @@ def load_files_interface(
                 settings=settings,
                 stream=stream
             )
-            stream.files.append(file_info[file_i])  # add file info as loaded
-            first_pass = False
 
         elif settings['data_loading_function'] == 'general_2d_load':
             stream = get_2d_stream(
@@ -148,8 +164,6 @@ def load_files_interface(
                 settings=settings,
                 stream=stream
             )
-            stream.files.append(file_info[file_i])  # add file info as loaded
-            first_pass = False
 
         # elif (self.settings[key]['data_loading_function'] ==
         #         'netcdf_load'):
@@ -158,7 +172,54 @@ def load_files_interface(
         else:
             raise ValueError('Data loading function not recognized',
                              settings['data_loading_function'])
+
+        stream.files.append(file_info[file_i])  # add file info as loaded
+        first_pass = False  # set first pass to false after first file
     return stream
+
+
+def load_folders_interface(
+        path: str,
+        folder_settings: dict,
+        lake: Optional[Lake] = None,
+) -> Lake:
+    """
+    Load files into a lake object based on settings.
+
+    Parameters:
+    ----------
+    path : str
+        The top-level directory path to scan for folders of data.
+    folder_settings : dict
+        A dictionary with keys corresponding to the stream names and values
+        corresponding to the settings for each stream. The settings can
+        be generated using the settings_generator function.
+    lake : Lake, optional
+        An instance of Lake class to be updated with loaded data. Defaults
+        to a new Lake object.
+
+    Returns:
+    -------
+    Lake
+        The Lake object updated with the loaded data streams.
+    """
+    if lake is None:
+        lake = Lake()
+
+    # loop through the folders
+    for key, file_settings in folder_settings.items():
+        if key in lake.streams.keys():
+            stream = lake[key]
+        else:
+            stream = None
+        print('Folder Settings:', key)
+        # call the load files interface
+        lake[key] = load_files_interface(
+            path=path,
+            settings=file_settings,
+            stream=stream
+        )
+    return lake
 
 
 def get_1d_stream(

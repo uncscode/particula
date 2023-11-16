@@ -471,7 +471,7 @@ def sizer_data_formatter(
                 data_header.index(data_sizer_reader["Dp_start_keyword"]),
                 data_header.index(data_sizer_reader["Dp_end_keyword"])
                 ]
-    dp_columns = list(range(dp_range[0], dp_range[1]+1))
+    dp_columns = list(range(dp_range[0], dp_range[1]+1))  # +1 to include end
     header = [data_header[i] for i in dp_columns]
     # change from np.array
 

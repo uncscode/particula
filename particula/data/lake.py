@@ -14,7 +14,7 @@ class Lake:
         streams (Dict[str, Stream]): A dictionary to hold streams with their
         names as keys.
     """
-    streams: Dict[str, Any] = field(default_factory=dict)
+    streams: Dict[str, Stream] = field(default_factory=dict)
 
     def add_stream(self, stream: Stream, name: str) -> None:
         """Add a stream to the lake.
@@ -68,9 +68,12 @@ class Lake:
         Example: lake['stream_name']"""
         return self.streams[key]
 
-    def __setitem__(self, key: str, value: Any) -> None:
+    def __setitem__(self, key: str, value: Stream) -> None:
         """Set a stream by name.
         Example: lake['stream_name'] = new_stream"""
+        # verify it is a stream object
+        if not isinstance(value, Stream):
+            raise ValueError(f"This is not a Stream object, {value}")
         self.streams[key] = value
 
     def __delitem__(self, key: str) -> None:

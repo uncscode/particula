@@ -48,9 +48,40 @@ class Stream:
         Validates the inputs for the DataStream object.
         Raises:
             TypeError: If header is not a list.
+        # this might be why I can't call Stream without inputs
         """
         if not isinstance(self.header, list):
             raise TypeError("header_list must be a list")
+
+    def __getitem__(self, index):
+        """Allows for indexing of the data stream.
+        Parameters:
+        ----------
+        index : int or str
+            The index of the data stream to return.
+        Returns:
+        -------
+        np.ndarray
+            The data stream at the specified index."""
+        if index is str:
+            index = self.header.index(index)
+        return self.data[index, :]
+
+    def __setitem__(self, index, value):
+        """Allows for setting of a row of data in the stream.
+        Parameters:
+        ----------
+        index : int or str
+            The index of the data stream to set.
+        value : np.ndarray
+            The data to set at the specified index."""
+        if index is str:
+            index = self.header.index(index)
+        self.data[index, :] = value
+
+    def __len__(self):
+        """Returns the length of the time stream."""
+        return len(self.time)
 
     @property
     def datetime64(self) -> np.ndarray:
@@ -105,3 +136,10 @@ class StreamAveraged(Stream):
                 self.start_time >= self.stop_time:
             raise ValueError(
                 "start_time must be less than stop_time and numerical")
+
+    @property
+    def get_std(self, index) -> np.ndarray:
+        """Returns the standard deviation of the data."""
+        if index is str:
+            index = self.header.index(index)
+        return self.standard_deviation[index, :]
