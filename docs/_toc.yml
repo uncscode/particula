@@ -15,6 +15,7 @@ parts:
   - file: examples/ionparticle_coagulation
   - file: examples/loading_data_part1
   - file: examples/loading_data_part2
+  - file: examples/loading_data_part3
   - file: examples/stream_stats_part1
 - caption: Documentation
   numbered: false

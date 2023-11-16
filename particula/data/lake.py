@@ -2,7 +2,7 @@
 # pytype: skip-file
 
 from dataclasses import dataclass, field
-from typing import Dict, Iterator, Any
+from typing import Dict, Iterator, Any, Tuple
 from particula.data.stream import Stream
 
 
@@ -14,7 +14,7 @@ class Lake:
         streams (Dict[str, Stream]): A dictionary to hold streams with their
         names as keys.
     """
-    streams: Dict[str, Any] = field(default_factory=dict)
+    streams: Dict[str, Stream] = field(default_factory=dict)
 
     def add_stream(self, stream: Stream, name: str) -> None:
         """Add a stream to the lake.
@@ -56,7 +56,19 @@ class Lake:
         """Iterate over the streams in the lake.
         Example: [stream.header for stream in lake]""
         """
+        return iter(self.streams.items())
+
+    def items(self) -> Iterator[Tuple[Any, Any]]:
+        """Return an iterator over the key-value pairs."""
+        return iter(self)
+
+    def values(self) -> Iterator[Any]:
+        """Return an iterator over the values."""
         return iter(self.streams.values())
+
+    def keys(self) -> Iterator[Any]:
+        """Return an iterator over the keys."""
+        return iter(self.streams.keys())
 
     def __len__(self) -> int:
         """Return the number of streams in the lake.
@@ -68,9 +80,12 @@ class Lake:
         Example: lake['stream_name']"""
         return self.streams[key]
 
-    def __setitem__(self, key: str, value: Any) -> None:
+    def __setitem__(self, key: str, value: Stream) -> None:
         """Set a stream by name.
         Example: lake['stream_name'] = new_stream"""
+        # verify it is a stream object
+        if not isinstance(value, Stream):
+            raise ValueError(f"This is not a Stream object, {value}")
         self.streams[key] = value
 
     def __delitem__(self, key: str) -> None:
