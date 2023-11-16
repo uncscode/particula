@@ -75,7 +75,7 @@ class Stream:
             The index of the data stream to set.
         value : np.ndarray
             The data to set at the specified index."""
-        if index is str:
+        if isinstance(index, str):
             index = self.header.index(index)
         self.data[index, :] = value
 
@@ -137,9 +137,8 @@ class StreamAveraged(Stream):
             raise ValueError(
                 "start_time must be less than stop_time and numerical")
 
-    @property
     def get_std(self, index) -> np.ndarray:
         """Returns the standard deviation of the data."""
-        if index is str:
+        if isinstance(index, str):
             index = self.header.index(index)
         return self.standard_deviation[index, :]
