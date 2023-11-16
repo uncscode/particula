@@ -65,7 +65,7 @@ const thebe_selector_output = ".output, .cell_output"
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/loading_data_part2';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Stream Stats" href="stream_stats_part1.html" />
+    <link rel="next" title="Loading Data Part 3" href="loading_data_part3.html" />
     <link rel="prev" title="Loading Data Part 1" href="loading_data_part1.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -184,6 +184,13 @@ const thebe_selector_output = ".output, .cell_output"
 
 
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Loading Data Part 2</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="loading_data_part3.html">Loading Data Part 3</a></li>
+
+
+
+
 
 
 <li class="toctree-l1"><a class="reference internal" href="stream_stats_part1.html">Stream Stats</a></li>
@@ -631,9 +638,9 @@ the start keyword is “Date Time” and the end keyword is “Total Conc”.</p
         <span class="s2">&quot;char_counts&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;/&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
     <span class="p">},</span>
     <span class="n">data_sizer_reader</span><span class="o">=</span><span class="p">{</span>
-        <span class="s1">&#39;Dp_start_keyword&#39;</span><span class="p">:</span> <span class="s1">&#39;Diameter Midpoint (nm)&#39;</span><span class="p">,</span>
-         <span class="s1">&#39;Dp_end_keyword&#39;</span><span class="p">:</span> <span class="s1">&#39;Scan Time (s)&#39;</span><span class="p">,</span>
-         <span class="s1">&#39;convert_scale_from&#39;</span><span class="p">:</span> <span class="s1">&#39;dw/dlogdp&#39;</span>
+        <span class="s1">&#39;Dp_start_keyword&#39;</span><span class="p">:</span> <span class="s1">&#39;20.72&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Dp_end_keyword&#39;</span><span class="p">:</span> <span class="s1">&#39;784.39&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;convert_scale_from&#39;</span><span class="p">:</span> <span class="s1">&#39;dw/dlogdp&#39;</span>
     <span class="p">},</span>
     <span class="n">time_column</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
     <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y %H:%M:%S&quot;</span><span class="p">,</span>
@@ -801,8 +808,8 @@ set to the example data provided.</p>
         <span class="s2">&quot;Mode_(nm)&quot;</span><span class="p">,</span>
         <span class="s2">&quot;Geo_Std_Dev.&quot;</span><span class="p">,</span>
         <span class="s2">&quot;Total_Conc_(#/cc)&quot;</span><span class="p">],</span>
-    <span class="n">data_2d_dp_start_keyword</span><span class="o">=</span><span class="s2">&quot;Diameter Midpoint (nm)&quot;</span><span class="p">,</span>
-    <span class="n">data_2d_dp_end_keyword</span><span class="o">=</span><span class="s2">&quot;Scan Time (s)&quot;</span><span class="p">,</span>
+    <span class="n">data_2d_dp_start_keyword</span><span class="o">=</span><span class="s2">&quot;20.72&quot;</span><span class="p">,</span>
+    <span class="n">data_2d_dp_end_keyword</span><span class="o">=</span><span class="s2">&quot;784.39&quot;</span><span class="p">,</span>
     <span class="n">data_2d_convert_concentration_from</span><span class="o">=</span><span class="s2">&quot;dw/dlogdp&quot;</span><span class="p">,</span>
     <span class="n">time_column</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
     <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y %H:%M:%S&quot;</span><span class="p">,</span>
@@ -846,7 +853,7 @@ MIN_SIZE_BYTES: 10
 data_loading_function: general_2d_load
 header_row: 24
 data_checks: {&#39;characters&#39;: [250], &#39;skip_rows&#39;: 25, &#39;skip_end&#39;: 0, &#39;char_counts&#39;: {&#39;/&#39;: 2, &#39;:&#39;: 2}}
-data_sizer_reader: {&#39;Dp_start_keyword&#39;: &#39;Diameter Midpoint (nm)&#39;, &#39;Dp_end_keyword&#39;: &#39;Scan Time (s)&#39;, &#39;convert_scale_from&#39;: &#39;dw/dlogdp&#39;}
+data_sizer_reader: {&#39;Dp_start_keyword&#39;: &#39;20.72&#39;, &#39;Dp_end_keyword&#39;: &#39;784.39&#39;, &#39;convert_scale_from&#39;: &#39;dw/dlogdp&#39;}
 time_column: [1, 2]
 time_format: %m/%d/%Y %H:%M:%S
 delimiter: ,
@@ -884,14 +891,17 @@ Calling the relevant functions.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading data from: 2022-07-07_095151_SMPS.csv
-Loading data from: 2022-07-10_094659_SMPS.csv
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading data from: 2022-07-07_095151_SMPS.csv
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file:
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading data from: 2022-07-10_094659_SMPS.csv
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 2022-07-10_094659_SMPS.csv
+  Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
 </div>
@@ -988,19 +998,42 @@ class Stream(builtins.object)
  |  __eq__(self, other)
  |      Return self==value.
  |  
+ |  __getitem__(self, index)
+ |      Allows for indexing of the data stream.
+ |      Parameters:
+ |      ----------
+ |      index : int or str
+ |          The index of the data stream to return.
+ |      Returns:
+ |      -------
+ |      np.ndarray
+ |          The data stream at the specified index.
+ |  
  |  __init__(self, header: List[str] = &lt;factory&gt;, data: numpy.ndarray = &lt;factory&gt;, time: numpy.ndarray = &lt;factory&gt;, files: List[str] = &lt;factory&gt;) -&gt; None
  |      Initialize self.  See help(type(self)) for accurate signature.
+ |  
+ |  __len__(self)
+ |      Returns the length of the time stream.
  |  
  |  __post_init__(self)
  |  
  |  __repr__(self)
  |      Return repr(self).
  |  
+ |  __setitem__(self, index, value)
+ |      Allows for setting of a row of data in the stream.
+ |      Parameters:
+ |      ----------
+ |      index : int or str
+ |          The index of the data stream to set.
+ |      value : np.ndarray
+ |          The data to set at the specified index.
+ |  
  |  validate_inputs(self)
  |      Validates the inputs for the DataStream object.
- |      
  |      Raises:
  |          TypeError: If header is not a list.
+ |      # this might be why I can&#39;t call Stream without inputs
  |  
  |  ----------------------------------------------------------------------
  |  Readonly properties defined here:
@@ -1184,8 +1217,45 @@ FUNCTIONS
         YourErrorType
             Explanation of when and why your error is raised and what it means.
     
-    load_files_interface(path: str, settings: dict, stream: Optional[object] = None) -&gt; object
+    load_files_interface(path: str, settings: dict, stream: Optional[particula.data.stream.Stream] = None) -&gt; particula.data.stream.Stream
         Load files into a stream object based on settings.
+        
+        Parameters:
+        ----------
+        path : str
+            The top-level directory path to scan for folders of data.
+        folder_settings : dict
+            A dictionary with keys corresponding to the stream names and values
+            corresponding to the settings for each stream. The settings can
+            be generated using the settings_generator function.
+        stream : Stream, optional
+            An instance of Stream class to be updated with loaded data. Defaults
+            to a new Stream object.
+        
+        Returns:
+        -------
+        Stream
+            The Stream object updated with the loaded data.
+    
+    load_folders_interface(path: str, folder_settings: dict, lake: Optional[particula.data.lake.Lake] = None) -&gt; particula.data.lake.Lake
+        Load files into a lake object based on settings.
+        
+        Parameters:
+        ----------
+        path : str
+            The top-level directory path to scan for folders of data.
+        folder_settings : dict
+            A dictionary with keys corresponding to the stream names and values
+            corresponding to the settings for each stream. The settings can
+            be generated using the settings_generator function.
+        lake : Lake, optional
+            An instance of Lake class to be updated with loaded data. Defaults
+            to a new Lake object.
+        
+        Returns:
+        -------
+        Lake
+            The Lake object updated with the loaded data streams.
 
 DATA
     Optional = typing.Optional
@@ -1242,11 +1312,11 @@ FILE
       </div>
     </a>
     <a class="right-next"
-       href="stream_stats_part1.html"
+       href="loading_data_part3.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Stream Stats</p>
+        <p class="prev-next-title">Loading Data Part 3</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

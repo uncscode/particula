@@ -66,7 +66,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="The Environment Class" href="../documentation/environment.html" />
-    <link rel="prev" title="Loading Data Part 2" href="loading_data_part2.html" />
+    <link rel="prev" title="Loading Data Part 3" href="loading_data_part3.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -184,6 +184,13 @@ const thebe_selector_output = ".output, .cell_output"
 
 
 <li class="toctree-l1"><a class="reference internal" href="loading_data_part2.html">Loading Data Part 2</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="loading_data_part3.html">Loading Data Part 3</a></li>
+
+
+
+
 
 
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Stream Stats</a></li>
@@ -586,10 +593,10 @@ load the data.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading data from: CPC_3010_data_20220710_Jul.csv
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: CPC_3010_data_20220710_Jul.csv
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading data from: CPC_3010_data_20220709_Jul.csv
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: CPC_3010_data_20220709_Jul.csv
 </pre></div>
 </div>
 </div>
@@ -728,7 +735,7 @@ NAME
     particula.data.stream_stats - Functions to operate on stream objects.
 
 FUNCTIONS
-    average_std(stream: object, average_interval: Union[float, int] = 60, new_time_array: Optional[numpy.ndarray] = None) -&gt; object
+    average_std(stream: particula.data.stream.Stream, average_interval: Union[float, int] = 60, new_time_array: Optional[numpy.ndarray] = None) -&gt; particula.data.stream.StreamAveraged
         Calculate the average and standard deviation of data within a given
         &#39;stream&#39; object over specified intervals.
         
@@ -760,7 +767,7 @@ FUNCTIONS
         interval and constructs a &#39;StreamAveraged&#39; object with the results and
         metadata from the original &#39;stream&#39; object.
     
-    drop_masked(stream: object, mask: numpy.ndarray) -&gt; object
+    drop_masked(stream: particula.data.stream.Stream, mask: numpy.ndarray) -&gt; particula.data.stream.Stream
         Drop rows where mask is false, and return data stream.
         
         Parameters
@@ -775,7 +782,7 @@ FUNCTIONS
         object
             stream object
     
-    filtering(stream: object, bottom: Optional[float] = None, top: Optional[float] = None, value: Optional[float] = None, invert: bool = False, replace_with: Union[float, int, NoneType] = None, drop: Optional[bool] = True) -&gt; object
+    filtering(stream: particula.data.stream.Stream, bottom: Optional[float] = None, top: Optional[float] = None, value: Optional[float] = None, invert: bool = False, clone: bool = True, replace_with: Union[float, int, NoneType] = None, drop: Optional[bool] = True) -&gt; particula.data.stream.Stream
         Filters the data of the given &#39;stream&#39; object based on the specified
         bounds or specific value. The filtered data can be either dropped or
         replaced with a specified value.  Note, not all parameters need to be
@@ -792,6 +799,9 @@ FUNCTIONS
             Defaults to None.
         - invert (bool): If True, inverts the filter criteria.
             Defaults to False.
+        - clone (bool): If True, returns a copy of the &#39;stream&#39; object, with
+            filtered data. If False, modifies the &#39;stream&#39; object in-place.
+            Defaults to True.
         - replace_with (float|int, optional): Value to replace filtered-out data.
             Defaults to None.
         - drop (bool, optional): If True, filtered-out data points are dropped
@@ -878,12 +888,12 @@ FILE
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="loading_data_part2.html"
+       href="loading_data_part3.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Loading Data Part 2</p>
+        <p class="prev-next-title">Loading Data Part 3</p>
       </div>
     </a>
     <a class="right-next"
