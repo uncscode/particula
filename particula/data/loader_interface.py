@@ -208,10 +208,7 @@ def load_folders_interface(
 
     # loop through the folders
     for key, file_settings in folder_settings.items():
-        if key in lake.streams.keys():
-            stream = lake[key]
-        else:
-            stream = None
+        stream = lake[key] if key in lake.streams.keys() else None
         print('Folder Settings:', key)
         # call the load files interface
         lake[key] = load_files_interface(
