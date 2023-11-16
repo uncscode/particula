@@ -183,36 +183,3 @@ def stream_add_data(
         stream.time = stream.time[sorted_time_index]
         stream.data = stream.data[:, sorted_time_index]
     return stream
-
-
-def stream_add_processed_data(
-            stream,
-            data_new: np.array,
-            time_new: np.array,
-            header_new: list,
-        ) -> object:
-    """
-    Adds processed data to the data stream. This data has the same time array
-    as the existing data, but we are adding additional data and headers.
-    This is using merger.add_processed_data to merge the new data with the 
-    existing data.
-
-    Parameters:
-    -----------
-    data_new : np.array
-        Processed data to add to the data stream.
-    time_new : np.array
-        Time array for the new data.
-    header_new : list
-        List of headers for the new data.
-    """
-    stream.data, stream.header, stream.header = \
-        combine_data(
-            data=stream.data,
-            time=stream.time,
-            header_list=stream.header,
-            data_new=data_new,
-            time_new=time_new,
-            header_new=header_new,
-        )
-    return stream

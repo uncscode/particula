@@ -2,7 +2,7 @@
 # pytype: skip-file
 
 from dataclasses import dataclass, field
-from typing import Dict, Iterator, Any
+from typing import Dict, Iterator, Any, Tuple
 from particula.data.stream import Stream
 
 
@@ -56,7 +56,19 @@ class Lake:
         """Iterate over the streams in the lake.
         Example: [stream.header for stream in lake]""
         """
+        return iter(self.streams.items())
+
+    def items(self) -> Iterator[Tuple[Any, Any]]:
+        """Return an iterator over the key-value pairs."""
+        return iter(self)
+
+    def values(self) -> Iterator[Any]:
+        """Return an iterator over the values."""
         return iter(self.streams.values())
+
+    def keys(self) -> Iterator[Any]:
+        """Return an iterator over the keys."""
+        return iter(self.streams.keys())
 
     def __len__(self) -> int:
         """Return the number of streams in the lake.

@@ -63,7 +63,7 @@ class Stream:
         -------
         np.ndarray
             The data stream at the specified index."""
-        if index is str:
+        if isinstance(index, str):
             index = self.header.index(index)
         return self.data[index, :]
 

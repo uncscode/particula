@@ -402,9 +402,6 @@ def sizer_mean_properties(
     sizer_dndlogdp_smps = np.nan_to_num(
         datalake.datastreams[stream_key].return_data())
 
-    # # do: fix aps data to concentrations
-    # sizer_dndlogdp_aps = datalake.datastreams['aps_2D'].return_data()/5
-
     total_concentration = np.zeros_like(time) * np.nan
     unit_mass_ugPm3 = np.zeros_like(time) * np.nan
     mean_diameter_nm = np.zeros_like(time) * np.nan
