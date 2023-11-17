@@ -7,11 +7,11 @@ import numpy as np
 
 
 def merge_formatting(
-        data_current: np.array,
+        data_current: np.ndarray,
         header_current: list,
-        data_new: np.array,
+        data_new: np.ndarray,
         header_new: list
-) -> Union[np.array, list, np.array, list]:
+) -> Union[np.ndarray, list, np.ndarray, list]:
     """
     Formats two data arrays and their headers so that the data new can be
     subsiqently added to data current.
