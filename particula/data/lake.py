@@ -102,7 +102,7 @@ class Lake:
         return f"Lake with streams: {list(self.streams.keys())}"
 
     @property
-    def summary(self) -> str:
+    def summary(self) -> None:
         """Return a string summary iterating over each stream
             and print Stream.header.
         Example: lake.summary
