@@ -304,11 +304,11 @@ def sample_data(
             elif value[0] == '.':
                 try:
                     data_array[i, j] = float(value)
-                except ValueError:
+                except ValueError as exc:
                     print(line_array)
                     raise ValueError(
                         f'Data is not a float: row {i}, col {j}, value {value}'
-                    )
+                    ) from exc
 
             elif value.isalpha():
                 true_match = [
@@ -736,6 +736,7 @@ def datalake_to_csv(
         print('saved: ', key)
 
 
+# pylint: disable-all
 def netcdf_get_epoch_time(
         file_path: str,
         settings: dict
