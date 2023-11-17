@@ -15,10 +15,10 @@ from particula.data.stream import Stream
 
 
 def mean_properties(
-    sizer_dndlogdp: List[float],
-    sizer_diameter: List[float],
+    sizer_dndlogdp: np.ndarray,
+    sizer_diameter: np.ndarray,
     total_concentration: Optional[float] = None,
-    sizer_limits: Optional[Tuple[float, float]] = None
+    sizer_limits: Optional[list] = None
 ) -> Tuple[float, float, float, float, float, float, float]:
     """
     Calculates the mean properties of the size distribution.
