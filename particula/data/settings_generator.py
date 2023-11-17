@@ -222,7 +222,7 @@ def save_settings_for_stream(
     dictionary for the data in that folder.
     """
 
-    settings_file_name = 'stream_settings' + settings_sufix + '.json'
+    settings_file_name = f'stream_settings{settings_sufix}.json'
 
     save_path = os.path.join(path, subfolder, settings_file_name)
     # write the json, with 4 space indentation
