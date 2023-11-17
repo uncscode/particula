@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Distribution evolution &#8212; Particula Book</title>
+    <title>Size Distribution Stats &#8212; Particula Book</title>
   
   
   
@@ -62,11 +62,11 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/distribution_evolution';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/stream_stats_size_distribution_part2';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Distributions" href="distribution_ambient.html" />
-    <link rel="prev" title="Distribution coagulation" href="distribution_coagulation.html" />
+    <link rel="next" title="The Environment Class" href="../documentation/environment.html" />
+    <link rel="prev" title="Stream Stats" href="stream_stats_part1.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -175,7 +175,7 @@ const thebe_selector_output = ".output, .cell_output"
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="distribution_statistics.html">Distribution statistics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="distribution_coagulation.html">Distribution coagulation</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Distribution evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distribution_evolution.html">Distribution evolution</a></li>
 <li class="toctree-l1"><a class="reference internal" href="distribution_ambient.html">Distributions</a></li>
 
 <li class="toctree-l1"><a class="reference internal" href="ionparticle_coagulation.html">Ion–particle coagulation</a></li>
@@ -197,7 +197,7 @@ const thebe_selector_output = ".output, .cell_output"
 
 
 
-<li class="toctree-l1"><a class="reference internal" href="stream_stats_size_distribution_part2.html">Size Distribution Stats</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Size Distribution Stats</a></li>
 
 
 
@@ -280,7 +280,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/distribution_evolution.ipynb" target="_blank"
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/stream_stats_size_distribution_part2.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
    title="Launch onBinder"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -298,7 +298,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/distribution_evolution.ipynb" target="_blank"
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/stream_stats_size_distribution_part2.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
    title="Launch onColab"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -364,7 +364,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/distribution_evolution.ipynb" target="_blank"
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/stream_stats_size_distribution_part2.ipynb" target="_blank"
    class="btn btn-sm btn-source-edit-button dropdown-item"
    title="Suggest edit"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -381,7 +381,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/distribution_evolution.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/stream_stats_size_distribution_part2.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -411,7 +411,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="../_sources/examples/distribution_evolution.ipynb" target="_blank"
+      <li><a href="../_sources/examples/stream_stats_size_distribution_part2.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -493,7 +493,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Distribution evolution</h1>
+    <h1>Size Distribution Stats</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -503,10 +503,18 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#for-loop-graph">For loop Graph</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ode-solver">ODE solver</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-on-stepping">summary on stepping</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Size Distribution Stats</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data">Load the data</a></li>
 </ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#processing-the-stream">Processing the Stream</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-data">Plot the Data</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tip-calling-the-header-directly">Tip: Calling the header directly</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+
             </nav>
         </div>
     </div>
@@ -517,155 +525,248 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="distribution-evolution">
-<h1>Distribution evolution<a class="headerlink" href="#distribution-evolution" title="Permalink to this heading">#</a></h1>
-<p>Now that we can make a distribution and calculate coagulation rates, let’s move that forward in time.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="size-distribution-stats">
+<h1>Size Distribution Stats<a class="headerlink" href="#size-distribution-stats" title="Permalink to this heading">#</a></h1>
+<p>This example shows how to process size distribution data from an SMPS.
+The processing returns mean properties of the size distribution, such as
+the mean diameter, median diameter, and total PM2.5 mass.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">particula</span><span class="o">,</span> <span class="nn">matplotlib</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting up computational environment...&quot;</span><span class="p">)</span>
-    <span class="o">%</span><span class="k">pip</span> install -U particula -qqq
-    <span class="o">%</span><span class="k">pip</span> install matplotlib -qqq
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># all the imports</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">loader_interface</span><span class="p">,</span> <span class="n">settings_generator</span>
+<span class="kn">from</span> <span class="nn">particula.data.tests.example_data.get_example_data</span> <span class="kn">import</span> <span class="n">get_data_folder</span>
+<span class="c1"># the new step</span>
+<span class="kn">from</span> <span class="nn">particula.data.process</span> <span class="kn">import</span> <span class="n">size_distribution</span>
 
-
-<span class="kn">from</span> <span class="nn">particula</span> <span class="kn">import</span> <span class="n">particle</span><span class="p">,</span> <span class="n">rates</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">from</span> <span class="nn">particula.util.coagulation_rate</span> <span class="kn">import</span> <span class="n">CoagulationRate</span>
-<span class="kn">from</span> <span class="nn">particula.util.dimensionless_coagulation</span> <span class="kn">import</span> <span class="n">full_coag</span>
-<span class="kn">from</span> <span class="nn">particula.util.input_handling</span> <span class="kn">import</span> <span class="n">in_time</span>
+<span class="c1"># set the parent directory of the data folder</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">get_data_folder</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>We can do this in a simple way by using a for loop to march through the time steps.</p>
+<section id="load-the-data">
+<h2>Load the data<a class="headerlink" href="#load-the-data" title="Permalink to this heading">#</a></h2>
+<p>For this example we’ll use the provided example data. But you can change the
+path to any folder on your computer. We then can used the settings generator
+to</p>
+<p>If you think this settings generator is getting tedious, we hear you. We’ll
+show the fix to that soon.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Time steps</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># settings for the SMPS data</span>
+<span class="n">smps_1d_settings</span><span class="p">,</span> <span class="n">smps_2d_settings</span> <span class="o">=</span> <span class="n">settings_generator</span><span class="o">.</span><span class="n">for_general_sizer_1d_2d_load</span><span class="p">(</span>
+    <span class="n">relative_data_folder</span><span class="o">=</span><span class="s1">&#39;SMPS_data&#39;</span><span class="p">,</span>
+    <span class="n">filename_regex</span><span class="o">=</span><span class="s1">&#39;*.csv&#39;</span><span class="p">,</span>
+    <span class="n">file_min_size_bytes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">header_row</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+    <span class="n">data_checks</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">250</span><span class="p">],</span>
+        <span class="s2">&quot;skip_rows&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+        <span class="s2">&quot;skip_end&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;char_counts&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;/&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="n">data_1d_column</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">&quot;Lower Size (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Upper Size (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Sample Temp (C)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Sample Pressure (kPa)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Relative Humidity (%)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Median (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mean (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Geo. Mean (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mode (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Geo. Std. Dev.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Total Conc. (#/cm³)&quot;</span><span class="p">],</span>
+    <span class="n">data_1d_header</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">&quot;Lower_Size_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Upper_Size_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Sample_Temp_(C)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Sample_Pressure_(kPa)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Relative_Humidity_(%)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Median_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mean_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Geo_Mean_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mode_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Geo_Std_Dev.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Total_Conc_(#/cc)&quot;</span><span class="p">],</span>
+    <span class="n">data_2d_dp_start_keyword</span><span class="o">=</span><span class="s2">&quot;20.72&quot;</span><span class="p">,</span>
+    <span class="n">data_2d_dp_end_keyword</span><span class="o">=</span><span class="s2">&quot;784.39&quot;</span><span class="p">,</span>
+    <span class="n">data_2d_convert_concentration_from</span><span class="o">=</span><span class="s2">&quot;dw/dlogdp&quot;</span><span class="p">,</span>
+    <span class="n">time_column</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y %H:%M:%S&quot;</span><span class="p">,</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
+    <span class="n">time_shift_seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">timezone_identifier</span><span class="o">=</span><span class="s2">&quot;UTC&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="n">simple_dic_kwargs</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="mf">200e-9</span><span class="p">,</span> <span class="c1"># 200 nm median</span>
-    <span class="s2">&quot;nbins&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span> <span class="c1"># 1000 bins</span>
-    <span class="s2">&quot;nparticles&quot;</span><span class="p">:</span> <span class="mf">1e6</span><span class="p">,</span> <span class="c1"># 1e4 #</span>
-    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="c1"># per 1e-6 m^3 (or 1 cc)</span>
-    <span class="s2">&quot;gsigma&quot;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="c1"># relatively narrow</span>
+<span class="c1"># collect settings into a dictionary</span>
+<span class="n">combined_settings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;smps_1d&#39;</span><span class="p">:</span> <span class="n">smps_1d_settings</span><span class="p">,</span>
+    <span class="s1">&#39;smps_2d&#39;</span><span class="p">:</span> <span class="n">smps_2d_settings</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="n">particle_dist2</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">Particle</span><span class="p">(</span><span class="o">**</span><span class="n">simple_dic_kwargs</span><span class="p">)</span> <span class="c1"># pass the kwargs using ** prefix</span>
 
-<span class="c1">#inital distribution</span>
-<span class="n">p_distribution_0</span> <span class="o">=</span> <span class="n">particle_dist2</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">()</span>
-<span class="n">p_radius</span> <span class="o">=</span> <span class="n">particle_dist2</span><span class="o">.</span><span class="n">particle_radius</span>
-<span class="n">coag_kernel</span> <span class="o">=</span> <span class="n">full_coag</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">p_radius</span><span class="p">)</span>
+<span class="c1"># now call the loader interface for files</span>
+<span class="n">lake</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_folders_interface</span><span class="p">(</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+    <span class="n">folder_settings</span><span class="o">=</span><span class="n">combined_settings</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="n">p_distribution_i</span> <span class="o">=</span> <span class="n">p_distribution_0</span>
-
-<span class="n">time_interval</span> <span class="o">=</span> <span class="n">in_time</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">time_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">time_interval</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
-
-<span class="n">distribution_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">time_array</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_distribution_0</span><span class="p">)])</span>
-
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dpa</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time_array</span><span class="p">):</span>
-
-    <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-        <span class="c1"># calculate coagulations</span>
-        <span class="n">coag_gain_i</span> <span class="o">=</span> <span class="n">CoagulationRate</span><span class="p">(</span><span class="n">p_distribution_i</span><span class="p">,</span> <span class="n">p_radius</span><span class="p">,</span> <span class="n">coag_kernel</span><span class="p">)</span><span class="o">.</span><span class="n">coag_gain</span><span class="p">()</span>
-        <span class="n">coag_loss_i</span> <span class="o">=</span> <span class="n">CoagulationRate</span><span class="p">(</span><span class="n">p_distribution_i</span><span class="p">,</span> <span class="n">p_radius</span><span class="p">,</span> <span class="n">coag_kernel</span><span class="p">)</span><span class="o">.</span><span class="n">coag_loss</span><span class="p">()</span>
-
-        <span class="n">net_change</span> <span class="o">=</span> <span class="p">(</span><span class="n">coag_gain_i</span><span class="o">-</span><span class="n">coag_loss_i</span><span class="p">)</span><span class="o">*</span><span class="n">time_interval</span>
-        <span class="n">p_distribution_i</span> <span class="o">=</span> <span class="n">p_distribution_i</span><span class="o">+</span><span class="n">net_change</span>
-
-    <span class="n">distribution_time</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">p_distribution_i</span><span class="o">.</span><span class="n">m</span>
-</pre></div>
-</div>
-</div>
-</div>
-<section id="for-loop-graph">
-<h2>For loop Graph<a class="headerlink" href="#for-loop-graph" title="Permalink to this heading">#</a></h2>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
-
-<span class="n">radius</span> <span class="o">=</span> <span class="n">p_radius</span><span class="o">.</span><span class="n">m</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">p_distribution_0</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Inital&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">distribution_time</span><span class="p">[</span><span class="mi">49</span><span class="p">,:],</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t=50&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">distribution_time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:],</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t=end&#39;</span><span class="p">)</span>
-
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number, </span><span class="si">{</span><span class="n">particle_dist2</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radius, </span><span class="si">{</span><span class="n">particle_dist2</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lake</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/6b06c99e7a4e5f761e7463291156ef6b0f13631abd74d03e0688ca454b0c76e3.png" src="../_images/6b06c99e7a4e5f761e7463291156ef6b0f13631abd74d03e0688ca454b0c76e3.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_1d
+  Loading file: 2022-07-07_095151_SMPS.csv
+  Loading file: 2022-07-10_094659_SMPS.csv
+</pre></div>
 </div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_2d
+  Loading file: 2022-07-07_095151_SMPS.csv
+  Loading file: 2022-07-10_094659_SMPS.csv
+</pre></div>
 </div>
-</section>
-<section id="ode-solver">
-<h2>ODE solver<a class="headerlink" href="#ode-solver" title="Permalink to this heading">#</a></h2>
-<p>Instead of prescribing the time steps, which can make the problem solution unstable, let’s let the code handle that with an ODE solver.</p>
-<p>Lets import that solver class</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.util.simple_solver</span> <span class="kn">import</span> <span class="n">SimpleSolver</span>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 
+Lake with streams: [&#39;smps_1d&#39;, &#39;smps_2d&#39;]
 </pre></div>
 </div>
 </div>
 </div>
-<p>Then let us run the same dynamic problem again</p>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="processing-the-stream">
+<h1>Processing the Stream<a class="headerlink" href="#processing-the-stream" title="Permalink to this heading">#</a></h1>
+<p>The lake is a collection of streams, stored as a dictionary. The next step
+can be average the data or you may have a processing step that you want to
+apply to all the data. For example, you may want to calculate the total
+PM2.5 mass from the SMPS data. You could do this by looping through the
+streams and applying a cusutom processing function to each stream. Or you could
+use some standard process already built in to <code class="docutils literal notranslate"><span class="pre">particula.data.process</span></code>. In this
+example we’ll use <code class="docutils literal notranslate"><span class="pre">process.size_distribution</span></code> to calculate the PM2.5 mass from the</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simple_dic_kwargs</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="mf">200e-9</span><span class="p">,</span> <span class="c1"># 200 nm median</span>
-    <span class="s2">&quot;nbins&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span> <span class="c1"># 1000 bins</span>
-    <span class="s2">&quot;nparticles&quot;</span><span class="p">:</span> <span class="mf">1e6</span><span class="p">,</span> <span class="c1"># 1e4 #</span>
-    <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="c1"># per 1e-6 m^3 (or 1 cc)</span>
-    <span class="s2">&quot;gsigma&quot;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="c1"># relatively narrow</span>
-<span class="p">}</span>
-<span class="n">particle_dist2</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">Particle</span><span class="p">(</span><span class="o">**</span><span class="n">simple_dic_kwargs</span><span class="p">)</span> <span class="c1"># pass the kwargs using ** prefix</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lake</span><span class="p">[</span><span class="s1">&#39;mean_properties&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">size_distribution</span><span class="o">.</span><span class="n">sizer_mean_properties</span><span class="p">(</span>
+    <span class="n">stream</span><span class="o">=</span><span class="n">lake</span><span class="p">[</span><span class="s1">&#39;smps_2d&#39;</span><span class="p">],</span>
+    <span class="n">diameter_units</span><span class="o">=</span><span class="s1">&#39;nm&#39;</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="c1">#inital distribution coag kernel</span>
-<span class="n">coag_kernel</span> <span class="o">=</span> <span class="n">full_coag</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">particle_dist2</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">)</span>
-<span class="n">time_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-
-<span class="c1">#setup the inital state of the distribution</span>
-<span class="n">problem</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;distribution&quot;</span><span class="p">:</span> <span class="n">particle_dist2</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">(),</span>
-    <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="n">particle_dist2</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span>
-    <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="n">coag_kernel</span><span class="p">,</span>
-    <span class="s2">&quot;tspan&quot;</span><span class="p">:</span> <span class="n">time_array</span>
-<span class="p">}</span>
-
-<span class="c1">#call the solver</span>
-<span class="n">solution</span> <span class="o">=</span> <span class="n">SimpleSolver</span><span class="p">(</span><span class="o">**</span><span class="n">problem</span><span class="p">)</span><span class="o">.</span><span class="n">solution</span><span class="p">()</span>
-
-<span class="c1">#plot</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
-
-<span class="n">radius</span> <span class="o">=</span> <span class="n">p_radius</span><span class="o">.</span><span class="n">m</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">particle_dist2</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Inital&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">solution</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="mi">49</span><span class="p">,:],</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t=50&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">solution</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:],</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;t=end&#39;</span><span class="p">)</span>
-
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number, </span><span class="si">{</span><span class="n">particle_dist2</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radius, </span><span class="si">{</span><span class="n">particle_dist2</span><span class="o">.</span><span class="n">particle_radius</span><span class="o">.</span><span class="n">u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="c1"># list out the header</span>
+<span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">lake</span><span class="p">[</span><span class="s1">&#39;mean_properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/867764bb28595b9f2db0985dc58d4fb49ee6f3817f7b36ed3164d90ea9ac8d3f.png" src="../_images/867764bb28595b9f2db0985dc58d4fb49ee6f3817f7b36ed3164d90ea9ac8d3f.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total_Conc_(#/cc)
+Mean_Diameter_(nm)
+Geometric_Mean_Diameter_(nm)
+Mode_Diameter_(nm)
+Mean_Diameter_Vol_(nm)
+Mode_Diameter_Vol_(nm)
+Unit_Mass_(ug/m3)
+Mass_(ug/m3)
+Total_Conc_(#/cc)_N100
+Unit_Mass_(ug/m3)_N100
+Mass_(ug/m3)_N100
+Total_Conc_(#/cc)_PM1
+Unit_Mass_(ug/m3)_PM1
+Mass_(ug/m3)_PM1
+Total_Conc_(#/cc)_PM2.5
+Unit_Mass_(ug/m3)_PM2.5
+Mass_(ug/m3)_PM2.5
+Total_Conc_(#/cc)_PM10
+Unit_Mass_(ug/m3)_PM10
+Mass_(ug/m3)_PM10
+</pre></div>
+</div>
 </div>
 </div>
 </section>
-<section id="summary-on-stepping">
-<h2>summary on stepping<a class="headerlink" href="#summary-on-stepping" title="Permalink to this heading">#</a></h2>
-<p>As we walked through, using the ODE solver is quite a nice way to get to the answer, without figuring out what time-step you might need.</p>
+<section class="tex2jax_ignore mathjax_ignore" id="plot-the-data">
+<h1>Plot the Data<a class="headerlink" href="#plot-the-data" title="Permalink to this heading">#</a></h1>
+<p>With that processing done we can plot some useful summary plots. For example,
+we can plot the total PM2.5 mass as a function of time. And on the same plot
+we can add the N100 mass.</p>
+<section id="tip-calling-the-header-directly">
+<h2>Tip: Calling the header directly<a class="headerlink" href="#tip-calling-the-header-directly" title="Permalink to this heading">#</a></h2>
+<p>Note below how we can call the data header directly from the stream. This is
+because the get items property defined in the stream class accepts, either and
+index or a header name. So we can call the header name directly from the
+stream and get back that specific time series.</p>
+<p>This is incontrast to callint <code class="docutils literal notranslate"><span class="pre">stream.data['header_name']</span></code> which would return
+an error. As that line first calls <code class="docutils literal notranslate"><span class="pre">stream.data</span></code> returning the np.ndarray, then calls
+the header name, which is not a valid index for a np.ndarray.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mean_prop_stream</span> <span class="o">=</span> <span class="n">lake</span><span class="p">[</span><span class="s1">&#39;mean_properties&#39;</span><span class="p">]</span>
+
+
+<span class="c1"># plot the data on twinx axis</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mean_prop_stream</span><span class="o">.</span><span class="n">datetime64</span><span class="p">,</span>
+        <span class="n">mean_prop_stream</span><span class="p">[</span><span class="s1">&#39;Mass_(ug/m3)_PM2.5&#39;</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="s1">&#39;PM 2.5&#39;</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mean_prop_stream</span><span class="o">.</span><span class="n">datetime64</span><span class="p">,</span>
+        <span class="n">mean_prop_stream</span><span class="p">[</span><span class="s1">&#39;Mass_(ug/m3)_N100&#39;</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="s1">&#39;N100 mass&#39;</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (UTC)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;PM mass (ug/m3)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/1cf13fedb6389f50d41729b8516e28aa3b355dd5ce7fc479bbcc21fd5eb554de.png" src="../_images/1cf13fedb6389f50d41729b8516e28aa3b355dd5ce7fc479bbcc21fd5eb554de.png" />
+</div>
+</div>
 </section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="summary">
+<h1>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h1>
+<p>This example showed how to process size distribution data from an SMPS. The
+processing returns mean properties of the size distribution, such as the mean
+diameter, median diameter, and total PM2.5 mass.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">size_distribution</span><span class="o">.</span><span class="n">sizer_mean_properties</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function sizer_mean_properties in module particula.data.process.size_distribution:
+
+sizer_mean_properties(stream: particula.data.stream.Stream, sizer_limits: Optional[List[float]] = None, density: float = 1.5, diameter_units: str = &#39;nm&#39;) -&gt; particula.data.stream.Stream
+    Calculates the mean properties of the size distribution, and returns a
+    stream.
+    
+    Parameters
+    ----------
+    stream : Stream
+        The stream to process.
+    sizer_limits : list, optional [in diameter_units]
+        The lower and upper limits of the size of interest. The default is None
+    density : float, optional
+        The density of the particles. The default is 1.5 g/cm3.
+    diameter_units : str
+        The units of the diameter. The default is &#39;nm&#39;. This will be converted
+        to nm.
+    
+    Returns
+    -------
+    stream : Stream
+        The stream with the mean properties added.
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 
     <script type="text/x-thebe-config">
@@ -699,20 +800,20 @@ document.write(`
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="distribution_coagulation.html"
+       href="stream_stats_part1.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Distribution coagulation</p>
+        <p class="prev-next-title">Stream Stats</p>
       </div>
     </a>
     <a class="right-next"
-       href="distribution_ambient.html"
+       href="../documentation/environment.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Distributions</p>
+        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -731,10 +832,18 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#for-loop-graph">For loop Graph</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ode-solver">ODE solver</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-on-stepping">summary on stepping</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Size Distribution Stats</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data">Load the data</a></li>
 </ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#processing-the-stream">Processing the Stream</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-data">Plot the Data</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tip-calling-the-header-directly">Tip: Calling the header directly</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+
   </nav></div>
 
 </div></div>
