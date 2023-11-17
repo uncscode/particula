@@ -768,6 +768,7 @@ def netcdf_get_epoch_time(
     return epoch_time
 
 
+# pylint: disable-all
 def netcdf_data_1d_load(
         file_path: str,
         settings: dict
@@ -826,6 +827,7 @@ def netcdf_data_1d_load(
     return epoch_time, header_1d, data_1d
 
 
+# pylint: disable-all
 def netcdf_data_2d_load(
         file_path: str,
         settings: dict
