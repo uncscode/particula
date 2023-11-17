@@ -1,4 +1,3 @@
-# %pytype: skip-file
 """Functions to operate on stream objects."""
 
 from typing import Optional, Union
@@ -106,8 +105,8 @@ def filtering(
     bottom: Optional[float] = None,
     top: Optional[float] = None,
     value: Optional[float] = None,
-    invert: bool = False,
-    clone: bool = True,
+    invert: Optional[bool] = False,
+    clone: Optional[bool] = True,
     replace_with: Optional[Union[float, int]] = None,
     drop: Optional[bool] = True,
 ) -> Stream:

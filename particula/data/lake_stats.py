@@ -1,11 +1,10 @@
-# %pytype: skip-file
 """Functions to operate on stream objects."""
 
 from typing import Optional, Union
 import numpy as np
 
 from particula.data.lake import Lake
-from particula.data import stream_stats
+import particula.data.stream_stats as stream_stats
 
 
 def average_std(
