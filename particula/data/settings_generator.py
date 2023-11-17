@@ -187,11 +187,27 @@ def load_settings_for_stream(
     subfolder: str,
     settings_suffix: str = ''
 ) -> dict:
-    """auto loader for lake data settings. given a path, it will look for the
-    json file in each folder containing the data and return the settings
-    dictionary for the data in that folder.
     """
+    Load settings for Stream data from a JSON file.
 
+    Given a path and subfolder, this function searches for a JSON file
+    named 'stream_settings' with an optional suffix. It returns the settings
+    as a dictionary. If no file is found, or multiple files are found,
+    appropriate errors or warnings are raised.
+
+    Args:
+    - path (str): The path where the subfolder is located.
+    - subfolder (str): The subfolder where the settings file is expected.
+    - settings_suffix (str, optional): An optional suffix for the settings
+        file name. Default is an empty string.
+
+    Returns:
+    - dict: A dictionary of settings loaded from the file.
+
+    Raises:
+    - FileNotFoundError: If no settings file is found.
+    - Warning: If more than one settings file is found.
+    """
     settings_file_name = f'stream_settings{settings_suffix}.json'
     file_list, full_path, file_size_in_bytes = get_files_in_folder_with_size(
         path=path,
@@ -199,34 +215,46 @@ def load_settings_for_stream(
         filename_regex=settings_file_name,
         min_size=10)
 
-    # if there is no settings file, raise an error
     if len(file_size_in_bytes) == 0:
         raise FileNotFoundError(
             f'No stream_settings file found in {path}/{subfolder}.')
     if len(file_size_in_bytes) > 1:
-        raise warnings.warn(
-            f'More than one stream_settings file found in {path}/{subfolder}.'
-            'Using the first one found.')  # type: ignore
+        warnings.warn(
+            f'More than one stream_settings file found in {path}/{subfolder}. '
+            'Using the first one found.')
 
-    return json.load(open(full_path[0], 'r'))
+    with open(full_path[0], 'r') as file:
+        return json.load(file)
 
 
 def save_settings_for_stream(
-        settings: dict,
-        path: str,
-        subfolder: str,
-        settings_suffix: str = ''
+    settings: dict,
+    path: str,
+    subfolder: str,
+    settings_suffix: str = ''
 ) -> None:
-    """auto saver for lake data settings. given a path, it will look for the
-    json file in each folder containing the data and save the settings
-    dictionary for the data in that folder.
     """
+    Save settings for lake data to a JSON file.
 
-    settings_file_name = 'stream_settings' + settings_suffix + '.json'
+    Given a dictionary of settings, this function saves it to a JSON file
+    named 'stream_settings' with an optional suffix in the specified filename.
+    The JSON file is formatted with a 4-space indentation.
 
+    Args:
+    - settings (dict): The settings dictionary to be saved.
+    - path (str): The path where the subfolder is located.
+    - subfolder (str): The subfolder where the settings file will be saved.
+    - settings_suffix (str, optional): An optional suffix for the settings
+        file name. Default is an empty string.
+
+    Returns:
+    - None
+    """
+    settings_file_name = f'stream_settings{settings_suffix}.json'
     save_path = os.path.join(path, subfolder, settings_file_name)
-    # write the json, with 4 space indentation
-    json.dump(settings, open(save_path, 'w'), indent=4)
+
+    with open(save_path, 'w') as file:
+        json.dump(settings, file, indent=4)
 
 
 def load_settings_for_lake(
