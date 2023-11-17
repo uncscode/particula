@@ -132,12 +132,7 @@ def load_files_interface(
         The Stream object updated with the loaded data.
     """
     if stream is None:
-        stream = Stream(
-            header=list(),
-            data=np.array([]),
-            time=np.array([]),
-            files=list()
-        )
+        stream = Stream(header=[], data=np.array([]), time=np.array([]), files=[])
     # get the files to load
     full_paths, first_pass, file_info = get_new_files(
         path=path,
@@ -263,12 +258,7 @@ def get_1d_stream(
         If any required keys are missing in the `settings` dictionary.
     """
     if stream is None:
-        stream = Stream(
-            header=list(),
-            data=np.array([]),
-            time=np.array([]),
-            files=list()
-        )
+        stream = Stream(header=[], data=np.array([]), time=np.array([]), files=[])
     # Input validation, should it be abstracted?
     if not isinstance(settings, dict):
         raise TypeError("The setting parameters must be in a dictionary.")
@@ -352,12 +342,7 @@ def get_2d_stream(
         None.
     """
     if stream is None:
-        stream = Stream(
-            header=list(),
-            data=np.array([]),
-            time=np.array([]),
-            files=list()
-        )
+        stream = Stream(header=[], data=np.array([]), time=np.array([]), files=[])
     # Input validation
     if not isinstance(settings, dict):
         raise TypeError("The setting parameters must be in a dictionary.")
