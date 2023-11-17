@@ -226,9 +226,9 @@ def sample_data(
     time_format: str,
     data_columns: List[int],
     delimiter: str,
-    date_offset: str = None,
-    seconds_shift: int = 0,
-    timezone_identifier: str = 'UTC'
+    date_offset: Optional[str] = None,
+    seconds_shift: Optional[int] = 0,
+    timezone_identifier: Optional[str] = 'UTC'
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Samples the data to get the time and data streams.
