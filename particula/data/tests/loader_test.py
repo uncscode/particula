@@ -1,5 +1,5 @@
 """Test the loader module."""
-# pytype: skip-file
+# %pytype: skip-file
 
 from datetime import datetime
 import pytz
@@ -41,19 +41,19 @@ def test_parse_time_column():
     # Test case with a single time column as integer index
     time_column_int = 0
     assert loader.parse_time_column(
-            time_column=time_column_int,
-            time_format=time_format,
-            line=line,
-            ) == expected_timestamp
+        time_column=time_column_int,
+        time_format=time_format,
+        line=line,
+    ) == expected_timestamp
 
     # Test case with two time columns as list of indices
     line = '2022-01-01,12:00:00,0.5,0.6'.split(',')
     time_column_int = [0, 1]
     assert loader.parse_time_column(
-            time_column=time_column_int,
-            time_format=time_format,
-            line=line,
-            ) == expected_timestamp
+        time_column=time_column_int,
+        time_format=time_format,
+        line=line,
+    ) == expected_timestamp
 
     # Test case with invalid time column
     time_column_invalid = 3

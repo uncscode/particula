@@ -1,6 +1,6 @@
 """Callable to generate settings file from template."""
 # pylint: disable=all
-# pytype: skip-file
+# %pytype: skip-file
 
 from typing import List, Optional
 
@@ -155,7 +155,7 @@ def for_general_sizer_1d_2d_load(
         'delimiter': delimiter,
         'time_shift_seconds': time_shift_seconds,
         'timezone_identifier': timezone_identifier,
-        }
+    }
     settings_2d = {
         'relative_data_folder': relative_data_folder,
         'filename_regex': filename_regex,
@@ -167,11 +167,11 @@ def for_general_sizer_1d_2d_load(
             "Dp_start_keyword": data_2d_dp_start_keyword,
             "Dp_end_keyword": data_2d_dp_end_keyword,
             "convert_scale_from": data_2d_convert_concentration_from,
-            },
+        },
         'time_column': time_column,
         'time_format': time_format,
         'delimiter': delimiter,
         'time_shift_seconds': time_shift_seconds,
         'timezone_identifier': timezone_identifier,
-        }
+    }
     return settings_1d, settings_2d

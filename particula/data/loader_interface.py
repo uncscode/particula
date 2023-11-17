@@ -1,5 +1,5 @@
 """interface to import data to a data stream"""
-# pytype: skip-file
+# %pytype: skip-file
 
 from typing import Optional
 import os
@@ -389,17 +389,17 @@ def get_2d_stream(
         date_offset = None
 
     epoch_time, data, header = loader.sizer_data_formatter(
-            data=data,
-            data_checks=settings['data_checks'],
-            data_sizer_reader=settings['data_sizer_reader'],
-            time_column=settings['time_column'],
-            time_format=settings['time_format'],
-            delimiter=settings['delimiter'],
-            header_row=settings['header_row'],
-            date_offset=date_offset,
-            seconds_shift=settings['time_shift_seconds'],
-            timezone_identifier=settings['timezone_identifier']
-            )
+        data=data,
+        data_checks=settings['data_checks'],
+        data_sizer_reader=settings['data_sizer_reader'],
+        time_column=settings['time_column'],
+        time_format=settings['time_format'],
+        delimiter=settings['delimiter'],
+        header_row=settings['header_row'],
+        date_offset=date_offset,
+        seconds_shift=settings['time_shift_seconds'],
+        timezone_identifier=settings['timezone_identifier']
+    )
 
     # check data shape
     data = convert.data_shape_check(

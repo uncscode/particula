@@ -1,6 +1,6 @@
 """Size distribution processing functions to calculate mean properties and
 merge distributions."""
-# pytype: skip-file
+# %pytype: skip-file
 # pylint: disable=too-many-locals
 
 from typing import Optional, List, Tuple
@@ -54,7 +54,7 @@ def mean_properties(
         total_concentration = np.sum(sizer_dn)
 
     if sizer_limits is None:
-        volume = 4*pi/3 * (sizer_diameter/2)**3
+        volume = 4 * pi / 3 * (sizer_diameter / 2)**3
     else:
         threshold_limits = (sizer_diameter >= sizer_limits[0]) & \
             (sizer_diameter <= sizer_limits[1])  # gets indexes to keep
@@ -66,7 +66,7 @@ def mean_properties(
         sizer_dn = sizer_dn[threshold_limits]
         sizer_diameter = sizer_diameter[threshold_limits]
 
-        volume = 4*pi/3 * (sizer_diameter/2)**3
+        volume = 4 * pi / 3 * (sizer_diameter / 2)**3
         total_concentration = np.sum(sizer_dn)
 
     # Calculate mass in ug_m3 assuming a density of 1.
@@ -87,24 +87,24 @@ def mean_properties(
     geometric_mean_diameter_nm = gmean(sizer_diameter, weights=normalized)
 
     # Calculate mode diameter by number.
-    sizer_dn_cumsum = np.cumsum(sizer_dn)/total_concentration
+    sizer_dn_cumsum = np.cumsum(sizer_dn) / total_concentration
     mode_diameter = np.interp(
-            0.5,
-            sizer_dn_cumsum,
-            sizer_diameter,
-            left=np.nan,
-            right=np.nan
-        )
+        0.5,
+        sizer_dn_cumsum,
+        sizer_diameter,
+        left=np.nan,
+        right=np.nan
+    )
 
     # Calculate mode diameter by mass.
-    sizer_dmass_cumsum = np.cumsum(mass_ug_m3)/unit_mass_ug_m3
+    sizer_dmass_cumsum = np.cumsum(mass_ug_m3) / unit_mass_ug_m3
     mode_diameter_mass = np.interp(
-            0.5,
-            sizer_dmass_cumsum,
-            sizer_diameter,
-            left=np.nan,
-            right=np.nan
-        )
+        0.5,
+        sizer_dmass_cumsum,
+        sizer_diameter,
+        left=np.nan,
+        right=np.nan
+    )
     return total_concentration, unit_mass_ug_m3, mean_diameter_nm, \
         mean_vol_diameter_nm, geometric_mean_diameter_nm, \
         mode_diameter, mode_diameter_mass

@@ -1,4 +1,4 @@
-# pytype: skip-file
+# %pytype: skip-file
 """Functions to operate on stream objects."""
 
 from typing import Optional, Union

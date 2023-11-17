@@ -1,4 +1,4 @@
-# pytype: skip-file
+# %pytype: skip-file
 """Functions to operate on stream objects."""
 
 from typing import Optional, Union
@@ -73,7 +73,7 @@ def average_std(
             start=stream.time[0],
             stop=stream.time[-1],
             step=average_interval
-            )
+        )
     # generate empty arrays for averaged data and std to be filled in
     average = np.zeros([len(stream.header), len(new_time_array)])
     std = np.zeros_like(average)
@@ -86,7 +86,7 @@ def average_std(
         average_interval_array=new_time_array,
         average_data=average,
         average_data_std=std,
-        )
+    )
     # write to new StreamAveraged object and return
     return StreamAveraged(
         header=stream.header,
@@ -97,7 +97,7 @@ def average_std(
         start_time=new_time_array[0],
         stop_time=new_time_array[-1],
         standard_deviation=std,
-        )
+    )
 
 
 # pylint: disable=too-many-arguments

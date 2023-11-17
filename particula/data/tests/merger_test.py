@@ -1,5 +1,5 @@
 """Test the loader module."""
-# pytype: skip-file
+# %pytype: skip-file
 
 import numpy as np
 from particula.data import merger
@@ -75,7 +75,7 @@ def test_combine_data_with_nan_values():
     ])
     assert np.array_equal(
         np.nan_to_num(merged_data), np.nan_to_num(expected_data)
-        )
+    )
     expected_header_list = ['header1', 'header2', 'header3', 'header4',
                             'header5']
     assert np.all(merged_header_list == expected_header_list)
