@@ -4,7 +4,7 @@ from typing import Optional, Union
 import numpy as np
 
 from particula.data.lake import Lake
-import particula.data.stream_stats as stream_stats
+from particula.data import stream_stats
 
 
 def average_std(
