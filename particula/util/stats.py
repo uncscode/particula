@@ -2,7 +2,7 @@
 # linting disabled until reformatting of this file
 # %pytype: skip-file
 
-from typing import Union, Tuple
+from typing import Tuple, Optional
 import numpy as np
 
 
@@ -11,7 +11,7 @@ def merge_formatting(
         header_current: list,
         data_new: np.ndarray,
         header_new: list
-) -> Union[np.ndarray, list, np.ndarray, list]:
+) -> Tuple[np.ndarray, list, np.ndarray, list]:
     """
     Formats two data arrays and their headers so that the data new can be
     subsiqently added to data current.
@@ -74,7 +74,7 @@ def merge_formatting(
     if data_current.shape[0] != data_new.shape[0]:
         raise ValueError(
             'data_current  ',
-            data_current .shape,
+            data_current.shape,
             ' and data_new ',
             data_new.shape,
             ' are not the same shape, check the data formatting'
@@ -82,9 +82,9 @@ def merge_formatting(
     if len(header_current) != len(header_new):
         raise ValueError(
             'header_current ',
-            header_current.shape,
+            len(header_current),
             ' and header_new ',
-            header_new.shape,
+            len(header_new),
             ' are not the same shape, check the data formatting'
         )
     # check if the headers are numeric
@@ -237,10 +237,10 @@ def average_to_interval(
 
 def mask_outliers(
         data: np.ndarray,
-        bottom: float = None,
-        top: float = None,
-        value: float = None,
-        invert: bool = False
+        bottom: Optional[float] = None,
+        top: Optional[float] = None,
+        value: Optional[float] = None,
+        invert: Optional[bool] = False
 ) -> np.ndarray:
     """
     Create a boolean mask for outliers in a data array. Outliers are defined as
