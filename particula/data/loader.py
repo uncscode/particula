@@ -728,7 +728,7 @@ def netcdf_data_1d_load(
             data_1d[i, :] = np.ma.filled(data.astype(float), np.nan)
         except (TypeError, KeyError):
             data_1d[i, :] = np.nan
-            warnings.warn([data_col + " not found in the netCDF file"])
+            warnings.warn(data_col + " not found in the netCDF file")
     nc_file.close()
 
     # check data shape, transpose if necessary so that time is last dimension
