@@ -3,6 +3,7 @@
 
 from datetime import datetime
 import pytz
+import numpy as np
 from particula.data import loader
 
 
@@ -31,7 +32,7 @@ def test_filter_list():
 
 def test_parse_time_column():
     """Test the parse_time_column function."""
-    line = '2022-01-01 12:00:00,0.5,0.6'.split(',')
+    line = np.array('2022-01-01 12:00:00,0.5,0.6'.split(','))
     time_format = '%Y-%m-%d %H:%M:%S'
 
     expected_timestamp = datetime(
@@ -47,7 +48,7 @@ def test_parse_time_column():
     ) == expected_timestamp
 
     # Test case with two time columns as list of indices
-    line = '2022-01-01,12:00:00,0.5,0.6'.split(',')
+    line = np.array('2022-01-01,12:00:00,0.5,0.6'.split(','))
     time_column_int = [0, 1]
     assert loader.parse_time_column(
         time_column=time_column_int,
