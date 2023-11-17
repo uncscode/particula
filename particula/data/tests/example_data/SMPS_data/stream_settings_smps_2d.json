@@ -1,0 +1,31 @@
+{
+    "relative_data_folder": "SMPS_data",
+    "filename_regex": "*.csv",
+    "MIN_SIZE_BYTES": 10,
+    "data_loading_function": "general_2d_load",
+    "header_row": 24,
+    "data_checks": {
+        "characters": [
+            250
+        ],
+        "skip_rows": 25,
+        "skip_end": 0,
+        "char_counts": {
+            "/": 2,
+            ":": 2
+        }
+    },
+    "data_sizer_reader": {
+        "Dp_start_keyword": "20.72",
+        "Dp_end_keyword": "784.39",
+        "convert_scale_from": "dw/dlogdp"
+    },
+    "time_column": [
+        1,
+        2
+    ],
+    "time_format": "%m/%d/%Y %H:%M:%S",
+    "delimiter": ",",
+    "time_shift_seconds": 0,
+    "timezone_identifier": "UTC"
+}
