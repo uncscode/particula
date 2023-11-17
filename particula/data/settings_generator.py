@@ -191,7 +191,7 @@ def load_settings_for_stream(
     dictionary for the data in that folder.
     """
 
-    settings_file_name = 'stream_settings' + settings_sufix + '.json'
+    settings_file_name = f'stream_settings{settings_sufix}.json'
     file_list, full_path, file_size_in_bytes = get_files_in_folder_with_size(
         path=path,
         subfolder=subfolder,
