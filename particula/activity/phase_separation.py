@@ -134,7 +134,7 @@ def organic_density_estimate(
     # (due to limited info at input)
     rho1 = M / (5.0 * NC * (2.0 + H2Cest + O2C * 2.0 + N2C * 2.0))
     # the returned denisty is in [g/cm^3]; and scaled assuming that most
-    # that most of the oxygen atoms are able to make H-bonds 
+    # that most of the oxygen atoms are able to make H-bonds
     # (donor or acceptor)
     return rho1 * (1.0 + min(NC * O2C * 0.1 + NC * N2C * 0.1, 0.3))
 
@@ -210,7 +210,7 @@ def coefficients_c(
         molarmass_ratio,
         O2C,
         fit_values
-        ):
+):
     """
     Coefficients for activity model, see Gorkowski (2019). equation S1 S2.
 
@@ -279,10 +279,10 @@ def gibbs_of_mixing(
     # the scaled molar mass ratio of this mixture's components.
     phi2 = org_mole_fraction / (
         org_mole_fraction + (1.0 - org_mole_fraction) * scaledMr / rhor
-        )  # phi2 is a scaled volume fraction
+    )  # phi2 is a scaled volume fraction
 
     # equation S4
-    sum1 = c1 + c2*(1-2*phi2)
+    sum1 = c1 + c2 * (1 - 2 * phi2)
     gibbs_mix = phi2 * (1.0 - phi2) * sum1
 
     # equation s6 the derivative of phi2 with respect to organic x2
@@ -290,8 +290,8 @@ def gibbs_of_mixing(
 
     # equation S7
     derivative_gibbs_mix = (
-        (1.0 - 2.0 * phi2) * sum1 - 2*c2*phi2 * (1.0 - phi2)
-        ) * dphi2dx2
+        (1.0 - 2.0 * phi2) * sum1 - 2 * c2 * phi2 * (1.0 - phi2)
+    ) * dphi2dx2
 
     return gibbs_mix, derivative_gibbs_mix
 
@@ -346,9 +346,9 @@ def gibbs_mix_weight(
                 density,
                 FIT_LOW
             )
-            gibbs_mix = weights[0]*gibbs_mix_low + weights[1]*gibbs_mix_mid
-            derivative_gibbs = weights[0]*derivative_gibbs_low \
-                + weights[1]*derivative_gibbs_mid
+            gibbs_mix = weights[0] * gibbs_mix_low + weights[1] * gibbs_mix_mid
+            derivative_gibbs = weights[0] * derivative_gibbs_low \
+                + weights[1] * derivative_gibbs_mid
         else:  # else paired with high O2C region
             gibbs_mix_high, derivative_gibbs_high = gibbs_of_mixing(
                 molarmass_ratio,
@@ -357,9 +357,10 @@ def gibbs_mix_weight(
                 density,
                 FIT_HIGH
             )
-            gibbs_mix = weights[2]*gibbs_mix_high + weights[1]*gibbs_mix_mid
-            derivative_gibbs = weights[2]*derivative_gibbs_high \
-                + weights[1]*derivative_gibbs_mid
+            gibbs_mix = weights[2] * gibbs_mix_high + \
+                weights[1] * gibbs_mix_mid
+            derivative_gibbs = weights[2] * derivative_gibbs_high \
+                + weights[1] * derivative_gibbs_mid
     else:  # when only high 2OC region is used
         gibbs_mix, derivative_gibbs = gibbs_of_mixing(
             molarmass_ratio,
@@ -402,11 +403,11 @@ def activity_coefficients(
         BAT_functional_group=None
     )
     gibbs_mix, derivative_gibbs = gibbs_mix_weight(
-            molarmass_ratio,
-            org_mole_fraction,
-            O2C,
-            density,
-        )
+        molarmass_ratio,
+        org_mole_fraction,
+        O2C,
+        density,
+    )
     # equations S8 S10
     # the func value for component 1 = LOG(activity coeff. water)
     ln_gamma_water = gibbs_mix - org_mole_fraction * derivative_gibbs
@@ -420,8 +421,8 @@ def activity_coefficients(
     activity_organic = gamma_org * org_mole_fraction
 
     mass_water = (1.0 - org_mole_fraction) * molarmass_ratio / (
-            (1.0 - org_mole_fraction) * (molarmass_ratio - 1) + 1
-        )
+        (1.0 - org_mole_fraction) * (molarmass_ratio - 1) + 1
+    )
     mass_organic = 1 - mass_water
 
     return activity_water, activity_organic, mass_water, mass_organic
@@ -443,7 +444,7 @@ def gibbs_free_engery(
     gibbs_real (np.array): The real gibbs free energy of mixing.
     """
 
-    gibbs_ideal = (1-org_mole_fraction) * log_limited(1-org_mole_fraction) \
+    gibbs_ideal = (1 - org_mole_fraction) * log_limited(1 - org_mole_fraction) \
         + org_mole_fraction * log_limited(org_mole_fraction)
     gibbs_real = gibbs_ideal + gibbs_mix
     return gibbs_ideal, gibbs_real
@@ -487,7 +488,7 @@ def find_phase_sep_index(activity_data):
             # Find where the sign changes in the activity difference
             activity_diff_sign_change = np.sign(
                 np.concatenate(([activity_diff[0]], activity_diff))
-                ) != np.sign(activity_diff[0])
+            ) != np.sign(activity_diff[0])
 
             # Find the first change in sign
             index_start = np.where(activity_diff_sign_change)[0][0]

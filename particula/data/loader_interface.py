@@ -1,5 +1,5 @@
 """interface to import data to a data stream"""
-# pytype: skip-file
+
 
 from typing import Optional
 import os
@@ -12,7 +12,7 @@ from particula.util import convert
 
 def get_new_files(
         path: str,
-        import_settings: dict[str, any],
+        import_settings: dict,
         loaded_list: Optional[list] = None,
 ) -> tuple:
     """
@@ -136,8 +136,7 @@ def load_files_interface(
             header=[],
             data=np.array([]),
             time=np.array([]),
-            files=[]
-        )
+            files=[])
     # get the files to load
     full_paths, first_pass, file_info = get_new_files(
         path=path,
@@ -223,8 +222,8 @@ def get_1d_stream(
     file_path: str,
     settings: dict,
     first_pass: bool = True,
-    stream: Optional[object] = None,
-) -> object:
+    stream: Optional[Stream] = None,
+) -> Stream:
     """
     Loads and formats a 1D data stream from a file and initializes or updates
     a Stream object.
@@ -267,8 +266,7 @@ def get_1d_stream(
             header=[],
             data=np.array([]),
             time=np.array([]),
-            files=[]
-        )
+            files=[])
     # Input validation, should it be abstracted?
     if not isinstance(settings, dict):
         raise TypeError("The setting parameters must be in a dictionary.")
@@ -336,8 +334,8 @@ def get_2d_stream(
     file_path: str,
     settings: dict,
     first_pass: bool = True,
-    stream: Optional[object] = None,
-) -> object:
+    stream: Optional[Stream] = None,
+) -> Stream:
     """
     Initializes a 2D stream using the settings in the DataLake object.
 
@@ -356,8 +354,7 @@ def get_2d_stream(
             header=[],
             data=np.array([]),
             time=np.array([]),
-            files=[]
-        )
+            files=[])
     # Input validation
     if not isinstance(settings, dict):
         raise TypeError("The setting parameters must be in a dictionary.")
@@ -389,17 +386,17 @@ def get_2d_stream(
         date_offset = None
 
     epoch_time, data, header = loader.sizer_data_formatter(
-            data=data,
-            data_checks=settings['data_checks'],
-            data_sizer_reader=settings['data_sizer_reader'],
-            time_column=settings['time_column'],
-            time_format=settings['time_format'],
-            delimiter=settings['delimiter'],
-            header_row=settings['header_row'],
-            date_offset=date_offset,
-            seconds_shift=settings['time_shift_seconds'],
-            timezone_identifier=settings['timezone_identifier']
-            )
+        data=data,
+        data_checks=settings['data_checks'],
+        data_sizer_reader=settings['data_sizer_reader'],
+        time_column=settings['time_column'],
+        time_format=settings['time_format'],
+        delimiter=settings['delimiter'],
+        header_row=settings['header_row'],
+        date_offset=date_offset,
+        seconds_shift=settings['time_shift_seconds'],
+        timezone_identifier=settings['timezone_identifier']
+    )
 
     # check data shape
     data = convert.data_shape_check(

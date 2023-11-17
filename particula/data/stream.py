@@ -1,7 +1,7 @@
 """A module for the Stream and StreamAveraged(Stream) classes."""
-# pytype: skip-file
 
-from typing import List
+
+from typing import List, Union
 from dataclasses import dataclass, field
 import numpy as np
 from particula.util import convert
@@ -53,7 +53,7 @@ class Stream:
         if not isinstance(self.header, list):
             raise TypeError("header_list must be a list")
 
-    def __getitem__(self, index: any):
+    def __getitem__(self, index: Union[int, str]):
         """Allows for indexing of the data stream.
         Parameters:
         ----------
@@ -67,7 +67,7 @@ class Stream:
             index = self.header.index(index)
         return self.data[index, :]
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index: Union[int, str], value):
         """Allows for setting of a row of data in the stream.
         Parameters:
         ----------

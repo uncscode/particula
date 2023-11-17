@@ -1,5 +1,5 @@
 """test for import_interface.py"""
-# pytype: skip-file
+
 
 import tempfile
 import os
