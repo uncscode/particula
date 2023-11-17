@@ -1,0 +1,33 @@
+{
+    "relative_data_folder": "CPC_3010_data",
+    "filename_regex": "*.csv",
+    "MIN_SIZE_BYTES": 10,
+    "data_loading_function": "general_1d_load",
+    "header_row": 0,
+    "data_checks": {
+        "characters": [
+            10,
+            100
+        ],
+        "char_counts": {
+            ",": 4
+        },
+        "skip_rows": 0,
+        "skip_end": 0
+    },
+    "data_column": [
+        1,
+        2
+    ],
+    "data_header": [
+        "CPC_count[#/sec]",
+        "Temperature[degC]"
+    ],
+    "time_column": [
+        0
+    ],
+    "time_format": "epoch",
+    "delimiter": ",",
+    "time_shift_seconds": 0,
+    "timezone_identifier": "UTC"
+}
