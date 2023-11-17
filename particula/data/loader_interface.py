@@ -12,7 +12,7 @@ from particula.util import convert
 
 def get_new_files(
         path: str,
-        import_settings: dict[str, any],
+        import_settings: dict,
         loaded_list: Optional[list] = None,
 ) -> tuple:
     """
@@ -109,7 +109,7 @@ def get_new_files(
 def load_files_interface(
         path: str,
         settings: dict,
-        stream: Optional[Stream] = None,
+        stream: Stream = None,
 ) -> Stream:
     """
     Load files into a stream object based on settings.
@@ -133,10 +133,10 @@ def load_files_interface(
     """
     if stream is None:
         stream = Stream(
-            header=[],
+            header=list(),
             data=np.array([]),
             time=np.array([]),
-            files=[]
+            files=list()
         )
     # get the files to load
     full_paths, first_pass, file_info = get_new_files(
@@ -181,7 +181,7 @@ def load_files_interface(
 def load_folders_interface(
         path: str,
         folder_settings: dict,
-        lake: Optional[Lake] = None,
+        lake: Lake = None,
 ) -> Lake:
     """
     Load files into a lake object based on settings.
@@ -223,8 +223,8 @@ def get_1d_stream(
     file_path: str,
     settings: dict,
     first_pass: bool = True,
-    stream: Optional[object] = None,
-) -> object:
+    stream: Stream = None,
+) -> Stream:
     """
     Loads and formats a 1D data stream from a file and initializes or updates
     a Stream object.
@@ -264,10 +264,10 @@ def get_1d_stream(
     """
     if stream is None:
         stream = Stream(
-            header=[],
+            header=list(),
             data=np.array([]),
             time=np.array([]),
-            files=[]
+            files=list()
         )
     # Input validation, should it be abstracted?
     if not isinstance(settings, dict):
@@ -336,8 +336,8 @@ def get_2d_stream(
     file_path: str,
     settings: dict,
     first_pass: bool = True,
-    stream: Optional[object] = None,
-) -> object:
+    stream: Stream = None,
+) -> Stream:
     """
     Initializes a 2D stream using the settings in the DataLake object.
 
@@ -353,10 +353,10 @@ def get_2d_stream(
     """
     if stream is None:
         stream = Stream(
-            header=[],
+            header=list(),
             data=np.array([]),
             time=np.array([]),
-            files=[]
+            files=list()
         )
     # Input validation
     if not isinstance(settings, dict):
