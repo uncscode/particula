@@ -9,19 +9,20 @@ interpolate the data to the data stream's time array.
 # %pytype: skip-file
 
 
-from typing import List, Tuple
+from typing import Tuple, Optional
 import numpy as np
 from particula.util import convert, stats
+from particula.data.stream import Stream
 
 
 def combine_data(
-    data: np.array,
-    time: np.array,
-    header_list: List[str],
-    data_new: np.array,
-    time_new: np.array,
-    header_new: List[str],
-) -> Tuple[np.array, List[str], dict[str, int]]:
+    data: np.ndarray,
+    time: np.ndarray,
+    header_list: list,
+    data_new: np.ndarray,
+    time_new: np.ndarray,
+    header_new: list,
+) -> Tuple[np.ndarray, list, dict[str, int]]:
     # pylint: disable=too-many-arguments
     """"
     Merge or adds processed data together. Accounts for data shape
@@ -102,12 +103,12 @@ def combine_data(
 
 
 def stream_add_data(
-    stream,
+    stream: Stream,
     time_new: np.ndarray,
     data_new: np.ndarray,
-    header_check: bool = False,
-    header_new: List[str] = None
-) -> object:
+    header_check: Optional[bool] = False,
+    header_new: Optional[list] = None
+) -> Stream:
     """
     Adds a new data stream and corresponding time stream to the
     existing data.
