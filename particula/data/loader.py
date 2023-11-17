@@ -268,6 +268,8 @@ def sample_data(
         - If the data value is not in the correct format.
         - If no match for data value is found.
     """
+    # flake8: noqa
+    # pylint disable: too-many-arguments
     epoch_time = np.zeros(len(data))
     epoch_time = np.zeros(len(data))
     data_array = np.zeros((len(data), len(data_columns)))

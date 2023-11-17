@@ -119,6 +119,7 @@ def average_to_interval(
     average_data: np.ndarray,
     average_data_std: np.ndarray
 ) -> Tuple[np.ndarray, np.ndarray]:
+    # pylint: disable=too-many-arguments, too-many-branches
     """
     Calculate the average of the data stream over the specified time intervals.
 
@@ -151,7 +152,6 @@ def average_to_interval(
             and the standard deviation of the data, both as arrays of shape
             (num_channels, num_intervals).
     """
-
     # average the data in the time interval initialization
     # find closet index in time_raw to the start time
     start_index = np.argmin(np.abs(average_interval_array[0] - time_raw))
