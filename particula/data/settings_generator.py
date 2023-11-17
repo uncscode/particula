@@ -62,7 +62,7 @@ def for_general_1d_load(
             "char_counts": {",": 4, ":": 0},
             "skip_rows": 0,
             "skip_end": 0,
-        },
+        }
     return {
         'relative_data_folder': relative_data_folder,
         'filename_regex': filename_regex,
@@ -140,7 +140,7 @@ def for_general_sizer_1d_2d_load(
             "char_counts": {",": 4, ":": 0},
             "skip_rows": 0,
             "skip_end": 0,
-        },
+        }
     settings_1d = {
         'relative_data_folder': relative_data_folder,
         'filename_regex': filename_regex,
