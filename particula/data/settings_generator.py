@@ -5,6 +5,7 @@
 from typing import List, Optional
 import json
 import warnings
+import os
 
 from particula.data.loader import get_files_in_folder_with_size
 
@@ -184,8 +185,8 @@ def for_general_sizer_1d_2d_load(
 def load_settings_for_stream(
             path: str,
             subfolder: str,
-            settings_sufix: str = '',
-            min_size: int = 10) -> dict:
+            settings_sufix: str = ''
+            ) -> dict:
     """auto loader for lake data settings. given a path, it will look for the
     json file in each folder containing the data and return the settings
     dictionary for the data in that folder.
@@ -208,3 +209,21 @@ def load_settings_for_stream(
             'Using the first one found.')  # type: ignore
 
     return json.load(open(full_path[0], 'r'))
+
+
+def save_settings_for_stream(
+        settings: dict,
+        path: str,
+        subfolder: str,
+        settings_sufix: str = ''
+        ) -> None:
+    """auto saver for lake data settings. given a path, it will look for the
+    json file in each folder containing the data and save the settings
+    dictionary for the data in that folder.
+    """
+
+    settings_file_name = 'stream_settings' + settings_sufix + '.json'
+
+    save_path = os.path.join(path, subfolder, settings_file_name)
+    # write the json, with 4 space indentation
+    json.dump(settings, open(save_path, 'w'), indent=4)
