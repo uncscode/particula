@@ -17,6 +17,7 @@ parts:
   - file: examples/loading_data_part2
   - file: examples/loading_data_part3
   - file: examples/stream_stats_part1
+  - file: examples/stream_stats_size_distribution_part2
 - caption: Documentation
   numbered: false
   chapters:

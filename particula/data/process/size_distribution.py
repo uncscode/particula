@@ -124,7 +124,7 @@ def sizer_mean_properties(
     ----------
     stream : Stream
         The stream to process.
-    sizer_limits : list, optional
+    sizer_limits : list, optional [in diameter_units]
         The lower and upper limits of the size of interest. The default is None
     density : float, optional
         The density of the particles. The default is 1.5 g/cm3.
@@ -140,6 +140,9 @@ def sizer_mean_properties(
 
     sizer_diameter_smps = np.array(stream.header).astype(float) \
         * convert_units(diameter_units, 'nm')
+    if sizer_limits is not None:  # convert to nm
+        sizer_limits[0] *= convert_units(diameter_units, 'nm')
+        sizer_limits[1] *= convert_units(diameter_units, 'nm')
     sizer_dndlogdp_smps = np.nan_to_num(stream.data)
 
     total_concentration = np.zeros_like(stream.time) * np.nan
