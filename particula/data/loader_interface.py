@@ -109,7 +109,7 @@ def get_new_files(
 def load_files_interface(
         path: str,
         settings: dict,
-        stream: Stream = None,
+        stream: Optional[Stream] = None,
 ) -> Stream:
     """
     Load files into a stream object based on settings.
@@ -181,7 +181,7 @@ def load_files_interface(
 def load_folders_interface(
         path: str,
         folder_settings: dict,
-        lake: Lake = None,
+        lake: Optional[Lake] = None,
 ) -> Lake:
     """
     Load files into a lake object based on settings.
@@ -223,7 +223,7 @@ def get_1d_stream(
     file_path: str,
     settings: dict,
     first_pass: bool = True,
-    stream: Stream = None,
+    stream: Optional[Stream] = None,
 ) -> Stream:
     """
     Loads and formats a 1D data stream from a file and initializes or updates
@@ -336,7 +336,7 @@ def get_2d_stream(
     file_path: str,
     settings: dict,
     first_pass: bool = True,
-    stream: Stream = None,
+    stream: Optional[Stream] = None,
 ) -> Stream:
     """
     Initializes a 2D stream using the settings in the DataLake object.
