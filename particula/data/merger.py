@@ -6,7 +6,6 @@ If the data has duplicate timestamps, it will remove the duplicates and
 interpolate the data to the data stream's time array.
 """
 # linting disabled until reformatting of this file
-# %pytype: skip-file
 
 
 from typing import Tuple, Optional

@@ -1,6 +1,4 @@
 """File readers and loaders for datacula."""
-# linting disabled until reformatting of this file
-# %pytype: skip-file
 
 from typing import List, Union, Tuple, Dict, Any, Optional
 import warnings

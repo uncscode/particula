@@ -1,5 +1,5 @@
 """interface to import data to a data stream"""
-# %pytype: skip-file
+
 
 from typing import Optional
 import os

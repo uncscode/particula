@@ -1,5 +1,5 @@
 """creates the lake class, a collection of streams"""
-# %pytype: skip-file
+
 
 from dataclasses import dataclass, field
 from typing import Dict, Iterator, Any, Tuple

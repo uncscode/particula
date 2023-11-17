@@ -1,5 +1,5 @@
 """Test the loader module."""
-# %pytype: skip-file
+
 
 from datetime import datetime
 import pytz

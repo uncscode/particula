@@ -1,5 +1,5 @@
 """A module for the Stream and StreamAveraged(Stream) classes."""
-# %pytype: skip-file
+
 
 from typing import List, Union
 from dataclasses import dataclass, field

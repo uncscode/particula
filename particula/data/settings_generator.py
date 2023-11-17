@@ -1,6 +1,6 @@
 """Callable to generate settings file from template."""
 # pylint: disable=all
-# %pytype: skip-file
+
 
 from typing import List, Optional
 

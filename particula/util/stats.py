@@ -1,6 +1,6 @@
 """stats module for datacula"""
 # linting disabled until reformatting of this file
-# %pytype: skip-file
+
 
 from typing import Tuple, Optional
 import numpy as np
