@@ -13,6 +13,7 @@ import pandas as pd
 
 from particula.util import convert
 from particula.util.time_manage import time_str_to_epoch
+from particula.data.lake import Lake
 
 FILTER_WARNING_FRACTION = 0.5
 
@@ -355,7 +356,7 @@ def general_data_formatter(
     date_offset: Optional[str] = None,
     seconds_shift: Optional[int] = 0,
     timezone_identifier: Optional[str] = 'UTC'
-) -> Tuple[np.array, np.array]:
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Formats and samples the data to get the time and data streams.
 
@@ -421,7 +422,7 @@ def sizer_data_formatter(
     date_offset: str = None,
     seconds_shift: int = 0,
     timezone_identifier: str = 'UTC'
-) -> Tuple[np.ndarray, List[str], np.ndarray, np.ndarray]:
+) -> Tuple[np.ndarray, np.ndarray, List[str]]:
     """
     Formats data from a particle sizer.
 
@@ -591,7 +592,10 @@ def get_files_in_folder_with_size(
     return file_list, full_path, file_size_in_bytes
 
 
-def save_datalake(path: str, data_lake: object = None, sufix_name: str = None):
+def save_lake(
+        path: str,
+        lake: Lake, 
+        sufix_name: Optional[str] = None):
     """
     Save datalake object as a pickle file.
 
@@ -604,27 +608,27 @@ def save_datalake(path: str, data_lake: object = None, sufix_name: str = None):
     sufix_name : str, optional
         Suffix to add to pickle file name. The default is None.
     """
-    print('Saving datalake...')
+    print('Saving lake...')
     # create output folder if it does not exist
     output_folder = os.path.join(path, 'output')
     os.makedirs(output_folder, exist_ok=True)
 
     # add suffix to file name if present
     if sufix_name is not None:
-        file_name = f'datalake_{sufix_name}.pk'
+        file_name = f'lake_{sufix_name}.pk'
     else:
-        file_name = 'datalake.pk'
+        file_name = 'lake.pk'
 
     # path to save pickle file
     file_path = os.path.join(output_folder, file_name)
 
     # save datalake
     with open(file_path, 'wb') as file:
-        pickle.dump(data_lake, file)
+        pickle.dump(lake, file)
     print('Datalake saved')
 
 
-def load_datalake(path: str, sufix_name: str = None) -> object:
+def load_lake(path: str, sufix_name: Optional[str] = None) -> object:
     """
     Load datalake object from a pickle file.
 
@@ -639,103 +643,18 @@ def load_datalake(path: str, sufix_name: str = None) -> object:
         Loaded DataLake object.
     """
     if sufix_name is not None:
-        file_name = f'datalake_{sufix_name}.pk'
-        file_name = f'datalake_{sufix_name}.pk'
+        file_name = f'lake_{sufix_name}.pk'
     else:
-        file_name = 'datalake.pk'
-
-        file_name = 'datalake.pk'
+        file_name = 'lake.pk'
 
     # path to load pickle file
     file_path = os.path.join(path, 'output', file_name)
 
     # load datalake
     with open(file_path, 'rb') as file:
-        data_lake = pickle.load(file)
+        lake = pickle.load(file)
 
-    return data_lake
-
-
-def datastream_to_csv(
-        datastream,
-        path,
-        filename,
-        header_keys=None,
-        time_shift_sec=0,
-):
-    """
-    Function to save a datastream to a csv file.
-    next: remove the pandas dependency
-
-    Parameters
-    ----------
-    datastream : DataStream
-        DataStream object to be saved
-    path : str
-        path to save the csv file
-    time_shift_sec : int, optional
-        time shift in seconds, by default 0
-    """
-
-    # save the data streams to text files
-    data = datastream.return_data(keys=header_keys)
-    time = convert.datetime64_from_epoch_array(
-        datastream.return_time(datetime64=False),
-        delta=time_shift_sec
-    )
-
-    if header_keys is None:
-        header = list(datastream.return_header_list())
-    else:
-        header = header_keys
-
-    combo = pd.DataFrame(data.T, index=time, columns=header)
-    combo.index.name = 'DateTime'
-
-    # add output folder to path if not already present
-    output_folder = os.path.join(path, 'output')
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-
-    save_path = os.path.join(path, 'output', filename + '.csv')
-    combo.to_csv(save_path, sep=',', index=True)
-
-
-def datalake_to_csv(
-        datalake,
-        path,
-        time_shift_sec=0,
-        keys=None,
-        sufix_name=None,
-):
-    """
-    Function to save a datalake to a csv file. Iterates through the
-    datastreams, or just the keys specified.
-
-    Parameters
-    ----------
-    datalake : DataLake
-        object of datastreams be saved
-    path : str
-        path to save the csv file
-    time_shift_sec : int, optional
-        time shift in seconds, by default 0
-    keys : list, optional
-        list of keys to save, by default None
-    """
-
-    if keys is None:
-        keys = list(datalake.datastreams.keys())
-
-    for key in keys:
-        save_name = key + '_' + sufix_name if sufix_name is not None else key
-        datastream_to_csv(
-            datastream=datalake.datastreams[key],
-            path=path,
-            filename=save_name,
-            time_shift_sec=time_shift_sec,
-        )
-        print('saved: ', key)
+    return lake
 
 
 # pylint: disable-all
