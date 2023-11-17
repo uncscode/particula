@@ -3,6 +3,10 @@
 
 
 from typing import List, Optional
+import json
+import warnings
+
+from particula.data.loader import get_files_in_folder_with_size
 
 
 def for_general_1d_load(
@@ -175,3 +179,32 @@ def for_general_sizer_1d_2d_load(
         'timezone_identifier': timezone_identifier,
     }
     return settings_1d, settings_2d
+
+
+def load_settings_for_stream(
+            path: str,
+            subfolder: str,
+            settings_sufix: str = '',
+            min_size: int = 10) -> dict:
+    """auto loader for lake data settings. given a path, it will look for the
+    json file in each folder containing the data and return the settings
+    dictionary for the data in that folder.
+    """
+
+    settings_file_name = 'stream_settings' + settings_sufix + '.json'
+    file_list, full_path, file_size_in_bytes = get_files_in_folder_with_size(
+        path=path,
+        subfolder=subfolder,
+        filename_regex=settings_file_name,
+        min_size=10)
+
+    # if there is no settings file, raise an error
+    if len(file_size_in_bytes) == 0:
+        raise FileNotFoundError(
+            f'No stream_settings file found in {path}/{subfolder}.')
+    if len(file_size_in_bytes) > 1:
+        raise warnings.warn(
+            f'More than one stream_settings file found in {path}/{subfolder}.'
+            'Using the first one found.')  # type: ignore
+
+    return json.load(open(full_path[0], 'r'))
