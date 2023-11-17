@@ -1,6 +1,7 @@
 """Size distribution processing functions to calculate mean properties and
 merge distributions."""
 # pytype: skip-file
+# pylint: disable=too-many-locals
 
 from typing import Optional, List, Tuple
 
