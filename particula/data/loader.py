@@ -2,7 +2,7 @@
 # linting disabled until reformatting of this file
 # %pytype: skip-file
 
-from typing import List, Union, Tuple, Dict, Any
+from typing import List, Union, Tuple, Dict, Any, Optional
 import warnings
 import glob
 import os
@@ -162,9 +162,9 @@ def parse_time_column(
     time_column: Union[int, List[int]],
     time_format: str,
     line: str,
-    date_offset: str = None,
-    seconds_shift: int = 0,
-    timezone_identifier: str = 'UTC'
+    date_offset: Optional[str] = None,
+    seconds_shift: Optional[int] = 0,
+    timezone_identifier: Optional[str] = 'UTC'
 ) -> float:
     """
     Parses the time column of a data line and returns it as a timestamp.
