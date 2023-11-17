@@ -614,11 +614,7 @@ def save_lake(
     os.makedirs(output_folder, exist_ok=True)
 
     # add suffix to file name if present
-    if sufix_name is not None:
-        file_name = f'lake_{sufix_name}.pk'
-    else:
-        file_name = 'lake.pk'
-
+    file_name = f'lake_{sufix_name}.pk' if sufix_name is not None else 'lake.pk'
     # path to save pickle file
     file_path = os.path.join(output_folder, file_name)
 
@@ -642,11 +638,7 @@ def load_lake(path: str, sufix_name: Optional[str] = None) -> object:
     data_lake : DataLake
         Loaded DataLake object.
     """
-    if sufix_name is not None:
-        file_name = f'lake_{sufix_name}.pk'
-    else:
-        file_name = 'lake.pk'
-
+    file_name = f'lake_{sufix_name}.pk' if sufix_name is not None else 'lake.pk'
     # path to load pickle file
     file_path = os.path.join(path, 'output', file_name)
 
