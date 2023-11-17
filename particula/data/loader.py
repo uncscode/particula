@@ -161,7 +161,7 @@ def data_format_checks(data: List[str], data_checks: dict) -> List[str]:
 def parse_time_column(
     time_column: Union[int, List[int]],
     time_format: str,
-    line: str,
+    line: np.ndarray,
     date_offset: Optional[str] = None,
     seconds_shift: Optional[int] = 0,
     timezone_identifier: Optional[str] = 'UTC'
@@ -350,11 +350,11 @@ def general_data_formatter(
     data_column: list,
     time_column: Union[int, List[int]],
     time_format: str,
-    delimiter: str = ',',
-    header_row: int = 0,
-    date_offset: str = None,
-    seconds_shift: int = 0,
-    timezone_identifier: str = 'UTC'
+    delimiter: Optional[str] = ',',
+    header_row: Optional[int] = 0,
+    date_offset: Optional[str] = None,
+    seconds_shift: Optional[int] = 0,
+    timezone_identifier: Optional[str] = 'UTC'
 ) -> Tuple[np.array, np.array]:
     """
     Formats and samples the data to get the time and data streams.
