@@ -417,12 +417,12 @@ def sizer_data_formatter(
     data_sizer_reader: Dict[str, str],
     time_column: int,
     time_format: str,
-    delimiter: str = ',',
-    header_row: int = 0,
-    date_offset: str = None,
-    seconds_shift: int = 0,
-    timezone_identifier: str = 'UTC'
-) -> Tuple[np.ndarray, np.ndarray, List[str]]:
+    delimiter: Optional[str] = ',',
+    header_row: Optional[int] = 0,
+    date_offset: Optional[str] = None,
+    seconds_shift: Optional[int] = 0,
+    timezone_identifier: Optional[str] = 'UTC'
+) -> Tuple[np.ndarray, np.ndarray, list]:
     """
     Formats data from a particle sizer.
 
@@ -744,7 +744,7 @@ def netcdf_data_1d_load(
 def netcdf_data_2d_load(
         file_path: str,
         settings: dict
-) -> Tuple[np.array, list, np.ndarray]:
+) -> Tuple[np.ndarray, list, np.ndarray]:
     """
     Given a netCDF file path and settings, returns a tuple containing the
     epoch time, header, and data as a numpy array. We do apply the mask to the
