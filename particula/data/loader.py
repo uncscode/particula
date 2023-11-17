@@ -162,8 +162,8 @@ def parse_time_column(
     time_format: str,
     line: np.ndarray,
     date_offset: Optional[str] = None,
-    seconds_shift: Optional[int] = 0,
-    timezone_identifier: Optional[str] = 'UTC'
+    seconds_shift: int = 0,
+    timezone_identifier: str = 'UTC'
 ) -> float:
     """
     Parses the time column of a data line and returns it as a timestamp.
@@ -221,13 +221,13 @@ def parse_time_column(
 
 def sample_data(
     data: List[str],
-    time_column: int,
+    time_column: Union[int, List[int]],
     time_format: str,
     data_columns: List[int],
     delimiter: str,
     date_offset: Optional[str] = None,
-    seconds_shift: Optional[int] = 0,
-    timezone_identifier: Optional[str] = 'UTC'
+    seconds_shift: int = 0,
+    timezone_identifier: str = 'UTC'
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Samples the data to get the time and data streams.
@@ -349,11 +349,11 @@ def general_data_formatter(
     data_column: list,
     time_column: Union[int, List[int]],
     time_format: str,
-    delimiter: Optional[str] = ',',
-    header_row: Optional[int] = 0,
+    delimiter: str = ',',
+    header_row: int = 0,
     date_offset: Optional[str] = None,
-    seconds_shift: Optional[int] = 0,
-    timezone_identifier: Optional[str] = 'UTC'
+    seconds_shift: int = 0,
+    timezone_identifier: str = 'UTC'
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Formats and samples the data to get the time and data streams.
@@ -413,13 +413,13 @@ def sizer_data_formatter(
     data: List[str],
     data_checks: Dict[str, Any],
     data_sizer_reader: Dict[str, str],
-    time_column: int,
+    time_column: Union[int, List[int]],
     time_format: str,
-    delimiter: Optional[str] = ',',
-    header_row: Optional[int] = 0,
+    delimiter: str = ',',
+    header_row: int = 0,
     date_offset: Optional[str] = None,
-    seconds_shift: Optional[int] = 0,
-    timezone_identifier: Optional[str] = 'UTC'
+    seconds_shift: int = 0,
+    timezone_identifier: str = 'UTC'
 ) -> Tuple[np.ndarray, np.ndarray, list]:
     """
     Formats data from a particle sizer.
@@ -667,7 +667,7 @@ def netcdf_get_epoch_time(
     -------
         np.ndarray: An array of epoch times, in seconds as a float.
     """
-    nc_file = nc.Dataset(file_path)
+    nc_file = nc.Dataset(file_path)  # type: ignore
 
     epoch_time = np.zeros(nc_file.dimensions['time'].size)
 
@@ -710,7 +710,7 @@ def netcdf_data_1d_load(
     # get header
     header_1d = settings['netcdf_reader']['header_1d']
 
-    nc_file = nc.Dataset(file_path)
+    nc_file = nc.Dataset(file_path)  # type: ignore
     # get epoch time
     epoch_time = netcdf_get_epoch_time(file_path, settings)
 
@@ -769,7 +769,7 @@ def netcdf_data_2d_load(
     # get epoch time
     epoch_time = netcdf_get_epoch_time(file_path, settings)
     # load netcdf file
-    nc_file = nc.Dataset(file_path)
+    nc_file = nc.Dataset(file_path)  # type: ignore
 
     # select data_2d
     data_2d = nc_file.variables.get(settings['netcdf_reader']['data_2d'])[:]
@@ -809,7 +809,7 @@ def netcdf_info_print(file_path, file_return=False):
         nc_file (netCDF4.Dataset): The netCDF file object.
     """
 
-    nc_file = nc.Dataset(file_path)
+    nc_file = nc.Dataset(file_path)  # type: ignore
     print("Dimensions:")
     for dim in nc_file.dimensions:
         print(dim, len(nc_file.dimensions[dim]))
