@@ -52,7 +52,7 @@ def knu(
         <Quantity(66.7097062, 'dimensionless')>
         ```
 
-        Parameters:
+        Args:
             radius  (float) [m]
             mfp     (float) [m] (default: util)
 
@@ -68,4 +68,4 @@ def knu(
     mfp_val = mfp_func(**kwargs) if mfp is None else in_length(mfp)
     radius = in_radius(radius)
 
-    return np.transpose([mfp_val.m])*mfp_val.u / radius
+    return np.transpose([mfp_val.m]) * mfp_val.u / radius

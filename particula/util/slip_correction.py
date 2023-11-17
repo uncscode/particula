@@ -47,7 +47,7 @@ def scf(
         <Quantity(111.101591, 'dimensionless')>
         ```
 
-        Parameters:
+        Args:
             radius  (float) [m]
             knu     (float) [ ] (default: util)
 
@@ -65,5 +65,5 @@ def scf(
         else in_scalar(knu)
 
     return 1 + knu_val * (
-        1.257 + 0.4*np.exp(-1.1/knu_val)
+        1.257 + 0.4 * np.exp(-1.1 / knu_val)
     )

@@ -15,7 +15,7 @@ def time_str_to_epoch(
     See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
     for a list of time zones.
 
-    Parameters:
+    Args:
     -----------
     time : float (single value no arrays)
         Epoch time in seconds.

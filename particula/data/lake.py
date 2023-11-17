@@ -19,7 +19,7 @@ class Lake:
     def add_stream(self, stream: Stream, name: str) -> None:
         """Add a stream to the lake.
 
-        Parameters:
+        Args:
         -----------
             stream (Stream): The stream object to be added.
             name (str): The name of the stream.

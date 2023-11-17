@@ -38,14 +38,15 @@ class DiffusiveKnudsen(CoulombEnhancement):
         mass_dummy = mass(radius=self.radius, density=self.density)
 
         return reduced_quantity(
-            np.transpose([mass_dummy.m])*mass_dummy.u,
+            np.transpose([mass_dummy.m]) * mass_dummy.u,
             mass(radius=self.other_radius, density=self.other_density)
         )
 
     def get_rxr(self):
         """ add two radii
         """
-        return np.transpose([self.radius.m])*self.radius.u + self.other_radius
+        return np.transpose([self.radius.m]) * \
+            self.radius.u + self.other_radius
 
     def get_red_frifac(self):
         """ get the reduced friction factor
@@ -59,7 +60,7 @@ class DiffusiveKnudsen(CoulombEnhancement):
 
         dummy_frifac = frifac(radius=self.radius, **frifac_kwargs)
         return reduced_quantity(
-            np.transpose([dummy_frifac.m])*dummy_frifac.u,
+            np.transpose([dummy_frifac.m]) * dummy_frifac.u,
             frifac(radius=self.other_radius, **other_frifac_kwargs)
         )
 
@@ -113,7 +114,7 @@ def diff_knu(**kwargs):
         >>> diff_knu(radius=1e-9, other_radius=1e-8, charge=-1, other_charge=1)
         <Quantity(4.58204028, 'dimensionless')>
         ```
-        Parameters:
+        Args:
             radius          (float) [m]
             other_radius    (float) [m]             (default: radius)
             density         (float) [kg/m^3]        (default: 1000)

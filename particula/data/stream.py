@@ -55,7 +55,7 @@ class Stream:
 
     def __getitem__(self, index: Union[int, str]):
         """Allows for indexing of the data stream.
-        Parameters:
+        Args:
         ----------
         index : int or str
             The index of the data stream to return.
@@ -69,7 +69,7 @@ class Stream:
 
     def __setitem__(self, index: Union[int, str], value):
         """Allows for setting of a row of data in the stream.
-        Parameters:
+        Args:
         ----------
         index : int or str
             The index of the data stream to set.

@@ -44,7 +44,7 @@ def average_std(
     results are returned as a new 'StreamAveraged' object containing the
     processed data.
 
-    Parameters:
+    Args:
     - stream (object): The input stream object containing 'time' and 'data'
         arrays along with other associated metadata.
     - average_interval (float|int, optional): The time interval over which the
@@ -116,7 +116,7 @@ def filtering(
     replaced with a specified value.  Note, not all parameters need to be
     specified, but at least one must be provided (top, bottom, value)
 
-    Parameters:
+    Args:
     - stream (Stream): The input stream object containing 'data' and 'time'
         attributes.
     - bottom (float, optional): The lower bound for filtering data. Defaults

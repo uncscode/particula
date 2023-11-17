@@ -16,7 +16,7 @@ def merge_formatting(
     Formats two data arrays and their headers so that the data new can be
     subsiqently added to data current.
 
-    Parameters:
+    Args:
         data_current (np.ndarray): First data array to merge.
         header_current (list): Header for the first data array.
         data_new (np.ndarray): Second data array to merge.
@@ -129,7 +129,7 @@ def average_to_interval(
     deviation of the data are calculated for each interval, and the results
     are returned as two arrays.
 
-    Parameters:
+    Args:
     ----------
         time_raw (np.ndarray): An array of timestamps, sorted in ascending
             order.
@@ -249,7 +249,7 @@ def mask_outliers(
     `invert` is True, the mask will be inverted. The mask will be True for
     False for outliers and True for non-outliers.
 
-    Parameters:
+    Args:
     ----------
         data (np.ndarray): The data array to be masked.
         bottom (float): The lower threshold for outliers.

@@ -274,7 +274,7 @@ def merge_distributions(
     """
     Merge two particle size distributions using linear weighting.
 
-    Parameters:
+    Args:
     concentration_lower:
         The concentration of particles in the lower
         distribution.
@@ -354,7 +354,7 @@ def iterate_merge_distributions(
     """
     Merge two sets of particle size distributions using linear weighting.
 
-    Parameters:
+    Args:
     concentration_lower: The concentration of particles in the
         lower distribution.
     diameters_lower: The diameters corresponding to the
@@ -401,7 +401,7 @@ def merge_size_distribution(
     Merge two sets of particle size distributions using linear weighting.
     The concentration should be in dN/dlogDp.
 
-    Parameters:
+    Args:
     stream_smaller: The stream with lower sizes, e.g. SMPS.
     stream_larger: The stream with larger sizes, e.g. OPS. or APS
     lower_units: The units of the lower distribution. The default is 'nm'.

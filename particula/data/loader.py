@@ -21,7 +21,7 @@ def data_raw_loader(file_path: str) -> list:
     Load raw data from a file at the specified file path and return it as a
     list of strings.
 
-    Parameters:
+    Args:
         file_path (str): The file path of the file to read.
 
     Returns:
@@ -50,7 +50,7 @@ def filter_list(data: List[str], char_counts: dict) -> List[str]:
     dictionary. The keys are the characters to count, and the values are the
     exact count required for each character in each row.
 
-    Parameters:
+    Args:
     ----------
         data (List[str]): A list of strings to filter.
             A list of strings to filter.
@@ -168,7 +168,7 @@ def parse_time_column(
     """
     Parses the time column of a data line and returns it as a timestamp.
 
-    Parameters:
+    Args:
     ----------
     time_column : Union[int, List[int]]
         The index or indices of the column(s) containing the time information.
@@ -232,7 +232,7 @@ def sample_data(
     """
     Samples the data to get the time and data streams.
 
-    Parameters:
+    Args:
     -----------
     data : List[str]
         The input data in the form of a list of strings.
@@ -358,7 +358,7 @@ def general_data_formatter(
     """
     Formats and samples the data to get the time and data streams.
 
-    Parameters:
+    Args:
     ----------
     data : list
         The list of strings containing the data.
@@ -508,7 +508,7 @@ def non_standard_date_location(
     """
     Extracts the date from a non-standard location in the data.
 
-    Parameters:
+    Args:
     ----------
     data : list
         A list of strings representing the data.
@@ -550,7 +550,7 @@ def get_files_in_folder_with_size(
     match the given filename pattern and have a size greater than the
     specified minimum size.
 
-    Parameters:
+    Args:
     ----------
     path : str
         The path to the parent folder.
@@ -592,7 +592,7 @@ def get_files_in_folder_with_size(
 
 def save_lake(
         path: str,
-        lake: Lake, 
+        lake: Lake,
         sufix_name: Optional[str] = None):
     """
     Save datalake object as a pickle file.
@@ -658,7 +658,7 @@ def netcdf_get_epoch_time(
 
     Currently only uses ARM 1.2 netCDF files (base_time + time_offset)
 
-    Parameters:
+    Args:
     ----------
         file_path (str): The path to the netCDF file.
         settings (dict): A dictionary containing settings for the instrument.
@@ -689,7 +689,7 @@ def netcdf_data_1d_load(
     epoch time, header, and data as a numpy array. We do apply the mask to the
     data, and fill the masked values with nan.
 
-    Parameters:
+    Args:
     ----------
         file_path (str): The path to the netCDF file.
         settings (dict): A dictionary containing settings for the instrument.
@@ -748,7 +748,7 @@ def netcdf_data_2d_load(
     epoch time, header, and data as a numpy array. We do apply the mask to the
     data, and fill the masked values with nan.
 
-    Parameters:
+    Args:
     ----------
         file_path (str): The path to the netCDF file.
         settings (dict): A dictionary containing settings for the instrument.
@@ -798,7 +798,7 @@ def netcdf_info_print(file_path, file_return=False):
     Prints information about a netCDF file. Useful for generating settings
     dictionaries.
 
-    Parameters:
+    Args:
     ----------
         file_path (str): The path to the netCDF file.
         file_return (bool): If True, returns the netCDF file object.

@@ -13,7 +13,7 @@ def fsc(
 ):
     """ Returns the Fuchs-Sutugin model transition regime correction.
 
-        Parameters:
+        Args:
             knu     (float)  [ ] (default: util)
             alpha   (float)  [ ] (default: 1)
 
@@ -26,7 +26,7 @@ def fsc(
     """
 
     knu_val = knu(**kwargs) if knu_val is None else in_scalar(knu_val)
-    alpha = np.transpose([in_scalar(alpha).m])*in_scalar(alpha).u
+    alpha = np.transpose([in_scalar(alpha).m]) * in_scalar(alpha).u
 
     return np.transpose(
         knu_val * alpha * (1 + knu_val) /
