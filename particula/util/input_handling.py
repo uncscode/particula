@@ -73,6 +73,39 @@ def in_handling(value, units: u.Quantity):
     return value
 
 
+def convert_units(old, new):
+    """ generic pint function to convert units
+
+        Parameters:
+            old     [str | u.Quantity]
+            new     [str | u.Quantity]
+
+        Returns:
+            multiplier     (float)
+
+        Notes:
+            * If unit is correct, take to base units
+            * Throws ValueError if unit is wrong
+            * Assigning default base units to scalar input
+    """
+    if isinstance(old, str):
+        old = 1*u.Quantity(old)
+    if isinstance(new, str):
+        new = u.Quantity(new)
+
+    if isinstance(old, u.Quantity) and isinstance(new, u.Quantity):
+        new = old.to(new)
+    else:
+        raise ValueError(
+            f"\n\t"
+            f"Input has unsupported units.\n\t"
+            f"Input must have units equivlanet to {new};\n\t"
+            f"otherwise, if dimensionless, it will\n\t"
+            f"be assigned {new}.\n"
+        )
+    return new.m
+
+
 # pylint: disable=missing-docstring, multiple-statements
 def in_temperature(temp): return in_handling(temp, u.K)
 def in_viscosity(vis): return in_handling(vis, u.kg/u.m/u.s)

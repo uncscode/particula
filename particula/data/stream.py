@@ -53,7 +53,7 @@ class Stream:
         if not isinstance(self.header, list):
             raise TypeError("header_list must be a list")
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: any):
         """Allows for indexing of the data stream.
         Parameters:
         ----------
