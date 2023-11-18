@@ -12,8 +12,9 @@ def test_safe_exp():
     assert np.allclose(safe_exp([-1, -2, -3]), np.exp([-1, -2, -3]))
 
     # Test with large values
-    assert not np.allclose(safe_exp([1000, 2000, 3000]),
-                       np.exp([1000, 2000, 3000]))
+    assert not np.allclose(
+        safe_exp([1000, 2000, 3000]),
+        np.exp([1000, 2000, 3000]))
 
 
 def test_safe_log():
