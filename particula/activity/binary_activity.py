@@ -11,8 +11,8 @@ from typing import Optional
 import numpy as np
 
 from particula.activity.machine_limit import safe_exp
-from particula.activity.phase_separation import organic_water_single_phase
-
+from particula.activity import phase_separation
+from particula.activity.species_density import organic_density_estimate
 
 # the fit values for the activity model
 FIT_LOW = {'a1': [7.089476E+00, -7.711860E+00, -3.885941E+01, -1.000000E+02],
@@ -205,6 +205,67 @@ def gibbs_mix_weight(
     return gibbs_mix, derivative_gibbs
 
 
+def biphasic_water_activity_point(
+    oxygen2carbon,
+    hydrogen2carbon,
+    molar_mass_ratio,
+    functional_group=None
+):
+    """
+    This function computes the biphasic to single phase
+    water activity (RH*100).
+
+    Args:
+    oxygen2carbon (np.array): An array representing oxygen2carbon values.
+    hydrogen2carbon (np.array): An array representing hydrogen2carbon values.
+    molar_mass_ratio (np.array): An array representing molar mass ratio values.
+    functional_group (str/list): The BAT functional group(s).
+
+    Returns:
+    np.array: The RH cross point array.
+    """
+
+    water_activity_cross_point = np.zeros_like(oxygen2carbon)
+
+    interpolate_step_numb = 200  # interpolation points
+    # mole_frac = np.linspace(1e-12, 1, interpolate_step_numb + 1)
+    mole_frac = np.logspace(-6, 0, interpolate_step_numb + 1)
+
+    for i, _ in enumerate(oxygen2carbon):
+        density = organic_density_estimate(
+            molar_mass_ratio[i],
+            oxygen2carbon[i],
+            hydrogen2carbon[i],
+            mass_ratio_convert=True)
+        activities = activity_coefficients(
+            molar_mass_ratio=molar_mass_ratio[i],
+            org_mole_fraction=mole_frac,
+            oxygen2carbon=oxygen2carbon[i],
+            density=density,
+            functional_group=functional_group
+        )
+
+        if np.isnan(activities[0]).any():
+            raise ValueError('water activity is NaN, check inputs')
+
+        phase_check = phase_separation.find_phase_separation(
+            activities[0],
+            activities[1])
+
+        if phase_check['phase_sep_check'] == 1:
+            water_activity_cross_point[i] = phase_check['upper_a_w_sep']
+        else:
+            water_activity_cross_point[i] = 0  # no phase separation
+
+    # Checks outputs with in physical limits
+    # round to zero
+    water_activity_cross_point[water_activity_cross_point < 0] = 0
+    # round max to 1
+    water_activity_cross_point[water_activity_cross_point > 1] = 1
+
+    return water_activity_cross_point
+
+
 def convert_to_oh_equivalent(
         oxygen2carbon, molar_mass_ratio, functional_group=None):
     """
@@ -230,7 +291,8 @@ def bat_blending_weights(molar_mass_ratio, oxygen2carbon):
         in the low, mid, and high oxygen2carbon regions.
     """
 
-    oxygen2carbon_ml = organic_water_single_phase(molar_mass_ratio)
+    oxygen2carbon_ml = phase_separation.organic_water_single_phase(
+        molar_mass_ratio)
 
     blending_weights = np.zeros(3)  # [low, mid, high] oxygen2carbon regions
 
