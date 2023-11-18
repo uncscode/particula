@@ -49,9 +49,9 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
         self.other_charge = in_scalar(other_charge)
         self.temperature = in_temperature(temperature)
         self.elem_char_val = in_handling(elementary_charge_value, u.C)
-        self.elec_perm = in_handling(electric_permittivity, u.F/u.m)
+        self.elec_perm = in_handling(electric_permittivity, u.F / u.m)
         self.boltz_const = in_handling(
-            boltzmann_constant, u.m**2*u.kg/u.s**2/u.K
+            boltzmann_constant, u.m**2 * u.kg / u.s**2 / u.K
         )
 
         self.kwargs = kwargs
@@ -77,7 +77,7 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
     def coulomb_potential_ratio(self):
         """ Calculates the Coulomb potential ratio.
 
-            Parameters:
+            Args:
                 radius          (float) [m]
                 other_radius    (float) [m]             (default: radius)
                 charge          (int)   [dimensionless] (default: 0)
@@ -92,7 +92,7 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
             self.elem_char_val ** 2
         )
         denominator = 4 * np.pi * self.elec_perm * (
-            np.transpose([self.radius.m])*self.radius.u +
+            np.transpose([self.radius.m]) * self.radius.u +
             self.other_radius
         )
 
@@ -103,7 +103,7 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
     def coulomb_enhancement_kinetic_limit(self):
         """ Coulombic coagulation enhancement kinetic limit.
 
-            Parameters:
+            Args:
                 radius          (float) [m]
                 other_radius    (float) [m]             (default: radius)
                 charge          (float) [dimensionless] (default: 0)
@@ -124,7 +124,7 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
     def coulomb_enhancement_continuum_limit(self):
         """ Coulombic coagulation enhancement continuum limit.
 
-            Parameters:
+            Args:
                 radius          (float) [m]
                 other_radius    (float) [m]             (default: radius)
                 charge          (float) [dimensionless] (default: 0)
@@ -139,8 +139,8 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
 
         # return ratio/(1-np.exp(-1*ratio)) if ratio != 0, otherwise 1
         return (
-            (ratio*(ratio != 0)+1*(ratio == 0))
-            / (1-np.exp(-1*ratio)*(ratio != 0))
+            (ratio * (ratio != 0) + 1 * (ratio == 0))
+            / (1 - np.exp(-1 * ratio) * (ratio != 0))
         ).to_base_units()
 
 

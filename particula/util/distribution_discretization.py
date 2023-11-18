@@ -16,7 +16,7 @@ def discretize(
 ):
     """ discretize the distribution of the particles
 
-        Parameters:
+        Args:
             interval    (float) the size interval of the distribution
             distype     (str)   the type of distribution, "lognormal" for now
             gsigma      (float) geometric standard deviation of distribution
@@ -43,7 +43,7 @@ def discretize(
             scale=np.reshape([mode.m], (np.array([mode.m]).size, 1)),
         ) / interval.u
         * np.reshape([nparticles], (np.array([nparticles]).size, 1))
-        ).sum(axis=0) /
+    ).sum(axis=0) /
         np.array([nparticles]).sum() /
         np.max([np.array([mode.m]).size, np.array([gsigma]).size])
     )

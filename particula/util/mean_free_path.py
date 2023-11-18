@@ -26,8 +26,8 @@ from particula.util.input_handling import (in_gas_constant,
 
 
 def mfp(
-    temperature=298.15*u.K,
-    pressure=101325*u.Pa,
+    temperature=298.15 * u.K,
+    pressure=101325 * u.Pa,
     molecular_weight=MOLECULAR_WEIGHT_AIR,
     dynamic_viscosity=None,
     gas_constant=GAS_CONSTANT,
@@ -82,7 +82,7 @@ def mfp(
         <Quantity([6.78918100e-08 6.43354325e-08], 'meter')>
         ```
 
-        Parameters: (either # or $)
+        Args: (either # or $)
             temperature           (float) [K]      (default: 298)
             pressure              (float) [Pa]     (default: 101325)
             molecular_weight      (float) [kg/mol] (default: constants)

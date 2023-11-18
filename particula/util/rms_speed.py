@@ -14,7 +14,7 @@ def cbar(
 ):
     """ Returns the mean speed of molecules in an ideal gas.
 
-        Parameters:
+        Args:
             temperature           (float) [K]      (default: 298.15)
             molecular_weight      (float) [kg/mol] (default: constants)
 

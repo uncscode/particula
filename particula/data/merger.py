@@ -29,7 +29,7 @@ def combine_data(
     than
     the existing data, it will be reshaped to match the existing data.
 
-    Parameters:
+    Args:
     -----------
     data : np.array
         Existing data stream.

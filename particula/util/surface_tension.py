@@ -12,7 +12,7 @@ def water(
     """Calculate the surface tension of water using the equation from Kalova
     and Mares (2018).
 
-    Parameters:
+    Args:
     ----------
         Temperature : float, Ambient temperature of air
         CritTemp : float, optional: Critical temperature of water
@@ -24,20 +24,20 @@ def water(
     temperature = in_temperature(temperature)
     critical_temperature = in_temperature(critical_temperature)
     # Dimensionless parameter from fitting equation
-    tau = 1 - temperature/critical_temperature
+    tau = 1 - temperature / critical_temperature
 
     # Surface tension in mN/m
     sigma = 241.322 * (tau.m ** 1.26) * (
-                1 - 0.0589 * (tau.m ** 0.5) - 0.56917 * tau.m
-            )
+        1 - 0.0589 * (tau.m ** 0.5) - 0.56917 * tau.m
+    )
 
-    return in_surface_tension(sigma/1000)
+    return in_surface_tension(sigma / 1000)
 
 
 def dry_mixing(volume_fractions, surface_tensions):
     """Function to calculate the effective surface tension of a dry mixture.
 
-    Parameters:
+    Args:
     ----------
     volume_fractions : array, volume fractions of solutes
     surface_tensions : array, surface tensions of solutes
@@ -52,20 +52,20 @@ def dry_mixing(volume_fractions, surface_tensions):
         volume_fractions = volume_fractions / np.sum(volume_fractions)
 
     # Calculate the surface tension of the mixture
-    return np.sum(volume_fractions*surface_tensions)
+    return np.sum(volume_fractions * surface_tensions)
 
 
 def wet_mixing(
-            volume_solute,
-            volume_water,
-            wet_radius,
-            surface_tension_solute,
-            temperature,
-            method='film'
-        ):
+    volume_solute,
+    volume_water,
+    wet_radius,
+    surface_tension_solute,
+    temperature,
+    method='film'
+):
     """Function to calculate the effective surface tension of a wet mixture.
 
-    Parameters:
+    Args:
     ----------
     volume_solute : array, volume of solute mixture
     volume_water : array, volume of water
@@ -92,7 +92,8 @@ def wet_mixing(
         mono = in_radius(0.3e-9)
 
         # Volume of the monolayer
-        film_volume = (4/3) * np.pi * (wet_radius**3 - (wet_radius - mono)**3)
+        film_volume = (4 / 3) * np.pi * (wet_radius **
+                                         3 - (wet_radius - mono)**3)
 
         # Determine if there's enough organics to cover the particle
         surface_coverage = volume_solute / film_volume
@@ -105,13 +106,13 @@ def wet_mixing(
             # If the particle is not completely covered, the surface tension
             # is a weighted average of the surface tension of the solute and
             # water
-            sigma = surface_tension_solute*surface_coverage + \
-                water(temperature)*(1-surface_coverage)
+            sigma = surface_tension_solute * surface_coverage + \
+                water(temperature) * (1 - surface_coverage)
     elif method == 'volume':
         # Volume method
         sigma = (
-                    volume_solute*surface_tension_solute +
-                    volume_water*water(temperature)
-                ) / (volume_solute + volume_water)
+            volume_solute * surface_tension_solute +
+            volume_water * water(temperature)
+        ) / (volume_solute + volume_water)
 
     return sigma

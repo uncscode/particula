@@ -8,7 +8,7 @@ from scipy.interpolate import RectBivariateSpline
 class CoagulationRate:
     """ A class to calculate the coagulation rate.
 
-        Parameters:
+        Args:
             distribution (float): The distribution of particles.
             radius       (float): The radius of the particles.
             kernel       (float): The kernel of the particles.
@@ -71,7 +71,7 @@ class CoagulationRate:
 
         nums, rads, kern = self.coag_prep()
 
-        return nums*np.trapz(kern*nums, rads)
+        return nums * np.trapz(kern * nums, rads)
 
     def coag_gain(self):
         """ Returns the coagulation gain rate
@@ -108,8 +108,8 @@ class CoagulationRate:
             rads.m, rads.m, kern.m * nums.m * np.transpose([nums.m])
         )
 
-        dpd = np.linspace(0, rads.m/2**(1/3), rads.m.size)*rads.u
-        dpi = ((np.transpose(rads.m)*rads.u)**3 - dpd**3)**(1/3)
+        dpd = np.linspace(0, rads.m / 2**(1 / 3), rads.m.size) * rads.u
+        dpi = ((np.transpose(rads.m) * rads.u)**3 - dpd**3)**(1 / 3)
 
         return rads**2 * np.trapz(
             interp.ev(dpd.m, dpi.m) * kern.u * nums.u * nums.u / dpi**2,

@@ -56,7 +56,7 @@ def frifac(
         >>> frifac(radius=1e-9, slip_correction=1.5)
         <Quantity(3.12763919e-15, 'kilogram / second')>
         ```
-        Parameters:
+        Args:
             radius            (float) [m]
             dynamic_viscosity (float) [kg/m/s]  (default: util)
             slip_corr_factor  (float) [ ]       (default: util)

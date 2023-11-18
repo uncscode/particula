@@ -3,6 +3,11 @@
 
 
 from typing import List, Optional
+import json
+import warnings
+import os
+
+from particula.data.loader import get_files_in_folder_with_size
 
 
 def for_general_1d_load(
@@ -62,7 +67,7 @@ def for_general_1d_load(
             "char_counts": {",": 4, ":": 0},
             "skip_rows": 0,
             "skip_end": 0,
-        },
+        }
     return {
         'relative_data_folder': relative_data_folder,
         'filename_regex': filename_regex,
@@ -140,7 +145,7 @@ def for_general_sizer_1d_2d_load(
             "char_counts": {",": 4, ":": 0},
             "skip_rows": 0,
             "skip_end": 0,
-        },
+        }
     settings_1d = {
         'relative_data_folder': relative_data_folder,
         'filename_regex': filename_regex,
@@ -175,3 +180,154 @@ def for_general_sizer_1d_2d_load(
         'timezone_identifier': timezone_identifier,
     }
     return settings_1d, settings_2d
+
+
+def load_settings_for_stream(
+    path: str,
+    subfolder: str,
+    settings_suffix: str = ''
+) -> dict:
+    """
+    Load settings for Stream data from a JSON file.
+
+    Given a path and subfolder, this function searches for a JSON file
+    named 'stream_settings' with an optional suffix. It returns the settings
+    as a dictionary. If no file is found, or multiple files are found,
+    appropriate errors or warnings are raised.
+
+    Args:
+    - path: The path where the subfolder is located.
+    - subfolder: The subfolder where the settings file is expected.
+    - settings_suffix: An optional suffix for the settings
+        file name. Default is an empty string.
+
+    Returns:
+    - dict: A dictionary of settings loaded from the file.
+
+    Raises:
+    - FileNotFoundError: If no settings file is found.
+    - Warning: If more than one settings file is found.
+    """
+    settings_file_name = f'stream_settings{settings_suffix}.json'
+    file_list, full_path, file_size_in_bytes = get_files_in_folder_with_size(
+        path=path,
+        subfolder=subfolder,
+        filename_regex=settings_file_name,
+        min_size=10)
+
+    if len(file_size_in_bytes) == 0:
+        raise FileNotFoundError(
+            f'No stream_settings file found in {path}/{subfolder}.')
+    if len(file_size_in_bytes) > 1:
+        warnings.warn(
+            f'More than one stream_settings file found in {path}/{subfolder}. '
+            'Using the first one found.')
+
+    with open(full_path[0], 'r') as file:
+        return json.load(file)
+
+
+def save_settings_for_stream(
+    settings: dict,
+    path: str,
+    subfolder: str,
+    settings_suffix: str = ''
+) -> None:
+    """
+    Save settings for lake data to a JSON file.
+
+    Given a dictionary of settings, this function saves it to a JSON file
+    named 'stream_settings' with an optional suffix in the specified filename.
+    The JSON file is formatted with a 4-space indentation.
+
+    Args:
+    - settings: The settings dictionary to be saved.
+    - path: The path where the subfolder is located.
+    - subfolder: The subfolder where the settings file will be saved.
+    - settings_suffix: An optional suffix for the settings
+        file name. Default is an empty string.
+
+    Returns:
+    - None
+    """
+    settings_file_name = f'stream_settings{settings_suffix}.json'
+    save_path = os.path.join(path, subfolder, settings_file_name)
+
+    with open(save_path, 'w') as file:
+        json.dump(settings, file, indent=4)
+
+
+def load_settings_for_lake(
+    path: str,
+    subfolder: str = '',
+    settings_suffix: str = ''
+) -> dict:
+    """
+    Load settings for Lake data from a JSON file. The settings file is
+    a dictionary of stream settings dictionaries.
+
+    Given a path and subfolder, this function searches for a JSON file
+    named 'lake_settings' with an optional suffix. It returns the settings
+    as a dictionary. If no file is found, or multiple files are found,
+    appropriate errors or warnings are raised.
+
+    Args:
+    - path: The path where the subfolder is located.
+    - subfolder: The subfolder where the settings file is expected.
+    - settings_suffix: An optional suffix for the settings
+        file name. Default is an empty string.
+
+    Returns:
+    - dict: A dictionary of settings loaded from the file.
+
+    Raises:
+    - FileNotFoundError: If no settings file is found.
+    - Warning: If more than one settings file is found.
+    """
+    settings_file_name = f'lake_settings{settings_suffix}.json'
+    file_list, full_path, file_size_in_bytes = get_files_in_folder_with_size(
+        path=path,
+        subfolder=subfolder,
+        filename_regex=settings_file_name,
+        min_size=10)
+
+    if len(file_size_in_bytes) == 0:
+        raise FileNotFoundError(
+            f'No lake_settings file found in {path}/{subfolder}.')
+    if len(file_size_in_bytes) > 1:
+        warnings.warn(
+            f'More than one lake_settings file found in {path}/{subfolder}. '
+            'Using the first one found.')
+
+    with open(full_path[0], 'r') as file:
+        return json.load(file)
+
+
+def save_settings_for_lake(
+    settings: dict,
+    path: str,
+    subfolder: str = '',
+    settings_suffix: str = ''
+) -> None:
+    """
+    Save settings for lake data to a JSON file.
+
+    Given a dictionary of settings, this function saves it to a JSON file
+    named 'lake_settings' with an optional suffix in the specified filename.
+    The JSON file is formatted with a 4-space indentation.
+
+    Args:
+    - settings: The settings dictionary to be saved.
+    - path: The path where the subfolder is located.
+    - subfolder: The subfolder where the settings file will be saved.
+    - settings_suffix: An optional suffix for the settings
+        file name. Default is an empty string.
+
+    Returns:
+    - None
+    """
+    settings_file_name = f'lake_settings{settings_suffix}.json'
+    save_path = os.path.join(path, subfolder, settings_file_name)
+
+    with open(save_path, 'w') as file:
+        json.dump(settings, file, indent=4)

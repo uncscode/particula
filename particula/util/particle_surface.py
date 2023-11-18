@@ -11,7 +11,7 @@ def area(
 ):
     """ Returns particle's surface area: 4 pi r^2 .
 
-        Parameters:
+        Args:
             radius       (float) [m]
             area_factor  (float) [ ]      (default: 1)
 
@@ -22,4 +22,4 @@ def area(
     radius = in_radius(radius)
     area_factor = in_scalar(area_factor)
 
-    return 4*np.pi*(radius**2)*area_factor
+    return 4 * np.pi * (radius**2) * area_factor

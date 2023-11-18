@@ -23,7 +23,7 @@ def to_molarmass_ratio(molar_mass, other_molar_mass=18.01528):
     Convert the given molar mass to a molar mass ratio with respect to water.
     (MW water / MW organic)
 
-    Parameters:
+    Args:
     molar_mass (np.array): The molar mass of the organic compound.
     other_molar_mass (float, optional): The molar mass of the other compound.
         Defaults to 18.01528.
@@ -42,7 +42,7 @@ def from_molarmass_ratio(molar_mass_ratio, other_molar_mass=18.01528):
     Convert the given molar mass ratio (MW water / MW organic) to a
     molar mass with respect to the other compound.
 
-    Parameters:
+    Args:
     molar_mass_ratio (np.array): The molar mass ratio with respect to water.
     other_molar_mass (float, optional): The molar mass of the other compound.
         Defaults to 18.01528.
@@ -62,7 +62,7 @@ def organic_water_single_phase(molar_mass_ratio):
     and O2C value were above is a single phase with water and below
     phase separation is possible.
 
-    Parameters:
+    Args:
     molar_mass_ratio np.: The molar mass ratio with respect to water.
 
     Returns:
@@ -100,7 +100,7 @@ def organic_density_estimate(
     the Densities and Molecular Volumes of Liquids and Solids,
     J. Chem. Educ., 71(11), 962, doi:10.1021/ed071p962, 1994.
 
-    Parameters:
+    Args:
         M (float): Molar mass.
         O2C (float): O:C ratio.
         H2C (float): H:C ratio. If unknown, provide a negative value.
@@ -143,7 +143,7 @@ def bat_blending_weights(molarmass_ratio, O2C):
     """
     Function to estimate the blending weights for the BAT model.
 
-    Parameters:
+    Args:
     -----------
     molarmass_ratio (float): Molar mass ratio of the organic compound.
 
@@ -214,7 +214,7 @@ def coefficients_c(
     """
     Coefficients for activity model, see Gorkowski (2019). equation S1 S2.
 
-    Parameters:
+    Args:
     ---------
         molar mass ratio (float): water MW / organic MW
         fit_values (list): a_n1, a_n2, a_n3, a_n4
@@ -228,7 +228,7 @@ def exp_limited(value):
     """
     np.exp with limits for machine precision max input value of 690.
 
-    Parameters:
+    Args:
     value (array): Input array.
 
     Returns:
@@ -241,7 +241,7 @@ def log_limited(value):
     """
     np.log with limits for machine precision min input value of 1e-300.
 
-    Parameters:
+    Args:
     value (array): Input array.
 
     Returns:
@@ -260,7 +260,7 @@ def gibbs_of_mixing(
     """
     Gibbs free energy of mixing, see Gorkowski (2019). equation S4.
 
-    Parameters:
+    Args:
     ---------
         molar mass ratio (float): water MW / organic MW
         org mole fraction (float): fraction of organic matter
@@ -307,7 +307,7 @@ def gibbs_mix_weight(
     Gibbs free energy of mixing, see Gorkowski (2019), with weighted
     O2C regions
 
-    Parameters:
+    Args:
     ---------
         molar mass ratio (float): water MW / organic MW
         org mole fraction (float): fraction of organic matter
@@ -382,7 +382,7 @@ def activity_coefficients(
     """
     Activity coefficients for water and organic matter, see Gorkowski (2019)
 
-    Parameters:
+    Args:
     ---------
         molar mass ratio (float): water MW / organic MW
         org mole fraction (float): fraction of organic matter
@@ -435,7 +435,7 @@ def gibbs_free_engery(
     """
     Calculate the gibbs free energy of the mixture. Ideal and non-ideal.
 
-    Parameters:
+    Args:
     org_mole_fraction (np.array): A numpy array of organic mole fractions.
     gibbs_mix (np.array): A numpy array of gibbs free energy of mixing.
 
@@ -457,7 +457,7 @@ def find_phase_sep_index(activity_data):
     In physical systems activity can not be above one and
     curve should be monotonic. Or else there will be phase separation.
 
-    Parameters:
+    Args:
     activity_data (np.array): A numpy array of activity data.
 
     Returns:
@@ -545,7 +545,7 @@ def find_phase_separation(activity_water, activity_org):
     """
     This function checks for phase separation in each activity curve.
 
-    Parameters:
+    Args:
     activity_water (np.array): A numpy array of water activity values.
     activity_org (np.array): A numpy array of organic activity values.
 
@@ -622,7 +622,7 @@ def phase_separation_q_alpha(
     This function makes a squeezed logistic function to transfer for
     q_alpha ~0 to q_alpha ~1,
 
-    Parameters:
+    Args:
     a_w_sep (np.array): A numpy array of values.
     aw_series (np.array): A numpy array of values.
     VBSBAT_options (dict): A dictionary of options.
@@ -664,7 +664,7 @@ def biphasic_to_single_phase_RH_point(
     """
     This function computes the biphasic to single phase RH.
 
-    Parameters:
+    Args:
     O2C (np.array): An array representing O2C values.
     H2C (np.array): An array representing H2C values.
     Mratio (np.array): An array representing molar mass ratio values.

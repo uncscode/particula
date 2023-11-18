@@ -25,7 +25,7 @@ def get_new_files(
     boolean indicating if this was the first pass, and a list of file
     information for new files.
 
-    Parameters:
+    Args:
     ----------
     path : str
         The top-level directory path to scan for files.
@@ -114,7 +114,7 @@ def load_files_interface(
     """
     Load files into a stream object based on settings.
 
-    Parameters:
+    Args:
     ----------
     path : str
         The top-level directory path to scan for folders of data.
@@ -185,7 +185,7 @@ def load_folders_interface(
     """
     Load files into a lake object based on settings.
 
-    Parameters:
+    Args:
     ----------
     path : str
         The top-level directory path to scan for folders of data.
@@ -228,7 +228,7 @@ def get_1d_stream(
     Loads and formats a 1D data stream from a file and initializes or updates
     a Stream object.
 
-    Parameters:
+    Args:
     ----------
     file_path : str
         The path of the file to load data from.
@@ -339,7 +339,7 @@ def get_2d_stream(
     """
     Initializes a 2D stream using the settings in the DataLake object.
 
-    Parameters:
+    Args:
     ----------
         key (str): The key of the stream to initialise.
         path (str): The path of the file to load data from.
@@ -428,7 +428,7 @@ def get_2d_stream(
 #     Initialise a netcdf stream using the settings in the DataLake
 #     object. This can load either 1D or 2D data, as specified in the
 #     settings.
-#     Parameters:
+#     Args:
 #     ----------
 #         key (str): The key of the stream to initialise.
 #         path (str): The path of the file to load data from.
