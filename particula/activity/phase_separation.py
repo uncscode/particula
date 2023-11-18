@@ -21,7 +21,7 @@ Q_ALPHA_AT_1PHASE_AW = 0.99
 
 
 def organic_water_single_phase(
-    molar_mass_ratio: Union[int, float, np.ndarray]
+    molar_mass_ratio: Union[int, float, list, np.ndarray]
 ) -> np.ndarray:
     """
     Convert the given molar mass ratio (MW water / MW organic) to a

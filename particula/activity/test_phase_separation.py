@@ -9,18 +9,20 @@ from particula.activity.phase_separation import (
 
 
 def test_organic_water_single_phase():
+    """Test for organic_water_single_phase function."""
     # Test with positive values
     assert np.all(
-        organic_water_single_phase([1, 2, 3])>=0
+        organic_water_single_phase([1, 2, 3]) >= 0
     )
 
     # Test with large values
     assert np.all(
-        organic_water_single_phase([1000, 2000, 3000])>=0
+        organic_water_single_phase([1000, 2000, 3000]) >= 0
     )
 
 
 def test_find_phase_sep_index():
+    """Test for find_phase_sep_index function."""
     # Test with positive values
     activity = [.2, .3, .4, .35, .5, .6, .9]
     sep_dic = find_phase_sep_index(activity_data=activity)
@@ -44,6 +46,7 @@ def test_find_phase_sep_index():
 
 
 def test_find_phase_separation():
+    """Test for find_phase_separation function."""
     # Test with positive values
 
     activity_water = [.2, .3, .4, .35, .5, .6, .9]
@@ -51,7 +54,7 @@ def test_find_phase_separation():
     sep_dic = find_phase_separation(
         activity_water=activity_water,
         activity_org=activity_org
-        )
+    )
 
     assert sep_dic == {
         'phase_sep_check': 1,
@@ -65,6 +68,7 @@ def test_find_phase_separation():
 
 
 def test_q_alpha():
+    """Test for q_alpha function."""
     # Test with positive values
     assert np.all(
         q_alpha(
