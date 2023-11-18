@@ -1,5 +1,5 @@
 """Callable to generate settings file from template."""
-# pylint: disable=all
+# %pylint: disable=all
 
 
 from typing import List, Optional
