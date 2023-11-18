@@ -261,8 +261,6 @@ def biphasic_water_activity_point(
 
     Returns:
     np.array: The RH cross point array.
-
-
     """
 
     water_activity_cross_point = np.zeros_like(oxygen2carbon)
