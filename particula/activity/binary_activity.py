@@ -37,7 +37,6 @@ def activity_coefficients(
     Activity coefficients for water and organic matter, see Gorkowski (2019)
 
     Args:
-    ---------
         molar mass ratio (float): water MW / organic MW
         org mole fraction (float): fraction of organic matter
         oxygen2carbon (float): oxygen to carbon ratio
@@ -46,7 +45,6 @@ def activity_coefficients(
         region
 
     Returns:
-    -------
         activity_water (float): activity coefficient of water
         activity_organic (float): activity coefficient of organic matter
         mass_water (float): mass fraction of water
@@ -94,7 +92,6 @@ def gibbs_of_mixing(
     Gibbs free energy of mixing, see Gorkowski (2019). equation S4.
 
     Args:
-    ---------
         molar mass ratio (float): water MW / organic MW
         org mole fraction (float): fraction of organic matter
         oxygen2carbon (float): oxygen to carbon ratio
@@ -145,7 +142,6 @@ def gibbs_mix_weight(
     oxygen2carbon regions
 
     Args:
-    ---------
         molar mass ratio (float): water MW / organic MW
         org mole fraction (float): fraction of organic matter
         oxygen2carbon (float): oxygen to carbon ratio
@@ -154,7 +150,6 @@ def gibbs_mix_weight(
         region
 
     Returns:
-    -------
         gibbs_mix (float): Gibbs energy of mixing (including 1/RT)
         derivative_gibbs (float): derivative of Gibbs energy with respect to
         mole fraction of organics (includes 1/RT)
@@ -228,11 +223,9 @@ def bat_blending_weights(molar_mass_ratio, oxygen2carbon):
     Function to estimate the blending weights for the BAT model.
 
     Args:
-    -----------
     molar_mass_ratio (float): Molar mass ratio of the organic compound.
 
     Returns:
-    --------
     blending_weights (array): List of blending weights for the BAT model
         in the low, mid, and high oxygen2carbon regions.
     """
@@ -288,7 +281,6 @@ def coefficients_c(
     Coefficients for activity model, see Gorkowski (2019). equation S1 S2.
 
     Args:
-    ---------
         molar mass ratio (float): water MW / organic MW
         fit_values (list): a_n1, a_n2, a_n3, a_n4
     """
