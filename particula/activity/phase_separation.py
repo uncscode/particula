@@ -10,9 +10,6 @@ Via an efficient reduced-complexity model.
 Atmospheric Chemistry and Physics
 https://doi.org/10.5194/acp-19-13383-2019
 """
-# consider changing o2c to oxygen2carbon
-# define convert_to_OH_equivalent
-# add test
 
 from typing import Union
 from numpy.typing import ArrayLike
@@ -33,10 +30,17 @@ def organic_water_single_phase(
     phase separation is possible.
 
     Args:
-    molar_mass_ratio np.: The molar mass ratio with respect to water.
+        - molar_mass_ratio: The molar mass ratio with respect to water.
 
     Returns:
-    float: The single phase cross point.
+        - The single phase cross point.
+
+    References:
+        - Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
+          Relative-humidity-dependent organic aerosol thermodynamics
+          Via an efficient reduced-complexity model.
+          Atmospheric Chemistry and Physics
+          https://doi.org/10.5194/acp-19-13383-2019
     """
     # check inputs
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
@@ -45,7 +49,7 @@ def organic_water_single_phase(
         0.205
         / (1 + safe_exp(26.6 * (molar_mass_ratio - 0.12))) ** 0.843
         + 0.225
-        )
+    )
 
 
 # pylint: disable=too-many-locals
@@ -59,12 +63,16 @@ def find_phase_sep_index(
     curve should be monotonic. Or else there will be phase separation.
 
     Args:
-    activity_data (np.array): A numpy array of activity data.
+    - activity_data: A array of activity data.
 
     Returns:
-    tuple: The phase separation via activity,
-    phase separation via activity curvature,
-    index phase separation starts, index phase separation end.
+    dict: A dictionary containing the following keys:
+        - 'phase_sep_activity': Phase separation via activity
+            (1 if there is phase separation, 0 otherwise)
+        - 'phase_sep_curve': Phase separation via activity curvature
+            (1 if there is phase separation, 0 otherwise)
+        - 'index_phase_sep_starts': Index where phase separation starts
+        - 'index_phase_sep_end': Index where phase separation ends
     """
     # check inputs
     activity_data = np.asarray(activity_data, dtype=np.float64)
@@ -152,14 +160,25 @@ def find_phase_separation(
     This function checks for phase separation in each activity curve.
 
     Args:
-    activity_water (np.array): A numpy array of water activity values.
-    activity_org (np.array): A numpy array of organic activity values.
+    - activity_water (np.array): A numpy array of water activity values.
+    - activity_org (np.array): A numpy array of organic activity values.
 
     Returns:
-    dic: 'phase_sep_check': phase_sep_check,
-            'lower_seperation_index': lower_seperation_index,
-            'upper_seperation_index': upper_seperation_index,
-            'matching_upper_seperation_index': matching_upper_seperation_index
+    dict: A dictionary containing the following keys:
+        - 'phase_sep_check': An integer indicating whether phase separation
+                is present (1) or not (0).
+        - 'lower_seperation_index': The index of the lower separation point
+                in the activity curve.
+        - 'upper_seperation_index': The index of the upper separation point in
+                the activity curve.
+        - 'matching_upper_seperation_index': The index where the difference
+                between activity_water_beta and match_a_w is greater than 0.
+        - 'lower_seperation': The value of water activity at the lower
+                separation point.
+        - 'upper_seperation': The value of water activity at the upper
+                separation point.
+        - 'matching_upper_seperation': The value of water activity at the
+                matching upper separation point.
     """
     # check inputs
     activity_water = np.asarray(activity_water, dtype=np.float64)
@@ -229,15 +248,22 @@ def q_alpha(
         activities: ArrayLike,
 ) -> np.ndarray:
     """
-    This function makes a squeezed logistic function to transfer for
-    q_alpha ~0 to q_alpha ~1,
+    This function calculates the q_alpha value using a squeezed logistic
+        function.
 
     Args:
-    seperation_activity (np.array): A numpy array of values.
-    activities (np.array): A numpy array of activity values.
+        - seperation_activity (np.array): A numpy array of values representing
+            the separation activity.
+        - activities (np.array): A numpy array of activity values.
 
     Returns:
-    np.array: The q_alpha value.
+        np.array: The q_alpha value.
+
+    Notes:
+        - The q_alpha value represents the transfer from
+            q_alpha ~0 to q_alpha ~1.
+        - The function uses a sigmoid curve parameter to calculate the
+            q_alpha value.
     """
     # check inputs
     activities = np.asarray(activities, dtype=np.float64)
