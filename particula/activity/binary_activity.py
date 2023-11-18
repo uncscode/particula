@@ -45,8 +45,8 @@ def activity_coefficients(
         - org_mole_fraction: Molar fraction of organic matter in the mixture.
         - oxygen2carbon: Oxygen to carbon ratio in the organic compound.
         - density: Density of the mixture.
-        - functional_group: Optional functional group(s) of the organic compound,
-            if applicable.
+        - functional_group: Optional functional group(s) of the organic
+            compound, if applicable.
 
     Returns:
         A tuple containing the activity coefficients of water, activity
