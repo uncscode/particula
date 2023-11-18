@@ -196,9 +196,9 @@ def load_settings_for_stream(
     appropriate errors or warnings are raised.
 
     Args:
-    - path (str): The path where the subfolder is located.
-    - subfolder (str): The subfolder where the settings file is expected.
-    - settings_suffix (str, optional): An optional suffix for the settings
+    - path: The path where the subfolder is located.
+    - subfolder: The subfolder where the settings file is expected.
+    - settings_suffix: An optional suffix for the settings
         file name. Default is an empty string.
 
     Returns:
@@ -241,10 +241,10 @@ def save_settings_for_stream(
     The JSON file is formatted with a 4-space indentation.
 
     Args:
-    - settings (dict): The settings dictionary to be saved.
-    - path (str): The path where the subfolder is located.
-    - subfolder (str): The subfolder where the settings file will be saved.
-    - settings_suffix (str, optional): An optional suffix for the settings
+    - settings: The settings dictionary to be saved.
+    - path: The path where the subfolder is located.
+    - subfolder: The subfolder where the settings file will be saved.
+    - settings_suffix: An optional suffix for the settings
         file name. Default is an empty string.
 
     Returns:
@@ -259,7 +259,7 @@ def save_settings_for_stream(
 
 def load_settings_for_lake(
     path: str,
-    subfolder: str,
+    subfolder: str = '',
     settings_suffix: str = ''
 ) -> dict:
     """
@@ -272,9 +272,9 @@ def load_settings_for_lake(
     appropriate errors or warnings are raised.
 
     Args:
-    - path (str): The path where the subfolder is located.
-    - subfolder (str): The subfolder where the settings file is expected.
-    - settings_suffix (str, optional): An optional suffix for the settings
+    - path: The path where the subfolder is located.
+    - subfolder: The subfolder where the settings file is expected.
+    - settings_suffix: An optional suffix for the settings
         file name. Default is an empty string.
 
     Returns:
@@ -306,7 +306,7 @@ def load_settings_for_lake(
 def save_settings_for_lake(
     settings: dict,
     path: str,
-    subfolder: str,
+    subfolder: str = '',
     settings_suffix: str = ''
 ) -> None:
     """
@@ -317,10 +317,10 @@ def save_settings_for_lake(
     The JSON file is formatted with a 4-space indentation.
 
     Args:
-    - settings (dict): The settings dictionary to be saved.
-    - path (str): The path where the subfolder is located.
-    - subfolder (str): The subfolder where the settings file will be saved.
-    - settings_suffix (str, optional): An optional suffix for the settings
+    - settings: The settings dictionary to be saved.
+    - path: The path where the subfolder is located.
+    - subfolder: The subfolder where the settings file will be saved.
+    - settings_suffix: An optional suffix for the settings
         file name. Default is an empty string.
 
     Returns:
