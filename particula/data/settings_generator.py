@@ -1,5 +1,5 @@
 """Callable to generate settings file from template."""
-# pylint: disable=all
+# pylint: disable=dangerous-default-value, too-many-locals, too-many-arguments
 
 
 from typing import List, Optional
@@ -11,18 +11,18 @@ from particula.data.loader import get_files_in_folder_with_size
 
 
 def for_general_1d_load(
-        relative_data_folder: str = 'instrument_data',
-        filename_regex: str = '*.csv',
-        file_min_size_bytes: int = 10,
-        header_row: int = 0,
-        data_checks: Optional[dict] = None,
-        data_column: list = [3, 5],
-        data_header: List[str] = ['data 1', 'data 3'],
-        time_column: List[int] = [0, 1],
-        time_format: str = '%Y-%m-%d %H:%M:%S.%f',
-        delimiter: str = ',',
-        time_shift_seconds: int = 0,
-        timezone_identifier: str = 'UTC',
+    relative_data_folder: str = 'instrument_data',
+    filename_regex: str = '*.csv',
+    file_min_size_bytes: int = 10,
+    header_row: int = 0,
+    data_checks: Optional[dict] = None,
+    data_column: list = [3, 5],
+    data_header: List[str] = ['data 1', 'data 3'],
+    time_column: List[int] = [0, 1],
+    time_format: str = '%Y-%m-%d %H:%M:%S.%f',
+    delimiter: str = ',',
+    time_shift_seconds: int = 0,
+    timezone_identifier: str = 'UTC',
 ) -> dict:
     """
     Generate a settings dictionary for loading and checking 1D data from CSV
@@ -209,7 +209,7 @@ def load_settings_for_stream(
     - Warning: If more than one settings file is found.
     """
     settings_file_name = f'stream_settings{settings_suffix}.json'
-    file_list, full_path, file_size_in_bytes = get_files_in_folder_with_size(
+    _, full_path, file_size_in_bytes = get_files_in_folder_with_size(
         path=path,
         subfolder=subfolder,
         filename_regex=settings_file_name,
@@ -223,7 +223,7 @@ def load_settings_for_stream(
             f'More than one stream_settings file found in {path}/{subfolder}. '
             'Using the first one found.')
 
-    with open(full_path[0], 'r') as file:
+    with open(full_path[0], 'r', encoding='utf-8') as file:
         return json.load(file)
 
 
@@ -253,7 +253,7 @@ def save_settings_for_stream(
     settings_file_name = f'stream_settings{settings_suffix}.json'
     save_path = os.path.join(path, subfolder, settings_file_name)
 
-    with open(save_path, 'w') as file:
+    with open(save_path, 'w', encoding='utf-8') as file:
         json.dump(settings, file, indent=4)
 
 
@@ -285,7 +285,7 @@ def load_settings_for_lake(
     - Warning: If more than one settings file is found.
     """
     settings_file_name = f'lake_settings{settings_suffix}.json'
-    file_list, full_path, file_size_in_bytes = get_files_in_folder_with_size(
+    _, full_path, file_size_in_bytes = get_files_in_folder_with_size(
         path=path,
         subfolder=subfolder,
         filename_regex=settings_file_name,
@@ -299,7 +299,7 @@ def load_settings_for_lake(
             f'More than one lake_settings file found in {path}/{subfolder}. '
             'Using the first one found.')
 
-    with open(full_path[0], 'r') as file:
+    with open(full_path[0], 'r', encoding='utf-8') as file:
         return json.load(file)
 
 
@@ -329,5 +329,5 @@ def save_settings_for_lake(
     settings_file_name = f'lake_settings{settings_suffix}.json'
     save_path = os.path.join(path, subfolder, settings_file_name)
 
-    with open(save_path, 'w') as file:
+    with open(save_path, 'w', encoding='utf-8') as file:
         json.dump(settings, file, indent=4)
