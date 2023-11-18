@@ -149,7 +149,7 @@ o2c = [0.1, 0.2, 0.3, 0.4, 0.5]
 mweight = [200, 200, 200, 200, 200]
 mratio = phase_separation.to_molar_mass_ratio(mweight)
 hydrogen2carbon = [2, 2, 2, 2, 2]
-RH_cross_point = phase_separation.biphasic_to_single_phase_RH_point(
+RH_cross_point = phase_separation.biphasic_to_single_water_activity(
     o2c,
     hydrogen2carbon,
     mratio,

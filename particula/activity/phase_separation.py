@@ -19,13 +19,25 @@ https://doi.org/10.5194/acp-19-13383-2019
 from typing import Optional
 
 import numpy as np
-from sqlalchemy import func
-
 
 MASS_C = 12.01  # the molar masses in [g/mol]
 MASS_O = 16.0
 MASS_H = 1.008
 MASS_N = 14.0067
+
+# the fit values for the activity model
+FIT_LOW = {'a1': [7.089476E+00, -7.711860E+00, -3.885941E+01, -1.000000E+02],
+           'a2': [-6.226781E-01, -1.000000E+02, 3.081244E-09, 6.188812E+01],
+           's': [-5.988895E+00, 6.940689E+00]}
+FIT_MID = {'a1': [5.872214E+00, -4.535007E+00, -5.129327E+00, -2.809232E+01],
+           'a2': [-9.740486E-01, -1.000000E+02, 2.109751E+00, -2.367683E+01],
+           's': [-1.219164E+00, 4.742729E+00]}
+FIT_HIGH = {'a1': [5.921550E+00, -2.528295E+00, -3.883017E+00, -7.898128E+00],
+            'a2': [-1.000000E+02, -1.000000E+02, 1.353916E+00, -1.160145E+01],
+            's': [-7.868187E-02, 3.650860E+00]}
+
+MIN_SPREAD_IN_AW = 10**-6
+Q_ALPHA_AT_1PHASE_AW = 0.99
 
 
 def to_molar_mass_ratio(molar_mass, other_molar_mass=18.01528):
@@ -122,7 +134,8 @@ def organic_density_estimate(
     Args:
         molar_mass(float): Molar mass.
         oxygen2carbon (float): O:C ratio.
-        hydrogen2carbon (float): H:C ratio. If unknown, provide a negative value.
+        hydrogen2carbon (float): H:C ratio. If unknown, provide a negative
+            value.
         nitrogen2carbon (float, optional): N:C ratio. Defaults to None.
 
     Returns:
@@ -133,28 +146,41 @@ def organic_density_estimate(
     if hydrogen2carbon is None:
         hydrogen2carbon = molar_mass * 0
     if mass_ratio_convert:
-        molar_mass = from_molar_mass_ratio(M)
-
+        molar_mass = from_molar_mass_ratio(molar_mass)
 
     # 1) Estimate the hydrogen2carbon value if not provided from input
-    # Assuming an aliphatic compound with hydrogen2carbon = 2.0 in the absence of
-    # functional groups, then correct for oxygen content assuming a linear
+    # Assuming an aliphatic compound with hydrogen2carbon = 2.0 in the absence
+    # of functional groups, then correct for oxygen content assuming a linear
     # -1 slope (Van Krevelen diagram for typical SOA)
-    hydrogen2carbonest = 2.0 - oxygen2carbon if hydrogen2carbon < 0.1 else hydrogen2carbon
+    hydrogen2carbonest = 2.0 - oxygen2carbon \
+        if hydrogen2carbon < 0.1 else hydrogen2carbon
+
     # 2) Compute the approximate number of carbon atoms per organic molecule
-    NC = molar_mass / (MASS_C + hydrogen2carbonest * MASS_H +
-              oxygen2carbon * MASS_O + nitrogen2carbon * MASS_N)
+    number_carbons = molar_mass / (
+        MASS_C
+        + hydrogen2carbonest * MASS_H
+        + oxygen2carbon * MASS_O
+        + nitrogen2carbon * MASS_N
+        )
 
     # 3) Compute density estimate based on method by Girolami (1994)
     # Here no correction is applied for rings and aromatic compounds
     # (due to limited info at input)
-    rho1 = molar_mass / (5.0 * NC * (2.0 + hydrogen2carbonest +
-                oxygen2carbon * 2.0 + nitrogen2carbon * 2.0))
+    rho1 = molar_mass / (
+        5.0 * number_carbons
+        * (2.0
+           + hydrogen2carbonest
+           + oxygen2carbon * 2.0
+           + nitrogen2carbon * 2.0
+           )
+        )
+
     # the returned denisty is in [g/cm^3]; and scaled assuming that most
     # that most of the oxygen atoms are able to make H-bonds
     # (donor or acceptor)
-    return rho1 * (1.0 + min(NC * oxygen2carbon * 0.1 +
-                   NC * nitrogen2carbon * 0.1, 0.3))
+    return rho1 * (
+        1.0 + min(number_carbons * oxygen2carbon * 0.1 +
+                  number_carbons * nitrogen2carbon * 0.1, 0.3))
 
 
 def bat_blending_weights(molar_mass_ratio, oxygen2carbon):
@@ -175,7 +201,8 @@ def bat_blending_weights(molar_mass_ratio, oxygen2carbon):
 
     blending_weights = np.zeros(3)  # [low, mid, high] oxygen2carbon regions
 
-    if oxygen2carbon <= oxygen2carbon_ml * 0.75:  # lower to mid oxygen2carbon region
+    # lower to middle oxygen2carbon region
+    if oxygen2carbon <= oxygen2carbon_ml * 0.75:
         b_ml = 0.189974476118418
         b_1 = 79.2606902175984
         b_2 = 0.0604293454322489
@@ -194,7 +221,8 @@ def bat_blending_weights(molar_mass_ratio, oxygen2carbon):
         blending_weights[1] = weight_b / weight_norm
         blending_weights[0] = 1 - blending_weights[1]
 
-    elif oxygen2carbon <= oxygen2carbon_ml * 2:  # mid to high oxygen2carbon region
+    # middle to high oxygen2carbon region
+    elif oxygen2carbon <= oxygen2carbon_ml * 2:
         b_1 = 75.0159268221068
         b_2 = 0.000947111285750515
 
@@ -209,19 +237,6 @@ def bat_blending_weights(molar_mass_ratio, oxygen2carbon):
         blending_weights[2] = 1
 
     return blending_weights
-
-# %%
-
-
-FIT_LOW = {'a1': [7.089476E+00, -7.711860E+00, -3.885941E+01, -1.000000E+02],
-           'a2': [-6.226781E-01, -1.000000E+02, 3.081244E-09, 6.188812E+01],
-           's': [-5.988895E+00, 6.940689E+00]}
-FIT_MID = {'a1': [5.872214E+00, -4.535007E+00, -5.129327E+00, -2.809232E+01],
-           'a2': [-9.740486E-01, -1.000000E+02, 2.109751E+00, -2.367683E+01],
-           's': [-1.219164E+00, 4.742729E+00]}
-FIT_HIGH = {'a1': [5.921550E+00, -2.528295E+00, -3.883017E+00, -7.898128E+00],
-            'a2': [-1.000000E+02, -1.000000E+02, 1.353916E+00, -1.160145E+01],
-            's': [-7.868187E-02, 3.650860E+00]}
 
 
 def coefficients_c(
@@ -284,7 +299,8 @@ def gibbs_of_mixing(
         org mole fraction (float): fraction of organic matter
         oxygen2carbon (float): oxygen to carbon ratio
         density (float): density of mixture
-        fit_coefficient (dict): dictionary of fit values for low oxygen2carbon region
+        fit_coefficient (dict): dictionary of fit values for low oxygen2carbon
+        region
     """
     c1 = coefficients_c(molar_mass_ratio, oxygen2carbon, fit_dict['a1'])
     c2 = coefficients_c(molar_mass_ratio, oxygen2carbon, fit_dict['a2'])
@@ -292,19 +308,22 @@ def gibbs_of_mixing(
     rhor = 0.997 / density  # assumes water is the other fluid
 
     # equation S3
-    scaledMr = molar_mass_ratio * fit_dict['s'][1] \
-        * (1.0 + oxygen2carbon) ** fit_dict['s'][0]
     # the scaled molar mass ratio of this mixture's components.
+    scaled_molar_mass_ratio = molar_mass_ratio * fit_dict['s'][1] \
+        * (1.0 + oxygen2carbon) ** fit_dict['s'][0]
+
+    # phi2 is a scaled volume fraction
     phi2 = org_mole_fraction / (
-        org_mole_fraction + (1.0 - org_mole_fraction) * scaledMr / rhor
-    )  # phi2 is a scaled volume fraction
+        org_mole_fraction + (1.0 - org_mole_fraction)
+        * scaled_molar_mass_ratio / rhor
+    )
 
     # equation S4
     sum1 = c1 + c2 * (1 - 2 * phi2)
     gibbs_mix = phi2 * (1.0 - phi2) * sum1
 
     # equation s6 the derivative of phi2 with respect to organic x2
-    dphi2dx2 = (scaledMr / rhor) * (phi2 / org_mole_fraction) ** 2
+    dphi2dx2 = (scaled_molar_mass_ratio / rhor) * (phi2 / org_mole_fraction)**2
 
     # equation S7
     derivative_gibbs_mix = (
@@ -331,7 +350,8 @@ def gibbs_mix_weight(
         org mole fraction (float): fraction of organic matter
         oxygen2carbon (float): oxygen to carbon ratio
         density (float): density of mixture
-        fit_coefficient (dict): dictionary of fit values for low oxygen2carbon region
+        fit_coefficient (dict): dictionary of fit values for low oxygen2carbon
+        region
 
     Returns:
     -------
@@ -406,7 +426,8 @@ def activity_coefficients(
         org mole fraction (float): fraction of organic matter
         oxygen2carbon (float): oxygen to carbon ratio
         density (float): density of mixture
-        fit_coefficient (dict): dictionary of fit values for low oxygen2carbon region
+        fit_coefficient (dict): dictionary of fit values for low oxygen2carbon
+        region
 
     Returns:
     -------
@@ -636,7 +657,6 @@ def find_phase_separation(activity_water, activity_org):
 def phase_separation_q_alpha(
         a_w_sep,
         aw_series,
-        VBSBAT_options=None
 ):
     """
     This function makes a squeezed logistic function to transfer for
@@ -655,14 +675,12 @@ def phase_separation_q_alpha(
     # spread in transfer from 50/50 point
     delta_a_w_sep = 1 - a_w_sep
 
-    MIN_SPREAD_IN_AW = 10**-6
     # check min value allowed
     above_min_delta_a_w_sep_value = delta_a_w_sep > MIN_SPREAD_IN_AW
     delta_a_w_sep = delta_a_w_sep * above_min_delta_a_w_sep_value + \
         ~above_min_delta_a_w_sep_value * MIN_SPREAD_IN_AW
 
     # calculate curve parameter of sigmoid
-    Q_ALPHA_AT_1PHASE_AW = 0.99  # can be changed
     sigmoid_curve_parameter = log_limited(
         1 / (1 - Q_ALPHA_AT_1PHASE_AW) - 1) / delta_a_w_sep
 
@@ -675,19 +693,20 @@ def phase_separation_q_alpha(
     )
 
 
-def biphasic_to_single_phase_RH_point(
+def biphasic_to_single_water_activity(
     oxygen2carbon,
     hydrogen2carbon,
-    Mratio,
+    molar_mass_ratio,
     functional_group=None
 ):
     """
-    This function computes the biphasic to single phase RH.
+    This function computes the biphasic to single phase
+    water activity (RH*100).
 
     Args:
     oxygen2carbon (np.array): An array representing oxygen2carbon values.
     hydrogen2carbon (np.array): An array representing hydrogen2carbon values.
-    Mratio (np.array): An array representing molar mass ratio values.
+    molar_mass_ratio (np.array): An array representing molar mass ratio values.
     functional_group (str/list): The BAT functional group(s).
 
     Returns:
@@ -696,20 +715,20 @@ def biphasic_to_single_phase_RH_point(
 
     """
 
-    RH_cross_point = np.zeros_like(oxygen2carbon)
+    water_activity_cross_point = np.zeros_like(oxygen2carbon)
 
     interpolate_step_numb = 200  # interpolation points
     # mole_frac = np.linspace(1e-12, 1, interpolate_step_numb + 1)
     mole_frac = np.logspace(-6, 0, interpolate_step_numb + 1)
 
-    for i in range(len(oxygen2carbon)):
+    for i, _ in enumerate(oxygen2carbon):
         density = organic_density_estimate(
-            Mratio[i],
+            molar_mass_ratio[i],
             oxygen2carbon[i],
             hydrogen2carbon[i],
             mass_ratio_convert=True)
         activities = activity_coefficients(
-            molar_mass_ratio=Mratio[i],
+            molar_mass_ratio=molar_mass_ratio[i],
             org_mole_fraction=mole_frac,
             oxygen2carbon=oxygen2carbon[i],
             density=density,
@@ -722,14 +741,14 @@ def biphasic_to_single_phase_RH_point(
         phase_check = find_phase_separation(activities[0], activities[1])
 
         if phase_check['phase_sep_check'] == 1:
-            RH_cross_point[i] = phase_check['upper_a_w_sep']
+            water_activity_cross_point[i] = phase_check['upper_a_w_sep']
         else:
-            RH_cross_point[i] = 0  # no phase separation
+            water_activity_cross_point[i] = 0  # no phase separation
 
     # Checks outputs with in physical limits
     # round to zero
-    RH_cross_point[RH_cross_point < 0] = 0
+    water_activity_cross_point[water_activity_cross_point < 0] = 0
     # round max to 1
-    RH_cross_point[RH_cross_point > 1] = 1
+    water_activity_cross_point[water_activity_cross_point > 1] = 1
 
-    return RH_cross_point
+    return water_activity_cross_point
