@@ -5,8 +5,6 @@ data stream, it will interpolate the data to the data stream's time array.
 If the data has duplicate timestamps, it will remove the duplicates and
 interpolate the data to the data stream's time array.
 """
-# linting disabled until reformatting of this file
-
 
 from typing import Tuple, Optional
 import numpy as np
@@ -21,7 +19,7 @@ def combine_data(
     data_new: np.ndarray,
     time_new: np.ndarray,
     header_new: list,
-) -> Tuple[np.ndarray, list, dict[str, int]]:
+) -> Tuple[np.ndarray, list]:
     # pylint: disable=too-many-arguments
     """"
     Merge or adds processed data together. Accounts for data shape
@@ -95,10 +93,8 @@ def combine_data(
             axis=0,
         )
 
-    header_updated = np.append(header_list, header_new)
-    header_dict = convert.list_to_dict(header_updated)
-
-    return data_updated, header_updated, header_dict
+    header_updated = list(np.append(header_list, header_new))
+    return data_updated, header_updated
 
 
 def stream_add_data(
@@ -157,6 +153,8 @@ def stream_add_data(
         stream.data = data_new
         stream.time = time_new
     elif header_check:
+        header_new = stream.header if header_new is None else header_new
+
         stream.data, stream.header, data_new, header_new = \
             stats.merge_formatting(
                 data_current=stream.data,

@@ -22,7 +22,7 @@ def test_combine_data_with_2d_data():
     header_new = ['header3', 'header4']
 
     # Execution
-    merged_data, merged_header_list, _ = merger.combine_data(
+    merged_data, merged_header_list = merger.combine_data(
         data, time, header_list, data_new, time_new, header_new)
 
     # Verification
@@ -43,7 +43,7 @@ def test_combine_data_with_1d_data():
     header_new = ['header3']
 
     # Execution
-    merged_data, merged_header_list, _ = merger.combine_data(
+    merged_data, merged_header_list = merger.combine_data(
         data, time, header_list, data_new, time_new, header_new)
 
     # Verification
@@ -65,7 +65,7 @@ def test_combine_data_with_nan_values():
     header_new = ['header3', 'header4', 'header5']
 
     # Execution
-    merged_data, merged_header_list, _ = merger.combine_data(
+    merged_data, merged_header_list = merger.combine_data(
         data, time, header_list, data_new, time_new, header_new)
 
     # Verification
@@ -91,7 +91,7 @@ def test_combine_data_with_transposed_input():
     header_new = ['header3', 'header4', 'header5']
 
     # Execution
-    merged_data, merged_header_list, _ = merger.combine_data(
+    merged_data, merged_header_list = merger.combine_data(
         data, time, header_list, data_new, time_new, header_new)
 
     # Verification
@@ -115,7 +115,7 @@ def test_combine_data_same_time_2d_data():
     header_new = ['header3', 'header4']
 
     # Execution
-    merged_data, merged_header_list, _ = merger.combine_data(
+    merged_data, merged_header_list = merger.combine_data(
         data, time, header_list, data_new, time_new, header_new)
 
     # Verification
@@ -136,7 +136,7 @@ def test_combine_data_same_time_1d_data():
     header_new = ['header3']
 
     # Execution
-    merged_data, merged_header_list, _ = merger.combine_data(
+    merged_data, merged_header_list = merger.combine_data(
         data, time, header_list, data_new, time_new, header_new)
 
     # Verification
