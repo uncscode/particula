@@ -133,8 +133,8 @@ phase_sep_aw = phase_separation.find_phase_separation(
     activity_water, activity_organic)
 
 q_alpha = phase_separation.phase_separation_q_alpha(
-    a_w_sep=phase_sep_aw['upper_a_w_sep'],
-    aw_series=aw,
+    seperation_activity=phase_sep_aw['upper_seperation'],
+    activities=aw,
 )
 
 fig, ax = plt.subplots()

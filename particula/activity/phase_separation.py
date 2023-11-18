@@ -14,6 +14,8 @@ https://doi.org/10.5194/acp-19-13383-2019
 # define convert_to_OH_equivalent
 # add test
 
+from typing import Union
+from numpy.typing import ArrayLike
 import numpy as np
 
 from particula.activity.machine_limit import safe_exp, safe_log
@@ -22,7 +24,9 @@ MIN_SPREAD_IN_AW = 10**-6
 Q_ALPHA_AT_1PHASE_AW = 0.99
 
 
-def organic_water_single_phase(molar_mass_ratio):
+def organic_water_single_phase(
+    molar_mass_ratio: Union[int, float, np.ndarray]
+) -> np.ndarray:
     """
     Convert the given molar mass ratio (MW water / MW organic) to a
     and oxygen2carbon value were above is a single phase with water and below
@@ -34,13 +38,20 @@ def organic_water_single_phase(molar_mass_ratio):
     Returns:
     float: The single phase cross point.
     """
+    # check inputs
+    molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
 
     return (
-        0.205 / (1 + np.exp(26.6 * (molar_mass_ratio - 0.12))) ** 0.843 + 0.225
-    )
+        0.205
+        / (1 + safe_exp(26.6 * (molar_mass_ratio - 0.12))) ** 0.843
+        + 0.225
+        )
 
 
-def find_phase_sep_index(activity_data):  # pylint: disable=too-many-locals
+# pylint: disable=too-many-locals
+def find_phase_sep_index(
+        activity_data: ArrayLike
+) -> dict:
     """
     This function finds phase separation using activity>1 and
     inflections in the activity curve data.
@@ -55,6 +66,8 @@ def find_phase_sep_index(activity_data):  # pylint: disable=too-many-locals
     phase separation via activity curvature,
     index phase separation starts, index phase separation end.
     """
+    # check inputs
+    activity_data = np.asarray(activity_data, dtype=np.float64)
 
     # Compute difference between consecutive elements in the array
     activity_diff = np.diff(activity_data)
@@ -131,7 +144,10 @@ def find_phase_sep_index(activity_data):  # pylint: disable=too-many-locals
             'index_phase_sep_end': index_phase_sep_end}
 
 
-def find_phase_separation(activity_water, activity_org):
+def find_phase_separation(
+        activity_water: ArrayLike,
+        activity_org: ArrayLike
+) -> dict:
     """
     This function checks for phase separation in each activity curve.
 
@@ -141,10 +157,13 @@ def find_phase_separation(activity_water, activity_org):
 
     Returns:
     dic: 'phase_sep_check': phase_sep_check,
-            'lower_a_w_sep_index': lower_a_w_sep_index,
-            'upper_a_w_sep_index': upper_a_w_sep_index,
-            'matching_upper_a_w_sep_index': matching_upper_a_w_sep_index
+            'lower_seperation_index': lower_seperation_index,
+            'upper_seperation_index': upper_seperation_index,
+            'matching_upper_seperation_index': matching_upper_seperation_index
     """
+    # check inputs
+    activity_water = np.asarray(activity_water, dtype=np.float64)
+    activity_org = np.asarray(activity_org, dtype=np.float64)
 
     # check for phase separation in each activity curve
     water_sep = find_phase_sep_index(activity_water)
@@ -163,23 +182,25 @@ def find_phase_separation(activity_water, activity_org):
         # Check for the direction of the curve (increasing or decreasing)
         if activity_water[0] < activity_water[-1]:  # increasing a_w with index
             # find the min and max indexes
-            lower_a_w_sep_index = min(indexes)
-            upper_a_w_sep_index = max(indexes)
+            lower_seperation_index = min(indexes)
+            upper_seperation_index = max(indexes)
 
             # calculate the mid index
-            mid_sep_index = (lower_a_w_sep_index + upper_a_w_sep_index) // 2
+            mid_sep_index = (lower_seperation_index
+                             + upper_seperation_index) // 2
             # slice the data upto mid index
             activity_water_beta = activity_water[:mid_sep_index]
         else:  # decreasing a_w with index
             # find the min and max indexes
-            lower_a_w_sep_index = max(indexes)
-            upper_a_w_sep_index = min(indexes)
+            lower_seperation_index = max(indexes)
+            upper_seperation_index = min(indexes)
 
             # calculate the mid index
-            mid_sep_index = (lower_a_w_sep_index + upper_a_w_sep_index) // 2
+            mid_sep_index = (lower_seperation_index
+                             + upper_seperation_index) // 2
             # slice the data upto mid index
             activity_water_beta = activity_water[mid_sep_index:]
-        match_a_w = activity_water[upper_a_w_sep_index]
+        match_a_w = activity_water[upper_seperation_index]
         # find the index where the difference is greater than 0
         match_index_prime = np.where((activity_water_beta - match_a_w) > 0)
 
@@ -189,53 +210,58 @@ def find_phase_separation(activity_water, activity_org):
             match_index_prime = np.argmax(activity_water_beta - match_a_w)
 
     else:
-        upper_a_w_sep_index = 2
-        lower_a_w_sep_index = 2
+        upper_seperation_index = 2
+        lower_seperation_index = 2
         match_index_prime = 2
-        phase_sep_check = 0  # no phase sep
+        phase_sep_check = 0  # no phase seperation
 
     return {'phase_sep_check': phase_sep_check,
-            'lower_a_w_sep_index': lower_a_w_sep_index,
-            'upper_a_w_sep_index': upper_a_w_sep_index,
-            'matching_upper_a_w_sep_index': match_index_prime,
-            'lower_a_w_sep': activity_water[lower_a_w_sep_index],
-            'upper_a_w_sep': activity_water[upper_a_w_sep_index],
-            'matching_upper_a_w_sep': activity_water[match_index_prime]}
+            'lower_seperation_index': lower_seperation_index,
+            'upper_seperation_index': upper_seperation_index,
+            'matching_upper_seperation_index': match_index_prime,
+            'lower_seperation': activity_water[lower_seperation_index],
+            'upper_seperation': activity_water[upper_seperation_index],
+            'matching_upper_seperation': activity_water[match_index_prime]}
 
 
 def q_alpha(
-        a_w_sep,
-        aw_series,
-):
+        seperation_activity: Union[int, float, np.ndarray],
+        activities: ArrayLike,
+) -> np.ndarray:
     """
     This function makes a squeezed logistic function to transfer for
     q_alpha ~0 to q_alpha ~1,
 
     Args:
-    a_w_sep (np.array): A numpy array of values.
-    aw_series (np.array): A numpy array of values.
+    seperation_activity (np.array): A numpy array of values.
+    activities (np.array): A numpy array of activity values.
 
     Returns:
     np.array: The q_alpha value.
     """
-    if a_w_sep == 0:
-        return np.ones_like(aw_series)
+    # check inputs
+    activities = np.asarray(activities, dtype=np.float64)
+    if seperation_activity == 0:
+        return np.ones_like(activities)
+    seperation_activity = np.asarray(seperation_activity, dtype=np.float64)
+
     # spread in transfer from 50/50 point
-    delta_a_w_sep = 1 - a_w_sep
+    delta_seperation = 1 - seperation_activity
 
     # check min value allowed
-    above_min_delta_a_w_sep_value = delta_a_w_sep > MIN_SPREAD_IN_AW
-    delta_a_w_sep = delta_a_w_sep * above_min_delta_a_w_sep_value + \
-        ~above_min_delta_a_w_sep_value * MIN_SPREAD_IN_AW
+    above_min_delta_seperation_value = delta_seperation > MIN_SPREAD_IN_AW
+    delta_seperation = delta_seperation * above_min_delta_seperation_value + \
+        ~above_min_delta_seperation_value * MIN_SPREAD_IN_AW
 
     # calculate curve parameter of sigmoid
     sigmoid_curve_parameter = safe_log(
-        1 / (1 - Q_ALPHA_AT_1PHASE_AW) - 1) / delta_a_w_sep
+        1 / (1 - Q_ALPHA_AT_1PHASE_AW) - 1) / delta_seperation
 
     # calculate q_alpha return value
     return 1 - 1 / (
         1
         + safe_exp(
-            sigmoid_curve_parameter * (aw_series - a_w_sep + delta_a_w_sep)
+            sigmoid_curve_parameter *
+            (activities - seperation_activity + delta_seperation)
         )
     )

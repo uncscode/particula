@@ -253,7 +253,7 @@ def biphasic_water_activity_point(
             activities[1])
 
         if phase_check['phase_sep_check'] == 1:
-            water_activity_cross_point[i] = phase_check['upper_a_w_sep']
+            water_activity_cross_point[i] = phase_check['upper_seperation']
         else:
             water_activity_cross_point[i] = 0  # no phase separation
 
