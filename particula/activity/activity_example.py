@@ -23,16 +23,16 @@ plt.rcParams.update({'text.color': "#333333",
 # %%
 
 org_mole_fraction = np.linspace(0, 1, 100)
-molarmass_ratio = 18.016 / 250
-O2C = 0.2
-H2C = 0
-N2C = 0
+molar_mass_ratio = 18.016 / 250
+oxygen2carbon = 0.2
+hydrogen2carbon = 0
+nitrogen2carbon = 0
 
 
-O2C, molarmass_ratio = phase_separation.convert_to_OH_equivalent(
-    O2C,
-    molarmass_ratio,
-    BAT_functional_group=None
+oxygen2carbon, molar_mass_ratio = phase_separation.convert_to_oh_equivalent(
+    oxygen2carbon,
+    molar_mass_ratio,
+    functional_group=None
 )
 
 # check the limits of possible mole fractions
@@ -43,21 +43,21 @@ org_mole_fraction = np.where(
     org_mole_fraction)
 
 density = phase_separation.organic_density_estimate(
-    18.016 / molarmass_ratio, O2C, H2C, N2C)
+    18.016 / molar_mass_ratio, oxygen2carbon, hydrogen2carbon, nitrogen2carbon)
 
 
 # %%
 
-O2C_array = np.linspace(0, 0.6, 100)
+oxygen2carbon_array = np.linspace(0, 0.6, 100)
 weights_matrix = np.zeros((100, 3))
 
-for index, O2C in enumerate(O2C_array):
+for index, oxygen2carbon in enumerate(oxygen2carbon_array):
     weights_matrix[index, :] = phase_separation.bat_blending_weights(
-        molarmass_ratio, O2C)
+        molar_mass_ratio, oxygen2carbon)
 
 fig, ax = plt.subplots()
 ax.plot(
-    O2C_array,
+    oxygen2carbon_array,
     weights_matrix,
 )
 
@@ -68,9 +68,9 @@ fig.show
 
 
 gibbs_mix, dervative_gibbs = phase_separation.gibbs_of_mixing(
-    molarmass_ratio,
+    molar_mass_ratio,
     org_mole_fraction,
-    O2C,
+    oxygen2carbon,
     density,
     phase_separation.FIT_LOW,
 )
@@ -94,18 +94,18 @@ ax.legend()
 
 
 # %%
-O2C = 0.225
-molarmass_ratio = 18.016 / 100
+oxygen2carbon = 0.225
+molar_mass_ratio = 18.016 / 100
 density = phase_separation.organic_density_estimate(
-    18.016 / molarmass_ratio, O2C)
+    18.016 / molar_mass_ratio, oxygen2carbon)
 
 activity_water, activity_organic, mass_water, mass_organic = \
     phase_separation.activity_coefficients(
-        molarmass_ratio=molarmass_ratio,
+        molar_mass_ratio=molar_mass_ratio,
         org_mole_fraction=org_mole_fraction,
-        O2C=O2C,
+        oxygen2carbon=oxygen2carbon,
         density=density,
-        BAT_functional_group=None,)
+        functional_group=None,)
 
 fig, ax = plt.subplots()
 ax.plot(
@@ -124,7 +124,6 @@ ax.set_ylim()
 ax.set_xlabel("water mole fraction")
 ax.set_ylabel("activity")
 ax.legend()
-fig.show
 
 
 # %%
@@ -143,19 +142,18 @@ fig, ax = plt.subplots()
 plt.plot(aw, q_alpha)
 plt.xlabel('water activity')
 plt.ylabel('q_alpha')
-plt.show()
 
 
 # %%
 o2c = [0.1, 0.2, 0.3, 0.4, 0.5]
 mweight = [200, 200, 200, 200, 200]
-mratio = phase_separation.to_molarmass_ratio(mweight)
-H2C = [2, 2, 2, 2, 2]
+mratio = phase_separation.to_molar_mass_ratio(mweight)
+hydrogen2carbon = [2, 2, 2, 2, 2]
 RH_cross_point = phase_separation.biphasic_to_single_phase_RH_point(
     o2c,
-    H2C,
+    hydrogen2carbon,
     mratio,
-    BAT_functional_group=None
+    functional_group=None
 )
 print(f'RH_cross_point: {RH_cross_point}')
 # %%

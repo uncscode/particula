@@ -595,7 +595,7 @@ def save_lake(
         lake: Lake,
         sufix_name: Optional[str] = None):
     """
-    Save datalake object as a pickle file.
+    Save lake object as a pickle file.
 
     Parameters
     ----------
@@ -619,7 +619,7 @@ def save_lake(
     # save datalake
     with open(file_path, 'wb') as file:
         pickle.dump(lake, file)
-    print('Datalake saved')
+    print('Lake saved')
 
 
 def load_lake(path: str, sufix_name: Optional[str] = None) -> object:
