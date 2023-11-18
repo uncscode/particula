@@ -663,7 +663,9 @@ the start keyword is “Date Time” and the end keyword is “Total Conc”.</p
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch time:
-[1.65718376e+09 1.65718385e+09 1.65718394e+09 1.65718403e+09
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[1.65718376e+09 1.65718385e+09 1.65718394e+09 1.65718403e+09
  1.65718412e+09]
 Data shape:
 (2854, 203)
@@ -694,7 +696,7 @@ like.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/20792551dcaf367ec39f626da37bbb15fb3d088e15f5532aa56ddfafeb8d0b69.png" src="../_images/20792551dcaf367ec39f626da37bbb15fb3d088e15f5532aa56ddfafeb8d0b69.png" />
+<img alt="../_images/00bc4560887c2ec74cdf1052ad887e46c426b8bd86531d332ff84dc6bd1abce9.png" src="../_images/00bc4560887c2ec74cdf1052ad887e46c426b8bd86531d332ff84dc6bd1abce9.png" />
 </div>
 </div>
 </section>
@@ -727,7 +729,7 @@ This is done with the <code class="docutils literal notranslate"><span class="pr
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/3cb69d55b0034ceec60c48c83ca5d50a69ffa4a111d37ad1894847a9fd4f62b1.png" src="../_images/3cb69d55b0034ceec60c48c83ca5d50a69ffa4a111d37ad1894847a9fd4f62b1.png" />
+<img alt="../_images/a864f004314ce51ace692f073e0f5e822d74fa130613514c6b32add59ea65e7e.png" src="../_images/a864f004314ce51ace692f073e0f5e822d74fa130613514c6b32add59ea65e7e.png" />
 </div>
 </div>
 </section>
@@ -760,7 +762,7 @@ how the data changes over time.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/61e68058f8385a581558047b804185e841aebd19d9bfa83c2e46ed96ea116573.png" src="../_images/61e68058f8385a581558047b804185e841aebd19d9bfa83c2e46ed96ea116573.png" />
+<img alt="../_images/17187fe59069cc8e9a2147fa0bafa8e2e0144396302953bb99513cd995a09b92.png" src="../_images/17187fe59069cc8e9a2147fa0bafa8e2e0144396302953bb99513cd995a09b92.png" />
 </div>
 </div>
 </section>
@@ -896,10 +898,10 @@ Calling the relevant functions.</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
-  Loading file: 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+  Loading file: 2022-07-07_095151_SMPS.csv
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
@@ -999,9 +1001,9 @@ class Stream(builtins.object)
  |  __eq__(self, other)
  |      Return self==value.
  |  
- |  __getitem__(self, index: &lt;built-in function any&gt;)
+ |  __getitem__(self, index: Union[int, str])
  |      Allows for indexing of the data stream.
- |      Parameters:
+ |      Args:
  |      ----------
  |      index : int or str
  |          The index of the data stream to return.
@@ -1021,9 +1023,9 @@ class Stream(builtins.object)
  |  __repr__(self)
  |      Return repr(self).
  |  
- |  __setitem__(self, index, value)
+ |  __setitem__(self, index: Union[int, str], value)
  |      Allows for setting of a row of data in the stream.
- |      Parameters:
+ |      Args:
  |      ----------
  |      index : int or str
  |          The index of the data stream to set.
@@ -1100,7 +1102,7 @@ None
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/f091420893b34f8dfd1950050471943e39031f7bc65be5af247f1ea9dbd2e1a4.png" src="../_images/f091420893b34f8dfd1950050471943e39031f7bc65be5af247f1ea9dbd2e1a4.png" />
+<img alt="../_images/8ba6465f1bb4a251ce2564b770701426bfa5d9373068fc414453e34daabf9f87.png" src="../_images/8ba6465f1bb4a251ce2564b770701426bfa5d9373068fc414453e34daabf9f87.png" />
 </div>
 </div>
 </section>
@@ -1130,11 +1132,11 @@ NAME
     particula.data.loader_interface - interface to import data to a data stream
 
 FUNCTIONS
-    get_1d_stream(file_path: str, settings: dict, first_pass: bool = True, stream: Optional[object] = None) -&gt; object
+    get_1d_stream(file_path: str, settings: dict, first_pass: bool = True, stream: Optional[particula.data.stream.Stream] = None) -&gt; particula.data.stream.Stream
         Loads and formats a 1D data stream from a file and initializes or updates
         a Stream object.
         
-        Parameters:
+        Args:
         ----------
         file_path : str
             The path of the file to load data from.
@@ -1167,10 +1169,10 @@ FUNCTIONS
         KeyError
             If any required keys are missing in the `settings` dictionary.
     
-    get_2d_stream(file_path: str, settings: dict, first_pass: bool = True, stream: Optional[object] = None) -&gt; object
+    get_2d_stream(file_path: str, settings: dict, first_pass: bool = True, stream: Optional[particula.data.stream.Stream] = None) -&gt; particula.data.stream.Stream
         Initializes a 2D stream using the settings in the DataLake object.
         
-        Parameters:
+        Args:
         ----------
             key (str): The key of the stream to initialise.
             path (str): The path of the file to load data from.
@@ -1180,7 +1182,7 @@ FUNCTIONS
         ----------
             None.
     
-    get_new_files(path: str, import_settings: dict[str, any], loaded_list: Optional[list] = None) -&gt; tuple
+    get_new_files(path: str, import_settings: dict, loaded_list: Optional[list] = None) -&gt; tuple
         Scan a directory for new files based on import settings and stream status.
         
         This function looks for files in a specified path using import settings.
@@ -1190,7 +1192,7 @@ FUNCTIONS
         boolean indicating if this was the first pass, and a list of file
         information for new files.
         
-        Parameters:
+        Args:
         ----------
         path : str
             The top-level directory path to scan for files.
@@ -1221,7 +1223,7 @@ FUNCTIONS
     load_files_interface(path: str, settings: dict, stream: Optional[particula.data.stream.Stream] = None) -&gt; particula.data.stream.Stream
         Load files into a stream object based on settings.
         
-        Parameters:
+        Args:
         ----------
         path : str
             The top-level directory path to scan for folders of data.
@@ -1241,7 +1243,7 @@ FUNCTIONS
     load_folders_interface(path: str, folder_settings: dict, lake: Optional[particula.data.lake.Lake] = None) -&gt; particula.data.lake.Lake
         Load files into a lake object based on settings.
         
-        Parameters:
+        Args:
         ----------
         path : str
             The top-level directory path to scan for folders of data.

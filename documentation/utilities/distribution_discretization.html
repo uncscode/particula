@@ -524,7 +524,7 @@ FUNCTIONS
     discretize(interval=None, disttype=&#39;lognormal&#39;, gsigma=array(1.25), mode=&lt;Quantity(1e-07, &#39;meter&#39;)&gt;, nparticles=array(100000.), **kwargs)
         discretize the distribution of the particles
         
-        Parameters:
+        Args:
             interval    (float) the size interval of the distribution
             distype     (str)   the type of distribution, &quot;lognormal&quot; for now
             gsigma      (float) geometric standard deviation of distribution
@@ -685,7 +685,7 @@ def discretize(
 ):
     &quot;&quot;&quot; discretize the distribution of the particles
 
-        Parameters:
+        Args:
             interval    (float) the size interval of the distribution
             distype     (str)   the type of distribution, &quot;lognormal&quot; for now
             gsigma      (float) geometric standard deviation of distribution
@@ -712,7 +712,7 @@ def discretize(
             scale=np.reshape([mode.m], (np.array([mode.m]).size, 1)),
         ) / interval.u
         * np.reshape([nparticles], (np.array([nparticles]).size, 1))
-        ).sum(axis=0) /
+    ).sum(axis=0) /
         np.array([nparticles]).sum() /
         np.max([np.array([mode.m]).size, np.array([gsigma]).size])
     )

@@ -558,7 +558,7 @@ FUNCTIONS
         &lt;Quantity(111.101591, &#39;dimensionless&#39;)&gt;
         ```
         
-        Parameters:
+        Args:
             radius  (float) [m]
             knu     (float) [ ] (default: util)
         
@@ -632,7 +632,7 @@ def scf(
         &lt;Quantity(111.101591, &#39;dimensionless&#39;)&gt;
         ```
 
-        Parameters:
+        Args:
             radius  (float) [m]
             knu     (float) [ ] (default: util)
 
@@ -650,7 +650,7 @@ def scf(
         else in_scalar(knu)
 
     return 1 + knu_val * (
-        1.257 + 0.4*np.exp(-1.1/knu_val)
+        1.257 + 0.4 * np.exp(-1.1 / knu_val)
     )
 </pre></div>
 </div>

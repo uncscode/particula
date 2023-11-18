@@ -643,7 +643,7 @@ Stream(header=[&#39;CPC_count[#/sec]&#39;, &#39;Temperature[degC]&#39;], data=ar
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/db87bafe76d91107284de99ac0f422522efba9031df874d02423cd62a1171faf.png" src="../_images/db87bafe76d91107284de99ac0f422522efba9031df874d02423cd62a1171faf.png" />
+<img alt="../_images/1d39430863bd57d914facd83561d5b135c1c83ce13d111b21b4e168084ac463c.png" src="../_images/1d39430863bd57d914facd83561d5b135c1c83ce13d111b21b4e168084ac463c.png" />
 </div>
 </div>
 </section>
@@ -688,7 +688,7 @@ object with the averaged data and the standard deviation of the data.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/514eaf885329a58ee969fc87d43ad73c3531152697b90cef4ebc3bca5385ba74.png" src="../_images/514eaf885329a58ee969fc87d43ad73c3531152697b90cef4ebc3bca5385ba74.png" />
+<img alt="../_images/7af6ea7517c747c1e46a7286be12fce8a4132e296f92a89dd00ee0eb50cbc0cd.png" src="../_images/7af6ea7517c747c1e46a7286be12fce8a4132e296f92a89dd00ee0eb50cbc0cd.png" />
 </div>
 </div>
 <section id="clean-up-the-data">
@@ -718,7 +718,7 @@ removed.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/a64cef9fd1553997bd306795d27d48bde4eac52b89553f5f283ebc99df0272c0.png" src="../_images/a64cef9fd1553997bd306795d27d48bde4eac52b89553f5f283ebc99df0272c0.png" />
+<img alt="../_images/bd0a546b1ebd37454b8baf49f8232deb7e62736f04be809b460fd9c513e8b7e3.png" src="../_images/bd0a546b1ebd37454b8baf49f8232deb7e62736f04be809b460fd9c513e8b7e3.png" />
 </div>
 </div>
 </section>
@@ -750,7 +750,7 @@ FUNCTIONS
         results are returned as a new &#39;StreamAveraged&#39; object containing the
         processed data.
         
-        Parameters:
+        Args:
         - stream (object): The input stream object containing &#39;time&#39; and &#39;data&#39;
             arrays along with other associated metadata.
         - average_interval (float|int, optional): The time interval over which the
@@ -786,13 +786,13 @@ FUNCTIONS
         object
             stream object
     
-    filtering(stream: particula.data.stream.Stream, bottom: Optional[float] = None, top: Optional[float] = None, value: Optional[float] = None, invert: bool = False, clone: bool = True, replace_with: Union[float, int, NoneType] = None, drop: Optional[bool] = True) -&gt; particula.data.stream.Stream
+    filtering(stream: particula.data.stream.Stream, bottom: Optional[float] = None, top: Optional[float] = None, value: Optional[float] = None, invert: Optional[bool] = False, clone: Optional[bool] = True, replace_with: Union[float, int, NoneType] = None, drop: Optional[bool] = True) -&gt; particula.data.stream.Stream
         Filters the data of the given &#39;stream&#39; object based on the specified
         bounds or specific value. The filtered data can be either dropped or
         replaced with a specified value.  Note, not all parameters need to be
         specified, but at least one must be provided (top, bottom, value)
         
-        Parameters:
+        Args:
         - stream (Stream): The input stream object containing &#39;data&#39; and &#39;time&#39;
             attributes.
         - bottom (float, optional): The lower bound for filtering data. Defaults
