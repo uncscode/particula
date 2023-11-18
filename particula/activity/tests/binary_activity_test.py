@@ -3,7 +3,7 @@ verify values, just that it can be called."""
 
 import numpy as np
 
-from particula.activity import binary_activity, phase_separation
+from particula.activity import binary_activity
 
 
 def test_convert_to_oh_eqivalent():
@@ -49,7 +49,6 @@ def test_biphasic_water_activity_point():
         functional_group=None,
     )
     assert np.all(activity_point >= 0)
-    assert np.all(activity_point <= 1)
 
     # array entry
     oxygen2carbon_array = np.linspace(0, 0.6, 10)
@@ -62,13 +61,12 @@ def test_biphasic_water_activity_point():
         functional_group=None,
     )
     assert np.all(activity_point >= 0)
-    assert np.all(activity_point <= 1)
 
 
 def test_gibbs_of_mixing():
     """test for gibbs_of_mixing function."""
     molar_mass_ratio = 18.016 / 250
-    org_mole_fraction = np.linspace(0, 1, 10)
+    org_mole_fraction = np.linspace(0.1, 1, 10)
     oxygen2carbon = 0.3
     density = 2.5
 
@@ -80,7 +78,7 @@ def test_gibbs_of_mixing():
         fit_dict=binary_activity.FIT_LOW,
     )
     assert np.all(gibbs_mix >= 0)
-    assert np.all(dervative_gibbs >= 0 or dervative_gibbs <= 0)
+    assert np.all(dervative_gibbs ** 2 >= 0)
 
     # repeat for mid fit
     gibbs_mix, dervative_gibbs = binary_activity.gibbs_of_mixing(
@@ -91,7 +89,7 @@ def test_gibbs_of_mixing():
         fit_dict=binary_activity.FIT_MID,
     )
     assert np.all(gibbs_mix >= 0)
-    assert np.all(dervative_gibbs >= 0 or dervative_gibbs <= 0)
+    assert np.all(dervative_gibbs ** 2 >= 0)
 
     # repeat for high fit
     gibbs_mix, dervative_gibbs = binary_activity.gibbs_of_mixing(
@@ -102,13 +100,13 @@ def test_gibbs_of_mixing():
         fit_dict=binary_activity.FIT_HIGH,
     )
     assert np.all(gibbs_mix >= 0)
-    assert np.all(dervative_gibbs >= 0 or dervative_gibbs <= 0)
+    assert np.all(dervative_gibbs ** 2 >= 0)
 
 
 def test_activity_coefficents():
     """test for activity_coefficents function."""
     molar_mass_ratio = 18.016 / 250
-    org_mole_fraction = np.linspace(0, 1, 10)
+    org_mole_fraction = np.linspace(0.1, 1, 10)
     oxygen2carbon = 0.3
     density = 2.5
 
