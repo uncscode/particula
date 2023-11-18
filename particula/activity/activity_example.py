@@ -8,7 +8,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from particula.activity import phase_separation
+from particula.activity import binary_activity, phase_separation
 
 plt.rcParams.update({'text.color': "#333333",
                      'axes.labelcolor': "#333333",
@@ -29,7 +29,7 @@ hydrogen2carbon = 0
 nitrogen2carbon = 0
 
 
-oxygen2carbon, molar_mass_ratio = phase_separation.convert_to_oh_equivalent(
+oxygen2carbon, molar_mass_ratio = binary_activity.convert_to_oh_equivalent(
     oxygen2carbon,
     molar_mass_ratio,
     functional_group=None
@@ -67,7 +67,7 @@ ax.set_ylabel("weights")
 fig.show
 
 
-gibbs_mix, dervative_gibbs = phase_separation.gibbs_of_mixing(
+gibbs_mix, dervative_gibbs = binary_activity.gibbs_of_mixing(
     molar_mass_ratio,
     org_mole_fraction,
     oxygen2carbon,

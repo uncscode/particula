@@ -14,6 +14,7 @@ from particula.activity.machine_limit import safe_exp
 from particula.activity import phase_separation
 from particula.activity.species_density import organic_density_estimate
 
+
 # the fit values for the activity model
 FIT_LOW = {'a1': [7.089476E+00, -7.711860E+00, -3.885941E+01, -1.000000E+02],
            'a2': [-6.226781E-01, -1.000000E+02, 3.081244E-09, 6.188812E+01],
@@ -269,7 +270,8 @@ def biphasic_water_activity_point(
 def convert_to_oh_equivalent(
         oxygen2carbon, molar_mass_ratio, functional_group=None):
     """
-    add the OH equivalent conversion to the docstring
+    just a pass through now, but will
+    add the oh equivalent conversion
     """
     # sourcery skip
     if functional_group is None:
