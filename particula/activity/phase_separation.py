@@ -55,8 +55,7 @@ def to_molar_mass_ratio(molar_mass, other_molar_mass=18.01528):
     """
     if isinstance(molar_mass, list):
         return [other_molar_mass / mm for mm in molar_mass]
-    else:
-        return other_molar_mass / molar_mass
+    return other_molar_mass / molar_mass
 
 
 def from_molar_mass_ratio(molar_mass_ratio, other_molar_mass=18.01528):
@@ -74,8 +73,7 @@ def from_molar_mass_ratio(molar_mass_ratio, other_molar_mass=18.01528):
     """
     if isinstance(molar_mass_ratio, list):
         return [other_molar_mass * mm for mm in molar_mass_ratio]
-    else:
-        return other_molar_mass * molar_mass_ratio
+    return other_molar_mass * molar_mass_ratio
 
 
 def organic_water_single_phase(molar_mass_ratio):
@@ -104,10 +102,9 @@ def convert_to_oh_equivalent(
     # sourcery skip
     if functional_group is None:
         return oxygen2carbon, molar_mass_ratio
-    elif functional_group == 'alcohol':
+    if functional_group == 'alcohol':
         return oxygen2carbon + 1, molar_mass_ratio + 16  # fix this from SI
-    else:
-        raise ValueError('BAT functional group not recognized')
+    raise ValueError('BAT functional group not recognized')
 
 
 def organic_density_estimate(
@@ -491,7 +488,7 @@ def gibbs_free_engery(
     return gibbs_ideal, gibbs_real
 
 
-def find_phase_sep_index(activity_data):
+def find_phase_sep_index(activity_data):  # pylint: disable=too-many-locals
     """
     This function finds phase separation using activity>1 and
     inflections in the activity curve data.

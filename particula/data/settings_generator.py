@@ -1,5 +1,5 @@
 """Callable to generate settings file from template."""
-# pylint: disable=dangerous-default-value
+# pylint: disable=dangerous-default-value, too-many-locals, too-many-arguments
 
 
 from typing import List, Optional
