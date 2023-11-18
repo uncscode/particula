@@ -1,4 +1,3 @@
-
 """
 This module contains functions to calculate the phase separation of organic
 compounds in water. The functions are based on the BAT model by Gorkowski
@@ -90,8 +89,10 @@ def find_phase_sep_index(
         if np.sign(min_value) == np.sign(max_value):
             # If so, no phase separation via activity curvature
             phase_sep_curve = 0
-            index_phase_sep_starts = np.nan
-            index_phase_sep_end = np.nan
+            # find the index where the activity is closest to 1
+            index_phase_sep_starts = np.argmin(
+                np.abs(activity_data - 1))
+            index_phase_sep_end = index_phase_sep_starts
         else:
             # If signs differ, phase separation via activity curvature occurs
             phase_sep_curve = 1
