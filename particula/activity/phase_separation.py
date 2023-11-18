@@ -22,6 +22,12 @@ import numpy as np
 from sqlalchemy import func
 
 
+MASS_C = 12.01  # the molar masses in [g/mol]
+MASS_O = 16.0
+MASS_H = 1.008
+MASS_N = 14.0067
+
+
 def to_molar_mass_ratio(molar_mass, other_molar_mass=18.01528):
     """
     Convert the given molar mass to a molar mass ratio with respect to water.
@@ -93,7 +99,7 @@ def convert_to_oh_equivalent(
 
 
 def organic_density_estimate(
-        M,
+        molar_mass,
         oxygen2carbon,
         hydrogen2carbon=None,
         nitrogen2carbon=None,
@@ -114,7 +120,7 @@ def organic_density_estimate(
     J. Chem. Educ., 71(11), 962, doi:10.1021/ed071p962, 1994.
 
     Args:
-        M (float): Molar mass.
+        molar_mass(float): Molar mass.
         oxygen2carbon (float): O:C ratio.
         hydrogen2carbon (float): H:C ratio. If unknown, provide a negative value.
         nitrogen2carbon (float, optional): N:C ratio. Defaults to None.
@@ -123,16 +129,12 @@ def organic_density_estimate(
         densityEst (float): Estimated density in g/cm^3.
     """
     if nitrogen2carbon is None:
-        nitrogen2carbon = M * 0
+        nitrogen2carbon = molar_mass * 0
     if hydrogen2carbon is None:
-        hydrogen2carbon = M * 0
+        hydrogen2carbon = molar_mass * 0
     if mass_ratio_convert:
-        M = from_molar_mass_ratio(M)
+        molar_mass = from_molar_mass_ratio(M)
 
-    mass_C = 12.01  # the molar masses in [g/mol]
-    mass_O = 16.0
-    mass_H = 1.008
-    mass_N = 14.0067
 
     # 1) Estimate the hydrogen2carbon value if not provided from input
     # Assuming an aliphatic compound with hydrogen2carbon = 2.0 in the absence of
@@ -140,13 +142,13 @@ def organic_density_estimate(
     # -1 slope (Van Krevelen diagram for typical SOA)
     hydrogen2carbonest = 2.0 - oxygen2carbon if hydrogen2carbon < 0.1 else hydrogen2carbon
     # 2) Compute the approximate number of carbon atoms per organic molecule
-    NC = M / (mass_C + hydrogen2carbonest * mass_H +
-              oxygen2carbon * mass_O + nitrogen2carbon * mass_N)
+    NC = molar_mass / (MASS_C + hydrogen2carbonest * MASS_H +
+              oxygen2carbon * MASS_O + nitrogen2carbon * MASS_N)
 
     # 3) Compute density estimate based on method by Girolami (1994)
     # Here no correction is applied for rings and aromatic compounds
     # (due to limited info at input)
-    rho1 = M / (5.0 * NC * (2.0 + hydrogen2carbonest +
+    rho1 = molar_mass / (5.0 * NC * (2.0 + hydrogen2carbonest +
                 oxygen2carbon * 2.0 + nitrogen2carbon * 2.0))
     # the returned denisty is in [g/cm^3]; and scaled assuming that most
     # that most of the oxygen atoms are able to make H-bonds
