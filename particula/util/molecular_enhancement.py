@@ -12,7 +12,7 @@ from particula.util.input_handling import in_length
 def mol_enh(vapor_size, particle_size):
     """ Returns the molecular enhancement.
 
-        Parameters:
+        Args:
             vapor_size      (float)  [m]
             particle_size   (float)  [m]
 
@@ -28,6 +28,6 @@ def mol_enh(vapor_size, particle_size):
 
     return np.reshape(
         np.transpose(
-            (np.transpose([a_q.m])*a_q.u + b_q) / (b_q)
+            (np.transpose([a_q.m]) * a_q.u + b_q) / (b_q)
         )**2, (b_q.size, a_q.size)
     )

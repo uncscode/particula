@@ -12,9 +12,9 @@ class Solver(Rates):
     def __init__(
         self,
         time_span=None,
-        do_coag=1,
-        do_cond=1,
-        do_nucl=1,
+        do_coag=True,
+        do_cond=True,
+        do_nucl=True,
         **kwargs
     ):
         """ constructor

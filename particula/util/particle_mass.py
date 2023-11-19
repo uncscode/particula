@@ -30,7 +30,7 @@ def mass(
         6.702064327658225e-23
         ```
 
-        Parameters:
+        Args:
             radius       (float) [m]
             density      (float) [kg/m^3] (default: 1000)
             shape_factor (float) [ ]      (default: 1)
@@ -46,6 +46,6 @@ def mass(
     vol_void = in_scalar(volume_void)
 
     return (
-        density * (4*np.pi/3) * (radius**3)
+        density * (4 * np.pi / 3) * (radius**3)
         * shape_factor * (1 - vol_void)
     ).to_base_units()

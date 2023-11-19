@@ -24,7 +24,7 @@ def reduced_quantity(a_quantity, b_quantity):
         array([0.99502488, 1.98675497])
         ```
 
-        Parameters:
+        Args:
             a_quantity  (float)  [arbitrary units]
             b_quantity  (float)  [arbitrary units]
 

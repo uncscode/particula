@@ -7,7 +7,7 @@ from particula import u
 def in_radius(radius):
     """ Handles radius input
 
-        Parameters:
+        Args:
             radius    (float) [m | dimensionless]
 
         Returns:
@@ -43,7 +43,7 @@ def in_radius(radius):
 def in_handling(value, units: u.Quantity):
     """ generic function to handle inputs
 
-        Parameters:
+        Args:
             value     (float)       [u.Quantity | dimensionless]
             units     (u.Quantity)
 
@@ -57,7 +57,7 @@ def in_handling(value, units: u.Quantity):
     """
 
     if isinstance(value, u.Quantity):
-        if value.to_base_units().u == (1*units).to_base_units().u:
+        if value.to_base_units().u == (1 * units).to_base_units().u:
             value = value.to_base_units()
         else:
             raise ValueError(
@@ -68,24 +68,59 @@ def in_handling(value, units: u.Quantity):
                 f"be assigned {units}.\n"
             )
     else:
-        value = u.Quantity(value, (1*units).to_base_units().u)
+        value = u.Quantity(value, (1 * units).to_base_units().u)
 
     return value
 
 
+def convert_units(old, new):
+    """ generic pint function to convert units
+
+        Args:
+            old     [str | u.Quantity]
+            new     [str | u.Quantity]
+
+        Returns:
+            multiplier     (float)
+
+        Notes:
+            * If unit is correct, take to base units
+            * Throws ValueError if unit is wrong
+            * Assigning default base units to scalar input
+    """
+    if isinstance(old, str):
+        old = 1 * u.Quantity(old)
+    if isinstance(new, str):
+        new = u.Quantity(new)
+
+    if isinstance(old, u.Quantity) and isinstance(new, u.Quantity):
+        new = old.to(new)
+    else:
+        raise ValueError(
+            f"\n\t"
+            f"Input has unsupported units.\n\t"
+            f"Input must have units equivlanet to {new};\n\t"
+            f"otherwise, if dimensionless, it will\n\t"
+            f"be assigned {new}.\n"
+        )
+    return new.m
+
+
 # pylint: disable=missing-docstring, multiple-statements
 def in_temperature(temp): return in_handling(temp, u.K)
-def in_viscosity(vis): return in_handling(vis, u.kg/u.m/u.s)
+def in_viscosity(vis): return in_handling(vis, u.kg / u.m / u.s)
 def in_pressure(pres): return in_handling(pres, u.Pa)
 def in_mass(mass): return in_handling(mass, u.kg)
 def in_volume(vol): return in_handling(vol, u.m**3)
 def in_time(time): return in_handling(time, u.s)
-def in_velocity(vel): return in_handling(vel, u.m/u.s)
-def in_acceleration(acc): return in_handling(acc, u.m/u.s**2)
-def in_molecular_weight(molw): return in_handling(molw, u.kg/u.mol)
-def in_density(density): return in_handling(density, u.kg/u.m**3)
+def in_velocity(vel): return in_handling(vel, u.m / u.s)
+def in_acceleration(acc): return in_handling(acc, u.m / u.s**2)
+def in_molecular_weight(molw): return in_handling(molw, u.kg / u.mol)
+def in_density(density): return in_handling(density, u.kg / u.m**3)
 def in_scalar(scalar): return in_handling(scalar, u.dimensionless)
 def in_length(length): return in_handling(length, u.m)
 def in_area(area): return in_handling(area, u.m**2)
-def in_gas_constant(con): return in_handling(con, u.J/u.K/u.mol)
-def in_concentration(conc): return in_handling(conc, u.kg/u.m**3)
+def in_gas_constant(con): return in_handling(con, u.J / u.K / u.mol)
+def in_concentration(conc): return in_handling(conc, u.kg / u.m**3)
+def in_surface_tension(surften): return in_handling(surften, u.N / u.m)
+def in_latent_heat(latheat): return in_handling(latheat, u.J / u.kg)
