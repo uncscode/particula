@@ -1,0 +1,52 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/nbclient/client.py", line 1305, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/jupyter_core/utils/__init__.py", line 173, in wrapped
+    return loop.run_until_complete(inner)
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/nbclient/client.py", line 705, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+def pdf_total(radius, pdf_distribution):
+    return np.trapz(y=pdf_distribution, x=radius)
+
+def pdf_volume_total(radius, pdf_distribution):
+    return np.trapz(y=pdf_distribution* 4/3 * np.pi * radius**3, x=radius)
+
+print(f'Total number of the PDF, {pdf_total(default_distribution.particle_radius, default_distribution.particle_distribution())}')
+
+print(f'Total volume of the PDF, {pdf_volume_total(default_distribution.particle_radius, default_distribution.particle_distribution())}')
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mTypeError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[5], line 7[0m
+[1;32m      4[0m [38;5;28;01mdef[39;00m [38;5;21mpdf_volume_total[39m(radius, pdf_distribution):
+[1;32m      5[0m     [38;5;28;01mreturn[39;00m np[38;5;241m.[39mtrapz(y[38;5;241m=[39mpdf_distribution[38;5;241m*[39m [38;5;241m4[39m[38;5;241m/[39m[38;5;241m3[39m [38;5;241m*[39m np[38;5;241m.[39mpi [38;5;241m*[39m radius[38;5;241m*[39m[38;5;241m*[39m[38;5;241m3[39m, x[38;5;241m=[39mradius)
+[0;32m----> 7[0m [38;5;28mprint[39m([38;5;124mf[39m[38;5;124m'[39m[38;5;124mTotal number of the PDF, [39m[38;5;132;01m{[39;00m[43mpdf_total[49m[43m([49m[43mdefault_distribution[49m[38;5;241;43m.[39;49m[43mparticle_radius[49m[43m,[49m[38;5;250;43m [39;49m[43mdefault_distribution[49m[38;5;241;43m.[39;49m[43mparticle_distribution[49m[43m([49m[43m)[49m[43m)[49m[38;5;132;01m}[39;00m[38;5;124m'[39m)
+[1;32m      9[0m [38;5;28mprint[39m([38;5;124mf[39m[38;5;124m'[39m[38;5;124mTotal volume of the PDF, [39m[38;5;132;01m{[39;00mpdf_volume_total(default_distribution[38;5;241m.[39mparticle_radius,[38;5;250m [39mdefault_distribution[38;5;241m.[39mparticle_distribution())[38;5;132;01m}[39;00m[38;5;124m'[39m)
+
+Cell [0;32mIn[5], line 2[0m, in [0;36mpdf_total[0;34m(radius, pdf_distribution)[0m
+[1;32m      1[0m [38;5;28;01mdef[39;00m [38;5;21mpdf_total[39m(radius, pdf_distribution):
+[0;32m----> 2[0m     [38;5;28;01mreturn[39;00m [43mnp[49m[38;5;241;43m.[39;49m[43mtrapz[49m[43m([49m[43my[49m[38;5;241;43m=[39;49m[43mpdf_distribution[49m[43m,[49m[43m [49m[43mx[49m[38;5;241;43m=[39;49m[43mradius[49m[43m)[49m
+
+File [0;32m/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/pint/facets/numpy/quantity.py:66[0m, in [0;36mNumpyQuantity.__array_function__[0;34m(self, func, types, args, kwargs)[0m
+[1;32m     65[0m [38;5;28;01mdef[39;00m [38;5;21m__array_function__[39m([38;5;28mself[39m, func, types, args, kwargs):
+[0;32m---> 66[0m     [38;5;28;01mreturn[39;00m [43mnumpy_wrap[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mfunction[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[43mfunc[49m[43m,[49m[43m [49m[43margs[49m[43m,[49m[43m [49m[43mkwargs[49m[43m,[49m[43m [49m[43mtypes[49m[43m)[49m
+
+File [0;32m/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/pint/facets/numpy/numpy_func.py:1034[0m, in [0;36mnumpy_wrap[0;34m(func_type, func, args, kwargs, types)[0m
+[1;32m   1032[0m [38;5;28;01mif[39;00m name [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m handled [38;5;129;01mor[39;00m [38;5;28many[39m(is_upcast_type(t) [38;5;28;01mfor[39;00m t [38;5;129;01min[39;00m types):
+[1;32m   1033[0m     [38;5;28;01mreturn[39;00m [38;5;28mNotImplemented[39m
+[0;32m-> 1034[0m [38;5;28;01mreturn[39;00m [43mhandled[49m[43m[[49m[43mname[49m[43m][49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+[0;31mTypeError[0m: _trapz() missing 1 required positional argument: 'a'
+

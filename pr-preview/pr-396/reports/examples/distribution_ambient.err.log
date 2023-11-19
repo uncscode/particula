@@ -1,0 +1,94 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/nbclient/client.py", line 1305, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/jupyter_core/utils/__init__.py", line 173, in wrapped
+    return loop.run_until_complete(inner)
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/nbclient/client.py", line 705, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+radius = ambient_dist.particle_radius.m
+radius_withunits= ambient_dist.particle_radius
+split = 600e-9 # fine to coarse cut off we are using.
+
+split_index = np.argmin(np.abs(radius-split))
+print(split_index)
+
+fine_mode = np.zeros_like(time_array)
+coarse_mode = np.zeros_like(time_array)
+
+fine_mode2 = np.zeros_like(time_array)
+coarse_mode2 = np.zeros_like(time_array)
+
+fine_mode_vol = np.zeros_like(time_array)
+coarse_mode_vol = np.zeros_like(time_array)
+
+def pdf_total(radius, pdf_distribution):
+    return np.trapz(y=pdf_distribution, x=radius)
+
+def pdf_volume_total(radius, pdf_distribution):
+    return np.trapz(y=pdf_distribution* 4/3 * np.pi * radius**3, x=radius)
+
+for i, value in enumerate(time_array):
+  fine_mode[i] = pdf_total(radius[0:split_index], solution.m[i, 0:split_index] )
+  coarse_mode[i] = pdf_total(radius[split_index:-1], solution.m[i, split_index:-1] )
+  fine_mode2[i] = pdf_total(radius[0:split_index], solution2.m[i, 0:split_index] )
+  coarse_mode2[i] = pdf_total(radius[split_index:-1], solution2.m[i, split_index:-1] )
+
+  fine_mode_vol[i] = pdf_volume_total(radius_withunits[0:split_index], solution[i, 0:split_index] )
+  coarse_mode_vol[i] = pdf_volume_total(radius_withunits[split_index:-1], solution[i, split_index:-1] )
+
+fig, ax= plt.subplots(1,1,figsize=[10,10])
+
+ax.semilogy(time_array, fine_mode, '-b', label='fine sphere')
+ax.semilogy(time_array, coarse_mode, '--b', label='coarse sphere')
+
+ax.semilogy(time_array, fine_mode2, '-r', label='fine soot')
+ax.semilogy(time_array, coarse_mode2, '--r', label='coarse soot')
+
+ax.legend()
+ax.set_xlim(left=0)
+ax.set_ylabel(f"number, #/m3 ")
+ax.set_xlabel(f"time, ")
+ax.grid(True, which='both', alpha=0.5)
+
+fig.savefig('coagulation_number.png')
+fig.savefig('coagulation_number.pdf')
+------------------
+
+----- stdout -----
+128
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mTypeError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[4], line 29[0m
+[1;32m     26[0m   fine_mode2[i] [38;5;241m=[39m pdf_total(radius[[38;5;241m0[39m:split_index], solution2[38;5;241m.[39mm[i, [38;5;241m0[39m:split_index] )
+[1;32m     27[0m   coarse_mode2[i] [38;5;241m=[39m pdf_total(radius[split_index:[38;5;241m-[39m[38;5;241m1[39m], solution2[38;5;241m.[39mm[i, split_index:[38;5;241m-[39m[38;5;241m1[39m] )
+[0;32m---> 29[0m   fine_mode_vol[i] [38;5;241m=[39m [43mpdf_volume_total[49m[43m([49m[43mradius_withunits[49m[43m[[49m[38;5;241;43m0[39;49m[43m:[49m[43msplit_index[49m[43m][49m[43m,[49m[43m [49m[43msolution[49m[43m[[49m[43mi[49m[43m,[49m[43m [49m[38;5;241;43m0[39;49m[43m:[49m[43msplit_index[49m[43m][49m[43m [49m[43m)[49m
+[1;32m     30[0m   coarse_mode_vol[i] [38;5;241m=[39m pdf_volume_total(radius_withunits[split_index:[38;5;241m-[39m[38;5;241m1[39m], solution[i, split_index:[38;5;241m-[39m[38;5;241m1[39m] )
+[1;32m     32[0m fig, ax[38;5;241m=[39m plt[38;5;241m.[39msubplots([38;5;241m1[39m,[38;5;241m1[39m,figsize[38;5;241m=[39m[[38;5;241m10[39m,[38;5;241m10[39m])
+
+Cell [0;32mIn[4], line 21[0m, in [0;36mpdf_volume_total[0;34m(radius, pdf_distribution)[0m
+[1;32m     20[0m [38;5;28;01mdef[39;00m [38;5;21mpdf_volume_total[39m(radius, pdf_distribution):
+[0;32m---> 21[0m     [38;5;28;01mreturn[39;00m [43mnp[49m[38;5;241;43m.[39;49m[43mtrapz[49m[43m([49m[43my[49m[38;5;241;43m=[39;49m[43mpdf_distribution[49m[38;5;241;43m*[39;49m[43m [49m[38;5;241;43m4[39;49m[38;5;241;43m/[39;49m[38;5;241;43m3[39;49m[43m [49m[38;5;241;43m*[39;49m[43m [49m[43mnp[49m[38;5;241;43m.[39;49m[43mpi[49m[43m [49m[38;5;241;43m*[39;49m[43m [49m[43mradius[49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[38;5;241;43m3[39;49m[43m,[49m[43m [49m[43mx[49m[38;5;241;43m=[39;49m[43mradius[49m[43m)[49m
+
+File [0;32m/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/pint/facets/numpy/quantity.py:66[0m, in [0;36mNumpyQuantity.__array_function__[0;34m(self, func, types, args, kwargs)[0m
+[1;32m     65[0m [38;5;28;01mdef[39;00m [38;5;21m__array_function__[39m([38;5;28mself[39m, func, types, args, kwargs):
+[0;32m---> 66[0m     [38;5;28;01mreturn[39;00m [43mnumpy_wrap[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mfunction[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[43mfunc[49m[43m,[49m[43m [49m[43margs[49m[43m,[49m[43m [49m[43mkwargs[49m[43m,[49m[43m [49m[43mtypes[49m[43m)[49m
+
+File [0;32m/opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/pint/facets/numpy/numpy_func.py:1034[0m, in [0;36mnumpy_wrap[0;34m(func_type, func, args, kwargs, types)[0m
+[1;32m   1032[0m [38;5;28;01mif[39;00m name [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m handled [38;5;129;01mor[39;00m [38;5;28many[39m(is_upcast_type(t) [38;5;28;01mfor[39;00m t [38;5;129;01min[39;00m types):
+[1;32m   1033[0m     [38;5;28;01mreturn[39;00m [38;5;28mNotImplemented[39m
+[0;32m-> 1034[0m [38;5;28;01mreturn[39;00m [43mhandled[49m[43m[[49m[43mname[49m[43m][49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+[0;31mTypeError[0m: _trapz() missing 1 required positional argument: 'a'
+
