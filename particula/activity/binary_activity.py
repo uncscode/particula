@@ -487,7 +487,6 @@ def fixed_water_activity(
         # change back to original order
         if flip:
             activities_alpha = np.flip(activities_alpha)
-            activities_beta = np.flip(activities_beta)
             q_alpha = np.flip(q_alpha)
         return (activities_alpha, activities_beta, q_alpha)
 
