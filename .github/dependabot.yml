@@ -6,12 +6,8 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    assignees:
-      - "ngam"
 
   - package-ecosystem: "docker"
     directory: ".devcontainer"
     schedule:
       interval: "monthly"
-    assignees:
-      - "ngam"
