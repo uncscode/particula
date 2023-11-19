@@ -31,6 +31,10 @@ parts:
     - file: documentation/utilities/slip_correction
     - file: documentation/utilities/friction_factor
     - file: documentation/utilities/dimensionless_coagulation
+- caption: Strategic Plan
+  numbered: false
+  chapters:
+    -file: strategic_planning_FY24
 - caption: Community
   numbered: false
   chapters:
