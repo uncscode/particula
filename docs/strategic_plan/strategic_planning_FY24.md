@@ -58,9 +58,9 @@ Scheduled for late winter/early spring, the inaugural release of Particula will 
 **Comprehensive Documentation**: An in-depth guide detailing the codebase structure and operational instructions.
 
 **Interactive Jupyter Notebook**: Featuring practical examples to facilitate user engagement with the software.
-Key Features in Particula v0.1.0
 
 Paper 1: A Particula model of the Microphysics and Chemistry of Aerosols
+
 - Equilibrium Analysis: Contrasting Thermodynamic and Dynamic Equilibria.
 - Chemical Processes:
   - Implementing Volatility Basis Set (VBS) for chemical reactions, in collaboration with CMU/Neil?
@@ -70,7 +70,9 @@ Paper 1: A Particula model of the Microphysics and Chemistry of Aerosols
   - Techniques: Sectional Method and Super Droplet (Direct Simulation).
 - Processes: Emphasizing Coagulation, Condensation, Evaporation, and Nucleation.
   - Impact Analysis: Investigating how initial emissions influence cloud formation and updraft velocity.
+
 Paper 2: Data Integration and Experimental Validation
+
 - Data pipeline in Particula: Aligning modeling with experimental data form a better understanding of the phenomena.
 - Remote Sensing Data Incorporation: Exploring integration with DOE-Radar Observations for cloud droplet analysis or other remote sensing data like AERONET.
 - Case Study: Examining the Saharan Dust transport to the DOE Houston site in 2022?
