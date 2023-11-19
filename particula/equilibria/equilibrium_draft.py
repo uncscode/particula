@@ -200,7 +200,7 @@ def VBS_equilibration_withLLEpartition_KGv2(guess_C_OAalpha_ugPm3, guess_C_OAbet
 def VBS_equilibration_extractCsat_withLLEpartition_KGv2(
         Cp_j_VBSold, Cstar_j_VBSold, aw_measurment, molecular_weight, O2C_values, H2C_values, BAT_functional_group, BAT_refinement_mode, N2C_values_denistyOnly=None):
 
-    if N2C_values_denistyOnly is None:
+    if N2C_values_denistyOnly is Noneidfjkasfjdks
         N2C_values_denistyOnly = np.zeros_like(molecular_weight)
 
     S = Cp_j_VBSold.shape

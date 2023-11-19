@@ -204,30 +204,35 @@ def find_phase_separation(
             # find the min and max indexes
             lower_seperation_index = min(indexes)
             upper_seperation_index = max(indexes)
+            match_a_w = activity_water[upper_seperation_index]
 
-            # calculate the mid index
-            mid_sep_index = (lower_seperation_index
-                             + upper_seperation_index) // 2
-            # slice the data upto mid index
-            activity_water_beta = activity_water[:mid_sep_index]
+            # start from the lower_seperation_index and find the index where
+            # the difference between activity_water and match_a_w changes sign
+            match_slice = np.sign(
+                match_a_w - activity_water[lower_seperation_index:]
+            )
+            match_index_prime = np.where(match_slice == -1)
+            if len(match_index_prime[0]) == 0:
+                match_index_prime = lower_seperation_index
+            else:
+                match_index_prime = match_index_prime[0][0] + \
+                    lower_seperation_index
         else:  # decreasing a_w with index
             # find the min and max indexes
             lower_seperation_index = max(indexes)
             upper_seperation_index = min(indexes)
+            match_a_w = activity_water[upper_seperation_index]
 
-            # calculate the mid index
-            mid_sep_index = (lower_seperation_index
-                             + upper_seperation_index) // 2
-            # slice the data upto mid index
-            activity_water_beta = activity_water[mid_sep_index:]
-        match_a_w = activity_water[upper_seperation_index]
-        # find the index where the difference is greater than 0
-        match_index_prime = np.where((activity_water_beta - match_a_w) > 0)
-
-        # if no such index found, assign the index where the max
-        # difference is located
-        if len(match_index_prime[0]) == 0:
-            match_index_prime = np.argmax(activity_water_beta - match_a_w)
+            # start from the lower_seperation_index and find the index where
+            # the difference between activity_water and match_a_w changes sign
+            match_slice = np.sign(
+                activity_water[:lower_seperation_index] - match_a_w
+            )
+            match_index_prime = np.where(match_slice == -1)
+            if len(match_index_prime[0]) == 0:
+                match_index_prime = lower_seperation_index
+            else:
+                match_index_prime = match_index_prime[0][0]
 
     else:
         upper_seperation_index = 2
