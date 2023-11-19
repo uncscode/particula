@@ -34,7 +34,7 @@ parts:
 - caption: Strategic Plan
   numbered: false
   chapters:
-    -file: strategic_planning_FY24
+  - file: strategic_planning_FY24
 - caption: Community
   numbered: false
   chapters:
