@@ -1,4 +1,4 @@
-# Strategic Planning FY24 for Particula Integration
+# FY24 Plan
 
 ## Review of Particula's Utilization
 
@@ -49,9 +49,9 @@ By adhering to this plan, we aim to boost Particula's adaptability, making it mo
 
 The proposed refactoring strategy for FY24 is crafted to address the current limitations of Particula and Datacula. It prioritizes modularity, intuitive understanding, and efficient data handling to aid researchers and educators alike.
 
-# FY24 Deliverables
+## FY24 Deliverables
 
-## Particula v0.1.0 Release
+### Particula v0.1.0 Release
 
 Scheduled for late winter/early spring, the inaugural release of Particula will have two manuscript publications. This release will encompass:
 
@@ -75,7 +75,7 @@ Paper 2: Data Integration and Experimental Validation
 - Remote Sensing Data Incorporation: Exploring integration with DOE-Radar Observations for cloud droplet analysis or other remote sensing data like AERONET.
 - Case Study: Examining the Saharan Dust transport to the DOE Houston site in 2022?
 
-## Collaborative Publications (Secondary role in helping setup the codebase for collaborators)
+### Collaborative Publications (Secondary role in helping setup the codebase for collaborators)
 
 - LANL Collaboration: CLoud Chamber Characterization and Coagulation Experiments
   - Size dependent wall loss correction
@@ -100,7 +100,7 @@ Paper 2: Data Integration and Experimental Validation
 - CMU Collaboration (CLOUD/Neil)
   - They probably have a lot of data, so we could get them started on the code base to look at something interesting.
 
-## Major Milestones for FY24
+### Major Milestones for FY24
 
 - [ ] Refactor Sectional Method
   - [ ] Wall loss correction, experimental data integration
