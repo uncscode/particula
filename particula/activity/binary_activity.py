@@ -432,9 +432,9 @@ def fixed_water_activity(
     Calculate the activity coefficients of water and organic matter in
     organic-water mixtures.
 
-    This function assumes a fixed water activity value (e.g., RH = 75% 
+    This function assumes a fixed water activity value (e.g., RH = 75%
     corresponds to 0.75 water activity in equilibrium).
-    It calculates the activity coefficients for different phases and 
+    It calculates the activity coefficients for different phases and
     determines phase separations if they occur.
 
     Parameters:
