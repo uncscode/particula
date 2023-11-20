@@ -427,7 +427,8 @@ def fixed_water_activity(
         molar_mass_ratio: ArrayLike,
         oxygen2carbon: ArrayLike,
         density: ArrayLike,
-) -> Tuple:    # pylint: disable=too-many-locals
+) -> Tuple:
+    # pylint: disable=too-many-locals
     """
     Calculate the activity coefficients of water and organic matter in
     organic-water mixtures.

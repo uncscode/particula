@@ -31,17 +31,17 @@ def test_find_phase_sep_index():
         'phase_sep_activity': 0,
         'phase_sep_curve': 1,
         'index_phase_sep_starts': 1,
-        'index_phase_sep_end': 3
+        'index_phase_sep_end': 2
     }
 
     # Test with values above 1
-    activity = [.2, .3, .4, 1, 1.2, 1.3]
+    activity = [.2, .3, .4, 1, 1.2, 1.3, 1.2, 1.1, 1.0]
     sep_dic = find_phase_sep_index(activity_data=activity)
     assert sep_dic == {
         'phase_sep_activity': 1,
-        'phase_sep_curve': 0,
-        'index_phase_sep_starts': 3,
-        'index_phase_sep_end': 3
+        'phase_sep_curve': 1,
+        'index_phase_sep_starts': 4,
+        'index_phase_sep_end': 8
     }
 
 
@@ -59,11 +59,11 @@ def test_find_phase_separation():
     assert sep_dic == {
         'phase_sep_check': 1,
         'lower_seperation_index': 1,
-        'upper_seperation_index': 3,
-        'matching_upper_seperation_index': 2,
+        'upper_seperation_index': 2,
+        'matching_upper_seperation_index': 4,
         'lower_seperation': 0.3,
-        'upper_seperation': 0.35,
-        'matching_upper_seperation': 0.4
+        'upper_seperation': 0.4,
+        'matching_upper_seperation': 0.5
     }
 
 

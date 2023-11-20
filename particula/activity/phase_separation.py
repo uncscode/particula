@@ -107,41 +107,19 @@ def find_phase_sep_index(
             back_index = inflection_index[-1] \
                 if len(inflection_index) > 0 else data_length
 
-            # Find closest match to restart the process
-            if back_index < data_length:
-                activity_data_gap = np.argmin(
-                    np.abs(
-                        activity_data[back_index:] - activity_data[index_start]
-                    ))
-                restart_match_index = activity_data_gap + back_index
-            else:
-                restart_match_index = data_length
-
-            # Check if any activity data is greater than 1
-            if sum(activity_data > 1):
-                # Find minimum activity corresponding index
-                if index_start == 0:
-                    min_index_idilute = 0
-                    activity_data_gap_start = 0
-                else:
-                    min_index_idilute = np.argmin(
-                        activity_data[index_start:]) + index_start
-
-                    # Find where activity data matches the minimum value
-                    activity_data_gap_start = np.argmin(
-                        np.abs(
-                            activity_data[:index_start]
-                            - activity_data[min_index_idilute]
-                        ))
-
-                # Assign appropriate indices for phase separation
-                index_phase_sep_starts = min(
-                    activity_data_gap_start, index_start)
-                index_phase_sep_end = min(
-                    min_index_idilute, restart_match_index)
+            # Check if first section of activity data is greater than 1
+            if np.any(activity_data[:index_start] > 1):
+                index_phase_sep_starts = np.argmin(
+                    np.abs(activity_data[:index_start] - 1))
             else:
                 index_phase_sep_starts = index_start
-                index_phase_sep_end = restart_match_index
+
+            # Check if second section of activity data is greater than 1
+            if np.any(activity_data[back_index:] > 1):
+                index_phase_sep_end = np.argmin(
+                    np.abs(activity_data[back_index:] - 1)) + back_index
+            else:
+                index_phase_sep_end = back_index
     else:
         phase_sep_activity = activity_data
         phase_sep_curve = 0
