@@ -93,15 +93,8 @@ def organic_array(
     """Get densities for an array."""
     density = np.empty([len(molar_mass), 1], dtype=float)
     for i, molar in enumerate(molar_mass):
-        if hydrogen2carbon is None:
-            hydrogen2carbon_run = None
-        else:
-            hydrogen2carbon_run = hydrogen2carbon[i]
-        if nitrogen2carbon is None:
-            nitrogen2carbon_run = None
-        else:
-            nitrogen2carbon_run = nitrogen2carbon[i]
-
+        hydrogen2carbon_run = None if hydrogen2carbon is None else hydrogen2carbon[i]
+        nitrogen2carbon_run = None if nitrogen2carbon is None else nitrogen2carbon[i]
         density[i] = organic_density_estimate(
             molar_mass=molar,
             oxygen2carbon=oxygen2carbon[i],
