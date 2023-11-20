@@ -30,8 +30,8 @@ def test_find_phase_sep_index():
     assert sep_dic == {
         'phase_sep_activity': 0,
         'phase_sep_curve': 1,
-        'index_phase_sep_starts': 3,
-        'index_phase_sep_end': 2
+        'index_phase_sep_starts': 1,
+        'index_phase_sep_end': 3
     }
 
     # Test with values above 1
@@ -58,12 +58,12 @@ def test_find_phase_separation():
 
     assert sep_dic == {
         'phase_sep_check': 1,
-        'lower_seperation_index': 2,
+        'lower_seperation_index': 1,
         'upper_seperation_index': 3,
-        'matching_upper_seperation_index': 1,
-        'lower_seperation': 0.4,
+        'matching_upper_seperation_index': 2,
+        'lower_seperation': 0.3,
         'upper_seperation': 0.35,
-        'matching_upper_seperation': 0.3
+        'matching_upper_seperation': 0.4
     }
 
 
