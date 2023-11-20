@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Size Distribution Stats &#8212; Particula Book</title>
+    <title>Liquid Vapor Equilibrium &#8212; Particula Book</title>
   
   
   
@@ -62,11 +62,11 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/stream_stats_size_distribution_part2';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/equilibria_part1';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Activity Example" href="activity_part1.html" />
-    <link rel="prev" title="Stream Stats" href="stream_stats_part1.html" />
+    <link rel="next" title="The Environment Class" href="../documentation/environment.html" />
+    <link rel="prev" title="Activity Example" href="activity_part1.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -199,13 +199,13 @@ const thebe_selector_output = ".output, .cell_output"
 
 
 
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Size Distribution Stats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stream_stats_size_distribution_part2.html">Size Distribution Stats</a></li>
 
 
 
 <li class="toctree-l1"><a class="reference internal" href="activity_part1.html">Activity Example</a></li>
 
-<li class="toctree-l1"><a class="reference internal" href="equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Liquid Vapor Equilibrium</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="nav bd-sidenav">
@@ -289,7 +289,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/stream_stats_size_distribution_part2.ipynb" target="_blank"
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/equilibria_part1.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
    title="Launch onBinder"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -307,7 +307,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/stream_stats_size_distribution_part2.ipynb" target="_blank"
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/equilibria_part1.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
    title="Launch onColab"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -373,7 +373,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/stream_stats_size_distribution_part2.ipynb" target="_blank"
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/equilibria_part1.ipynb" target="_blank"
    class="btn btn-sm btn-source-edit-button dropdown-item"
    title="Suggest edit"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -390,7 +390,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/stream_stats_size_distribution_part2.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/equilibria_part1.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -420,7 +420,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="../_sources/examples/stream_stats_size_distribution_part2.ipynb" target="_blank"
+      <li><a href="../_sources/examples/equilibria_part1.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -502,7 +502,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Size Distribution Stats</h1>
+    <h1>Liquid Vapor Equilibrium</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -512,18 +512,12 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Size Distribution Stats</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data">Load the data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup-the-system">Setup the system</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-the-activity-coefficients">Calculate the activity coefficients</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#now-with-f-rh">Now with f(RH)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#now-plot-the-results">Now plot the results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
 </ul>
-</li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#processing-the-stream">Processing the Stream</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-data">Plot the Data</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tip-calling-the-header-directly">Tip: Calling the header directly</a></li>
-</ul>
-</li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
-</ul>
-
             </nav>
         </div>
     </div>
@@ -534,250 +528,176 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="size-distribution-stats">
-<h1>Size Distribution Stats<a class="headerlink" href="#size-distribution-stats" title="Permalink to this heading">#</a></h1>
-<p>This example shows how to process size distribution data from an SMPS.
-The processing returns mean properties of the size distribution, such as
-the mean diameter, median diameter, and total PM2.5 mass.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="liquid-vapor-equilibrium">
+<h1>Liquid Vapor Equilibrium<a class="headerlink" href="#liquid-vapor-equilibrium" title="Permalink to this heading">#</a></h1>
+<p>Using the activity coefficient model, we can now calculate the equilibrium composition of a liquid-vapor mixture.  We consider just an
+arbitrary organic volatility distribution to show the steps.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># all the imports</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># import libraries</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">loader_interface</span><span class="p">,</span> <span class="n">settings_generator</span>
-<span class="kn">from</span> <span class="nn">particula.data.tests.example_data.get_example_data</span> <span class="kn">import</span> <span class="n">get_data_folder</span>
-<span class="c1"># the new step</span>
-<span class="kn">from</span> <span class="nn">particula.data.process</span> <span class="kn">import</span> <span class="n">size_distribution</span>
-
-<span class="c1"># set the parent directory of the data folder</span>
-<span class="n">path</span> <span class="o">=</span> <span class="n">get_data_folder</span><span class="p">()</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">particula.activity</span> <span class="kn">import</span> <span class="n">species_density</span>
+<span class="kn">from</span> <span class="nn">particula.equilibria</span> <span class="kn">import</span> <span class="n">partitioning</span>
 </pre></div>
 </div>
 </div>
 </div>
-<section id="load-the-data">
-<h2>Load the data<a class="headerlink" href="#load-the-data" title="Permalink to this heading">#</a></h2>
-<p>For this example we’ll use the provided example data. But you can change the
-path to any folder on your computer. We then can used the settings generator
-to</p>
-<p>If you think this settings generator is getting tedious, we hear you. We’ll
-show the fix to that soon.</p>
+<section id="setup-the-system">
+<h2>Setup the system<a class="headerlink" href="#setup-the-system" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>c_star_j_dry: the volatility distribution of the organics in the dry air (can calculate from the vapor pressure)</p></li>
+<li><p>concentration_organic_matter: is the vapor+liquid concentration of the organics in the system</p></li>
+<li><p>oxygen2carbon: is the oxygen to carbon ratio of the organics in the system</p></li>
+<li><p>molar_mass: is the molar mass of the organics in the system</p></li>
+</ul>
+<p>We’ll use this infromation to get the denisty of the organics in the system.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># settings for the SMPS data</span>
-<span class="n">smps_1d_settings</span><span class="p">,</span> <span class="n">smps_2d_settings</span> <span class="o">=</span> <span class="n">settings_generator</span><span class="o">.</span><span class="n">for_general_sizer_1d_2d_load</span><span class="p">(</span>
-    <span class="n">relative_data_folder</span><span class="o">=</span><span class="s1">&#39;SMPS_data&#39;</span><span class="p">,</span>
-    <span class="n">filename_regex</span><span class="o">=</span><span class="s1">&#39;*.csv&#39;</span><span class="p">,</span>
-    <span class="n">file_min_size_bytes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">header_row</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
-    <span class="n">data_checks</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">250</span><span class="p">],</span>
-        <span class="s2">&quot;skip_rows&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
-        <span class="s2">&quot;skip_end&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s2">&quot;char_counts&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;/&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
-    <span class="p">},</span>
-    <span class="n">data_1d_column</span><span class="o">=</span><span class="p">[</span>
-        <span class="s2">&quot;Lower Size (nm)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Upper Size (nm)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Sample Temp (C)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Sample Pressure (kPa)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Relative Humidity (%)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Median (nm)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Mean (nm)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Geo. Mean (nm)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Mode (nm)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Geo. Std. Dev.&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Total Conc. (#/cm³)&quot;</span><span class="p">],</span>
-    <span class="n">data_1d_header</span><span class="o">=</span><span class="p">[</span>
-        <span class="s2">&quot;Lower_Size_(nm)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Upper_Size_(nm)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Sample_Temp_(C)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Sample_Pressure_(kPa)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Relative_Humidity_(%)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Median_(nm)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Mean_(nm)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Geo_Mean_(nm)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Mode_(nm)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Geo_Std_Dev.&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Total_Conc_(#/cc)&quot;</span><span class="p">],</span>
-    <span class="n">data_2d_dp_start_keyword</span><span class="o">=</span><span class="s2">&quot;20.72&quot;</span><span class="p">,</span>
-    <span class="n">data_2d_dp_end_keyword</span><span class="o">=</span><span class="s2">&quot;784.39&quot;</span><span class="p">,</span>
-    <span class="n">data_2d_convert_concentration_from</span><span class="o">=</span><span class="s2">&quot;dw/dlogdp&quot;</span><span class="p">,</span>
-    <span class="n">time_column</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-    <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y %H:%M:%S&quot;</span><span class="p">,</span>
-    <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
-    <span class="n">time_shift_seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">timezone_identifier</span><span class="o">=</span><span class="s2">&quot;UTC&quot;</span><span class="p">,</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c_star_j_dry</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-1</span><span class="p">,</span> <span class="mf">1e2</span><span class="p">,</span> <span class="mf">1e4</span><span class="p">]</span>  <span class="c1"># ug/m3</span>
+<span class="n">concentration_organic_matter</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>  <span class="c1"># ug/m3</span>
+<span class="n">oxygen2carbon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">])</span>
+
+<span class="n">molar_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">])</span>  <span class="c1"># g/mol</span>
+
+<span class="n">water_activity_desired</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">])</span>
+
+<span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="mf">18.015</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">)</span>
+
+<span class="n">density</span> <span class="o">=</span> <span class="n">species_density</span><span class="o">.</span><span class="n">organic_array</span><span class="p">(</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
+    <span class="n">oxygen2carbon</span><span class="o">=</span><span class="n">oxygen2carbon</span><span class="p">,</span>
+    <span class="n">hydrogen2carbon</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">nitrogen2carbon</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="calculate-the-activity-coefficients">
+<h2>Calculate the activity coefficients<a class="headerlink" href="#calculate-the-activity-coefficients" title="Permalink to this heading">#</a></h2>
+<p>For equilibrium, we do not need all the returns from <code class="docutils literal notranslate"><span class="pre">activity.binary_activity</span></code>, so
+<code class="docutils literal notranslate"><span class="pre">partitioning.get_properties_for_liquid_vapor_equilibrium</span></code> is a wrapper that just returns the activity coefficients,
+mass fractions, and the two phase q (alpha-beta) values.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gamma_organic_ab</span><span class="p">,</span> <span class="n">mass_fraction_water_ab</span><span class="p">,</span> <span class="n">q_ab</span> <span class="o">=</span> \
+    <span class="n">partitioning</span><span class="o">.</span><span class="n">get_properties_for_liquid_vapor_partitioning</span><span class="p">(</span>
+        <span class="n">water_activity_desired</span><span class="o">=</span><span class="n">water_activity_desired</span><span class="p">,</span>
+        <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
+        <span class="n">oxygen2carbon</span><span class="o">=</span><span class="n">oxygen2carbon</span><span class="p">,</span>
+        <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
+    <span class="p">)</span>
 
-<span class="c1"># collect settings into a dictionary</span>
-<span class="n">combined_settings</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;smps_1d&#39;</span><span class="p">:</span> <span class="n">smps_1d_settings</span><span class="p">,</span>
-    <span class="s1">&#39;smps_2d&#39;</span><span class="p">:</span> <span class="n">smps_2d_settings</span><span class="p">,</span>
-<span class="p">}</span>
+<span class="c1"># optimize the partition coefficients</span>
+<span class="n">alpha_opt</span><span class="p">,</span> <span class="n">beta_opt</span><span class="p">,</span> <span class="n">system_opt</span><span class="p">,</span> <span class="n">fit_result</span> <span class="o">=</span> \
+    <span class="n">partitioning</span><span class="o">.</span><span class="n">liquid_vapor_partitioning</span><span class="p">(</span>
+        <span class="n">c_star_j_dry</span><span class="o">=</span><span class="n">c_star_j_dry</span><span class="p">,</span>
+        <span class="n">concentration_organic_matter</span><span class="o">=</span><span class="n">concentration_organic_matter</span><span class="p">,</span>
+        <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
+        <span class="n">gamma_organic_ab</span><span class="o">=</span><span class="n">gamma_organic_ab</span><span class="p">,</span>
+        <span class="n">mass_fraction_water_ab</span><span class="o">=</span><span class="n">mass_fraction_water_ab</span><span class="p">,</span>
+        <span class="n">q_ab</span><span class="o">=</span><span class="n">q_ab</span><span class="p">,</span>
+        <span class="n">partition_coefficient_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
 
-<span class="c1"># now call the loader interface for files</span>
-<span class="n">lake</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_folders_interface</span><span class="p">(</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-    <span class="n">folder_settings</span><span class="o">=</span><span class="n">combined_settings</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">lake</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mass in organic aerosol [ug/m3]: </span><span class="si">{</span><span class="n">system_opt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mass in water [ug/3]: </span><span class="si">{</span><span class="n">system_opt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_1d
-  Loading file: 2022-07-07_095151_SMPS.csv
-  Loading file: 2022-07-10_094659_SMPS.csv
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_2d
-  Loading file: 2022-07-07_095151_SMPS.csv
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 
-Lake with streams: [&#39;smps_1d&#39;, &#39;smps_2d&#39;]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mass in organic aerosol [ug/m3]: 22.377292909189197
+mass in water [ug/3]: 4.826984126401714
 </pre></div>
 </div>
 </div>
 </div>
 </section>
-</section>
-<section class="tex2jax_ignore mathjax_ignore" id="processing-the-stream">
-<h1>Processing the Stream<a class="headerlink" href="#processing-the-stream" title="Permalink to this heading">#</a></h1>
-<p>The lake is a collection of streams, stored as a dictionary. The next step
-can be average the data or you may have a processing step that you want to
-apply to all the data. For example, you may want to calculate the total
-PM2.5 mass from the SMPS data. You could do this by looping through the
-streams and applying a cusutom processing function to each stream. Or you could
-use some standard process already built in to <code class="docutils literal notranslate"><span class="pre">particula.data.process</span></code>. In this
-example we’ll use <code class="docutils literal notranslate"><span class="pre">process.size_distribution</span></code> to calculate the PM2.5 mass from the</p>
+<section id="now-with-f-rh">
+<h2>Now with f(RH)<a class="headerlink" href="#now-with-f-rh" title="Permalink to this heading">#</a></h2>
+<p>The whole point of the binary activity model is for interactions with water.
+We can now calculate the activity coefficients as a function of RH or (water activity).</p>
+<p>We’ll do that now by looping over a range of RH values and calculating the activity coefficients.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lake</span><span class="p">[</span><span class="s1">&#39;mean_properties&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">size_distribution</span><span class="o">.</span><span class="n">sizer_mean_properties</span><span class="p">(</span>
-    <span class="n">stream</span><span class="o">=</span><span class="n">lake</span><span class="p">[</span><span class="s1">&#39;smps_2d&#39;</span><span class="p">],</span>
-    <span class="n">diameter_units</span><span class="o">=</span><span class="s1">&#39;nm&#39;</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># and water concentration</span>
 
-<span class="c1"># list out the header</span>
-<span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">lake</span><span class="p">[</span><span class="s1">&#39;mean_properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+<span class="n">water_activity_curve</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>
+<span class="n">totol_oa_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">water_activity_curve</span><span class="p">),</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">water_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">water_activity_curve</span><span class="p">),</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">water_activity</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">water_activity_curve</span><span class="p">):</span>
+    <span class="n">gamma_organic_ab</span><span class="p">,</span> <span class="n">mass_fraction_water_ab</span><span class="p">,</span> <span class="n">q_ab</span> <span class="o">=</span> \
+        <span class="n">partitioning</span><span class="o">.</span><span class="n">get_properties_for_liquid_vapor_partitioning</span><span class="p">(</span>
+            <span class="n">water_activity_desired</span><span class="o">=</span><span class="n">water_activity</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
+            <span class="n">oxygen2carbon</span><span class="o">=</span><span class="n">oxygen2carbon</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">alpha_opt</span><span class="p">,</span> <span class="n">beta_opt</span><span class="p">,</span> <span class="n">system_opt</span><span class="p">,</span> <span class="n">fit_result</span> <span class="o">=</span> \
+        <span class="n">partitioning</span><span class="o">.</span><span class="n">liquid_vapor_partitioning</span><span class="p">(</span>
+            <span class="n">c_star_j_dry</span><span class="o">=</span><span class="n">c_star_j_dry</span><span class="p">,</span>
+            <span class="n">concentration_organic_matter</span><span class="o">=</span><span class="n">concentration_organic_matter</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
+            <span class="n">gamma_organic_ab</span><span class="o">=</span><span class="n">gamma_organic_ab</span><span class="p">,</span>
+            <span class="n">mass_fraction_water_ab</span><span class="o">=</span><span class="n">mass_fraction_water_ab</span><span class="p">,</span>
+            <span class="n">q_ab</span><span class="o">=</span><span class="n">q_ab</span><span class="p">,</span>
+            <span class="n">partition_coefficient_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+    
+    <span class="c1"># get the total organic concentration</span>
+    <span class="n">totol_oa_concentration</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_opt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">water_concentration</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_opt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total_Conc_(#/cc)
-Mean_Diameter_(nm)
-Geometric_Mean_Diameter_(nm)
-Mode_Diameter_(nm)
-Mean_Diameter_Vol_(nm)
-Mode_Diameter_Vol_(nm)
-Unit_Mass_(ug/m3)
-Mass_(ug/m3)
-Total_Conc_(#/cc)_N100
-Unit_Mass_(ug/m3)_N100
-Mass_(ug/m3)_N100
-Total_Conc_(#/cc)_PM1
-Unit_Mass_(ug/m3)_PM1
-Mass_(ug/m3)_PM1
-Total_Conc_(#/cc)_PM2.5
-Unit_Mass_(ug/m3)_PM2.5
-Mass_(ug/m3)_PM2.5
-Total_Conc_(#/cc)_PM10
-Unit_Mass_(ug/m3)_PM10
-Mass_(ug/m3)_PM10
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>done
 </pre></div>
 </div>
 </div>
 </div>
 </section>
-<section class="tex2jax_ignore mathjax_ignore" id="plot-the-data">
-<h1>Plot the Data<a class="headerlink" href="#plot-the-data" title="Permalink to this heading">#</a></h1>
-<p>With that processing done we can plot some useful summary plots. For example,
-we can plot the total PM2.5 mass as a function of time. And on the same plot
-we can add the N100 mass.</p>
-<section id="tip-calling-the-header-directly">
-<h2>Tip: Calling the header directly<a class="headerlink" href="#tip-calling-the-header-directly" title="Permalink to this heading">#</a></h2>
-<p>Note below how we can call the data header directly from the stream. This is
-because the get items property defined in the stream class accepts, either and
-index or a header name. So we can call the header name directly from the
-stream and get back that specific time series.</p>
-<p>This is incontrast to callint <code class="docutils literal notranslate"><span class="pre">stream.data['header_name']</span></code> which would return
-an error. As that line first calls <code class="docutils literal notranslate"><span class="pre">stream.data</span></code> returning the np.ndarray, then calls
-the header name, which is not a valid index for a np.ndarray.</p>
+<section id="now-plot-the-results">
+<h2>Now plot the results<a class="headerlink" href="#now-plot-the-results" title="Permalink to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mean_prop_stream</span> <span class="o">=</span> <span class="n">lake</span><span class="p">[</span><span class="s1">&#39;mean_properties&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">water_activity_curve</span><span class="p">,</span> <span class="n">totol_oa_concentration</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s1">&#39;total organic concentration&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+<span class="n">aw</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">aw</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">water_activity_curve</span><span class="p">,</span> <span class="n">water_concentration</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s1">&#39;water concentration&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;water activity (a_w is RH/100)&#39;</span><span class="p">)</span>
 
+<span class="n">handles</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+<span class="n">aw_handles</span><span class="p">,</span> <span class="n">aw_labels</span> <span class="o">=</span> <span class="n">aw</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+<span class="n">handles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">aw_handles</span><span class="p">)</span>
+<span class="n">labels</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">aw_labels</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
 
-<span class="c1"># plot the data on twinx axis</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mean_prop_stream</span><span class="o">.</span><span class="n">datetime64</span><span class="p">,</span>
-        <span class="n">mean_prop_stream</span><span class="p">[</span><span class="s1">&#39;Mass_(ug/m3)_PM2.5&#39;</span><span class="p">],</span>
-        <span class="n">label</span><span class="o">=</span><span class="s1">&#39;PM 2.5&#39;</span><span class="p">,</span>
-        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mean_prop_stream</span><span class="o">.</span><span class="n">datetime64</span><span class="p">,</span>
-        <span class="n">mean_prop_stream</span><span class="p">[</span><span class="s1">&#39;Mass_(ug/m3)_N100&#39;</span><span class="p">],</span>
-        <span class="n">label</span><span class="o">=</span><span class="s1">&#39;N100 mass&#39;</span><span class="p">,</span>
-        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (UTC)&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;PM mass (ug/m3)&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;organic aerosol concentration [ug/m3]&#39;</span><span class="p">)</span>
+<span class="n">aw</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;aerosol water concentration [ug/m3]&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/43222c71774c96efe0c9a6f6fdc72002f81ca925780a822a56c637408f2cb7a4.png" src="../_images/43222c71774c96efe0c9a6f6fdc72002f81ca925780a822a56c637408f2cb7a4.png" />
+<img alt="../_images/3d6d166add949fba85c144f49c77389b90d9d6c5c3cf5e84cc2ad5744cac0fcb.png" src="../_images/3d6d166add949fba85c144f49c77389b90d9d6c5c3cf5e84cc2ad5744cac0fcb.png" />
 </div>
 </div>
 </section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h2>
+<p>We covered a lot of ground here.  We started with defining the system. We then used the binary activity model to calculate
+the activity coefficients as a function of RH.  We then used those activity coefficients to calculate the equilibrium
+composition of the liquid and vapor phases.  We then plotted the results.</p>
 </section>
-<section class="tex2jax_ignore mathjax_ignore" id="summary">
-<h1>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h1>
-<p>This example showed how to process size distribution data from an SMPS. The
-processing returns mean properties of the size distribution, such as the mean
-diameter, median diameter, and total PM2.5 mass.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">size_distribution</span><span class="o">.</span><span class="n">sizer_mean_properties</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function sizer_mean_properties in module particula.data.process.size_distribution:
-
-sizer_mean_properties(stream: particula.data.stream.Stream, sizer_limits: Optional[List[float]] = None, density: float = 1.5, diameter_units: str = &#39;nm&#39;) -&gt; particula.data.stream.Stream
-    Calculates the mean properties of the size distribution, and returns a
-    stream.
-    
-    Parameters
-    ----------
-    stream : Stream
-        The stream to process.
-    sizer_limits : list, optional [in diameter_units]
-        The lower and upper limits of the size of interest. The default is None
-    density : float, optional
-        The density of the particles. The default is 1.5 g/cm3.
-    diameter_units : str
-        The units of the diameter. The default is &#39;nm&#39;. This will be converted
-        to nm.
-    
-    Returns
-    -------
-    stream : Stream
-        The stream with the mean properties added.
-</pre></div>
-</div>
-</div>
-</div>
 </section>
 
     <script type="text/x-thebe-config">
@@ -811,20 +731,20 @@ sizer_mean_properties(stream: particula.data.stream.Stream, sizer_limits: Option
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="stream_stats_part1.html"
+       href="activity_part1.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Stream Stats</p>
+        <p class="prev-next-title">Activity Example</p>
       </div>
     </a>
     <a class="right-next"
-       href="activity_part1.html"
+       href="../documentation/environment.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Activity Example</p>
+        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -843,18 +763,12 @@ sizer_mean_properties(stream: particula.data.stream.Stream, sizer_limits: Option
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Size Distribution Stats</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data">Load the data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup-the-system">Setup the system</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-the-activity-coefficients">Calculate the activity coefficients</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#now-with-f-rh">Now with f(RH)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#now-plot-the-results">Now plot the results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
 </ul>
-</li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#processing-the-stream">Processing the Stream</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-data">Plot the Data</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tip-calling-the-header-directly">Tip: Calling the header directly</a></li>
-</ul>
-</li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
-</ul>
-
   </nav></div>
 
 </div></div>
