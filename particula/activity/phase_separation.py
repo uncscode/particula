@@ -96,17 +96,16 @@ def find_phase_sep_index(
         else:
             # If signs differ, phase separation via activity curvature occurs
             phase_sep_curve = 1
+            # Find indices where the sign of the second derivative changes
+            sign_changes = np.diff(np.sign(activity_diff))
 
-            # Find where the sign changes in the activity difference
-            activity_diff_sign_change = np.sign(
-                np.concatenate(([activity_diff[0]], activity_diff))
-            ) != np.sign(activity_diff[0])
-
-            # Find the first change in sign
-            index_start = np.where(activity_diff_sign_change)[0][0]
-            # Find the last change in sign
-            back_index = index_start - 1 + np.where(
-                ~activity_diff_sign_change[index_start:])[0][0]
+            # The first index where a sign change occurs
+            inflection_index = np.where(sign_changes)[0]  # all indices
+            index_start = inflection_index[0] \
+                if len(inflection_index) > 0 else data_length
+            # The last index where a sign change occurs
+            back_index = inflection_index[-1] \
+                if len(inflection_index) > 0 else data_length
 
             # Find closest match to restart the process
             if back_index < data_length:
@@ -114,22 +113,26 @@ def find_phase_sep_index(
                     np.abs(
                         activity_data[back_index:] - activity_data[index_start]
                     ))
-                restart_match_index = activity_data_gap + back_index - 1
+                restart_match_index = activity_data_gap + back_index
             else:
                 restart_match_index = data_length
 
             # Check if any activity data is greater than 1
             if sum(activity_data > 1):
                 # Find minimum activity corresponding index
-                min_index_idilute = np.argmin(
-                    activity_data[index_start:]) + index_start - 1
+                if index_start == 0:
+                    min_index_idilute = 0
+                    activity_data_gap_start = 0
+                else:
+                    min_index_idilute = np.argmin(
+                        activity_data[index_start:]) + index_start
 
-                # Find where activity data matches the minimum value
-                activity_data_gap_start = np.argmin(
-                    np.abs(
-                        activity_data[:index_start]
-                        - activity_data[min_index_idilute]
-                    ))
+                    # Find where activity data matches the minimum value
+                    activity_data_gap_start = np.argmin(
+                        np.abs(
+                            activity_data[:index_start]
+                            - activity_data[min_index_idilute]
+                        ))
 
                 # Assign appropriate indices for phase separation
                 index_phase_sep_starts = min(

@@ -54,9 +54,10 @@ def activity_coefficients(
             compound, if applicable.
 
     Returns:
-        A tuple containing the activity coefficients of water, activity
-        coefficients of organic matter, mass fraction of water, and mass
-        fraction of organic matter, respectively.
+        A tuple containing the activity of water, activity
+        of organic matter, mass fraction of water, and mass
+        fraction of organic matter, gamma_water (activity coefficient),
+        and gamma_organic (activity coefficient).
     """
     # check types
     organic_mole_fraction = np.asarray(organic_mole_fraction, dtype=np.float64)
@@ -426,12 +427,27 @@ def fixed_water_activity(
         molar_mass_ratio: ArrayLike,
         oxygen2carbon: ArrayLike,
         density: ArrayLike,
-) -> Tuple:
+) -> Tuple:  # pylint: disable=too-many-locals
     """
-    Function to calculate the activity coefficients of water and organic
-    matter in organic-water mixtures. Assuming that the water activity is
-    fixed at a certain value (e.g. RH = 75% is 0.75 water activity in
-    equilibrium)"""
+    Calculate the activity coefficients of water and organic matter in
+    organic-water mixtures.
+
+    This function assumes a fixed water activity value (e.g., RH = 75% 
+    corresponds to 0.75 water activity in equilibrium).
+    It calculates the activity coefficients for different phases and 
+    determines phase separations if they occur.
+
+    Parameters:
+    water_activity (ArrayLike): An array of water activity values.
+    molar_mass_ratio (ArrayLike): Array of molar mass ratios of the components.
+    oxygen2carbon (ArrayLike): Array of oxygen-to-carbon ratios.
+    density (ArrayLike): Array of densities of the mixture.
+
+    Returns:
+    Tuple: A tuple containing the activity coefficients for alpha and beta
+            phases, and the alpha phase mole fraction.
+           If no phase separation occurs, the beta phase values are None.
+    """
 
     # check types
     water_activity = np.asarray(water_activity, dtype=np.float64)

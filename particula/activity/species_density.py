@@ -40,9 +40,9 @@ def organic_density_estimate(
         densityEst (float): Estimated density in g/cm^3.
     """
     if nitrogen2carbon is None:
-        nitrogen2carbon = molar_mass * 0
+        nitrogen2carbon = oxygen2carbon * 0
     if hydrogen2carbon is None:
-        hydrogen2carbon = molar_mass * 0
+        hydrogen2carbon = oxygen2carbon * 0
     if mass_ratio_convert:
         molar_mass = from_molar_mass_ratio(molar_mass)
 
@@ -50,13 +50,13 @@ def organic_density_estimate(
     # Assuming an aliphatic compound with hydrogen2carbon = 2.0 in the absence
     # of functional groups, then correct for oxygen content assuming a linear
     # -1 slope (Van Krevelen diagram for typical SOA)
-    hydrogen2carbonest = 2.0 - oxygen2carbon \
+    hydrogen2carbon_est = 2.0 - oxygen2carbon \
         if hydrogen2carbon < 0.1 else hydrogen2carbon
 
     # 2) Compute the approximate number of carbon atoms per organic molecule
     number_carbons = molar_mass / (
         MASS_C
-        + hydrogen2carbonest * MASS_H
+        + hydrogen2carbon_est * MASS_H
         + oxygen2carbon * MASS_O
         + nitrogen2carbon * MASS_N
     )
@@ -67,7 +67,7 @@ def organic_density_estimate(
     rho1 = molar_mass / (
         5.0 * number_carbons
         * (2.0
-           + hydrogen2carbonest
+           + hydrogen2carbon_est
            + oxygen2carbon * 2.0
            + nitrogen2carbon * 2.0
            )
