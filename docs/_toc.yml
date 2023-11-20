@@ -20,6 +20,7 @@ parts:
   - file: examples/stream_stats_part1
   - file: examples/stream_stats_size_distribution_part2
   - file: examples/activity_part1
+  - file: examples/equilibria_part1
 - caption: Documentation
   numbered: false
   chapters:

@@ -1,5 +1,6 @@
 """Species density estimation functions."""
 
+import numpy as np
 from particula.activity.ratio import from_molar_mass_ratio
 
 MASS_C = 12.01  # the molar masses in [g/mol]
@@ -79,3 +80,33 @@ def organic_density_estimate(
     return rho1 * (
         1.0 + min(number_carbons * oxygen2carbon * 0.1 +
                   number_carbons * nitrogen2carbon * 0.1, 0.3))
+
+
+def organic_array(
+        molar_mass,
+        oxygen2carbon,
+        hydrogen2carbon=None,
+        nitrogen2carbon=None,
+        mass_ratio_convert=False
+):
+    # pylint: disable=too-many-arguments
+    """Get densities for an array."""
+    density = np.empty([len(molar_mass), 1], dtype=float)
+    for i, molar in enumerate(molar_mass):
+        if hydrogen2carbon is None:
+            hydrogen2carbon_run = None
+        else:
+            hydrogen2carbon_run = hydrogen2carbon[i]
+        if nitrogen2carbon is None:
+            nitrogen2carbon_run = None
+        else:
+            nitrogen2carbon_run = nitrogen2carbon[i]
+
+        density[i] = organic_density_estimate(
+            molar_mass=molar,
+            oxygen2carbon=oxygen2carbon[i],
+            hydrogen2carbon=hydrogen2carbon_run,
+            nitrogen2carbon=nitrogen2carbon_run,
+            mass_ratio_convert=mass_ratio_convert
+        )
+    return density

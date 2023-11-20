@@ -457,7 +457,7 @@ def fixed_water_activity(
     density = np.asarray(density, dtype=np.float64)
 
     # must have activity of water in increasing order
-    if water_activity[0] > water_activity[-1]:
+    if water_activity.size > 1 and water_activity[0] > water_activity[-1]:
         water_activity = np.flip(water_activity)
         flip = True
     else:
@@ -500,7 +500,7 @@ def fixed_water_activity(
             density=density
         )
         activities_beta = None
-        q_alpha = np.ones(len(water_activity))
+        q_alpha = np.ones(water_activity.size)
         # change back to original order
         if flip:
             activities_alpha = np.flip(activities_alpha)

@@ -3,6 +3,8 @@
 from scipy.optimize import minimize, Bounds
 import numpy as np
 
+from particula.activity import binary_activity
+
 
 def liquid_vapor_obj_function(
         e_j_partition_guess,
@@ -82,7 +84,7 @@ def liquid_vapor_obj_function(
         + c_star_j_via_beta * q_ab[:, 1]
 
     # with this new value we can calculate the new e_j_partition (Ej)
-    e_j_partition_new = (1 + c_star_j_new / c_liquid_total)**-1
+    e_j_partition_new = (1 + c_star_j_new / (c_liquid_total+1e-16))**-1
 
     # with the new e_j_partition (Ej) we can calculate the new c_j_liquid (Cj)
     c_j_liquid_new = e_j_partition_new * concentration_organic_matter
@@ -173,3 +175,43 @@ def liquid_vapor_partitioning(
         error_only=False
     )
     return alpha, beta, system, fit_result
+
+
+def get_properties_for_liquid_vapor_partitioning(
+        water_activity_desired,
+        molar_mass,
+        oxygen2carbon,
+        density,
+):
+    """Get properties for liquid-vapor partitioning."""
+    oxygen2carbon = np.asarray(oxygen2carbon, dtype=float)
+    molar_mass = np.asarray(molar_mass, dtype=float)
+    density = np.asarray(density, dtype=float)
+    water_activity_desired = np.asarray(water_activity_desired, dtype=float)
+
+    gamma_organic_ab = np.empty([len(oxygen2carbon), 2], dtype=float)
+    mass_fraction_water_ab = np.empty([len(oxygen2carbon), 2], dtype=float)
+    q_ab = np.empty([len(oxygen2carbon), 2], dtype=float)
+
+    molar_mass_ratio = 18.015 / np.array(molar_mass)
+
+    for i, oxy in enumerate(oxygen2carbon):
+
+        alpha, beta, q_alpha = binary_activity.fixed_water_activity(
+            water_activity=water_activity_desired,
+            molar_mass_ratio=molar_mass_ratio[i],
+            oxygen2carbon=oxy,
+            density=density[i]
+        )
+
+        gamma_organic_ab[i, 0] = alpha[-1][0]
+        mass_fraction_water_ab[i, 0] = alpha[2]
+        if beta is None:
+            gamma_organic_ab[i, 1] = 0
+            mass_fraction_water_ab[i, 1] = 0
+        else:
+            gamma_organic_ab[i, 1] = beta[-1]
+            mass_fraction_water_ab[i, 1] = beta[2]
+        q_ab[i, 0] = q_alpha
+        q_ab[i, 1] = 1 - q_alpha
+    return gamma_organic_ab, mass_fraction_water_ab, q_ab
