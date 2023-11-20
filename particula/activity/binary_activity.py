@@ -427,7 +427,7 @@ def fixed_water_activity(
         molar_mass_ratio: ArrayLike,
         oxygen2carbon: ArrayLike,
         density: ArrayLike,
-) -> Tuple:  # pylint: disable=too-many-locals
+) -> Tuple:    # pylint: disable=too-many-locals
     """
     Calculate the activity coefficients of water and organic matter in
     organic-water mixtures.
@@ -516,9 +516,11 @@ def fixed_water_activity(
         phase_check['upper_seperation_index']:]
     # beta organic rich phase
     beta_water_activity = activities_water[
-        0:phase_check['matching_upper_seperation_index']]
+        : phase_check['matching_upper_seperation_index']
+    ]
     beta_organic_mole_fraction = organic_mole_fraction_array[
-        0:phase_check['matching_upper_seperation_index']]
+        : phase_check['matching_upper_seperation_index']
+    ]
 
     # find the water activity of the alpha phase
     alpha_organic_mole_fraction_interp = np.interp(

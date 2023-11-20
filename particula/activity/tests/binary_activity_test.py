@@ -136,5 +136,3 @@ def test_fixed_water_activity():
         oxygen2carbon=oxygen2carbon,
         density=density,
     )
-    # does it run
-    assert True
