@@ -2,7 +2,7 @@
 name = "particula"
 description = "a simple, fast, and powerful particle simulator"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 license = {file = "LICENSE"}
 authors = [
     {name = "aktwo", email="aktwo@users.noreply.github.com"},

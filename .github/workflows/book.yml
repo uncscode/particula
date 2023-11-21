@@ -28,9 +28,22 @@ jobs:
       run: |
         jupyter-book build docs
 
+    # - if: ${{ github.event_name == 'push' }}
+    #   name: GitHub Pages action
+    #   uses: peaceiris/actions-gh-pages@v3.9.3
+    #   with:
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    #     publish_dir: docs/_build/html
+
     - if: ${{ github.event_name == 'push' }}
       name: GitHub Pages action
-      uses: peaceiris/actions-gh-pages@v3.9.3
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: docs/_build/html
+        clean-exclude: pull-request-previews
+        folder: docs/_build/html
+
+    - if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+      name: Preview docs
+      uses: rossjrw/pr-preview-action@v1
+      with:
+        source-dir: docs/_build/html
