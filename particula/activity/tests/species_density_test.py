@@ -1,6 +1,7 @@
 """Test the species_density module if it runs without errors."""
 
-from particula.activity.species_density import organic_density_estimate
+import numpy as np
+from particula.activity import species_density
 
 
 def test_organic_density_estimate():
@@ -11,7 +12,7 @@ def test_organic_density_estimate():
     hydrogen2carbon = 1.0
     nitrogen2carbon = 0.1
 
-    assert organic_density_estimate(
+    assert species_density.organic_density_estimate(
         molar_mass,
         oxygen2carbon,
         hydrogen2carbon,
@@ -22,7 +23,7 @@ def test_organic_density_estimate():
     oxygen2carbon = 0.4
     nitrogen2carbon = 0.2
 
-    assert organic_density_estimate(
+    assert species_density.organic_density_estimate(
         molar_mass,
         oxygen2carbon,
         nitrogen2carbon) > 0.0
@@ -32,7 +33,7 @@ def test_organic_density_estimate():
     oxygen2carbon = 0.6
     hydrogen2carbon = 0.8
 
-    assert organic_density_estimate(
+    assert species_density.organic_density_estimate(
         molar_mass,
         oxygen2carbon,
         hydrogen2carbon) > 0.0
@@ -43,9 +44,23 @@ def test_organic_density_estimate():
     hydrogen2carbon = 1.2
     nitrogen2carbon = 0.05
 
-    assert organic_density_estimate(
+    assert species_density.organic_density_estimate(
         molar_mass,
         oxygen2carbon,
         hydrogen2carbon,
         nitrogen2carbon,
         mass_ratio_convert=True) > 0.0
+
+
+def test_organic_array():
+    """test the organic_array function."""
+    molar_mass_array = [180.16, 200.0, 150.0]
+    oxygen2carbon_array = [0.5, 0.4, 0.6]
+    hydrogen2carbon_array = [1.0, 1.0, 0.8]
+    nitrogen2carbon_array = None
+
+    assert np.all(species_density.organic_array(
+        molar_mass=molar_mass_array,
+        oxygen2carbon=oxygen2carbon_array,
+        hydrogen2carbon=hydrogen2carbon_array,
+        nitrogen2carbon=nitrogen2carbon_array) > 0.0)

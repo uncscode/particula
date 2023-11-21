@@ -96,49 +96,30 @@ def find_phase_sep_index(
         else:
             # If signs differ, phase separation via activity curvature occurs
             phase_sep_curve = 1
+            # Find indices where the sign of the second derivative changes
+            sign_changes = np.diff(np.sign(activity_diff))
 
-            # Find where the sign changes in the activity difference
-            activity_diff_sign_change = np.sign(
-                np.concatenate(([activity_diff[0]], activity_diff))
-            ) != np.sign(activity_diff[0])
+            # The first index where a sign change occurs
+            inflection_index = np.where(sign_changes)[0]  # all indices
+            index_start = inflection_index[0] \
+                if len(inflection_index) > 0 else data_length
+            # The last index where a sign change occurs
+            back_index = inflection_index[-1] \
+                if len(inflection_index) > 0 else data_length
 
-            # Find the first change in sign
-            index_start = np.where(activity_diff_sign_change)[0][0]
-            # Find the last change in sign
-            back_index = index_start - 1 + np.where(
-                ~activity_diff_sign_change[index_start:])[0][0]
-
-            # Find closest match to restart the process
-            if back_index < data_length:
-                activity_data_gap = np.argmin(
-                    np.abs(
-                        activity_data[back_index:] - activity_data[index_start]
-                    ))
-                restart_match_index = activity_data_gap + back_index - 1
-            else:
-                restart_match_index = data_length
-
-            # Check if any activity data is greater than 1
-            if sum(activity_data > 1):
-                # Find minimum activity corresponding index
-                min_index_idilute = np.argmin(
-                    activity_data[index_start:]) + index_start - 1
-
-                # Find where activity data matches the minimum value
-                activity_data_gap_start = np.argmin(
-                    np.abs(
-                        activity_data[:index_start]
-                        - activity_data[min_index_idilute]
-                    ))
-
-                # Assign appropriate indices for phase separation
-                index_phase_sep_starts = min(
-                    activity_data_gap_start, index_start)
-                index_phase_sep_end = min(
-                    min_index_idilute, restart_match_index)
+            # Check if first section of activity data is greater than 1
+            if np.any(activity_data[:index_start] > 1):
+                index_phase_sep_starts = np.argmin(
+                    np.abs(activity_data[:index_start] - 1))
             else:
                 index_phase_sep_starts = index_start
-                index_phase_sep_end = restart_match_index
+
+            # Check if second section of activity data is greater than 1
+            if np.any(activity_data[back_index:] > 1):
+                index_phase_sep_end = np.argmin(
+                    np.abs(activity_data[back_index:] - 1)) + back_index
+            else:
+                index_phase_sep_end = back_index
     else:
         phase_sep_activity = activity_data
         phase_sep_curve = 0
@@ -204,30 +185,35 @@ def find_phase_separation(
             # find the min and max indexes
             lower_seperation_index = min(indexes)
             upper_seperation_index = max(indexes)
+            match_a_w = activity_water[upper_seperation_index]
 
-            # calculate the mid index
-            mid_sep_index = (lower_seperation_index
-                             + upper_seperation_index) // 2
-            # slice the data upto mid index
-            activity_water_beta = activity_water[:mid_sep_index]
+            # start from the lower_seperation_index and find the index where
+            # the difference between activity_water and match_a_w changes sign
+            match_slice = np.sign(
+                match_a_w - activity_water[lower_seperation_index:]
+            )
+            match_index_prime = np.where(match_slice == -1)
+            if len(match_index_prime[0]) == 0:
+                match_index_prime = lower_seperation_index
+            else:
+                match_index_prime = match_index_prime[0][0] + \
+                    lower_seperation_index
         else:  # decreasing a_w with index
             # find the min and max indexes
             lower_seperation_index = max(indexes)
             upper_seperation_index = min(indexes)
+            match_a_w = activity_water[upper_seperation_index]
 
-            # calculate the mid index
-            mid_sep_index = (lower_seperation_index
-                             + upper_seperation_index) // 2
-            # slice the data upto mid index
-            activity_water_beta = activity_water[mid_sep_index:]
-        match_a_w = activity_water[upper_seperation_index]
-        # find the index where the difference is greater than 0
-        match_index_prime = np.where((activity_water_beta - match_a_w) > 0)
-
-        # if no such index found, assign the index where the max
-        # difference is located
-        if len(match_index_prime[0]) == 0:
-            match_index_prime = np.argmax(activity_water_beta - match_a_w)
+            # start from the lower_seperation_index and find the index where
+            # the difference between activity_water and match_a_w changes sign
+            match_slice = np.sign(
+                activity_water[:lower_seperation_index] - match_a_w
+            )
+            match_index_prime = np.where(match_slice == -1)
+            if len(match_index_prime[0]) == 0:
+                match_index_prime = lower_seperation_index
+            else:
+                match_index_prime = match_index_prime[0][0]
 
     else:
         upper_seperation_index = 2
