@@ -66,13 +66,13 @@ def test_biphasic_water_activity_point():
 def test_gibbs_of_mixing():
     """test for gibbs_of_mixing function."""
     molar_mass_ratio = 18.016 / 250
-    org_mole_fraction = np.linspace(0.1, 1, 10)
+    organic_mole_fraction = np.linspace(0.1, 1, 10)
     oxygen2carbon = 0.3
     density = 2.5
 
     gibbs_mix, dervative_gibbs = binary_activity.gibbs_of_mixing(
         molar_mass_ratio=molar_mass_ratio,
-        org_mole_fraction=org_mole_fraction,
+        organic_mole_fraction=organic_mole_fraction,
         oxygen2carbon=oxygen2carbon,
         density=density,
         fit_dict=binary_activity.FIT_LOW,
@@ -83,7 +83,7 @@ def test_gibbs_of_mixing():
     # repeat for mid fit
     gibbs_mix, dervative_gibbs = binary_activity.gibbs_of_mixing(
         molar_mass_ratio=molar_mass_ratio,
-        org_mole_fraction=org_mole_fraction,
+        organic_mole_fraction=organic_mole_fraction,
         oxygen2carbon=oxygen2carbon,
         density=density,
         fit_dict=binary_activity.FIT_MID,
@@ -94,7 +94,7 @@ def test_gibbs_of_mixing():
     # repeat for high fit
     gibbs_mix, dervative_gibbs = binary_activity.gibbs_of_mixing(
         molar_mass_ratio=molar_mass_ratio,
-        org_mole_fraction=org_mole_fraction,
+        organic_mole_fraction=organic_mole_fraction,
         oxygen2carbon=oxygen2carbon,
         density=density,
         fit_dict=binary_activity.FIT_HIGH,
@@ -106,13 +106,13 @@ def test_gibbs_of_mixing():
 def test_activity_coefficents():
     """test for activity_coefficents function."""
     molar_mass_ratio = 18.016 / 250
-    org_mole_fraction = np.linspace(0.1, 1, 10)
+    organic_mole_fraction = np.linspace(0.1, 1, 10)
     oxygen2carbon = 0.3
     density = 2.5
 
     activity_coefficients = binary_activity.activity_coefficients(
         molar_mass_ratio=molar_mass_ratio,
-        org_mole_fraction=org_mole_fraction,
+        organic_mole_fraction=organic_mole_fraction,
         oxygen2carbon=oxygen2carbon,
         density=density,
         functional_group=None,
@@ -121,3 +121,18 @@ def test_activity_coefficents():
     assert np.all(activity_coefficients[1] >= 0)
     assert np.all(activity_coefficients[2] >= 0)
     assert np.all(activity_coefficients[3] >= 0)
+
+
+def test_fixed_water_activity():
+    """test for fixed_water_activity function."""
+    molar_mass_ratio = 18.016 / 250
+    water_activity_desired = np.linspace(0.001, 0.9999, 1000)
+    oxygen2carbon = 0.3
+    density = 1.5
+
+    _ = binary_activity.fixed_water_activity(
+        water_activity=water_activity_desired,
+        molar_mass_ratio=molar_mass_ratio,
+        oxygen2carbon=oxygen2carbon,
+        density=density,
+    )
