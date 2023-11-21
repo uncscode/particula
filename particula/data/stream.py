@@ -1,7 +1,6 @@
 """A module for the Stream and StreamAveraged(Stream) classes."""
 
 
-from math import e
 from typing import List, Union
 from dataclasses import dataclass, field
 import numpy as np
