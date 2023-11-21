@@ -1,6 +1,7 @@
 """A module for the Stream and StreamAveraged(Stream) classes."""
 
 
+from math import e
 from typing import List, Union
 from dataclasses import dataclass, field
 import numpy as np
@@ -68,15 +69,18 @@ class Stream:
         return self.data[index, :]
 
     def __setitem__(self, index: Union[int, str], value):
-        """Allows for setting of a row of data in the stream.
+        """Allows for setting or adding of a row of data in the stream.
         Args:
-        ----------
-        index : int or str
-            The index of the data stream to set.
-        value : np.ndarray
-            The data to set at the specified index."""
+        index : The index of the data stream to set.
+        value : The data to set at the specified index.
+
+        future work maybe add a list option and iterate through the list"""
         if isinstance(index, str):
+            if index not in self.header:
+                self.header.append(index)  # add new header element
+                self.data = np.vstack((self.data, value))
             index = self.header.index(index)
+        # if index is an int, set the data at that index
         self.data[index, :] = value
 
     def __len__(self):
@@ -92,10 +96,15 @@ class Stream:
         return convert.datetime64_from_epoch_array(self.time)
 
     @property
-    def return_header_dict(self) -> dict:
+    def header_dict(self) -> dict:
         """Returns the header as a dictionary with index (0, 1) as the keys
         and the names as values."""
         return dict(enumerate(self.header))
+
+    @property
+    def header_float(self) -> np.ndarray:
+        """Returns the header as a numpy array of floats."""
+        return np.array(self.header, dtype=float)
 
 
 @dataclass

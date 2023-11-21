@@ -409,7 +409,6 @@ def convert_sizer_dn(
     """
     assert len(diameter) == len(dn_dlogdp) > 0, \
         "Inputs must be non-empty arrays of the same length."
-
     # Compute the bin widths
     delta = np.zeros_like(diameter)
     delta[:-1] = np.diff(diameter)
@@ -419,6 +418,10 @@ def convert_sizer_dn(
     lower = diameter - delta / 2
     upper = diameter + delta / 2
 
+    if dn_dlogdp.ndim == 2:
+        # expand diameter by one dimension so it can be broadcast
+        lower = np.expand_dims(lower, axis=1)
+        upper = np.expand_dims(upper, axis=1)
     if inverse:
         # Convert from dn to dn/dlogdp
         return dn_dlogdp / np.log10(upper / lower)
