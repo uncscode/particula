@@ -4,7 +4,7 @@
 from typing import List, Union
 from dataclasses import dataclass, field
 import numpy as np
-from particula.util import convert
+from particula.util import convert, time_manage
 
 
 @dataclass
@@ -92,7 +92,7 @@ class Stream:
         Returns an array of datetime64 objects representing the time stream.
         Useful for plotting, with matplotlib.dates.
         """
-        return convert.datetime64_from_epoch_array(self.time)
+        return time_manage.datetime64_from_epoch_array(self.time)
 
     @property
     def header_dict(self) -> dict:

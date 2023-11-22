@@ -429,34 +429,6 @@ def convert_sizer_dn(
     return dn_dlogdp * np.log10(upper / lower)
 
 
-def datetime64_from_epoch_array(
-        epoch_array: np.ndarray,
-        delta: int = 0) -> np.ndarray:
-    """
-    Converts an array of epoch times to a numpy array of datetime64 objects.
-
-    Args:
-    -----------
-        epoch_array (np.ndarray): Array of epoch times (in seconds since
-            the Unix epoch).
-        delta (int): An optional offset (in seconds) to add to the epoch times
-            before converting to datetime64 objects.
-
-    Returns:
-    --------
-        np.ndarray: Array of datetime64 objects corresponding to the input
-            epoch times.
-    """
-    assert len(epoch_array) > 0, "Input epoch_array must not be empty."
-    # assert np.issubdtype(epoch_array.dtype, np.integer), \
-    #     "Input epoch_array must be an array of integers."
-
-    # Convert epoch times to datetime64 objects with an optional offset
-    return np.array(
-        [np.datetime64(int(epoch + delta), 's') for epoch in epoch_array]
-    )
-
-
 def list_to_dict(list_of_str: list) -> dict:
     """
     Converts a list of strings to a dictionary. The keys are the strings

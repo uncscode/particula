@@ -2,6 +2,7 @@
 
 from typing import Optional, Union
 import copy
+from click import Option
 import numpy as np
 
 from particula.util import stats
@@ -164,4 +165,39 @@ def filtering(
         stream.data = np.where(mask, stream.data, replace_with)
         # No need to modify 'stream.time' as it remains consistent with
         # 'stream.data'
+    return stream
+
+
+def remove_time_window(
+        stream: Stream,
+        epoch_start: Union[float, int],
+        epoch_end: Optional[Union[float, int]] = None,
+) -> Stream:
+    """
+    Remove a time window from a stream object.
+
+    Args:
+    - stream: The input stream object containing 'data' and 'time'
+        attributes.
+    - epoch_start: The start time of the time window to be
+        removed.
+    - epoch_end: The end time of the time window to be
+        removed. If not provided, the time window is the closest time point to
+        'epoch_start'.
+
+    Returns:
+    - Stream: The 'stream' object with the specified time window removed.
+    """
+    # get index of start time
+    index_start = np.argmin(np.abs(stream.time - epoch_start))
+    if epoch_end is None:
+        # if no end time provided, remove the closest time point
+        stream.time = np.delete(stream.time, index_start)
+        stream.data = np.delete(stream.data, index_start, axis=1)
+        return stream
+    # get index of end time
+    index_end = np.argmin(np.abs(stream.time - epoch_end)) + 1
+    # remove time and data between start and end times
+    stream.time = np.delete(stream.time, slice(index_start, index_end))
+    stream.data = np.delete(stream.data, slice(index_start, index_end), axis=1)
     return stream
