@@ -210,6 +210,7 @@ const thebe_selector_output = ".output, .cell_output"
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="wall_loss_section.html">Chamber Wall Loss Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="chamber_smps_data.html">Chamber Analysis</a></li>
+
 </ul>
 </li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Activity Example</a></li>
@@ -919,12 +920,12 @@ DATA
     INTERPOLATE_WATER_FIT = 500
     LOWEST_ORGANIC_MOLE_FRACTION = 1e-12
     Optional = typing.Optional
-        Optional type.
-        
         Optional[X] is equivalent to Union[X, None].
     
     Tuple = typing.Tuple
-        Tuple type; Tuple[X, Y] is the cross-product type of X and Y.
+        Deprecated alias to builtins.tuple.
+        
+        Tuple[X, Y] is the cross-product type of X and Y.
         
         Example: Tuple[T1, T2] is a tuple of two elements corresponding
         to type variables T1 and T2.  Tuple[int, float, str] is a tuple
@@ -935,31 +936,35 @@ DATA
     Union = typing.Union
         Union type; Union[X, Y] means either X or Y.
         
-        To define a union, use e.g. Union[int, str].  Details:
+        On Python 3.10 and higher, the | operator
+        can also be used to denote unions;
+        X | Y means the same thing to the type checker as Union[X, Y].
+        
+        To define a union, use e.g. Union[int, str]. Details:
         - The arguments must be types and there must be at least one.
         - None as an argument is a special case and is replaced by
           type(None).
         - Unions of unions are flattened, e.g.::
         
-            Union[Union[int, str], float] == Union[int, str, float]
+            assert Union[Union[int, str], float] == Union[int, str, float]
         
         - Unions of a single argument vanish, e.g.::
         
-            Union[int] == int  # The constructor actually returns int
+            assert Union[int] == int  # The constructor actually returns int
         
         - Redundant arguments are skipped, e.g.::
         
-            Union[int, str, int] == Union[int, str]
+            assert Union[int, str, int] == Union[int, str]
         
         - When comparing unions, the argument order is ignored, e.g.::
         
-            Union[int, str] == Union[str, int]
+            assert Union[int, str] == Union[str, int]
         
         - You cannot subclass or instantiate a union.
         - You can use Optional[X] as a shorthand for Union[X, None].
 
 FILE
-    /opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/particula/activity/binary_activity.py
+    /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/activity/binary_activity.py
 </pre></div>
 </div>
 </div>

@@ -208,6 +208,7 @@ const thebe_selector_output = ".output, .cell_output"
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="wall_loss_section.html">Chamber Wall Loss Analysis</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Chamber Analysis</a></li>
+
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="activity_part1.html">Activity Example</a></li>
@@ -519,11 +520,21 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Chamber Analysis</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data">Load the data</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pause-to-plot">Pause to Plot</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clean-up-the-data">Clean up the data</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-distributions">Plot the distributions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#remove-the-bad-data-points">3. Remove the Bad data points</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#crop-to-the-start-and-end-of-the-experiment">4. Crop to the Start and End of the Experiment</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-cleaned-data">Plot the Cleaned Data</a></li>
 </ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+
             </nav>
         </div>
     </div>
@@ -548,7 +559,8 @@ document.write(`
 <span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">loader_interface</span><span class="p">,</span> <span class="n">settings_generator</span>
 <span class="kn">from</span> <span class="nn">particula.data.tests.example_data.get_example_data</span> <span class="kn">import</span> <span class="n">get_data_folder</span>
 
-<span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">convert</span>
+<span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">stream_stats</span>
+<span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">time_manage</span>
 <span class="c1"># set the parent directory of the data folders</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">get_data_folder</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path to data folder:&#39;</span><span class="p">)</span>
@@ -636,8 +648,8 @@ document.write(`
 <ol class="arabic simple">
 <li><p>The SMPS data is in dN/dlogDp, but we want dN/dDp. So we need to convert the data.</p></li>
 <li><p>The SMPS sample line was diluted 1:2 with clean air, so we need to account for that.</p></li>
-<li><p>We need to select from after the injection starts and before the chamber is purged (that small bump at the end of the data).</p></li>
 <li><p>Then we need to remove those couple scans where data jumps crazy high (due to a cpc malfunction), around 1900.</p></li>
+<li><p>We need to select from after the injection starts and before the chamber is purged (that small bump at the end of the data).</p></li>
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -690,6 +702,172 @@ document.write(`
 </div>
 </div>
 </section>
+<section id="remove-the-bad-data-points">
+<h2>3. Remove the Bad data points<a class="headerlink" href="#remove-the-bad-data-points" title="Permalink to this heading">#</a></h2>
+<p>To we’ll send the select start and end times to <code class="docutils literal notranslate"><span class="pre">particula.data.stream_stats.remove_time_window</span></code> to remove the data in that time window.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># select the time window</span>
+<span class="kn">from</span> <span class="nn">pytest</span> <span class="kn">import</span> <span class="n">mark</span>
+
+
+<span class="n">bad_window_start_epoch</span> <span class="o">=</span> <span class="n">time_manage</span><span class="o">.</span><span class="n">time_str_to_epoch</span><span class="p">(</span>
+    <span class="n">time</span><span class="o">=</span><span class="s1">&#39;09-25-2023 19:00:00&#39;</span><span class="p">,</span>
+    <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;%m-</span><span class="si">%d</span><span class="s1">-%Y %H:%M:%S&#39;</span><span class="p">,</span>
+    <span class="n">timezone_identifier</span><span class="o">=</span><span class="s1">&#39;UTC&#39;</span>
+<span class="p">)</span>
+<span class="n">bad_window_end_epoch</span> <span class="o">=</span> <span class="n">time_manage</span><span class="o">.</span><span class="n">time_str_to_epoch</span><span class="p">(</span>
+    <span class="n">time</span><span class="o">=</span><span class="s1">&#39;09-25-2023 19:45:00&#39;</span><span class="p">,</span>
+    <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;%m-</span><span class="si">%d</span><span class="s1">-%Y %H:%M:%S&#39;</span><span class="p">,</span>
+    <span class="n">timezone_identifier</span><span class="o">=</span><span class="s1">&#39;UTC&#39;</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Length of stream before crop: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">stream_smps_1d</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># remove the bad data</span>
+<span class="n">stream_smps_1d</span> <span class="o">=</span> <span class="n">stream_stats</span><span class="o">.</span><span class="n">remove_time_window</span><span class="p">(</span>
+    <span class="n">stream</span><span class="o">=</span><span class="n">stream_smps_1d</span><span class="p">,</span>
+    <span class="n">epoch_start</span><span class="o">=</span><span class="n">bad_window_start_epoch</span><span class="p">,</span>
+    <span class="n">epoch_end</span><span class="o">=</span><span class="n">bad_window_end_epoch</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Length of stream after crop: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">stream_smps_1d</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># plot the 1d data</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">stream_smps_1d</span><span class="o">.</span><span class="n">datetime64</span><span class="p">,</span>
+    <span class="n">stream_smps_1d</span><span class="p">[</span><span class="s1">&#39;Total_Conc_(#/cc)&#39;</span><span class="p">],</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Concentration&#39;</span><span class="p">,</span>
+    <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (UTC)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Particle concentration (#/cc)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Length of stream before crop: 336
+Length of stream after crop: 321
+</pre></div>
+</div>
+<img alt="../_images/463ef5e937a87d22ccd8db889f91579a6b1635c62623fafed75d27582310424c.png" src="../_images/463ef5e937a87d22ccd8db889f91579a6b1635c62623fafed75d27582310424c.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### Repeat the removal for the 2d data</span>
+
+<span class="n">stream_smps_2d</span> <span class="o">=</span> <span class="n">stream_stats</span><span class="o">.</span><span class="n">remove_time_window</span><span class="p">(</span>
+    <span class="n">stream</span><span class="o">=</span><span class="n">stream_smps_2d</span><span class="p">,</span>
+    <span class="n">epoch_start</span><span class="o">=</span><span class="n">bad_window_start_epoch</span><span class="p">,</span>
+    <span class="n">epoch_end</span><span class="o">=</span><span class="n">bad_window_end_epoch</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="crop-to-the-start-and-end-of-the-experiment">
+<h2>4. Crop to the Start and End of the Experiment<a class="headerlink" href="#crop-to-the-start-and-end-of-the-experiment" title="Permalink to this heading">#</a></h2>
+<p>To crop the start and end we can use the same functions as in the previous example. This time the start/end will just be the first and last time in the data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># crop start</span>
+<span class="n">experiment_start_epoch</span> <span class="o">=</span> <span class="n">time_manage</span><span class="o">.</span><span class="n">time_str_to_epoch</span><span class="p">(</span>
+    <span class="n">time</span><span class="o">=</span><span class="s1">&#39;09-25-2023 15:25:00&#39;</span><span class="p">,</span>
+    <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;%m-</span><span class="si">%d</span><span class="s1">-%Y %H:%M:%S&#39;</span><span class="p">,</span>
+    <span class="n">timezone_identifier</span><span class="o">=</span><span class="s1">&#39;UTC&#39;</span>
+<span class="p">)</span>
+
+<span class="n">stream_smps_1d</span> <span class="o">=</span> <span class="n">stream_stats</span><span class="o">.</span><span class="n">remove_time_window</span><span class="p">(</span>
+    <span class="n">stream</span><span class="o">=</span><span class="n">stream_smps_1d</span><span class="p">,</span>
+    <span class="n">epoch_start</span><span class="o">=</span><span class="n">stream_smps_1d</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">epoch_end</span><span class="o">=</span><span class="n">experiment_start_epoch</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">stream_smps_2d</span> <span class="o">=</span> <span class="n">stream_stats</span><span class="o">.</span><span class="n">remove_time_window</span><span class="p">(</span>
+    <span class="n">stream</span><span class="o">=</span><span class="n">stream_smps_2d</span><span class="p">,</span>
+    <span class="n">epoch_start</span><span class="o">=</span><span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">epoch_end</span><span class="o">=</span><span class="n">experiment_start_epoch</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># crop the end</span>
+<span class="n">experiment_end_epoch</span> <span class="o">=</span> <span class="n">time_manage</span><span class="o">.</span><span class="n">time_str_to_epoch</span><span class="p">(</span>
+    <span class="n">time</span><span class="o">=</span><span class="s1">&#39;09-26-2023 07:00:00&#39;</span><span class="p">,</span>
+    <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;%m-</span><span class="si">%d</span><span class="s1">-%Y %H:%M:%S&#39;</span><span class="p">,</span>
+    <span class="n">timezone_identifier</span><span class="o">=</span><span class="s1">&#39;UTC&#39;</span>
+<span class="p">)</span>
+
+<span class="n">stream_smps_1d</span> <span class="o">=</span> <span class="n">stream_stats</span><span class="o">.</span><span class="n">remove_time_window</span><span class="p">(</span>
+    <span class="n">stream</span><span class="o">=</span><span class="n">stream_smps_1d</span><span class="p">,</span>
+    <span class="n">epoch_start</span><span class="o">=</span><span class="n">experiment_end_epoch</span><span class="p">,</span>
+    <span class="n">epoch_end</span><span class="o">=</span><span class="n">stream_smps_1d</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">stream_smps_2d</span> <span class="o">=</span> <span class="n">stream_stats</span><span class="o">.</span><span class="n">remove_time_window</span><span class="p">(</span>
+    <span class="n">stream</span><span class="o">=</span><span class="n">stream_smps_2d</span><span class="p">,</span>
+    <span class="n">epoch_start</span><span class="o">=</span><span class="n">experiment_end_epoch</span><span class="p">,</span>
+    <span class="n">epoch_end</span><span class="o">=</span><span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="plot-the-cleaned-data">
+<h3>Plot the Cleaned Data<a class="headerlink" href="#plot-the-cleaned-data" title="Permalink to this heading">#</a></h3>
+<p>Here, we’ll also conver to relative time, so hours since the start of the experiment.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot the 1d data</span>
+<span class="n">experiment_time</span> <span class="o">=</span> <span class="n">time_manage</span><span class="o">.</span><span class="n">relative_time</span><span class="p">(</span>
+    <span class="n">epoch_array</span><span class="o">=</span><span class="n">stream_smps_1d</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+    <span class="n">units</span><span class="o">=</span><span class="s1">&#39;hours&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">experiment_time</span><span class="p">,</span>
+    <span class="n">stream_smps_1d</span><span class="p">[</span><span class="s1">&#39;Total_Conc_(#/cc)&#39;</span><span class="p">],</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Concentration&#39;</span><span class="p">,</span>
+    <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Experiment time (hours)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Particle concentration (#/cc)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/ecca72db70184b2b26ba95832aa8d258c8bb40f80a88240933fc68bec5752c16.png" src="../_images/ecca72db70184b2b26ba95832aa8d258c8bb40f80a88240933fc68bec5752c16.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the 2d data</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span>
+    <span class="n">experiment_time</span><span class="p">,</span>
+    <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">header_float</span><span class="p">,</span>
+    <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">PuBu_r</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Epoch Time&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Diameter (nm)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Concentration dN [#/cm3]&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/5c0feb66a4c926b7adcd938864dd1e62e33fdcb4fe7e5cb712ec5564bf5bdd03.png" src="../_images/5c0feb66a4c926b7adcd938864dd1e62e33fdcb4fe7e5cb712ec5564bf5bdd03.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="summary">
+<h1>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h1>
+<p>We’ve now loaded the data, cleaned it up, and plotted the size distribution. We can see that the size distribution is changing with time. We’ll look at accounting for chamber processes, like coagulation, dilution, and wall losses, in the next part.</p>
 </section>
 
     <script type="text/x-thebe-config">
@@ -755,11 +933,21 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Chamber Analysis</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data">Load the data</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pause-to-plot">Pause to Plot</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clean-up-the-data">Clean up the data</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-distributions">Plot the distributions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#remove-the-bad-data-points">3. Remove the Bad data points</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#crop-to-the-start-and-end-of-the-experiment">4. Crop to the Start and End of the Experiment</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-cleaned-data">Plot the Cleaned Data</a></li>
 </ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+
   </nav></div>
 
 </div></div>
