@@ -68,7 +68,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Liquid Vapor Equilibrium" href="equilibria_part1.html" />
-    <link rel="prev" title="Size Distribution Stats" href="stream_stats_size_distribution_part2.html" />
+    <link rel="prev" title="Chamber Analysis" href="chamber_smps_data.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -208,20 +208,25 @@ const thebe_selector_output = ".output, .cell_output"
 
 </ul>
 </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="wall_loss_section.html">Chamber Wall Loss Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="chamber_smps_data.html">Chamber Analysis</a></li>
+
+</ul>
+</li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Activity Example</a></li>
 
 <li class="toctree-l1"><a class="reference internal" href="equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
@@ -915,12 +920,12 @@ DATA
     INTERPOLATE_WATER_FIT = 500
     LOWEST_ORGANIC_MOLE_FRACTION = 1e-12
     Optional = typing.Optional
-        Optional type.
-        
         Optional[X] is equivalent to Union[X, None].
     
     Tuple = typing.Tuple
-        Tuple type; Tuple[X, Y] is the cross-product type of X and Y.
+        Deprecated alias to builtins.tuple.
+        
+        Tuple[X, Y] is the cross-product type of X and Y.
         
         Example: Tuple[T1, T2] is a tuple of two elements corresponding
         to type variables T1 and T2.  Tuple[int, float, str] is a tuple
@@ -931,31 +936,35 @@ DATA
     Union = typing.Union
         Union type; Union[X, Y] means either X or Y.
         
-        To define a union, use e.g. Union[int, str].  Details:
+        On Python 3.10 and higher, the | operator
+        can also be used to denote unions;
+        X | Y means the same thing to the type checker as Union[X, Y].
+        
+        To define a union, use e.g. Union[int, str]. Details:
         - The arguments must be types and there must be at least one.
         - None as an argument is a special case and is replaced by
           type(None).
         - Unions of unions are flattened, e.g.::
         
-            Union[Union[int, str], float] == Union[int, str, float]
+            assert Union[Union[int, str], float] == Union[int, str, float]
         
         - Unions of a single argument vanish, e.g.::
         
-            Union[int] == int  # The constructor actually returns int
+            assert Union[int] == int  # The constructor actually returns int
         
         - Redundant arguments are skipped, e.g.::
         
-            Union[int, str, int] == Union[int, str]
+            assert Union[int, str, int] == Union[int, str]
         
         - When comparing unions, the argument order is ignored, e.g.::
         
-            Union[int, str] == Union[str, int]
+            assert Union[int, str] == Union[str, int]
         
         - You cannot subclass or instantiate a union.
         - You can use Optional[X] as a shorthand for Union[X, None].
 
 FILE
-    /opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/particula/activity/binary_activity.py
+    /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/activity/binary_activity.py
 </pre></div>
 </div>
 </div>
@@ -993,12 +1002,12 @@ FILE
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="stream_stats_size_distribution_part2.html"
+       href="chamber_smps_data.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Size Distribution Stats</p>
+        <p class="prev-next-title">Chamber Analysis</p>
       </div>
     </a>
     <a class="right-next"

@@ -206,20 +206,25 @@ const thebe_selector_output = ".output, .cell_output"
 
 </ul>
 </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="wall_loss_section.html">Chamber Wall Loss Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="chamber_smps_data.html">Chamber Analysis</a></li>
+
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="activity_part1.html">Activity Example</a></li>
 
 <li class="toctree-l1"><a class="reference internal" href="equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
@@ -831,41 +836,58 @@ FUNCTIONS
         replaced with &#39;replace_with&#39; value.
         
         add specific data row to filter on
+    
+    remove_time_window(stream: particula.data.stream.Stream, epoch_start: Union[float, int], epoch_end: Union[float, int, NoneType] = None) -&gt; particula.data.stream.Stream
+        Remove a time window from a stream object.
+        
+        Args:
+        - stream: The input stream object containing &#39;data&#39; and &#39;time&#39;
+            attributes.
+        - epoch_start: The start time of the time window to be
+            removed.
+        - epoch_end: The end time of the time window to be
+            removed. If not provided, the time window is the closest time point to
+            &#39;epoch_start&#39;.
+        
+        Returns:
+        - Stream: The &#39;stream&#39; object with the specified time window removed.
 
 DATA
     Optional = typing.Optional
-        Optional type.
-        
         Optional[X] is equivalent to Union[X, None].
     
     Union = typing.Union
         Union type; Union[X, Y] means either X or Y.
         
-        To define a union, use e.g. Union[int, str].  Details:
+        On Python 3.10 and higher, the | operator
+        can also be used to denote unions;
+        X | Y means the same thing to the type checker as Union[X, Y].
+        
+        To define a union, use e.g. Union[int, str]. Details:
         - The arguments must be types and there must be at least one.
         - None as an argument is a special case and is replaced by
           type(None).
         - Unions of unions are flattened, e.g.::
         
-            Union[Union[int, str], float] == Union[int, str, float]
+            assert Union[Union[int, str], float] == Union[int, str, float]
         
         - Unions of a single argument vanish, e.g.::
         
-            Union[int] == int  # The constructor actually returns int
+            assert Union[int] == int  # The constructor actually returns int
         
         - Redundant arguments are skipped, e.g.::
         
-            Union[int, str, int] == Union[int, str]
+            assert Union[int, str, int] == Union[int, str]
         
         - When comparing unions, the argument order is ignored, e.g.::
         
-            Union[int, str] == Union[str, int]
+            assert Union[int, str] == Union[str, int]
         
         - You cannot subclass or instantiate a union.
         - You can use Optional[X] as a shorthand for Union[X, None].
 
 FILE
-    /opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/particula/data/stream_stats.py
+    /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/stream_stats.py
 </pre></div>
 </div>
 </div>

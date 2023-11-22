@@ -206,20 +206,25 @@ const thebe_selector_output = ".output, .cell_output"
 
 </ul>
 </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="wall_loss_section.html">Chamber Wall Loss Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="chamber_smps_data.html">Chamber Analysis</a></li>
+
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="activity_part1.html">Activity Example</a></li>
 
 <li class="toctree-l1"><a class="reference internal" href="equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
@@ -739,7 +744,16 @@ This is done with the <code class="docutils literal notranslate"><span class="pr
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/a864f004314ce51ace692f073e0f5e822d74fa130613514c6b32add59ea65e7e.png" src="../_images/a864f004314ce51ace692f073e0f5e822d74fa130613514c6b32add59ea65e7e.png" />
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">particula.util.convert</span> <span class="kn">import</span> <span class="n">datetime64_from_epoch_array</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="c1"># convert the epoch time to datetime64</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">time_in_datetime64</span> <span class="o">=</span> <span class="n">datetime64_from_epoch_array</span><span class="p">(</span><span class="n">epoch_time</span><span class="p">)</span>
+
+<span class="ne">ImportError</span>: cannot import name &#39;datetime64_from_epoch_array&#39; from &#39;particula.util.convert&#39; (/opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/util/convert.py)
+</pre></div>
+</div>
 </div>
 </div>
 </section>
@@ -772,7 +786,7 @@ how the data changes over time.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/17187fe59069cc8e9a2147fa0bafa8e2e0144396302953bb99513cd995a09b92.png" src="../_images/17187fe59069cc8e9a2147fa0bafa8e2e0144396302953bb99513cd995a09b92.png" />
+<img alt="../_images/61e68058f8385a581558047b804185e841aebd19d9bfa83c2e46ed96ea116573.png" src="../_images/61e68058f8385a581558047b804185e841aebd19d9bfa83c2e46ed96ea116573.png" />
 </div>
 </div>
 </section>
@@ -907,16 +921,12 @@ Calling the relevant functions.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading data from: 2022-07-07_095151_SMPS.csv
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading data from: 2022-07-10_094659_SMPS.csv
+Loading data from: 2022-07-07_095151_SMPS.csv
+Loading data from: 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
 </div>
@@ -950,7 +960,7 @@ Stream(header=[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample
         2.31800e+00, 2.24800e+00],
        [2.16900e+03, 2.39408e+03, 2.27861e+03, ..., 2.08056e+03,
         2.10616e+03, 2.45781e+03]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
-       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
+       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5620804], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2004838]])
 
 Data stream 2d summary:
 Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39;, &#39;22.27&#39;, &#39;22.67&#39;, &#39;23.08&#39;, &#39;23.50&#39;, &#39;23.93&#39;, &#39;24.36&#39;, &#39;24.80&#39;, &#39;25.25&#39;, &#39;25.71&#39;, &#39;26.18&#39;, &#39;26.66&#39;, &#39;27.14&#39;, &#39;27.63&#39;, &#39;28.13&#39;, &#39;28.64&#39;, &#39;29.16&#39;, &#39;29.69&#39;, &#39;30.23&#39;, &#39;30.78&#39;, &#39;31.34&#39;, &#39;31.91&#39;, &#39;32.49&#39;, &#39;33.08&#39;, &#39;33.68&#39;, &#39;34.29&#39;, &#39;34.91&#39;, &#39;35.55&#39;, &#39;36.19&#39;, &#39;36.85&#39;, &#39;37.52&#39;, &#39;38.20&#39;, &#39;38.89&#39;, &#39;39.60&#39;, &#39;40.32&#39;, &#39;41.05&#39;, &#39;41.79&#39;, &#39;42.55&#39;, &#39;43.32&#39;, &#39;44.11&#39;, &#39;44.91&#39;, &#39;45.73&#39;, &#39;46.56&#39;, &#39;47.40&#39;, &#39;48.26&#39;, &#39;49.14&#39;, &#39;50.03&#39;, &#39;50.94&#39;, &#39;51.86&#39;, &#39;52.80&#39;, &#39;53.76&#39;, &#39;54.74&#39;, &#39;55.73&#39;, &#39;56.74&#39;, &#39;57.77&#39;, &#39;58.82&#39;, &#39;59.89&#39;, &#39;60.98&#39;, &#39;62.08&#39;, &#39;63.21&#39;, &#39;64.36&#39;, &#39;65.52&#39;, &#39;66.71&#39;, &#39;67.93&#39;, &#39;69.16&#39;, &#39;70.41&#39;, &#39;71.69&#39;, &#39;72.99&#39;, &#39;74.32&#39;, &#39;75.67&#39;, &#39;77.04&#39;, &#39;78.44&#39;, &#39;79.86&#39;, &#39;81.31&#39;, &#39;82.79&#39;, &#39;84.29&#39;, &#39;85.82&#39;, &#39;87.38&#39;, &#39;88.96&#39;, &#39;90.58&#39;, &#39;92.22&#39;, &#39;93.90&#39;, &#39;95.60&#39;, &#39;97.34&#39;, &#39;99.10&#39;, &#39;100.90&#39;, &#39;102.74&#39;, &#39;104.60&#39;, &#39;106.50&#39;, &#39;108.43&#39;, &#39;110.40&#39;, &#39;112.40&#39;, &#39;114.44&#39;, &#39;116.52&#39;, &#39;118.64&#39;, &#39;120.79&#39;, &#39;122.98&#39;, &#39;125.21&#39;, &#39;127.49&#39;, &#39;129.80&#39;, &#39;132.16&#39;, &#39;134.56&#39;, &#39;137.00&#39;, &#39;139.49&#39;, &#39;142.02&#39;, &#39;144.60&#39;, &#39;147.22&#39;, &#39;149.89&#39;, &#39;152.61&#39;, &#39;155.38&#39;, &#39;158.20&#39;, &#39;161.08&#39;, &#39;164.00&#39;, &#39;166.98&#39;, &#39;170.01&#39;, &#39;173.09&#39;, &#39;176.24&#39;, &#39;179.43&#39;, &#39;182.69&#39;, &#39;186.01&#39;, &#39;189.38&#39;, &#39;192.82&#39;, &#39;196.32&#39;, &#39;199.89&#39;, &#39;203.51&#39;, &#39;207.21&#39;, &#39;210.97&#39;, &#39;214.80&#39;, &#39;218.70&#39;, &#39;222.67&#39;, &#39;226.71&#39;, &#39;230.82&#39;, &#39;235.01&#39;, &#39;239.28&#39;, &#39;243.62&#39;, &#39;248.05&#39;, &#39;252.55&#39;, &#39;257.13&#39;, &#39;261.80&#39;, &#39;266.55&#39;, &#39;271.39&#39;, &#39;276.32&#39;, &#39;281.33&#39;, &#39;286.44&#39;, &#39;291.64&#39;, &#39;296.93&#39;, &#39;302.32&#39;, &#39;307.81&#39;, &#39;313.40&#39;, &#39;319.08&#39;, &#39;324.88&#39;, &#39;330.77&#39;, &#39;336.78&#39;, &#39;342.89&#39;, &#39;349.12&#39;, &#39;355.45&#39;, &#39;361.90&#39;, &#39;368.47&#39;, &#39;375.16&#39;, &#39;381.97&#39;, &#39;388.91&#39;, &#39;395.96&#39;, &#39;403.15&#39;, &#39;410.47&#39;, &#39;417.92&#39;, &#39;425.51&#39;, &#39;433.23&#39;, &#39;441.09&#39;, &#39;449.10&#39;, &#39;457.25&#39;, &#39;465.55&#39;, &#39;474.00&#39;, &#39;482.61&#39;, &#39;491.37&#39;, &#39;500.29&#39;, &#39;509.37&#39;, &#39;518.61&#39;, &#39;528.03&#39;, &#39;537.61&#39;, &#39;547.37&#39;, &#39;557.31&#39;, &#39;567.42&#39;, &#39;577.72&#39;, &#39;588.21&#39;, &#39;598.89&#39;, &#39;609.76&#39;, &#39;620.82&#39;, &#39;632.09&#39;, &#39;643.57&#39;, &#39;655.25&#39;, &#39;667.14&#39;, &#39;679.25&#39;, &#39;691.58&#39;, &#39;704.14&#39;, &#39;716.92&#39;, &#39;729.93&#39;, &#39;743.18&#39;, &#39;756.67&#39;, &#39;770.40&#39;, &#39;784.39&#39;], data=array([[ 6103.186,  5621.118,  5165.139, ...,  9962.036,  8765.782,
@@ -966,7 +976,7 @@ Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39
             0.   ],
        [    0.   ,    75.377,   124.085, ...,   124.153,   372.433,
             0.   ]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
-       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
+       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5620804], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2004838]])
 </pre></div>
 </div>
 </div>
@@ -1011,44 +1021,17 @@ class Stream(builtins.object)
  |  Methods defined here:
  |  
  |  __eq__(self, other)
- |      Return self==value.
- |  
- |  __getitem__(self, index: Union[int, str])
- |      Allows for indexing of the data stream.
- |      Args:
- |      ----------
- |      index : int or str
- |          The index of the data stream to return.
- |      Returns:
- |      -------
- |      np.ndarray
- |          The data stream at the specified index.
  |  
  |  __init__(self, header: List[str] = &lt;factory&gt;, data: numpy.ndarray = &lt;factory&gt;, time: numpy.ndarray = &lt;factory&gt;, files: List[str] = &lt;factory&gt;) -&gt; None
- |      Initialize self.  See help(type(self)) for accurate signature.
- |  
- |  __len__(self)
- |      Returns the length of the time stream.
  |  
  |  __post_init__(self)
  |  
  |  __repr__(self)
- |      Return repr(self).
- |  
- |  __setitem__(self, index: Union[int, str], value)
- |      Allows for setting of a row of data in the stream.
- |      Args:
- |      ----------
- |      index : int or str
- |          The index of the data stream to set.
- |      value : np.ndarray
- |          The data to set at the specified index.
  |  
  |  validate_inputs(self)
  |      Validates the inputs for the DataStream object.
  |      Raises:
  |          TypeError: If header is not a list.
- |      # this might be why I can&#39;t call Stream without inputs
  |  
  |  ----------------------------------------------------------------------
  |  Readonly properties defined here:
@@ -1080,8 +1063,6 @@ class Stream(builtins.object)
  |  __dataclass_params__ = _DataclassParams(init=True,repr=True,eq=True,or...
  |  
  |  __hash__ = None
- |  
- |  __match_args__ = (&#39;header&#39;, &#39;data&#39;, &#39;time&#39;, &#39;files&#39;)
 
 None
 </pre></div>
@@ -1114,7 +1095,7 @@ None
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/8ba6465f1bb4a251ce2564b770701426bfa5d9373068fc414453e34daabf9f87.png" src="../_images/8ba6465f1bb4a251ce2564b770701426bfa5d9373068fc414453e34daabf9f87.png" />
+<img alt="../_images/f091420893b34f8dfd1950050471943e39031f7bc65be5af247f1ea9dbd2e1a4.png" src="../_images/f091420893b34f8dfd1950050471943e39031f7bc65be5af247f1ea9dbd2e1a4.png" />
 </div>
 </div>
 </section>
@@ -1144,7 +1125,7 @@ NAME
     particula.data.loader_interface - interface to import data to a data stream
 
 FUNCTIONS
-    get_1d_stream(file_path: str, settings: dict, first_pass: bool = True, stream: Optional[particula.data.stream.Stream] = None) -&gt; particula.data.stream.Stream
+    get_1d_stream(file_path: str, settings: dict, first_pass: bool = True, stream: Optional[object] = None) -&gt; object
         Loads and formats a 1D data stream from a file and initializes or updates
         a Stream object.
         
@@ -1181,7 +1162,7 @@ FUNCTIONS
         KeyError
             If any required keys are missing in the `settings` dictionary.
     
-    get_2d_stream(file_path: str, settings: dict, first_pass: bool = True, stream: Optional[particula.data.stream.Stream] = None) -&gt; particula.data.stream.Stream
+    get_2d_stream(file_path: str, settings: dict, first_pass: bool = True, stream: Optional[object] = None) -&gt; object
         Initializes a 2D stream using the settings in the DataLake object.
         
         Args:
@@ -1194,7 +1175,7 @@ FUNCTIONS
         ----------
             None.
     
-    get_new_files(path: str, import_settings: dict, loaded_list: Optional[list] = None) -&gt; tuple
+    get_new_files(path: str, import_settings: dict[str, any], loaded_list: Optional[list] = None) -&gt; tuple
         Scan a directory for new files based on import settings and stream status.
         
         This function looks for files in a specified path using import settings.
@@ -1232,45 +1213,8 @@ FUNCTIONS
         YourErrorType
             Explanation of when and why your error is raised and what it means.
     
-    load_files_interface(path: str, settings: dict, stream: Optional[particula.data.stream.Stream] = None) -&gt; particula.data.stream.Stream
+    load_files_interface(path: str, settings: dict, stream: Optional[object] = None) -&gt; object
         Load files into a stream object based on settings.
-        
-        Args:
-        ----------
-        path : str
-            The top-level directory path to scan for folders of data.
-        folder_settings : dict
-            A dictionary with keys corresponding to the stream names and values
-            corresponding to the settings for each stream. The settings can
-            be generated using the settings_generator function.
-        stream : Stream, optional
-            An instance of Stream class to be updated with loaded data. Defaults
-            to a new Stream object.
-        
-        Returns:
-        -------
-        Stream
-            The Stream object updated with the loaded data.
-    
-    load_folders_interface(path: str, folder_settings: dict, lake: Optional[particula.data.lake.Lake] = None) -&gt; particula.data.lake.Lake
-        Load files into a lake object based on settings.
-        
-        Args:
-        ----------
-        path : str
-            The top-level directory path to scan for folders of data.
-        folder_settings : dict
-            A dictionary with keys corresponding to the stream names and values
-            corresponding to the settings for each stream. The settings can
-            be generated using the settings_generator function.
-        lake : Lake, optional
-            An instance of Lake class to be updated with loaded data. Defaults
-            to a new Lake object.
-        
-        Returns:
-        -------
-        Lake
-            The Lake object updated with the loaded data streams.
 
 DATA
     Optional = typing.Optional
@@ -1279,7 +1223,7 @@ DATA
         Optional[X] is equivalent to Union[X, None].
 
 FILE
-    /opt/hostedtoolcache/Python/3.10.13/x64/lib/python3.10/site-packages/particula/data/loader_interface.py
+    c:\users\kkgor\onedrive\areas\github\particula\particula\data\loader_interface.py
 </pre></div>
 </div>
 </div>
