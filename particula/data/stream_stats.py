@@ -2,7 +2,6 @@
 
 from typing import Optional, Union
 import copy
-from click import Option
 import numpy as np
 
 from particula.util import stats

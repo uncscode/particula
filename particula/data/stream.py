@@ -4,7 +4,7 @@
 from typing import List, Union
 from dataclasses import dataclass, field
 import numpy as np
-from particula.util import convert, time_manage
+from particula.util import time_manage
 
 
 @dataclass
