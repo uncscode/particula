@@ -586,7 +586,6 @@ document.write(`
     <span class="n">subfolder</span><span class="o">=</span><span class="s1">&#39;chamber_data&#39;</span><span class="p">,</span>
     <span class="n">settings_suffix</span><span class="o">=</span><span class="s1">&#39;_smps_1d&#39;</span><span class="p">,</span>
 <span class="p">)</span>
-
 <span class="n">stream_smps_1d</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
     <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
     <span class="n">settings</span><span class="o">=</span><span class="n">smps_1d_stream_settings</span>
@@ -598,7 +597,6 @@ document.write(`
     <span class="n">subfolder</span><span class="o">=</span><span class="s1">&#39;chamber_data&#39;</span><span class="p">,</span>
     <span class="n">settings_suffix</span><span class="o">=</span><span class="s1">&#39;_smps_2d&#39;</span><span class="p">,</span>
 <span class="p">)</span>
-
 <span class="n">stream_smps_2d</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
     <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
     <span class="n">settings</span><span class="o">=</span><span class="n">smps_2d_stream_settings</span>
@@ -654,7 +652,6 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1 convert to dn/dlogDp</span>
-
 <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">convert_sizer_dn</span><span class="p">(</span>
     <span class="n">diameter</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">header</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
     <span class="n">dn_dlogdp</span><span class="o">=</span><span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
@@ -708,9 +705,6 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># select the time window</span>
-<span class="kn">from</span> <span class="nn">pytest</span> <span class="kn">import</span> <span class="n">mark</span>
-
-
 <span class="n">bad_window_start_epoch</span> <span class="o">=</span> <span class="n">time_manage</span><span class="o">.</span><span class="n">time_str_to_epoch</span><span class="p">(</span>
     <span class="n">time</span><span class="o">=</span><span class="s1">&#39;09-25-2023 19:00:00&#39;</span><span class="p">,</span>
     <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;%m-</span><span class="si">%d</span><span class="s1">-%Y %H:%M:%S&#39;</span><span class="p">,</span>
