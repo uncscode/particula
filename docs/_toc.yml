@@ -26,6 +26,9 @@ parts:
     - file: examples/chamber_smps_data
   - file: examples/activity_part1
   - file: examples/equilibria_part1
+  - file: exmaples/lagrangian/lagrangian_intro
+    sections:
+    - file: examples/lagrangian/basic_lagrangian_box
 - caption: Documentation
   numbered: false
   chapters:
