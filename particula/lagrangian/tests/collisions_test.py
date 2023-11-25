@@ -33,4 +33,3 @@ def test_coalescence():
         velocity, mass, collision_indices_pairs)
     assert torch.allclose(result_mass, expected_mass, atol=1e-4)
     assert torch.allclose(result_velocity, expected_velocity, atol=1e-4)
-

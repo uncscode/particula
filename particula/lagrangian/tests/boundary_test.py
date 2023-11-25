@@ -37,4 +37,3 @@ def test_wrapped_cube():
             position,
             cube_side),
         expected_result)
-

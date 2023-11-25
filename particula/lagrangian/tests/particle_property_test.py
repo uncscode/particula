@@ -10,4 +10,3 @@ def test_radius_vector():
         [1.0608, 1.1675, 1.2143])
     result = particle_property.radius(mass, density)
     assert torch.allclose(result, expected_radius, atol=1e-4)
-
