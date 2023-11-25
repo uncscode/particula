@@ -717,10 +717,86 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
-  Loading file: 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample_Temp_(C)&#39;, &#39;Sample_Pressure_(kPa)&#39;, &#39;Relative_Humidity_(%)&#39;, &#39;Median_(nm)&#39;, &#39;Mean_(nm)&#39;, &#39;Geo_Mean_(nm)&#39;, &#39;Mode_(nm)&#39;, &#39;Geo_Std_Dev.&#39;, &#39;Total_Conc_(#/cc)&#39;]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">7</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="n">smps_1d_stream_settings</span> <span class="o">=</span> <span class="n">settings_generator</span><span class="o">.</span><span class="n">load_settings_for_stream</span><span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span>     <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">subfolder</span><span class="o">=</span><span class="s1">&#39;SMPS_data&#39;</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">settings_suffix</span><span class="o">=</span><span class="s1">&#39;_smps_1d&#39;</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">7</span> <span class="n">stream_smps_1d</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span>     <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span>     <span class="n">settings</span><span class="o">=</span><span class="n">smps_1d_stream_settings</span>
+<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="nb">print</span><span class="p">(</span><span class="n">stream_smps_1d</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:152,</span> in <span class="ni">load_files_interface</span><span class="nt">(path, settings, stream)</span>
+<span class="g g-Whitespace">    </span><span class="mi">149</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Loading file:&#39;</span><span class="p">,</span> <span class="n">file_info</span><span class="p">[</span><span class="n">file_i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="g g-Whitespace">    </span><span class="mi">151</span> <span class="k">if</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_1d_load&#39;</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">152</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_1d_stream</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">153</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">154</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">155</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">156</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
+<span class="g g-Whitespace">    </span><span class="mi">157</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">159</span> <span class="k">elif</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_2d_load&#39;</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">160</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_2d_stream</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">161</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">162</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">163</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">164</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
+<span class="g g-Whitespace">    </span><span class="mi">165</span>     <span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:323,</span> in <span class="ni">get_1d_stream</span><span class="nt">(file_path, settings, first_pass, stream)</span>
+<span class="g g-Whitespace">    </span><span class="mi">321</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">epoch_time</span>
+<span class="g g-Whitespace">    </span><span class="mi">322</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">323</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">merger</span><span class="o">.</span><span class="n">stream_add_data</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">324</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">325</span>         <span class="n">time_new</span><span class="o">=</span><span class="n">epoch_time</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">326</span>         <span class="n">data_new</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">327</span>         <span class="n">header_check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">328</span>         <span class="n">header_new</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_header&#39;</span><span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">329</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">330</span> <span class="k">return</span> <span class="n">stream</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/merger.py:159,</span> in <span class="ni">stream_add_data</span><span class="nt">(stream, time_new, data_new, header_check, header_new)</span>
+<span class="g g-Whitespace">    </span><span class="mi">155</span> <span class="k">elif</span> <span class="n">header_check</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">156</span>     <span class="n">header_new</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">header</span> <span class="k">if</span> <span class="n">header_new</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">header_new</span>
+<span class="g g-Whitespace">    </span><span class="mi">158</span>     <span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">header</span><span class="p">,</span> <span class="n">data_new</span><span class="p">,</span> <span class="n">header_new</span> <span class="o">=</span> \
+<span class="ne">--&gt; </span><span class="mi">159</span>         <span class="n">stats</span><span class="o">.</span><span class="n">merge_formatting</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">160</span>             <span class="n">data_current</span><span class="o">=</span><span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">161</span>             <span class="n">header_current</span><span class="o">=</span><span class="n">stream</span><span class="o">.</span><span class="n">header</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">162</span>             <span class="n">data_new</span><span class="o">=</span><span class="n">data_new</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">163</span>             <span class="n">header_new</span><span class="o">=</span><span class="n">header_new</span>
+<span class="g g-Whitespace">    </span><span class="mi">164</span>         <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">165</span>     <span class="c1"># updates stream</span>
+<span class="g g-Whitespace">    </span><span class="mi">166</span>     <span class="n">stream</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data_new</span><span class="p">))</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/util/stats.py:75,</span> in <span class="ni">merge_formatting</span><span class="nt">(data_current, header_current, data_new, header_new)</span>
+<span class="g g-Whitespace">     </span><span class="mi">73</span> <span class="c1"># check that the shapes are the same</span>
+<span class="g g-Whitespace">     </span><span class="mi">74</span> <span class="k">if</span> <span class="n">data_current</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">data_new</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+<span class="ne">---&gt; </span><span class="mi">75</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">76</span>         <span class="s1">&#39;data_current  &#39;</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">77</span>         <span class="n">data_current</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">78</span>         <span class="s1">&#39; and data_new &#39;</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">79</span>         <span class="n">data_new</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">80</span>         <span class="s1">&#39; are not the same shape, check the data formatting&#39;</span>
+<span class="g g-Whitespace">     </span><span class="mi">81</span>     <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">82</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">header_current</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">header_new</span><span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">83</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">84</span>         <span class="s1">&#39;header_current &#39;</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">85</span>         <span class="nb">len</span><span class="p">(</span><span class="n">header_current</span><span class="p">),</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">88</span>         <span class="s1">&#39; are not the same shape, check the data formatting&#39;</span>
+<span class="g g-Whitespace">     </span><span class="mi">89</span>     <span class="p">)</span>
+
+<span class="ne">ValueError</span>: (&#39;data_current  &#39;, (2854, 11), &#39; and data_new &#39;, (1015, 11), &#39; are not the same shape, check the data formatting&#39;)
 </pre></div>
 </div>
 </div>
@@ -775,24 +851,13 @@ document.write(`
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: cpc
   Loading file: CPC_3010_data_20220709_Jul.csv
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: CPC_3010_data_20220710_Jul.csv
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_1d
+  Loading file: CPC_3010_data_20220710_Jul.csv
+Folder Settings: smps_1d
   Loading file: 2022-07-07_095151_SMPS.csv
   Loading file: 2022-07-10_094659_SMPS.csv
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_2d
+Folder Settings: smps_2d
   Loading file: 2022-07-07_095151_SMPS.csv
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 
+  Loading file: 2022-07-10_094659_SMPS.csv
 Lake with streams: [&#39;cpc&#39;, &#39;smps_1d&#39;, &#39;smps_2d&#39;]
 </pre></div>
 </div>
@@ -821,10 +886,10 @@ save_settings_for_stream(settings: dict, path: str, subfolder: str, settings_suf
     The JSON file is formatted with a 4-space indentation.
     
     Args:
-    - settings: The settings dictionary to be saved.
-    - path: The path where the subfolder is located.
-    - subfolder: The subfolder where the settings file will be saved.
-    - settings_suffix: An optional suffix for the settings
+    - settings (dict): The settings dictionary to be saved.
+    - path (str): The path where the subfolder is located.
+    - subfolder (str): The subfolder where the settings file will be saved.
+    - settings_suffix (str, optional): An optional suffix for the settings
         file name. Default is an empty string.
     
     Returns:
@@ -851,9 +916,9 @@ load_settings_for_stream(path: str, subfolder: str, settings_suffix: str = &#39;
     appropriate errors or warnings are raised.
     
     Args:
-    - path: The path where the subfolder is located.
-    - subfolder: The subfolder where the settings file is expected.
-    - settings_suffix: An optional suffix for the settings
+    - path (str): The path where the subfolder is located.
+    - subfolder (str): The subfolder where the settings file is expected.
+    - settings_suffix (str, optional): An optional suffix for the settings
         file name. Default is an empty string.
     
     Returns:
@@ -883,10 +948,10 @@ save_settings_for_lake(settings: dict, path: str, subfolder: str = &#39;&#39;, s
     The JSON file is formatted with a 4-space indentation.
     
     Args:
-    - settings: The settings dictionary to be saved.
-    - path: The path where the subfolder is located.
-    - subfolder: The subfolder where the settings file will be saved.
-    - settings_suffix: An optional suffix for the settings
+    - settings (dict): The settings dictionary to be saved.
+    - path (str): The path where the subfolder is located.
+    - subfolder (str): The subfolder where the settings file will be saved.
+    - settings_suffix (str, optional): An optional suffix for the settings
         file name. Default is an empty string.
     
     Returns:
@@ -914,9 +979,9 @@ load_settings_for_lake(path: str, subfolder: str = &#39;&#39;, settings_suffix: 
     appropriate errors or warnings are raised.
     
     Args:
-    - path: The path where the subfolder is located.
-    - subfolder: The subfolder where the settings file is expected.
-    - settings_suffix: An optional suffix for the settings
+    - path (str): The path where the subfolder is located.
+    - subfolder (str): The subfolder where the settings file is expected.
+    - settings_suffix (str, optional): An optional suffix for the settings
         file name. Default is an empty string.
     
     Returns:

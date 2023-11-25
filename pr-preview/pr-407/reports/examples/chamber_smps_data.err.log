@@ -1,0 +1,65 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/nbclient/client.py", line 1305, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 173, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/nbclient/client.py", line 705, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# 1 convert to dn/dlogDp
+stream_smps_2d.data = convert.convert_sizer_dn(
+    diameter=np.array(stream_smps_2d.header, dtype=float),
+    dn_dlogdp=stream_smps_2d.data,
+)
+
+# Dilution correction
+dilution_correction = 2
+
+# scale the concentrations
+stream_smps_2d.data *= dilution_correction
+stream_smps_1d['Total_Conc_(#/cc)'] *= dilution_correction
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAssertionError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[4], line 2[0m
+[1;32m      1[0m [38;5;66;03m# 1 convert to dn/dlogDp[39;00m
+[0;32m----> 2[0m stream_smps_2d[38;5;241m.[39mdata [38;5;241m=[39m [43mconvert[49m[38;5;241;43m.[39;49m[43mconvert_sizer_dn[49m[43m([49m
+[1;32m      3[0m [43m    [49m[43mdiameter[49m[38;5;241;43m=[39;49m[43mnp[49m[38;5;241;43m.[39;49m[43marray[49m[43m([49m[43mstream_smps_2d[49m[38;5;241;43m.[39;49m[43mheader[49m[43m,[49m[43m [49m[43mdtype[49m[38;5;241;43m=[39;49m[38;5;28;43mfloat[39;49m[43m)[49m[43m,[49m
+[1;32m      4[0m [43m    [49m[43mdn_dlogdp[49m[38;5;241;43m=[39;49m[43mstream_smps_2d[49m[38;5;241;43m.[39;49m[43mdata[49m[43m,[49m
+[1;32m      5[0m [43m)[49m
+[1;32m      7[0m [38;5;66;03m# Dilution correction[39;00m
+[1;32m      8[0m dilution_correction [38;5;241m=[39m [38;5;241m2[39m
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/util/convert.py:410[0m, in [0;36mconvert_sizer_dn[0;34m(diameter, dn_dlogdp, inverse)[0m
+[1;32m    378[0m [38;5;28;01mdef[39;00m [38;5;21mconvert_sizer_dn[39m(
+[1;32m    379[0m     diameter: np[38;5;241m.[39mndarray,
+[1;32m    380[0m     dn_dlogdp: np[38;5;241m.[39mndarray,
+[1;32m    381[0m     inverse: [38;5;28mbool[39m [38;5;241m=[39m [38;5;28;01mFalse[39;00m
+[1;32m    382[0m ) [38;5;241m-[39m[38;5;241m>[39m np[38;5;241m.[39mndarray:
+[1;32m    383[0m [38;5;250m    [39m[38;5;124;03m"""[39;00m
+[1;32m    384[0m [38;5;124;03m    Converts the sizer data from dn/dlogdp to d_num.[39;00m
+[1;32m    385[0m 
+[0;32m   (...)[0m
+[1;32m    408[0m [38;5;124;03m    # future: Address potential over-counting in last/first bin[39;00m
+[1;32m    409[0m [38;5;124;03m    """[39;00m
+[0;32m--> 410[0m     [38;5;28;01massert[39;00m [38;5;28mlen[39m(diameter) [38;5;241m==[39m [38;5;28mlen[39m(dn_dlogdp) [38;5;241m>[39m [38;5;241m0[39m, \
+[1;32m    411[0m         [38;5;124m"[39m[38;5;124mInputs must be non-empty arrays of the same length.[39m[38;5;124m"[39m
+[1;32m    412[0m     [38;5;66;03m# Compute the bin widths[39;00m
+[1;32m    413[0m     delta [38;5;241m=[39m np[38;5;241m.[39mzeros_like(diameter)
+
+[0;31mAssertionError[0m: Inputs must be non-empty arrays of the same length.
+
