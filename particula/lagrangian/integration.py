@@ -4,7 +4,7 @@ from typing import Tuple
 import torch
 
 
-def integration_leapfrog(
+def leapfrog(
         position: torch.Tensor,
         velocity: torch.Tensor,
         force: torch.Tensor,

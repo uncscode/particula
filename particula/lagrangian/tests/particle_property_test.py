@@ -7,6 +7,7 @@ def test_radius_vector():
     mass = torch.tensor([10.0, 20.0, 30.0])
     density = torch.tensor([2.0, 3.0, 4.0])
     expected_radius = torch.tensor(
-        [1.5773502691896257, 2.46621207433047, 3.3019272488946263])
+        [1.0608, 1.1675, 1.2143])
     result = particle_property.radius(mass, density)
-    assert torch.allclose(result, expected_radius)
+    assert torch.allclose(result, expected_radius, atol=1e-4)
+
