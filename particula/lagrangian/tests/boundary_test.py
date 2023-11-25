@@ -5,6 +5,7 @@ from particula.lagrangian import boundary
 
 
 def test_wrapped_cube():
+    """Test wrapping a position vector to a cube."""
     # Test case 1: position within the cube
     position = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 4.0]])
     cube_side = 10.0

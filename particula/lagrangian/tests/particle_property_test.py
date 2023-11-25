@@ -4,6 +4,7 @@ from particula.lagrangian import particle_property
 
 
 def test_radius_vector():
+    """Test calculating the radius vector."""
     mass = torch.tensor([10.0, 20.0, 30.0])
     density = torch.tensor([2.0, 3.0, 4.0])
     expected_radius = torch.tensor(
