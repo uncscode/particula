@@ -116,3 +116,45 @@ def coalescence(
     mass[unique_indices[:, 1]] -= mass[unique_indices[:, 1]]
 
     return velocity, mass
+
+
+# flake8: noqa: C901
+def elastic_collision(
+    velocity: torch.Tensor,
+    mass: torch.Tensor,
+    collision_indices_pairs: torch.Tensor,
+) -> torch.Tensor:
+    """
+    Update velocities of particles based on elastic collision pairs using
+    matrix operations, conserving kinetic energy and momentum.
+
+    Parameters:
+    velocity (torch.Tensor): A 2D tensor of shape [n_dimensions, n_particles]
+        representing the velocities of particles.
+    mass (torch.Tensor): A 1D tensor containing the mass of each particle.
+    collision_indices_pairs (torch.Tensor): A 2D tensor containing pairs of
+        indices representing colliding particles.
+    remove_duplicates_func (function): A function to remove duplicate entries
+        from a tensor of index pairs.
+
+    Returns:
+    torch.Tensor: A 2D tensor of shape [n_dimensions, n_particles]
+        representing the updated velocities of particles.
+
+    Note:
+    - This function modifies the `velocity` tensor in-place.
+    - Mass remains unchanged in elastic collisions.
+
+    Example:
+    2d: https://www.wolframalpha.com/input?i=elastic+collision&assumption=%7B%22F%22%2C+%22ElasticCollision%22%2C+%22m2%22%7D+-%3E%221+kg%22&assumption=%7B%22F%22%2C+%22ElasticCollision%22%2C+%22m1%22%7D+-%3E%221+kg%22&assumption=%22FSelect%22+-%3E+%7B%7B%22ElasticCollision2D%22%7D%7D&assumption=%7B%22F%22%2C+%22ElasticCollision%22%2C+%22v1i%22%7D+-%3E%221+m%2Fs%22&assumption=%7B%22F%22%2C+%22ElasticCollision%22%2C+%22v2i%22%7D+-%3E%22-0.5+m%2Fs%22
+    3d fortran: https://www.plasmaphysics.org.uk/programs/coll3d_for.htm
+    https://www.plasmaphysics.org.uk/collision3d.htm
+
+    I think the approach is take a pair, and rotate the coordinate system so
+    that the collision is in the x-y plane. Then, the z component of the
+    velocity is a 1d problem, and the x-y component is a 2d problem. Then,
+    rotate back to the original coordinate system.
+    """
+    # harder than in-elastic collisions
+
+    raise NotImplementedError
