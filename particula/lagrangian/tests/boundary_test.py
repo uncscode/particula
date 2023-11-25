@@ -1,7 +1,6 @@
 """Test module for boundary.py"""
 
 import torch
-import numpy as np
 from particula.lagrangian import boundary
 
 
