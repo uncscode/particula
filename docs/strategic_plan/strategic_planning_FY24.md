@@ -39,7 +39,7 @@ The goal is to restructure Particula to facilitate ease of modification and to i
 #### Systems-Level Concepts (Classes)
 
 - **Role**: To abstract routine tasks, such as ODE coagulation simulation using particle classes.
-- **Utility**: Serves users requiring higher abstraction without delving into interface mechanics. These poeple already know what they are calling and how the procedures work.
+- **Utility**: Serves users requiring higher abstraction without delving into interface mechanics. These people already know what they are calling and how the procedures work.
 - **Documentation**: Detailed Jupyter notebooks explaining the class's purpose, its importance, and connection to other code components. What it is, Why it is important, and how it relates to other parts of the code. At least three examples of how to use it.
 - **Testing**: Validated through Jupyter notebook execution.
 
@@ -70,6 +70,7 @@ Paper 1: A Particula model of the Microphysics and Chemistry of Aerosols
   - Techniques: Sectional Method and Super Droplet (Direct Simulation).
 - Processes: Emphasizing Coagulation, Condensation, Evaporation, and Nucleation.
   - Impact Analysis: Investigating how initial emissions influence cloud formation and updraft velocity.
+
 Paper 2: Data Integration and Experimental Validation
 - Data pipeline in Particula: Aligning modeling with experimental data form a better understanding of the phenomena.
 - Remote Sensing Data Incorporation: Exploring integration with DOE-Radar Observations for cloud droplet analysis or other remote sensing data like AERONET.
@@ -106,7 +107,7 @@ Paper 2: Data Integration and Experimental Validation
   - [ ] Wall loss correction, experimental data integration
 - [ ] Add Non-ideal Mixing (BAT/AIOMFAC integration, maybe web api)
   - [ ] Add Thermodynamic Equilibrium
-- [ ] Add Super Droplet Method
+- [ ] Add Direct Lagrangian Simulation
   - [ ] Rough estimates of memory on an RTX A6000 16 GB using pytorch can handle about 5000 particles tracking (position and velocity only) with coagulation checks, time steps of 0.000008 sec, 1000 sec simulation time
 - [ ] Add Chemistry (this could come later, but simple VBS bin shift might be achievable)
   - [ ] Add Volatility Basis Set (VBS) for chemical reactions
