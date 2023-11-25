@@ -119,6 +119,7 @@ def coalescence(
 
 
 # flake8: noqa: C901
+# pylint: disable=line-too-long
 def elastic_collision(
     velocity: torch.Tensor,
     mass: torch.Tensor,
