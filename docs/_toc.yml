@@ -13,14 +13,14 @@ parts:
   - file: examples/distribution_evolution
   - file: examples/distribution_ambient
   - file: examples/ionparticle_coagulation
-  - file: examples/particula_data
+  - file: examples/streamlake/particula_data
     sections:
-    - file: examples/loading_data_part1
-    - file: examples/loading_data_part2
-    - file: examples/loading_data_part3
-    - file: examples/loading_data_part4
-    - file: examples/stream_stats_part1
-    - file: examples/stream_stats_size_distribution_part2
+    - file: examples/streamlake/loading_data_part1
+    - file: examples/streamlake/loading_data_part2
+    - file: examples/streamlake/loading_data_part3
+    - file: examples/streamlake/loading_data_part4
+    - file: examples/streamlake/stream_stats_part1
+    - file: examples/streamlake/stream_stats_size_distribution_part2
   - file: examples/wall_loss_section
     sections:
     - file: examples/chamber_smps_data
