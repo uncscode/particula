@@ -23,7 +23,7 @@ def drop_masked(stream: Stream, mask: np.ndarray) -> Stream:
     object
         stream object
     """
-    stream.data = stream.data[:, mask]
+    stream.data = stream.data[mask, :]
     stream.time = stream.time[mask]
     return stream
 
@@ -74,7 +74,7 @@ def average_std(
             step=average_interval
         )
     # generate empty arrays for averaged data and std to be filled in
-    average = np.zeros([len(stream.header), len(new_time_array)])
+    average = np.zeros([len(new_time_array), len(stream.header)])
     std = np.zeros_like(average)
 
     # average data
@@ -157,8 +157,8 @@ def filtering(
     )
     if drop and replace_with is None:
         # Apply mask to data and time, dropping filtered values
-        # if any columns are then drop that whole column
-        mask_sum = np.invert(np.sum(np.invert(mask), axis=0) > 0)
+        # if any rows are then drop that whole column
+        mask_sum = np.invert(np.sum(np.invert(mask), axis=1) > 0)
         stream = drop_masked(stream, mask_sum)
     elif replace_with is not None:
         stream.data = np.where(mask, stream.data, replace_with)
@@ -192,11 +192,11 @@ def remove_time_window(
     if epoch_end is None:
         # if no end time provided, remove the closest time point
         stream.time = np.delete(stream.time, index_start)
-        stream.data = np.delete(stream.data, index_start, axis=1)
+        stream.data = np.delete(stream.data, index_start, axis=0)
         return stream
     # get index of end time
     index_end = np.argmin(np.abs(stream.time - epoch_end)) + 1
     # remove time and data between start and end times
     stream.time = np.delete(stream.time, slice(index_start, index_end))
-    stream.data = np.delete(stream.data, slice(index_start, index_end), axis=1)
+    stream.data = np.delete(stream.data, slice(index_start, index_end), axis=0)
     return stream

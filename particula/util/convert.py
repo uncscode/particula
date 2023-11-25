@@ -525,28 +525,28 @@ def data_shape_check(
     if len(data.shape) == 2:
         # Check if time matches the dimensions of data
         if len(time) == data.shape[0] and len(time) == data.shape[1]:
-            concatenate_axis_new = 0  # Default to the first axis
+            concatenate_axis_new = 1  # Default to the axis=1
             # Check if the last axis of data matches the length of time
-            if data.shape[-1] != len(time):
+            if data.shape[0] != len(time):
                 warnings.warn("Square data with time shape assumes time \
                                   axis is the first axis in data.")
         else:
             # Find the axis that doesn't match the length of time
             concatenate_axis_new = np.argwhere(
                 np.array(data.shape) != len(time)).flatten()[0]
-        # Reshape new data so the concatenate axis is the first axis
-        data = np.moveaxis(data, concatenate_axis_new, 0)
+        # Reshape new data so the concatenate axis is axis=1
+        data = np.moveaxis(data, concatenate_axis_new, 1)
 
         # check header list length matches data_new shape
-        if len(header) != data.shape[0]:
+        if len(header) != data.shape[1]:
             print(f'header len: {len(header)} vs. data.shape: \
                   {data.shape}')
             print(header)
-            raise ValueError("Header list length must match the first \
+            raise ValueError("Header list length must match the second \
                               dimension of data_new.")
     elif len(header) == 1:
-        # Reshape new data so the concatenate axis is the first axis
-        data = np.expand_dims(data, 0)
+        # Reshape new data so the concatenate axis is axis=1
+        data = np.expand_dims(data, 1)
 
     else:
         raise ValueError("Header list must be a single entry if data_new \
