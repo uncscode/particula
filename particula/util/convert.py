@@ -526,10 +526,6 @@ def data_shape_check(
         # Check if time matches the dimensions of data
         if len(time) == data.shape[0] and len(time) == data.shape[1]:
             concatenate_axis_new = 1  # Default to the axis=1
-            # Check if the last axis of data matches the length of time
-            if data.shape[0] != len(time):
-                warnings.warn("Square data with time shape assumes time \
-                                  axis is the first axis in data.")
         else:
             # Find the axis that doesn't match the length of time
             concatenate_axis_new = np.argwhere(
