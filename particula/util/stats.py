@@ -223,10 +223,10 @@ def average_to_interval(
             if start_index < stop_index:
                 # average the data in the time interval
                 average_data[i - 1, :] = np.nanmean(
-                    data_raw[start_index:stop_index, :], axis=1
+                    data_raw[start_index:stop_index, :], axis=0
                 )  # the actual averaging of data is here
                 average_data_std[i - 1, :] = np.nanstd(
-                    data_raw[start_index:stop_index, :], axis=1
+                    data_raw[start_index:stop_index, :], axis=0
                 )  # the actual std data is here
             else:
                 start_time = time_raw[stop_index]
