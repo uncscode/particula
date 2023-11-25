@@ -418,10 +418,10 @@ def convert_sizer_dn(
     lower = diameter - delta / 2
     upper = diameter + delta / 2
 
-    if dn_dlogdp.ndim == 2:
-        # expand diameter by one dimension so it can be broadcast
-        lower = np.expand_dims(lower, axis=1)
-        upper = np.expand_dims(upper, axis=1)
+    # if dn_dlogdp.ndim == 2:
+    #     # expand diameter by one dimension so it can be broadcast
+    #     lower = np.expand_dims(lower, axis=1)
+    #     upper = np.expand_dims(upper, axis=1)
     if inverse:
         # Convert from dn to dn/dlogdp
         return dn_dlogdp / np.log10(upper / lower)
