@@ -640,95 +640,18 @@ show the fix to that soon.</p>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_1d
   Loading file: 2022-07-07_095151_SMPS.csv
-  Loading file: 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">54</span>
-<span class="g g-Whitespace">     </span><span class="mi">48</span> <span class="n">combined_settings</span> <span class="o">=</span> <span class="p">{</span>
-<span class="g g-Whitespace">     </span><span class="mi">49</span>     <span class="s1">&#39;smps_1d&#39;</span><span class="p">:</span> <span class="n">smps_1d_settings</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">50</span>     <span class="s1">&#39;smps_2d&#39;</span><span class="p">:</span> <span class="n">smps_2d_settings</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">51</span> <span class="p">}</span>
-<span class="g g-Whitespace">     </span><span class="mi">53</span> <span class="c1"># now call the loader interface for files</span>
-<span class="ne">---&gt; </span><span class="mi">54</span> <span class="n">lake</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_folders_interface</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">55</span>     <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">56</span>     <span class="n">folder_settings</span><span class="o">=</span><span class="n">combined_settings</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">57</span> <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">59</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">60</span> <span class="nb">print</span><span class="p">(</span><span class="n">lake</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:213,</span> in <span class="ni">load_folders_interface</span><span class="nt">(path, folder_settings, lake)</span>
-<span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Folder Settings:&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># call the load files interface</span>
-<span class="ne">--&gt; </span><span class="mi">213</span>     <span class="n">lake</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_files_interface</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">214</span>         <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">215</span>         <span class="n">settings</span><span class="o">=</span><span class="n">file_settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">216</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">217</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">218</span> <span class="k">return</span> <span class="n">lake</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:152,</span> in <span class="ni">load_files_interface</span><span class="nt">(path, settings, stream)</span>
-<span class="g g-Whitespace">    </span><span class="mi">149</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Loading file:&#39;</span><span class="p">,</span> <span class="n">file_info</span><span class="p">[</span><span class="n">file_i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-<span class="g g-Whitespace">    </span><span class="mi">151</span> <span class="k">if</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_1d_load&#39;</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">152</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_1d_stream</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">153</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">154</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">155</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">156</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">157</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">159</span> <span class="k">elif</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_2d_load&#39;</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">160</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_2d_stream</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">161</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">162</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">163</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">165</span>     <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:323,</span> in <span class="ni">get_1d_stream</span><span class="nt">(file_path, settings, first_pass, stream)</span>
-<span class="g g-Whitespace">    </span><span class="mi">321</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">epoch_time</span>
-<span class="g g-Whitespace">    </span><span class="mi">322</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">323</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">merger</span><span class="o">.</span><span class="n">stream_add_data</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">324</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">325</span>         <span class="n">time_new</span><span class="o">=</span><span class="n">epoch_time</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">326</span>         <span class="n">data_new</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">327</span>         <span class="n">header_check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">328</span>         <span class="n">header_new</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_header&#39;</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">329</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">330</span> <span class="k">return</span> <span class="n">stream</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/merger.py:159,</span> in <span class="ni">stream_add_data</span><span class="nt">(stream, time_new, data_new, header_check, header_new)</span>
-<span class="g g-Whitespace">    </span><span class="mi">155</span> <span class="k">elif</span> <span class="n">header_check</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">156</span>     <span class="n">header_new</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">header</span> <span class="k">if</span> <span class="n">header_new</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">header_new</span>
-<span class="g g-Whitespace">    </span><span class="mi">158</span>     <span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">header</span><span class="p">,</span> <span class="n">data_new</span><span class="p">,</span> <span class="n">header_new</span> <span class="o">=</span> \
-<span class="ne">--&gt; </span><span class="mi">159</span>         <span class="n">stats</span><span class="o">.</span><span class="n">merge_formatting</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">160</span>             <span class="n">data_current</span><span class="o">=</span><span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">161</span>             <span class="n">header_current</span><span class="o">=</span><span class="n">stream</span><span class="o">.</span><span class="n">header</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">162</span>             <span class="n">data_new</span><span class="o">=</span><span class="n">data_new</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">163</span>             <span class="n">header_new</span><span class="o">=</span><span class="n">header_new</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span>         <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">165</span>     <span class="c1"># updates stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">166</span>     <span class="n">stream</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data_new</span><span class="p">))</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/util/stats.py:75,</span> in <span class="ni">merge_formatting</span><span class="nt">(data_current, header_current, data_new, header_new)</span>
-<span class="g g-Whitespace">     </span><span class="mi">73</span> <span class="c1"># check that the shapes are the same</span>
-<span class="g g-Whitespace">     </span><span class="mi">74</span> <span class="k">if</span> <span class="n">data_current</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">data_new</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-<span class="ne">---&gt; </span><span class="mi">75</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">76</span>         <span class="s1">&#39;data_current  &#39;</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">77</span>         <span class="n">data_current</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">78</span>         <span class="s1">&#39; and data_new &#39;</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">79</span>         <span class="n">data_new</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">80</span>         <span class="s1">&#39; are not the same shape, check the data formatting&#39;</span>
-<span class="g g-Whitespace">     </span><span class="mi">81</span>     <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">82</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">header_current</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">header_new</span><span class="p">):</span>
-<span class="g g-Whitespace">     </span><span class="mi">83</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">84</span>         <span class="s1">&#39;header_current &#39;</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">85</span>         <span class="nb">len</span><span class="p">(</span><span class="n">header_current</span><span class="p">),</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">88</span>         <span class="s1">&#39; are not the same shape, check the data formatting&#39;</span>
-<span class="g g-Whitespace">     </span><span class="mi">89</span>     <span class="p">)</span>
-
-<span class="ne">ValueError</span>: (&#39;data_current  &#39;, (2854, 11), &#39; and data_new &#39;, (1015, 11), &#39; are not the same shape, check the data formatting&#39;)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+Folder Settings: smps_2d
+  Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 
+Lake with streams: [&#39;smps_1d&#39;, &#39;smps_2d&#39;]
 </pre></div>
 </div>
 </div>
@@ -758,26 +681,65 @@ example we’ll use <code class="docutils literal notranslate"><span class="pre"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total_Conc_(#/cc)
-Mean_Diameter_(nm)
-Geometric_Mean_Diameter_(nm)
-Mode_Diameter_(nm)
-Mean_Diameter_Vol_(nm)
-Mode_Diameter_Vol_(nm)
-Unit_Mass_(ug/m3)
-Mass_(ug/m3)
-Total_Conc_(#/cc)_N100
-Unit_Mass_(ug/m3)_N100
-Mass_(ug/m3)_N100
-Total_Conc_(#/cc)_PM1
-Unit_Mass_(ug/m3)_PM1
-Mass_(ug/m3)_PM1
-Total_Conc_(#/cc)_PM2.5
-Unit_Mass_(ug/m3)_PM2.5
-Mass_(ug/m3)_PM2.5
-Total_Conc_(#/cc)_PM10
-Unit_Mass_(ug/m3)_PM10
-Mass_(ug/m3)_PM10
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">AssertionError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">lake</span><span class="p">[</span><span class="s1">&#39;mean_properties&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">size_distribution</span><span class="o">.</span><span class="n">sizer_mean_properties</span><span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span>     <span class="n">stream</span><span class="o">=</span><span class="n">lake</span><span class="p">[</span><span class="s1">&#39;smps_2d&#39;</span><span class="p">],</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">diameter_units</span><span class="o">=</span><span class="s1">&#39;nm&#39;</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="c1"># list out the header</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">lake</span><span class="p">[</span><span class="s1">&#39;mean_properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/process/size_distribution.py:172,</span> in <span class="ni">sizer_mean_properties</span><span class="nt">(stream, sizer_limits, density, diameter_units)</span>
+<span class="g g-Whitespace">    </span><span class="mi">166</span> <span class="n">unit_mass_ug_m3_pm10</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">total_concentration</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+<span class="g g-Whitespace">    </span><span class="mi">168</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">time</span><span class="p">)):</span>
+<span class="g g-Whitespace">    </span><span class="mi">169</span>     <span class="n">total_concentration</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">unit_mass_ug_m3</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">mean_diameter_nm</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> \
+<span class="g g-Whitespace">    </span><span class="mi">170</span>         <span class="n">mean_vol_diameter_nm</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">geometric_mean_diameter_nm</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> \
+<span class="g g-Whitespace">    </span><span class="mi">171</span>         <span class="n">mode_diameter</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">mode_diameter_mass</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> \
+<span class="ne">--&gt; </span><span class="mi">172</span>         <span class="n">mean_properties</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">173</span>         <span class="n">sizer_dndlogdp_smps</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span>
+<span class="g g-Whitespace">    </span><span class="mi">174</span>         <span class="n">sizer_diameter_smps</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">175</span>         <span class="n">sizer_limits</span><span class="o">=</span><span class="n">sizer_limits</span>
+<span class="g g-Whitespace">    </span><span class="mi">176</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">178</span>     <span class="c1"># total PM 100 nm concentration</span>
+<span class="g g-Whitespace">    </span><span class="mi">179</span>     <span class="n">total_concentration_pm01</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">unit_mass_ug_m3_pm01</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> \
+<span class="g g-Whitespace">    </span><span class="mi">180</span>         <span class="n">mean_properties</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">181</span>         <span class="n">sizer_dndlogdp_smps</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span>
+<span class="g g-Whitespace">    </span><span class="mi">182</span>         <span class="n">sizer_diameter_smps</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">183</span>         <span class="n">sizer_limits</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">184</span>     <span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/process/size_distribution.py:50,</span> in <span class="ni">mean_properties</span><span class="nt">(sizer_dndlogdp, sizer_diameter, total_concentration, sizer_limits)</span>
+<span class="g g-Whitespace">     </span><span class="mi">23</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">24</span><span class="sd"> Calculates the mean properties of the size distribution.</span>
+<span class="g g-Whitespace">     </span><span class="mi">25</span><span class="sd"> </span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">     </span><span class="mi">46</span><span class="sd">     Mode diameter of the distribution by volume.</span>
+<span class="g g-Whitespace">     </span><span class="mi">47</span><span class="sd"> &quot;&quot;&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">49</span> <span class="c1"># convert to dn from dn/dlogDp</span>
+<span class="ne">---&gt; </span><span class="mi">50</span> <span class="n">sizer_dn</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">convert_sizer_dn</span><span class="p">(</span><span class="n">sizer_diameter</span><span class="p">,</span> <span class="n">sizer_dndlogdp</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">51</span> <span class="k">if</span> <span class="n">total_concentration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">52</span>     <span class="n">sizer_dn</span> <span class="o">=</span> <span class="n">sizer_dn</span> <span class="o">*</span> <span class="n">total_concentration</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sizer_dn</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/util/convert.py:410,</span> in <span class="ni">convert_sizer_dn</span><span class="nt">(diameter, dn_dlogdp, inverse)</span>
+<span class="g g-Whitespace">    </span><span class="mi">378</span> <span class="k">def</span> <span class="nf">convert_sizer_dn</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">379</span>     <span class="n">diameter</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">380</span>     <span class="n">dn_dlogdp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">381</span>     <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="g g-Whitespace">    </span><span class="mi">382</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">383</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">384</span><span class="sd">     Converts the sizer data from dn/dlogdp to d_num.</span>
+<span class="g g-Whitespace">    </span><span class="mi">385</span><span class="sd"> </span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">    </span><span class="mi">408</span><span class="sd">     # future: Address potential over-counting in last/first bin</span>
+<span class="g g-Whitespace">    </span><span class="mi">409</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">410</span>     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">diameter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dn_dlogdp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> \
+<span class="g g-Whitespace">    </span><span class="mi">411</span>         <span class="s2">&quot;Inputs must be non-empty arrays of the same length.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">412</span>     <span class="c1"># Compute the bin widths</span>
+<span class="g g-Whitespace">    </span><span class="mi">413</span>     <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">diameter</span><span class="p">)</span>
+
+<span class="ne">AssertionError</span>: Inputs must be non-empty arrays of the same length.
 </pre></div>
 </div>
 </div>

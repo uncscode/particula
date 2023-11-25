@@ -876,84 +876,6 @@ Calling the relevant functions.</p>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: CPC_3010_data_20220710_Jul.csv
 </pre></div>
 </div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">line</span> <span class="mi">34</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="n">cpc_settings</span> <span class="o">=</span> <span class="p">{</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span>     <span class="s1">&#39;relative_data_folder&#39;</span><span class="p">:</span> <span class="s1">&#39;CPC_3010_data&#39;</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span>     <span class="s1">&#39;filename_regex&#39;</span><span class="p">:</span> <span class="s1">&#39;*.csv&#39;</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">30</span>     <span class="s1">&#39;time_shift_seconds&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">31</span>     <span class="s1">&#39;timezone_identifier&#39;</span><span class="p">:</span> <span class="s1">&#39;UTC&#39;</span><span class="p">}</span>
-<span class="g g-Whitespace">     </span><span class="mi">33</span> <span class="c1"># no call the loader interface</span>
-<span class="ne">---&gt; </span><span class="mi">34</span> <span class="n">data_stream</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">35</span>     <span class="n">path</span><span class="o">=</span><span class="n">working_path</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">36</span>     <span class="n">settings</span><span class="o">=</span><span class="n">cpc_settings</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">37</span> <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:152,</span> in <span class="ni">load_files_interface</span><span class="nt">(path, settings, stream)</span>
-<span class="g g-Whitespace">    </span><span class="mi">149</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Loading file:&#39;</span><span class="p">,</span> <span class="n">file_info</span><span class="p">[</span><span class="n">file_i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-<span class="g g-Whitespace">    </span><span class="mi">151</span> <span class="k">if</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_1d_load&#39;</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">152</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_1d_stream</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">153</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">154</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">155</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">156</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">157</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">159</span> <span class="k">elif</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_2d_load&#39;</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">160</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_2d_stream</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">161</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">162</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">163</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">165</span>     <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:323,</span> in <span class="ni">get_1d_stream</span><span class="nt">(file_path, settings, first_pass, stream)</span>
-<span class="g g-Whitespace">    </span><span class="mi">321</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">epoch_time</span>
-<span class="g g-Whitespace">    </span><span class="mi">322</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">323</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">merger</span><span class="o">.</span><span class="n">stream_add_data</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">324</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">325</span>         <span class="n">time_new</span><span class="o">=</span><span class="n">epoch_time</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">326</span>         <span class="n">data_new</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">327</span>         <span class="n">header_check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">328</span>         <span class="n">header_new</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_header&#39;</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">329</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">330</span> <span class="k">return</span> <span class="n">stream</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/data/merger.py:159,</span> in <span class="ni">stream_add_data</span><span class="nt">(stream, time_new, data_new, header_check, header_new)</span>
-<span class="g g-Whitespace">    </span><span class="mi">155</span> <span class="k">elif</span> <span class="n">header_check</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">156</span>     <span class="n">header_new</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">header</span> <span class="k">if</span> <span class="n">header_new</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">header_new</span>
-<span class="g g-Whitespace">    </span><span class="mi">158</span>     <span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">header</span><span class="p">,</span> <span class="n">data_new</span><span class="p">,</span> <span class="n">header_new</span> <span class="o">=</span> \
-<span class="ne">--&gt; </span><span class="mi">159</span>         <span class="n">stats</span><span class="o">.</span><span class="n">merge_formatting</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">160</span>             <span class="n">data_current</span><span class="o">=</span><span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">161</span>             <span class="n">header_current</span><span class="o">=</span><span class="n">stream</span><span class="o">.</span><span class="n">header</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">162</span>             <span class="n">data_new</span><span class="o">=</span><span class="n">data_new</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">163</span>             <span class="n">header_new</span><span class="o">=</span><span class="n">header_new</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span>         <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">165</span>     <span class="c1"># updates stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">166</span>     <span class="n">stream</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data_new</span><span class="p">))</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/util/stats.py:75,</span> in <span class="ni">merge_formatting</span><span class="nt">(data_current, header_current, data_new, header_new)</span>
-<span class="g g-Whitespace">     </span><span class="mi">73</span> <span class="c1"># check that the shapes are the same</span>
-<span class="g g-Whitespace">     </span><span class="mi">74</span> <span class="k">if</span> <span class="n">data_current</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">data_new</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-<span class="ne">---&gt; </span><span class="mi">75</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">76</span>         <span class="s1">&#39;data_current  &#39;</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">77</span>         <span class="n">data_current</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">78</span>         <span class="s1">&#39; and data_new &#39;</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">79</span>         <span class="n">data_new</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">80</span>         <span class="s1">&#39; are not the same shape, check the data formatting&#39;</span>
-<span class="g g-Whitespace">     </span><span class="mi">81</span>     <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">82</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">header_current</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">header_new</span><span class="p">):</span>
-<span class="g g-Whitespace">     </span><span class="mi">83</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">84</span>         <span class="s1">&#39;header_current &#39;</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">85</span>         <span class="nb">len</span><span class="p">(</span><span class="n">header_current</span><span class="p">),</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">88</span>         <span class="s1">&#39; are not the same shape, check the data formatting&#39;</span>
-<span class="g g-Whitespace">     </span><span class="mi">89</span>     <span class="p">)</span>
-
-<span class="ne">ValueError</span>: (&#39;data_current  &#39;, (33254, 2), &#39; and data_new &#39;, (35297, 2), &#39; are not the same shape, check the data formatting&#39;)
-</pre></div>
-</div>
 </div>
 </div>
 <div class="cell docutils container">
@@ -961,16 +883,26 @@ Calling the relevant functions.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># print data stream summary</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Stream:&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">data_stream</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Stream length:&#39;</span><span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">data_stream</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_stream</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_stream</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Stream:
-Stream(header=[&#39;data 1&#39;, &#39;data 2&#39;], data=array([[3.3510e+04, 3.3465e+04, 3.2171e+04, ..., 1.9403e+04, 2.0230e+04,
-        1.9521e+04],
-       [1.7000e+01, 1.7100e+01, 1.7000e+01, ..., 1.6900e+01, 1.7000e+01,
-        1.6800e+01]]), time=array([1.65734280e+09, 1.65734281e+09, 1.65734281e+09, ...,
-       1.65751559e+09, 1.65751560e+09, 1.65751560e+09]), files=[[&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1044534], [&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1113488]])
+Stream(header=[&#39;data 1&#39;, &#39;data 2&#39;], data=array([[3.3510e+04, 1.7000e+01],
+       [3.3465e+04, 1.7100e+01],
+       [3.2171e+04, 1.7000e+01],
+       ...,
+       [1.9403e+04, 1.6900e+01],
+       [2.0230e+04, 1.7000e+01],
+       [1.9521e+04, 1.6800e+01]]), time=array([1.65734280e+09, 1.65734281e+09, 1.65734281e+09, ...,
+       1.65751559e+09, 1.65751560e+09, 1.65751560e+09]), files=[[&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1011254], [&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1078191]])
+Stream length:
+(68551, 2)
+(68551,)
 </pre></div>
 </div>
 </div>
@@ -980,7 +912,7 @@ Stream(header=[&#39;data 1&#39;, &#39;data 2&#39;], data=array([[3.3510e+04, 3.3
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot the data</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_stream</span><span class="o">.</span><span class="n">datetime64</span><span class="p">,</span>
-        <span class="n">data_stream</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>  <span class="c1"># data_stream.data is a 2d array, so we need</span>
+        <span class="n">data_stream</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># data_stream.data is a 2d array, so we need</span>
                                  <span class="c1"># to specify which column we want to plot</span>
         <span class="n">label</span><span class="o">=</span><span class="s2">&quot;data column 1&quot;</span><span class="p">,</span>
         <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
@@ -995,7 +927,7 @@ Stream(header=[&#39;data 1&#39;, &#39;data 2&#39;], data=array([[3.3510e+04, 3.3
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/5afc75e1b48d40919b0db688e929153c1d86a4b67dd6b42e4003c513625210d3.png" src="../_images/5afc75e1b48d40919b0db688e929153c1d86a4b67dd6b42e4003c513625210d3.png" />
+<img alt="../_images/a7e4974dabf1e257dc1c94d71abf12d1b6d4a1fa3fc5229e4ffcd4f919e21061.png" src="../_images/a7e4974dabf1e257dc1c94d71abf12d1b6d4a1fa3fc5229e4ffcd4f919e21061.png" />
 </div>
 </div>
 </section>
