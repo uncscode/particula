@@ -25,8 +25,9 @@ parts:
     sections:
     - file: examples/chamber_smps_data
   - file: examples/equilibria/equilibria_intro
-  - file: examples/equilibria/activity_part1
-  - file: examples/equilibria/equilibria_part1
+    sections:
+    - file: examples/equilibria/activity_part1
+    - file: examples/equilibria/equilibria_part1
 - caption: Documentation
   numbered: false
   chapters:
