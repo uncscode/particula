@@ -65,6 +65,8 @@ const thebe_selector_output = ".output, .cell_output"
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/lagrangian/basic_lagrangian_box';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Equilibria of Aerosols" href="../equilibria/equilibria_intro.html" />
+    <link rel="prev" title="Lagrangian Particle Model" href="lagrangian_intro.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -170,7 +172,7 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="../../tour/part-tour.html">Particula tour</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../distribution_statistics.html">Distribution statistics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../distribution_coagulation.html">Distribution coagulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../distribution_evolution.html">Distribution evolution</a></li>
@@ -205,7 +207,11 @@ const thebe_selector_output = ".output, .cell_output"
 
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../equilibria/equilibria_intro.html">Equilibria of Aerosols</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="lagrangian_intro.html">Lagrangian Particle Model</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Introduction to the Lagrangian Box Model</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../equilibria/equilibria_intro.html">Equilibria of Aerosols</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../equilibria/activity_part1.html">Activity Example</a></li>
 
 <li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
@@ -214,14 +220,14 @@ const thebe_selector_output = ".output, .cell_output"
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
@@ -709,217 +715,214 @@ document.write(`
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   0%|          | 0/10000 [00:00&lt;?, ?it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   1%|▏         | 140/10000 [00:00&lt;00:07, 1398.45it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   1%|▏         | 147/10000 [00:00&lt;00:06, 1466.57it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   3%|▎         | 291/10000 [00:00&lt;00:06, 1459.25it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   3%|▎         | 294/10000 [00:00&lt;00:06, 1447.60it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   4%|▍         | 437/10000 [00:00&lt;00:06, 1399.37it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   4%|▍         | 445/10000 [00:00&lt;00:06, 1473.85it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   6%|▌         | 578/10000 [00:00&lt;00:07, 1297.81it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   6%|▌         | 594/10000 [00:00&lt;00:06, 1479.20it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   7%|▋         | 724/10000 [00:00&lt;00:06, 1352.27it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   7%|▋         | 742/10000 [00:00&lt;00:06, 1478.07it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   9%|▊         | 869/10000 [00:00&lt;00:06, 1381.22it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   9%|▉         | 890/10000 [00:00&lt;00:06, 1472.91it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  10%|█         | 1014/10000 [00:00&lt;00:06, 1399.89it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  10%|█         | 1038/10000 [00:00&lt;00:06, 1467.89it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  12%|█▏        | 1158/10000 [00:00&lt;00:06, 1409.86it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  12%|█▏        | 1185/10000 [00:00&lt;00:06, 1464.66it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  13%|█▎        | 1302/10000 [00:00&lt;00:06, 1417.85it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  13%|█▎        | 1332/10000 [00:00&lt;00:05, 1460.80it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  14%|█▍        | 1445/10000 [00:01&lt;00:06, 1420.33it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  15%|█▍        | 1479/10000 [00:01&lt;00:05, 1456.15it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  16%|█▌        | 1589/10000 [00:01&lt;00:05, 1424.80it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  16%|█▋        | 1625/10000 [00:01&lt;00:05, 1453.75it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  17%|█▋        | 1733/10000 [00:01&lt;00:05, 1425.96it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  18%|█▊        | 1771/10000 [00:01&lt;00:05, 1451.09it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  19%|█▉        | 1876/10000 [00:01&lt;00:05, 1424.09it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  19%|█▉        | 1917/10000 [00:01&lt;00:05, 1447.51it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  20%|██        | 2019/10000 [00:01&lt;00:05, 1423.76it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  21%|██        | 2062/10000 [00:01&lt;00:05, 1424.61it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  22%|██▏       | 2162/10000 [00:01&lt;00:05, 1422.90it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  22%|██▏       | 2206/10000 [00:01&lt;00:05, 1427.41it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  23%|██▎       | 2305/10000 [00:01&lt;00:05, 1418.98it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  24%|██▎       | 2350/10000 [00:01&lt;00:05, 1430.00it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  24%|██▍       | 2448/10000 [00:01&lt;00:05, 1419.91it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  25%|██▍       | 2494/10000 [00:01&lt;00:05, 1428.06it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  26%|██▌       | 2591/10000 [00:01&lt;00:05, 1416.87it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  26%|██▋       | 2637/10000 [00:01&lt;00:05, 1427.96it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  27%|██▋       | 2733/10000 [00:01&lt;00:05, 1409.11it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  28%|██▊       | 2781/10000 [00:01&lt;00:05, 1429.07it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  29%|██▊       | 2874/10000 [00:02&lt;00:05, 1404.69it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  29%|██▉       | 2925/10000 [00:02&lt;00:04, 1429.92it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  30%|███       | 3017/10000 [00:02&lt;00:04, 1410.09it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  31%|███       | 3069/10000 [00:02&lt;00:04, 1427.37it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  32%|███▏      | 3159/10000 [00:02&lt;00:04, 1390.58it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  32%|███▏      | 3212/10000 [00:02&lt;00:04, 1413.42it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  33%|███▎      | 3299/10000 [00:02&lt;00:04, 1360.73it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  34%|███▎      | 3355/10000 [00:02&lt;00:04, 1417.16it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  34%|███▍      | 3440/10000 [00:02&lt;00:04, 1374.93it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  35%|███▍      | 3498/10000 [00:02&lt;00:04, 1419.43it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  36%|███▌      | 3583/10000 [00:02&lt;00:04, 1389.40it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  36%|███▋      | 3641/10000 [00:02&lt;00:04, 1420.91it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  37%|███▋      | 3724/10000 [00:02&lt;00:04, 1393.33it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  38%|███▊      | 3785/10000 [00:02&lt;00:04, 1424.32it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  39%|███▊      | 3866/10000 [00:02&lt;00:04, 1399.05it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  39%|███▉      | 3928/10000 [00:02&lt;00:04, 1422.99it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  40%|████      | 4008/10000 [00:02&lt;00:04, 1403.42it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  41%|████      | 4071/10000 [00:02&lt;00:04, 1419.58it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  41%|████▏     | 4149/10000 [00:02&lt;00:04, 1402.52it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  42%|████▏     | 4213/10000 [00:02&lt;00:04, 1419.20it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  43%|████▎     | 4290/10000 [00:03&lt;00:04, 1403.45it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  44%|████▎     | 4355/10000 [00:03&lt;00:03, 1419.39it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  44%|████▍     | 4432/10000 [00:03&lt;00:03, 1408.11it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  45%|████▍     | 4498/10000 [00:03&lt;00:03, 1420.84it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  46%|████▌     | 4573/10000 [00:03&lt;00:03, 1395.53it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  46%|████▋     | 4641/10000 [00:03&lt;00:03, 1421.59it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  47%|████▋     | 4713/10000 [00:03&lt;00:03, 1394.43it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  48%|████▊     | 4784/10000 [00:03&lt;00:03, 1422.68it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  49%|████▊     | 4854/10000 [00:03&lt;00:03, 1397.18it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  49%|████▉     | 4927/10000 [00:03&lt;00:03, 1424.13it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  50%|████▉     | 4995/10000 [00:03&lt;00:03, 1398.36it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  51%|█████     | 5070/10000 [00:03&lt;00:03, 1423.55it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  51%|█████▏    | 5136/10000 [00:03&lt;00:03, 1398.84it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  52%|█████▏    | 5213/10000 [00:03&lt;00:03, 1422.79it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  53%|█████▎    | 5278/10000 [00:03&lt;00:03, 1403.82it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  54%|█████▎    | 5356/10000 [00:03&lt;00:03, 1422.90it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  54%|█████▍    | 5420/10000 [00:03&lt;00:03, 1407.71it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  55%|█████▍    | 5499/10000 [00:03&lt;00:03, 1423.86it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  56%|█████▌    | 5561/10000 [00:03&lt;00:03, 1386.06it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  56%|█████▋    | 5642/10000 [00:03&lt;00:03, 1421.17it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  57%|█████▋    | 5702/10000 [00:04&lt;00:03, 1390.32it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  58%|█████▊    | 5785/10000 [00:04&lt;00:02, 1422.85it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  58%|█████▊    | 5842/10000 [00:04&lt;00:02, 1391.98it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  59%|█████▉    | 5928/10000 [00:04&lt;00:02, 1422.92it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  60%|█████▉    | 5982/10000 [00:04&lt;00:02, 1375.12it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  61%|██████    | 6071/10000 [00:04&lt;00:02, 1423.39it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  61%|██████    | 6123/10000 [00:04&lt;00:02, 1384.36it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  62%|██████▏   | 6214/10000 [00:04&lt;00:02, 1423.48it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  63%|██████▎   | 6264/10000 [00:04&lt;00:02, 1390.78it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  64%|██████▎   | 6357/10000 [00:04&lt;00:02, 1424.90it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  64%|██████▍   | 6405/10000 [00:04&lt;00:02, 1394.88it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  65%|██████▌   | 6501/10000 [00:04&lt;00:02, 1426.60it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  65%|██████▌   | 6546/10000 [00:04&lt;00:02, 1397.62it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  66%|██████▋   | 6645/10000 [00:04&lt;00:02, 1428.03it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  67%|██████▋   | 6687/10000 [00:04&lt;00:02, 1400.35it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  68%|██████▊   | 6788/10000 [00:04&lt;00:02, 1426.60it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  68%|██████▊   | 6828/10000 [00:04&lt;00:02, 1396.95it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  69%|██████▉   | 6931/10000 [00:04&lt;00:02, 1427.28it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  70%|██████▉   | 6969/10000 [00:04&lt;00:02, 1400.49it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  71%|███████   | 7074/10000 [00:04&lt;00:02, 1426.36it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  71%|███████   | 7110/10000 [00:05&lt;00:02, 1358.85it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  72%|███████▏  | 7218/10000 [00:05&lt;00:01, 1427.54it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  72%|███████▏  | 7247/10000 [00:05&lt;00:02, 1229.53it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  74%|███████▎  | 7361/10000 [00:05&lt;00:01, 1424.94it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  74%|███████▍  | 7383/10000 [00:05&lt;00:02, 1264.26it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  75%|███████▌  | 7504/10000 [00:05&lt;00:01, 1425.11it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  75%|███████▌  | 7524/10000 [00:05&lt;00:01, 1302.68it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  76%|███████▋  | 7647/10000 [00:05&lt;00:01, 1423.43it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  77%|███████▋  | 7662/10000 [00:05&lt;00:01, 1323.02it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  78%|███████▊  | 7790/10000 [00:05&lt;00:01, 1413.85it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  78%|███████▊  | 7804/10000 [00:05&lt;00:01, 1349.29it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  79%|███████▉  | 7933/10000 [00:05&lt;00:01, 1418.60it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  79%|███████▉  | 7943/10000 [00:05&lt;00:01, 1359.56it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  81%|████████  | 8077/10000 [00:05&lt;00:01, 1423.52it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  81%|████████  | 8085/10000 [00:05&lt;00:01, 1374.67it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  82%|████████▏ | 8220/10000 [00:05&lt;00:01, 1422.46it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  82%|████████▏ | 8225/10000 [00:05&lt;00:01, 1379.80it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  84%|████████▎ | 8363/10000 [00:05&lt;00:01, 1421.54it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  84%|████████▎ | 8367/10000 [00:06&lt;00:01, 1389.62it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  85%|████████▌ | 8506/10000 [00:05&lt;00:01, 1422.08it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  85%|████████▌ | 8508/10000 [00:06&lt;00:01, 1393.75it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  86%|████████▋ | 8649/10000 [00:06&lt;00:00, 1423.84it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  87%|████████▋ | 8651/10000 [00:06&lt;00:00, 1402.23it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  88%|████████▊ | 8792/10000 [00:06&lt;00:00, 1425.49it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  88%|████████▊ | 8792/10000 [00:06&lt;00:00, 1386.55it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  89%|████████▉ | 8936/10000 [00:06&lt;00:00, 1427.52it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  89%|████████▉ | 8933/10000 [00:06&lt;00:00, 1393.02it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  91%|█████████ | 9079/10000 [00:06&lt;00:00, 1426.85it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  91%|█████████ | 9075/10000 [00:06&lt;00:00, 1400.33it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  92%|█████████▏| 9222/10000 [00:06&lt;00:00, 1424.38it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  92%|█████████▏| 9217/10000 [00:06&lt;00:00, 1405.87it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  94%|█████████▎| 9365/10000 [00:06&lt;00:00, 1423.41it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  94%|█████████▎| 9359/10000 [00:06&lt;00:00, 1407.86it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  95%|█████████▌| 9509/10000 [00:06&lt;00:00, 1425.85it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  95%|█████████▌| 9501/10000 [00:06&lt;00:00, 1408.41it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  97%|█████████▋| 9652/10000 [00:06&lt;00:00, 1410.15it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  96%|█████████▋| 9642/10000 [00:06&lt;00:00, 1406.51it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  98%|█████████▊| 9795/10000 [00:06&lt;00:00, 1414.18it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  98%|█████████▊| 9783/10000 [00:07&lt;00:00, 1403.49it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  99%|█████████▉| 9937/10000 [00:06&lt;00:00, 1415.89it/s]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  99%|█████████▉| 9925/10000 [00:07&lt;00:00, 1406.82it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation: 100%|██████████| 10000/10000 [00:07&lt;00:00, 1389.74it/s]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation: 100%|██████████| 10000/10000 [00:07&lt;00:00, 1428.38it/s]
 </pre></div>
 </div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
@@ -983,10 +986,10 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 33
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 26
 </pre></div>
 </div>
-<img alt="../../_images/ba1ccf8b13ae5ee2cc8d02905ed0d9e2bdda47772a10616819088f32739e70f3.png" src="../../_images/ba1ccf8b13ae5ee2cc8d02905ed0d9e2bdda47772a10616819088f32739e70f3.png" />
+<img alt="../../_images/8e89d920a7b0ccb03b97fbbf8f429d98f5fef39e8ba2d902179cd1fe7279690d.png" src="../../_images/8e89d920a7b0ccb03b97fbbf8f429d98f5fef39e8ba2d902179cd1fe7279690d.png" />
 </div>
 </div>
 </section>
@@ -1026,7 +1029,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/15dbba0bcf18195f8824e220a3a2d73d3bba5e785f2e089da431fbab3c0f7e03.png" src="../../_images/15dbba0bcf18195f8824e220a3a2d73d3bba5e785f2e089da431fbab3c0f7e03.png" />
+<img alt="../../_images/f64a4512fbb116d29462fb3cf65c926ecefd47b60f11e43ef9ba713d76a3c1d0.png" src="../../_images/f64a4512fbb116d29462fb3cf65c926ecefd47b60f11e43ef9ba713d76a3c1d0.png" />
 </div>
 </div>
 </section>
@@ -1096,6 +1099,24 @@ document.write(`
                 <footer class="prev-next-footer">
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="lagrangian_intro.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Lagrangian Particle Model</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../equilibria/equilibria_intro.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Equilibria of Aerosols</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
