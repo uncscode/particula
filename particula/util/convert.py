@@ -406,8 +406,8 @@ def convert_sizer_dn(
 
     # future: Address potential over-counting in last/first bin
     """
-    assert len(diameter) == len(dn_dlogdp) > 0, \
-        "Inputs must be non-empty arrays of the same length."
+    assert len(diameter) > 0, \
+        "Inputs must be non-empty arrays."
     # Compute the bin widths
     delta = np.zeros_like(diameter)
     delta[:-1] = np.diff(diameter)
