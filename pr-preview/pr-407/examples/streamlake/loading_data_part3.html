@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Loading Data Part 3 &#8212; Particula Book</title>
+    <title>Loading Data Part 3: Combining Data from Multiple Instruments &#8212; Particula Book</title>
   
   
   
@@ -186,10 +186,7 @@ const thebe_selector_output = ".output, .cell_output"
 
 <li class="toctree-l2"><a class="reference internal" href="loading_data_part2.html">Loading Data Part 2</a></li>
 
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Loading Data Part 3</a></li>
-
-
-
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Loading Data Part 3: Combining Data from Multiple Instruments</a></li>
 
 
 
@@ -512,7 +509,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Loading Data Part 3</h1>
+    <h1>Loading Data Part 3: Combining Data from Multiple Instruments</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -522,14 +519,21 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Data Part 3</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-path">Working path</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Data Part 3: Combining Data from Multiple Instruments</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-the-working-path">Setting the Working Path</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data">Load the Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lake-class-overview">Lake Class Overview</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#attributes">Attributes:</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods:</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage:</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data">Load the data</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#lake">Lake</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#pause-to-plot-the-data">Pause to Plot the data</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#average-the-data">Average the data</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#pause-to-plot-the-data">Pause to Plot the data</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-averaging">Data Averaging</a></li>
+</ul>
+</li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-averaged-data">Plot the Averaged Data</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
 </ul>
@@ -544,18 +548,16 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="loading-data-part-3">
-<h1>Loading Data Part 3<a class="headerlink" href="#loading-data-part-3" title="Permalink to this heading">#</a></h1>
-<p>This example shows how to work with data from multiple instruments, and how to load them into a single <code class="docutils literal notranslate"><span class="pre">Lake</span></code> object. A <code class="docutils literal notranslate"><span class="pre">Lake</span></code> object is a container of multiple <code class="docutils literal notranslate"><span class="pre">Stream</span></code>s from individual instruments.</p>
-<p>This allows for easy access to the data from all instruments, and also allows for easy plotting of the data from all instruments.</p>
-<section id="working-path">
-<h2>Working path<a class="headerlink" href="#working-path" title="Permalink to this heading">#</a></h2>
-<p>Set the working path where the data is stored. For now we’ll use the
-provided example data in this current directory.</p>
-<p>But the path could be any where on your computer. For example, if you have a
-folder called “data” in your home directory, you could set the path to:
-<code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">=</span> <span class="pre">&quot;U:\\data\\processing\\Campgain2023_of_aswsome\\data&quot;</span></code></p>
-<p>The folder structure should look like this:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="loading-data-part-3-combining-data-from-multiple-instruments">
+<h1>Loading Data Part 3: Combining Data from Multiple Instruments<a class="headerlink" href="#loading-data-part-3-combining-data-from-multiple-instruments" title="Permalink to this heading">#</a></h1>
+<p>In this example, we explore the process of working with data from multiple instruments and consolidating them into a single <code class="docutils literal notranslate"><span class="pre">Lake</span></code> object. A <code class="docutils literal notranslate"><span class="pre">Lake</span></code> object serves as a convenient container for aggregating multiple <code class="docutils literal notranslate"><span class="pre">Stream</span></code>s, each representing data from individual instruments.</p>
+<section id="setting-the-working-path">
+<h2>Setting the Working Path<a class="headerlink" href="#setting-the-working-path" title="Permalink to this heading">#</a></h2>
+<p>To begin, you need to establish the working path where your data is stored. For this demonstration, we will use provided example data located in the current directory. However, keep in mind that the path can be anywhere on your computer. For instance, if you have a folder named “data” in your home directory, you can set the path as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;U:</span><span class="se">\\</span><span class="s2">data</span><span class="se">\\</span><span class="s2">processing</span><span class="se">\\</span><span class="s2">Campaign2023_of_awesome</span><span class="se">\\</span><span class="s2">data&quot;</span>
+</pre></div>
+</div>
+<p>Your folder structure should resemble the following:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>data
 ├── CPC_3010_data
 │   ├── CPC_3010_data_20220709_Jul.csv
@@ -565,46 +567,34 @@ folder called “data” in your home directory, you could set the path to:
 │   ├── 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">path</span></code> is <code class="docutils literal notranslate"><span class="pre">data</span></code>. Within that folder are two folders, one for the CPC
-data and one for the SMPS data. These are your <code class="docutils literal notranslate"><span class="pre">relative_data_folder</span></code>
-keywords you put
-in the settings dictionary. The data within will be loaded as <code class="docutils literal notranslate"><span class="pre">Stream</span></code>
-objects.
-Then within each of those folders are the
-data files which are selected by the <code class="docutils literal notranslate"><span class="pre">filename_regex</span></code>. A regex is a
-regular expression that is used to match the files. In this case we are
-matching all files that end with <code class="docutils literal notranslate"><span class="pre">.csv</span></code>, then loading them into the
-<code class="docutils literal notranslate"><span class="pre">stream</span></code> object.</p>
+<p>Here, the path points to the “data” folder. Within this folder, you’ll find two subfolders: one for CPC data and another for SMPS data. These subfolders correspond to the relative_data_folder keywords used in the settings dictionary. The data within these subfolders will be loaded as Stream objects.</p>
+<p>Inside each of these subfolders, you’ll find data files that match the specified filename_regex. A regular expression is used to select files based on specific criteria. In this case, we are matching all files ending with “.csv” and loading them into the respective Stream objects. This approach allows you to efficiently manage and consolidate data from various instruments for further analysis and visualization.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># all the imports, but we&#39;ll go through them one by one as we use them</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import necessary modules</span>
+<span class="kn">import</span> <span class="nn">os</span>  <span class="c1"># Provides functions for interacting with the operating system.</span>
+<span class="c1"># Matplotlib is a library for creating visualizations and plots.</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">loader_interface</span><span class="p">,</span> <span class="n">settings_generator</span><span class="p">,</span> <span class="n">lake_stats</span>
+<span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">loader_interface</span><span class="p">,</span>  <span class="c1"># This module allows you to load data from files.</span>
+    <span class="n">settings_generator</span><span class="p">,</span>  <span class="c1"># It helps generate settings for data loading.</span>
+    <span class="c1"># This module provides statistics for a collection of data streams.</span>
+    <span class="n">lake_stats</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">particula.data.tests.example_data.get_example_data</span> <span class="kn">import</span> <span class="n">get_data_folder</span>
+<span class="c1"># Lake is a container for multiple data streams.</span>
 <span class="kn">from</span> <span class="nn">particula.data.lake</span> <span class="kn">import</span> <span class="n">Lake</span>
 
-<span class="c1"># set the parent directory of the data folder</span>
+<span class="c1"># Set the parent directory of the data folder</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">get_data_folder</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path to data folder:&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;particula&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Path to data folder:
-/data/tests/example_data
 </pre></div>
 </div>
 </div>
 </div>
 </section>
-</section>
-<section class="tex2jax_ignore mathjax_ignore" id="load-the-data">
-<h1>Load the data<a class="headerlink" href="#load-the-data" title="Permalink to this heading">#</a></h1>
-<p>For this example we’ll use the provided example data. But you can change the
-path to any folder on your computer. We then can used the settings generator to
-load the data.</p>
+<section id="load-the-data">
+<h2>Load the Data<a class="headerlink" href="#load-the-data" title="Permalink to this heading">#</a></h2>
+<p>In this example, we’ll work with provided example data. However, you have the flexibility to change the path to any folder on your computer. We will use the settings generator to efficiently load the data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># settings for the CPC data</span>
@@ -718,15 +708,58 @@ Lake with streams: [&#39;cpc&#39;, &#39;smps_1d&#39;, &#39;smps_2d&#39;]
 </div>
 </div>
 </section>
-<section class="tex2jax_ignore mathjax_ignore" id="lake">
-<h1>Lake<a class="headerlink" href="#lake" title="Permalink to this heading">#</a></h1>
-<p>The lake is a collection of streams, stored as a dictionary. The keys are the
-names of the streams, and the values are the streams themselves. We can access
-the streams by their name. For example, to get the CPC stream we can do:
-<code class="docutils literal notranslate"><span class="pre">lake['cpc']</span></code>. We can also get the names of the streams by doing
-<code class="docutils literal notranslate"><span class="pre">lake.keys()</span></code>. We can also loop through the streams by doing
-<code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">stream</span> <span class="pre">in</span> <span class="pre">lake.values():</span></code>. We can also loop through the names and streams
-by doing <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">name,</span> <span class="pre">stream</span> <span class="pre">in</span> <span class="pre">lake.items():</span></code>.</p>
+<section id="lake-class-overview">
+<h2>Lake Class Overview<a class="headerlink" href="#lake-class-overview" title="Permalink to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Lake</span></code> is a collection of <code class="docutils literal notranslate"><span class="pre">Stream</span></code> objects stored as a dictionary. The keys represent the names of the streams, and the values are the stream objects themselves. It provides a convenient way to organize and manage multiple datasets. Let’s explore its key attributes and methods:</p>
+<section id="attributes">
+<h3>Attributes:<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">streams</span></code> (Dict[str, Stream]): A dictionary where keys are stream names, and values are the corresponding <code class="docutils literal notranslate"><span class="pre">Stream</span></code> objects.</p></li>
+</ul>
+</section>
+<section id="methods">
+<h3>Methods:<a class="headerlink" href="#methods" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">__getitem__(self,</span> <span class="pre">key:</span> <span class="pre">str)</span> <span class="pre">-&gt;</span> <span class="pre">Any</span></code>: Retrieve a specific <code class="docutils literal notranslate"><span class="pre">Stream</span></code> by its name.</p>
+<ul>
+<li><p>Example: To access the CPC stream, you can use <code class="docutils literal notranslate"><span class="pre">lake['cpc']</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__delitem__(self,</span> <span class="pre">key:</span> <span class="pre">str)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>: Remove a <code class="docutils literal notranslate"><span class="pre">Stream</span></code> from the <code class="docutils literal notranslate"><span class="pre">Lake</span></code> using its name.</p>
+<ul>
+<li><p>Example: To remove a stream named ‘cpc’, you can use <code class="docutils literal notranslate"><span class="pre">del</span> <span class="pre">lake['cpc']</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__getattr__(self,</span> <span class="pre">name:</span> <span class="pre">str)</span> <span class="pre">-&gt;</span> <span class="pre">Any</span></code>: Access streams as attributes for easier navigation.</p>
+<ul>
+<li><p>Example: You can directly access the ‘cpc’ stream with <code class="docutils literal notranslate"><span class="pre">lake.cpc</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">add_stream(self,</span> <span class="pre">stream:</span> <span class="pre">particula.data.stream.Stream,</span> <span class="pre">name:</span> <span class="pre">str)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>: Add a new <code class="docutils literal notranslate"><span class="pre">Stream</span></code> to the <code class="docutils literal notranslate"><span class="pre">Lake</span></code>.</p>
+<ul>
+<li><p>Example: To add a new stream, you can use <code class="docutils literal notranslate"><span class="pre">lake.add_stream(new_stream,</span> <span class="pre">'stream_name')</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__len__(self)</span> <span class="pre">-&gt;</span> <span class="pre">int</span></code>: Determine the number of streams in the <code class="docutils literal notranslate"><span class="pre">Lake</span></code>.</p>
+<ul>
+<li><p>Example: To find out how many streams are in the <code class="docutils literal notranslate"><span class="pre">Lake</span></code>, use <code class="docutils literal notranslate"><span class="pre">len(lake)</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__iter__(self)</span> <span class="pre">-&gt;</span> <span class="pre">Iterator[Any]</span></code>: Iterate over the streams in the <code class="docutils literal notranslate"><span class="pre">Lake</span></code>.</p>
+<ul>
+<li><p>Example: To loop through all streams, you can use <code class="docutils literal notranslate"><span class="pre">[stream.header</span> <span class="pre">for</span> <span class="pre">stream</span> <span class="pre">in</span> <span class="pre">lake]</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">summary</span></code> (Readonly property): Generate a summary by iterating through each stream and printing their headers.</p>
+<ul>
+<li><p>Example: To get a summary of all streams, use <code class="docutils literal notranslate"><span class="pre">lake.summary</span></code>.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="usage">
+<h3>Usage:<a class="headerlink" href="#usage" title="Permalink to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Lake</span></code> class simplifies the management of multiple datasets. You can access individual streams by name, add new streams, and iterate through them efficiently. This class is particularly helpful when dealing with various data sources within your analysis.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get the names of the streams</span>
@@ -793,59 +826,6 @@ The streams:
        [14380.528, 11524.35 , 13632.727, ...,     0.   ,     0.   ,
             0.   ]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
        1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]]))
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get the names and streams</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The names and streams:&#39;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">stream</span> <span class="ow">in</span> <span class="n">lake</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">stream</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 
-The names and streams:
-cpc Stream(header=[&#39;CPC_count[#/sec]&#39;, &#39;Temperature[degC]&#39;], data=array([[3.3510e+04, 1.7000e+01],
-       [3.3465e+04, 1.7100e+01],
-       [3.2171e+04, 1.7000e+01],
-       ...,
-       [1.9403e+04, 1.6900e+01],
-       [2.0230e+04, 1.7000e+01],
-       [1.9521e+04, 1.6800e+01]]), time=array([1.65734280e+09, 1.65734281e+09, 1.65734281e+09, ...,
-       1.65751559e+09, 1.65751560e+09, 1.65751560e+09]), files=[[&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1011254], [&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1078191]])
-smps_1d Stream(header=[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample_Temp_(C)&#39;, &#39;Sample_Pressure_(kPa)&#39;, &#39;Relative_Humidity_(%)&#39;, &#39;Median_(nm)&#39;, &#39;Mean_(nm)&#39;, &#39;Geo_Mean_(nm)&#39;, &#39;Mode_(nm)&#39;, &#39;Geo_Std_Dev.&#39;, &#39;Total_Conc_(#/cc)&#39;], data=array([[2.05000e+01, 7.91500e+02, 2.37000e+01, ..., 2.07210e+01,
-        2.17900e+00, 2.16900e+03],
-       [2.05000e+01, 7.91500e+02, 2.36000e+01, ..., 2.52550e+01,
-        2.10100e+00, 2.39408e+03],
-       [2.05000e+01, 7.91500e+02, 2.37000e+01, ..., 2.18700e+01,
-        2.13600e+00, 2.27861e+03],
-       ...,
-       [2.05000e+01, 7.91500e+02, 2.35000e+01, ..., 2.07210e+01,
-        2.31800e+00, 2.08056e+03],
-       [2.05000e+01, 7.91500e+02, 2.33000e+01, ..., 2.10970e+01,
-        2.31800e+00, 2.10616e+03],
-       [2.05000e+01, 7.91500e+02, 2.35000e+01, ..., 2.07210e+01,
-        2.24800e+00, 2.45781e+03]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
-       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
-smps_2d Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39;, &#39;22.27&#39;, &#39;22.67&#39;, &#39;23.08&#39;, &#39;23.50&#39;, &#39;23.93&#39;, &#39;24.36&#39;, &#39;24.80&#39;, &#39;25.25&#39;, &#39;25.71&#39;, &#39;26.18&#39;, &#39;26.66&#39;, &#39;27.14&#39;, &#39;27.63&#39;, &#39;28.13&#39;, &#39;28.64&#39;, &#39;29.16&#39;, &#39;29.69&#39;, &#39;30.23&#39;, &#39;30.78&#39;, &#39;31.34&#39;, &#39;31.91&#39;, &#39;32.49&#39;, &#39;33.08&#39;, &#39;33.68&#39;, &#39;34.29&#39;, &#39;34.91&#39;, &#39;35.55&#39;, &#39;36.19&#39;, &#39;36.85&#39;, &#39;37.52&#39;, &#39;38.20&#39;, &#39;38.89&#39;, &#39;39.60&#39;, &#39;40.32&#39;, &#39;41.05&#39;, &#39;41.79&#39;, &#39;42.55&#39;, &#39;43.32&#39;, &#39;44.11&#39;, &#39;44.91&#39;, &#39;45.73&#39;, &#39;46.56&#39;, &#39;47.40&#39;, &#39;48.26&#39;, &#39;49.14&#39;, &#39;50.03&#39;, &#39;50.94&#39;, &#39;51.86&#39;, &#39;52.80&#39;, &#39;53.76&#39;, &#39;54.74&#39;, &#39;55.73&#39;, &#39;56.74&#39;, &#39;57.77&#39;, &#39;58.82&#39;, &#39;59.89&#39;, &#39;60.98&#39;, &#39;62.08&#39;, &#39;63.21&#39;, &#39;64.36&#39;, &#39;65.52&#39;, &#39;66.71&#39;, &#39;67.93&#39;, &#39;69.16&#39;, &#39;70.41&#39;, &#39;71.69&#39;, &#39;72.99&#39;, &#39;74.32&#39;, &#39;75.67&#39;, &#39;77.04&#39;, &#39;78.44&#39;, &#39;79.86&#39;, &#39;81.31&#39;, &#39;82.79&#39;, &#39;84.29&#39;, &#39;85.82&#39;, &#39;87.38&#39;, &#39;88.96&#39;, &#39;90.58&#39;, &#39;92.22&#39;, &#39;93.90&#39;, &#39;95.60&#39;, &#39;97.34&#39;, &#39;99.10&#39;, &#39;100.90&#39;, &#39;102.74&#39;, &#39;104.60&#39;, &#39;106.50&#39;, &#39;108.43&#39;, &#39;110.40&#39;, &#39;112.40&#39;, &#39;114.44&#39;, &#39;116.52&#39;, &#39;118.64&#39;, &#39;120.79&#39;, &#39;122.98&#39;, &#39;125.21&#39;, &#39;127.49&#39;, &#39;129.80&#39;, &#39;132.16&#39;, &#39;134.56&#39;, &#39;137.00&#39;, &#39;139.49&#39;, &#39;142.02&#39;, &#39;144.60&#39;, &#39;147.22&#39;, &#39;149.89&#39;, &#39;152.61&#39;, &#39;155.38&#39;, &#39;158.20&#39;, &#39;161.08&#39;, &#39;164.00&#39;, &#39;166.98&#39;, &#39;170.01&#39;, &#39;173.09&#39;, &#39;176.24&#39;, &#39;179.43&#39;, &#39;182.69&#39;, &#39;186.01&#39;, &#39;189.38&#39;, &#39;192.82&#39;, &#39;196.32&#39;, &#39;199.89&#39;, &#39;203.51&#39;, &#39;207.21&#39;, &#39;210.97&#39;, &#39;214.80&#39;, &#39;218.70&#39;, &#39;222.67&#39;, &#39;226.71&#39;, &#39;230.82&#39;, &#39;235.01&#39;, &#39;239.28&#39;, &#39;243.62&#39;, &#39;248.05&#39;, &#39;252.55&#39;, &#39;257.13&#39;, &#39;261.80&#39;, &#39;266.55&#39;, &#39;271.39&#39;, &#39;276.32&#39;, &#39;281.33&#39;, &#39;286.44&#39;, &#39;291.64&#39;, &#39;296.93&#39;, &#39;302.32&#39;, &#39;307.81&#39;, &#39;313.40&#39;, &#39;319.08&#39;, &#39;324.88&#39;, &#39;330.77&#39;, &#39;336.78&#39;, &#39;342.89&#39;, &#39;349.12&#39;, &#39;355.45&#39;, &#39;361.90&#39;, &#39;368.47&#39;, &#39;375.16&#39;, &#39;381.97&#39;, &#39;388.91&#39;, &#39;395.96&#39;, &#39;403.15&#39;, &#39;410.47&#39;, &#39;417.92&#39;, &#39;425.51&#39;, &#39;433.23&#39;, &#39;441.09&#39;, &#39;449.10&#39;, &#39;457.25&#39;, &#39;465.55&#39;, &#39;474.00&#39;, &#39;482.61&#39;, &#39;491.37&#39;, &#39;500.29&#39;, &#39;509.37&#39;, &#39;518.61&#39;, &#39;528.03&#39;, &#39;537.61&#39;, &#39;547.37&#39;, &#39;557.31&#39;, &#39;567.42&#39;, &#39;577.72&#39;, &#39;588.21&#39;, &#39;598.89&#39;, &#39;609.76&#39;, &#39;620.82&#39;, &#39;632.09&#39;, &#39;643.57&#39;, &#39;655.25&#39;, &#39;667.14&#39;, &#39;679.25&#39;, &#39;691.58&#39;, &#39;704.14&#39;, &#39;716.92&#39;, &#39;729.93&#39;, &#39;743.18&#39;, &#39;756.67&#39;, &#39;770.40&#39;, &#39;784.39&#39;], data=array([[ 6103.186,  2832.655,  4733.553, ...,    93.413,   122.992,
-            0.   ],
-       [ 5621.118,  5867.747,  6233.403, ...,     0.   ,     0.   ,
-           75.377],
-       [ 5165.139,  4969.987,  4312.386, ...,     0.   ,   122.992,
-          124.085],
-       ...,
-       [ 9962.036,  7986.823,  8682.258, ...,     0.   ,     0.   ,
-          124.153],
-       [ 8765.782, 11175.603,  8148.945, ...,     0.   ,     0.   ,
-          372.433],
-       [14380.528, 11524.35 , 13632.727, ...,     0.   ,     0.   ,
-            0.   ]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
-       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
 </pre></div>
 </div>
 </div>
@@ -924,59 +904,89 @@ Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39
 </div>
 </div>
 </section>
+</section>
+</section>
 <section class="tex2jax_ignore mathjax_ignore" id="pause-to-plot-the-data">
 <h1>Pause to Plot the data<a class="headerlink" href="#pause-to-plot-the-data" title="Permalink to this heading">#</a></h1>
-<p>We’ll compare the CPC counts with the Mode of the SMPS data.</p>
+<p>In this code snippet, we retrieve data from the Lake object and create a dual-axis plot to visualize both CPC and SMPS data over time.</p>
+<ul class="simple">
+<li><p>We access the CPC data from the Lake using lake[‘cpc’]. We retrieve the datetime and CPC count data.</p></li>
+<li><p>Similarly, we access the SMPS data from the Lake using lake[‘smps_1d’] and retrieve the datetime and Mode data.</p></li>
+<li><p>We create a plot with a blue line for CPC data using ax.plot(), and an orange line for SMPS data on a twin y-axis axb.</p></li>
+<li><p>To improve readability, we rotate the x-axis labels using plt.xticks(rotation=45).</p></li>
+<li><p>We set y-axis limits for the SMPS data to be in the range [0, 200] using axb.set_ylim(0, 200).</p></li>
+<li><p>Axis labels and legends are added for both datasets.</p></li>
+<li><p>Finally, we display the plot and adjust the layout for better visualization using plt.show() and fig.tight_layout().</p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get cpc data</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load and Plot Data from Lake</span>
+
+<span class="c1"># Access CPC data from the Lake</span>
 <span class="n">cpc_time</span> <span class="o">=</span> <span class="n">lake</span><span class="p">[</span><span class="s1">&#39;cpc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">datetime64</span>
 <span class="n">cpc_data</span> <span class="o">=</span> <span class="n">lake</span><span class="p">[</span><span class="s1">&#39;cpc&#39;</span><span class="p">][</span><span class="s1">&#39;CPC_count[#/sec]&#39;</span><span class="p">]</span>
-<span class="c1"># get smps data</span>
+
+<span class="c1"># Access SMPS data from the Lake</span>
 <span class="n">smps_time</span> <span class="o">=</span> <span class="n">lake</span><span class="p">[</span><span class="s1">&#39;smps_1d&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">datetime64</span>
 <span class="n">smps_data</span> <span class="o">=</span> <span class="n">lake</span><span class="p">[</span><span class="s1">&#39;smps_1d&#39;</span><span class="p">][</span><span class="s1">&#39;Mode_(nm)&#39;</span><span class="p">]</span>
 
-<span class="c1"># plot the data on twinx axis</span>
+<span class="c1"># Plot the Data on Twinx Axis</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="c1"># Plot CPC data</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cpc_time</span><span class="p">,</span>
         <span class="n">cpc_data</span><span class="p">,</span>
         <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CPC&#39;</span><span class="p">,</span>
-        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span> 
+        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+
+<span class="c1"># Rotate x-axis labels for better readability</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+
+<span class="c1"># Create a twin y-axis for SMPS data</span>
 <span class="n">axb</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+
+<span class="c1"># Plot SMPS data</span>
 <span class="n">axb</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">smps_time</span><span class="p">,</span>
          <span class="n">smps_data</span><span class="p">,</span>
          <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SMPS&#39;</span><span class="p">,</span>
-         <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,)</span>
+         <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
+
+<span class="c1"># Set y-axis limits for SMPS data</span>
 <span class="n">axb</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="c1"># Set axis labels</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (UTC)&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;CPC_counts[#/sec]&#39;</span><span class="p">)</span>
-<span class="n">axb</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;SMPS_Mode[nm]&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;CPC Counts [#/sec]&#39;</span><span class="p">)</span>
+<span class="n">axb</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;SMPS Mode [nm]&#39;</span><span class="p">)</span>
+
+<span class="c1"># Display the legend and show the plot</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Adjust layout for better visualization</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/b5246f0b17509a7560854cfd7c7178093232f74160c33dfe4c310a619f314663.png" src="../../_images/b5246f0b17509a7560854cfd7c7178093232f74160c33dfe4c310a619f314663.png" />
+<img alt="../../_images/d8b30e7a1ddf6913e82e826c831a29f8b3ad5cf49854ada22e035a8eca25d916.png" src="../../_images/d8b30e7a1ddf6913e82e826c831a29f8b3ad5cf49854ada22e035a8eca25d916.png" />
 </div>
 </div>
-</section>
-<section class="tex2jax_ignore mathjax_ignore" id="average-the-data">
-<h1>Average the data<a class="headerlink" href="#average-the-data" title="Permalink to this heading">#</a></h1>
-<p>Now that we have the data loaded, we can average the data over time. We’ll use
-the ‘particula.data.lake_stats’ module to do this. The module has a function
-called ‘averaged_std’ that will take stream object and return a new stream
-object with the averaged data and the standard deviation of the data.</p>
-<p>If you recall this is the same naming convention as <code class="docutils literal notranslate"><span class="pre">stream_stats.average_std</span></code>
-which operates on stream objects.</p>
+<section id="data-averaging">
+<h2>Data Averaging<a class="headerlink" href="#data-averaging" title="Permalink to this heading">#</a></h2>
+<p>Now that we have loaded the data, we can perform data averaging over time. To achieve this, we will utilize the ‘particula.data.lake_stats’ module, which provides a convenient function called ‘averaged_std.’ This function takes a stream object as input and returns a new stream object containing both the averaged data and the standard deviation of the data.</p>
+<p>It’s worth noting that this function follows a similar naming convention to ‘stream_stats.average_std,’ which operates on individual stream objects.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lake_averaged</span> <span class="o">=</span> <span class="n">lake_stats</span><span class="o">.</span><span class="n">average_std</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute the average and standard deviation of data within a time interval</span>
+<span class="c1"># of 600 seconds for each stream in the lake, and create a new lake</span>
+<span class="c1"># containing the averaged data.</span>
+<span class="n">lake_averaged</span> <span class="o">=</span> <span class="n">lake_stats</span><span class="o">.</span><span class="n">average_std</span><span class="p">(</span>
     <span class="n">lake</span><span class="o">=</span><span class="n">lake</span><span class="p">,</span>
     <span class="n">average_interval</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
-    <span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">clone</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># Create a new lake instead of modifying the original</span>
+<span class="p">)</span>
 
+<span class="c1"># Print the resulting lake with averaged data and standard deviation.</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">lake_averaged</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -988,33 +998,42 @@ which operates on stream objects.</p>
 </div>
 </div>
 </section>
+</section>
 <section class="tex2jax_ignore mathjax_ignore" id="plot-the-averaged-data">
 <h1>Plot the Averaged Data<a class="headerlink" href="#plot-the-averaged-data" title="Permalink to this heading">#</a></h1>
-<p>get cpc data</p>
+<p>Let’s plot the averaged data to see how it compares to the raw data. We will use the same approach as before, but this time we will use the averaged data from the Lake object.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cpc_time</span> <span class="o">=</span> <span class="n">lake_averaged</span><span class="p">[</span><span class="s1">&#39;cpc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">datetime64</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Extract datetime and CPC data from the averaged lake</span>
+<span class="n">cpc_time</span> <span class="o">=</span> <span class="n">lake_averaged</span><span class="p">[</span><span class="s1">&#39;cpc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">datetime64</span>
 <span class="n">cpc_data</span> <span class="o">=</span> <span class="n">lake_averaged</span><span class="p">[</span><span class="s1">&#39;cpc&#39;</span><span class="p">][</span><span class="s1">&#39;CPC_count[#/sec]&#39;</span><span class="p">]</span>
-<span class="c1"># get smps data</span>
+
+<span class="c1"># Extract datetime and SMPS data from the averaged lake</span>
 <span class="n">smps_time</span> <span class="o">=</span> <span class="n">lake_averaged</span><span class="p">[</span><span class="s1">&#39;smps_1d&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">datetime64</span>
 <span class="n">smps_data</span> <span class="o">=</span> <span class="n">lake_averaged</span><span class="p">[</span><span class="s1">&#39;smps_1d&#39;</span><span class="p">][</span><span class="s1">&#39;Mode_(nm)&#39;</span><span class="p">]</span>
 
-<span class="c1"># plot the data on twinx axis</span>
+<span class="c1"># Create a plot with two y-axes (twinx) for CPC and SMPS data</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cpc_time</span><span class="p">,</span>
         <span class="n">cpc_data</span><span class="p">,</span>
         <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CPC&#39;</span><span class="p">,</span>
         <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+
+<span class="c1"># Create a twinx axis for SMPS data</span>
 <span class="n">axb</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
 <span class="n">axb</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">smps_time</span><span class="p">,</span>
          <span class="n">smps_data</span><span class="p">,</span>
          <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SMPS&#39;</span><span class="p">,</span>
          <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,)</span>
 <span class="n">axb</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="c1"># Set labels for both y-axes and the x-axis</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (UTC)&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;CPC_counts[#/sec]&#39;</span><span class="p">)</span>
 <span class="n">axb</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;SMPS_Mode[nm]&#39;</span><span class="p">)</span>
+
+<span class="c1"># Show the plot and adjust layout for better presentation</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
@@ -1027,9 +1046,7 @@ which operates on stream objects.</p>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="summary">
 <h1>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h1>
-<p>This example showed how to load data from a folder and then average the data
-over time. The data was then plotted to show the difference between the
-averaged and non-averaged data.</p>
+<p>In this part of the tutorial, we learned how to work with multiple streams of data and load them into a <code class="docutils literal notranslate"><span class="pre">Lake</span></code> object, which is a collection of streams. We explored operations on the data, including averaging it over time using the <code class="docutils literal notranslate"><span class="pre">particula.data.lake_stats</span></code> module. This allowed us to create more meaningful visualizations by comparing the averaged and non-averaged data. The example demonstrated the power of the <code class="docutils literal notranslate"><span class="pre">particula.data</span></code> package in handling and analyzing scientific data efficiently.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">Lake</span><span class="p">)</span>
@@ -1210,14 +1227,21 @@ class Lake(builtins.object)
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Data Part 3</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-path">Working path</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Data Part 3: Combining Data from Multiple Instruments</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-the-working-path">Setting the Working Path</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data">Load the Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lake-class-overview">Lake Class Overview</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#attributes">Attributes:</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods:</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage:</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data">Load the data</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#lake">Lake</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#pause-to-plot-the-data">Pause to Plot the data</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#average-the-data">Average the data</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#pause-to-plot-the-data">Pause to Plot the data</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-averaging">Data Averaging</a></li>
+</ul>
+</li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-averaged-data">Plot the Averaged Data</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
 </ul>

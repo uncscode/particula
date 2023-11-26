@@ -66,7 +66,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Stream Stats" href="stream_stats_part1.html" />
-    <link rel="prev" title="Loading Data Part 3" href="loading_data_part3.html" />
+    <link rel="prev" title="Loading Data Part 3: Combining Data from Multiple Instruments" href="loading_data_part3.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -186,10 +186,7 @@ const thebe_selector_output = ".output, .cell_output"
 
 <li class="toctree-l2"><a class="reference internal" href="loading_data_part2.html">Loading Data Part 2</a></li>
 
-<li class="toctree-l2"><a class="reference internal" href="loading_data_part3.html">Loading Data Part 3</a></li>
-
-
-
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part3.html">Loading Data Part 3: Combining Data from Multiple Instruments</a></li>
 
 
 
@@ -523,13 +520,13 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Data Part 4</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-path">Working path</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-the-settings-and-save-them">Generate the settings and save them</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#next-save-the-smps-settings">Next save the SMPS settings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-path">Working Path</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-and-save-settings">Generate and Save Settings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#next-save-the-smps-settings">Next save the SMPS settings</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-stream-settings">Load the Stream settings</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lake-settings">Lake settings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-stream-settings">Loading Stream Settings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lake-settings">Lake settings</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-lake">Load the Lake</a></li>
 </ul>
 </li>
@@ -550,10 +547,10 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="loading-data-part-4">
 <h1>Loading Data Part 4<a class="headerlink" href="#loading-data-part-4" title="Permalink to this heading">#</a></h1>
-<p>This example shows how do that save and load those stream and lake settings dictionaries. This is useful if you want to save your settings and then load them later.  This is also useful if you want to share your settings with someone else.  Or just stop from having to retype everything.</p>
+<p>In this part of the tutorial, we will explore how to save and load stream and lake settings dictionaries. This can be incredibly useful for preserving your settings, sharing them with others, or simply avoiding the need to retype everything.</p>
 <section id="working-path">
-<h2>Working path<a class="headerlink" href="#working-path" title="Permalink to this heading">#</a></h2>
-<p>In the working path you now see a couple of <code class="docutils literal notranslate"><span class="pre">.json</span></code> files, these are the settings files.  The <code class="docutils literal notranslate"><span class="pre">lake_settings.json</span></code> file contains the settings for the lake.  The <code class="docutils literal notranslate"><span class="pre">stream_settings.json</span></code> file contains the settings for the stream.  These are the same settings that you created in the previous example.  The only difference is that they are now saved to a file.</p>
+<h2>Working Path<a class="headerlink" href="#working-path" title="Permalink to this heading">#</a></h2>
+<p>In your working path, you will find a couple of <code class="docutils literal notranslate"><span class="pre">.json</span></code> files. These files are the settings files. The <code class="docutils literal notranslate"><span class="pre">lake_settings.json</span></code> file stores the settings for the lake, while the <code class="docutils literal notranslate"><span class="pre">stream_settings.json</span></code> file stores the settings for the stream. These settings are the same ones you created in the previous example, but now they are saved to files for easy access and sharing.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>data
 ├── CPC_3010_data
 │   ├── CPC_3010_data_20220709_Jul.csv
@@ -569,13 +566,13 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># all the imports</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import the necessary libraries and modules</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">loader_interface</span><span class="p">,</span> <span class="n">settings_generator</span>
 <span class="kn">from</span> <span class="nn">particula.data.tests.example_data.get_example_data</span> <span class="kn">import</span> <span class="n">get_data_folder</span>
 <span class="kn">from</span> <span class="nn">particula.data.lake</span> <span class="kn">import</span> <span class="n">Lake</span>
 
-<span class="c1"># set the parent directory of the data folders</span>
+<span class="c1"># Set the parent directory where the data folders are located</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">get_data_folder</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path to data folder:&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;particula&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -589,9 +586,10 @@ document.write(`
 </div>
 </div>
 </div>
-<section id="generate-the-settings-and-save-them">
-<h3>Generate the settings and save them<a class="headerlink" href="#generate-the-settings-and-save-them" title="Permalink to this heading">#</a></h3>
-<p>We’ll use <code class="docutils literal notranslate"><span class="pre">generate_settings.save_settings_for_stream</span></code> to</p>
+</section>
+<section id="generate-and-save-settings">
+<h2>Generate and Save Settings<a class="headerlink" href="#generate-and-save-settings" title="Permalink to this heading">#</a></h2>
+<p>First, we generate the settings for the CPC data using the <code class="docutils literal notranslate"><span class="pre">settings_generator.for_general_1d_load</span></code> function. These settings include details such as the data file location, file format, column names, and more.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># settings for the CPC data</span>
@@ -626,7 +624,7 @@ document.write(`
 </div>
 </div>
 <section id="next-save-the-smps-settings">
-<h4>Next save the SMPS settings<a class="headerlink" href="#next-save-the-smps-settings" title="Permalink to this heading">#</a></h4>
+<h3>Next save the SMPS settings<a class="headerlink" href="#next-save-the-smps-settings" title="Permalink to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># settings for the SMPS data</span>
@@ -694,9 +692,9 @@ document.write(`
 </div>
 </section>
 </section>
-<section id="load-the-stream-settings">
-<h3>Load the Stream settings<a class="headerlink" href="#load-the-stream-settings" title="Permalink to this heading">#</a></h3>
-<p>If you are still exploring you anlaysis pipeline, you may what individual streams. To load the settings for a stream use <code class="docutils literal notranslate"><span class="pre">generate_settings.load_settings_for_stream</span></code>.  This function takes the path to the settings file as an argument.  It returns a dictionary with the settings.</p>
+<section id="loading-stream-settings">
+<h2>Loading Stream Settings<a class="headerlink" href="#loading-stream-settings" title="Permalink to this heading">#</a></h2>
+<p>If you are still exploring your analysis pipeline, you may want to load settings for individual streams. To do so, you can use the generate_settings.load_settings_for_stream function. This function takes the path to the settings file as an argument and returns a dictionary containing the stream settings.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">smps_1d_stream_settings</span> <span class="o">=</span> <span class="n">settings_generator</span><span class="o">.</span><span class="n">load_settings_for_stream</span><span class="p">(</span>
@@ -716,17 +714,17 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
-  Loading file: 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample_Temp_(C)&#39;, &#39;Sample_Pressure_(kPa)&#39;, &#39;Relative_Humidity_(%)&#39;, &#39;Median_(nm)&#39;, &#39;Mean_(nm)&#39;, &#39;Geo_Mean_(nm)&#39;, &#39;Mode_(nm)&#39;, &#39;Geo_Std_Dev.&#39;, &#39;Total_Conc_(#/cc)&#39;]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample_Temp_(C)&#39;, &#39;Sample_Pressure_(kPa)&#39;, &#39;Relative_Humidity_(%)&#39;, &#39;Median_(nm)&#39;, &#39;Mean_(nm)&#39;, &#39;Geo_Mean_(nm)&#39;, &#39;Mode_(nm)&#39;, &#39;Geo_Std_Dev.&#39;, &#39;Total_Conc_(#/cc)&#39;]
 </pre></div>
 </div>
 </div>
 </div>
 </section>
 <section id="lake-settings">
-<h3>Lake settings<a class="headerlink" href="#lake-settings" title="Permalink to this heading">#</a></h3>
+<h2>Lake settings<a class="headerlink" href="#lake-settings" title="Permalink to this heading">#</a></h2>
 <p>If you wanted to load everything for a reanalysis, instead of calling each individual stream, you can first save a lake settings file.  This is done with <code class="docutils literal notranslate"><span class="pre">generate_settings.save_settings_for_lake</span></code>.  This function takes the path to the lake settings file as an argument.  It returns a dictionary with the settings.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -748,7 +746,6 @@ document.write(`
 </div>
 </div>
 </div>
-</section>
 <section id="load-the-lake">
 <h3>Load the Lake<a class="headerlink" href="#load-the-lake" title="Permalink to this heading">#</a></h3>
 <p>To load the lake settings use <code class="docutils literal notranslate"><span class="pre">generate_settings.load_settings_for_lake</span></code>.  This function takes the path to the lake settings file as an argument.  It returns a dictionary with the settings.</p>
@@ -781,10 +778,10 @@ document.write(`
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_1d
   Loading file: 2022-07-07_095151_SMPS.csv
+  Loading file: 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
-Folder Settings: smps_2d
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_2d
   Loading file: 2022-07-07_095151_SMPS.csv
 </pre></div>
 </div>
@@ -966,7 +963,7 @@ load_settings_for_lake(path: str, subfolder: str = &#39;&#39;, settings_suffix: 
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Loading Data Part 3</p>
+        <p class="prev-next-title">Loading Data Part 3: Combining Data from Multiple Instruments</p>
       </div>
     </a>
     <a class="right-next"
@@ -994,13 +991,13 @@ load_settings_for_lake(path: str, subfolder: str = &#39;&#39;, settings_suffix: 
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Data Part 4</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-path">Working path</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-the-settings-and-save-them">Generate the settings and save them</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#next-save-the-smps-settings">Next save the SMPS settings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-path">Working Path</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-and-save-settings">Generate and Save Settings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#next-save-the-smps-settings">Next save the SMPS settings</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-stream-settings">Load the Stream settings</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lake-settings">Lake settings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-stream-settings">Loading Stream Settings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lake-settings">Lake settings</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-lake">Load the Lake</a></li>
 </ul>
 </li>
