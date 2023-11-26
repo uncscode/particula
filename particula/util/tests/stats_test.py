@@ -7,9 +7,9 @@ from particula.util import stats
 def test_merge_format_str_headers():
     """Test the merge_different_headers function."""
     # Create example input data
-    data = np.array([[1, 2, 4], [3, 4, 5]]).T
+    data = np.array([[1, 2, 3], [1, 2, 3], [1, 2, 3]])
     header = ['a', 'b', 'c']
-    data_add = np.array([[5, 5], [8, 8]]).T
+    data_add = np.array([[5, 8], [5, 8], [5, 8]])
     header_add = ['c', 'd']
 
     # Call function to merge the data and headers
@@ -21,7 +21,7 @@ def test_merge_format_str_headers():
     )
 
     # Test merged data shape
-    assert merged_data.shape == (4, 2)
+    assert merged_data.shape == (3, 4)
 
     # Test merged header
     assert merged_header == ['a', 'b', 'c', 'd']
@@ -30,9 +30,9 @@ def test_merge_format_str_headers():
 def test_merge_format_num_headers():
     """Test the merge_different_headers function."""
     # Create example input data
-    data = np.array([[1, 2, 4], [3, 4, 5]]).T
+    data = np.array([[1, 2, 3], [1, 2, 3]])
     header = ['1', '2', '3']
-    data_add = np.array([[5, 5], [8, 8]]).T
+    data_add = np.array([[5, 8], [5, 8]])
     header_add = ['3', '4']
 
     # Call function to merge the data and headers
@@ -44,7 +44,7 @@ def test_merge_format_num_headers():
     )
 
     # Test merged data shape
-    assert merged_data.shape == (4, 2)
+    assert merged_data.shape == (2, 4)
 
     # Test merged header
     assert merged_header == ['1', '2', '3', '4']
@@ -56,10 +56,10 @@ def test_average_to_interval():
     time_stream = np.arange(0, 1000, 10)
     average_base_sec = 10
     average_base_time = np.arange(0, 1000, 60)
-    data_stream = np.linspace(0, 1000, len(time_stream))
-    data_stream = np.vstack((data_stream, data_stream, data_stream))
-    average_base_data = np.zeros((3, len(average_base_time)))
-    average_base_data_std = np.zeros((3, len(average_base_time)))
+    data_stream = np.linspace(0, 1000, len(time_stream)).reshape(-1, 1)
+    data_stream = np.concatenate([data_stream, data_stream, data_stream], axis=1)
+    average_base_data = np.zeros((len(average_base_time), 3))
+    average_base_data_std = np.zeros((len(average_base_time), 3))
 
     # Call the function
     average_base_data, average_base_data_std = stats.average_to_interval(
@@ -88,7 +88,7 @@ def test_average_to_interval():
                     691.919, 752.525, 813.131, 873.737,
                     934.34343434]
             ]
-        )
+        ).T
 
     expected_std = np.array(
             [
@@ -105,7 +105,7 @@ def test_average_to_interval():
                     17.250, 17.250, 17.250, 17.250, 17.250,
                     17.250, 17.250]
             ]
-        )
+        ).T
 
     assert np.allclose(average_base_data, expected_data, rtol=1e-3)
     assert np.allclose(average_base_data_std, expected_std, rtol=1e-3)

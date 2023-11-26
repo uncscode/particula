@@ -255,6 +255,7 @@ def save_settings_for_stream(
 
     with open(save_path, 'w', encoding='utf-8') as file:
         json.dump(settings, file, indent=4)
+        file.write('\n')  # Add an empty line at the bottom
 
 
 def load_settings_for_lake(
@@ -331,3 +332,4 @@ def save_settings_for_lake(
 
     with open(save_path, 'w', encoding='utf-8') as file:
         json.dump(settings, file, indent=4)
+        file.write('\n')  # Add an empty line at the bottom

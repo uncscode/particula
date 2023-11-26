@@ -170,7 +170,7 @@ def sizer_mean_properties(
             mean_vol_diameter_nm[i], geometric_mean_diameter_nm[i], \
             mode_diameter[i], mode_diameter_mass[i] = \
             mean_properties(
-            sizer_dndlogdp_smps[:, i],
+            sizer_dndlogdp_smps[i, :],
             sizer_diameter_smps,
             sizer_limits=sizer_limits
         )
@@ -178,7 +178,7 @@ def sizer_mean_properties(
         # total PM 100 nm concentration
         total_concentration_pm01[i], unit_mass_ug_m3_pm01[i], _, _, _, _, _ = \
             mean_properties(
-            sizer_dndlogdp_smps[:, i],
+            sizer_dndlogdp_smps[i, :],
             sizer_diameter_smps,
             sizer_limits=[0, 100]
         )
@@ -186,14 +186,14 @@ def sizer_mean_properties(
         # total PM1 um concentration
         total_concentration_pm1[i], unit_mass_ug_m3_pm1[i], _, _, _, _, _ = \
             mean_properties(
-            sizer_dndlogdp_smps[:, i],
+            sizer_dndlogdp_smps[i, :],
             sizer_diameter_smps,
             sizer_limits=[0, 1000]
         )
         # total PM <2.5 um concentration
         total_concentration_pm25[i], unit_mass_ug_m3_pm25[i], _, _, _, _, _ = \
             mean_properties(
-            sizer_dndlogdp_smps[:, i],
+            sizer_dndlogdp_smps[i, :],
             sizer_diameter_smps,
             sizer_limits=[0, 2500]
         )
@@ -201,7 +201,7 @@ def sizer_mean_properties(
         # total PM <10 um concentration
         total_concentration_pm10[i], unit_mass_ug_m3_pm10[i], _, _, _, _, _ = \
             mean_properties(
-            sizer_dndlogdp_smps[:, i],
+            sizer_dndlogdp_smps[i, :],
             sizer_diameter_smps,
             sizer_limits=[0, 10000]
         )
@@ -213,7 +213,7 @@ def sizer_mean_properties(
     mass_ug_m3_pm10 = unit_mass_ug_m3_pm10 * density
 
     # combine the data for datalake
-    combinded = np.vstack((
+    combinded = np.stack((
         total_concentration,
         mean_diameter_nm,
         geometric_mean_diameter_nm,
@@ -234,7 +234,7 @@ def sizer_mean_properties(
         total_concentration_pm10,
         unit_mass_ug_m3_pm10,
         mass_ug_m3_pm10,
-    ))
+    ), axis=1)
     header = [
         'Total_Conc_(#/cc)',
         'Mean_Diameter_(nm)',
