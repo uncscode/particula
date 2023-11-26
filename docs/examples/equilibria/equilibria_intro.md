@@ -1,4 +1,4 @@
-# Understanding Equilibria in Aerosol Science
+# Equilibria of Aerosols
 
 ## What is Equilibria?
 
