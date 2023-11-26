@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Loading Data Part 4 &#8212; Particula Book</title>
+    <title>Loading Part 4: Settings Files &#8212; Particula Book</title>
   
   
   
@@ -65,8 +65,8 @@ const thebe_selector_output = ".output, .cell_output"
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/streamlake/loading_data_part4';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Stream Stats" href="stream_stats_part1.html" />
-    <link rel="prev" title="Loading Data Part 3: Combining Data from Multiple Instruments" href="loading_data_part3.html" />
+    <link rel="next" title="Stream: Averaging and Outliers" href="stream_stats_part1.html" />
+    <link rel="prev" title="Loading Part 3: Lake" href="loading_data_part3.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -180,19 +180,19 @@ const thebe_selector_output = ".output, .cell_output"
 
 <li class="toctree-l1"><a class="reference internal" href="../ionparticle_coagulation.html">Ion–particle coagulation</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="particula_data.html">Data in Particula</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="loading_data_part1.html">Loading Data Part 1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part1.html">Loading Part 1: Into &amp; 1D Data</a></li>
 
 
 
-<li class="toctree-l2"><a class="reference internal" href="loading_data_part2.html">Loading Data Part 2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part2.html">Loading Part 2: Sizer Data</a></li>
 
-<li class="toctree-l2"><a class="reference internal" href="loading_data_part3.html">Loading Data Part 3: Combining Data from Multiple Instruments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part3.html">Loading Part 3: Lake</a></li>
 
 
 
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Loading Data Part 4</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Loading Part 4: Settings Files</a></li>
 
-<li class="toctree-l2"><a class="reference internal" href="stream_stats_part1.html">Stream Stats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stream_stats_part1.html">Stream: Averaging and Outliers</a></li>
 
 
 
@@ -509,7 +509,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Loading Data Part 4</h1>
+    <h1>Loading Part 4: Settings Files</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -519,7 +519,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Data Part 4</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Part 4: Settings Files</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-path">Working Path</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-and-save-settings">Generate and Save Settings</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#next-save-the-smps-settings">Next save the SMPS settings</a></li>
@@ -545,8 +545,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="loading-data-part-4">
-<h1>Loading Data Part 4<a class="headerlink" href="#loading-data-part-4" title="Permalink to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="loading-part-4-settings-files">
+<h1>Loading Part 4: Settings Files<a class="headerlink" href="#loading-part-4-settings-files" title="Permalink to this heading">#</a></h1>
 <p>In this part of the tutorial, we will explore how to save and load stream and lake settings dictionaries. This can be incredibly useful for preserving your settings, sharing them with others, or simply avoiding the need to retype everything.</p>
 <section id="working-path">
 <h2>Working Path<a class="headerlink" href="#working-path" title="Permalink to this heading">#</a></h2>
@@ -780,10 +780,10 @@ document.write(`
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_1d
   Loading file: 2022-07-07_095151_SMPS.csv
-  Loading file: 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_2d
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+Folder Settings: smps_2d
   Loading file: 2022-07-07_095151_SMPS.csv
 </pre></div>
 </div>
@@ -965,7 +965,7 @@ load_settings_for_lake(path: str, subfolder: str = &#39;&#39;, settings_suffix: 
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Loading Data Part 3: Combining Data from Multiple Instruments</p>
+        <p class="prev-next-title">Loading Part 3: Lake</p>
       </div>
     </a>
     <a class="right-next"
@@ -973,7 +973,7 @@ load_settings_for_lake(path: str, subfolder: str = &#39;&#39;, settings_suffix: 
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Stream Stats</p>
+        <p class="prev-next-title">Stream: Averaging and Outliers</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -992,7 +992,7 @@ load_settings_for_lake(path: str, subfolder: str = &#39;&#39;, settings_suffix: 
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Data Part 4</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Part 4: Settings Files</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-path">Working Path</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-and-save-settings">Generate and Save Settings</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#next-save-the-smps-settings">Next save the SMPS settings</a></li>
