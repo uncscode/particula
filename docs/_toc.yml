@@ -24,7 +24,7 @@ parts:
   - file: examples/wall_loss_section
     sections:
     - file: examples/chamber_smps_data
-  - file: exmaples/lagrangian/lagrangian_intro
+  - file: examples/lagrangian/lagrangian_intro
     sections:
     - file: examples/lagrangian/basic_lagrangian_box
   - file: examples/equilibria/equilibria_intro
