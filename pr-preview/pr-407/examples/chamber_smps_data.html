@@ -665,39 +665,6 @@ document.write(`
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">AssertionError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># 1 convert to dn/dlogDp</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">convert_sizer_dn</span><span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">diameter</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">header</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">dn_dlogdp</span><span class="o">=</span><span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="c1"># Dilution correction</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="n">dilution_correction</span> <span class="o">=</span> <span class="mi">2</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/util/convert.py:409,</span> in <span class="ni">convert_sizer_dn</span><span class="nt">(diameter, dn_dlogdp, inverse)</span>
-<span class="g g-Whitespace">    </span><span class="mi">377</span> <span class="k">def</span> <span class="nf">convert_sizer_dn</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">378</span>     <span class="n">diameter</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">379</span>     <span class="n">dn_dlogdp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">380</span>     <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="g g-Whitespace">    </span><span class="mi">381</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">382</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">383</span><span class="sd">     Converts the sizer data from dn/dlogdp to d_num.</span>
-<span class="g g-Whitespace">    </span><span class="mi">384</span><span class="sd"> </span>
-<span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">407</span><span class="sd">     # future: Address potential over-counting in last/first bin</span>
-<span class="g g-Whitespace">    </span><span class="mi">408</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">409</span>     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">diameter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dn_dlogdp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> \
-<span class="g g-Whitespace">    </span><span class="mi">410</span>         <span class="s2">&quot;Inputs must be non-empty arrays of the same length.&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">411</span>     <span class="c1"># Compute the bin widths</span>
-<span class="g g-Whitespace">    </span><span class="mi">412</span>     <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">diameter</span><span class="p">)</span>
-
-<span class="ne">AssertionError</span>: Inputs must be non-empty arrays of the same length.
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="plot-the-distributions">
@@ -708,12 +675,12 @@ document.write(`
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">header_float</span><span class="p">,</span>
-    <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">10</span><span class="p">],</span>
+    <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="p">:],</span>
     <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Concentration earlier&#39;</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">header_float</span><span class="p">,</span>
-    <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">20</span><span class="p">],</span>
+    <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="p">:],</span>
     <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Concentration later&#39;</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
@@ -727,7 +694,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/36662410c8f83d85eeaa139ff2927f8c12ba2208e6450e14814e3373622e276d.png" src="../_images/36662410c8f83d85eeaa139ff2927f8c12ba2208e6450e14814e3373622e276d.png" />
+<img alt="../_images/6e6ca1c991e0109895751d68cb221cf7cd9eb731a88bed475b6fcca10fe291ef.png" src="../_images/6e6ca1c991e0109895751d68cb221cf7cd9eb731a88bed475b6fcca10fe291ef.png" />
 </div>
 </div>
 </section>
@@ -776,7 +743,7 @@ document.write(`
 Length of stream after crop: 321
 </pre></div>
 </div>
-<img alt="../_images/9bf615cef15e1c3bd565c983c16485c050d2340896673688443ba084975a5dd9.png" src="../_images/9bf615cef15e1c3bd565c983c16485c050d2340896673688443ba084975a5dd9.png" />
+<img alt="../_images/463ef5e937a87d22ccd8db889f91579a6b1635c62623fafed75d27582310424c.png" src="../_images/463ef5e937a87d22ccd8db889f91579a6b1635c62623fafed75d27582310424c.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -863,7 +830,7 @@ Length of stream after crop: 321
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/4c8baea7a31425e1bc103cd28f8b74384c98b4b71cc9401d06afcbd02ad86715.png" src="../_images/4c8baea7a31425e1bc103cd28f8b74384c98b4b71cc9401d06afcbd02ad86715.png" />
+<img alt="../_images/ecca72db70184b2b26ba95832aa8d258c8bb40f80a88240933fc68bec5752c16.png" src="../_images/ecca72db70184b2b26ba95832aa8d258c8bb40f80a88240933fc68bec5752c16.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -874,7 +841,7 @@ Length of stream after crop: 321
 <span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span>
     <span class="n">experiment_time</span><span class="p">,</span>
     <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">header_float</span><span class="p">,</span>
-    <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+    <span class="n">stream_smps_2d</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
     <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">PuBu_r</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Experiment time (hours)&#39;</span><span class="p">)</span>
@@ -885,7 +852,7 @@ Length of stream after crop: 321
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/c5551cec7db65cdb77084d20e482b5086f24bc7a76afa17771423b6942deadbf.png" src="../_images/c5551cec7db65cdb77084d20e482b5086f24bc7a76afa17771423b6942deadbf.png" />
+<img alt="../_images/f80cae09196f1e154491194b19519e01ae4ab05044c9b8319770168e3b24be66.png" src="../_images/f80cae09196f1e154491194b19519e01ae4ab05044c9b8319770168e3b24be66.png" />
 </div>
 </div>
 </section>
