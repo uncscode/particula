@@ -186,7 +186,6 @@ const thebe_selector_output = ".output, .cell_output"
 
 <li class="toctree-l2"><a class="reference internal" href="streamlake/loading_data_part2.html">Loading Data Part 2</a></li>
 
-
 <li class="toctree-l2"><a class="reference internal" href="streamlake/loading_data_part3.html">Loading Data Part 3</a></li>
 
 
@@ -681,22 +680,22 @@ document.write(`
 <span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="c1"># Dilution correction</span>
 <span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="n">dilution_correction</span> <span class="o">=</span> <span class="mi">2</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/util/convert.py:410,</span> in <span class="ni">convert_sizer_dn</span><span class="nt">(diameter, dn_dlogdp, inverse)</span>
-<span class="g g-Whitespace">    </span><span class="mi">378</span> <span class="k">def</span> <span class="nf">convert_sizer_dn</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">379</span>     <span class="n">diameter</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">380</span>     <span class="n">dn_dlogdp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">381</span>     <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="g g-Whitespace">    </span><span class="mi">382</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">383</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">384</span><span class="sd">     Converts the sizer data from dn/dlogdp to d_num.</span>
-<span class="g g-Whitespace">    </span><span class="mi">385</span><span class="sd"> </span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/util/convert.py:409,</span> in <span class="ni">convert_sizer_dn</span><span class="nt">(diameter, dn_dlogdp, inverse)</span>
+<span class="g g-Whitespace">    </span><span class="mi">377</span> <span class="k">def</span> <span class="nf">convert_sizer_dn</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">378</span>     <span class="n">diameter</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">379</span>     <span class="n">dn_dlogdp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">380</span>     <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="g g-Whitespace">    </span><span class="mi">381</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">382</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">383</span><span class="sd">     Converts the sizer data from dn/dlogdp to d_num.</span>
+<span class="g g-Whitespace">    </span><span class="mi">384</span><span class="sd"> </span>
 <span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">408</span><span class="sd">     # future: Address potential over-counting in last/first bin</span>
-<span class="g g-Whitespace">    </span><span class="mi">409</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">410</span>     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">diameter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dn_dlogdp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> \
-<span class="g g-Whitespace">    </span><span class="mi">411</span>         <span class="s2">&quot;Inputs must be non-empty arrays of the same length.&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">412</span>     <span class="c1"># Compute the bin widths</span>
-<span class="g g-Whitespace">    </span><span class="mi">413</span>     <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">diameter</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">407</span><span class="sd">     # future: Address potential over-counting in last/first bin</span>
+<span class="g g-Whitespace">    </span><span class="mi">408</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">409</span>     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">diameter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dn_dlogdp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> \
+<span class="g g-Whitespace">    </span><span class="mi">410</span>         <span class="s2">&quot;Inputs must be non-empty arrays of the same length.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">411</span>     <span class="c1"># Compute the bin widths</span>
+<span class="g g-Whitespace">    </span><span class="mi">412</span>     <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">diameter</span><span class="p">)</span>
 
 <span class="ne">AssertionError</span>: Inputs must be non-empty arrays of the same length.
 </pre></div>

@@ -186,7 +186,6 @@ const thebe_selector_output = ".output, .cell_output"
 
 <li class="toctree-l2"><a class="reference internal" href="loading_data_part2.html">Loading Data Part 2</a></li>
 
-
 <li class="toctree-l2"><a class="reference internal" href="loading_data_part3.html">Loading Data Part 3</a></li>
 
 
@@ -730,11 +729,6 @@ object with the averaged data and the standard deviation of the data.</p>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(2, 288)
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="plot-the-averaged-data">
@@ -753,9 +747,6 @@ object with the averaged data and the standard deviation of the data.</p>
 <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/514eaf885329a58ee969fc87d43ad73c3531152697b90cef4ebc3bca5385ba74.png" src="../../_images/514eaf885329a58ee969fc87d43ad73c3531152697b90cef4ebc3bca5385ba74.png" />
 </div>
 </div>
 <section id="clean-up-the-data">
@@ -784,12 +775,6 @@ removed.</p>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(2, 63787)
-</pre></div>
-</div>
-<img alt="../../_images/a64cef9fd1553997bd306795d27d48bde4eac52b89553f5f283ebc99df0272c0.png" src="../../_images/a64cef9fd1553997bd306795d27d48bde4eac52b89553f5f283ebc99df0272c0.png" />
-</div>
 </div>
 </section>
 <section id="summary">
@@ -799,128 +784,6 @@ and averaging the values over time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">stream_stats</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on module particula.data.stream_stats in particula.data:
-
-NAME
-    particula.data.stream_stats - Functions to operate on stream objects.
-
-FUNCTIONS
-    average_std(stream: object, average_interval: Union[float, int] = 60, new_time_array: Optional[numpy.ndarray] = None) -&gt; object
-        Calculate the average and standard deviation of data within a given
-        &#39;stream&#39; object over specified intervals.
-        
-        This function takes a &#39;stream&#39; object, which should contain time-series
-        data, and computes the average and standard deviation of the data at
-        intervals specified by &#39;average_interval&#39;. If data.time is in seconds
-        then the units of the interval are seconds (hour in hours etc). The
-        results are returned as a new &#39;StreamAveraged&#39; object containing the
-        processed data.
-        
-        Args:
-        - stream (object): The input stream object containing &#39;time&#39; and &#39;data&#39;
-            arrays along with other associated metadata.
-        - average_interval (float|int, optional): The time interval over which the
-            averaging is to be performed.
-        - new_time_array (np.ndarray, optional): An optional array of time points
-            at which the average and standard deviation are computed.
-            If not provided, a new time array is generated based on the start and
-            end times within the &#39;stream.time&#39; object.
-        
-        Returns:
-        - StreamAveraged (object): An object of type &#39;StreamAveraged&#39; containing
-            the averaged data, time array, start and stop times, the standard
-            deviation of the averaged data, and other metadata from the original
-            &#39;stream&#39; object.
-        
-        The function checks for an existing &#39;new_time_array&#39; and generates one if
-        needed. It then calculates the average and standard deviation for each
-        interval and constructs a &#39;StreamAveraged&#39; object with the results and
-        metadata from the original &#39;stream&#39; object.
-    
-    drop_masked(stream: object, mask: numpy.ndarray) -&gt; object
-        Drop rows where mask is false, and return data stream.
-        
-        Parameters
-        ----------
-        stream : object
-            data stream object
-        mask : np.ndarray
-            mask to apply to data stream
-        
-        Returns
-        -------
-        object
-            stream object
-    
-    filtering(stream: object, bottom: Optional[float] = None, top: Optional[float] = None, value: Optional[float] = None, invert: bool = False, replace_with: Union[float, int, NoneType] = None, drop: Optional[bool] = True) -&gt; object
-        Filters the data of the given &#39;stream&#39; object based on the specified
-        bounds or specific value. The filtered data can be either dropped or
-        replaced with a specified value.  Note, not all parameters need to be
-        specified, but at least one must be provided (top, bottom, value)
-        
-        Args:
-        - stream (Stream): The input stream object containing &#39;data&#39; and &#39;time&#39;
-            attributes.
-        - bottom (float, optional): The lower bound for filtering data. Defaults
-            to None.
-        - top (float, optional): The upper bound for filtering data.
-            Defaults to None.
-        - value (float, optional): Specific value to filter from data.
-            Defaults to None.
-        - invert (bool): If True, inverts the filter criteria.
-            Defaults to False.
-        - replace_with (float|int, optional): Value to replace filtered-out data.
-            Defaults to None.
-        - drop (bool, optional): If True, filtered-out data points are dropped
-            from the dataset. Defaults to False.
-        
-        Returns:
-        - Stream: The &#39;stream&#39; object with data filtered as specified.
-        
-        If &#39;drop&#39; is True, &#39;replace_with&#39; is ignored and filtered data points are
-        removed from the &#39;stream&#39; object. Otherwise, filtered data points are
-        replaced with &#39;replace_with&#39; value.
-        
-        add specific data row to filter on
-
-DATA
-    Optional = typing.Optional
-        Optional type.
-        
-        Optional[X] is equivalent to Union[X, None].
-    
-    Union = typing.Union
-        Union type; Union[X, Y] means either X or Y.
-        
-        To define a union, use e.g. Union[int, str].  Details:
-        - The arguments must be types and there must be at least one.
-        - None as an argument is a special case and is replaced by
-          type(None).
-        - Unions of unions are flattened, e.g.::
-        
-            Union[Union[int, str], float] == Union[int, str, float]
-        
-        - Unions of a single argument vanish, e.g.::
-        
-            Union[int] == int  # The constructor actually returns int
-        
-        - Redundant arguments are skipped, e.g.::
-        
-            Union[int, str, int] == Union[int, str]
-        
-        - When comparing unions, the argument order is ignored, e.g.::
-        
-            Union[int, str] == Union[str, int]
-        
-        - You cannot subclass or instantiate a union.
-        - You can use Optional[X] as a shorthand for Union[X, None].
-
-FILE
-    c:\users\kkgor\onedrive\areas\github\particula\particula\data\stream_stats.py
 </pre></div>
 </div>
 </div>

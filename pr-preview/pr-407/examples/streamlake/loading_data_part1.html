@@ -186,7 +186,6 @@ const thebe_selector_output = ".output, .cell_output"
 
 <li class="toctree-l2"><a class="reference internal" href="loading_data_part2.html">Loading Data Part 2</a></li>
 
-
 <li class="toctree-l2"><a class="reference internal" href="loading_data_part3.html">Loading Data Part 3</a></li>
 
 
@@ -836,7 +835,8 @@ First 5 data entries: [[3.3510e+04 1.7000e+01]
     <span class="n">data_column</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>  <span class="c1"># Columns in the file that contain the data</span>
     <span class="n">data_header</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;data 1&#39;</span><span class="p">,</span> <span class="s1">&#39;data 2&#39;</span><span class="p">],</span>  <span class="c1"># Headers for the data columns</span>
     <span class="n">time_column</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="c1"># Column in the file that contains the time data</span>
-    <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;epoch&#39;</span><span class="p">,</span>  <span class="c1"># Format of the time data (epoch, ISO 8601, etc.)</span>
+    <span class="c1"># Format of the time data (epoch, &quot;%m/%d/%Y %H:%M:%S&quot; etc.)</span>
+    <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;epoch&#39;</span><span class="p">,</span>
     <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span>  <span class="c1"># Delimiter used in the data file (e.g., comma for CSV)</span>
     <span class="n">time_shift_seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># Shift in time data if needed, in seconds</span>
     <span class="n">timezone_identifier</span><span class="o">=</span><span class="s1">&#39;UTC&#39;</span><span class="p">,</span>  <span class="c1"># Timezone identifier for the time data</span>

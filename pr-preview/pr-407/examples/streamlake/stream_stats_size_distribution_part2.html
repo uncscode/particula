@@ -186,7 +186,6 @@ const thebe_selector_output = ".output, .cell_output"
 
 <li class="toctree-l2"><a class="reference internal" href="loading_data_part2.html">Loading Data Part 2</a></li>
 
-
 <li class="toctree-l2"><a class="reference internal" href="loading_data_part3.html">Loading Data Part 3</a></li>
 
 
@@ -640,10 +639,10 @@ show the fix to that soon.</p>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_1d
   Loading file: 2022-07-07_095151_SMPS.csv
-  Loading file: 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_2d
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+Folder Settings: smps_2d
   Loading file: 2022-07-07_095151_SMPS.csv
 </pre></div>
 </div>
@@ -722,22 +721,22 @@ example we’ll use <code class="docutils literal notranslate"><span class="pre"
 <span class="g g-Whitespace">     </span><span class="mi">51</span> <span class="k">if</span> <span class="n">total_concentration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 <span class="g g-Whitespace">     </span><span class="mi">52</span>     <span class="n">sizer_dn</span> <span class="o">=</span> <span class="n">sizer_dn</span> <span class="o">*</span> <span class="n">total_concentration</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sizer_dn</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/util/convert.py:410,</span> in <span class="ni">convert_sizer_dn</span><span class="nt">(diameter, dn_dlogdp, inverse)</span>
-<span class="g g-Whitespace">    </span><span class="mi">378</span> <span class="k">def</span> <span class="nf">convert_sizer_dn</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">379</span>     <span class="n">diameter</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">380</span>     <span class="n">dn_dlogdp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">381</span>     <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="g g-Whitespace">    </span><span class="mi">382</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">383</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">384</span><span class="sd">     Converts the sizer data from dn/dlogdp to d_num.</span>
-<span class="g g-Whitespace">    </span><span class="mi">385</span><span class="sd"> </span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/particula/util/convert.py:409,</span> in <span class="ni">convert_sizer_dn</span><span class="nt">(diameter, dn_dlogdp, inverse)</span>
+<span class="g g-Whitespace">    </span><span class="mi">377</span> <span class="k">def</span> <span class="nf">convert_sizer_dn</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">378</span>     <span class="n">diameter</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">379</span>     <span class="n">dn_dlogdp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">380</span>     <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="g g-Whitespace">    </span><span class="mi">381</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">382</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">383</span><span class="sd">     Converts the sizer data from dn/dlogdp to d_num.</span>
+<span class="g g-Whitespace">    </span><span class="mi">384</span><span class="sd"> </span>
 <span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">408</span><span class="sd">     # future: Address potential over-counting in last/first bin</span>
-<span class="g g-Whitespace">    </span><span class="mi">409</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">410</span>     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">diameter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dn_dlogdp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> \
-<span class="g g-Whitespace">    </span><span class="mi">411</span>         <span class="s2">&quot;Inputs must be non-empty arrays of the same length.&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">412</span>     <span class="c1"># Compute the bin widths</span>
-<span class="g g-Whitespace">    </span><span class="mi">413</span>     <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">diameter</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">407</span><span class="sd">     # future: Address potential over-counting in last/first bin</span>
+<span class="g g-Whitespace">    </span><span class="mi">408</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">409</span>     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">diameter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dn_dlogdp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> \
+<span class="g g-Whitespace">    </span><span class="mi">410</span>         <span class="s2">&quot;Inputs must be non-empty arrays of the same length.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">411</span>     <span class="c1"># Compute the bin widths</span>
+<span class="g g-Whitespace">    </span><span class="mi">412</span>     <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">diameter</span><span class="p">)</span>
 
 <span class="ne">AssertionError</span>: Inputs must be non-empty arrays of the same length.
 </pre></div>
@@ -784,9 +783,6 @@ the header name, which is not a valid index for a np.ndarray.</p>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/1cf13fedb6389f50d41729b8516e28aa3b355dd5ce7fc479bbcc21fd5eb554de.png" src="../../_images/1cf13fedb6389f50d41729b8516e28aa3b355dd5ce7fc479bbcc21fd5eb554de.png" />
-</div>
 </div>
 </section>
 </section>
@@ -798,32 +794,6 @@ diameter, median diameter, and total PM2.5 mass.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">size_distribution</span><span class="o">.</span><span class="n">sizer_mean_properties</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function sizer_mean_properties in module particula.data.process.size_distribution:
-
-sizer_mean_properties(stream: particula.data.stream.Stream, sizer_limits: Optional[List[float]] = None, density: float = 1.5, diameter_units: str = &#39;nm&#39;) -&gt; particula.data.stream.Stream
-    Calculates the mean properties of the size distribution, and returns a
-    stream.
-    
-    Parameters
-    ----------
-    stream : Stream
-        The stream to process.
-    sizer_limits : list, optional [in diameter_units]
-        The lower and upper limits of the size of interest. The default is None
-    density : float, optional
-        The density of the particles. The default is 1.5 g/cm3.
-    diameter_units : str
-        The units of the diameter. The default is &#39;nm&#39;. This will be converted
-        to nm.
-    
-    Returns
-    -------
-    stream : Stream
-        The stream with the mean properties added.
 </pre></div>
 </div>
 </div>
