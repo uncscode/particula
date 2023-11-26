@@ -1,0 +1,1323 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Loading Part 2: Sizer Data &#8212; Particula Book</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
+  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/streamlake/loading_data_part2';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Loading Part 3: Lake" href="loading_data_part3.html" />
+    <link rel="prev" title="Loading Part 1: Into &amp; 1D Data" href="loading_data_part1.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/placeholder.png" class="logo__image only-light" alt="Particula Book - Home"/>
+    <script>document.write(`<img src="../../_static/placeholder.png" class="logo__image only-dark" alt="Particula Book - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    Getting started
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tour</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../tour/part-tour.html">Particula tour</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../distribution_statistics.html">Distribution statistics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_coagulation.html">Distribution coagulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_evolution.html">Distribution evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_ambient.html">Distributions</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../ionparticle_coagulation.html">Ion–particle coagulation</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="particula_data.html">Data in Particula</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part1.html">Loading Part 1: Into &amp; 1D Data</a></li>
+
+
+
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Loading Part 2: Sizer Data</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part3.html">Loading Part 3: Lake</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part4.html">Loading Part 4: Settings Files</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="stream_stats_part1.html">Stream: Averaging and Outliers</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="stream_stats_size_distribution_part2.html">Size Distribution Stats</a></li>
+
+
+
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../wall_loss_section.html">Chamber Wall Loss Analysis</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../chamber_smps_data.html">Chamber Analysis</a></li>
+
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../equilibria/equilibria_intro.html">Equilibria of Aerosols</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../equilibria/activity_part1.html">Activity Example</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/knudsen_number.html"><code class="docutils literal notranslate"><span class="pre">knudsen_number</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/slip_correction.html"><code class="docutils literal notranslate"><span class="pre">slip_correction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/friction_factor.html"><code class="docutils literal notranslate"><span class="pre">friction_factor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Strategic Plan</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/strategic_planning_FY24.html">FY24 Plan</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributor Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/streamlake/loading_data_part2.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/streamlake/loading_data_part2.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/streamlake/loading_data_part2.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/streamlake/loading_data_part2.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/examples/streamlake/loading_data_part2.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Loading Part 2: Sizer Data</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Part 2: Sizer Data</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-your-working-path">Setting Up Your Working Path</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data">Load the Data</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#formatting-the-data">Formatting the Data</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pause-to-plot">Pause to Plot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dates-in-plots">Dates in Plots</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contour-plot-of-data">Contour Plot of Data</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#preparing-the-data-for-contour-plotting">Preparing the Data for Contour Plotting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-the-contour-plot">Creating the Contour Plot</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simplifying-data-import-with-the-settings-generator">Simplifying Data Import with the Settings Generator</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-the-settings-generator-function">Understanding the Settings Generator Function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-default-settings">Using Default Settings</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#efficient-data-loading-with-the-interface">Efficient Data Loading with the Interface</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-the-interface-s-role">Understanding the Interface’s Role</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-advantages-of-mastery">The Advantages of Mastery</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#printing-data-stream-summaries">Printing Data Stream Summaries</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-the-data-stream-summary">Understanding the Data Stream Summary</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-for-printing-summaries">Code for Printing Summaries</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-again">Plotting Again</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-loading-data-part-2">Summary of Loading Data Part 2</a></li>
+</ul>
+</li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="loading-part-2-sizer-data">
+<h1>Loading Part 2: Sizer Data<a class="headerlink" href="#loading-part-2-sizer-data" title="Permalink to this heading">#</a></h1>
+<p>Welcome to Part 2 of our data loading series! This section builds upon the concepts and techniques introduced in Part 1. If you haven’t gone through the first part, we highly recommend you do so to get a firm foundation. Here, we’ll dive into handling 2-dimensional data, such as size distributions, which are common in fields like environmental science and engineering.</p>
+<section id="setting-up-your-working-path">
+<h2>Setting Up Your Working Path<a class="headerlink" href="#setting-up-your-working-path" title="Permalink to this heading">#</a></h2>
+<p>Before we begin, let’s set up the working path, which is the location on your computer where your data files are stored. In this example, we’ll use data provided in the current directory of this notebook. However, you can easily change this to any directory where your data files are located. For instance, if you have a folder named “data” in your home directory for a project called “Campaign2023_of_awesome”, you would set the path like this:</p>
+<p><code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">=</span> <span class="pre">&quot;U:\\data\\processing\\Campaign2023_of_awesome\\data&quot;</span></code></p>
+<p>Let’s start by importing the necessary Python libraries and modules. We’ll explain each one as we use them throughout this notebook.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>  <span class="c1"># For handling file and directory paths</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>  <span class="c1"># For numerical operations</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>  <span class="c1"># For plotting and visualizing data</span>
+<span class="c1"># Particula package components</span>
+<span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">loader</span><span class="p">,</span> <span class="n">loader_interface</span><span class="p">,</span> <span class="n">settings_generator</span>
+<span class="c1"># For accessing example data</span>
+<span class="kn">from</span> <span class="nn">particula.data.tests.example_data.get_example_data</span> <span class="kn">import</span> <span class="n">get_data_folder</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we’ll determine the current working directory and set the path for the data folder. This step is essential for ensuring that our scripts know where to look for the data files.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Retrieving and printing the current working directory of this script</span>
+<span class="n">current_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Current path for this script:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">current_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;particula&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Setting and printing the path to the data folder</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">get_data_folder</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path to data folder:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;particula&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Current path for this script:
+/docs/examples/streamlake
+Path to data folder:
+/data/tests/example_data
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="load-the-data">
+<h2>Load the Data<a class="headerlink" href="#load-the-data" title="Permalink to this heading">#</a></h2>
+<p>Now that we’ve set our working directory, the next step is to load the data. We’ll be using the <code class="docutils literal notranslate"><span class="pre">loader</span></code> module from the Particula package for this task. The function <code class="docutils literal notranslate"><span class="pre">loader.data_raw_loader()</span></code> is specifically designed to read data from a file, which we’ll specify using its file path. This approach is straightforward and efficient for loading data into Python for analysis.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Constructing the full file path for the data file</span>
+<span class="c1"># We&#39;re joining the path set earlier with the specific file we want to load</span>
+<span class="n">data_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">,</span>  <span class="c1"># The base path we set earlier</span>
+    <span class="s1">&#39;SMPS_data&#39;</span><span class="p">,</span>  <span class="c1"># The subdirectory where the data file is located</span>
+    <span class="s1">&#39;2022-07-07_095151_SMPS.csv&#39;</span><span class="p">)</span>  <span class="c1"># The name of the data file</span>
+
+<span class="c1"># Optional: Print the file path to confirm it&#39;s correct</span>
+<span class="c1"># print(&quot;Data file path:&quot;, data_file)</span>
+
+<span class="c1"># Using the loader module to load the data from the file</span>
+<span class="c1"># The data_raw_loader function takes the file path as its argument and</span>
+<span class="c1"># reads the data</span>
+<span class="n">raw_data</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">data_raw_loader</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+
+<span class="c1"># Printing a snippet of the loaded data for a quick preview</span>
+<span class="c1"># This helps us to confirm that the data is loaded and to get an idea of</span>
+<span class="c1"># its structure</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Preview of loaded data:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">raw_data</span><span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="mi">30</span><span class="p">]:</span>  <span class="c1"># Displaying rows 22 to 30 as a sample</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Preview of loaded data:
+Units,dW/dlogDp
+Weight,Number
+Sample #,Date,Start Time,Sample Temp (C),Sample Pressure (kPa),Relative Humidity (%),Mean Free Path (m),Gas Viscosity (Pa*s),Diameter Midpoint (nm),20.72,21.10,21.48,21.87,22.27,22.67,23.08,23.50,23.93,24.36,24.80,25.25,25.71,26.18,26.66,27.14,27.63,28.13,28.64,29.16,29.69,30.23,30.78,31.34,31.91,32.49,33.08,33.68,34.29,34.91,35.55,36.19,36.85,37.52,38.20,38.89,39.60,40.32,41.05,41.79,42.55,43.32,44.11,44.91,45.73,46.56,47.40,48.26,49.14,50.03,50.94,51.86,52.80,53.76,54.74,55.73,56.74,57.77,58.82,59.89,60.98,62.08,63.21,64.36,65.52,66.71,67.93,69.16,70.41,71.69,72.99,74.32,75.67,77.04,78.44,79.86,81.31,82.79,84.29,85.82,87.38,88.96,90.58,92.22,93.90,95.60,97.34,99.10,100.90,102.74,104.60,106.50,108.43,110.40,112.40,114.44,116.52,118.64,120.79,122.98,125.21,127.49,129.80,132.16,134.56,137.00,139.49,142.02,144.60,147.22,149.89,152.61,155.38,158.20,161.08,164.00,166.98,170.01,173.09,176.24,179.43,182.69,186.01,189.38,192.82,196.32,199.89,203.51,207.21,210.97,214.80,218.70,222.67,226.71,230.82,235.01,239.28,243.62,248.05,252.55,257.13,261.80,266.55,271.39,276.32,281.33,286.44,291.64,296.93,302.32,307.81,313.40,319.08,324.88,330.77,336.78,342.89,349.12,355.45,361.90,368.47,375.16,381.97,388.91,395.96,403.15,410.47,417.92,425.51,433.23,441.09,449.10,457.25,465.55,474.00,482.61,491.37,500.29,509.37,518.61,528.03,537.61,547.37,557.31,567.42,577.72,588.21,598.89,609.76,620.82,632.09,643.57,655.25,667.14,679.25,691.58,704.14,716.92,729.93,743.18,756.67,770.40,784.39,Scan Time (s),Retrace Time (s),Scan Resolution (Hz),Scans Per Sample,HV Polarity,Sheath Flow (L/min),Aerosol Flow (L/min),Bypass Flow (L/min),Low Voltage (V),High Voltage (V),Lower Size (nm),Upper Size (nm),Density (g/cm³),td + 0.5 (s),tf (s),D50 (nm),Median (nm),Mean (nm),Geo. Mean (nm),Mode (nm),Geo. Std. Dev.,Total Conc. (#/cm³),Neutralizer Status,Dilution Factor,Test Name,Test Description,Dataset Name,Dataset Description,Instrument Errors
+1,07/07/2022,08:49:17,23.7,101.2,61.9,6.75690e-8,1.83579e-5,,6103.186,2832.655,4733.553,4765.944,5960.964,4475.806,4412.044,5853.069,4832.167,3781.343,3675.830,3271.549,3084.392,3668.269,4116.143,3310.157,3978.368,4151.566,2515.995,3755.837,2776.663,5032.745,3775.426,2818.553,2641.302,2636.806,3079.759,2606.094,2317.234,3192.346,2226.703,2484.878,3394.395,1762.834,3172.359,2919.533,2452.013,3403.780,2360.277,2543.386,2563.290,2649.769,1375.374,1364.046,1446.529,2068.167,1336.070,1542.077,1707.249,1482.481,2272.182,1754.409,2472.438,1191.563,2221.825,1635.293,2548.571,1991.926,2546.956,1790.114,2115.075,1138.769,1934.746,2163.955,1613.179,2132.750,1654.348,1698.154,2403.529,1222.983,1829.254,1197.162,1638.797,1248.565,2417.521,1130.421,1429.423,1694.923,1658.378,1443.393,1731.346,1277.799,1089.149,1072.630,1205.387,1693.146,1109.648,915.428,491.529,881.028,1218.297,755.658,714.301,686.247,790.943,398.805,1043.226,1298.495,1548.704,1070.899,846.596,938.241,232.947,926.941,837.452,794.492,254.455,392.637,353.144,872.576,693.986,1544.164,657.340,546.445,311.890,365.934,616.794,610.810,938.786,815.964,593.441,939.634,188.115,1077.429,1213.142,737.913,1876.626,735.779,996.521,1098.601,1166.494,962.551,1392.535,947.504,655.459,993.819,682.087,852.503,601.057,733.860,529.122,960.578,687.512,839.973,652.820,289.921,623.835,453.604,588.057,856.253,283.994,282.839,365.801,200.382,365.756,146.548,306.730,373.162,114.272,0.000,182.692,260.788,164.857,19.851,89.612,0.000,181.974,0.000,53.276,20.016,0.000,0.000,95.433,96.222,0.000,0.000,197.307,0.000,100.336,0.000,102.072,0.000,0.000,209.529,0.000,213.227,107.561,0.000,218.965,220.930,111.453,0.000,113.460,0.000,115.513,0.000,0.000,0.000,0.000,28.221,93.413,122.992,0.000,75,4,50,1,Negative,2.000,0.300,0.00,10.07,9863.01,20.5,791.5,1.0,1.81,10.79,1000.0,41.562,74.959,52.078,20.721,2.179,2.16900e+3,ON,1,TRACER-CAT,,2022 07 07 09_51,,Detector aerosol flow rate error;Incomplete Scan
+2,07/07/2022,08:50:48,23.6,101.2,61.7,6.75401e-8,1.83531e-5,,5621.118,5867.747,6233.403,3453.156,4484.307,5468.148,4725.052,4689.983,3661.759,4356.725,4292.911,7728.414,5112.679,4746.084,3957.005,3472.977,3496.697,4674.202,4188.868,2868.559,3375.113,4306.112,5191.077,4732.512,4566.029,3514.167,5172.877,3825.270,5323.756,2327.737,3846.602,2347.097,3182.011,1876.273,2952.863,2831.255,2497.869,4158.061,3828.510,3199.720,2309.195,2462.550,3060.240,1086.744,1476.289,2069.774,1727.787,2710.631,2067.327,2619.082,2345.026,2362.235,1429.749,2557.408,2660.327,1209.933,1590.320,1696.569,2236.773,1499.046,1922.632,1650.213,3147.351,2201.919,1622.954,2198.739,1800.998,1429.621,1426.761,1923.931,1262.939,1745.284,1458.571,1523.548,1920.108,1382.558,2211.525,2571.277,1979.297,1562.697,1741.573,1307.680,967.481,838.919,1502.136,1301.401,1011.619,829.770,973.269,1100.004,1152.808,749.250,1187.900,806.256,111.008,297.062,809.059,1361.412,779.536,535.087,881.522,1307.518,800.804,1053.953,182.381,1042.830,673.021,646.171,825.612,963.187,748.743,540.954,769.157,788.222,825.566,236.537,865.009,289.185,803.098,398.510,446.847,439.645,1118.961,1003.003,924.180,745.149,430.134,415.522,805.970,790.348,998.975,1043.136,604.082,1004.545,1082.455,1312.781,1447.390,872.420,398.380,695.719,857.412,645.872,691.129,623.007,471.728,641.049,1023.693,394.611,475.599,446.076,657.686,313.003,136.395,248.550,579.894,336.126,485.938,298.810,0.000,227.571,104.550,157.583,289.697,0.229,0.000,0.000,217.592,67.816,24.067,0.000,0.000,0.000,0.000,0.000,97.009,0.000,0.000,0.000,0.000,0.000,0.000,205.900,0.000,104.761,0.000,0.000,0.000,108.509,0.000,110.461,0.000,0.000,0.000,114.471,115.506,116.540,0.000,118.660,0.000,0.000,0.000,0.000,75.377,75,4,50,1,Negative,2.000,0.300,0.00,10.07,9863.01,20.5,791.5,1.0,1.81,10.79,1000.0,39.458,69.080,49.198,25.255,2.101,2.39408e+3,ON,1,TRACER-CAT,,2022 07 07 09_51,,Detector aerosol flow rate error;Incomplete Scan
+3,07/07/2022,08:52:19,23.7,101.2,61.5,6.75690e-8,1.83579e-5,,5165.139,4969.987,4312.386,6939.394,4680.764,3224.473,4999.149,3653.002,4241.532,3928.137,2718.607,3363.947,4863.410,5338.452,4659.515,3430.329,3997.386,4644.421,4943.511,3883.970,3212.310,4445.981,2349.435,3605.419,4366.557,4969.924,4880.573,3186.281,3089.412,2724.537,3195.740,4277.947,4864.436,4263.532,2100.807,1967.634,3283.337,3268.660,3001.917,2781.549,1879.354,1376.083,2051.524,2165.874,2012.210,2923.129,1575.515,1544.252,1610.635,1572.609,1299.370,1549.832,1145.100,2897.864,1839.992,2351.579,2102.027,1543.106,953.811,2073.610,2317.378,2087.617,1586.363,1897.860,2456.722,1647.781,1013.534,1734.023,1633.021,1841.697,2193.442,2714.856,1396.336,2264.046,1671.363,1538.012,1257.148,1423.316,1217.281,1745.437,1787.473,1284.774,1534.815,1274.852,1438.025,1199.602,964.066,862.098,685.995,679.146,879.775,806.703,979.672,894.103,1379.499,1112.031,744.999,580.777,1241.262,960.784,750.484,908.236,957.901,652.265,1200.515,429.487,347.453,552.393,617.871,652.163,709.227,788.963,1499.238,627.895,1315.208,976.800,555.360,440.680,1182.819,863.800,362.530,942.047,460.380,1222.507,678.820,1006.555,319.371,91.941,761.841,205.384,449.120,751.217,572.530,350.734,295.089,413.379,612.088,474.457,678.504,490.408,751.536,400.656,585.567,676.707,364.052,124.385,631.790,788.487,566.062,390.904,141.751,256.369,366.589,528.781,512.078,257.120,393.412,350.601,361.659,65.138,348.203,326.629,329.714,175.810,111.365,74.091,103.212,0.000,0.000,47.532,0.000,166.826,0.000,96.217,388.070,97.832,98.649,99.490,200.678,202.399,0.000,102.953,0.000,0.000,105.683,106.611,33.630,183.108,2.602,218.305,222.901,0.000,226.925,0.000,0.000,116.553,0.000,118.661,119.732,120.801,0.000,122.992,124.085,75,4,50,1,Negative,2.000,0.300,0.00,10.07,9863.01,20.5,791.5,1.0,1.81,10.79,1000.0,39.324,72.102,50.019,21.870,2.136,2.27861e+3,ON,1,TRACER-CAT,,2022 07 07 09_51,,Detector aerosol flow rate error;Incomplete Scan
+4,07/07/2022,08:53:50,23.8,101.2,61.4,6.75979e-8,1.83627e-5,,5814.745,5937.421,5542.118,7127.484,5341.069,4793.690,4938.844,5721.541,4877.746,5900.250,5104.984,4914.366,4891.892,6655.579,4431.173,3389.961,4947.809,3115.245,4138.126,5421.474,4589.063,4007.156,2524.137,5009.064,4780.963,4959.096,3648.285,4148.676,4270.099,2229.465,3043.487,5618.376,3689.188,4700.549,2535.915,1754.223,2560.335,2853.385,2454.711,2515.907,3015.370,1502.864,2344.161,2761.448,2047.076,1542.531,2151.757,2365.884,2330.816,2585.566,1431.955,2391.335,2097.717,1891.014,2211.815,2071.479,2188.302,2475.058,1906.364,1781.793,2356.998,1527.723,2609.446,1644.771,1917.624,1843.984,2418.197,1385.516,1263.621,2155.939,2083.223,1765.167,957.777,2077.747,1667.811,1122.065,1579.113,1709.471,1604.406,686.151,390.075,1194.313,1657.144,1462.232,1870.846,1012.132,847.165,1248.528,1039.604,779.076,1375.101,1058.272,1013.378,1211.420,1641.490,979.146,835.539,763.524,951.720,1270.393,1308.492,1056.486,1715.924,657.112,1475.767,235.866,827.129,1266.089,1080.958,1246.249,1147.116,840.719,1560.246,1201.554,1743.366,1233.526,1166.422,1068.551,1047.492,787.018,759.836,491.419,714.111,460.361,681.068,767.815,654.715,501.038,357.016,575.937,613.281,851.029,583.739,475.691,431.584,616.144,744.932,409.334,984.682,371.750,613.130,757.474,637.077,441.004,609.132,380.961,595.419,565.033,566.955,332.402,450.524,139.761,430.419,443.058,558.628,158.467,271.708,346.807,57.637,148.050,226.825,353.827,77.661,0.000,0.000,74.100,0.000,250.296,117.433,93.156,187.816,0.000,95.443,0.000,0.000,293.505,0.000,99.496,100.342,0.000,102.078,102.959,0.000,0.000,0.000,106.622,322.709,0.000,328.474,0.000,67.473,44.378,0.000,0.000,115.519,0.000,0.000,118.668,0.000,0.000,0.000,0.000,0.000,75,4,50,1,Negative,2.000,0.300,0.00,10.07,9863.01,20.5,791.5,1.0,1.81,10.79,1000.0,37.995,68.796,48.896,21.870,2.107,2.51144e+3,ON,1,TRACER-CAT,,2022 07 07 09_51,,Detector aerosol flow rate error;Incomplete Scan
+5,07/07/2022,08:55:21,24.0,101.1,61.4,6.77227e-8,1.83722e-5,,8034.425,6317.981,6972.600,4577.324,6488.519,4985.397,5484.518,7295.312,3449.590,4261.716,4259.456,6124.670,4418.824,5418.742,3311.293,3548.897,4940.747,6738.536,3377.823,3309.433,5322.339,4148.187,3387.285,3967.636,5064.382,4573.259,3896.245,4006.531,3769.030,4129.946,4678.454,3121.839,3888.625,2443.782,1947.617,2321.130,1845.465,2833.269,2745.881,3262.145,4055.876,2319.187,3397.282,2596.623,2935.256,1508.733,1555.232,3184.200,2683.631,2158.530,2303.663,2739.336,2714.276,2536.377,2051.076,2063.667,2074.972,2852.267,2366.702,2135.668,1500.801,2228.817,2220.527,1501.131,2354.567,2072.434,2547.917,2111.890,1474.809,1561.614,1334.889,1100.318,1077.335,1470.618,1377.825,1684.933,1093.441,1596.409,1456.255,1543.298,1116.499,984.258,1294.805,1586.816,723.664,1709.369,1060.965,1415.310,1611.158,1791.258,1098.238,1513.790,1335.019,1178.572,1538.772,477.803,1130.380,1596.999,652.664,1098.951,1384.104,772.285,788.185,1432.363,773.331,729.470,819.882,979.684,925.309,753.771,706.255,659.741,1026.707,818.647,1205.428,940.460,906.655,758.763,811.344,1123.245,520.356,1009.392,651.265,735.336,209.657,549.624,537.181,841.849,483.705,713.011,497.248,743.196,556.459,953.140,847.692,614.097,423.810,816.193,627.059,453.998,976.898,592.170,548.197,535.480,667.837,312.390,476.781,369.028,451.687,432.520,1001.512,312.053,498.408,198.771,399.968,363.778,403.848,381.782,223.839,227.667,212.819,101.097,164.909,359.326,285.450,0.000,44.177,0.000,158.441,220.559,81.404,49.687,95.468,0.000,194.095,391.452,98.679,0.000,0.000,0.000,0.000,102.990,103.881,104.800,0.000,106.644,0.000,108.554,0.000,110.496,0.000,112.492,113.494,0.000,115.548,0.000,0.000,0.000,239.531,241.683,0.000,0.000,248.252,75,4,50,1,Negative,2.000,0.300,0.00,10.07,9863.01,20.5,791.5,1.0,1.81,10.79,1000.0,39.214,69.960,48.959,20.721,2.123,2.56068e+3,ON,1,TRACER-CAT,,2022 07 07 09_51,,Detector aerosol flow rate error;Incomplete Scan
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="formatting-the-data">
+<h1>Formatting the Data<a class="headerlink" href="#formatting-the-data" title="Permalink to this heading">#</a></h1>
+<p>When dealing with 2-dimensional data, such as size distributions, the formatting process can be a bit more complex compared to 1-dimensional data. For our data, we need to extract size bins and use them as headers for our dataset. This involves specifying the start and end points within the data that define our size bins. In our specific example, the start point is indicated by the keyword “Date Time” and the end point by “Total Conc”. Understanding where your data starts and ends is crucial for accurate formatting and analysis.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Formatting the data for time series analysis</span>
+<span class="c1"># The sizer_data_formatter function from the loader module is used for</span>
+<span class="c1"># this purpose</span>
+
+<span class="n">epoch_time</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">sizer_data_formatter</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">raw_data</span><span class="p">,</span>  <span class="c1"># The raw data that was loaded earlier</span>
+    <span class="n">data_checks</span><span class="o">=</span><span class="p">{</span>  <span class="c1"># Performing checks on the data</span>
+        <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">250</span><span class="p">],</span>  <span class="c1"># Expected character count per line</span>
+        <span class="c1"># Number of rows to skip at the beginning (headers, etc.)</span>
+        <span class="s2">&quot;skip_rows&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+        <span class="s2">&quot;skip_end&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Number of rows to skip at the end</span>
+        <span class="s2">&quot;char_counts&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;/&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>  <span class="c1"># Ensuring line formats are consistent</span>
+    <span class="p">},</span>
+    <span class="n">data_sizer_reader</span><span class="o">=</span><span class="p">{</span>  <span class="c1"># Reading the size distribution data</span>
+        <span class="s1">&#39;Dp_start_keyword&#39;</span><span class="p">:</span> <span class="s1">&#39;20.72&#39;</span><span class="p">,</span>  <span class="c1"># Starting keyword for size bins</span>
+        <span class="s1">&#39;Dp_end_keyword&#39;</span><span class="p">:</span> <span class="s1">&#39;784.39&#39;</span><span class="p">,</span>  <span class="c1"># Ending keyword for size bins</span>
+        <span class="s1">&#39;convert_scale_from&#39;</span><span class="p">:</span> <span class="s1">&#39;dw/dlogdp&#39;</span>  <span class="c1"># Scale conversion for the data everything is converted to dN/dlogdp</span>
+    <span class="p">},</span>
+    <span class="n">time_column</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>  <span class="c1"># Columns that contain the time data</span>
+    <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y %H:%M:%S&quot;</span><span class="p">,</span>  <span class="c1"># Format of the time data</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>  <span class="c1"># Delimiter used in the data file</span>
+    <span class="n">header_row</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>  <span class="c1"># Row number that contains the header</span>
+
+<span class="c1"># Printing a preview of the formatted data to confirm successful formatting</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Epoch time (First 5 Entries):&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">epoch_time</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>  <span class="c1"># Displaying the first 5 time entries</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Data shape:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>  <span class="c1"># Showing the shape of the data array</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Header (First 10 Entries):&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">header</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>  <span class="c1"># Displaying the first 10 headers</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch time (First 5 Entries):
+[1.65718376e+09 1.65718385e+09 1.65718394e+09 1.65718403e+09
+ 1.65718412e+09]
+Data shape:
+(2854, 203)
+Header (First 10 Entries):
+[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39;, &#39;22.27&#39;, &#39;22.67&#39;, &#39;23.08&#39;, &#39;23.50&#39;, &#39;23.93&#39;, &#39;24.36&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<section id="pause-to-plot">
+<h2>Pause to Plot<a class="headerlink" href="#pause-to-plot" title="Permalink to this heading">#</a></h2>
+<p>Visualizing your data is a crucial step in the data analysis process. It allows you to see patterns, trends, and potential anomalies that might not be evident from the raw data alone. Now that we have formatted the data and extracted the time information, let’s create a plot. This will help us get a visual sense of the data’s characteristics, such as the concentration of particles in different size bins over time.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Creating a plot using matplotlib</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>  <span class="c1"># Creating a figure and axis for the plot</span>
+
+<span class="c1"># Plotting data from a specific size bin against time</span>
+<span class="c1"># &#39;epoch_time&#39; is used on the x-axis (time data)</span>
+<span class="c1"># &#39;data[:, 50]&#39; selects the data from the 50th bin (as an example) for the y-axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epoch_time</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">[:,</span> <span class="mi">50</span><span class="p">],</span>  <span class="c1"># Selecting the 50th bin of data to plot</span>
+        <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Bin </span><span class="si">{</span><span class="n">header</span><span class="p">[</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s1"> nm&#39;</span><span class="p">,</span>  <span class="c1"># Adding a label with the bin size</span>
+        <span class="p">)</span>
+
+<span class="c1"># Setting labels for the x-axis and y-axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (epoch)&quot;</span><span class="p">)</span>  <span class="c1"># Label for the x-axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Bin Concentration (#/cm³)&quot;</span><span class="p">)</span>  <span class="c1"># Label for the y-axis</span>
+
+<span class="c1"># Adding a legend to the plot for clarity</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="c1"># Displaying the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Adjusting the layout to ensure all plot elements are visible and</span>
+<span class="c1"># well-arranged</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/00bc4560887c2ec74cdf1052ad887e46c426b8bd86531d332ff84dc6bd1abce9.png" src="../../_images/00bc4560887c2ec74cdf1052ad887e46c426b8bd86531d332ff84dc6bd1abce9.png" />
+</div>
+</div>
+</section>
+<section id="dates-in-plots">
+<h2>Dates in Plots<a class="headerlink" href="#dates-in-plots" title="Permalink to this heading">#</a></h2>
+<p>When working with time-series data, it’s often helpful to have dates on the x-axis of your plots for better readability and understanding. However, to display dates effectively in plots using <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>, we need to convert our time data into a format that <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> can recognize and work with.</p>
+<p>One common format for this purpose is <code class="docutils literal notranslate"><span class="pre">np.datetime64</span></code>. This format represents dates and times in a way that is compatible with numpy arrays, making it ideal for plotting time-related data. In our case, we can convert our epoch time (time since a fixed point in the past, typically January 1, 1970) to <code class="docutils literal notranslate"><span class="pre">np.datetime64</span></code> using the <code class="docutils literal notranslate"><span class="pre">convert.datetime64_from_epoch_array</span></code> function from the Particula package.</p>
+<p>Additionally, to make the plot more readable, especially when there are many data points, it’s a good practice to rotate the x-axis labels. This prevents overlapping and makes each date and time label clear. We can achieve this rotation using <code class="docutils literal notranslate"><span class="pre">plt.xticks(rotation=45)</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Importing the necessary function for converting epoch time to datetime64</span>
+<span class="kn">from</span> <span class="nn">particula.util.time_manage</span> <span class="kn">import</span> <span class="n">datetime64_from_epoch_array</span>
+
+<span class="c1"># Converting the epoch time to datetime64 format</span>
+<span class="n">time_in_datetime64</span> <span class="o">=</span> <span class="n">datetime64_from_epoch_array</span><span class="p">(</span><span class="n">epoch_time</span><span class="p">)</span>
+
+<span class="c1"># Creating a plot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="c1"># Plotting the data with time in datetime64 format on the x-axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_in_datetime64</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">[:,</span> <span class="mi">50</span><span class="p">],</span>  <span class="c1"># Selecting the 50th bin of data</span>
+        <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Bin </span><span class="si">{</span><span class="n">header</span><span class="p">[</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s1"> nm&#39;</span><span class="p">,</span>  <span class="c1"># Label for the data series</span>
+        <span class="p">)</span>
+
+<span class="c1"># Rotating the x-axis labels to 45 degrees for better readability</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+
+<span class="c1"># Setting the x-axis and y-axis labels</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (UTC)&quot;</span><span class="p">)</span>  <span class="c1"># Updated label to indicate the time format</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Bin Concentration (#/cm³)&quot;</span><span class="p">)</span>
+
+<span class="c1"># Adding a legend to the plot</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="c1"># Displaying the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Adjusting the layout for a neat presentation</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/9aa5bd047b4dabb67621f80320fb76d60763f45993f1e118e385def746d842d2.png" src="../../_images/9aa5bd047b4dabb67621f80320fb76d60763f45993f1e118e385def746d842d2.png" />
+</div>
+</div>
+</section>
+<section id="contour-plot-of-data">
+<h2>Contour Plot of Data<a class="headerlink" href="#contour-plot-of-data" title="Permalink to this heading">#</a></h2>
+<p>Contour plots are a powerful tool for visualizing how data changes over time and space. In the context of size distribution data, a contour plot can effectively show the variation in particle concentration across different sizes over time. It’s like looking at a topographic map where different colors or shades represent varying concentrations of particles at different sizes and times.</p>
+<section id="preparing-the-data-for-contour-plotting">
+<h3>Preparing the Data for Contour Plotting<a class="headerlink" href="#preparing-the-data-for-contour-plotting" title="Permalink to this heading">#</a></h3>
+<p>Before we plot, it’s a good practice to set limits on our data to ensure that extreme values don’t skew the visualization. This helps in highlighting the relevant ranges of our data. Here’s how we do it:</p>
+<ol class="arabic simple">
+<li><p><strong>Setting Lower and Upper Limits</strong>: We impose a lower limit to avoid plotting extremely low concentrations (which might be less relevant or below detection limits) and an upper limit to avoid letting very high concentrations dominate the plot.</p></li>
+<li><p><strong>Option for Logarithmic Scale</strong>: For data with a wide range of values, using a logarithmic scale (e.g., <code class="docutils literal notranslate"><span class="pre">np.log10(concentration)</span></code>) can make the plot more informative by compressing the scale and emphasizing the variations across orders of magnitude.</p></li>
+</ol>
+</section>
+<section id="creating-the-contour-plot">
+<h3>Creating the Contour Plot<a class="headerlink" href="#creating-the-contour-plot" title="Permalink to this heading">#</a></h3>
+<p>With our data prepared, we can now create the contour plot. This type of plot will use different colors or shades to represent the concentration of particles at various sizes and times.</p>
+<ul class="simple">
+<li><p><strong>X-Axis (Epoch Time)</strong>: Represents the time dimension of our data.</p></li>
+<li><p><strong>Y-Axis (Diameter in nm)</strong>: Represents the different size bins of particles.</p></li>
+<li><p><strong>Color Intensity</strong>: Indicates the concentration of particles at each size and time.</p></li>
+</ul>
+<p>Using <code class="docutils literal notranslate"><span class="pre">plt.contourf</span></code>, we create a filled contour plot with a logarithmic y-scale, which is particularly useful for size distribution data that typically spans several orders of magnitude in particle sizes.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Setting limits on the concentration data to improve plot readability</span>
+<span class="n">concentration</span> <span class="o">=</span> <span class="n">data</span>
+<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+    <span class="n">concentration</span> <span class="o">&lt;</span> <span class="mf">1e-5</span><span class="p">,</span>
+    <span class="mf">1e-5</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="p">)</span>  <span class="c1"># Setting a lower limit</span>
+<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+    <span class="n">concentration</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="o">**</span><span class="mi">5</span><span class="p">,</span>
+    <span class="mi">10</span><span class="o">**</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="p">)</span>  <span class="c1"># Setting an upper limit</span>
+<span class="c1"># Uncomment the next line to plot concentration in logarithmic scale</span>
+<span class="c1"># concentration = np.log10(concentration)</span>
+
+<span class="c1"># Creating a figure and axis for the contour plot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Creating the contour plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span>
+    <span class="n">epoch_time</span><span class="p">,</span>  <span class="c1"># X-axis: Time data in epoch format</span>
+    <span class="c1"># Y-axis: Particle sizes converted to float</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">header</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+    <span class="n">concentration</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>  <span class="c1"># Transposed concentration data for correct orientation</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">PuBu_r</span><span class="p">,</span>  <span class="c1"># Color map for the plot</span>
+    <span class="n">levels</span><span class="o">=</span><span class="mi">50</span>  <span class="c1"># Number of levels in the contour plot</span>
+<span class="p">)</span>
+
+<span class="c1"># Setting the y-axis to logarithmic scale for better visualization of size</span>
+<span class="c1"># distribution</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+<span class="c1"># Setting labels for the x-axis and y-axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Epoch Time&#39;</span><span class="p">)</span>  <span class="c1"># Label for the x-axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Diameter (nm)&#39;</span><span class="p">)</span>  <span class="c1"># Label for the y-axis</span>
+
+<span class="c1"># Adding a color bar to the plot, indicating concentration levels</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Concentration dN/dlogDp [#/cm³]&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+<span class="c1"># Displaying the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Adjusting the layout for a better presentation of the plot elements</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/122d1ea6a4c2d3fb8a7ace1a108e2d22196f20676b7766e09d5ba716f21c6d5a.png" src="../../_images/122d1ea6a4c2d3fb8a7ace1a108e2d22196f20676b7766e09d5ba716f21c6d5a.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="simplifying-data-import-with-the-settings-generator">
+<h2>Simplifying Data Import with the Settings Generator<a class="headerlink" href="#simplifying-data-import-with-the-settings-generator" title="Permalink to this heading">#</a></h2>
+<p>In the same way we handled 1-dimensional (1d) data, we can also streamline the import process for 2-dimensional (2d) data using the settings generator. This tool is particularly useful for creating a structured approach to loading complex datasets. By using the <code class="docutils literal notranslate"><span class="pre">settings_generator.for_general_sizer_1d_2d_load()</span></code> function, we can generate a comprehensive settings dictionary that directs how data should be imported and formatted.</p>
+<section id="understanding-the-settings-generator-function">
+<h3>Understanding the Settings Generator Function<a class="headerlink" href="#understanding-the-settings-generator-function" title="Permalink to this heading">#</a></h3>
+<p>This function is designed to be flexible and accommodate a wide range of data types and formats. It comes with numerous arguments that allow you to specify details like data checks, column information, time format, etc., tailored to your specific dataset. However, it’s important to note that you don’t have to be overwhelmed by these options.</p>
+</section>
+<section id="using-default-settings">
+<h3>Using Default Settings<a class="headerlink" href="#using-default-settings" title="Permalink to this heading">#</a></h3>
+<p>For many users, especially those just starting out or working with standard data formats, the default settings of the <code class="docutils literal notranslate"><span class="pre">settings_generator</span></code> function may work. These defaults are configured to align with the example data provided in the Particula package. This means that if your data structure is similar to the example data, you can call this function without passing any arguments, and it will automatically set up the settings for you.</p>
+<p>This approach not only saves time but also reduces the potential for errors in the data import process, making it a quick and reliable way to get your data ready for analysis.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Importing the necessary module for settings generation</span>
+<span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">settings_generator</span>
+
+<span class="c1"># Generating settings for loading 1d and 2d data from files</span>
+<span class="c1"># This is useful for instruments that output both types of data in the</span>
+<span class="c1"># same file</span>
+<span class="n">settings_1d</span><span class="p">,</span> <span class="n">settings_2d</span> <span class="o">=</span> <span class="n">settings_generator</span><span class="o">.</span><span class="n">for_general_sizer_1d_2d_load</span><span class="p">(</span>
+    <span class="n">relative_data_folder</span><span class="o">=</span><span class="s1">&#39;SMPS_data&#39;</span><span class="p">,</span>  <span class="c1"># Folder where the data files are located</span>
+    <span class="n">filename_regex</span><span class="o">=</span><span class="s1">&#39;*.csv&#39;</span><span class="p">,</span>  <span class="c1"># Pattern to match filenames (e.g., all CSV files)</span>
+    <span class="n">file_min_size_bytes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>  <span class="c1"># Minimum file size in bytes for consideration</span>
+    <span class="n">header_row</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>  <span class="c1"># Row number containing the header in the data file</span>
+    <span class="n">data_checks</span><span class="o">=</span><span class="p">{</span>  <span class="c1"># Checks to ensure data integrity</span>
+        <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">250</span><span class="p">],</span>  <span class="c1"># Expected character count per line</span>
+        <span class="s2">&quot;skip_rows&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>  <span class="c1"># Rows to skip at the start of the file</span>
+        <span class="s2">&quot;skip_end&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Rows to skip at the end of the file</span>
+        <span class="s2">&quot;char_counts&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;/&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>  <span class="c1"># Ensuring date formats are consistent</span>
+    <span class="p">},</span>
+    <span class="n">data_1d_column</span><span class="o">=</span><span class="p">[</span>  <span class="c1"># Columns for 1d data in the data file</span>
+        <span class="s2">&quot;Lower Size (nm)&quot;</span><span class="p">,</span> <span class="s2">&quot;Upper Size (nm)&quot;</span><span class="p">,</span> <span class="s2">&quot;Sample Temp (C)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Sample Pressure (kPa)&quot;</span><span class="p">,</span> <span class="s2">&quot;Relative Humidity (%)&quot;</span><span class="p">,</span> <span class="s2">&quot;Median (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mean (nm)&quot;</span><span class="p">,</span> <span class="s2">&quot;Geo. Mean (nm)&quot;</span><span class="p">,</span> <span class="s2">&quot;Mode (nm)&quot;</span><span class="p">,</span> <span class="s2">&quot;Geo. Std. Dev.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Total Conc. (#/cm³)&quot;</span>
+    <span class="p">],</span>
+    <span class="n">data_1d_header</span><span class="o">=</span><span class="p">[</span>  <span class="c1"># Headers for 1d data columns once in the Stream</span>
+        <span class="s2">&quot;Lower_Size_(nm)&quot;</span><span class="p">,</span> <span class="s2">&quot;Upper_Size_(nm)&quot;</span><span class="p">,</span> <span class="s2">&quot;Sample_Temp_(C)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Sample_Pressure_(kPa)&quot;</span><span class="p">,</span> <span class="s2">&quot;Relative_Humidity_(%)&quot;</span><span class="p">,</span> <span class="s2">&quot;Median_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mean_(nm)&quot;</span><span class="p">,</span> <span class="s2">&quot;Geo_Mean_(nm)&quot;</span><span class="p">,</span> <span class="s2">&quot;Mode_(nm)&quot;</span><span class="p">,</span> <span class="s2">&quot;Geo_Std_Dev.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Total_Conc_(#/cc)&quot;</span>
+    <span class="p">],</span>
+    <span class="n">data_2d_dp_start_keyword</span><span class="o">=</span><span class="s2">&quot;20.72&quot;</span><span class="p">,</span>  <span class="c1"># Starting keyword for 2d size bins</span>
+    <span class="n">data_2d_dp_end_keyword</span><span class="o">=</span><span class="s2">&quot;784.39&quot;</span><span class="p">,</span>  <span class="c1"># Ending keyword for 2d size bins</span>
+    <span class="n">data_2d_convert_concentration_from</span><span class="o">=</span><span class="s2">&quot;dw/dlogdp&quot;</span><span class="p">,</span>  <span class="c1"># Conversion for 2d concentration</span>
+    <span class="n">time_column</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>  <span class="c1"># Columns containing time data</span>
+    <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y %H:%M:%S&quot;</span><span class="p">,</span>  <span class="c1"># Format of the time data</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>  <span class="c1"># Delimiter used in the data file</span>
+    <span class="n">time_shift_seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># Time shift, if needed</span>
+    <span class="n">timezone_identifier</span><span class="o">=</span><span class="s2">&quot;UTC&quot;</span><span class="p">,</span>  <span class="c1"># Timezone for the time data</span>
+<span class="p">)</span>
+
+<span class="c1"># Printing the generated settings dictionaries for both 1d and 2d data</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Settings for 1d data:&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">settings_1d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Settings for 2d data:&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">settings_2d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Settings for 1d data:
+relative_data_folder: SMPS_data
+filename_regex: *.csv
+MIN_SIZE_BYTES: 10
+data_loading_function: general_1d_load
+header_row: 24
+data_checks: {&#39;characters&#39;: [250], &#39;skip_rows&#39;: 25, &#39;skip_end&#39;: 0, &#39;char_counts&#39;: {&#39;/&#39;: 2, &#39;:&#39;: 2}}
+data_column: [&#39;Lower Size (nm)&#39;, &#39;Upper Size (nm)&#39;, &#39;Sample Temp (C)&#39;, &#39;Sample Pressure (kPa)&#39;, &#39;Relative Humidity (%)&#39;, &#39;Median (nm)&#39;, &#39;Mean (nm)&#39;, &#39;Geo. Mean (nm)&#39;, &#39;Mode (nm)&#39;, &#39;Geo. Std. Dev.&#39;, &#39;Total Conc. (#/cm³)&#39;]
+data_header: [&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample_Temp_(C)&#39;, &#39;Sample_Pressure_(kPa)&#39;, &#39;Relative_Humidity_(%)&#39;, &#39;Median_(nm)&#39;, &#39;Mean_(nm)&#39;, &#39;Geo_Mean_(nm)&#39;, &#39;Mode_(nm)&#39;, &#39;Geo_Std_Dev.&#39;, &#39;Total_Conc_(#/cc)&#39;]
+time_column: [1, 2]
+time_format: %m/%d/%Y %H:%M:%S
+delimiter: ,
+time_shift_seconds: 0
+timezone_identifier: UTC
+
+Settings for 2d data:
+relative_data_folder: SMPS_data
+filename_regex: *.csv
+MIN_SIZE_BYTES: 10
+data_loading_function: general_2d_load
+header_row: 24
+data_checks: {&#39;characters&#39;: [250], &#39;skip_rows&#39;: 25, &#39;skip_end&#39;: 0, &#39;char_counts&#39;: {&#39;/&#39;: 2, &#39;:&#39;: 2}}
+data_sizer_reader: {&#39;Dp_start_keyword&#39;: &#39;20.72&#39;, &#39;Dp_end_keyword&#39;: &#39;784.39&#39;, &#39;convert_scale_from&#39;: &#39;dw/dlogdp&#39;}
+time_column: [1, 2]
+time_format: %m/%d/%Y %H:%M:%S
+delimiter: ,
+time_shift_seconds: 0
+timezone_identifier: UTC
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="efficient-data-loading-with-the-interface">
+<h2>Efficient Data Loading with the Interface<a class="headerlink" href="#efficient-data-loading-with-the-interface" title="Permalink to this heading">#</a></h2>
+<p>After configuring our settings dictionaries for 1-dimensional and 2-dimensional data, we’re set to leverage the interface for data loading. This interface, a key component of the Particula package, streamlines the process, making it more efficient and straightforward, especially after you have a good grasp of how the settings work.</p>
+<section id="understanding-the-interface-s-role">
+<h3>Understanding the Interface’s Role<a class="headerlink" href="#understanding-the-interface-s-role" title="Permalink to this heading">#</a></h3>
+<p>The interface acts as a facilitator that intelligently uses the settings we’ve established to manage the data loading process. It eliminates the need for manual execution of multiple steps, thereby integrating and automating the data import based on our predefined preferences.</p>
+</section>
+<section id="the-advantages-of-mastery">
+<h3>The Advantages of Mastery<a class="headerlink" href="#the-advantages-of-mastery" title="Permalink to this heading">#</a></h3>
+<p>Once you’re comfortable with setting up your data parameters, using the interface offers several key benefits:</p>
+<ul class="simple">
+<li><p><strong>Enhanced Efficiency</strong>: It consolidates several operations into a single action, significantly speeding up the data loading process.</p></li>
+<li><p><strong>Consistent Results</strong>: By automating the data import process with predefined settings, it ensures uniformity and accuracy across different datasets.</p></li>
+<li><p><strong>Optimized Workflow</strong>: For users who understand the settings, the interface offers a simplified and more effective way to handle data loading. It removes the repetitive task of manually calling functions, allowing you to focus more on data analysis.</p></li>
+</ul>
+<p>In the following section, we’ll demonstrate how to utilize the interface with our prepared settings to efficiently load and process our data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Importing the necessary module for the loader interface</span>
+<span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">loader_interface</span>
+<span class="kn">from</span> <span class="nn">particula.data.tests.example_data.get_example_data</span> <span class="kn">import</span> <span class="n">get_data_folder</span>
+
+<span class="c1"># Setting the working path to the directory where the data files are located</span>
+<span class="n">working_path</span> <span class="o">=</span> <span class="n">get_data_folder</span><span class="p">()</span>
+
+<span class="c1"># Using the settings dictionaries created earlier for 1d and 2d data</span>
+
+<span class="c1"># Loading 1-dimensional data using the loader interface</span>
+<span class="c1"># The interface takes the path and settings for 1d data and loads the data</span>
+<span class="c1"># accordingly</span>
+<span class="n">data_stream_1d</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">working_path</span><span class="p">,</span>  <span class="c1"># The path where data files are stored</span>
+    <span class="n">settings</span><span class="o">=</span><span class="n">settings_1d</span><span class="p">,</span>  <span class="c1"># Settings dictionary for 1d data</span>
+<span class="p">)</span>
+
+<span class="c1"># Loading 2-dimensional data using the loader interface</span>
+<span class="c1"># Similar to the 1d data, but using the settings for 2d data</span>
+<span class="n">data_stream_2d</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">working_path</span><span class="p">,</span>  <span class="c1"># The path where data files are stored</span>
+    <span class="n">settings</span><span class="o">=</span><span class="n">settings_2d</span><span class="p">,</span>  <span class="c1"># Settings dictionary for 2d data</span>
+<span class="p">)</span>
+
+<span class="c1"># The data_stream_1d and data_stream_2d objects now contain the loaded data</span>
+<span class="c1"># ready for further analysis and visualization</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+  Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="printing-data-stream-summaries">
+<h2>Printing Data Stream Summaries<a class="headerlink" href="#printing-data-stream-summaries" title="Permalink to this heading">#</a></h2>
+<p>After loading our data using the loader interface, it’s a good practice to take a moment and review what we have loaded. This helps us confirm that the data is imported correctly and gives us an initial overview of its structure. We’ll do this by printing summaries of the <code class="docutils literal notranslate"><span class="pre">data_stream_1d</span></code> and <code class="docutils literal notranslate"><span class="pre">data_stream_2d</span></code> objects.</p>
+<section id="understanding-the-data-stream-summary">
+<h3>Understanding the Data Stream Summary<a class="headerlink" href="#understanding-the-data-stream-summary" title="Permalink to this heading">#</a></h3>
+<p>When we print a <code class="docutils literal notranslate"><span class="pre">data_stream</span></code> object, it provides us with a summary of its contents. This includes information like the size of the data, the headers (which represent different data types or measurements), and a glimpse into the actual data values. These summaries are especially useful for:</p>
+<ul class="simple">
+<li><p><strong>Verifying Data Integrity</strong>: Ensuring that the data has been loaded as expected and is ready for analysis.</p></li>
+<li><p><strong>Quick Overview</strong>: Getting a high-level understanding of the data’s structure, such as the number of data points and the range of measurements.</p></li>
+</ul>
+</section>
+<section id="code-for-printing-summaries">
+<h3>Code for Printing Summaries<a class="headerlink" href="#code-for-printing-summaries" title="Permalink to this heading">#</a></h3>
+<p>Here’s how we print the summaries for our 1-dimensional and 2-dimensional data streams:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print a blank line for better readability</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+<span class="c1"># Print the summary of the 1-dimensional data stream</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Data stream 1d summary:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_stream_1d</span><span class="p">)</span>  <span class="c1"># This will display a summary of the 1d data</span>
+
+<span class="c1"># Print another blank line for separation</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+<span class="c1"># Print the summary of the 2-dimensional data stream</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Data stream 2d summary:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_stream_2d</span><span class="p">)</span>  <span class="c1"># This will display a summary of the 2d data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Data stream 1d summary:
+Stream(header=[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample_Temp_(C)&#39;, &#39;Sample_Pressure_(kPa)&#39;, &#39;Relative_Humidity_(%)&#39;, &#39;Median_(nm)&#39;, &#39;Mean_(nm)&#39;, &#39;Geo_Mean_(nm)&#39;, &#39;Mode_(nm)&#39;, &#39;Geo_Std_Dev.&#39;, &#39;Total_Conc_(#/cc)&#39;], data=array([[2.05000e+01, 7.91500e+02, 2.37000e+01, ..., 2.07210e+01,
+        2.17900e+00, 2.16900e+03],
+       [2.05000e+01, 7.91500e+02, 2.36000e+01, ..., 2.52550e+01,
+        2.10100e+00, 2.39408e+03],
+       [2.05000e+01, 7.91500e+02, 2.37000e+01, ..., 2.18700e+01,
+        2.13600e+00, 2.27861e+03],
+       ...,
+       [2.05000e+01, 7.91500e+02, 2.35000e+01, ..., 2.07210e+01,
+        2.31800e+00, 2.08056e+03],
+       [2.05000e+01, 7.91500e+02, 2.33000e+01, ..., 2.10970e+01,
+        2.31800e+00, 2.10616e+03],
+       [2.05000e+01, 7.91500e+02, 2.35000e+01, ..., 2.07210e+01,
+        2.24800e+00, 2.45781e+03]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
+       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
+
+Data stream 2d summary:
+Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39;, &#39;22.27&#39;, &#39;22.67&#39;, &#39;23.08&#39;, &#39;23.50&#39;, &#39;23.93&#39;, &#39;24.36&#39;, &#39;24.80&#39;, &#39;25.25&#39;, &#39;25.71&#39;, &#39;26.18&#39;, &#39;26.66&#39;, &#39;27.14&#39;, &#39;27.63&#39;, &#39;28.13&#39;, &#39;28.64&#39;, &#39;29.16&#39;, &#39;29.69&#39;, &#39;30.23&#39;, &#39;30.78&#39;, &#39;31.34&#39;, &#39;31.91&#39;, &#39;32.49&#39;, &#39;33.08&#39;, &#39;33.68&#39;, &#39;34.29&#39;, &#39;34.91&#39;, &#39;35.55&#39;, &#39;36.19&#39;, &#39;36.85&#39;, &#39;37.52&#39;, &#39;38.20&#39;, &#39;38.89&#39;, &#39;39.60&#39;, &#39;40.32&#39;, &#39;41.05&#39;, &#39;41.79&#39;, &#39;42.55&#39;, &#39;43.32&#39;, &#39;44.11&#39;, &#39;44.91&#39;, &#39;45.73&#39;, &#39;46.56&#39;, &#39;47.40&#39;, &#39;48.26&#39;, &#39;49.14&#39;, &#39;50.03&#39;, &#39;50.94&#39;, &#39;51.86&#39;, &#39;52.80&#39;, &#39;53.76&#39;, &#39;54.74&#39;, &#39;55.73&#39;, &#39;56.74&#39;, &#39;57.77&#39;, &#39;58.82&#39;, &#39;59.89&#39;, &#39;60.98&#39;, &#39;62.08&#39;, &#39;63.21&#39;, &#39;64.36&#39;, &#39;65.52&#39;, &#39;66.71&#39;, &#39;67.93&#39;, &#39;69.16&#39;, &#39;70.41&#39;, &#39;71.69&#39;, &#39;72.99&#39;, &#39;74.32&#39;, &#39;75.67&#39;, &#39;77.04&#39;, &#39;78.44&#39;, &#39;79.86&#39;, &#39;81.31&#39;, &#39;82.79&#39;, &#39;84.29&#39;, &#39;85.82&#39;, &#39;87.38&#39;, &#39;88.96&#39;, &#39;90.58&#39;, &#39;92.22&#39;, &#39;93.90&#39;, &#39;95.60&#39;, &#39;97.34&#39;, &#39;99.10&#39;, &#39;100.90&#39;, &#39;102.74&#39;, &#39;104.60&#39;, &#39;106.50&#39;, &#39;108.43&#39;, &#39;110.40&#39;, &#39;112.40&#39;, &#39;114.44&#39;, &#39;116.52&#39;, &#39;118.64&#39;, &#39;120.79&#39;, &#39;122.98&#39;, &#39;125.21&#39;, &#39;127.49&#39;, &#39;129.80&#39;, &#39;132.16&#39;, &#39;134.56&#39;, &#39;137.00&#39;, &#39;139.49&#39;, &#39;142.02&#39;, &#39;144.60&#39;, &#39;147.22&#39;, &#39;149.89&#39;, &#39;152.61&#39;, &#39;155.38&#39;, &#39;158.20&#39;, &#39;161.08&#39;, &#39;164.00&#39;, &#39;166.98&#39;, &#39;170.01&#39;, &#39;173.09&#39;, &#39;176.24&#39;, &#39;179.43&#39;, &#39;182.69&#39;, &#39;186.01&#39;, &#39;189.38&#39;, &#39;192.82&#39;, &#39;196.32&#39;, &#39;199.89&#39;, &#39;203.51&#39;, &#39;207.21&#39;, &#39;210.97&#39;, &#39;214.80&#39;, &#39;218.70&#39;, &#39;222.67&#39;, &#39;226.71&#39;, &#39;230.82&#39;, &#39;235.01&#39;, &#39;239.28&#39;, &#39;243.62&#39;, &#39;248.05&#39;, &#39;252.55&#39;, &#39;257.13&#39;, &#39;261.80&#39;, &#39;266.55&#39;, &#39;271.39&#39;, &#39;276.32&#39;, &#39;281.33&#39;, &#39;286.44&#39;, &#39;291.64&#39;, &#39;296.93&#39;, &#39;302.32&#39;, &#39;307.81&#39;, &#39;313.40&#39;, &#39;319.08&#39;, &#39;324.88&#39;, &#39;330.77&#39;, &#39;336.78&#39;, &#39;342.89&#39;, &#39;349.12&#39;, &#39;355.45&#39;, &#39;361.90&#39;, &#39;368.47&#39;, &#39;375.16&#39;, &#39;381.97&#39;, &#39;388.91&#39;, &#39;395.96&#39;, &#39;403.15&#39;, &#39;410.47&#39;, &#39;417.92&#39;, &#39;425.51&#39;, &#39;433.23&#39;, &#39;441.09&#39;, &#39;449.10&#39;, &#39;457.25&#39;, &#39;465.55&#39;, &#39;474.00&#39;, &#39;482.61&#39;, &#39;491.37&#39;, &#39;500.29&#39;, &#39;509.37&#39;, &#39;518.61&#39;, &#39;528.03&#39;, &#39;537.61&#39;, &#39;547.37&#39;, &#39;557.31&#39;, &#39;567.42&#39;, &#39;577.72&#39;, &#39;588.21&#39;, &#39;598.89&#39;, &#39;609.76&#39;, &#39;620.82&#39;, &#39;632.09&#39;, &#39;643.57&#39;, &#39;655.25&#39;, &#39;667.14&#39;, &#39;679.25&#39;, &#39;691.58&#39;, &#39;704.14&#39;, &#39;716.92&#39;, &#39;729.93&#39;, &#39;743.18&#39;, &#39;756.67&#39;, &#39;770.40&#39;, &#39;784.39&#39;], data=array([[ 6103.186,  2832.655,  4733.553, ...,    93.413,   122.992,
+            0.   ],
+       [ 5621.118,  5867.747,  6233.403, ...,     0.   ,     0.   ,
+           75.377],
+       [ 5165.139,  4969.987,  4312.386, ...,     0.   ,   122.992,
+          124.085],
+       ...,
+       [ 9962.036,  7986.823,  8682.258, ...,     0.   ,     0.   ,
+          124.153],
+       [ 8765.782, 11175.603,  8148.945, ...,     0.   ,     0.   ,
+          372.433],
+       [14380.528, 11524.35 , 13632.727, ...,     0.   ,     0.   ,
+            0.   ]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
+       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="plotting-again">
+<h2>Plotting Again<a class="headerlink" href="#plotting-again" title="Permalink to this heading">#</a></h2>
+<p>Plotting is an integral part of the data analysis process. It transforms raw data into visual representations that can reveal insights, patterns, and anomalies that might not be immediately apparent in numerical form. Let’s delve into why plotting is so crucial in understanding your data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Adjusting the concentration data for better visualization in the plot</span>
+<span class="n">concentration</span> <span class="o">=</span> <span class="n">data_stream_2d</span><span class="o">.</span><span class="n">data</span>
+<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+    <span class="n">concentration</span> <span class="o">&lt;</span> <span class="mf">1e-5</span><span class="p">,</span>
+    <span class="mf">1e-5</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="p">)</span>  <span class="c1"># Setting a lower limit</span>
+<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+    <span class="n">concentration</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="o">**</span><span class="mi">5</span><span class="p">,</span>
+    <span class="mi">10</span><span class="o">**</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="p">)</span>  <span class="c1"># Setting an upper limit</span>
+<span class="c1"># Uncomment the following line to plot the concentration on a logarithmic scale</span>
+<span class="c1"># concentration = np.log10(concentration)</span>
+
+<span class="c1"># Creating a figure and axis for the contour plot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Creating the contour plot</span>
+<span class="c1"># X-axis: Time data in datetime64 format from data_stream_2d</span>
+<span class="c1"># Y-axis: Particle sizes (diameter in nm) converted from the header strings to floats</span>
+<span class="c1"># Z-axis: Concentration data</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span>
+    <span class="n">data_stream_2d</span><span class="o">.</span><span class="n">datetime64</span><span class="p">,</span>  <span class="c1"># Time data</span>
+    <span class="n">data_stream_2d</span><span class="o">.</span><span class="n">header_float</span><span class="p">,</span>  <span class="c1"># Particle sizes</span>
+    <span class="n">concentration</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>  <span class="c1"># Concentration data, transposed for correct orientation</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">PuBu_r</span><span class="p">,</span>  <span class="c1"># Color map for the plot</span>
+    <span class="n">levels</span><span class="o">=</span><span class="mi">50</span>  <span class="c1"># Number of contour levels</span>
+<span class="p">)</span>
+
+<span class="c1"># Setting the y-axis to logarithmic scale for better visualization of size</span>
+<span class="c1"># distribution</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+<span class="c1"># Rotating the x-axis labels for better readability</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">35</span><span class="p">)</span>
+
+<span class="c1"># Setting labels for the x-axis and y-axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (UTC)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Diameter (nm)&#39;</span><span class="p">)</span>
+
+<span class="c1"># Adding a color bar to indicate concentration levels</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Concentration dN/dlog(Dp) [#/cm³]&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+<span class="c1"># Displaying the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Adjusting the layout to ensure all elements of the plot are clearly visible</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/c2dcd4095c2ebef9075fd5a204f16a9f1761b719de2a6f9168ca806e850ae1ba.png" src="../../_images/c2dcd4095c2ebef9075fd5a204f16a9f1761b719de2a6f9168ca806e850ae1ba.png" />
+</div>
+</div>
+</section>
+<section id="summary-of-loading-data-part-2">
+<h2>Summary of Loading Data Part 2<a class="headerlink" href="#summary-of-loading-data-part-2" title="Permalink to this heading">#</a></h2>
+<p>In this section, we delved into the process of loading and handling 2-dimensional data, focusing on a size distribution dataset. We walked through several crucial steps, providing a comprehensive guide to managing and visualizing complex data structures. Here’s a recap of what we covered:</p>
+<ul class="simple">
+<li><p>Setting the Working Path: We began by establishing the working directory for our data, a foundational step in ensuring our scripts access the correct files.</p></li>
+<li><p>Loading the Data: Using the loader module, we demonstrated how to import raw data from a file, setting the stage for further processing.</p></li>
+<li><p>Formatting the Data: We then tackled the challenge of formatting 2-dimensional data, extracting size bins as headers, and preparing the dataset for analysis.</p></li>
+<li><p>Initial Plotting: To get a preliminary understanding of our data, we created initial plots. This step is crucial for visually inspecting the data and confirming its integrity.</p></li>
+<li><p>Generating the Settings Dictionary: We utilized the settings_generator to create settings dictionaries for both 1-dimensional and 2-dimensional data. This streamlines the data loading process, especially for complex datasets.</p></li>
+<li><p>Loading Data with the Interface: We showcased how to use the loader interface to efficiently load data using the predefined settings, emphasizing the ease and efficiency it brings to the data loading process.</p></li>
+<li><p>Advanced Plotting of the Data Stream: Lastly, we explored more advanced data visualization techniques, including creating contour plots. This allowed us to visualize how particle concentration varied across different sizes and times, offering valuable insights into our dataset.</p></li>
+</ul>
+<p>Throughout this section, we focused on making each step clear and accessible, particularly for those new to working with 2-dimensional datasets in Python. By following these steps, you can effectively manage and analyze complex data, gaining deeper insights into your research or projects.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "uncscode/particula",
+            ref: "v0.0.10",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./examples/streamlake"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="loading_data_part1.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Loading Part 1: Into &amp; 1D Data</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="loading_data_part3.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Loading Part 3: Lake</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Part 2: Sizer Data</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-your-working-path">Setting Up Your Working Path</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data">Load the Data</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#formatting-the-data">Formatting the Data</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pause-to-plot">Pause to Plot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dates-in-plots">Dates in Plots</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contour-plot-of-data">Contour Plot of Data</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#preparing-the-data-for-contour-plotting">Preparing the Data for Contour Plotting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-the-contour-plot">Creating the Contour Plot</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simplifying-data-import-with-the-settings-generator">Simplifying Data Import with the Settings Generator</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-the-settings-generator-function">Understanding the Settings Generator Function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-default-settings">Using Default Settings</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#efficient-data-loading-with-the-interface">Efficient Data Loading with the Interface</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-the-interface-s-role">Understanding the Interface’s Role</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-advantages-of-mastery">The Advantages of Mastery</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#printing-data-stream-summaries">Printing Data Stream Summaries</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-the-data-stream-summary">Understanding the Data Stream Summary</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-for-printing-summaries">Code for Printing Summaries</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-again">Plotting Again</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-loading-data-part-2">Summary of Loading Data Part 2</a></li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By particula contributors
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
