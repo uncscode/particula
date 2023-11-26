@@ -1,7 +1,6 @@
 """conversion functions common for aerosol processing
 """
 
-import warnings
 from typing import Union, Tuple, Any, List, Dict
 import numpy as np
 
