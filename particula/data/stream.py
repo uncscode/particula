@@ -16,7 +16,8 @@ class Stream:
     header : List[str]
         A list of strings representing the header of the data stream.
     data : np.ndarray
-        A numpy array representing the data stream.
+        A numpy array representing the data stream. The first dimension
+        represents time and the second dimension represents the header.
     time : np.ndarray
         A numpy array representing the time stream.
     files : List[str]
@@ -65,7 +66,7 @@ class Stream:
             The data stream at the specified index."""
         if isinstance(index, str):
             index = self.header.index(index)
-        return self.data[index, :]
+        return self.data[:, index]
 
     def __setitem__(self, index: Union[int, str], value):
         """Allows for setting or adding of a row of data in the stream.
@@ -77,10 +78,10 @@ class Stream:
         if isinstance(index, str):
             if index not in self.header:
                 self.header.append(index)  # add new header element
-                self.data = np.vstack((self.data, value))
+                self.data = np.hstack((self.data, value))
             index = self.header.index(index)
         # if index is an int, set the data at that index
-        self.data[index, :] = value
+        self.data[:, index] = value
 
     def __len__(self):
         """Returns the length of the time stream."""
@@ -149,4 +150,4 @@ class StreamAveraged(Stream):
         """Returns the standard deviation of the data."""
         if isinstance(index, str):
             index = self.header.index(index)
-        return self.standard_deviation[index, :]
+        return self.standard_deviation[:, index]

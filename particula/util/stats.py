@@ -48,11 +48,11 @@ def merge_formatting(
             (
                 data_current,
                 np.full((
-                        len(header_new_not_listed),
-                        data_current.shape[1]
+                        data_current.shape[0],
+                        len(header_new_not_listed)
                         ), np.nan)
             ),
-            axis=0
+            axis=1
         )
 
     if bool(header_list_not_new):
@@ -63,15 +63,15 @@ def merge_formatting(
             (
                 data_new,
                 np.full((
-                        len(header_list_not_new),
-                        data_new.shape[1]
+                        data_new.shape[0],
+                        len(header_list_not_new)
                         ), np.nan)
             ),
-            axis=0
+            axis=1
         )
 
     # check that the shapes are the same
-    if data_current.shape[0] != data_new.shape[0]:
+    if data_current.shape[1] != data_new.shape[1]:
         raise ValueError(
             'data_current  ',
             data_current.shape,
@@ -100,14 +100,14 @@ def merge_formatting(
         header_new = [header_new[i] for i in header_new_indices]
 
         # sort the data
-        data_current = data_current[header_stored_indices, :]
+        data_current = data_current[:, header_stored_indices]
     else:
         # match header_new to header_current and sort the data
         header_new_indices = [
             header_new.index(x) for x in header_current
         ]
         header_new = [header_new[i] for i in header_new_indices]
-    data_new = data_new[header_new_indices, :]
+    data_new = data_new[:, header_new_indices]
     return data_current, header_current, data_new, header_new
 
 
@@ -222,11 +222,11 @@ def average_to_interval(
 
             if start_index < stop_index:
                 # average the data in the time interval
-                average_data[:, i - 1] = np.nanmean(
-                    data_raw[:, start_index:stop_index], axis=1
+                average_data[i - 1, :] = np.nanmean(
+                    data_raw[start_index:stop_index, :], axis=0
                 )  # the actual averaging of data is here
-                average_data_std[:, i - 1] = np.nanstd(
-                    data_raw[:, start_index:stop_index], axis=1
+                average_data_std[i - 1, :] = np.nanstd(
+                    data_raw[start_index:stop_index, :], axis=0
                 )  # the actual std data is here
             else:
                 start_time = time_raw[stop_index]

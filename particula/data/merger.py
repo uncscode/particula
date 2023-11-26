@@ -66,21 +66,21 @@ def combine_data(
                 data,
                 data_new,
             ),
-            axis=0,
+            axis=1,
         )
     else:  # interpolate the data_new before adding it to the data_stream
-        data_interp = np.empty((data_new.shape[0], len(time)))
-        for i in range(data_new.shape[0]):
-            mask = ~np.isnan(data_new[i, :])
+        data_interp = np.empty((len(time), data_new.shape[1]))
+        for i in range(data_new.shape[1]):
+            mask = ~np.isnan(data_new[:, i])
             if not mask.any():
-                data_interp[i, :] = np.nan
+                data_interp[:, i] = np.nan
             else:
-                left_value = data_new[i, mask][0]
-                right_value = data_new[i, mask][-1]
-                data_interp[i, :] = np.interp(
+                left_value = data_new[mask, i][0]
+                right_value = data_new[mask, i][-1]
+                data_interp[:, i] = np.interp(
                     time,
                     time_new[mask],
-                    data_new[i, mask],
+                    data_new[mask, i],
                     left=left_value,
                     right=right_value,
                 )
@@ -90,7 +90,7 @@ def combine_data(
                 data,
                 data_interp,
             ),
-            axis=0,
+            axis=1,
         )
 
     header_updated = list(np.append(header_list, header_new))
@@ -163,10 +163,10 @@ def stream_add_data(
                 header_new=header_new
             )
         # updates stream
-        stream.data = np.hstack((stream.data, data_new))
+        stream.data = np.vstack((stream.data, data_new))
         stream.time = np.concatenate((stream.time, time_new))
     else:
-        stream.data = np.hstack((stream.data, data_new))
+        stream.data = np.vstack((stream.data, data_new))
         stream.time = np.concatenate((stream.time, time_new))
 
     # check if the time stream added is increasing
