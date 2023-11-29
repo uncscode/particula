@@ -1,7 +1,7 @@
 
 # %%
 # Code Section: Importing Necessary Libraries and Initializing Variables
-
+from typing import Tuple
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,6 +63,125 @@ save_mass = np.zeros((TOTAL_NUMBER_OF_PARTICLES, save_points))
 
 # Determine which iterations will correspond to the save points
 save_iterations = np.linspace(0, total_iterations, save_points, dtype=int)
+radius = particle_property.radius(mass=mass, density=density)
+
+
+def single_axis_sweep_and_prune(
+        position_axis: torch.Tensor,
+        radius: torch.Tensor
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """Sweep and prune algorithm for collision detection, 
+    along a single axis, repeated for each axis.
+    
+    Args:
+        position_axis (torch.Tensor): The position of particles along a single
+            axis.
+        mass (torch.Tensor): The mass of particles.
+        density (torch.Tensor): The density of particles.
+        
+    Returns:
+        torch.Tensor: The indices of particles that are close
+        enough to collide.
+        """
+    # fast return if there are no particles
+    if position_axis.shape[0] == 0:
+        return torch.tensor([]), torch.tensor([])
+    # apply sweep and prune to find pairs of particles that are close enough
+    # to collide
+    sweep = torch.sort(position_axis)
+
+    # gap
+    sweep_diff = torch.diff(sweep.values)
+    radius_sum = radius[sweep.indices[:-1]] + radius[sweep.indices[1:]]
+
+    # select indices of particles that are close enough to collide
+    prune_bool = sweep_diff < radius_sum
+    # select left particle indices
+    left_overlap_indices = sweep.indices[
+        torch.cat([prune_bool, torch.tensor([False])])]
+    # select right particle indices
+    right_overlap_indices = sweep.indices[
+        torch.cat([torch.tensor([False]), prune_bool])]
+    return left_overlap_indices, right_overlap_indices
+
+
+def full_sweep_and_prune(
+        position: torch.Tensor,
+        radius: torch.Tensor
+) -> torch.Tensor:
+    """Sweep and prune algorithm for collision detection, 
+    along all axes.
+    
+    Args:
+        position (torch.Tensor): The position of particles.
+        mass (torch.Tensor): The mass of particles.
+        density (torch.Tensor): The density of particles.
+        
+    Returns:
+        torch.Tensor: The indices of particles that are close
+        enough to collide.
+        """
+    # select only particles with positive radius
+    valid_radius = radius > 0
+    valid_radius_indices = torch.arange(radius.shape[0])[valid_radius]
+    # sweep x axis
+    left_x_overlap_shifted, right_x_overlap_shifted = single_axis_sweep_and_prune(
+        position_axis=position[0, valid_radius_indices],
+        radius=radius[valid_radius_indices]
+    )
+    # fast return if there are no particles overlapping in x
+    if left_x_overlap_shifted.shape[0] == 0:
+        return torch.tensor([])
+    # unshift from relative valid radius to position index
+    left_x_overlap_indices = valid_radius_indices[left_x_overlap_shifted]
+    right_x_overlap_indices = valid_radius_indices[right_x_overlap_shifted]
+
+    # cobine left and right indices for next step
+    all_overlaps_x = torch.cat(
+        [left_x_overlap_indices, right_x_overlap_indices])
+    # select unique indices
+    indices_x_unique = torch.unique(all_overlaps_x)
+
+    # sweep y axis
+    left_y_overlap_shifted, right_y_overlap_shifted = single_axis_sweep_and_prune(
+        position_axis=position[1][indices_x_unique],
+        radius=radius[indices_x_unique]
+    )
+    # fast return if there are no particles overlapping in y
+    if left_y_overlap_shifted.shape[0] == 0:
+        return torch.tensor([])
+    # unshift from x relative index to position index
+    left_y_overlap_indices = indices_x_unique[left_y_overlap_shifted]
+    right_y_overlap_indices = indices_x_unique[right_y_overlap_shifted]
+
+    # combine left and right indices for next step
+    all_overlaps_y = torch.cat(
+        [left_y_overlap_indices, right_y_overlap_indices])
+    # select unique indices
+    indices_y_unique = torch.unique(all_overlaps_y)
+
+    # sweep z axis
+    left_z_overlap_shifted, right_z_overlap_shifted = single_axis_sweep_and_prune(
+        position_axis=position[2][indices_y_unique],
+        radius=radius[indices_y_unique]
+    )
+    # fast return if there are no particles overlapping in z
+    if left_z_overlap_shifted.shape[0] == 0:
+        return torch.tensor([])
+    # unshift from y relative index to position index
+    left_z_overlap_indices = indices_y_unique[left_z_overlap_shifted]
+    right_z_overlap_indices = indices_y_unique[right_z_overlap_shifted]
+
+    # Combine indices to form collision pairs, may still have duplicates
+    collision_indices_pairs = torch.cat(
+        [left_z_overlap_indices.unsqueeze(1),
+         right_z_overlap_indices.unsqueeze(1)], dim=1)
+
+    return collision_indices_pairs
+
+
+collision_pairs = full_sweep_and_prune(position=position, radius=radius)
+
 
 # %%
 # Initialize counter for saving data
@@ -73,6 +192,12 @@ for i in tqdm(range(total_iterations), desc='Simulation'):
 
     # Apply boundary conditions for the cube (wrap-around)
     position = boundary.wrapped_cube(position=position, cube_side=CUBE_SIDE)
+
+
+    # calculate sweep and prune collision pairs
+    radius = particle_property.radius(mass=mass, density=density)
+    valid_collision_indices_pairs = full_sweep_and_prune(
+         position=position, radius=radius)
 
     # # Calculate pairwise distances between particles
     # distance_matrix = particle_pairs.calculate_pairwise_distance(
@@ -87,10 +212,11 @@ for i in tqdm(range(total_iterations), desc='Simulation'):
     # valid_collision_indices_pairs = collisions.find_collisions(
     #     distance_matrix=distance_matrix, indices=indices, mass=mass)
 
-    # # Coalesce particles that have collided and update their velocity and mass
-    # velocity, mass = collisions.coalescence(
-    #     velocity=velocity, mass=mass,
-    #     collision_indices_pairs=valid_collision_indices_pairs)
+    if valid_collision_indices_pairs.shape[0] > 0:
+        # Coalesce particles that have collided and update their velocity and mass
+        velocity, mass = collisions.coalescence(
+            velocity=velocity, mass=mass,
+            collision_indices_pairs=valid_collision_indices_pairs)
 
     # Calculate the force acting on the particles (e.g., gravity)
     force = mass * gravity
