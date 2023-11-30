@@ -11,7 +11,8 @@ def wrapped_cube(
     This function modifies positions that exceed the cubic domain side,
     wrapping them around to the opposite side of the domain. It handles both
     positive and negative overflows. The center of the cube is assumed to be
-    at zero.
+    at zero. If a particle is way outside the cube, it is wrapped around to
+    the opposite side of the cube.
 
     Parameters:
     - position (torch.Tensor): A tensor representing positions that might
@@ -40,4 +41,17 @@ def wrapped_cube(
         position < -half_cube_side,
         position + cube_side,
         position)
+
+    # Wrap around for very large positive overflow
+    position = torch.where(
+        position > half_cube_side,
+        -half_cube_side,
+        position)
+
+    # Wrap around for very large negative overflow
+    position = torch.where(
+        position < -half_cube_side,
+        half_cube_side,
+        position)
+
     return position

@@ -76,6 +76,31 @@ def calculate_pairwise_distance(position: torch.Tensor) -> torch.Tensor:
     return torch.sqrt(torch.sum(detla_position**2, dim=0))
 
 
+def validate_pair_distance(
+    collision_indices_pairs: torch.Tensor,
+    position: torch.Tensor,
+    radius: torch.Tensor
+) -> torch.Tensor:
+    """
+    need to test this:
+    Calculate if the pairwise Euclidean distances between points in a given
+    position tensor is smaller than the sum of the radius of the particles.
+    """
+    # Fast return if there are no particles
+    if collision_indices_pairs.shape[0] == 0:
+        return torch.tensor([])
+
+    # check 3d distance for collision pairs
+    detla_position = position[:, collision_indices_pairs[:, 0]] - \
+        position[:, collision_indices_pairs[:, 1]]
+    # Compute pairwise Euclidean distances
+    distance = torch.sqrt(torch.sum(detla_position**2, dim=0))
+    distance_threshold = radius[collision_indices_pairs[:, 0]] + \
+        radius[collision_indices_pairs[:, 1]]
+    # Check and return collision pairs
+    return collision_indices_pairs[distance < distance_threshold]
+
+
 def single_axis_sweep_and_prune(
     position_axis: torch.Tensor,
     radius: torch.Tensor

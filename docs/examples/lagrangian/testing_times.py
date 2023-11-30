@@ -14,12 +14,12 @@ t_type = torch.float32
 # %%
 # Setting up the Simulation Parameters and Initial Conditions
 # Define fixed parameters
-TOTAL_NUMBER_OF_PARTICLES = 500
+TOTAL_NUMBER_OF_PARTICLES = 1000
 TIME_STEP = 0.01
 SIMULATION_TIME = 100
 MASS = 3
-CUBE_SIDE = 100
-speed = 1
+CUBE_SIDE = 50
+speed = 10
 save_points = 50
 
 # Initialize particle positions randomly within the cube
@@ -74,15 +74,26 @@ for i in range(total_iterations):
     valid_collision_indices_pairs = particle_pairs.full_sweep_and_prune(
          position=position, radius=radius)
 
-    # check 3d distance for collision pairs
-    detla_position = position.unsqueeze(2) - position.unsqueeze(1)
-    # Compute pairwise Euclidean distances
-    distance = torch.sqrt(torch.sum(detla_position**2, dim=0))
+    # if valid_collision_indices_pairs.shape[0] > 0:
+    #     # check 3d distance for collision pairs
+    #     detla_position = position[:, valid_collision_indices_pairs[:, 0]] - \
+    #         position[:, valid_collision_indices_pairs[:, 1]]
+    #     # Compute pairwise Euclidean distances
+    #     distance = torch.sqrt(torch.sum(detla_position**2, dim=0))
+    #     distance_threshold = radius[valid_collision_indices_pairs[:, 0]] + \
+    #         radius[valid_collision_indices_pairs[:, 1]]
+    #     # Check for collisions
+    #     valid_collision_indices_pairs_final = valid_collision_indices_pairs[distance < distance_threshold]
+    # else:
+    #     valid_collision_indices_pairs_final = torch.tensor([], dtype=torch.int64)
 
     if valid_collision_indices_pairs.shape[0] > 0:
         # Coalesce particles that have collided and update their velocity and mass
         velocity, mass = collisions.coalescence(
-            velocity=velocity, mass=mass,
+            position=position,
+            velocity=velocity,
+            mass=mass,
+            radius=radius,
             collision_indices_pairs=valid_collision_indices_pairs)
 
     # Calculate the force acting on the particles (e.g., gravity)
@@ -114,7 +125,7 @@ print(f"Ratio of wall time to simulation time: {(end_time - start_time) / SIMULA
 # Processing the Final Data for Visualization
 
 # Select the final time index for the data
-time_index = -1
+time_index = -2
 position_final = save_position[:, :, time_index]
 mass_final = save_mass[:, time_index]
 
@@ -167,15 +178,17 @@ fig.tight_layout()
 # Create a new figure for the histogram
 fig = plt.figure()
 ax = fig.add_subplot()
+# Normalizing by initial MASS to observe distribution changes
+normalized_mass = save_mass[filter_zero_mass, :] / MASS
+max_mass = normalized_mass.max()
 
 # Plot histograms of mass distribution at different stages
-# Normalizing by initial MASS to observe distribution changes
-ax.hist(save_mass[filter_zero_mass, 0] / MASS, bins=25,
-        alpha=0.8, label='Initial', range=(0, 60))
-ax.hist(save_mass[filter_zero_mass, 24] / MASS, bins=25,
-        alpha=0.6, label='Middle', range=(0, 60))
-ax.hist(save_mass[filter_zero_mass, -1] / MASS, bins=25,
-        alpha=0.5, label='Final', range=(0, 60))
+ax.hist(normalized_mass[:, 0], bins=25,
+        alpha=0.8, label='Initial', range=(0, max_mass))
+ax.hist(normalized_mass[:, 24], bins=25,
+        alpha=0.6, label='Middle', range=(0, max_mass))
+ax.hist(normalized_mass[:, -1], bins=25,
+        alpha=0.5, label='Final', range=(0, max_mass))
 
 # Setting labels and title for the plot
 ax.set_xlabel('Mass / Initial MASS')
