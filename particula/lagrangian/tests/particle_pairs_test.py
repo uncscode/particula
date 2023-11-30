@@ -24,6 +24,7 @@ def test_calculate_pairwise_distance():
 
 
 def test_single_axis_sweep_and_prune():
+    """Test single axis sweep and prune algorithm."""
     # Test case with some overlapping particles
     position_axis = torch.tensor([1.0, 2.0, 4.0, 5.0])
     radius = torch.tensor([0.5, 1.5, 0.2, 0.2])
