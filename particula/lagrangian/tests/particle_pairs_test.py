@@ -21,3 +21,23 @@ def test_calculate_pairwise_distance():
                                     [2.2361, 1.0, 0.0]])
     result = particle_pairs.calculate_pairwise_distance(position)
     assert torch.allclose(result, expected_output, atol=1e-4)
+
+
+def test_single_axis_sweep_and_prune():
+    # Test case with some overlapping particles
+    position_axis = torch.tensor([1.0, 2.0, 4.0, 5.0])
+    radius = torch.tensor([0.5, 1.5, 0.2, 0.2])
+    left_indices, right_indices = particle_pairs.single_axis_sweep_and_prune(
+        position_axis, radius)
+
+    assert torch.equal(left_indices, torch.tensor([0]))
+    assert torch.equal(right_indices, torch.tensor([1]))
+
+    # Test case with no particles
+    position_axis = torch.tensor([])
+    radius = torch.tensor([])
+    left_indices, right_indices = particle_pairs.single_axis_sweep_and_prune(
+        position_axis, radius)
+
+    assert torch.equal(left_indices, torch.tensor([]))
+    assert torch.equal(right_indices, torch.tensor([]))
