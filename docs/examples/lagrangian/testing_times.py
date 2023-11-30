@@ -1,6 +1,7 @@
 
 # %%
 # Code Section: Importing Necessary Libraries and Initializing Variables
+import time
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,11 +16,11 @@ t_type = torch.float32
 # Setting up the Simulation Parameters and Initial Conditions
 progress_bar = True
 # Define fixed parameters
-TOTAL_NUMBER_OF_PARTICLES = 100
+TOTAL_NUMBER_OF_PARTICLES = 500
 TIME_STEP = 0.01
 SIMULATION_TIME = 1000
 MASS = 3
-CUBE_SIDE = 1000
+CUBE_SIDE = 50
 speed = 1
 save_points = 50
 
@@ -53,9 +54,7 @@ total_mass = torch.zeros(total_iterations, dtype=t_type)
 gravity = torch.tensor(
     [0, -9.81, 0]).repeat(TOTAL_NUMBER_OF_PARTICLES, 1).transpose(0, 1)
 
-# %%
 # Initializing Arrays for Saving Position and Mass Data
-
 # Create arrays to store position and mass data at each save point
 save_position = np.zeros((3, TOTAL_NUMBER_OF_PARTICLES, save_points))
 save_mass = np.zeros((TOTAL_NUMBER_OF_PARTICLES, save_points))
@@ -68,10 +67,8 @@ radius = particle_property.radius(mass=mass, density=density)
 # %%
 # Initialize counter for saving data
 save_counter = 0
+start_time = time.time()
 
-# Start the simulation
-if progress_bar:
-    timer = tqdm(total=total_iterations, desc='Simulation')
 for i in range(total_iterations):
 
     # calculate sweep and prune collision pairs
@@ -100,15 +97,15 @@ for i in range(total_iterations):
         save_position[:, :, save_counter] = position.detach().numpy()
         save_mass[:, save_counter] = mass.detach().numpy()
         save_counter += 1
-        if progress_bar:
-            timer.update(save_iterations[1]-save_iterations[0])
-
-if progress_bar:
-    timer.close
 
 # Perform a final save of the position and mass data
 save_position[:, :, -1] = position.detach().numpy()
 save_mass[:, -1] = mass.detach().numpy()
+
+# Calculate the total simulation time
+end_time = time.time()
+print(f"Total wall time: {end_time - start_time} seconds")
+print(f"Ratio of wall time to simulation time: {(end_time - start_time) / SIMULATION_TIME}")
 
 # %%
 # Processing the Final Data for Visualization
@@ -160,9 +157,6 @@ fig.tight_layout()
 
 # %% [markdown]
 # ## Analyzing the Mass Distribution of Particles
-#
-# Next, we turn our attention to understanding how the mass distribution of the particles has evolved over the course of the simulation. To achieve this, we will analyze the mass data normalized by the initial MASS value. This normalization allows us to observe changes in the mass distribution as multiples of the initial mass, providing insights into the extent of coalescence and mass variation among the particles.
-#
 
 # %%
 # Visualizing the Mass Distribution at Different Stages
@@ -195,20 +189,3 @@ fig.tight_layout()
 
 # %% [markdown]
 # ## Summary of the Lagrangian Particle Simulation
-#
-# In this Jupyter Notebook, we have explored the dynamics of a Lagrangian particle system within a defined cubic space. Our focus has been on simulating and analyzing the interactions and evolution of particles under a set of initial conditions and physical laws. Here is a brief overview of what we covered:
-#
-# ### System Definition and Initialization
-# - We began by defining the simulation space and initial conditions for our particle system. This included setting parameters such as the number of particles, mass, and dimensions of the cubic space, as well as initializing the positions and velocities of the particles.
-#
-# ### Simulation Process
-# - The core of our simulation involved a series of iterative steps to simulate particle dynamics. These steps included checking boundary conditions, calculating distances, detecting and handling collisions, coalescing particles, applying forces, and integrating the equations of motion.
-#
-# ### Data Saving and Analysis
-# - Throughout the simulation, we saved key data points, such as the position and mass of particles at specified intervals. This allowed us to track and analyze the changes in the system over time.
-#
-# ### Visualization and Interpretation
-# - We utilized various visualization techniques to interpret the simulation results. This included creating 3D plots to visualize the final positions of particles and histograms to analyze the distribution of mass at different stages of the simulation.
-#
-# ### Insights Gained
-# - The simulation provided valuable insights into the behavior of particles in a Lagrangian framework. We observed how particles interact, coalesce, and evolve over time under the influence of set physical parameters and forces.
