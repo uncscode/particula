@@ -70,7 +70,7 @@ radius = particle_property.radius(mass=mass, density=density)
 save_counter = 0
 
 # Start the simulation
-if progress_bar is True:
+if progress_bar:
     timer = tqdm(total=total_iterations, desc='Simulation')
 for i in range(total_iterations):
 
@@ -100,10 +100,10 @@ for i in range(total_iterations):
         save_position[:, :, save_counter] = position.detach().numpy()
         save_mass[:, save_counter] = mass.detach().numpy()
         save_counter += 1
-        if progress_bar is True:
+        if progress_bar:
             timer.update(save_iterations[1]-save_iterations[0])
 
-if progress_bar is True:
+if progress_bar:
     timer.close
 
 # Perform a final save of the position and mass data
