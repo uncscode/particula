@@ -570,11 +570,10 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Code Section: Importing Necessary Libraries and Initializing Variables</span>
-
+<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">particula.lagrangian</span> <span class="kn">import</span> <span class="n">boundary</span><span class="p">,</span> <span class="n">integration</span><span class="p">,</span> <span class="n">collisions</span><span class="p">,</span> <span class="n">particle_property</span><span class="p">,</span> <span class="n">particle_pairs</span>
 
 <span class="c1"># Initializing the Torch Generator and setting the data type</span>
@@ -593,12 +592,12 @@ document.write(`
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setting up the Simulation Parameters and Initial Conditions</span>
 
 <span class="c1"># Define fixed parameters</span>
-<span class="n">TOTAL_NUMBER_OF_PARTICLES</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="n">TOTAL_NUMBER_OF_PARTICLES</span> <span class="o">=</span> <span class="mi">500</span>
 <span class="n">TIME_STEP</span> <span class="o">=</span> <span class="mf">0.01</span>
 <span class="n">SIMULATION_TIME</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">MASS</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">CUBE_SIDE</span> <span class="o">=</span> <span class="mi">50</span>
-<span class="n">speed</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">speed</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">save_points</span> <span class="o">=</span> <span class="mi">50</span>
 
 <span class="c1"># Initialize particle positions randomly within the cube</span>
@@ -670,29 +669,29 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize counter for saving data</span>
 <span class="n">save_counter</span> <span class="o">=</span> <span class="mi">0</span>
-
+<span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="c1"># Start the simulation</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">total_iterations</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Simulation&#39;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_iterations</span><span class="p">):</span>
 
     <span class="c1"># Apply boundary conditions for the cube (wrap-around)</span>
     <span class="n">position</span> <span class="o">=</span> <span class="n">boundary</span><span class="o">.</span><span class="n">wrapped_cube</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">cube_side</span><span class="o">=</span><span class="n">CUBE_SIDE</span><span class="p">)</span>
 
-    <span class="c1"># # Calculate pairwise distances between particles</span>
-    <span class="c1"># distance_matrix = particle_pairs.calculate_pairwise_distance(</span>
-    <span class="c1">#     position=position)</span>
+    <span class="c1"># Calculate pairwise distances between particles</span>
+    <span class="n">distance_matrix</span> <span class="o">=</span> <span class="n">particle_pairs</span><span class="o">.</span><span class="n">calculate_pairwise_distance</span><span class="p">(</span>
+        <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">)</span>
 
-    <span class="c1"># # Adjust distances for the radius of each particle (surface-to-surface</span>
-    <span class="c1"># # distance)</span>
-    <span class="c1"># radius = particle_property.radius(mass=mass, density=density)</span>
-    <span class="c1"># distance_matrix -= radius.unsqueeze(1) + radius.unsqueeze(0)</span>
+    <span class="c1"># Adjust distances for the radius of each particle (surface-to-surface</span>
+    <span class="c1"># distance)</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+    <span class="n">distance_matrix</span> <span class="o">-=</span> <span class="n">radius</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">radius</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="c1"># # Identify pairs of particles that have collided</span>
-    <span class="c1"># valid_collision_indices_pairs = collisions.find_collisions(</span>
-    <span class="c1">#     distance_matrix=distance_matrix, indices=indices, mass=mass)</span>
+    <span class="c1"># Identify pairs of particles that have collided</span>
+    <span class="n">valid_collision_indices_pairs</span> <span class="o">=</span> <span class="n">collisions</span><span class="o">.</span><span class="n">find_collisions</span><span class="p">(</span>
+        <span class="n">distance_matrix</span><span class="o">=</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">)</span>
 
-    <span class="c1"># # Coalesce particles that have collided and update their velocity and mass</span>
-    <span class="c1"># velocity, mass = collisions.coalescence(</span>
-    <span class="c1">#     velocity=velocity, mass=mass, collision_indices_pairs=valid_collision_indices_pairs)</span>
+    <span class="c1"># Coalesce particles that have collided and update their velocity and mass</span>
+    <span class="n">velocity</span><span class="p">,</span> <span class="n">mass</span> <span class="o">=</span> <span class="n">collisions</span><span class="o">.</span><span class="n">coalescence</span><span class="p">(</span>
+        <span class="n">velocity</span><span class="o">=</span><span class="n">velocity</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">collision_indices_pairs</span><span class="o">=</span><span class="n">valid_collision_indices_pairs</span><span class="p">)</span>
 
     <span class="c1"># Calculate the force acting on the particles (e.g., gravity)</span>
     <span class="n">force</span> <span class="o">=</span> <span class="n">mass</span> <span class="o">*</span> <span class="n">gravity</span>
@@ -710,47 +709,17 @@ document.write(`
 <span class="c1"># Perform a final save of the position and mass data</span>
 <span class="n">save_position</span><span class="p">[:,</span> <span class="p">:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">position</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 <span class="n">save_mass</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mass</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+<span class="c1"># Calculate the total simulation time</span>
+<span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total wall time: </span><span class="si">{</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ratio of wall time to simulation time: </span><span class="si">{</span><span class="p">(</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">SIMULATION_TIME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   0%|          | 0/10000 [00:00&lt;?, ?it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  10%|▉         | 978/10000 [00:00&lt;00:00, 9774.67it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  20%|█▉        | 1963/10000 [00:00&lt;00:00, 9818.41it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  29%|██▉       | 2945/10000 [00:00&lt;00:00, 9799.57it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  39%|███▉      | 3925/10000 [00:00&lt;00:00, 9782.91it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  49%|████▉     | 4904/10000 [00:00&lt;00:00, 9753.70it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  59%|█████▉    | 5880/10000 [00:00&lt;00:00, 9737.72it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  69%|██████▊   | 6854/10000 [00:00&lt;00:00, 9720.32it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  78%|███████▊  | 7827/10000 [00:00&lt;00:00, 9686.92it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  88%|████████▊ | 8796/10000 [00:00&lt;00:00, 9654.93it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  98%|█████████▊| 9762/10000 [00:01&lt;00:00, 9636.11it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation: 100%|██████████| 10000/10000 [00:01&lt;00:00, 9693.20it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 18.64733576774597 seconds
+Ratio of wall time to simulation time: 0.1864733576774597
 </pre></div>
 </div>
 </div>
@@ -811,10 +780,10 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 2000
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 203
 </pre></div>
 </div>
-<img alt="../../_images/98732f20c747d5333cfcc48a563469e6cc149788aa4881bbd1beaff44d96f6be.png" src="../../_images/98732f20c747d5333cfcc48a563469e6cc149788aa4881bbd1beaff44d96f6be.png" />
+<img alt="../../_images/ec785df986992914c4602d013b619519103c1db39783240638298dda810e0145.png" src="../../_images/ec785df986992914c4602d013b619519103c1db39783240638298dda810e0145.png" />
 </div>
 </div>
 </section>
@@ -854,7 +823,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/c50d1e8593e2aed0252064400056a09d0375691ed64c10fcd173d17c7f371a7d.png" src="../../_images/c50d1e8593e2aed0252064400056a09d0375691ed64c10fcd173d17c7f371a7d.png" />
+<img alt="../../_images/e7d25de3566ac8b808132e59eceb323bce83730b1b28e99f25e20c00de365fbc.png" src="../../_images/e7d25de3566ac8b808132e59eceb323bce83730b1b28e99f25e20c00de365fbc.png" />
 </div>
 </div>
 </section>
