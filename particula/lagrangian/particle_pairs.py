@@ -82,22 +82,36 @@ def validate_pair_distance(
     radius: torch.Tensor
 ) -> torch.Tensor:
     """
-    need to test this:
-    Calculate if the pairwise Euclidean distances between points in a given
-    position tensor is smaller than the sum of the radius of the particles.
-    """
-    # Fast return if there are no particles
-    if collision_indices_pairs.shape[0] == 0:
-        return torch.tensor([])
+    Validates if the Euclidean distances between pairs of points are smaller
+    than the sum of their radii.
 
-    # check 3d distance for collision pairs
-    detla_position = position[:, collision_indices_pairs[:, 0]] - \
-        position[:, collision_indices_pairs[:, 1]]
-    # Compute pairwise Euclidean distances
-    distance = torch.sqrt(torch.sum(detla_position**2, dim=0))
-    distance_threshold = radius[collision_indices_pairs[:, 0]] + \
-        radius[collision_indices_pairs[:, 1]]
-    # Check and return collision pairs
+    Args:
+        collision_indices_pairs (torch.Tensor): A tensor containing pairs of
+            indices of potentially colliding particles.
+        position (torch.Tensor): A 2D tensor of particle positions, where each
+            column represents a particle, and each row represents an axis.
+        radius (torch.Tensor): A 1D tensor representing the radius of each
+            particle.
+
+    Returns:
+        torch.Tensor: A tensor containing the indices of the pairs of
+            particles that are actually colliding.
+    """
+    # Fast return if there are no particle pairs
+    if collision_indices_pairs.numel() == 0:
+        return torch.tensor([], dtype=torch.int64)
+
+    # Calculate 3D distance for each pair of particles
+    delta_position = position[:, collision_indices_pairs[:, 0]] \
+        - position[:, collision_indices_pairs[:, 1]]
+    # Euclidean distance between particles
+    distance = torch.sqrt(torch.sum(delta_position**2, axis=0))
+    # radius sum of both particles
+    distance_threshold = radius[collision_indices_pairs[:, 0]] \
+        + radius[collision_indices_pairs[:, 1]]
+
+    # Return the pairs of particles where the distance is less than the sum of
+    # their radii
     return collision_indices_pairs[distance < distance_threshold]
 
 
