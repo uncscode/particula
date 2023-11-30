@@ -189,12 +189,13 @@ def full_sweep_and_prune(
     left_z_overlap_indices = indices_y_unique[left_z_overlap_shifted]
     right_z_overlap_indices = indices_y_unique[right_z_overlap_shifted]
 
-    # Combine indices to form collision pairs, may still have duplicates
-    collision_indices_pairs = torch.cat(
-        [left_z_overlap_indices.unsqueeze(1),
-         right_z_overlap_indices.unsqueeze(1)], dim=1)
-
-    return collision_indices_pairs
+    return torch.cat(
+        [
+            left_z_overlap_indices.unsqueeze(1),
+            right_z_overlap_indices.unsqueeze(1),
+        ],
+        dim=1,
+    )
 
 
 def full_sweep_and_prune_simplified(
@@ -245,10 +246,10 @@ def full_sweep_and_prune_simplified(
         if axis < position.shape[0]:  # not last axis
             unique_indices = torch.unique(all_overlaps)  # remove duplicates
 
-    # Forming collision pairs
-    # Combine indices to form collision pairs, may still have duplicates
-    collision_indices_pairs = torch.cat(
-        [unique_indices[left_overlap_indices].unsqueeze(1),
-         unique_indices[right_overlap_indices].unsqueeze(1)], dim=1)
-
-    return collision_indices_pairs
+    return torch.cat(
+        [
+            unique_indices[left_overlap_indices].unsqueeze(1),
+            unique_indices[right_overlap_indices].unsqueeze(1),
+        ],
+        dim=1,
+    )
