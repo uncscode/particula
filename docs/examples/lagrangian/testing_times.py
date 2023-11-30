@@ -5,7 +5,6 @@ import time
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from tqdm import tqdm
 from particula.lagrangian import boundary, integration, collisions, particle_property, particle_pairs
 
 # Initializing the Torch Generator and setting the data type
@@ -14,13 +13,12 @@ t_type = torch.float32
 
 # %%
 # Setting up the Simulation Parameters and Initial Conditions
-progress_bar = True
 # Define fixed parameters
 TOTAL_NUMBER_OF_PARTICLES = 500
 TIME_STEP = 0.01
-SIMULATION_TIME = 1000
+SIMULATION_TIME = 100
 MASS = 3
-CUBE_SIDE = 50
+CUBE_SIDE = 100
 speed = 1
 save_points = 50
 
@@ -75,6 +73,11 @@ for i in range(total_iterations):
     radius = particle_property.radius(mass=mass, density=density)
     valid_collision_indices_pairs = particle_pairs.full_sweep_and_prune(
          position=position, radius=radius)
+
+    # check 3d distance for collision pairs
+    detla_position = position.unsqueeze(2) - position.unsqueeze(1)
+    # Compute pairwise Euclidean distances
+    distance = torch.sqrt(torch.sum(detla_position**2, dim=0))
 
     if valid_collision_indices_pairs.shape[0] > 0:
         # Coalesce particles that have collided and update their velocity and mass
