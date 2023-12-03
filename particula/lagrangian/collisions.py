@@ -107,9 +107,6 @@ def coalescence(
     sorted_pairs, _ = torch.sort(collision_indices_pairs, dim=1)
     unique_left_indices = particle_pairs.remove_duplicates(sorted_pairs, 0)
     unique_indices = particle_pairs.remove_duplicates(unique_left_indices, 1)
-    # fast return if no collisions
-    if unique_indices.shape[0] == 0:
-        return velocity, mass
     unique_indices = particle_pairs.validate_pair_distance(
         collision_indices_pairs=unique_indices,
         position=position,
