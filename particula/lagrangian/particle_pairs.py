@@ -99,7 +99,7 @@ def validate_pair_distance(
     """
     # Fast return if there are no particle pairs
     if collision_indices_pairs.numel() == 0:
-        return torch.tensor([], dtype=torch.int64)
+        return torch.tensor([], dtype=torch.bool)
 
     # Calculate 3D distance for each pair of particles
     delta_position = position[:, collision_indices_pairs[:, 0]] \
@@ -239,7 +239,8 @@ def full_sweep_and_prune(
 
 def full_sweep_and_prune_simplified(
     position: torch.Tensor,
-    radius: torch.Tensor
+    radius: torch.Tensor,
+    working_yet: bool = False
 ) -> torch.Tensor:
     """
     A simplified version of the full sweep and prune algorithm for collision
@@ -259,6 +260,8 @@ def full_sweep_and_prune_simplified(
         torch.Tensor: A tensor containing pairs of indices of potentially
             colliding particles.
     """
+    if not working_yet:
+        raise NotImplementedError
     if radius.shape[0] == 0:
         return torch.tensor([])
 
