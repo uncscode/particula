@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="" >
 
   <head>
     <meta charset="utf-8" />
@@ -19,12 +19,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -38,9 +38,9 @@
     <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
-  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -65,7 +65,7 @@ const thebe_selector_output = ".output, .cell_output"
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/lagrangian/basic_lagrangian_box';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Equilibria of Aerosols" href="../equilibria/equilibria_intro.html" />
+    <link rel="next" title="Sweep and Prune Algorithm" href="sweep_and_prune.html" />
     <link rel="prev" title="Lagrangian Particle Model" href="lagrangian_intro.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -139,6 +139,7 @@ const thebe_selector_output = ".output, .cell_output"
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
+
   
 
 <a class="navbar-brand logo" href="../../intro.html">
@@ -209,6 +210,7 @@ const thebe_selector_output = ".output, .cell_output"
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="lagrangian_intro.html">Lagrangian Particle Model</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Introduction to the Lagrangian Box Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sweep_and_prune.html">Sweep and Prune Algorithm</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../equilibria/equilibria_intro.html">Equilibria of Aerosols</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -483,6 +485,7 @@ const thebe_selector_output = ".output, .cell_output"
 </button>
 
 
+
 <script>
 document.write(`
   <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -492,6 +495,7 @@ document.write(`
   </button>
 `);
 </script>
+
 
 <script>
 document.write(`
@@ -567,15 +571,14 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Code Section: Importing Necessary Libraries and Initializing Variables</span>
-
+<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">particula.lagrangian</span> <span class="kn">import</span> <span class="n">boundary</span><span class="p">,</span> <span class="n">integration</span><span class="p">,</span> <span class="n">collisions</span><span class="p">,</span> <span class="n">particle_property</span><span class="p">,</span> <span class="n">particle_pairs</span>
 
 <span class="c1"># Initializing the Torch Generator and setting the data type</span>
-<span class="n">t_gen</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>  <span class="c1"># Set the seed for reproducibility</span>
 <span class="n">t_type</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span>
 </pre></div>
 </div>
@@ -587,16 +590,15 @@ document.write(`
 <p>The first step in our simulation is to define the system. This involves setting up a combination of fixed parameters and initializing the conditions for our particles. These parameters include the total number of particles, time step for the simulation, mass of each particle, dimensions of the cubic space, and other physical properties. The initial positions and velocities of the particles are generated randomly within this defined space, laying the groundwork for the subsequent simulation dynamics.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">TOTAL_NUMBER_OF_PARTICLES</span> <span class="o">=</span> <span class="mi">200</span>
-<span class="c1"># Setting up the Simulation Parameters and Initial Conditions</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setting up the Simulation Parameters and Initial Conditions</span>
 
 <span class="c1"># Define fixed parameters</span>
-<span class="n">TOTAL_NUMBER_OF_PARTICLES</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">TOTAL_NUMBER_OF_PARTICLES</span> <span class="o">=</span> <span class="mi">500</span>
 <span class="n">TIME_STEP</span> <span class="o">=</span> <span class="mf">0.01</span>
 <span class="n">SIMULATION_TIME</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">MASS</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">CUBE_SIDE</span> <span class="o">=</span> <span class="mi">50</span>
-<span class="n">speed</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">speed</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">save_points</span> <span class="o">=</span> <span class="mi">50</span>
 
 <span class="c1"># Initialize particle positions randomly within the cube</span>
@@ -668,12 +670,10 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize counter for saving data</span>
 <span class="n">save_counter</span> <span class="o">=</span> <span class="mi">0</span>
-
+<span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="c1"># Start the simulation</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">total_iterations</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Simulation&#39;</span><span class="p">):</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_iterations</span><span class="p">):</span>
 
-    <span class="c1"># Apply boundary conditions for the cube (wrap-around)</span>
-    <span class="n">position</span> <span class="o">=</span> <span class="n">boundary</span><span class="o">.</span><span class="n">wrapped_cube</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">cube_side</span><span class="o">=</span><span class="n">CUBE_SIDE</span><span class="p">)</span>
 
     <span class="c1"># Calculate pairwise distances between particles</span>
     <span class="n">distance_matrix</span> <span class="o">=</span> <span class="n">particle_pairs</span><span class="o">.</span><span class="n">calculate_pairwise_distance</span><span class="p">(</span>
@@ -688,9 +688,15 @@ document.write(`
     <span class="n">valid_collision_indices_pairs</span> <span class="o">=</span> <span class="n">collisions</span><span class="o">.</span><span class="n">find_collisions</span><span class="p">(</span>
         <span class="n">distance_matrix</span><span class="o">=</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">)</span>
 
-    <span class="c1"># Coalesce particles that have collided and update their velocity and mass</span>
-    <span class="n">velocity</span><span class="p">,</span> <span class="n">mass</span> <span class="o">=</span> <span class="n">collisions</span><span class="o">.</span><span class="n">coalescence</span><span class="p">(</span>
-        <span class="n">velocity</span><span class="o">=</span><span class="n">velocity</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">collision_indices_pairs</span><span class="o">=</span><span class="n">valid_collision_indices_pairs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">valid_collision_indices_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Coalesce particles that have collided and update their velocity and</span>
+        <span class="c1"># mass</span>
+        <span class="n">velocity</span><span class="p">,</span> <span class="n">mass</span> <span class="o">=</span> <span class="n">collisions</span><span class="o">.</span><span class="n">coalescence</span><span class="p">(</span>
+            <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+            <span class="n">velocity</span><span class="o">=</span><span class="n">velocity</span><span class="p">,</span>
+            <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span>
+            <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+            <span class="n">collision_indices_pairs</span><span class="o">=</span><span class="n">valid_collision_indices_pairs</span><span class="p">)</span>
 
     <span class="c1"># Calculate the force acting on the particles (e.g., gravity)</span>
     <span class="n">force</span> <span class="o">=</span> <span class="n">mass</span> <span class="o">*</span> <span class="n">gravity</span>
@@ -698,6 +704,9 @@ document.write(`
     <span class="c1"># Integrate the equations of motion to update position and velocity</span>
     <span class="n">position</span><span class="p">,</span> <span class="n">velocity</span> <span class="o">=</span> <span class="n">integration</span><span class="o">.</span><span class="n">leapfrog</span><span class="p">(</span>
         <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">velocity</span><span class="o">=</span><span class="n">velocity</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">TIME_STEP</span><span class="p">)</span>
+
+    <span class="c1"># Apply boundary conditions for the cube (wrap-around)</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="n">boundary</span><span class="o">.</span><span class="n">wrapped_cube</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">cube_side</span><span class="o">=</span><span class="n">CUBE_SIDE</span><span class="p">)</span>
 
     <span class="c1"># Save the position and mass data at designated save points</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">save_iterations</span><span class="p">[</span><span class="n">save_counter</span><span class="p">]:</span>
@@ -708,224 +717,17 @@ document.write(`
 <span class="c1"># Perform a final save of the position and mass data</span>
 <span class="n">save_position</span><span class="p">[:,</span> <span class="p">:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">position</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 <span class="n">save_mass</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mass</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+<span class="c1"># Calculate the total simulation time</span>
+<span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total wall time: </span><span class="si">{</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ratio of wall time to simulation time: </span><span class="si">{</span><span class="p">(</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">SIMULATION_TIME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   0%|          | 0/10000 [00:00&lt;?, ?it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   1%|▏         | 147/10000 [00:00&lt;00:06, 1466.57it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   3%|▎         | 294/10000 [00:00&lt;00:06, 1447.60it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   4%|▍         | 445/10000 [00:00&lt;00:06, 1473.85it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   6%|▌         | 594/10000 [00:00&lt;00:06, 1479.20it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   7%|▋         | 742/10000 [00:00&lt;00:06, 1478.07it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:   9%|▉         | 890/10000 [00:00&lt;00:06, 1472.91it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  10%|█         | 1038/10000 [00:00&lt;00:06, 1467.89it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  12%|█▏        | 1185/10000 [00:00&lt;00:06, 1464.66it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  13%|█▎        | 1332/10000 [00:00&lt;00:05, 1460.80it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  15%|█▍        | 1479/10000 [00:01&lt;00:05, 1456.15it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  16%|█▋        | 1625/10000 [00:01&lt;00:05, 1453.75it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  18%|█▊        | 1771/10000 [00:01&lt;00:05, 1451.09it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  19%|█▉        | 1917/10000 [00:01&lt;00:05, 1447.51it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  21%|██        | 2062/10000 [00:01&lt;00:05, 1424.61it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  22%|██▏       | 2206/10000 [00:01&lt;00:05, 1427.41it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  24%|██▎       | 2350/10000 [00:01&lt;00:05, 1430.00it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  25%|██▍       | 2494/10000 [00:01&lt;00:05, 1428.06it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  26%|██▋       | 2637/10000 [00:01&lt;00:05, 1427.96it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  28%|██▊       | 2781/10000 [00:01&lt;00:05, 1429.07it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  29%|██▉       | 2925/10000 [00:02&lt;00:04, 1429.92it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  31%|███       | 3069/10000 [00:02&lt;00:04, 1427.37it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  32%|███▏      | 3212/10000 [00:02&lt;00:04, 1413.42it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  34%|███▎      | 3355/10000 [00:02&lt;00:04, 1417.16it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  35%|███▍      | 3498/10000 [00:02&lt;00:04, 1419.43it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  36%|███▋      | 3641/10000 [00:02&lt;00:04, 1420.91it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  38%|███▊      | 3785/10000 [00:02&lt;00:04, 1424.32it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  39%|███▉      | 3928/10000 [00:02&lt;00:04, 1422.99it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  41%|████      | 4071/10000 [00:02&lt;00:04, 1419.58it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  42%|████▏     | 4213/10000 [00:02&lt;00:04, 1419.20it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  44%|████▎     | 4355/10000 [00:03&lt;00:03, 1419.39it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  45%|████▍     | 4498/10000 [00:03&lt;00:03, 1420.84it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  46%|████▋     | 4641/10000 [00:03&lt;00:03, 1421.59it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  48%|████▊     | 4784/10000 [00:03&lt;00:03, 1422.68it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  49%|████▉     | 4927/10000 [00:03&lt;00:03, 1424.13it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  51%|█████     | 5070/10000 [00:03&lt;00:03, 1423.55it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  52%|█████▏    | 5213/10000 [00:03&lt;00:03, 1422.79it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  54%|█████▎    | 5356/10000 [00:03&lt;00:03, 1422.90it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  55%|█████▍    | 5499/10000 [00:03&lt;00:03, 1423.86it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  56%|█████▋    | 5642/10000 [00:03&lt;00:03, 1421.17it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  58%|█████▊    | 5785/10000 [00:04&lt;00:02, 1422.85it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  59%|█████▉    | 5928/10000 [00:04&lt;00:02, 1422.92it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  61%|██████    | 6071/10000 [00:04&lt;00:02, 1423.39it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  62%|██████▏   | 6214/10000 [00:04&lt;00:02, 1423.48it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  64%|██████▎   | 6357/10000 [00:04&lt;00:02, 1424.90it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  65%|██████▌   | 6501/10000 [00:04&lt;00:02, 1426.60it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  66%|██████▋   | 6645/10000 [00:04&lt;00:02, 1428.03it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  68%|██████▊   | 6788/10000 [00:04&lt;00:02, 1426.60it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  69%|██████▉   | 6931/10000 [00:04&lt;00:02, 1427.28it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  71%|███████   | 7074/10000 [00:04&lt;00:02, 1426.36it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  72%|███████▏  | 7218/10000 [00:05&lt;00:01, 1427.54it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  74%|███████▎  | 7361/10000 [00:05&lt;00:01, 1424.94it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  75%|███████▌  | 7504/10000 [00:05&lt;00:01, 1425.11it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  76%|███████▋  | 7647/10000 [00:05&lt;00:01, 1423.43it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  78%|███████▊  | 7790/10000 [00:05&lt;00:01, 1413.85it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  79%|███████▉  | 7933/10000 [00:05&lt;00:01, 1418.60it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  81%|████████  | 8077/10000 [00:05&lt;00:01, 1423.52it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  82%|████████▏ | 8220/10000 [00:05&lt;00:01, 1422.46it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  84%|████████▎ | 8363/10000 [00:05&lt;00:01, 1421.54it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  85%|████████▌ | 8506/10000 [00:05&lt;00:01, 1422.08it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  86%|████████▋ | 8649/10000 [00:06&lt;00:00, 1423.84it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  88%|████████▊ | 8792/10000 [00:06&lt;00:00, 1425.49it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  89%|████████▉ | 8936/10000 [00:06&lt;00:00, 1427.52it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  91%|█████████ | 9079/10000 [00:06&lt;00:00, 1426.85it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  92%|█████████▏| 9222/10000 [00:06&lt;00:00, 1424.38it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  94%|█████████▎| 9365/10000 [00:06&lt;00:00, 1423.41it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  95%|█████████▌| 9509/10000 [00:06&lt;00:00, 1425.85it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  97%|█████████▋| 9652/10000 [00:06&lt;00:00, 1410.15it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  98%|█████████▊| 9795/10000 [00:06&lt;00:00, 1414.18it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation:  99%|█████████▉| 9937/10000 [00:06&lt;00:00, 1415.89it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Simulation: 100%|██████████| 10000/10000 [00:07&lt;00:00, 1428.38it/s]
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 15.512137651443481 seconds
+Ratio of wall time to simulation time: 0.1551213765144348
 </pre></div>
 </div>
 </div>
@@ -986,10 +788,10 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 26
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 64
 </pre></div>
 </div>
-<img alt="../../_images/8e89d920a7b0ccb03b97fbbf8f429d98f5fef39e8ba2d902179cd1fe7279690d.png" src="../../_images/8e89d920a7b0ccb03b97fbbf8f429d98f5fef39e8ba2d902179cd1fe7279690d.png" />
+<img alt="../../_images/baf822ddf3fc6b4858d6a28ed0b150e60a97398cb5eeb4d3a2ddcd25ed03e939.png" src="../../_images/baf822ddf3fc6b4858d6a28ed0b150e60a97398cb5eeb4d3a2ddcd25ed03e939.png" />
 </div>
 </div>
 </section>
@@ -1004,14 +806,17 @@ document.write(`
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">()</span>
 
-<span class="c1"># Plot histograms of mass distribution at different stages</span>
 <span class="c1"># Normalizing by initial MASS to observe distribution changes</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">save_mass</span><span class="p">[</span><span class="n">filter_zero_mass</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">MASS</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Initial&#39;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">save_mass</span><span class="p">[</span><span class="n">filter_zero_mass</span><span class="p">,</span> <span class="mi">24</span><span class="p">]</span> <span class="o">/</span> <span class="n">MASS</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Middle&#39;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">save_mass</span><span class="p">[</span><span class="n">filter_zero_mass</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">MASS</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Final&#39;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
+<span class="n">normalized_mass</span> <span class="o">=</span> <span class="n">save_mass</span><span class="p">[</span><span class="n">filter_zero_mass</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/</span> <span class="n">MASS</span>
+<span class="n">max_mass</span> <span class="o">=</span> <span class="n">normalized_mass</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+<span class="c1"># Plot histograms of mass distribution at different stages</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">normalized_mass</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Initial&#39;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_mass</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">normalized_mass</span><span class="p">[:,</span> <span class="mi">24</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Middle&#39;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_mass</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">normalized_mass</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Final&#39;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_mass</span><span class="p">))</span>
 
 <span class="c1"># Setting labels and title for the plot</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Mass / Initial MASS&#39;</span><span class="p">)</span>
@@ -1029,7 +834,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/f64a4512fbb116d29462fb3cf65c926ecefd47b60f11e43ef9ba713d76a3c1d0.png" src="../../_images/f64a4512fbb116d29462fb3cf65c926ecefd47b60f11e43ef9ba713d76a3c1d0.png" />
+<img alt="../../_images/e1ef362feed676e530411324e0f44febd03f2c81042375be7c8a26b0e8f33a0a.png" src="../../_images/e1ef362feed676e530411324e0f44febd03f2c81042375be7c8a26b0e8f33a0a.png" />
 </div>
 </div>
 </section>
@@ -1097,7 +902,7 @@ document.write(`
               
               
                 <footer class="prev-next-footer">
-                  <!-- Previous / next buttons -->
+                  
 <div class="prev-next-area">
     <a class="left-prev"
        href="lagrangian_intro.html"
@@ -1109,11 +914,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="../equilibria/equilibria_intro.html"
+       href="sweep_and_prune.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Equilibria of Aerosols</p>
+        <p class="prev-next-title">Sweep and Prune Algorithm</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1169,6 +974,7 @@ By particula contributors
   
   <div class="footer-item">
     
+
   <p class="copyright">
     
       © Copyright 2022.
@@ -1195,8 +1001,8 @@ By particula contributors
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
 
   <footer class="bd-footer">
   </footer>
