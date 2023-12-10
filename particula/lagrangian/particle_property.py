@@ -222,6 +222,7 @@ def random_thermal_velocity(
     mass_kg: torch.Tensor,
     number_of_particles: int,
     t_type=torch.float,
+    random_seed: int = 0,
 ) -> torch.Tensor:
     """
     Generate a random thermal velocity for each particle.
@@ -234,6 +235,8 @@ def random_thermal_velocity(
     Returns:
         torch.Tensor: Thermal speed of the particle in meters per second.
     """
+    # set the seed
+    torch.manual_seed(random_seed)
     # Initialize particle velocities uniformly random
     unit_velocity = torch.rand(3, number_of_particles, dtype=t_type) - 0.5
     # get the speed
