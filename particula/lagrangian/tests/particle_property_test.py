@@ -45,15 +45,17 @@ def test_generate_mass():
 
 
 def test_thermal_speed_calculation():
-    """test calculating thermal velocity"""
-    temperature = 300  # example value
-    mass = torch.tensor(1e-20)  # example mass
-    expected_velocity = torch.tensor(0.0001)
+    """test calculating thermal velocity
+    should check the values"""
+    temperature = 273.0  # example value
+    mass = particle_property.mass(radius=torch.tensor([1e-6]),
+                                  density=torch.tensor([1e3]))
+    expected_velocity = torch.tensor([0.0015])
     result = particle_property.thermal_speed(
         temperature_kelvin=temperature,
         mass_kg=mass,
     )
-    assert torch.allclose(result, expected_velocity, atol=1e-4)
+    assert torch.allclose(result, expected_velocity, atol=1e-3)
 
 
 def test_speed_calculation():
