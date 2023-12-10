@@ -112,13 +112,11 @@ def friction_factor_wrapper(
         knu=knudsen,
     )
 
-    particle_friction_factor = friction_factor.frifac(
+    return friction_factor.frifac(
         radius=radius_meter,
         dynamic_viscosity=dynamic_viscosity_value,
         scf_val=slip_correction_factor,
     ).m
-
-    return particle_friction_factor
 
 
 def generate_particle_masses(
