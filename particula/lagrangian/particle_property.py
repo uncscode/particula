@@ -4,6 +4,7 @@ from typing import Union
 import numpy as np
 import torch
 
+from particula.constants import BOLTZMANN_CONSTANT
 from particula.util import friction_factor, dynamic_viscosity, \
     slip_correction, mean_free_path, knudsen_number
 from particula.util.input_handling import convert_units
@@ -69,19 +70,26 @@ def mass(
 
 def friction_factor_wrapper(
         radius_meter: torch.Tensor,
-        temperature_kelvin: torch.Tensor,
-        pressure_pascal: torch.Tensor,
+        temperature_kelvin: float,
+        pressure_pascal: float,
 ) -> torch.Tensor:
     """
-    Wrapper for the friction factor function.
+    Calculate the friction factor for a given radius, temperature, and
+    pressure.
+
+    This function wraps several underlying calculations related to
+    dynamic viscosity, mean free path, Knudsen number, and slip correction
+    factor to compute the particle friction factor.
 
     Args:
-    - radius_meter (torch.Tensor): A tensor containing the radius of the
-        sphere(s). Can be a scalar or a vector.
-
+        radius_meter: A tensor representing the radius of the
+        sphere(s) in meters. Can be a scalar or a vector.
+        temperature_kelvin: A tensor of the temperature in Kelvin.
+        pressure_pascal: A tensor of the pressure in Pascals.
 
     Returns:
-    torch.Tensor: A tensor of the same shape as `radius_meter`,
+        torch.Tensor: A tensor of the same shape as `radius_meter`,
+        representing the particle friction factor.
     """
     # get dynamic viscosity
     dynamic_viscosity_value = dynamic_viscosity.dyn_vis(
@@ -122,28 +130,121 @@ def generate_particle_masses(
         radius_input_units: str = "nm",
 ) -> torch.Tensor:
     """
-    Generate particle masses based on a log-normal distribution of particle
-        sizes.
+    Generate an array of particle masses based on a log-normal distribution of
+    particle radii and a given density.
 
     Args:
-        mean_size_nm (float): Mean size of the particles in nanometers.
-        std_dev_nm (float): Standard deviation of the particle sizes in
-            nanometers.
-        density (float): Density of the particles in kg/m^3.
-        num_particles (int): Number of particles.
+        mean_radius (float): Mean radius of the particles. The units are
+            specified by `radius_input_units`.
+        std_dev_radius (float): Standard deviation of the particle radii. The
+            units are specified by `radius_input_units`.
+        density (torch.Tensor): Density of the particles in kg/m^3.
+        num_particles (int): Number of particles to generate.
+        radius_input_units (str, optional): Units of `mean_radius` and
+            `std_dev_radius`. Defaults to 'nm' (nanometers).
 
     Returns:
-        torch.Tensor: An array of particle masses.
+        torch.Tensor: A tensor of particle masses in kg, corresponding to each
+            particle.
+
+    Raises:
+        ValueError: If `mean_radius` or `std_dev_radius` are non-positive.
     """
-    # Convert mean and standard deviation to log-scale
+    if mean_radius <= 0 or std_dev_radius <= 0:
+        raise ValueError(
+            "Mean radius and standard deviation must be positive.")
+
+    # Convert mean and standard deviation from the specified units to meters
     mean_log = np.log(mean_radius)
     std_dev_log = np.log(std_dev_radius)
+    if mean_log < 0 or std_dev_log < 0:
+        # need to check on this error, not clear why this happens
+        raise ValueError(
+            "log of Mean radius and standard deviation must be positive for"
+            + " torch.distributions.log_normal.LogNormal")
 
-    # Sample from log-normal distribution
-    radius_normal = torch.distributions.log_normal.LogNormal(
+    # Sample radii from the log-normal distribution
+    radius_samples = torch.distributions.log_normal.LogNormal(
         mean_log, std_dev_log).sample((num_particles,))
-    radius_normal = radius_normal * convert_units(
-        old=radius_input_units, new='m')  # Convert to meters
+    radius_samples *= convert_units(radius_input_units, "m")
 
     # Calculate mass of each particle
-    return mass(radius=radius_normal, density=density)
+    return mass(radius=radius_samples, density=density)
+
+
+def thermal_speed(
+        temperature_kelvin: float,
+        mass_kg: torch.Tensor,
+) -> torch.Tensor:
+    """
+    Calculate the thermal speed of a particle based on its temperature and
+    mass.
+
+    The thermal speed is computed using the formula: sqrt(8 * k * T / (pi * m))
+    where k is the Boltzmann constant, T is the temperature in Kelvin, and m is
+    the particle mass in kilograms.
+
+    Args:
+        temperature_kelvin (float): Temperature of the environment in Kelvin.
+        mass_kg (torch.Tensor): Mass of the particle(s) in kilograms.
+            Can be a scalar or a vector.
+
+    Returns:
+        torch.Tensor: The thermal speed of the particle(s) in meters per second
+
+    Raises:
+        ValueError: If `temperature_kelvin` is less than or equal to zero or
+        if any element of `mass_kg` is non-positive.
+    """
+    if temperature_kelvin <= 0:
+        raise ValueError("Temperature must be greater than zero.")
+    if torch.any(mass_kg <= 0):
+        raise ValueError("All mass values must be positive.")
+
+    return torch.sqrt(8 * BOLTZMANN_CONSTANT *
+                      temperature_kelvin / (np.pi * mass_kg))
+
+
+def speed(
+          velocity: torch.Tensor,
+) -> torch.Tensor:
+    """
+    Calculate the speed of a particle.
+
+    Args:
+        velocity (torch.Tensor): Velocity of the particle.
+
+    Returns:
+        torch.Tensor: Speed of the particle.
+    """
+    return torch.sqrt(torch.sum(velocity**2, dim=0))
+
+
+def random_thermal_velocity(
+    temperature_kelvin: float,
+    mass_kg: torch.Tensor,
+    number_of_particles: int,
+    t_type=torch.float,
+) -> torch.Tensor:
+    """
+    Generate a random thermal velocity for each particle.
+
+    Args:
+        temperature_kelvin (torch.Tensor): Temperature of the fluid in Kelvin.
+        mass_kg (torch.Tensor): Mass of the particle in kilograms.
+        number_of_particles (int): Number of particles.
+
+    Returns:
+        torch.Tensor: Thermal speed of the particle in meters per second.
+    """
+    # Initialize particle velocities uniformly random
+    unit_velocity = torch.rand(3, number_of_particles, dtype=t_type) - 0.5
+    # get the speed
+    unit_speed = speed(unit_velocity)
+    # get the thermal speed
+    thermal_particle_speed = thermal_speed(
+        temperature_kelvin=temperature_kelvin,
+        mass_kg=mass_kg,
+    )
+    # normalize the unit
+    return unit_velocity * thermal_particle_speed / unit_speed
