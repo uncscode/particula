@@ -9,7 +9,7 @@ from particula.util import friction_factor, dynamic_viscosity, \
 from particula.util.input_handling import convert_units
 
 
-def radius(
+def radius_calculation(
         mass: torch.Tensor,
         density: torch.Tensor
 ) -> torch.Tensor:
@@ -41,7 +41,7 @@ def radius(
     return torch.pow(3 * mass / (4 * np.pi * density), 1 / 3)
 
 
-def mass(
+def mass_calculation(
         radius: torch.Tensor,
         density: torch.Tensor
 ) -> torch.Tensor:
@@ -166,7 +166,7 @@ def generate_particle_masses(
     radius_samples *= convert_units(radius_input_units, "m")
 
     # Calculate mass of each particle
-    return mass(radius=radius_samples, density=density)
+    return mass_calculation(radius=radius_samples, density=density)
 
 
 def thermal_speed(
