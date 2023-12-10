@@ -9,7 +9,7 @@ def test_radius_vector():
     density = torch.tensor([2.0, 3.0, 4.0])
     expected_radius = torch.tensor(
         [1.0608, 1.1675, 1.2143])
-    result = particle_property.radius(mass, density)
+    result = particle_property.radius_calculation(mass, density)
     assert torch.allclose(result, expected_radius, atol=1e-4)
 
 
@@ -48,7 +48,7 @@ def test_thermal_speed_calculation():
     """test calculating thermal velocity
     should check the values"""
     temperature = 273.0  # example value
-    mass = particle_property.mass(radius=torch.tensor([1e-6]),
+    mass = particle_property.mass_calculation(radius=torch.tensor([1e-6]),
                                   density=torch.tensor([1e3]))
     expected_velocity = torch.tensor([0.0015])
     result = particle_property.thermal_speed(
