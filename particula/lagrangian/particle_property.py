@@ -1,6 +1,5 @@
 """Particle self calculation. e.g. radius, surface area, volume, etc."""
 
-from typing import Union
 import numpy as np
 import torch
 
@@ -201,7 +200,7 @@ def thermal_speed(
     if torch.any(mass_kg <= 0):
         raise ValueError("All mass values must be positive.")
 
-    return torch.sqrt(8 * BOLTZMANN_CONSTANT *
+    return torch.sqrt(8 * BOLTZMANN_CONSTANT.magnitude *
                       temperature_kelvin / (np.pi * mass_kg))
 
 
