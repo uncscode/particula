@@ -640,19 +640,7 @@ document.write(`
 
 <span class="c1"># Determine which iterations will correspond to the save points</span>
 <span class="n">save_iterations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">total_iterations</span><span class="p">,</span> <span class="n">save_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-<span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">48</span>
-<span class="g g-Whitespace">     </span><span class="mi">46</span> <span class="c1"># Determine which iterations will correspond to the save points</span>
-<span class="g g-Whitespace">     </span><span class="mi">47</span> <span class="n">save_iterations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">total_iterations</span><span class="p">,</span> <span class="n">save_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-<span class="ne">---&gt; </span><span class="mi">48</span> <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
-
-<span class="ne">AttributeError</span>: module &#39;particula.lagrangian.particle_property&#39; has no attribute &#39;radius&#39;
+<span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -666,7 +654,7 @@ document.write(`
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_iterations</span><span class="p">):</span>
 
     <span class="c1"># NEW calculate sweep and prune collision pairs</span>
-    <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
     <span class="n">valid_collision_indices_pairs</span> <span class="o">=</span> <span class="n">particle_pairs</span><span class="o">.</span><span class="n">full_sweep_and_prune</span><span class="p">(</span>
          <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span>
 
@@ -707,8 +695,8 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 12.119566679000854 seconds
-Ratio of wall time to simulation time: 0.12119566679000854
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 8.380159139633179 seconds
+Ratio of wall time to simulation time: 0.08380159139633178
 </pre></div>
 </div>
 </div>
@@ -730,7 +718,7 @@ Ratio of wall time to simulation time: 0.12119566679000854
 <span class="n">filter_zero_mass</span> <span class="o">=</span> <span class="n">mass_final</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
 <span class="c1"># Calculate the radius and area of each particle</span>
-<span class="n">radius_final</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass_final</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+<span class="n">radius_final</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass_final</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
 <span class="n">particle_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_final</span><span class="o">**</span><span class="mi">2</span>
 
 <span class="c1"># Display the number of remaining particles</span>
@@ -769,10 +757,10 @@ Ratio of wall time to simulation time: 0.12119566679000854
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 96
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 90
 </pre></div>
 </div>
-<img alt="../../_images/edea4456a07ed47a3f79da10d4901ce2047f232a30089c7e27e26bc311c74411.png" src="../../_images/edea4456a07ed47a3f79da10d4901ce2047f232a30089c7e27e26bc311c74411.png" />
+<img alt="../../_images/86e0e030c72e0243c8390e2a463d546787afd56aab5a554b0cd22585703133bb.png" src="../../_images/86e0e030c72e0243c8390e2a463d546787afd56aab5a554b0cd22585703133bb.png" />
 </div>
 </div>
 </section>
@@ -813,7 +801,7 @@ Ratio of wall time to simulation time: 0.12119566679000854
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/1f0637b072bb651123bfc493c9232cb7ccdc9feb238b10e3a0dd0b9d5b913f27.png" src="../../_images/1f0637b072bb651123bfc493c9232cb7ccdc9feb238b10e3a0dd0b9d5b913f27.png" />
+<img alt="../../_images/a0a86736b6aa2affe3ec81b863f0cd7ee85966977a8696c3320df0d7062b3292.png" src="../../_images/a0a86736b6aa2affe3ec81b863f0cd7ee85966977a8696c3320df0d7062b3292.png" />
 </div>
 </div>
 </section>

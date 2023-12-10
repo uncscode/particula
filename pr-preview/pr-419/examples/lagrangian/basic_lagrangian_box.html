@@ -726,8 +726,8 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 16.46156144142151 seconds
-Ratio of wall time to simulation time: 0.1646156144142151
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 15.591015338897705 seconds
+Ratio of wall time to simulation time: 0.15591015338897704
 </pre></div>
 </div>
 </div>
@@ -749,7 +749,7 @@ Ratio of wall time to simulation time: 0.1646156144142151
 <span class="n">filter_zero_mass</span> <span class="o">=</span> <span class="n">mass_final</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
 <span class="c1"># Calculate the radius and area of each particle</span>
-<span class="n">radius_final</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass_final</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+<span class="n">radius_final</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass_final</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
 <span class="n">particle_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_final</span><span class="o">**</span><span class="mi">2</span>
 
 <span class="c1"># Display the number of remaining particles</span>
@@ -788,18 +788,10 @@ Ratio of wall time to simulation time: 0.1646156144142151
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">12</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="n">filter_zero_mass</span> <span class="o">=</span> <span class="n">mass_final</span> <span class="o">&gt;</span> <span class="mi">0</span>
-<span class="g g-Whitespace">     </span><span class="mi">11</span> <span class="c1"># Calculate the radius and area of each particle</span>
-<span class="ne">---&gt; </span><span class="mi">12</span> <span class="n">radius_final</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass_final</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">13</span> <span class="n">particle_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_final</span><span class="o">**</span><span class="mi">2</span>
-<span class="g g-Whitespace">     </span><span class="mi">15</span> <span class="c1"># Display the number of remaining particles</span>
-
-<span class="ne">AttributeError</span>: module &#39;particula.lagrangian.particle_property&#39; has no attribute &#39;radius&#39;
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 64
 </pre></div>
 </div>
+<img alt="../../_images/baf822ddf3fc6b4858d6a28ed0b150e60a97398cb5eeb4d3a2ddcd25ed03e939.png" src="../../_images/baf822ddf3fc6b4858d6a28ed0b150e60a97398cb5eeb4d3a2ddcd25ed03e939.png" />
 </div>
 </div>
 </section>
@@ -842,7 +834,7 @@ Ratio of wall time to simulation time: 0.1646156144142151
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/27a901ffa62c93b23ee5fa6b5989696e7c2acfd930148bbc18b2beda77046417.png" src="../../_images/27a901ffa62c93b23ee5fa6b5989696e7c2acfd930148bbc18b2beda77046417.png" />
+<img alt="../../_images/e1ef362feed676e530411324e0f44febd03f2c81042375be7c8a26b0e8f33a0a.png" src="../../_images/e1ef362feed676e530411324e0f44febd03f2c81042375be7c8a26b0e8f33a0a.png" />
 </div>
 </div>
 </section>
