@@ -23,6 +23,11 @@ def test_coalescence():
                              [7.0, 8.0, 9.0],
                              [0.0, 0.0, 0.0]]).T
     mass = torch.tensor([1.0, 2.0, 3.0, 1.0])
+    radius = torch.tensor([1.0, 2.0, 0.5, 0.5])
+    position = torch.tensor([[1.0, 1.0, 2.0],
+                             [1.0, 1.0, 3.0],
+                             [7.0, 8.0, 9.0],
+                             [0.0, 0.0, 0.0]]).T
     collision_indices_pairs = torch.tensor([[0, 1]], dtype=torch.int32)
     expected_velocity = torch.tensor([[1.0, 2.0, 5.0],
                                       [0.0, 0.0, 0.0],
@@ -30,6 +35,10 @@ def test_coalescence():
                                       [0.0, 0.0, 0.0]]).T
     expected_mass = torch.tensor([3.0, 0.0, 3.0, 1.0])
     result_velocity, result_mass = collisions.coalescence(
-        velocity, mass, collision_indices_pairs)
+        position=position,
+        velocity=velocity,
+        mass=mass,
+        radius=radius,
+        collision_indices_pairs=collision_indices_pairs)
     assert torch.allclose(result_mass, expected_mass, atol=1e-4)
     assert torch.allclose(result_velocity, expected_velocity, atol=1e-4)

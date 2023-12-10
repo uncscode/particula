@@ -67,8 +67,10 @@ def find_collisions(
 
 
 def coalescence(
+        position: torch.Tensor,
         velocity: torch.Tensor,
         mass: torch.Tensor,
+        radius: torch.Tensor,
         collision_indices_pairs: torch.Tensor,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """
@@ -80,9 +82,12 @@ def coalescence(
     according to the conservation of mass and momentum.
 
     Parameters:
+    position (torch.Tensor): A 2D tensor of shape [n_dimensions, n_particles]
+        representing the positions of particles.
     velocity (torch.Tensor): A 2D tensor of shape [n_dimensions, n_particles]
         representing the velocities of particles.
     mass (torch.Tensor): A 1D tensor containing the mass of each particle.
+    radius (torch.Tensor): A 1D tensor containing the radius of each particle.
     collision_indices_pairs (torch.Tensor): A 2D tensor containing pairs of
         indices representing colliding particles.
     remove_duplicates_func (function): A function to remove duplicate entries
@@ -102,6 +107,14 @@ def coalescence(
     sorted_pairs, _ = torch.sort(collision_indices_pairs, dim=1)
     unique_left_indices = particle_pairs.remove_duplicates(sorted_pairs, 0)
     unique_indices = particle_pairs.remove_duplicates(unique_left_indices, 1)
+    unique_indices = particle_pairs.validate_pair_distance(
+        collision_indices_pairs=unique_indices,
+        position=position,
+        radius=radius,
+    )
+    # fast return if no collisions
+    if unique_indices.shape[0] == 0:
+        return velocity, mass
 
     # Update velocities based on conservation of momentum
     total_mass = mass[unique_indices[:, 0]] + mass[unique_indices[:, 1]]
