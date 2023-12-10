@@ -49,7 +49,7 @@ def test_thermal_speed_calculation():
     should check the values"""
     temperature = 273.0  # example value
     mass = particle_property.mass_calculation(radius=torch.tensor([1e-6]),
-                                  density=torch.tensor([1e3]))
+                                              density=torch.tensor([1e3]))
     expected_velocity = torch.tensor([0.0015])
     result = particle_property.thermal_speed(
         temperature_kelvin=temperature,
