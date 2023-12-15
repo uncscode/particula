@@ -576,7 +576,7 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setting up the Simulation Parameters and Initial Conditions</span>
 <span class="c1"># Define fixed parameters</span>
-<span class="n">TOTAL_NUMBER_OF_PARTICLES</span> <span class="o">=</span> <span class="mi">5000</span>
+<span class="n">TOTAL_NUMBER_OF_PARTICLES</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="n">TIME_STEP</span> <span class="o">=</span> <span class="mf">0.001</span>
 <span class="n">SIMULATION_TIME</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">CUBE_SIDE</span> <span class="o">=</span> <span class="mf">0.010</span>  <span class="c1"># meters</span>
@@ -670,8 +670,8 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/6a3ab2dce00445fdd8cde23e7192c088e33790ba4a3104b66309a2aa829df06d.png" src="../../_images/6a3ab2dce00445fdd8cde23e7192c088e33790ba4a3104b66309a2aa829df06d.png" />
-<img alt="../../_images/acd176fc5cea22c6f6eab2b4cc37b4487245e004ad43f3138d498194d702f615.png" src="../../_images/acd176fc5cea22c6f6eab2b4cc37b4487245e004ad43f3138d498194d702f615.png" />
+<img alt="../../_images/262998e6cafddade897ac64b83f5b0aeb089e1763869043b4e44b6cc41c3ee32.png" src="../../_images/262998e6cafddade897ac64b83f5b0aeb089e1763869043b4e44b6cc41c3ee32.png" />
+<img alt="../../_images/06c2c5f50fd83449284ec4c47297622477f0e4da8c9714602bd44b142f700306.png" src="../../_images/06c2c5f50fd83449284ec4c47297622477f0e4da8c9714602bd44b142f700306.png" />
 </div>
 </div>
 </section>
@@ -720,11 +720,11 @@ $<span class="math notranslate nohighlight">\( m_p \frac{dv}{dt}~=~m_pg + f_p (u
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Max Radius [m]:  tensor(0.0080)
-Min Radius [m]:  tensor(8.5353e-11)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Max Radius [m]:  tensor(0.0011)
+Min Radius [m]:  tensor(3.9282e-10)
 </pre></div>
 </div>
-<img alt="../../_images/f0863346b7965f8aa723d0a2220dc845ade7e5b54ec7db87aa17110481697626.png" src="../../_images/f0863346b7965f8aa723d0a2220dc845ade7e5b54ec7db87aa17110481697626.png" />
+<img alt="../../_images/ec154c22ad9bab165c0aad4535e49584fa3acee62c17465db3c0dab8bcc25314.png" src="../../_images/ec154c22ad9bab165c0aad4535e49584fa3acee62c17465db3c0dab8bcc25314.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -796,33 +796,8 @@ Min Radius [m]:  tensor(8.5353e-11)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">48</span>
-<span class="g g-Whitespace">     </span><span class="mi">44</span> <span class="n">position</span><span class="p">,</span> <span class="n">velocity</span> <span class="o">=</span> <span class="n">integration</span><span class="o">.</span><span class="n">leapfrog</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">45</span>     <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">velocity</span><span class="o">=</span><span class="n">velocity</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">TIME_STEP</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">47</span> <span class="c1"># Apply boundary conditions for the cube (wrap-around)</span>
-<span class="ne">---&gt; </span><span class="mi">48</span> <span class="n">position</span> <span class="o">=</span> <span class="n">boundary</span><span class="o">.</span><span class="n">wrapped_cube</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">cube_side</span><span class="o">=</span><span class="n">CUBE_SIDE</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">50</span> <span class="c1"># Save the position and mass data at designated save points</span>
-<span class="g g-Whitespace">     </span><span class="mi">51</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">save_iterations</span><span class="p">[</span><span class="n">save_counter</span><span class="p">]:</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/lagrangian/boundary.py:46,</span> in <span class="ni">wrapped_cube</span><span class="nt">(position, cube_side)</span>
-<span class="g g-Whitespace">     </span><span class="mi">40</span> <span class="n">position</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">41</span>     <span class="n">position</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">half_cube_side</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">42</span>     <span class="n">position</span> <span class="o">+</span> <span class="n">cube_side</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">43</span>     <span class="n">position</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">45</span> <span class="c1"># Wrap around for very large positive overflow</span>
-<span class="ne">---&gt; </span><span class="mi">46</span> <span class="n">position</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">47</span>     <span class="n">position</span> <span class="o">&gt;</span> <span class="n">half_cube_side</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">48</span>     <span class="o">-</span><span class="n">half_cube_side</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">49</span>     <span class="n">position</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">51</span> <span class="c1"># Wrap around for very large negative overflow</span>
-<span class="g g-Whitespace">     </span><span class="mi">52</span> <span class="n">position</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">53</span>     <span class="n">position</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">half_cube_side</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">54</span>     <span class="n">half_cube_side</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">55</span>     <span class="n">position</span><span class="p">)</span>
-
-<span class="ne">KeyboardInterrupt</span>: 
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 18.6370267868042 seconds
+Ratio of wall time to simulation time: 0.186370267868042
 </pre></div>
 </div>
 </div>
@@ -884,10 +859,10 @@ Min Radius [m]:  tensor(8.5353e-11)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 4929
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 993
 </pre></div>
 </div>
-<img alt="../../_images/3b369915a827e82163422cfa1d96890b4a718cc3dac86d1e778798794fa60669.png" src="../../_images/3b369915a827e82163422cfa1d96890b4a718cc3dac86d1e778798794fa60669.png" />
+<img alt="../../_images/f1c3eff70e3c23c552fd3280852ee79cf422ac25d638bc336592b482b5a63741.png" src="../../_images/f1c3eff70e3c23c552fd3280852ee79cf422ac25d638bc336592b482b5a63741.png" />
 </div>
 </div>
 </section>
@@ -922,7 +897,7 @@ Min Radius [m]:  tensor(8.5353e-11)
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/99e30c41158ddcbfb4dbbad5081f199aab9396843db6f845a5b3540630632c58.png" src="../../_images/99e30c41158ddcbfb4dbbad5081f199aab9396843db6f845a5b3540630632c58.png" />
+<img alt="../../_images/3ca137a12ac72370a365a1ad67d4262bcea6de523dd1b7b3265c3cb064371dd5.png" src="../../_images/3ca137a12ac72370a365a1ad67d4262bcea6de523dd1b7b3265c3cb064371dd5.png" />
 </div>
 </div>
 </section>
