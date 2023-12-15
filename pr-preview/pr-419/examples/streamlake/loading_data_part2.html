@@ -1017,14 +1017,66 @@ timezone_identifier: UTC
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
-  Loading file: 2022-07-10_094659_SMPS.csv
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
-</pre></div>
-</div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+  Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">IndexError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">line</span> <span class="mi">13</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="n">working_path</span> <span class="o">=</span> <span class="n">get_data_folder</span><span class="p">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="c1"># Using the settings dictionaries created earlier for 1d and 2d data</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> 
+<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="c1"># Loading 1-dimensional data using the loader interface</span>
+<span class="g g-Whitespace">     </span><span class="mi">11</span> <span class="c1"># The interface takes the path and settings for 1d data and loads the data</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="c1"># accordingly</span>
+<span class="ne">---&gt; </span><span class="mi">13</span> <span class="n">data_stream_1d</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">14</span>     <span class="n">path</span><span class="o">=</span><span class="n">working_path</span><span class="p">,</span>  <span class="c1"># The path where data files are stored</span>
+<span class="g g-Whitespace">     </span><span class="mi">15</span>     <span class="n">settings</span><span class="o">=</span><span class="n">settings_1d</span><span class="p">,</span>  <span class="c1"># Settings dictionary for 1d data</span>
+<span class="g g-Whitespace">     </span><span class="mi">16</span> <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">18</span> <span class="c1"># Loading 2-dimensional data using the loader interface</span>
+<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="c1"># Similar to the 1d data, but using the settings for 2d data</span>
+<span class="g g-Whitespace">     </span><span class="mi">20</span> <span class="n">data_stream_2d</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">21</span>     <span class="n">path</span><span class="o">=</span><span class="n">working_path</span><span class="p">,</span>  <span class="c1"># The path where data files are stored</span>
+<span class="g g-Whitespace">     </span><span class="mi">22</span>     <span class="n">settings</span><span class="o">=</span><span class="n">settings_2d</span><span class="p">,</span>  <span class="c1"># Settings dictionary for 2d data</span>
+<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:152,</span> in <span class="ni">load_files_interface</span><span class="nt">(path, settings, stream)</span>
+<span class="g g-Whitespace">    </span><span class="mi">149</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Loading file:&#39;</span><span class="p">,</span> <span class="n">file_info</span><span class="p">[</span><span class="n">file_i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="g g-Whitespace">    </span><span class="mi">151</span> <span class="k">if</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_1d_load&#39;</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">152</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_1d_stream</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">153</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">154</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">155</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">156</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
+<span class="g g-Whitespace">    </span><span class="mi">157</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">159</span> <span class="k">elif</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_2d_load&#39;</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">160</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_2d_stream</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">161</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">162</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">163</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">164</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
+<span class="g g-Whitespace">    </span><span class="mi">165</span>     <span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:323,</span> in <span class="ni">get_1d_stream</span><span class="nt">(file_path, settings, first_pass, stream)</span>
+<span class="g g-Whitespace">    </span><span class="mi">321</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">epoch_time</span>
+<span class="g g-Whitespace">    </span><span class="mi">322</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">323</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">merger</span><span class="o">.</span><span class="n">stream_add_data</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">324</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">325</span>         <span class="n">time_new</span><span class="o">=</span><span class="n">epoch_time</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">326</span>         <span class="n">data_new</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">327</span>         <span class="n">header_check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">328</span>         <span class="n">header_new</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_header&#39;</span><span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">329</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">330</span> <span class="k">return</span> <span class="n">stream</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/merger.py:182,</span> in <span class="ni">stream_add_data</span><span class="nt">(stream, time_new, data_new, header_check, header_new)</span>
+<span class="g g-Whitespace">    </span><span class="mi">180</span>     <span class="n">sorted_time_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">181</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">sorted_time_index</span><span class="p">]</span>
+<span class="ne">--&gt; </span><span class="mi">182</span>     <span class="n">stream</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">sorted_time_index</span><span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">return</span> <span class="n">stream</span>
+
+<span class="ne">IndexError</span>: index 1015 is out of bounds for axis 1 with size 11
 </pre></div>
 </div>
 </div>
@@ -1078,7 +1130,7 @@ Stream(header=[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample
         2.31800e+00, 2.10616e+03],
        [2.05000e+01, 7.91500e+02, 2.35000e+01, ..., 2.07210e+01,
         2.24800e+00, 2.45781e+03]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
-       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
+       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5620804], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2004838]])
 
 Data stream 2d summary:
 Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39;, &#39;22.27&#39;, &#39;22.67&#39;, &#39;23.08&#39;, &#39;23.50&#39;, &#39;23.93&#39;, &#39;24.36&#39;, &#39;24.80&#39;, &#39;25.25&#39;, &#39;25.71&#39;, &#39;26.18&#39;, &#39;26.66&#39;, &#39;27.14&#39;, &#39;27.63&#39;, &#39;28.13&#39;, &#39;28.64&#39;, &#39;29.16&#39;, &#39;29.69&#39;, &#39;30.23&#39;, &#39;30.78&#39;, &#39;31.34&#39;, &#39;31.91&#39;, &#39;32.49&#39;, &#39;33.08&#39;, &#39;33.68&#39;, &#39;34.29&#39;, &#39;34.91&#39;, &#39;35.55&#39;, &#39;36.19&#39;, &#39;36.85&#39;, &#39;37.52&#39;, &#39;38.20&#39;, &#39;38.89&#39;, &#39;39.60&#39;, &#39;40.32&#39;, &#39;41.05&#39;, &#39;41.79&#39;, &#39;42.55&#39;, &#39;43.32&#39;, &#39;44.11&#39;, &#39;44.91&#39;, &#39;45.73&#39;, &#39;46.56&#39;, &#39;47.40&#39;, &#39;48.26&#39;, &#39;49.14&#39;, &#39;50.03&#39;, &#39;50.94&#39;, &#39;51.86&#39;, &#39;52.80&#39;, &#39;53.76&#39;, &#39;54.74&#39;, &#39;55.73&#39;, &#39;56.74&#39;, &#39;57.77&#39;, &#39;58.82&#39;, &#39;59.89&#39;, &#39;60.98&#39;, &#39;62.08&#39;, &#39;63.21&#39;, &#39;64.36&#39;, &#39;65.52&#39;, &#39;66.71&#39;, &#39;67.93&#39;, &#39;69.16&#39;, &#39;70.41&#39;, &#39;71.69&#39;, &#39;72.99&#39;, &#39;74.32&#39;, &#39;75.67&#39;, &#39;77.04&#39;, &#39;78.44&#39;, &#39;79.86&#39;, &#39;81.31&#39;, &#39;82.79&#39;, &#39;84.29&#39;, &#39;85.82&#39;, &#39;87.38&#39;, &#39;88.96&#39;, &#39;90.58&#39;, &#39;92.22&#39;, &#39;93.90&#39;, &#39;95.60&#39;, &#39;97.34&#39;, &#39;99.10&#39;, &#39;100.90&#39;, &#39;102.74&#39;, &#39;104.60&#39;, &#39;106.50&#39;, &#39;108.43&#39;, &#39;110.40&#39;, &#39;112.40&#39;, &#39;114.44&#39;, &#39;116.52&#39;, &#39;118.64&#39;, &#39;120.79&#39;, &#39;122.98&#39;, &#39;125.21&#39;, &#39;127.49&#39;, &#39;129.80&#39;, &#39;132.16&#39;, &#39;134.56&#39;, &#39;137.00&#39;, &#39;139.49&#39;, &#39;142.02&#39;, &#39;144.60&#39;, &#39;147.22&#39;, &#39;149.89&#39;, &#39;152.61&#39;, &#39;155.38&#39;, &#39;158.20&#39;, &#39;161.08&#39;, &#39;164.00&#39;, &#39;166.98&#39;, &#39;170.01&#39;, &#39;173.09&#39;, &#39;176.24&#39;, &#39;179.43&#39;, &#39;182.69&#39;, &#39;186.01&#39;, &#39;189.38&#39;, &#39;192.82&#39;, &#39;196.32&#39;, &#39;199.89&#39;, &#39;203.51&#39;, &#39;207.21&#39;, &#39;210.97&#39;, &#39;214.80&#39;, &#39;218.70&#39;, &#39;222.67&#39;, &#39;226.71&#39;, &#39;230.82&#39;, &#39;235.01&#39;, &#39;239.28&#39;, &#39;243.62&#39;, &#39;248.05&#39;, &#39;252.55&#39;, &#39;257.13&#39;, &#39;261.80&#39;, &#39;266.55&#39;, &#39;271.39&#39;, &#39;276.32&#39;, &#39;281.33&#39;, &#39;286.44&#39;, &#39;291.64&#39;, &#39;296.93&#39;, &#39;302.32&#39;, &#39;307.81&#39;, &#39;313.40&#39;, &#39;319.08&#39;, &#39;324.88&#39;, &#39;330.77&#39;, &#39;336.78&#39;, &#39;342.89&#39;, &#39;349.12&#39;, &#39;355.45&#39;, &#39;361.90&#39;, &#39;368.47&#39;, &#39;375.16&#39;, &#39;381.97&#39;, &#39;388.91&#39;, &#39;395.96&#39;, &#39;403.15&#39;, &#39;410.47&#39;, &#39;417.92&#39;, &#39;425.51&#39;, &#39;433.23&#39;, &#39;441.09&#39;, &#39;449.10&#39;, &#39;457.25&#39;, &#39;465.55&#39;, &#39;474.00&#39;, &#39;482.61&#39;, &#39;491.37&#39;, &#39;500.29&#39;, &#39;509.37&#39;, &#39;518.61&#39;, &#39;528.03&#39;, &#39;537.61&#39;, &#39;547.37&#39;, &#39;557.31&#39;, &#39;567.42&#39;, &#39;577.72&#39;, &#39;588.21&#39;, &#39;598.89&#39;, &#39;609.76&#39;, &#39;620.82&#39;, &#39;632.09&#39;, &#39;643.57&#39;, &#39;655.25&#39;, &#39;667.14&#39;, &#39;679.25&#39;, &#39;691.58&#39;, &#39;704.14&#39;, &#39;716.92&#39;, &#39;729.93&#39;, &#39;743.18&#39;, &#39;756.67&#39;, &#39;770.40&#39;, &#39;784.39&#39;], data=array([[ 6103.186,  2832.655,  4733.553, ...,    93.413,   122.992,
@@ -1094,7 +1146,7 @@ Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39
           372.433],
        [14380.528, 11524.35 , 13632.727, ...,     0.   ,     0.   ,
             0.   ]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
-       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
+       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5620804], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2004838]])
 </pre></div>
 </div>
 </div>
@@ -1160,7 +1212,7 @@ Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/c2dcd4095c2ebef9075fd5a204f16a9f1761b719de2a6f9168ca806e850ae1ba.png" src="../../_images/c2dcd4095c2ebef9075fd5a204f16a9f1761b719de2a6f9168ca806e850ae1ba.png" />
+<img alt="../../_images/f7a21ee18fc0fa1366bf5e2692e0d2504e07b3881bb170df0e9529cffa6bc97a.png" src="../../_images/f7a21ee18fc0fa1366bf5e2692e0d2504e07b3881bb170df0e9529cffa6bc97a.png" />
 </div>
 </div>
 </section>
