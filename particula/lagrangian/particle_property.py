@@ -203,7 +203,7 @@ def thermal_speed(
 
 
 def speed(
-          velocity: torch.Tensor,
+    velocity: torch.Tensor,
 ) -> torch.Tensor:
     """
     Calculate the speed of a particle.
@@ -248,3 +248,34 @@ def random_thermal_velocity(
     )
     # normalize the unit
     return unit_velocity * thermal_particle_speed / unit_speed
+
+
+def nearest_match(
+    x_values: torch.Tensor,
+    y_values: torch.Tensor,
+    x_new: torch.Tensor,
+) -> torch.Tensor:
+    """
+    Perform nearest neighbor interpolation (on torch objects) to find y-values
+    corresponding to new x-values. The function identifies the nearest x-value
+    for each value in x_new and returns the corresponding y-value.
+
+    Args:
+        x_values (torch.Tensor): The original x-values of shape (n,).
+        y_values (torch.Tensor): The original y-values of shape (n,).
+            Each y-value corresponds to an x-value.
+        x_new (torch.Tensor): The new x-values for which y-values are to be
+            interpolated, of shape (m,).
+
+    Returns:
+        torch.Tensor: The interpolated y-values of shape (m,). Each value
+            corresponds to the nearest match from x_values.
+    """
+    # Reshape x_values and x_new for broadcasting
+    x_values = x_values.unsqueeze(0)
+    x_new = x_new.unsqueeze(1)
+    # Find the indices of the nearest x-values in x_values for each value in
+    # x_new
+    idx = torch.argmin(torch.abs(x_values - x_new), dim=1)
+    # Return the corresponding y-values for the found indices
+    return y_values[idx]
