@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Realistic Mass and Velocity in Aerosol Particle Simulations &#8212; Particula Book</title>
+    <title>Realistic Drag, Mass, and Velocity &#8212; Particula Book</title>
   
   
   
@@ -64,11 +64,9 @@ const thebe_selector_output = ".output, .cell_output"
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/lagrangian/real_aerosols';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/lagrangian/friction_froce';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Equilibria of Aerosols" href="../equilibria/equilibria_intro.html" />
-    <link rel="prev" title="Sweep and Prune Algorithm" href="sweep_and_prune.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -175,7 +173,7 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="../../tour/part-tour.html">Particula tour</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../distribution_statistics.html">Distribution statistics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../distribution_coagulation.html">Distribution coagulation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../distribution_evolution.html">Distribution evolution</a></li>
@@ -210,10 +208,9 @@ const thebe_selector_output = ".output, .cell_output"
 
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="lagrangian_intro.html">Lagrangian Particle Model</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="lagrangian_intro.html">Lagrangian Particle Model</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="basic_lagrangian_box.html">Introduction to the Lagrangian Box Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sweep_and_prune.html">Sweep and Prune Algorithm</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Realistic Mass and Velocity in Aerosol Particle Simulations</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../equilibria/equilibria_intro.html">Equilibria of Aerosols</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -305,7 +302,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/lagrangian/real_aerosols.ipynb" target="_blank"
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/lagrangian/friction_froce.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
    title="Launch onBinder"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -323,7 +320,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/lagrangian/real_aerosols.ipynb" target="_blank"
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/lagrangian/friction_froce.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
    title="Launch onColab"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -389,7 +386,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/lagrangian/real_aerosols.ipynb" target="_blank"
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/lagrangian/friction_froce.ipynb" target="_blank"
    class="btn btn-sm btn-source-edit-button dropdown-item"
    title="Suggest edit"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -406,7 +403,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/lagrangian/real_aerosols.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/lagrangian/friction_froce.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -436,7 +433,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="../../_sources/examples/lagrangian/real_aerosols.ipynb" target="_blank"
+      <li><a href="../../_sources/examples/lagrangian/friction_froce.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -520,7 +517,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Realistic Mass and Velocity in Aerosol Particle Simulations</h1>
+    <h1>Realistic Drag, Mass, and Velocity</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -570,8 +567,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="realistic-mass-and-velocity-in-aerosol-particle-simulations">
-<h1>Realistic Mass and Velocity in Aerosol Particle Simulations<a class="headerlink" href="#realistic-mass-and-velocity-in-aerosol-particle-simulations" title="Permalink to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="realistic-drag-mass-and-velocity">
+<h1>Realistic Drag, Mass, and Velocity<a class="headerlink" href="#realistic-drag-mass-and-velocity" title="Permalink to this heading">#</a></h1>
 <p>This notebook section focuses on simulating cloud droplet-sized aerosol particles (around 100 microns) with accurate mass and velocity. Key improvements include:</p>
 <ol class="arabic simple">
 <li><p><strong>Refining Initial Conditions</strong>: Setting precise starting values for particle mass and velocity.</p></li>
@@ -735,14 +732,17 @@ document.write(`
 <p>As we simulate particles at a realistic scale, accounting for forces acting on them becomes crucial. The first significant force is friction, which opposes the particle’s motion and is proportional to its velocity.</p>
 <section id="mathematical-representation">
 <h4>Mathematical Representation<a class="headerlink" href="#mathematical-representation" title="Permalink to this heading">#</a></h4>
-<p>The friction factor <span class="math notranslate nohighlight">\((f_p)\)</span> is described by:
-$<span class="math notranslate nohighlight">\( f_p = \frac{3 \pi D_p \mu}{D_c} \)</span><span class="math notranslate nohighlight">\(
-where \)</span>D_p<span class="math notranslate nohighlight">\( is the particle diameter, \)</span>\mu<span class="math notranslate nohighlight">\( is the dynamic viscosity, and \)</span>D_c$ is the diffusion coefficient scale.</p>
-<p>The drag force (<span class="math notranslate nohighlight">\(F_d\$) is then:
-\)</span><span class="math notranslate nohighlight">\( F_d = f_p v_p \)</span><span class="math notranslate nohighlight">\(
-with \)</span>v_p$ representing the particle velocity.</p>
-<p>Considering gravitational settling in a fluid at rest <span class="math notranslate nohighlight">\((u_{fluid} = 0)\)</span>, the motion equation becomes:
-$<span class="math notranslate nohighlight">\( m_p \frac{dv}{dt} = m_pg + f_p (u_{fluid}-v_p) \)</span>$</p>
+<p>The friction factor <span class="math notranslate nohighlight">\((f_p)\)</span> is described by:</p>
+<div class="math notranslate nohighlight">
+\[ f_p = \frac{3 \pi D_p \mu}{D_c} \]</div>
+<p>where <span class="math notranslate nohighlight">\(D_p\)</span> is the particle diameter, <span class="math notranslate nohighlight">\(\mu\)</span> is the dynamic viscosity, and <span class="math notranslate nohighlight">\(D_c\)</span> is the diffusion coefficient.</p>
+<p>The drag force, <span class="math notranslate nohighlight">\(F_d\)</span>, is then:</p>
+<div class="math notranslate nohighlight">
+\[ F_d = f_p v_p \]</div>
+<p>with <span class="math notranslate nohighlight">\(v_p\)</span> representing the particle velocity.</p>
+<p>Considering gravitational settling in a fluid at rest <span class="math notranslate nohighlight">\((u_{fluid} = 0)\)</span>, the motion equation becomes:</p>
+<div class="math notranslate nohighlight">
+\[ m_p \frac{dv}{dt} = m_pg + f_p (u_{fluid}-v_p) \]</div>
 </section>
 </section>
 <section id="implementing-the-friction-factor-in-the-simulation">
@@ -885,8 +885,8 @@ Min Radius [m]:  tensor(2.9795e-06)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 8.348026514053345 seconds
-Ratio of wall time to simulation time: 0.08348026514053344
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 8.50465989112854 seconds
+Ratio of wall time to simulation time: 0.0850465989112854
 </pre></div>
 </div>
 </div>
@@ -1056,24 +1056,6 @@ Final Max Radius [m]:  0.0007361950668992882
                 <footer class="prev-next-footer">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="sweep_and_prune.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Sweep and Prune Algorithm</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="../equilibria/equilibria_intro.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Equilibria of Aerosols</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
