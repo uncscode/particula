@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Realistic Mass and Velocity &#8212; Particula Book</title>
+    <title>Realistic Mass and Velocity in Aerosol Particle Simulations &#8212; Particula Book</title>
   
   
   
@@ -213,7 +213,7 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="lagrangian_intro.html">Lagrangian Particle Model</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="basic_lagrangian_box.html">Introduction to the Lagrangian Box Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sweep_and_prune.html">Sweep and Prune Algorithm</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Realistic Mass and Velocity</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Realistic Mass and Velocity in Aerosol Particle Simulations</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../equilibria/equilibria_intro.html">Equilibria of Aerosols</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -520,7 +520,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Realistic Mass and Velocity</h1>
+    <h1>Realistic Mass and Velocity in Aerosol Particle Simulations</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -530,14 +530,35 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#initialization">Initialization</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#friction-factor">Friction Factor</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-of-friction-factor">Implementation of Friction Factor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#initialization-of-particles">Initialization of Particles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-initial-conditions">Plotting Initial Conditions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particle-size-distribution">Particle Size Distribution</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particle-velocity-distribution">Particle Velocity Distribution</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-positions">Plot Positions</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analyzing-the-mass-distribution-of-particles">Analyzing the Mass Distribution of Particles</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-smaller-particles">Summary of Smaller Particles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#friction-factor-in-particle-dynamics">Friction Factor in Particle Dynamics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-the-friction-force">Understanding the Friction Force</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-representation">Mathematical Representation</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-the-friction-factor-in-the-simulation">Implementing the Friction Factor in the Simulation</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#efficiency-considerations">Efficiency Considerations</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#current-approach">Current Approach</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-particle-simulation">Running the Particle Simulation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-particle-positions">Plotting Particle Positions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#size-distribution-of-particles">Size Distribution of Particles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-cloud-droplet-simulation">Summary of Cloud Droplet Simulation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#achievements-in-realism">Achievements in Realism</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#performance-considerations">Performance Considerations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenges-with-sub-micron-aerosols">Challenges with Sub-Micron Aerosols</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#positive-observations">Positive Observations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -549,9 +570,14 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="realistic-mass-and-velocity">
-<h1>Realistic Mass and Velocity<a class="headerlink" href="#realistic-mass-and-velocity" title="Permalink to this heading">#</a></h1>
-<p>With the key components of the aerosol model in place, we can now start to build towards more realistic aerosol particles. This notebook will focus on the mass and velocity of the particles. This involves imporvements, the initial conditions, and the forces acting on the particles.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="realistic-mass-and-velocity-in-aerosol-particle-simulations">
+<h1>Realistic Mass and Velocity in Aerosol Particle Simulations<a class="headerlink" href="#realistic-mass-and-velocity-in-aerosol-particle-simulations" title="Permalink to this heading">#</a></h1>
+<p>This notebook section focuses on simulating cloud droplet-sized aerosol particles (around 100 microns) with accurate mass and velocity. Key improvements include:</p>
+<ol class="arabic simple">
+<li><p><strong>Refining Initial Conditions</strong>: Setting precise starting values for particle mass and velocity.</p></li>
+<li><p><strong>Modeling Forces Accurately</strong>: Better representation of forces acting on particles to influence their movement.</p></li>
+</ol>
+<p>These steps are crucial for enhancing the realism of the aerosol particle model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Code Section: Importing Necessary Libraries and Initializing Variables</span>
@@ -569,31 +595,37 @@ document.write(`
 </div>
 </div>
 </div>
-<section id="initialization">
-<h2>Initialization<a class="headerlink" href="#initialization" title="Permalink to this heading">#</a></h2>
-<p>Here we will change the initialalization of the particles to be more realistic. We will use a normal distribution for the particle masses. For the velocities, we will use the particle’s thermal velocity (induced from Brownian motion). The initial positions will be randomly distributed in a box.</p>
+<section id="initialization-of-particles">
+<h2>Initialization of Particles<a class="headerlink" href="#initialization-of-particles" title="Permalink to this heading">#</a></h2>
+<p>In this section, we’ll enhance particle initialization for realism:</p>
+<ul class="simple">
+<li><p><strong>Particle Masses</strong>: Implementing a narrow log-normal distribution to better represent real-world mass variation.</p></li>
+<li><p><strong>Particle Velocities</strong>: Utilizing thermal velocity, influenced by Brownian motion, for initial velocity settings.</p></li>
+<li><p><strong>Initial Positions</strong>: Particles will be randomly placed within a defined box area to simulate natural distribution.</p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setting up the Simulation Parameters and Initial Conditions</span>
+
 <span class="c1"># Define fixed parameters</span>
-<span class="n">TOTAL_NUMBER_OF_PARTICLES</span> <span class="o">=</span> <span class="mi">1000</span>
-<span class="n">TIME_STEP</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">TOTAL_NUMBER_OF_PARTICLES</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="n">TIME_STEP</span> <span class="o">=</span> <span class="mf">0.005</span>
 <span class="n">SIMULATION_TIME</span> <span class="o">=</span> <span class="mi">100</span>
-<span class="n">CUBE_SIDE</span> <span class="o">=</span> <span class="mf">0.010</span>  <span class="c1"># meters</span>
-<span class="n">save_points</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">CUBE_SIDE</span> <span class="o">=</span> <span class="mf">0.010</span>  <span class="c1"># Size of the simulation cube in meters</span>
+<span class="n">save_points</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># Number of points to save the simulation data</span>
 
-<span class="c1"># new parameters</span>
-<span class="n">density_uniform</span> <span class="o">=</span> <span class="mf">1.5e3</span>
-<span class="n">mean_radius_nm</span> <span class="o">=</span> <span class="mi">1000</span>
-<span class="n">std_dev_nm</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">system_temperature_kelvin</span> <span class="o">=</span> <span class="mi">300</span>
-<span class="n">system_pressure_pascal</span> <span class="o">=</span> <span class="mf">1e5</span>
+<span class="c1"># Defining new parameters for more realistic simulation</span>
+<span class="n">density_uniform</span> <span class="o">=</span> <span class="mf">1.5e3</span>  <span class="c1"># Uniform density of particles in kg/m^3</span>
+<span class="n">mean_radius_nm</span> <span class="o">=</span> <span class="mi">50000</span>  <span class="c1"># Mean radius of particles in nanometers</span>
+<span class="n">std_dev_nm</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># Standard deviation of particle radius in nanometers</span>
+<span class="n">system_temperature_kelvin</span> <span class="o">=</span> <span class="mi">300</span>  <span class="c1"># System temperature in Kelvin</span>
+<span class="n">system_pressure_pascal</span> <span class="o">=</span> <span class="mf">1e5</span>  <span class="c1"># System pressure in Pascal</span>
 
-<span class="c1"># New interation update interval</span>
-<span class="n">interval_friction_factor</span> <span class="o">=</span> <span class="mi">10000</span>
-<span class="n">interval_coagulation</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="c1"># Define intervals for updating interaction factors</span>
+<span class="n">interval_friction_factor</span> <span class="o">=</span> <span class="mi">1000</span>  <span class="c1"># Interval for updating friction factor</span>
+<span class="n">interval_coagulation</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># Interval for updating coagulation</span>
 
-<span class="c1"># generate particle masses</span>
+<span class="c1"># Generating particle masses using a log-normal distribution</span>
 <span class="n">mass</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">generate_particle_masses</span><span class="p">(</span>
     <span class="n">mean_radius</span><span class="o">=</span><span class="n">mean_radius_nm</span><span class="p">,</span>
     <span class="n">std_dev_radius</span><span class="o">=</span><span class="n">std_dev_nm</span><span class="p">,</span>
@@ -602,7 +634,7 @@ document.write(`
     <span class="n">radius_input_units</span><span class="o">=</span><span class="s2">&quot;nm&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="c1"># Initialize particle velocities randomly</span>
+<span class="c1"># Initializing particle velocities using thermal velocity</span>
 <span class="n">velocity</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">random_thermal_velocity</span><span class="p">(</span>
     <span class="n">temperature_kelvin</span><span class="o">=</span><span class="n">system_temperature_kelvin</span><span class="p">,</span>
     <span class="n">mass_kg</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span>
@@ -611,10 +643,9 @@ document.write(`
     <span class="n">random_seed</span><span class="o">=</span><span class="n">seed</span>
 <span class="p">)</span>
 
-<span class="c1"># Set constant mass and density for all particles</span>
+<span class="c1"># Setting constant density for all particles</span>
 <span class="n">density</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">TOTAL_NUMBER_OF_PARTICLES</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">t_type</span><span class="p">)</span> <span class="o">*</span> <span class="n">density_uniform</span>
 
-<span class="c1">#---------------Same as before------------------#</span>
 <span class="c1"># Initialize particle positions randomly within the cube</span>
 <span class="n">position</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span>
     <span class="mi">3</span><span class="p">,</span>
@@ -624,44 +655,65 @@ document.write(`
 <span class="c1"># Initialize force as zero for all particles</span>
 <span class="n">force</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">TOTAL_NUMBER_OF_PARTICLES</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">t_type</span><span class="p">)</span>
 
-<span class="c1"># Generate indices for particles, could be integer type</span>
-<span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">TOTAL_NUMBER_OF_PARTICLES</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">t_type</span><span class="p">)</span>  <span class="c1"># could be int</span>
+<span class="c1"># Generating indices for particles</span>
+<span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">TOTAL_NUMBER_OF_PARTICLES</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">t_type</span><span class="p">)</span>  <span class="c1"># Integer type</span>
 
-<span class="c1"># Calculate the total number of iterations for the simulation</span>
+<span class="c1"># Calculating the total number of iterations for the simulation</span>
 <span class="n">total_iterations</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">SIMULATION_TIME</span> <span class="o">/</span> <span class="n">TIME_STEP</span><span class="p">)</span>
 
-<span class="c1"># Initialize a tensor to track the total mass over iterations</span>
+<span class="c1"># Initializing tensor to track total mass over iterations</span>
 <span class="n">total_mass</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">total_iterations</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">t_type</span><span class="p">)</span>
 
-<span class="c1"># Define gravity acting on all particles</span>
+<span class="c1"># Defining gravity acting on all particles</span>
 <span class="n">gravity</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
     <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.81</span><span class="p">])</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">TOTAL_NUMBER_OF_PARTICLES</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
 <span class="c1"># Initializing Arrays for Saving Position and Mass Data</span>
-<span class="c1"># Create arrays to store position and mass data at each save point</span>
 <span class="n">save_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">TOTAL_NUMBER_OF_PARTICLES</span><span class="p">,</span> <span class="n">save_points</span><span class="p">))</span>
 <span class="n">save_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">TOTAL_NUMBER_OF_PARTICLES</span><span class="p">,</span> <span class="n">save_points</span><span class="p">))</span>
-
-<span class="c1"># Determine which iterations will correspond to the save points</span>
 <span class="n">save_iterations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">total_iterations</span><span class="p">,</span> <span class="n">save_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="c1"># Calculating particle radius from mass and density</span>
 <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
+</section>
+<section id="plotting-initial-conditions">
+<h2>Plotting Initial Conditions<a class="headerlink" href="#plotting-initial-conditions" title="Permalink to this heading">#</a></h2>
+<p>To verify the realism of our particle model, we’ll plot the initial distributions of particle size and velocity. This step ensures that the initial setup aligns with our expectations and the intended simulation parameters.</p>
+<section id="particle-size-distribution">
+<h3>Particle Size Distribution<a class="headerlink" href="#particle-size-distribution" title="Permalink to this heading">#</a></h3>
+<p>First, we examine the distribution of particle radii. The goal is to confirm that the radii follow the specified log-normal distribution.</p>
+</section>
+<section id="particle-velocity-distribution">
+<h3>Particle Velocity Distribution<a class="headerlink" href="#particle-velocity-distribution" title="Permalink to this heading">#</a></h3>
+<p>Next, we assess the distribution of particle velocities. This is crucial for ensuring that the initial velocities reflect thermal motion as intended.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot initial radius distribution</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plotting the Initial Radius Distribution</span>
+
+<span class="c1"># Calculate the initial radius of particles</span>
+<span class="n">radius_initial</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span>
+    <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+
+<span class="c1"># Plotting the histogram for radius distribution</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">machine_limit</span><span class="o">.</span><span class="n">safe_log10</span><span class="p">(</span><span class="n">radius</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">machine_limit</span><span class="o">.</span><span class="n">safe_log10</span><span class="p">(</span><span class="n">radius_initial</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;log10 Radius (m)&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Particles&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Initial Particle Radius Distribution&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="c1"># plot initial velocity distribution</span>
+<span class="c1"># Plotting the Initial Velocity Distribution</span>
+
+<span class="c1"># Calculate the speeds of particles from their velocities</span>
+<span class="n">initial_speeds</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">speed</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span>
+
+<span class="c1"># Plotting the histogram for velocity distribution</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">machine_limit</span><span class="o">.</span><span class="n">safe_log10</span><span class="p">(</span><span class="n">particle_property</span><span class="o">.</span><span class="n">speed</span><span class="p">(</span><span class="n">velocity</span><span class="p">)),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span> <span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">machine_limit</span><span class="o">.</span><span class="n">safe_log10</span><span class="p">(</span><span class="n">initial_speeds</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;log10 Velocity (m/s)&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Particles&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Initial Particle Velocity Distribution&quot;</span><span class="p">)</span>
@@ -670,70 +722,104 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/262998e6cafddade897ac64b83f5b0aeb089e1763869043b4e44b6cc41c3ee32.png" src="../../_images/262998e6cafddade897ac64b83f5b0aeb089e1763869043b4e44b6cc41c3ee32.png" />
-<img alt="../../_images/06c2c5f50fd83449284ec4c47297622477f0e4da8c9714602bd44b142f700306.png" src="../../_images/06c2c5f50fd83449284ec4c47297622477f0e4da8c9714602bd44b142f700306.png" />
+<img alt="../../_images/e28a3ef07ead4d1c4d8896c51e04a046ba7776e400089756f366794a7cc6dd0a.png" src="../../_images/e28a3ef07ead4d1c4d8896c51e04a046ba7776e400089756f366794a7cc6dd0a.png" />
+<img alt="../../_images/e8e00de78dbb82fef1d78d5c411bef0a80964dfa7401e5b06a25d5dbabc04525.png" src="../../_images/e8e00de78dbb82fef1d78d5c411bef0a80964dfa7401e5b06a25d5dbabc04525.png" />
 </div>
 </div>
 </section>
-<section id="friction-factor">
-<h2>Friction Factor<a class="headerlink" href="#friction-factor" title="Permalink to this heading">#</a></h2>
-<p>Now that we are operating on a more realistic scale, we need to consider the forces acting on the particles. The first force we will consider is the friction force. This force is proportional to the velocity of the particle and is in the opposite direction. The friction factor is given by</p>
-<div class="math notranslate nohighlight">
-\[ f_p~=~\frac{3 \pi D_p \mu}{D_c}  \]</div>
-<p>So the drag force is
-$<span class="math notranslate nohighlight">\( F_d~=~f_p v_p  \)</span>$</p>
-<p>For gravitational settling we then get (fluid velocity u_(fluid))
-$<span class="math notranslate nohighlight">\( m_p \frac{dv}{dt}~=~m_pg + f_p (u_{fluid}-v_p)  \)</span>$</p>
-<p>For now we’ll assume that the fluid velocity is zero.</p>
-<section id="implementation-of-friction-factor">
-<h3>Implementation of Friction Factor<a class="headerlink" href="#implementation-of-friction-factor" title="Permalink to this heading">#</a></h3>
-<p>For the friction factor, we’ll could calculate it at each step but that is not very efficient. It does however depend on enviromental variables of pressure and temperature so if those change then it needs to be accounted for (we’ll address this in the future). For now we’ll calculate it once and use a nearest neighbor interpolation to get the friction factor for each particle.</p>
+</section>
+<section id="friction-factor-in-particle-dynamics">
+<h2>Friction Factor in Particle Dynamics<a class="headerlink" href="#friction-factor-in-particle-dynamics" title="Permalink to this heading">#</a></h2>
+<section id="understanding-the-friction-force">
+<h3>Understanding the Friction Force<a class="headerlink" href="#understanding-the-friction-force" title="Permalink to this heading">#</a></h3>
+<p>As we simulate particles at a realistic scale, accounting for forces acting on them becomes crucial. The first significant force is friction, which opposes the particle’s motion and is proportional to its velocity.</p>
+<section id="mathematical-representation">
+<h4>Mathematical Representation<a class="headerlink" href="#mathematical-representation" title="Permalink to this heading">#</a></h4>
+<p>The friction factor <span class="math notranslate nohighlight">\((f_p)\)</span> is described by:
+$<span class="math notranslate nohighlight">\( f_p = \frac{3 \pi D_p \mu}{D_c} \)</span><span class="math notranslate nohighlight">\(
+where \)</span>D_p<span class="math notranslate nohighlight">\( is the particle diameter, \)</span>\mu<span class="math notranslate nohighlight">\( is the dynamic viscosity, and \)</span>D_c$ is the diffusion coefficient scale.</p>
+<p>The drag force (<span class="math notranslate nohighlight">\(F_d\$) is then:
+\)</span><span class="math notranslate nohighlight">\( F_d = f_p v_p \)</span><span class="math notranslate nohighlight">\(
+with \)</span>v_p$ representing the particle velocity.</p>
+<p>Considering gravitational settling in a fluid at rest <span class="math notranslate nohighlight">\((u_{fluid} = 0)\)</span>, the motion equation becomes:
+$<span class="math notranslate nohighlight">\( m_p \frac{dv}{dt} = m_pg + f_p (u_{fluid}-v_p) \)</span>$</p>
+</section>
+</section>
+<section id="implementing-the-friction-factor-in-the-simulation">
+<h3>Implementing the Friction Factor in the Simulation<a class="headerlink" href="#implementing-the-friction-factor-in-the-simulation" title="Permalink to this heading">#</a></h3>
+<section id="efficiency-considerations">
+<h4>Efficiency Considerations<a class="headerlink" href="#efficiency-considerations" title="Permalink to this heading">#</a></h4>
+<p>Calculating the friction factor at each simulation step could be computationally intensive. However, it’s important to note that <span class="math notranslate nohighlight">\(f_p\)</span> is dependent on environmental variables like pressure and temperature, which might change.</p>
+</section>
+<section id="current-approach">
+<h4>Current Approach<a class="headerlink" href="#current-approach" title="Permalink to this heading">#</a></h4>
+<p>For the current stage of the simulation, we’ll compute <span class="math notranslate nohighlight">\(f_p\)</span> initially and use nearest neighbor interpolation for each particle. This approach balances efficiency with accuracy, keeping in mind that future iterations may include dynamic adjustments for varying environmental conditions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># print max and min </span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Printing the Maximum and Minimum Radii of the Particles</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Max Radius [m]: &quot;</span><span class="p">,</span> <span class="n">radius</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Min Radius [m]: &quot;</span><span class="p">,</span> <span class="n">radius</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
 
-<span class="c1"># initialize the friction factor radius</span>
+<span class="c1"># Initializing the Range of Radii for Friction Factor Calculation</span>
+<span class="c1"># We use a linspace to cover a range from the smallest to 10 times the</span>
+<span class="c1"># largest radius.</span>
 <span class="n">friction_factor_radius</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
     <span class="n">start</span><span class="o">=</span><span class="n">radius</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
-    <span class="n">end</span><span class="o">=</span><span class="n">radius</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">end</span><span class="o">=</span><span class="n">radius</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">steps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-    <span class="p">)</span>
+<span class="p">)</span>
 
-<span class="c1"># calculate the friction factor</span>
+<span class="c1"># Calculating the Friction Factor</span>
+<span class="c1"># This calculation considers the radius, temperature, and pressure to</span>
+<span class="c1"># determine the friction factor.</span>
 <span class="n">friction_factor_array</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">friction_factor_wrapper</span><span class="p">(</span>
     <span class="n">radius_meter</span><span class="o">=</span><span class="n">friction_factor_radius</span><span class="p">,</span>
     <span class="n">temperature_kelvin</span><span class="o">=</span><span class="n">system_temperature_kelvin</span><span class="p">,</span>
     <span class="n">pressure_pascal</span><span class="o">=</span><span class="n">system_pressure_pascal</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="c1"># Plotting Friction Factor vs Radius</span>
+<span class="c1"># The plot helps in visualizing how friction factor varies with particle</span>
+<span class="c1"># radius.</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">friction_factor_radius</span><span class="p">,</span> <span class="n">friction_factor_array</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Radius (m)&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Friction Factor&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Friction Factor vs Radius&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Max Radius [m]:  tensor(0.0011)
-Min Radius [m]:  tensor(3.9282e-10)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Max Radius [m]:  tensor(0.0006)
+Min Radius [m]:  tensor(2.9795e-06)
 </pre></div>
 </div>
-<img alt="../../_images/ec154c22ad9bab165c0aad4535e49584fa3acee62c17465db3c0dab8bcc25314.png" src="../../_images/ec154c22ad9bab165c0aad4535e49584fa3acee62c17465db3c0dab8bcc25314.png" />
+<img alt="../../_images/506f2ac621e8b5d90126114dfadc856c2d26750db5562419711c2ba2fa7ccdb7.png" src="../../_images/506f2ac621e8b5d90126114dfadc856c2d26750db5562419711c2ba2fa7ccdb7.png" />
 </div>
 </div>
+</section>
+</section>
+</section>
+<section id="running-the-particle-simulation">
+<h2>Running the Particle Simulation<a class="headerlink" href="#running-the-particle-simulation" title="Permalink to this heading">#</a></h2>
+<p>In this part of the notebook, we execute the core simulation loop. This involves integrating the motion of the particles over time while considering the forces acting on them, including friction and gravity. Several key updates and optimizations are included:</p>
+<ol class="arabic simple">
+<li><p><strong>Friction Factor Initialization</strong>: Before entering the main loop, the friction factor for each particle is calculated. This is an essential step for accurately simulating the drag force on particles.</p></li>
+<li><p><strong>Conditional Coagulation Step</strong>: The simulation includes an optional coagulation step, executed at a specified interval. This step simulates the merging of particles upon collision, affecting their mass and velocity.</p></li>
+<li><p><strong>Friction Factor Update</strong>: The friction factor is updated at regular intervals to reflect changes in particle size or other environmental conditions. This step ensures that the drag force remains accurate throughout the simulation.</p></li>
+<li><p><strong>Force Calculation and Integration</strong>: Within each iteration, we calculate the forces acting on the particles and update their positions and velocities using the leapfrog integration method.</p></li>
+<li><p><strong>Boundary Conditions and Data Saving</strong>: The simulation includes boundary conditions to mimic a wrapped cube environment. Additionally, particle position and mass data are saved at predefined intervals for analysis.</p></li>
+</ol>
+<p>This simulation loop provides a comprehensive and dynamic model of particle motion, taking into account physical factors and interactions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize counter for saving data</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize Counter for Saving Data and Start Timer</span>
 <span class="n">save_counter</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-<span class="c1"># initializes</span>
+<span class="c1"># Initial Calculations Before Starting the Simulation Loop</span>
 <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
 <span class="n">friction_factor_iter</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">nearest_match</span><span class="p">(</span>
     <span class="n">x_values</span><span class="o">=</span><span class="n">friction_factor_radius</span><span class="p">,</span>
@@ -741,16 +827,20 @@ Min Radius [m]:  tensor(3.9282e-10)
     <span class="n">x_new</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="c1"># Main Simulation Loop</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_iterations</span><span class="p">):</span>
 
+    <span class="c1"># Coagulation Step (Optional, based on specified interval)</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">interval_coagulation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c1"># calculate sweep and prune collision pairs</span>
-        <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+        <span class="c1"># Update radius for collision detection</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span>
+            <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+        <span class="c1"># Detect potential collision pairs</span>
         <span class="n">valid_collision_indices_pairs</span> <span class="o">=</span> <span class="n">particle_pairs</span><span class="o">.</span><span class="n">full_sweep_and_prune</span><span class="p">(</span>
-             <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span>
+            <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span>
 
+        <span class="c1"># Process collisions and update particle properties</span>
         <span class="k">if</span> <span class="n">valid_collision_indices_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c1"># Coalesce particles that have collided and update their velocity and mass</span>
             <span class="n">velocity</span><span class="p">,</span> <span class="n">mass</span> <span class="o">=</span> <span class="n">collisions</span><span class="o">.</span><span class="n">coalescence</span><span class="p">(</span>
                 <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
                 <span class="n">velocity</span><span class="o">=</span><span class="n">velocity</span><span class="p">,</span>
@@ -758,55 +848,53 @@ Min Radius [m]:  tensor(3.9282e-10)
                 <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
                 <span class="n">collision_indices_pairs</span><span class="o">=</span><span class="n">valid_collision_indices_pairs</span><span class="p">)</span>
 
-    <span class="c1"># NEW: calculate the friction factor for each particle</span>
-    <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">interval_friction_factor</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>       
-        <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+    <span class="c1"># Update Friction Factor (Optional, based on specified interval)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">interval_friction_factor</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span>
+            <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
         <span class="n">friction_factor_iter</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">nearest_match</span><span class="p">(</span>
             <span class="n">x_values</span><span class="o">=</span><span class="n">friction_factor_radius</span><span class="p">,</span>
             <span class="n">y_values</span><span class="o">=</span><span class="n">friction_factor_array</span><span class="p">,</span>
             <span class="n">x_new</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="c1"># Calculate the force acting on the particles (e.g., gravity)</span>
-    <span class="c1"># NEW: friction factor is opposite direction of velocity</span>
+    <span class="c1"># Calculate Forces (including updated friction factor)</span>
     <span class="n">force</span> <span class="o">=</span> <span class="n">mass</span> <span class="o">*</span> <span class="n">gravity</span> <span class="o">-</span> <span class="n">velocity</span> <span class="o">*</span> <span class="n">friction_factor_iter</span>
 
-    <span class="c1"># Integrate the equations of motion to update position and velocity</span>
+    <span class="c1"># Integrate Equations of Motion (Leapfrog Method)</span>
     <span class="n">position</span><span class="p">,</span> <span class="n">velocity</span> <span class="o">=</span> <span class="n">integration</span><span class="o">.</span><span class="n">leapfrog</span><span class="p">(</span>
         <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">velocity</span><span class="o">=</span><span class="n">velocity</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">TIME_STEP</span><span class="p">)</span>
 
-    <span class="c1"># Apply boundary conditions for the cube (wrap-around)</span>
+    <span class="c1"># Apply Boundary Conditions (Cube Wrap-around)</span>
     <span class="n">position</span> <span class="o">=</span> <span class="n">boundary</span><span class="o">.</span><span class="n">wrapped_cube</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">cube_side</span><span class="o">=</span><span class="n">CUBE_SIDE</span><span class="p">)</span>
 
-    <span class="c1"># Save the position and mass data at designated save points</span>
+    <span class="c1"># Save Data at Predefined Intervals</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">save_iterations</span><span class="p">[</span><span class="n">save_counter</span><span class="p">]:</span>
         <span class="n">save_position</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">save_counter</span><span class="p">]</span> <span class="o">=</span> <span class="n">position</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
         <span class="n">save_mass</span><span class="p">[:,</span> <span class="n">save_counter</span><span class="p">]</span> <span class="o">=</span> <span class="n">mass</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
         <span class="n">save_counter</span> <span class="o">+=</span> <span class="mi">1</span>
 
-<span class="c1"># Perform a final save of the position and mass data</span>
+<span class="c1"># Final Data Save and Calculation of Total Simulation Time</span>
 <span class="n">save_position</span><span class="p">[:,</span> <span class="p">:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">position</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 <span class="n">save_mass</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mass</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-
-<span class="c1"># Calculate the total simulation time</span>
 <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total wall time: </span><span class="si">{</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ratio of wall time to simulation time: </span><span class="si">{</span><span class="p">(</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">SIMULATION_TIME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;Ratio of wall time to simulation time: </span><span class="si">{</span><span class="p">(</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">SIMULATION_TIME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 18.72576093673706 seconds
-Ratio of wall time to simulation time: 0.1872576093673706
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 8.348026514053345 seconds
+Ratio of wall time to simulation time: 0.08348026514053344
 </pre></div>
 </div>
 </div>
 </div>
 </section>
-</section>
-<section id="plot-positions">
-<h2>Plot Positions<a class="headerlink" href="#plot-positions" title="Permalink to this heading">#</a></h2>
-<p>Compared to the previous notebook, now we have realistic particles with additional forces acting on them. These forces makup additional calculations that need to be done at each step. This means that the simulation will run slower. But by not calculating the new friciton factor at each step, and doing similar with coagulation, we can still run a reasonable factor of real time.</p>
+<section id="plotting-particle-positions">
+<h2>Plotting Particle Positions<a class="headerlink" href="#plotting-particle-positions" title="Permalink to this heading">#</a></h2>
+<p>After running the simulation, we’ll plot the particle positions to visualize their movement.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Processing the Final Data for Visualization</span>
@@ -822,6 +910,9 @@ Ratio of wall time to simulation time: 0.1872576093673706
 <span class="c1"># Calculate the radius and area of each particle</span>
 <span class="n">radius_final</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass_final</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
 <span class="n">particle_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_final</span><span class="o">**</span><span class="mi">2</span>
+<span class="c1"># normalize the area</span>
+<span class="n">particle_area</span> <span class="o">=</span> <span class="n">particle_area</span> <span class="o">/</span> <span class="n">particle_area</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
 
 <span class="c1"># Display the number of remaining particles</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of particles at the end: </span><span class="si">{</span><span class="n">filter_zero_mass</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -840,17 +931,17 @@ Ratio of wall time to simulation time: 0.1872576093673706
     <span class="n">position_final</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">filter_zero_mass</span><span class="p">],</span>
     <span class="n">c</span><span class="o">=</span><span class="n">mass_final</span><span class="p">[</span><span class="n">filter_zero_mass</span><span class="p">],</span>
     <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
-    <span class="n">s</span><span class="o">=</span><span class="n">particle_area</span><span class="p">[</span><span class="n">filter_zero_mass</span><span class="p">]</span>  <span class="c1"># Particle size based on area</span>
+    <span class="n">s</span><span class="o">=</span><span class="n">particle_area</span><span class="p">[</span><span class="n">filter_zero_mass</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span> <span class="c1"># scalled Particle size based on normalized area</span>
 <span class="p">)</span>
 
-<span class="c1"># Set axis limits based on cube dimensions</span>
+<span class="c1"># # Set axis limits based on cube dimensions</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="n">CUBE_SIDE</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">CUBE_SIDE</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="n">CUBE_SIDE</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">CUBE_SIDE</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="o">-</span><span class="n">CUBE_SIDE</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">CUBE_SIDE</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 
 <span class="c1"># Add a color bar indicating particle mass</span>
 <span class="n">color_bar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">scatter_plot</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-<span class="n">color_bar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">&#39;Mass&#39;</span><span class="p">)</span>
+<span class="n">color_bar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s1">&#39;Mass [kg]&#39;</span><span class="p">)</span>
 
 <span class="c1"># Show the plot with optimized layout</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -859,50 +950,79 @@ Ratio of wall time to simulation time: 0.1872576093673706
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 993
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 1510
 </pre></div>
 </div>
-<img alt="../../_images/f1c3eff70e3c23c552fd3280852ee79cf422ac25d638bc336592b482b5a63741.png" src="../../_images/f1c3eff70e3c23c552fd3280852ee79cf422ac25d638bc336592b482b5a63741.png" />
+<img alt="../../_images/ce6e55417aac803114ab29ffb23839c7c9bb9702feae96bc8d81fdfdb09c6732.png" src="../../_images/ce6e55417aac803114ab29ffb23839c7c9bb9702feae96bc8d81fdfdb09c6732.png" />
 </div>
 </div>
 </section>
-<section id="analyzing-the-mass-distribution-of-particles">
-<h2>Analyzing the Mass Distribution of Particles<a class="headerlink" href="#analyzing-the-mass-distribution-of-particles" title="Permalink to this heading">#</a></h2>
+<section id="size-distribution-of-particles">
+<h2>Size Distribution of Particles<a class="headerlink" href="#size-distribution-of-particles" title="Permalink to this heading">#</a></h2>
+<p>Given particle collision and coagulation, we’ll plot the distribution of particle sizes at the end of the simulation. This step ensures that the particle size distribution aligns with our expectations and the intended simulation parameters. That being, both a decrease in the number of particles and an increase in the average particle size.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualizing the Mass Distribution at Different Stages</span>
 
-<span class="c1"># Create a new figure for the histogram</span>
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">()</span>
-<span class="n">max_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">save_mass</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-<span class="c1"># Plot histograms of mass distribution at different stages</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">save_mass</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Final&#39;</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_mass</span><span class="p">))</span>
-
-<span class="c1"># Setting labels and title for the plot</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Mass&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Number of Particles&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
-<span class="c1"># Add a legend to the plot</span>
+<span class="c1"># plot initial radius distribution</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">machine_limit</span><span class="o">.</span><span class="n">safe_log10</span><span class="p">(</span><span class="n">radius_initial</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Initial&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">machine_limit</span><span class="o">.</span><span class="n">safe_log10</span><span class="p">(</span><span class="n">radius_final</span><span class="p">[</span><span class="n">filter_zero_mass</span><span class="p">]),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Final&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;log10 Radius (m)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Particles&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Initial Particle Radius Distribution&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-
-<span class="c1"># Display the plot</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="c1"># Adjust layout for optimal visualization</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial Max Radius [m]: &quot;</span><span class="p">,</span> <span class="n">radius_initial</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Final Max Radius [m]: &quot;</span><span class="p">,</span> <span class="n">radius_final</span><span class="p">[</span><span class="n">filter_zero_mass</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/3ca137a12ac72370a365a1ad67d4262bcea6de523dd1b7b3265c3cb064371dd5.png" src="../../_images/3ca137a12ac72370a365a1ad67d4262bcea6de523dd1b7b3265c3cb064371dd5.png" />
+<img alt="../../_images/5b8ea439ef3edf6e1972aee34493ec63dd8a0acf86489dcb5fb633a722cea1cb.png" src="../../_images/5b8ea439ef3edf6e1972aee34493ec63dd8a0acf86489dcb5fb633a722cea1cb.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial Max Radius [m]:  0.0006300950772128999
+Final Max Radius [m]:  0.0007361950668992882
+</pre></div>
+</div>
 </div>
 </div>
 </section>
-<section id="summary-of-smaller-particles">
-<h2>Summary of Smaller Particles<a class="headerlink" href="#summary-of-smaller-particles" title="Permalink to this heading">#</a></h2>
+<section id="summary-of-cloud-droplet-simulation">
+<h2>Summary of Cloud Droplet Simulation<a class="headerlink" href="#summary-of-cloud-droplet-simulation" title="Permalink to this heading">#</a></h2>
+<section id="achievements-in-realism">
+<h3>Achievements in Realism<a class="headerlink" href="#achievements-in-realism" title="Permalink to this heading">#</a></h3>
+<p>In this iteration of the cloud droplet simulation, we’ve significantly advanced towards realism:</p>
+<ul class="simple">
+<li><p><strong>Enhanced Initial Conditions</strong>: The simulation now starts with more realistically distributed particle sizes and velocities.</p></li>
+<li><p><strong>Inclusion of Friction Force</strong>: We’ve incorporated the friction force, an essential factor in accurately simulating particle dynamics.</p></li>
+<li><p><strong>Optional Coagulation</strong>: The simulation allows for the inclusion of coagulation, further adding to its complexity and realism.</p></li>
+</ul>
+</section>
+<section id="performance-considerations">
+<h3>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permalink to this heading">#</a></h3>
+<p>While these enhancements bring us closer to real-world scenarios, they also slow down the simulation. However, it still runs at a reasonable pace relative to real time.</p>
+</section>
+<section id="challenges-with-sub-micron-aerosols">
+<h3>Challenges with Sub-Micron Aerosols<a class="headerlink" href="#challenges-with-sub-micron-aerosols" title="Permalink to this heading">#</a></h3>
+<p>The next goal is to simulate sub-micron aerosol sizes accurately. The main challenge here lies in particle velocity:</p>
+<ul class="simple">
+<li><p><strong>High Speeds and Domain Size</strong>: At sub-micron scales, particles can travel multiple domain lengths in a single time step. This necessitates extremely small time steps for accuracy, which is computationally inefficient.</p></li>
+<li><p><strong>Domain Wrapping Issue</strong>: As observed in the final position plot, larger droplets end up at the domain’s top due to their high speeds and the wrap-around nature of the domain. This indicates the need for a different approach to handle fast-moving particles.</p></li>
+</ul>
+</section>
+<section id="positive-observations">
+<h3>Positive Observations<a class="headerlink" href="#positive-observations" title="Permalink to this heading">#</a></h3>
+<p>Despite these challenges, there are encouraging signs:</p>
+<ul class="simple">
+<li><p><strong>Evolving Size Distribution</strong>: The simulation shows a trend towards fewer, larger particles over time. This behavior mirrors what is expected in cloud formation, where larger particles are more likely to collide and grow.</p></li>
+</ul>
+</section>
+<section id="conclusion">
+<h3>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">#</a></h3>
+<p>These observations suggest that we are moving in the right direction towards a realistic and efficient simulation of particle dynamics. Future improvements will focus on addressing the challenges with sub-micron aerosols and further refining the simulation model.</p>
+</section>
 </section>
 </section>
 
@@ -969,14 +1089,35 @@ Ratio of wall time to simulation time: 0.1872576093673706
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#initialization">Initialization</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#friction-factor">Friction Factor</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-of-friction-factor">Implementation of Friction Factor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#initialization-of-particles">Initialization of Particles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-initial-conditions">Plotting Initial Conditions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particle-size-distribution">Particle Size Distribution</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particle-velocity-distribution">Particle Velocity Distribution</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-positions">Plot Positions</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analyzing-the-mass-distribution-of-particles">Analyzing the Mass Distribution of Particles</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-smaller-particles">Summary of Smaller Particles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#friction-factor-in-particle-dynamics">Friction Factor in Particle Dynamics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-the-friction-force">Understanding the Friction Force</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-representation">Mathematical Representation</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-the-friction-factor-in-the-simulation">Implementing the Friction Factor in the Simulation</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#efficiency-considerations">Efficiency Considerations</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#current-approach">Current Approach</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-particle-simulation">Running the Particle Simulation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-particle-positions">Plotting Particle Positions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#size-distribution-of-particles">Size Distribution of Particles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-cloud-droplet-simulation">Summary of Cloud Droplet Simulation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#achievements-in-realism">Achievements in Realism</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#performance-considerations">Performance Considerations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenges-with-sub-micron-aerosols">Challenges with Sub-Micron Aerosols</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#positive-observations">Positive Observations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
