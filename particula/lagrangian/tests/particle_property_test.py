@@ -78,3 +78,16 @@ def test_random_thermal_velocity():
         number_of_particles=num_particles
     )
     assert velocities.shape[1] == num_particles
+
+
+def test_nearest_match():
+    """test nearest match function"""
+    # Example usage
+    x = torch.tensor([0.0, 1.0, 2.0, 3.0, 4.0], dtype=torch.float)
+    y = torch.tensor([0.0, 0.5, 1.0, 1.5, 2.0], dtype=torch.float)
+    x_new = torch.tensor([0.5, 1.5, 2.5, 3.5], dtype=torch.float)
+
+    # Nearest neighbor interpolation
+    y_new_nearest = particle_property.nearest_match(x, y, x_new)
+    expected = torch.tensor([0.0, 0.5, 1.0, 1.5])
+    assert torch.allclose(y_new_nearest, expected, atol=1e-4)
