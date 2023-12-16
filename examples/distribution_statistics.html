@@ -213,6 +213,7 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1 has-children"><a class="reference internal" href="lagrangian/lagrangian_intro.html">Lagrangian Particle Model</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="lagrangian/basic_lagrangian_box.html">Introduction to the Lagrangian Box Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lagrangian/sweep_and_prune.html">Sweep and Prune Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lagrangian/friction_force.html">Realistic Drag, Mass, and Velocity</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="equilibria/equilibria_intro.html">Equilibria of Aerosols</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -646,28 +647,8 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">7</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="k">def</span> <span class="nf">pdf_volume_total</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">pdf_distribution</span><span class="p">):</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">pdf_distribution</span><span class="o">*</span> <span class="mi">4</span><span class="o">/</span><span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span>
-<span class="ne">----&gt; </span><span class="mi">7</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total number of the PDF, </span><span class="si">{</span><span class="n">pdf_total</span><span class="p">(</span><span class="n">default_distribution</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span><span class="w"> </span><span class="n">default_distribution</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">())</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total volume of the PDF, </span><span class="si">{</span><span class="n">pdf_volume_total</span><span class="p">(</span><span class="n">default_distribution</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">,</span><span class="w"> </span><span class="n">default_distribution</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">())</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-<span class="nn">Cell In[5], line 2,</span> in <span class="ni">pdf_total</span><span class="nt">(radius, pdf_distribution)</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="k">def</span> <span class="nf">pdf_total</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">pdf_distribution</span><span class="p">):</span>
-<span class="ne">----&gt; </span><span class="mi">2</span>     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">pdf_distribution</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/pint/facets/numpy/quantity.py:66,</span> in <span class="ni">NumpyQuantity.__array_function__</span><span class="nt">(self, func, types, args, kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">65</span> <span class="k">def</span> <span class="nf">__array_function__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">types</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
-<span class="ne">---&gt; </span><span class="mi">66</span>     <span class="k">return</span> <span class="n">numpy_wrap</span><span class="p">(</span><span class="s2">&quot;function&quot;</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">types</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.6/x64/lib/python3.11/site-packages/pint/facets/numpy/numpy_func.py:1034,</span> in <span class="ni">numpy_wrap</span><span class="nt">(func_type, func, args, kwargs, types)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1032</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">handled</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">is_upcast_type</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">):</span>
-<span class="g g-Whitespace">   </span><span class="mi">1033</span>     <span class="k">return</span> <span class="bp">NotImplemented</span>
-<span class="ne">-&gt; </span><span class="mi">1034</span> <span class="k">return</span> <span class="n">handled</span><span class="p">[</span><span class="n">name</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="ne">TypeError</span>: _trapz() missing 1 required positional argument: &#39;a&#39;
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total number of the PDF, 99989997132.11078 / meter ** 3
+Total volume of the PDF, 5.237475060187453e-10 dimensionless
 </pre></div>
 </div>
 </div>
@@ -778,8 +759,8 @@ Total volume of the PDF, 0.0003653651719983997 dimensionless
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/a0aa1896e46089fd1549a3b55404ebe7dc5307979a5ce4867d781d95acd5d703.png" src="../_images/a0aa1896e46089fd1549a3b55404ebe7dc5307979a5ce4867d781d95acd5d703.png" />
-<img alt="../_images/0c201138dab0eecbd6f4e1832a2581b55829e9926c87b25542ba5b29ab7fabea.png" src="../_images/0c201138dab0eecbd6f4e1832a2581b55829e9926c87b25542ba5b29ab7fabea.png" />
+<img alt="../_images/c51652afa1098fefd6627188bb39cbe2f5bf69c548648cf9d79a1353da06ddfc.png" src="../_images/c51652afa1098fefd6627188bb39cbe2f5bf69c548648cf9d79a1353da06ddfc.png" />
+<img alt="../_images/58af24f477a4fc8e77e1262161ce7a128bb01f0c45acfd0e041c3fc9a71639b5.png" src="../_images/58af24f477a4fc8e77e1262161ce7a128bb01f0c45acfd0e041c3fc9a71639b5.png" />
 </div>
 </div>
 </section>

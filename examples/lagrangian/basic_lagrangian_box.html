@@ -211,6 +211,7 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="lagrangian_intro.html">Lagrangian Particle Model</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Introduction to the Lagrangian Box Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sweep_and_prune.html">Sweep and Prune Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="friction_force.html">Realistic Drag, Mass, and Velocity</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../equilibria/equilibria_intro.html">Equilibria of Aerosols</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -681,7 +682,7 @@ document.write(`
 
     <span class="c1"># Adjust distances for the radius of each particle (surface-to-surface</span>
     <span class="c1"># distance)</span>
-    <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
     <span class="n">distance_matrix</span> <span class="o">-=</span> <span class="n">radius</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">radius</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="c1"># Identify pairs of particles that have collided</span>
@@ -726,8 +727,8 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 15.512137651443481 seconds
-Ratio of wall time to simulation time: 0.1551213765144348
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 15.764200925827026 seconds
+Ratio of wall time to simulation time: 0.15764200925827027
 </pre></div>
 </div>
 </div>
@@ -749,7 +750,7 @@ Ratio of wall time to simulation time: 0.1551213765144348
 <span class="n">filter_zero_mass</span> <span class="o">=</span> <span class="n">mass_final</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
 <span class="c1"># Calculate the radius and area of each particle</span>
-<span class="n">radius_final</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass_final</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+<span class="n">radius_final</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass_final</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
 <span class="n">particle_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_final</span><span class="o">**</span><span class="mi">2</span>
 
 <span class="c1"># Display the number of remaining particles</span>
