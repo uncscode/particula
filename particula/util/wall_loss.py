@@ -9,41 +9,147 @@ from particula.util.settling_velocity import psv
 from particula.util.diffusion_coefficient import pdc
 
 
+def spherical_wall_loss_coefficient(
+    ktp_value,
+    diffusion_coefficient_value,
+    chamber_radius,
+    settling_velocity_value
+):
+    """Calculate the wall loss coefficient for a spherical chamber
+        approximation.
+
+    Args:
+        ktp_value: ?? turbulent parameter ??
+        diffusion_coefficient_value: Particle diffusion coefficient.
+        chamber_radius: Radius of the chamber.
+        settling_velocity_value: Settling velocity of the particle.
+
+    Returns:
+        The calculated wall loss coefficient for simple case.
+    """
+    return (
+        6 * np.sqrt(ktp_value * diffusion_coefficient_value) /
+        (np.pi * chamber_radius) * df1(
+            np.pi * settling_velocity_value /
+            (2 * np.sqrt(ktp_value * diffusion_coefficient_value))
+        ) + settling_velocity_value / (4 * chamber_radius / 3)
+    )
+
+
+def rectangle_wall_loss(
+    ktp_value,
+    diffusion_coefficient_value,
+    settling_velocity_value,
+    dimensions
+):
+    """
+    Calculate the wall loss coefficient, β₀, for a rectangular chamber.
+
+    Given the turbulent mixing parameter (ktp_value), the particle diffusion
+    coefficient (diffusion_coefficient_value), and the terminal settling
+    velocity (settling_velocity_value), this function computes the wall loss
+    coefficient for a rectangular-prism chamber with specified dimensions.
+
+    The wall loss coefficient is calculated based on the diffusion and
+    gravitational sedimentation in a rectangular chamber. It accounts for the
+    effect of chamber geometry on particle loss by considering the length (L),
+    width (W), and height (H) of the chamber.
+
+    Args:
+        ktp_value (float): The turbulent mixing parameter in units of inverse
+            seconds (s^-1).
+        diffusion_coefficient_value (float): The particle diffusion
+            coefficient in units of square meters per second (m^2/s).
+        settling_velocity_value (float): The terminal settling velocity of the
+            particles, in units of meters per second (m/s).
+        dimensions (tuple): A tuple of three floats representing the length (L)
+            width (W), and height (H) of the rectangular chamber,
+            in units of meters (m).
+
+    Returns:
+        float: The calculated wall loss coefficient (B0) for the rectangular
+        chamber.
+
+    Reference:
+        The wall loss coefficient, β₀, is calculated using the following
+        formula:
+        $$
+        \beta_0 = (LWH)^{-1} (4H(L+W) \\sqrt{k_t D}/\\pi +
+        v_g LW \\coth{[(\\pi v_g)/(4\\sqrt{k_t D}})])
+        $$
+    """
+    L, W, H = dimensions  # Unpack the dimensions tuple
+    # Using 1/tanh(x) for coth(x)
+    coth_vg_kt_d = 1 / np.tanh(
+        (np.pi * settling_velocity_value)
+        / (4 * np.sqrt(ktp_value * diffusion_coefficient_value))
+        )
+    return (L * W * H)**-1 * (
+        4 * H * (L + W) * np.sqrt(ktp_value * diffusion_coefficient_value)
+        / np.pi
+        + settling_velocity_value * L * W * coth_vg_kt_d)
+
+
 def wlc(
     approx="none",
-    ktp_val=0.1 * u.s**-1,
-    pdc_val=None,
-    crad=None,
-    psv_val=None,
+    ktp_value=0.1 * u.s**-1,
+    diffusion_coefficient_value=None,
+    dimensions=None,
+    settling_velocity_value=None,
     **kwargs
 ):
-    """ calculate the dilution loss coefficient
+    """Calculate the wall loss coefficient.
+
+    Args:
+        approximation: The approximation method to use, e.g., "none",
+        "spherical", "rectangle"
+        ktp_value: ??turbulent parameter??
+        diffusion_coefficient_value: Particle diffusion coefficient.
+        dimensions: Radius of the chamber or tuple of rectangular dimensions.
+        settling_velocity_value: Settling velocity of the particle.
+
+    Returns:
+        The calculated wall loss coefficient.
     """
 
     if approx == "none":
         return 0.0
 
-    if approx == "simple":
-        ktp_val = in_handling(ktp_val, u.s**-1)
-        pdc_val = in_handling(
-            pdc_val, u.m**2 / u.s) if pdc_val is not None else (
-                pdc(**kwargs)
-            )
-        psv_val = in_handling(
-            psv_val, u.m / u.s) if psv_val is not None else (
-                psv(**kwargs)
-        )
-        crad = in_handling(
-            crad, u.m) if crad is not None else (
-                1 * u.m
+    if approx == "simple" or approx == "spherical":
+        # input checks
+        ktp_value = in_handling(ktp_value, u.s**-1)
+        diffusion_coefficient_value = in_handling(
+            diffusion_coefficient_value, u.m**2 / u.s
+        ) if diffusion_coefficient_value is not None else pdc(**kwargs)
+
+        settling_velocity_value = in_handling(
+            settling_velocity_value, u.m / u.s
+        ) if settling_velocity_value is not None else psv(**kwargs)
+
+        chamber_radius = in_handling(
+            dimensions, u.m
+        ) if dimensions is not None else 1 * u.m
+
+        # calculation of the wall loss coefficient
+        return spherical_wall_loss_coefficient(
+            ktp_value=ktp_value,
+            diffusion_coefficient_value=diffusion_coefficient_value,
+            chamber_radius=chamber_radius,
+            settling_velocity_value=settling_velocity_value
         )
 
-        return (
-            6 * np.sqrt(ktp_val * pdc_val) / (np.pi * crad) *
-            df1(
-                np.pi * psv_val / (2 * np.sqrt(ktp_val * pdc_val))
-            ) +
-            psv_val / (4 * crad / 3)
+    if approx == "rectangle":
+        if dimensions is None:
+            # Default dimensions if not provided
+            dimensions = (1 * u.m, 1 * u.m, 1 * u.m)
+        else:
+            dimensions = tuple(in_handling(dim, u.m) for dim in dimensions)
+
+        return rectangle_wall_loss(
+            ktp_value=ktp_value,
+            diffusion_coefficient_value=diffusion_coefficient_value,
+            settling_velocity_value=settling_velocity_value,
+            dimensions=dimensions
         )
 
     return 0
