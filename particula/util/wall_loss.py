@@ -115,7 +115,7 @@ def wlc(
     if approx == "none":
         return 0.0
 
-    if approx == "simple" or approx == "spherical":
+    if approx in ["simple", "spherical"]:
         # input checks
         ktp_value = in_handling(ktp_value, u.s**-1)
         diffusion_coefficient_value = in_handling(
