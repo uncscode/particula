@@ -78,16 +78,16 @@ def rectangle_wall_loss(
         v_g LW \\coth{[(\\pi v_g)/(4\\sqrt{k_t D}})])
         $$
     """
-    L, W, H = dimensions  # Unpack the dimensions tuple
+    l, w, h = dimensions  # Unpack the dimensions tuple
     # Using 1/tanh(x) for coth(x)
     coth_vg_kt_d = 1 / np.tanh(
         (np.pi * settling_velocity_value)
         / (4 * np.sqrt(ktp_value * diffusion_coefficient_value))
         )
-    return (L * W * H)**-1 * (
-        4 * H * (L + W) * np.sqrt(ktp_value * diffusion_coefficient_value)
+    return (l * w * h)**-1 * (
+        4 * h * (l + w) * np.sqrt(ktp_value * diffusion_coefficient_value)
         / np.pi
-        + settling_velocity_value * L * W * coth_vg_kt_d)
+        + settling_velocity_value * l * w * coth_vg_kt_d)
 
 
 def wlc(
