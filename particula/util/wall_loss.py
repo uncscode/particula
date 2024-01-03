@@ -95,7 +95,7 @@ def wlc(
     approx="none",
     ktp_value=0.1 * u.s**-1,
     diffusion_coefficient_value=None,
-    dimensions=None,
+    dimensions=1 * u.m,
     settling_velocity_value=None,
     **kwargs
 ):
