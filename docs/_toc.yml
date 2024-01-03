@@ -23,7 +23,7 @@ parts:
     - file: examples/streamlake/stream_stats_size_distribution_part2
   - file: examples/wall_loss_section
     sections:
-    - file: examples/chamber_smps_data
+    - file: examples/wall_loss/chamber_smps_data
   - file: examples/lagrangian/lagrangian_intro
     sections:
     - file: examples/lagrangian/basic_lagrangian_box
