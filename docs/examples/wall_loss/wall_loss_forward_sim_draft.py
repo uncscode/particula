@@ -13,12 +13,14 @@ from particula.util.dimensionless_coagulation import full_coag
 
 # %%
 simple_dic_kwargs = {
-    "mode": 200e-9,  # 200 nm median
+    "mode": 100e-9,  # 200 nm median
     "nbins": 500,  # 1000 bins
-    "nparticles": 1e6,  # 1e4 #
+    "nparticles": 8e4,  # 1e4 #
     "volume": 1e-6,  # per 1e-6 m^3 (or 1 cc)
     "gsigma": 1.5,  # relatively narrow
     "dilution_rate_coefficient": 0.1 * u.hour**-1,
+    "wall_loss_approximation": "spherical",
+    "chamber_radius": 1 * u.m
 }
 
 
@@ -26,7 +28,7 @@ simple_dic_kwargs = {
 particle_dist2 = particle.Particle(**simple_dic_kwargs)
 
 # inital distribution coag kernel
-time_array = np.linspace(0, 1000, 100)
+time_array = np.linspace(0, 60*60*1, 100)
 
 
 # call the solver
@@ -40,11 +42,11 @@ rates_kwargs = {
 
 solution2 = Solver(
     time_span=time_array,
-    do_coagulation=True,
+    do_coagulation=False,
     do_condensation=False,
     do_nucleation=False,
-    do_dilution=True,
-    do_wall_loss=False,
+    do_dilution=False,
+    do_wall_loss=True,
     **rates_kwargs
 ).solution(method='solve_ivp')
 
