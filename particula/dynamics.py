@@ -67,7 +67,7 @@ class Solver(Rates):
 
         if method == 'solve_ivp':
             if 'method' not in kwargs_ode:
-                kwargs_ode['method'] = 'BDF' # Choose an appropriate method
+                kwargs_ode['method'] = 'BDF'  # Choose an appropriate method
             return solve_ivp(
                 fun=self._ode_func,
                 t_span=(self.time_span[0], self.time_span[-1]),
