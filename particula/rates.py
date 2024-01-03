@@ -108,10 +108,17 @@ class Rates:
             self.particle_distribution
         )
 
-    def sum_rates(self, coagulation=True, condensation=True, nucleation=True):
+    def sum_rates(
+            self,
+            coagulation=True,
+            condensation=True,
+            nucleation=True,
+            dilution=False,
+            wall_loss=False,
+    ):  # pylint: disable=too-many-arguments
         """Sum rates, with options to disable individual rate terms.
 
-        Parameters
+        Args:
         ----------
         coagulation : bool, optional
             does the coagulation calcuation, by default True
@@ -119,22 +126,29 @@ class Rates:
             does the condensation calculation, by default True
         nucleation : bool, optional
             does the nucleation calculation, by default True
+        dilution : bool, optional
+            does the dilution calculation, by default False
+        wall_loss : bool, optional
+            does the wall loss calculation, by default False
 
-        TODO: add wall and dilution loss rates
         """
 
         # Define a dictionary that maps option names to rate functions
         rates = {
             'coagulation': self.coagulation_rate,
             'condensation': self.condensation_growth_rate,
-            'nucleation': self.nucleation_rate
+            'nucleation': self.nucleation_rate,
+            'dilution': self.dilution_rate,
+            'wall_loss': self.wall_loss_rate,
         }
 
         # Define a dictionary that maps option names to their Boolean values
         options = {
             'coagulation': coagulation,
             'condensation': condensation,
-            'nucleation': nucleation
+            'nucleation': nucleation,
+            'dilution': dilution,
+            'wall_loss': wall_loss,
         }
         # Return the sum of the rates that are enabled
         return sum(
