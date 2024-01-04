@@ -723,8 +723,7 @@ document.write(`
 <p>Each simulation uses the <code class="docutils literal notranslate"><span class="pre">Solver</span></code> class with the Ordinary Differential Equation integration method (<code class="docutils literal notranslate"><span class="pre">odeint</span></code>). By running these simulations and analyzing the resulting particle distributions, we can discern the roles and significances of coagulation, dilution, and wall loss in shaping aerosol populations within controlled chamber environments. These insights are crucial for accurate modeling and prediction of aerosol behavior in both laboratory and atmospheric conditions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Simulation with Coagulation and Dilution</span>
-<span class="c1"># This simulation includes particle coagulation and dilution from the chamber.</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This simulation includes particle coagulation and dilution from the chamber.</span>
 <span class="n">solution_coag_dil</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span>
     <span class="n">time_span</span><span class="o">=</span><span class="n">time_array</span><span class="p">,</span>
     <span class="n">do_coagulation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Enable coagulation process</span>
@@ -735,7 +734,6 @@ document.write(`
     <span class="o">**</span><span class="n">rates_kwargs</span>
 <span class="p">)</span><span class="o">.</span><span class="n">solution</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;odeint&#39;</span><span class="p">)</span>
 
-<span class="c1"># Simulation with Coagulation, Dilution, and Wall Loss</span>
 <span class="c1"># This simulation includes particle coagulation, dilution, and wall loss</span>
 <span class="c1"># (deposition).</span>
 <span class="n">solution_coag_dil_wall</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span>
@@ -748,7 +746,6 @@ document.write(`
     <span class="o">**</span><span class="n">rates_kwargs</span>
 <span class="p">)</span><span class="o">.</span><span class="n">solution</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;odeint&#39;</span><span class="p">)</span>
 
-<span class="c1"># Simulation with Dilution and Wall Loss</span>
 <span class="c1"># This simulation includes only dilution and wall loss (deposition)</span>
 <span class="c1"># without coagulation.</span>
 <span class="n">solution_dil_wall</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">(</span>
