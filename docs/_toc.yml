@@ -29,6 +29,7 @@ parts:
     sections:
     - file: examples/lagrangian/basic_lagrangian_box
     - file: examples/lagrangian/sweep_and_prune
+    - file: examples/lagrangian/friction_force
   - file: examples/equilibria/equilibria_intro
     sections:
     - file: examples/equilibria/activity_part1
