@@ -24,6 +24,7 @@ parts:
   - file: examples/wall_loss_section
     sections:
     - file: examples/wall_loss/chamber_smps_data
+    - file: examples/wall_loss/wall_loss_forward_simulation
   - file: examples/lagrangian/lagrangian_intro
     sections:
     - file: examples/lagrangian/basic_lagrangian_box
