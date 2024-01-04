@@ -18,7 +18,7 @@ class Solver(Rates):
         do_dilution=False,
         do_wall_loss=False,
         **kwargs
-    ):
+    ):  # pylint: disable=too-many-arguments
         """ constructor
         """
         super().__init__(**kwargs)

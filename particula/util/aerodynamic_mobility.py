@@ -17,7 +17,7 @@ def pam(
     """
     rad = in_radius(radius)
     scf_val = in_scalar(
-        scf_val) if scf_val is not None else scf(radius=rad, **kwargs) 
+        scf_val) if scf_val is not None else scf(radius=rad, **kwargs)
 
     # dyn_vis has no radius, is this a bug waiting to happen?
     vis_val = in_viscosity(
