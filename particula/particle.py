@@ -23,6 +23,9 @@ from particula.util.reduced_quantity import reduced_quantity as redq
 from particula.util.rms_speed import cbar
 from particula.util.slip_correction import scf
 from particula.util.vapor_flux import phi
+from particula.util.settling_velocity import psv
+from particula.util.aerodynamic_mobility import pam
+from particula.util.diffusion_coefficient import pdc
 from particula.util.wall_loss import wlc
 from particula.util.kelvin_correction import kelvin_term
 from particula.vapor import Vapor
@@ -221,6 +224,33 @@ class ParticleInstances(ParticleDistribution):
             scf=self.slip_correction_factor(),
         )
 
+    def settling_velocity(self):
+        """ Returns a particle's settling velocity.
+        """
+        return psv(
+            rad=self.particle_radius,
+            den=self.particle_density,
+            scf_val=self.slip_correction_factor(),
+            vis_val=self.dynamic_viscosity(),
+        )
+
+    def aerodynamic_mobility(self):
+        """ Returns a particle's aerodynamic mobility.
+        """
+        return pam(
+            radius=self.particle_radius,
+            scf_val=self.slip_correction_factor(),
+            vis_val=self.dynamic_viscosity(),
+        )
+
+    def diffusion_coefficient(self):
+        """ Returns a particle's diffusion coefficient.
+        """
+        return pdc(
+            temperature=self.temperature,
+            pam_val=self.aerodynamic_mobility(),
+        )
+
 
 class ParticleCondensation(ParticleInstances):
     """ calculate some condensation stuff
@@ -332,8 +362,12 @@ class ParticleWallLoss(ParticleCondensation):
         self.wall_loss_approximation = str(
             kwargs.get("wall_loss_approximation", "none")
         )
-        self.chamber_radius = in_length(
-            kwargs.get("chamber_radius", 3)
+        self.chamber_dimensions = in_length(
+            kwargs.get("chamber_dimensions", 1)
+        )
+        self.chamber_ktp_value = in_handling(
+            kwargs.get("chamber_ktp_value", 0.1),
+            u.s**-1
         )
         self.kwargs = kwargs
 
@@ -341,8 +375,12 @@ class ParticleWallLoss(ParticleCondensation):
         """ Returns a particle's wall loss coefficient.
         """
         return wlc(
-            approx=self.wall_loss_approximation
-        )
+            approx=self.wall_loss_approximation,
+            ktp_value=self.chamber_ktp_value,
+            diffusion_coefficient_value=self.diffusion_coefficient(),
+            dimensions=self.chamber_dimensions,
+            settling_velocity_value=self.settling_velocity(),
+            )
 
 
 class Particle(ParticleWallLoss):

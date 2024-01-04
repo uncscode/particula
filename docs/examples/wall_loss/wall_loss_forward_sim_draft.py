@@ -3,13 +3,10 @@
 
 # %%
 from particula import u
-from particula.util.simple_solver import SimpleSolver
 from particula.dynamics import Solver
-from particula.rates import Rates
 from particula import particle
 import numpy as np
 from matplotlib import pyplot as plt
-from particula.util.dimensionless_coagulation import full_coag
 
 # %%
 simple_dic_kwargs = {
@@ -20,7 +17,8 @@ simple_dic_kwargs = {
     "gsigma": 1.5,  # relatively narrow
     "dilution_rate_coefficient": 0.1 * u.hour**-1,
     "wall_loss_approximation": "spherical",
-    "chamber_radius": 1 * u.m
+    "chamber_dimension": 1 * u.m,
+    "chamber_ktp_value": 0.5 * u.s**-1,
 }
 
 
@@ -28,7 +26,7 @@ simple_dic_kwargs = {
 particle_dist2 = particle.Particle(**simple_dic_kwargs)
 
 # inital distribution coag kernel
-time_array = np.linspace(0, 60*60*1, 100)
+time_array = np.linspace(0, 60*60*5, 100)
 
 
 # call the solver
@@ -45,12 +43,11 @@ solution2 = Solver(
     do_coagulation=False,
     do_condensation=False,
     do_nucleation=False,
-    do_dilution=False,
+    do_dilution=True,
     do_wall_loss=True,
     **rates_kwargs
-).solution(method='solve_ivp')
+).solution(method='odeint')
 
-print(solution2.shape)
 #%%
 # plot
 fig, ax = plt.subplots(1, 1, figsize=[9, 6])
