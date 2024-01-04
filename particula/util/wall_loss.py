@@ -12,8 +12,8 @@ from particula.util.diffusion_coefficient import pdc
 def spherical_wall_loss_coefficient(
     ktp_value,
     diffusion_coefficient_value,
-    chamber_radius,
-    settling_velocity_value
+    settling_velocity_value,
+    chamber_radius
 ):
     """Calculate the wall loss coefficient for a spherical chamber
         approximation.
@@ -21,8 +21,8 @@ def spherical_wall_loss_coefficient(
     Args:
         ktp_value: rate of the wall eddy diffusivity
         diffusion_coefficient_value: Particle diffusion coefficient.
-        chamber_radius: Radius of the chamber.
         settling_velocity_value: Settling velocity of the particle.
+        chamber_radius: Radius of the chamber.
 
     Returns:
         The calculated wall loss coefficient for simple case.
@@ -106,8 +106,8 @@ def wlc(
         "spherical", "rectangle"
         ktp_value: rate of the wall eddy diffusivity
         diffusion_coefficient_value: Particle diffusion coefficient.
-        dimension: Radius of the chamber or tuple of rectangular dimensions.
         settling_velocity_value: Settling velocity of the particle.
+        dimension: Radius of the chamber or tuple of rectangular dimensions.
 
     Returns:
         The calculated wall loss coefficient.
@@ -135,8 +135,8 @@ def wlc(
         return spherical_wall_loss_coefficient(
             ktp_value=ktp_value,
             diffusion_coefficient_value=diffusion_coefficient_value,
-            chamber_radius=chamber_radius,
-            settling_velocity_value=settling_velocity_value
+            settling_velocity_value=settling_velocity_value,
+            chamber_radius=chamber_radius
         )
 
     if approx == "rectangle":
