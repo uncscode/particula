@@ -15,9 +15,9 @@ simple_dic_kwargs = {
     "nparticles": 8e4,  # 1e4 #
     "volume": 1e-6,  # per 1e-6 m^3 (or 1 cc)
     "gsigma": 1.5,  # relatively narrow
-    "dilution_rate_coefficient": 0.1 * u.hour**-1,
-    "wall_loss_approximation": "spherical",
-    "chamber_dimension": 1 * u.m,
+    "dilution_rate_coefficient": 0.2 * u.hour**-1,
+    "wall_loss_approximation": "rectangle",
+    "chamber_dimension": [0.5 , 0.5 , 1 ]*u.m,
     "chamber_ktp_value": 0.5 * u.s**-1,
 }
 
@@ -26,7 +26,7 @@ simple_dic_kwargs = {
 particle_dist2 = particle.Particle(**simple_dic_kwargs)
 
 # inital distribution coag kernel
-time_array = np.linspace(0, 60*60*5, 100)
+time_array = np.linspace(0, 60*60*1, 100)
 
 
 # call the solver
@@ -40,7 +40,7 @@ rates_kwargs = {
 
 solution2 = Solver(
     time_span=time_array,
-    do_coagulation=False,
+    do_coagulation=True,
     do_condensation=False,
     do_nucleation=False,
     do_dilution=True,

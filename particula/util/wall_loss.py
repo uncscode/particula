@@ -40,7 +40,7 @@ def rectangle_wall_loss(
     ktp_value,
     diffusion_coefficient_value,
     settling_velocity_value,
-    dimensions
+    dimension
 ):
     """
     Calculate the wall loss coefficient, β₀, for a rectangular chamber.
@@ -63,7 +63,7 @@ def rectangle_wall_loss(
             coefficient in units of square meters per second (m^2/s).
         settling_velocity_value (float): The terminal settling velocity of the
             particles, in units of meters per second (m/s).
-        dimensions (tuple): A tuple of three floats representing the length (L)
+        dimension (tuple): A tuple of three floats representing the length (L)
             width (W), and height (H) of the rectangular chamber,
             in units of meters (m).
 
@@ -79,7 +79,7 @@ def rectangle_wall_loss(
         v_g LW \\coth{[(\\pi v_g)/(4\\sqrt{k_t D}})])
         $$
     """
-    l, w, h = dimensions  # Unpack the dimensions tuple
+    l, w, h = dimension  # Unpack the dimensions tuple
     # Using 1/tanh(x) for coth(x)
     coth_vg_kt_d = 1 / np.tanh(
         (np.pi * settling_velocity_value)
@@ -95,7 +95,7 @@ def wlc(
     approx="none",
     ktp_value=0.1 * u.s**-1,
     diffusion_coefficient_value=None,
-    dimensions=1 * u.m,
+    dimension=1 * u.m,
     settling_velocity_value=None,
     **kwargs
 ):
@@ -106,7 +106,7 @@ def wlc(
         "spherical", "rectangle"
         ktp_value: rate of the wall eddy diffusivity
         diffusion_coefficient_value: Particle diffusion coefficient.
-        dimensions: Radius of the chamber or tuple of rectangular dimensions.
+        dimension: Radius of the chamber or tuple of rectangular dimensions.
         settling_velocity_value: Settling velocity of the particle.
 
     Returns:
@@ -128,8 +128,8 @@ def wlc(
         ) if settling_velocity_value is not None else psv(**kwargs)
 
         chamber_radius = in_handling(
-            dimensions, u.m
-        ) if dimensions is not None else 1 * u.m
+            dimension, u.m
+        ) if dimension is not None else 1 * u.m
 
         # calculation of the wall loss coefficient
         return spherical_wall_loss_coefficient(
@@ -140,17 +140,17 @@ def wlc(
         )
 
     if approx == "rectangle":
-        if dimensions is None:
+        if dimension is None:
             # Default dimensions if not provided
-            dimensions = (1 * u.m, 1 * u.m, 1 * u.m)
+            dimension = (1 * u.m, 1 * u.m, 1 * u.m)
         else:
-            dimensions = tuple(in_handling(dim, u.m) for dim in dimensions)
+            dimension = tuple(in_handling(dim, u.m) for dim in dimension)
 
         return rectangle_wall_loss(
             ktp_value=ktp_value,
             diffusion_coefficient_value=diffusion_coefficient_value,
             settling_velocity_value=settling_velocity_value,
-            dimensions=dimensions
+            dimension=dimension
         )
 
     return 0

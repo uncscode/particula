@@ -362,8 +362,8 @@ class ParticleWallLoss(ParticleCondensation):
         self.wall_loss_approximation = str(
             kwargs.get("wall_loss_approximation", "none")
         )
-        self.chamber_dimensions = in_length(
-            kwargs.get("chamber_dimensions", 1)
+        self.chamber_dimension = in_length(
+            kwargs.get("chamber_dimension", 1)
         )
         self.chamber_ktp_value = in_handling(
             kwargs.get("chamber_ktp_value", 0.1),
@@ -378,7 +378,7 @@ class ParticleWallLoss(ParticleCondensation):
             approx=self.wall_loss_approximation,
             ktp_value=self.chamber_ktp_value,
             diffusion_coefficient_value=self.diffusion_coefficient(),
-            dimensions=self.chamber_dimensions,
+            dimension=self.chamber_dimension,
             settling_velocity_value=self.settling_velocity(),
             )
 
