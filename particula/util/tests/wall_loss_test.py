@@ -4,18 +4,13 @@ Test the wall loss functions.
 
 import numpy as np
 
-from particula import u
-from particula.util.input_handling import in_handling
-from particula.util.debye_function import df1
-from particula.util.settling_velocity import psv
-from particula.util.diffusion_coefficient import pdc
 from particula.util.wall_loss import (
     spherical_wall_loss_coefficient,
-    rectangle_wall_loss,
-    wlc)
+    rectangle_wall_loss)
 
 
 def test_spherical_wall_loss_coefficient():
+    """test the spherical wall loss coefficient function"""
     # Test case with hypothetical values
     ktp_value = 1.5  # Example value
     diffusion_coefficient_value = 0.01  # Example value
@@ -37,6 +32,7 @@ def test_spherical_wall_loss_coefficient():
 
 
 def test_rectangle_wall_loss():
+    """test the rectangular wall loss coefficient function"""
     # Test case with hypothetical values
     ktp_value = 1.5  # Example value
     diffusion_coefficient_value = 0.01  # Example value
