@@ -141,4 +141,104 @@ plt.show()
 
 # %%
 
+time_pairs = [5, 30]
+start_number = stream_smps_2d.data[time_pairs[0], :]
+end_number = stream_smps_2d.data[time_pairs[1], :]
+time_span = stream_smps_2d.time[time_pairs[1]] \
+    - stream_smps_2d.time[time_pairs[0]]
 
+radius_bins = stream_smps_2d.header_float * 1e-9  # convert to m
+
+# chamber flow rates
+chamber_push = 1.2  # L/min
+chamber_dillution = 1.2  # L/min
+
+CHAMBER_VOLUME = 908.2  # L
+
+k_rate_chamber_min = chamber_push / CHAMBER_VOLUME
+k_rate_chamber_hr = k_rate_chamber_min * 60
+
+#%%
+# Define initial simulation parameters
+simple_dic_kwargs = {
+    "particle_radius": radius_bins,  # Number of bins for size distribution
+    "particle_number": start_number,  # Total number of particles
+    "particle_density": 1.8e3,  # Density of particles in kg/m^3
+    "particle_charge": 0,  # Charge of particles in elementary charges
+    "volume": 1e-6,  # Volume occupied by particles in cubic meters (1 cc)
+    "dilution_rate_coefficient": k_rate_chamber_hr * u.hour**-1,  # Rate of particle dilution
+    "wall_loss_approximation": "rectangle",  # Method for approximating wall loss
+    # Dimensions of the chamber in meters
+    "chamber_dimension": [0.739, 0.739, 1.663] * u.m,
+    "chamber_ktp_value": 2 * u.s**-1,  # Rate of wall eddy diffusivity
+}
+
+# Create particle distribution using the defined parameters
+particle_dist = particle.Particle(**simple_dic_kwargs)
+kernel = particle_dist.particle_coagulation()
+# Define the time array for simulation, simulating 1 hour in 100 steps
+time_array = np.linspace(0, time_span, 10)
+
+# Define additional parameters for dynamics simulation
+rates_kwargs = {
+    "particle": particle_dist,  # pass it the particle distribution
+}
+
+# Initialize and solve the dynamics with the specified conditions
+solution_coag = Solver(
+    time_span=time_array,  # Time over which to solve the dynamics
+    do_coagulation=True,  # Enable coagulation process
+    do_condensation=False,  # Disable condensation process
+    do_nucleation=False,  # Disable nucleation process
+    do_dilution=True,  # Disable dilution process
+    do_wall_loss=True,  # Disable wall loss process
+    **rates_kwargs  # Additional parameters for the solver
+).solution(method='odeint')  # Specify the method for solving the ODEs
+
+# Initialize and solve the dynamics with the specified conditions
+solution_coagOff = Solver(
+    time_span=time_array,  # Time over which to solve the dynamics
+    do_coagulation=False,  # Enable coagulation process
+    do_condensation=False,  # Disable condensation process
+    do_nucleation=False,  # Disable nucleation process
+    do_dilution=True,  # Disable dilution process
+    do_wall_loss=True,  # Disable wall loss process
+    **rates_kwargs  # Additional parameters for the solver
+).solution(method='odeint')  # Specify the method for solving the ODEs
+
+
+
+# Plotting the simulation results
+# Adjusting the figure size for better clarity
+fig, ax = plt.subplots(1, 1, figsize=[8, 6])
+
+# Retrieving the radius and distribution data
+radius = particle_dist.particle_radius  # Particle radii in meters
+# Initial particle distribution
+initial_distribution = particle_dist.particle_distribution().m
+
+# Plotting simulation
+ax.semilogx(radius.m, (initial_distribution*radius).m, '-b',
+            label='Start Simulation')  # Initial distribution
+ax.semilogx(radius.m, (solution_coag.m[-1, :]*radius).m,
+            '-r', label='t=End Simulation')  # Final distribution
+ax.semilogx(radius.m, (solution_coagOff.m[-1, :]*radius).m,
+            '.m', label='t=End Simulation NoCoag')  # Final distribution no coag
+ax.semilogx(radius_bins, start_number*1e6, '--k',
+            label='Start Experiment')  # Initial measured
+ax.semilogx(radius_bins, end_number*1e6, '--g',
+            label='t=End Experiment')  # Final measured
+
+# Enhancing the plot with labels, title, grid, and legend
+# X-axis label with units
+ax.set_xlabel(f"Radius ({particle_dist.particle_radius.u})")
+# Y-axis label with units
+ax.set_ylabel(f"Number ({particle_dist.particle_distribution().u})")
+ax.set_title("Particle Size Distribution Over Time")  # Title of the plot
+ax.grid(True, which="both", linestyle='--', linewidth=0.5,
+        alpha=0.7)  # Grid for better readability
+ax.legend()  # Legend to identify the lines
+
+fig.tight_layout()  # Adjusting the layout to prevent clipping of labels
+plt.show()  # Displaying the plot
+# %%
