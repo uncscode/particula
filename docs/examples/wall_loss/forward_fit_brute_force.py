@@ -42,7 +42,7 @@ stream_smps_2d = loader_interface.load_files_interface(
     settings=smps_2d_stream_settings
 )
 
-# 1 convert to dn/dlogDp
+# 1 convert from dn/dlogDp
 stream_smps_2d.data = convert.convert_sizer_dn(
     diameter=np.array(stream_smps_2d.header, dtype=float),
     dn_dlogdp=stream_smps_2d.data,
@@ -175,7 +175,7 @@ simple_dic_kwargs = {
 
 # Create particle distribution using the defined parameters
 particle_dist = particle.Particle(**simple_dic_kwargs)
-kernel = particle_dist.particle_coagulation()
+kernel = particle_dist.coagulation()
 # Define the time array for simulation, simulating 1 hour in 100 steps
 time_array = np.linspace(0, time_span, 10)
 
@@ -231,7 +231,7 @@ ax.semilogx(radius_bins, end_number*1e6, '--g',
 
 # Enhancing the plot with labels, title, grid, and legend
 # X-axis label with units
-ax.set_xlabel(f"Radius ({particle_dist.particle_radius.u})")
+ax.set_xlabel(f"Radius ({(particle_dist.particle_radius*radius).u})")
 # Y-axis label with units
 ax.set_ylabel(f"Number ({particle_dist.particle_distribution().u})")
 ax.set_title("Particle Size Distribution Over Time")  # Title of the plot
