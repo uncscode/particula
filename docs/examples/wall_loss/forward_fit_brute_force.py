@@ -143,7 +143,7 @@ plt.show()
 
 # %%
 
-def distribution_conversion(radius, distribution, to_pdf=True):
+def distribution_convert_pdf_pms(radius, distribution, to_pdf=True):
     """
     Convert between a probability density function (PDF) and a probability
     mass spectrum (PMS) based on the specified direction.
@@ -207,8 +207,8 @@ print(f'Time Span min: {time_span/60}')
 
 
 # chamber flow rates
-chamber_push = 1.2  # L/min
-chamber_dillution = 1.2  # L/min
+chamber_push = 1.27  # L/min
+chamber_dillution = 1.27  # L/min
 
 CHAMBER_VOLUME = 908.2  # L
 
