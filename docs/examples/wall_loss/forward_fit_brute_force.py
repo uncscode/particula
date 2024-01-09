@@ -419,4 +419,15 @@ for i, index_start in enumerate(index_steps):
     error_mae[i] = fit_return.fun
 
 
+# %% export the fits to csv using numpy
+
+np.savetxt(
+    fname='ktp_fits.csv',
+    X=fitted_ktp_values,
+    delimiter=',',
+    header='ktp_fits',
+    comments='',
+)
+
+
 # %%
