@@ -168,14 +168,7 @@ def distribution_convert_pdf_pms(radius, distribution, to_pdf=True):
     # For the last bin, extrapolate the width assuming constant growth rate from the last two bins.
     difrad[-1] = difrad[-2]**2 / difrad[-3]
 
-    if to_pdf:
-        # Converting PMS to PDF by dividing the PMS values by the bin widths.
-        converted_distribution = distribution / difrad
-    else:
-        # Converting PDF to PMS by multiplying the PDF values by the bin widths.
-        converted_distribution = distribution * difrad
-
-    return converted_distribution
+    return distribution / difrad if to_pdf else distribution * difrad
 
 radius_bins = stream_smps_2d.header_float/2 * 1e-9  # convert to m
 
