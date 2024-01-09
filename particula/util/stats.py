@@ -286,3 +286,40 @@ def mask_outliers(
     # invert the mask to get true= non-outliers and false=outliers
     mask = np.logical_not(mask)
     return mask
+
+
+def distribution_integration(
+        distribution: np.ndarray,
+        x_array: Optional[np.ndarray] = None,
+        axis: int = 0
+) -> np.ndarray:
+    """
+    Performs either PDF integration or PMS integration based on the input.
+    This function supports broadcasting where x_array has shape (m,) and
+    distribution has shape (n, m).
+
+    Args:
+    -----
+        distribution: The distribution array to integrate.
+            It should have a shape of (n, m).
+        x_array: The x-values array for PDF
+            integration. It should have a shape of (m,).
+            If None, PMS integration is performed. Defaults to None.
+        axis: The axis along which to perform the integration
+            for PDF or the sum for PMS. 
+            Defaults to 0.
+
+    Return:
+    -------
+        np.ndarray: The result of the integration. If PDF integration is
+        performed, the result will have a shape of (n,) if axis=0 or (m,)
+        if axis=1. If PMS integration is performed, the result will be a
+        single value if axis=None, or an array with reduced dimensionality
+        otherwise.
+    """
+    if x_array is not None:
+        # Perform PDF integration along the specified axis
+        return np.trapz(y=distribution, x=x_array, axis=axis)
+    else:
+        # Perform PMS integration
+        return np.sum(distribution, axis=axis)

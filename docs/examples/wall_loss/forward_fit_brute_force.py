@@ -1,10 +1,11 @@
 # %%
-# pylint: ignore=all
 # flake8: noqa
 
 # all the imports
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import minimize, Bounds
+from datetime import datetime
 
 from particula import u
 from particula.data import loader_interface, settings_generator
@@ -15,6 +16,8 @@ from particula.util import convert, time_manage
 
 from particula.dynamics import Solver
 from particula import particle
+
+from particula.util.convert import distribution_convert_pdf_pms
 
 #%%
 # set the parent directory of the data folders
@@ -52,12 +55,7 @@ stream_smps_2d.data = convert.convert_sizer_dn(
 
 #%%
 
-# Dilution correction
-dilution_correction = 2
 
-# scale the concentrations
-stream_smps_2d.data *= dilution_correction
-stream_smps_1d['Total_Conc_(#/cc)'] *= dilution_correction
 
 
 # select the time window
@@ -141,174 +139,243 @@ ax.set_xlabel("Experiment time (hours)")
 ax.set_ylabel('Particle concentration (#/cc)')
 plt.show()
 
-# %%
-
-def distribution_convert_pdf_pms(radius, distribution, to_pdf=True):
-    """
-    Convert between a probability density function (PDF) and a probability
-    mass spectrum (PMS) based on the specified direction.
-
-    Parameters:
-    radius : array
-        An array of radii corresponding to the bins of the distribution.
-    distribution : array
-        The values of the distribution (either PDF or PMS) at the given radii.
-    to_PDF : bool
-        Direction of conversion. If True, converts PMS to PDF. If False,
-        converts PDF to PMS.
-
-    Returns:
-    converted_distribution : array
-        The converted distribution array (either PDF or PMS).
-    """
-
-    # Calculate the differences between consecutive radius values for bin widths.
-    difrad = np.empty_like(radius)
-    difrad[:-1] = np.diff(radius)
-    # For the last bin, extrapolate the width assuming constant growth rate from the last two bins.
-    difrad[-1] = difrad[-2]**2 / difrad[-3]
-
-    return distribution / difrad if to_pdf else distribution * difrad
-
-radius_bins = stream_smps_2d.header_float/2 * 1e-9  # convert to m
-
-# convert to number
-stream_smps_2d.data *= 1e6 # number per m3
-
-stream_smps_2d.data = distribution_conversion(
-    radius=radius_bins,
-    distribution=stream_smps_2d.data,
-    to_pdf=True
-)
-
-
-def pdf_total(radius, pdf_distribution):
-    return np.trapz(y=pdf_distribution, x=radius)
-
-
-def pms_total(distribution, axis=0):
-    return np.sum(distribution, axis=axis)
-# %%
-
-time_pairs = [1, 10]
-start_number = stream_smps_2d.data[time_pairs[0], :]
-end_number = stream_smps_2d.data[time_pairs[1], :]
-time_span = stream_smps_2d.time[time_pairs[1]] \
-    - stream_smps_2d.time[time_pairs[0]]
-print(f'Time Span min: {time_span/60}')
-# totalNumber = pdf_total(radius_bins, start_number)
-
+# %% convert concentrations and correct for dilution
 
 # chamber flow rates
 chamber_push = 1.27  # L/min
 chamber_dillution = 1.27  # L/min
 
-CHAMBER_VOLUME = 908.2  # L
+# Dilution correction
+dilution_correction = (chamber_push + chamber_dillution) / chamber_push
+# scale the concentrations for dilution
+stream_smps_2d.data *= dilution_correction
+stream_smps_1d['Total_Conc_(#/cc)'] *= dilution_correction
 
+radius_bins = stream_smps_2d.header_float/2 * 1e-9  # convert to m and radius
+stream_smps_2d.data *= 1e6 # convert to number per m3
+
+CHAMBER_VOLUME = 908.2  # L
 k_rate_chamber_min = chamber_push / CHAMBER_VOLUME
 k_rate_chamber_hr = k_rate_chamber_min * 60
 
-#%%
-# Input measurments as initial conditions
-simple_dic_kwargs = {
-    "particle_radius": radius_bins,  # bins for size distribution
-    "particle_number": start_number*radius_bins,  # Total number of particles
+# %% evaluate distribution
+
+def simulate_chamber_interval(
+    particle_kwargs: dict,
+    time_array: np.ndarray,
+    concentration_m3: np.ndarray,
+    radius_bins: np.ndarray,
+):
+    """
+    Simulate the aerosol chamber for a given time interval.
+
+    This function simulates the dynamics of aerosol particles in a chamber
+    over a specified time interval. It considers processes like
+    coagulation, condensation, nucleation, dilution, and wall loss.
+
+    Args:
+    -----
+        particle_kwargs (dict): Keyword arguments for the Particle object,
+            including particle properties and chamber characteristics.
+        time_array (np.ndarray): Array of time points over which to
+            simulate the chamber dynamics.
+        concentration_m3 (np.ndarray): Concentration of particles per
+            cubic meter for each radius bin.
+        radius_bins (np.ndarray): Array of radius bins for the particles.
+
+    Returns:
+    --------
+        tuple: A tuple containing two elements:
+            - simulation_pdf (np.ndarray): The particle number density
+                distribution over time as a probability density function.
+            - concentration_pdf (np.ndarray): The concentration distribution
+                over time as a probability density function.
+
+    Note:
+        - The function modifies 'particle_kwargs' to include
+            particle number and radius.
+        - It assumes that the time array is increasing sequence of time points.
+    """
+
+    # Convert size distribution to PDF
+    concentration_pdf = distribution_convert_pdf_pms(
+        x_array=radius_bins,
+        distribution=concentration_m3,
+        to_pdf=True
+    ) * radius_bins
+
+    # Set number and radius in particle_kwargs
+    particle_kwargs["particle_number"] = concentration_pdf[0, :]
+    particle_kwargs["particle_radius"] = radius_bins
+    particle_kwargs["volume"] = 1  # volume of concentration in cubic meters
+
+    # Rebase time to start from zero
+    rebased_time = time_array - time_array[0]
+
+    # Create particle distribution
+    particle_dist = particle.Particle(**particle_kwargs)
+
+    # Pack the distribution into the solver
+    rates_kwargs = {
+        "particle": particle_dist,
+    }
+
+    # Initialize and solve the dynamics
+    solution_coag = Solver(
+        time_span=rebased_time,
+        do_coagulation=True,
+        do_condensation=False,
+        do_nucleation=False,
+        do_dilution=True,
+        do_wall_loss=True,
+        **rates_kwargs
+    ).solution(method='odeint')
+
+    # Process the solution
+    simulation_pdf = solution_coag[:, :] * particle_dist.particle_radius
+    concentration_pdf = concentration_pdf * simulation_pdf.u
+    return simulation_pdf, concentration_pdf
+
+
+# calculate the error
+
+def simulation_error(simulation_pdf, concentration_pdf):
+    """
+    Calculate the Mean Absolute Error (MAE) between simulation PDF and concentration PDF.
+
+    The function computes the MAE as the average of absolute differences between 
+    the two provided probability density functions (PDFs). This metric is useful 
+    for quantifying the accuracy of a simulation against observed data.
+
+    Args:
+        simulation_pdf (np.ndarray): The simulated particle number density distribution as a PDF.
+        concentration_pdf (np.ndarray): The observed concentration distribution as a PDF.
+
+    Returns:
+        float: The Mean Absolute Error between the two PDFs.
+    
+    Raises:
+        ValueError: If the input arrays do not have the same shape.
+    """
+
+    if simulation_pdf.shape != concentration_pdf.shape:
+        raise ValueError("The shapes of simulation_pdf and concentration_pdf must be the same.")
+
+    # Calculate the mean absolute error
+    mae = np.mean(np.abs(simulation_pdf.m - concentration_pdf.m))
+    return mae
+
+
+def chamber_ktp_objective_funciton(
+        chamber_ktp_value: float,
+        particle_kwargs: dict,
+        time_array: np.ndarray,
+        concentration_m3: np.ndarray,
+        radius_bins: np.ndarray,
+) -> float:
+    """objective funciton to compare simualiton of chamber to fit ktp values
+    """
+    
+    particle_kwargs['chamber_ktp_value'] = chamber_ktp_value * u.s**-1
+
+    simulation_pdf, concentration_pdf = simulate_chamber_interval(
+        particle_kwargs=particle_kwargs,
+        time_array=time_array,
+        concentration_m3=concentration_m3,
+        radius_bins=radius_bins,
+    )
+
+    error_out = simulation_error(simulation_pdf, concentration_pdf)
+
+    return error_out
+
+
+def optimize_ktp_value(
+        particle_kwargs: dict,
+        time_array: np.ndarray,
+        concentration_m3: np.ndarray,
+        radius_bins: np.ndarray,
+        guess_ktp_value=1,
+        display_fitting=True,
+) -> float:
+    """ optimized for ktp value"""
+
+    bounds = Bounds(lb=0.01, ub=10)
+
+    problem = {
+        'fun': lambda x: chamber_ktp_objective_funciton(
+            chamber_ktp_value=x,
+            particle_kwargs=particle_kwargs,
+            time_array=time_array,
+            concentration_m3=concentration_m3,
+            radius_bins=radius_bins),
+        'x0': guess_ktp_value,
+        'bounds': bounds,
+        'options': {'disp': display_fitting},
+    }
+
+    fit_result = minimize(**problem)
+    return fit_result
+
+#%% run fit
+# inputs
+index_span = [5, 15]
+concentration_m3= stream_smps_2d.data[index_span[0]:index_span[1], :]
+time_array = stream_smps_2d.time[index_span[0]:index_span[1]]
+
+particle_kwargs = {
     "particle_density": 1.8e3,  # Density of particles in kg/m^3
     "particle_charge": 0,  # Charge of particles in elementary charges
-    "volume": 1,  # Volume occupied by particles in cubic meters (1 cc)
-    "dilution_rate_coefficient": k_rate_chamber_hr * u.hour**-1,  # Rate of particle dilution
+    # Rate of particle dilution
+    "dilution_rate_coefficient": k_rate_chamber_hr * u.hour**-1,
     "wall_loss_approximation": "rectangle",  # Method for approximating wall loss
     # Dimensions of the chamber in meters
     "chamber_dimension": [0.739, 0.739, 1.663] * u.m,
-    "chamber_ktp_value": 1.5 * u.s**-1,  # Rate of wall eddy diffusivity
+    "chamber_ktp_value": 0.5 * u.s**-1,  # Rate of wall eddy diffusivity
 }
 
-# simple_dic_kwargs2 = {
-#     "mode": 42e-9,  # Median radius of the particles in meters
-#     "nbins": 250,  # Number of bins for size distribution
-#     "nparticles": 2e4,  # Total number of particles
-#     "volume": 1e-6,  # Volume occupied by particles in cubic meters (1 cc)
-#     "gsigma": 1.9,  # Geometric standard deviation of particle size distribution
-#     "dilution_rate_coefficient": k_rate_chamber_hr * u.hour**-1,  # Rate of particle dilution
-#     "wall_loss_approximation": "rectangle",  # Method for approximating wall loss
-#     # Dimensions of the chamber in meters
-#     "chamber_dimension": [0.739, 0.739, 1.663] * u.m,
-#     "chamber_ktp_value": 2 * u.s**-1,  # Rate of wall eddy diffusivity
-# }
+fit_return = optimize_ktp_value(
+    particle_kwargs=particle_kwargs,
+    time_array=time_array,
+    concentration_m3=concentration_m3,
+    radius_bins=radius_bins,
+)
 
-# Create particle distribution using the defined parameters
-particle_dist = particle.Particle(**simple_dic_kwargs)
-# particle_dist2 = particle.Particle(**simple_dic_kwargs2)
-# Define the time array for simulation, simulating 1 hour in 100 steps
-time_array = np.linspace(0, time_span, 10)
 
-# Define additional parameters for dynamics simulation
-rates_kwargs = {
-    "particle": particle_dist,  # pass it the particle distribution
-}
 
-# fig, ax = plt.subplots()
-# ax.loglog(
-#     particle_dist.particle_radius.m, 
-#     particle_dist.particle_distribution(),
-#     '-b',
-#     label='Start Simulation')  # Initial distribution
-# ax.loglog(
-#     particle_dist2.particle_radius.m,
-#     particle_dist2.particle_distribution(),
-#     '-r', label='t=End Simulation')  # Final distribution
 
-# %%
-# Initialize and solve the dynamics with the specified conditions
-solution_coag = Solver(
-    time_span=time_array,  # Time over which to solve the dynamics
-    do_coagulation=True,  # Enable coagulation process
-    do_condensation=False,  # Disable condensation process
-    do_nucleation=False,  # Disable nucleation process
-    do_dilution=True,  # Disable dilution process
-    do_wall_loss=True,  # Disable wall loss process
-    **rates_kwargs  # Additional parameters for the solver
-).solution(method='odeint')  # Specify the method for solving the ODEs
+particle_kwargs['chamber_ktp_value'] = fit_return.x * u.s**-1
+simulation_pdf, concentration_pdf = simulate_chamber_interval(
+    particle_kwargs=particle_kwargs,
+    time_array=time_array,
+    concentration_m3=concentration_m3,
+    radius_bins=radius_bins,
+)
 
-# Initialize and solve the dynamics with the specified conditions
-solution_coagOff = Solver(
-    time_span=time_array,  # Time over which to solve the dynamics
-    do_coagulation=False,  # Enable coagulation process
-    do_condensation=False,  # Disable condensation process
-    do_nucleation=False,  # Disable nucleation process
-    do_dilution=True,  # Disable dilution process
-    do_wall_loss=True,  # Disable wall loss process
-    **rates_kwargs  # Additional parameters for the solver
-).solution(method='odeint')  # Specify the method for solving the ODEs
 
 
 # %%
+
+
 # Plotting the simulation results
 # Adjusting the figure size for better clarity
 fig, ax = plt.subplots(1, 1, figsize=[8, 6])
 
-# Retrieving the radius and distribution data
-radius = particle_dist.particle_radius  # Particle radii in meters
-# Initial particle distribution
-initial_distribution = particle_dist.particle_distribution().m
-
 # Plotting simulation
-ax.semilogx(radius.m, (initial_distribution*radius), '-b',
+ax.semilogx(radius_bins, (simulation_pdf.m[0, :]), '-b',
             label='Start Simulation')  # Initial distribution
-ax.semilogx(radius.m, (solution_coag.m[-1, :]*radius),
+ax.semilogx(radius_bins, (simulation_pdf.m[-1, :]),
             '-r', label='t=End Simulation')  # Final distribution
-ax.semilogx(radius.m, (solution_coagOff.m[-1, :]*radius),
-            '.m', label='t=End Simulation NoCoag')  # Final distribution no coag
-ax.semilogx(radius_bins, start_number*radius_bins, '--k',
+ax.semilogx(radius_bins, concentration_pdf[0,: ], '--k',
             label='Start Experiment')  # Initial measured
-ax.semilogx(radius_bins, end_number*radius_bins, '--g',
+ax.semilogx(radius_bins, concentration_pdf[-1, :], '--g',
             label='t=End Experiment')  # Final measured
 
 # Enhancing the plot with labels, title, grid, and legend
 # X-axis label with units
-ax.set_xlabel(f"Radius ({particle_dist.particle_radius.u})")
+ax.set_xlabel(f"Radius (meter)")
 # Y-axis label with units
-ax.set_ylabel(f"Number ({(particle_dist.particle_distribution()).u})")
+ax.set_ylabel(f"Number ({simulation_pdf.u})")
 ax.set_title("Particle Size Distribution Over Time")  # Title of the plot
 ax.grid(True, which="both", linestyle='--', linewidth=0.5,
         alpha=0.7)  # Grid for better readability
@@ -317,4 +384,39 @@ ax.legend()  # Legend to identify the lines
 
 fig.tight_layout()  # Adjusting the layout to prevent clipping of labels
 plt.show()  # Displaying the plot
+# %% loop over the full data set
+
+simulation_window = 20
+step_size = 10
+index_steps = np.arange(0, len(stream_smps_2d)-simulation_window, step_size)
+
+fitted_ktp_values = np.zeros_like(index_steps)
+error_mae = np.zeros_like(index_steps)
+for i, index_start in enumerate(index_steps):
+    print(
+        f"Fit Percent: {i/len(index_steps) * 100:.2f}%, "
+        f"Time: {datetime.now().strftime('%H:%M:%S')}"
+    )
+
+    index_end = index_start + simulation_window
+    concentration_m3 = stream_smps_2d.data[index_start:index_end, :]
+    time_array = stream_smps_2d.time[index_start:index_end]
+
+    if i == 0:
+        guess_ktp_value = 1
+    else:
+        guess_ktp_value = fitted_ktp_values[i-1]
+    fit_return = optimize_ktp_value(
+        particle_kwargs=particle_kwargs,
+        time_array=time_array,
+        concentration_m3=concentration_m3,
+        radius_bins=radius_bins,
+        guess_ktp_value=guess_ktp_value,
+        display_fitting=False,
+    )
+
+    fitted_ktp_values[i] = fit_return.x
+    error_mae[i] = fit_return.fun
+
+
 # %%

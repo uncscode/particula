@@ -547,3 +547,42 @@ def data_shape_check(
         raise ValueError("Header list must be a single entry if data_new \
                               is 1D.")
     return data
+
+
+def distribution_convert_pdf_pms(
+        x_array: np.ndarray,
+        distribution: np.ndarray,
+        to_pdf: bool = True
+) -> np.ndarray:
+    """
+    Convert between a probability density function (PDF) and a probability
+    mass spectrum (PMS) based on the specified direction.
+
+    Args:
+    x_array
+        An array of radii corresponding to the bins of the distribution,
+        shape (m).
+    distribution
+        The concentration values of the distribution (either PDF or PMS)
+        at the given radii. Supports broadcasting across x_array (n,m).
+    to_PDF
+        Direction of conversion. If True, converts PMS to PDF. If False,
+        converts PDF to PMS.
+
+    Returns:
+    converted_distribution
+        The converted distribution array (either PDF or PMS).
+    """
+
+    # Calculate the differences between consecutive x_array values for bin
+    # widths.
+    delta_x_array = np.empty_like(x_array)
+    delta_x_array[:-1] = np.diff(x_array)
+    # For the last bin, extrapolate the width assuming constant growth
+    # rate from the last two bins.
+    delta_x_array[-1] = delta_x_array[-2]**2 / delta_x_array[-3]
+
+    # Converting PMS to PDF by dividing the PMS values by the bin widths. or
+    # Converting PDF to PMS by multiplying the PDF values by the bin widths.
+    return distribution / delta_x_array if to_pdf \
+        else distribution * delta_x_array
