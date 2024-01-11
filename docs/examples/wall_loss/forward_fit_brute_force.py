@@ -311,7 +311,8 @@ def optimize_ktp_value(
             radius_bins=radius_bins),
         'x0': guess_ktp_value,
         'bounds': bounds,
-        'options': {'disp': display_fitting},
+        'tol': 1e-4,
+        'options': {'disp': display_fitting, 'maxiter' : 10},
     }
 
     fit_result = minimize(**problem)
@@ -341,6 +342,7 @@ fit_return = optimize_ktp_value(
     radius_bins=radius_bins,
 )
 
+print(f"Fit ktp value: {fit_return.x[0]}")
 
 
 
@@ -390,8 +392,8 @@ simulation_window = 20
 step_size = 10
 index_steps = np.arange(0, len(stream_smps_2d)-simulation_window, step_size)
 
-fitted_ktp_values = np.zeros_like(index_steps)
-error_mae = np.zeros_like(index_steps)
+fitted_ktp_values = np.zeros_like(index_steps, dtype=float)
+error_mae = np.zeros_like(index_steps, dtype=float)
 for i, index_start in enumerate(index_steps):
     print(
         f"Fit Percent: {i/len(index_steps) * 100:.2f}%, "
@@ -411,13 +413,12 @@ for i, index_start in enumerate(index_steps):
         time_array=time_array,
         concentration_m3=concentration_m3,
         radius_bins=radius_bins,
-        guess_ktp_value=guess_ktp_value,
+        guess_ktp_value=guess_ktp_value * u.s**-1,
         display_fitting=False,
     )
-
-    fitted_ktp_values[i] = fit_return.x
+    print(f"Fit ktp value: {fit_return.x[0]}")
+    fitted_ktp_values[i] = fit_return.x[0]
     error_mae[i] = fit_return.fun
-
 
 # %% export the fits to csv using numpy
 
@@ -430,4 +431,3 @@ np.savetxt(
 )
 
 
-# %%
