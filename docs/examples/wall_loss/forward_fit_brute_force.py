@@ -261,9 +261,7 @@ def simulation_error(simulation_pdf, concentration_pdf):
     if simulation_pdf.shape != concentration_pdf.shape:
         raise ValueError("The shapes of simulation_pdf and concentration_pdf must be the same.")
 
-    # Calculate the mean absolute error
-    mae = np.mean(np.abs(simulation_pdf.m - concentration_pdf.m))
-    return mae
+    return np.mean(np.abs(simulation_pdf.m - concentration_pdf.m))
 
 
 def chamber_ktp_objective_funciton(
@@ -285,9 +283,7 @@ def chamber_ktp_objective_funciton(
         radius_bins=radius_bins,
     )
 
-    error_out = simulation_error(simulation_pdf, concentration_pdf)
-
-    return error_out
+    return simulation_error(simulation_pdf, concentration_pdf)
 
 
 def optimize_ktp_value(
@@ -315,8 +311,7 @@ def optimize_ktp_value(
         'options': {'disp': display_fitting, 'maxiter' : 10},
     }
 
-    fit_result = minimize(**problem)
-    return fit_result
+    return minimize(**problem)
 
 #%% run fit
 # inputs
@@ -375,7 +370,7 @@ ax.semilogx(radius_bins, concentration_pdf[-1, :], '--g',
 
 # Enhancing the plot with labels, title, grid, and legend
 # X-axis label with units
-ax.set_xlabel(f"Radius (meter)")
+ax.set_xlabel("Radius (meter)")
 # Y-axis label with units
 ax.set_ylabel(f"Number ({simulation_pdf.u})")
 ax.set_title("Particle Size Distribution Over Time")  # Title of the plot
@@ -404,10 +399,7 @@ for i, index_start in enumerate(index_steps):
     concentration_m3 = stream_smps_2d.data[index_start:index_end, :]
     time_array = stream_smps_2d.time[index_start:index_end]
 
-    if i == 0:
-        guess_ktp_value = 1
-    else:
-        guess_ktp_value = fitted_ktp_values[i-1]
+    guess_ktp_value = 1 if i == 0 else fitted_ktp_values[i-1]
     fit_return = optimize_ktp_value(
         particle_kwargs=particle_kwargs,
         time_array=time_array,
