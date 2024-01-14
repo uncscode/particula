@@ -306,7 +306,7 @@ def distribution_integration(
             integration. It should have a shape of (m,).
             If None, PMS integration is performed. Defaults to None.
         axis: The axis along which to perform the integration
-            for PDF or the sum for PMS. 
+            for PDF or the sum for PMS.
             Defaults to 0.
 
     Return:
@@ -320,6 +320,5 @@ def distribution_integration(
     if x_array is not None:
         # Perform PDF integration along the specified axis
         return np.trapz(y=distribution, x=x_array, axis=axis)
-    else:
-        # Perform PMS integration
-        return np.sum(distribution, axis=axis)
+    # Perform PMS integration
+    return np.sum(distribution, axis=axis)
