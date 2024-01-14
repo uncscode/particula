@@ -1,0 +1,173 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/nbclient/client.py", line 1305, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/nbclient/client.py", line 705, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# settings for the CPC data
+cpc_settings = settings_generator.for_general_1d_load(
+    relative_data_folder='CPC_3010_data',
+    filename_regex='*.csv',
+    file_min_size_bytes=10,
+    data_checks={
+        "characters": [10, 100],
+        "char_counts": {",": 4},
+        "skip_rows": 0,
+        "skip_end": 0,
+    },
+    data_column=[1, 2],
+    data_header=['CPC_count[#/sec]', 'Temperature[degC]'],
+    time_column=[0],
+    time_format='epoch',
+    delimiter=',',
+    time_shift_seconds=0,
+    timezone_identifier='UTC',
+)
+
+# settings for the SMPS data
+smps_1d_settings, smps_2d_settings = settings_generator.for_general_sizer_1d_2d_load(
+    relative_data_folder='SMPS_data',
+    filename_regex='*.csv',
+    file_min_size_bytes=10,
+    header_row=24,
+    data_checks={
+        "characters": [250],
+        "skip_rows": 25,
+        "skip_end": 0,
+        "char_counts": {"/": 2, ":": 2}
+    },
+    data_1d_column=[
+        "Lower Size (nm)",
+        "Upper Size (nm)",
+        "Sample Temp (C)",
+        "Sample Pressure (kPa)",
+        "Relative Humidity (%)",
+        "Median (nm)",
+        "Mean (nm)",
+        "Geo. Mean (nm)",
+        "Mode (nm)",
+        "Geo. Std. Dev.",
+        "Total Conc. (#/cm³)"],
+    data_1d_header=[
+        "Lower_Size_(nm)",
+        "Upper_Size_(nm)",
+        "Sample_Temp_(C)",
+        "Sample_Pressure_(kPa)",
+        "Relative_Humidity_(%)",
+        "Median_(nm)",
+        "Mean_(nm)",
+        "Geo_Mean_(nm)",
+        "Mode_(nm)",
+        "Geo_Std_Dev.",
+        "Total_Conc_(#/cc)"],
+    data_2d_dp_start_keyword="20.72",
+    data_2d_dp_end_keyword="784.39",
+    data_2d_convert_concentration_from="dw/dlogdp",
+    time_column=[1, 2],
+    time_format="%m/%d/%Y %H:%M:%S",
+    delimiter=",",
+    time_shift_seconds=0,
+    timezone_identifier="UTC",
+)
+
+# collect settings into a dictionary
+combined_settings = {
+    'cpc': cpc_settings,
+    'smps_1d': smps_1d_settings,
+    'smps_2d': smps_2d_settings,
+}
+
+# now call the loader interface for files
+lake = loader_interface.load_folders_interface(
+    path=path,
+    folder_settings=combined_settings,
+)
+
+print(' ')
+print(lake)
+------------------
+
+----- stdout -----
+Folder Settings: cpc
+  Loading file: CPC_3010_data_20220710_Jul.csv
+----- stdout -----
+  Loading file: CPC_3010_data_20220709_Jul.csv
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mMemoryError[0m                               Traceback (most recent call last)
+Cell [0;32mIn[2], line 75[0m
+[1;32m     68[0m combined_settings [38;5;241m=[39m {
+[1;32m     69[0m     [38;5;124m'[39m[38;5;124mcpc[39m[38;5;124m'[39m: cpc_settings,
+[1;32m     70[0m     [38;5;124m'[39m[38;5;124msmps_1d[39m[38;5;124m'[39m: smps_1d_settings,
+[1;32m     71[0m     [38;5;124m'[39m[38;5;124msmps_2d[39m[38;5;124m'[39m: smps_2d_settings,
+[1;32m     72[0m }
+[1;32m     74[0m [38;5;66;03m# now call the loader interface for files[39;00m
+[0;32m---> 75[0m lake [38;5;241m=[39m [43mloader_interface[49m[38;5;241;43m.[39;49m[43mload_folders_interface[49m[43m([49m
+[1;32m     76[0m [43m    [49m[43mpath[49m[38;5;241;43m=[39;49m[43mpath[49m[43m,[49m
+[1;32m     77[0m [43m    [49m[43mfolder_settings[49m[38;5;241;43m=[39;49m[43mcombined_settings[49m[43m,[49m
+[1;32m     78[0m [43m)[49m
+[1;32m     80[0m [38;5;28mprint[39m([38;5;124m'[39m[38;5;124m [39m[38;5;124m'[39m)
+[1;32m     81[0m [38;5;28mprint[39m(lake)
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:213[0m, in [0;36mload_folders_interface[0;34m(path, folder_settings, lake)[0m
+[1;32m    211[0m     [38;5;28mprint[39m([38;5;124m'[39m[38;5;124mFolder Settings:[39m[38;5;124m'[39m, key)
+[1;32m    212[0m     [38;5;66;03m# call the load files interface[39;00m
+[0;32m--> 213[0m     lake[key] [38;5;241m=[39m [43mload_files_interface[49m[43m([49m
+[1;32m    214[0m [43m        [49m[43mpath[49m[38;5;241;43m=[39;49m[43mpath[49m[43m,[49m
+[1;32m    215[0m [43m        [49m[43msettings[49m[38;5;241;43m=[39;49m[43mfile_settings[49m[43m,[49m
+[1;32m    216[0m [43m        [49m[43mstream[49m[38;5;241;43m=[39;49m[43mstream[49m
+[1;32m    217[0m [43m    [49m[43m)[49m
+[1;32m    218[0m [38;5;28;01mreturn[39;00m lake
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:152[0m, in [0;36mload_files_interface[0;34m(path, settings, stream)[0m
+[1;32m    149[0m [38;5;28mprint[39m([38;5;124m'[39m[38;5;124m  Loading file:[39m[38;5;124m'[39m, file_info[file_i][[38;5;241m0[39m])
+[1;32m    151[0m [38;5;28;01mif[39;00m settings[[38;5;124m'[39m[38;5;124mdata_loading_function[39m[38;5;124m'[39m] [38;5;241m==[39m [38;5;124m'[39m[38;5;124mgeneral_1d_load[39m[38;5;124m'[39m:
+[0;32m--> 152[0m     stream [38;5;241m=[39m [43mget_1d_stream[49m[43m([49m
+[1;32m    153[0m [43m        [49m[43mfile_path[49m[38;5;241;43m=[39;49m[43mfile_path[49m[43m,[49m
+[1;32m    154[0m [43m        [49m[43mfirst_pass[49m[38;5;241;43m=[39;49m[43mfirst_pass[49m[43m,[49m
+[1;32m    155[0m [43m        [49m[43msettings[49m[38;5;241;43m=[39;49m[43msettings[49m[43m,[49m
+[1;32m    156[0m [43m        [49m[43mstream[49m[38;5;241;43m=[39;49m[43mstream[49m
+[1;32m    157[0m [43m    [49m[43m)[49m
+[1;32m    159[0m [38;5;28;01melif[39;00m settings[[38;5;124m'[39m[38;5;124mdata_loading_function[39m[38;5;124m'[39m] [38;5;241m==[39m [38;5;124m'[39m[38;5;124mgeneral_2d_load[39m[38;5;124m'[39m:
+[1;32m    160[0m     stream [38;5;241m=[39m get_2d_stream(
+[1;32m    161[0m         file_path[38;5;241m=[39mfile_path,
+[1;32m    162[0m         first_pass[38;5;241m=[39mfirst_pass,
+[1;32m    163[0m         settings[38;5;241m=[39msettings,
+[1;32m    164[0m         stream[38;5;241m=[39mstream
+[1;32m    165[0m     )
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:323[0m, in [0;36mget_1d_stream[0;34m(file_path, settings, first_pass, stream)[0m
+[1;32m    321[0m     stream[38;5;241m.[39mtime [38;5;241m=[39m epoch_time
+[1;32m    322[0m [38;5;28;01melse[39;00m:
+[0;32m--> 323[0m     stream [38;5;241m=[39m [43mmerger[49m[38;5;241;43m.[39;49m[43mstream_add_data[49m[43m([49m
+[1;32m    324[0m [43m        [49m[43mstream[49m[38;5;241;43m=[39;49m[43mstream[49m[43m,[49m
+[1;32m    325[0m [43m        [49m[43mtime_new[49m[38;5;241;43m=[39;49m[43mepoch_time[49m[43m,[49m
+[1;32m    326[0m [43m        [49m[43mdata_new[49m[38;5;241;43m=[39;49m[43mdata[49m[43m,[49m
+[1;32m    327[0m [43m        [49m[43mheader_check[49m[38;5;241;43m=[39;49m[38;5;28;43;01mTrue[39;49;00m[43m,[49m
+[1;32m    328[0m [43m        [49m[43mheader_new[49m[38;5;241;43m=[39;49m[43msettings[49m[43m[[49m[38;5;124;43m'[39;49m[38;5;124;43mdata_header[39;49m[38;5;124;43m'[39;49m[43m][49m
+[1;32m    329[0m [43m    [49m[43m)[49m
+[1;32m    330[0m [38;5;28;01mreturn[39;00m stream
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/merger.py:182[0m, in [0;36mstream_add_data[0;34m(stream, time_new, data_new, header_check, header_new)[0m
+[1;32m    180[0m     sorted_time_index [38;5;241m=[39m np[38;5;241m.[39margsort(stream[38;5;241m.[39mtime)
+[1;32m    181[0m     stream[38;5;241m.[39mtime [38;5;241m=[39m stream[38;5;241m.[39mtime[sorted_time_index]
+[0;32m--> 182[0m     stream[38;5;241m.[39mdata [38;5;241m=[39m [43mstream[49m[38;5;241;43m.[39;49m[43mdata[49m[43m[[49m[43m:[49m[43m,[49m[43m [49m[43msorted_time_index[49m[43m][49m
+[1;32m    183[0m [38;5;28;01mreturn[39;00m stream
+
+[0;31mMemoryError[0m: Unable to allocate 35.0 GiB for an array with shape (68551, 68551) and data type float64
+
