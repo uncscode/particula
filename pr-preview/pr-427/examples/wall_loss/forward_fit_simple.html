@@ -959,7 +959,7 @@ python</p></li>
         <span class="n">concentration_m3</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">radius_bins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">guess_ktp_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">display_fitting</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">display_fitting</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; optimized for ktp value&quot;&quot;&quot;</span>
 
@@ -1050,49 +1050,8 @@ python</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>RUNNING THE L-BFGS-B CODE
-
-           * * *
-
-Machine precision = 2.220D-16
- N =            1     M =           10
-
-At X0         0 variables are exactly at the bounds
-
-At iterate    0    f=  9.51447D+01    |proj g|=  9.90000D-01
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>At iterate    1    f=  9.28977D+01    |proj g|=  9.34706D+00
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>At iterate    2    f=  9.20729D+01    |proj g|=  7.88389D-01
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>At iterate    3    f=  9.20036D+01    |proj g|=  1.32724D+00
-</pre></div>
-</div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Fit ktp value: 0.768888288188083
 Fit error: 92.00172725493776
-
-At iterate    4    f=  9.20017D+01    |proj g|=  4.14485D-01
-
-           * * *
-
-Tit   = total number of iterations
-Tnf   = total number of function evaluations
-Tnint = total number of segments explored during Cauchy searches
-Skip  = number of BFGS updates skipped
-Nact  = number of active bounds at final generalized Cauchy point
-Projg = norm of the final projected gradient
-F     = final function value
-
-           * * *
-
-   N    Tit     Tnf  Tnint  Skip  Nact     Projg        F
-    1      4      9      4     0     0   4.145D-01   9.200D+01
-  F =   92.001727254937762     
-
-CONVERGENCE: REL_REDUCTION_OF_F_&lt;=_FACTR*EPSMCH             
 </pre></div>
 </div>
 </div>
