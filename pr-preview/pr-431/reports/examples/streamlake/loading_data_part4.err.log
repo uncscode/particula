@@ -1,0 +1,90 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/nbclient/client.py", line 1305, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/nbclient/client.py", line 705, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+smps_1d_stream_settings = settings_generator.load_settings_for_stream(
+    path=path,
+    subfolder='SMPS_data',
+    settings_suffix='_smps_1d',
+)
+
+stream_smps_1d = loader_interface.load_files_interface(
+    path=path,
+    settings=smps_1d_stream_settings
+)
+
+print(stream_smps_1d.header)
+------------------
+
+----- stdout -----
+  Loading file: 2022-07-10_094659_SMPS.csv
+  Loading file: 2022-07-07_095151_SMPS.csv
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mIndexError[0m                                Traceback (most recent call last)
+Cell [0;32mIn[4], line 7[0m
+[1;32m      1[0m smps_1d_stream_settings [38;5;241m=[39m settings_generator[38;5;241m.[39mload_settings_for_stream(
+[1;32m      2[0m     path[38;5;241m=[39mpath,
+[1;32m      3[0m     subfolder[38;5;241m=[39m[38;5;124m'[39m[38;5;124mSMPS_data[39m[38;5;124m'[39m,
+[1;32m      4[0m     settings_suffix[38;5;241m=[39m[38;5;124m'[39m[38;5;124m_smps_1d[39m[38;5;124m'[39m,
+[1;32m      5[0m )
+[0;32m----> 7[0m stream_smps_1d [38;5;241m=[39m [43mloader_interface[49m[38;5;241;43m.[39;49m[43mload_files_interface[49m[43m([49m
+[1;32m      8[0m [43m    [49m[43mpath[49m[38;5;241;43m=[39;49m[43mpath[49m[43m,[49m
+[1;32m      9[0m [43m    [49m[43msettings[49m[38;5;241;43m=[39;49m[43msmps_1d_stream_settings[49m
+[1;32m     10[0m [43m)[49m
+[1;32m     12[0m [38;5;28mprint[39m(stream_smps_1d[38;5;241m.[39mheader)
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:152[0m, in [0;36mload_files_interface[0;34m(path, settings, stream)[0m
+[1;32m    149[0m [38;5;28mprint[39m([38;5;124m'[39m[38;5;124m  Loading file:[39m[38;5;124m'[39m, file_info[file_i][[38;5;241m0[39m])
+[1;32m    151[0m [38;5;28;01mif[39;00m settings[[38;5;124m'[39m[38;5;124mdata_loading_function[39m[38;5;124m'[39m] [38;5;241m==[39m [38;5;124m'[39m[38;5;124mgeneral_1d_load[39m[38;5;124m'[39m:
+[0;32m--> 152[0m     stream [38;5;241m=[39m [43mget_1d_stream[49m[43m([49m
+[1;32m    153[0m [43m        [49m[43mfile_path[49m[38;5;241;43m=[39;49m[43mfile_path[49m[43m,[49m
+[1;32m    154[0m [43m        [49m[43mfirst_pass[49m[38;5;241;43m=[39;49m[43mfirst_pass[49m[43m,[49m
+[1;32m    155[0m [43m        [49m[43msettings[49m[38;5;241;43m=[39;49m[43msettings[49m[43m,[49m
+[1;32m    156[0m [43m        [49m[43mstream[49m[38;5;241;43m=[39;49m[43mstream[49m
+[1;32m    157[0m [43m    [49m[43m)[49m
+[1;32m    159[0m [38;5;28;01melif[39;00m settings[[38;5;124m'[39m[38;5;124mdata_loading_function[39m[38;5;124m'[39m] [38;5;241m==[39m [38;5;124m'[39m[38;5;124mgeneral_2d_load[39m[38;5;124m'[39m:
+[1;32m    160[0m     stream [38;5;241m=[39m get_2d_stream(
+[1;32m    161[0m         file_path[38;5;241m=[39mfile_path,
+[1;32m    162[0m         first_pass[38;5;241m=[39mfirst_pass,
+[1;32m    163[0m         settings[38;5;241m=[39msettings,
+[1;32m    164[0m         stream[38;5;241m=[39mstream
+[1;32m    165[0m     )
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:323[0m, in [0;36mget_1d_stream[0;34m(file_path, settings, first_pass, stream)[0m
+[1;32m    321[0m     stream[38;5;241m.[39mtime [38;5;241m=[39m epoch_time
+[1;32m    322[0m [38;5;28;01melse[39;00m:
+[0;32m--> 323[0m     stream [38;5;241m=[39m [43mmerger[49m[38;5;241;43m.[39;49m[43mstream_add_data[49m[43m([49m
+[1;32m    324[0m [43m        [49m[43mstream[49m[38;5;241;43m=[39;49m[43mstream[49m[43m,[49m
+[1;32m    325[0m [43m        [49m[43mtime_new[49m[38;5;241;43m=[39;49m[43mepoch_time[49m[43m,[49m
+[1;32m    326[0m [43m        [49m[43mdata_new[49m[38;5;241;43m=[39;49m[43mdata[49m[43m,[49m
+[1;32m    327[0m [43m        [49m[43mheader_check[49m[38;5;241;43m=[39;49m[38;5;28;43;01mTrue[39;49;00m[43m,[49m
+[1;32m    328[0m [43m        [49m[43mheader_new[49m[38;5;241;43m=[39;49m[43msettings[49m[43m[[49m[38;5;124;43m'[39;49m[38;5;124;43mdata_header[39;49m[38;5;124;43m'[39;49m[43m][49m
+[1;32m    329[0m [43m    [49m[43m)[49m
+[1;32m    330[0m [38;5;28;01mreturn[39;00m stream
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/merger.py:182[0m, in [0;36mstream_add_data[0;34m(stream, time_new, data_new, header_check, header_new)[0m
+[1;32m    180[0m     sorted_time_index [38;5;241m=[39m np[38;5;241m.[39margsort(stream[38;5;241m.[39mtime)
+[1;32m    181[0m     stream[38;5;241m.[39mtime [38;5;241m=[39m stream[38;5;241m.[39mtime[sorted_time_index]
+[0;32m--> 182[0m     stream[38;5;241m.[39mdata [38;5;241m=[39m [43mstream[49m[38;5;241;43m.[39;49m[43mdata[49m[43m[[49m[43m:[49m[43m,[49m[43m [49m[43msorted_time_index[49m[43m][49m
+[1;32m    183[0m [38;5;28;01mreturn[39;00m stream
+
+[0;31mIndexError[0m: index 1015 is out of bounds for axis 1 with size 11
+
