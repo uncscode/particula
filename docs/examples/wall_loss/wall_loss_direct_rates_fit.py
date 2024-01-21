@@ -92,6 +92,14 @@ stream_averaged_2d = stream_stats.average_std(
     average_interval=average_interval,
 )
 
+# filter out zeros
+stream_averaged_2d = stream_stats.filtering(
+    stream=stream_averaged_2d,
+    value=0,
+    drop=True,
+    header=[100]
+)
+
 # get the time in hours
 experiment_time = time_manage.relative_time(
     epoch_array=stream_averaged_2d.time.copy(),
@@ -132,3 +140,4 @@ k_rate_chamber_min = chamber_push / CHAMBER_VOLUME
 k_rate_chamber_hr = k_rate_chamber_min * 60
 
 # %%
+
