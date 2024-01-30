@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Simple Wall Loss Fit &#8212; Particula Book</title>
   
@@ -29,39 +28,43 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
 const thebe_selector = ".thebe,.cell"
 const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
-    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=afe5de03"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/wall_loss/forward_fit_simple';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -160,7 +163,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -565,10 +579,10 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="simple-wall-loss-fit">
-<h1>Simple Wall Loss Fit<a class="headerlink" href="#simple-wall-loss-fit" title="Permalink to this heading">#</a></h1>
+<h1>Simple Wall Loss Fit<a class="headerlink" href="#simple-wall-loss-fit" title="Link to this heading">#</a></h1>
 <p>In this section, we integrate particle simulations with data import tools to optimize wall-loss parameters in a chamber environment. This process is essential in understanding and accurately modeling the behavior of aerosol particles within a confined space.</p>
 <section id="approach">
-<h2>Approach:<a class="headerlink" href="#approach" title="Permalink to this heading">#</a></h2>
+<h2>Approach:<a class="headerlink" href="#approach" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>We commence by defining the initial size distribution of particles at the start time (<code class="docutils literal notranslate"><span class="pre">t_start</span></code>).</p></li>
 <li><p>Utilizing <code class="docutils literal notranslate"><span class="pre">particula.Solver</span></code>, we simulate the dynamics of particles in the chamber up to a specified end time (<code class="docutils literal notranslate"><span class="pre">t_end</span></code>).</p></li>
@@ -602,7 +616,7 @@ document.write(`
 </div>
 </section>
 <section id="data-preparation-loading-and-converting-smps-data">
-<h2>Data Preparation: Loading and Converting SMPS Data<a class="headerlink" href="#data-preparation-loading-and-converting-smps-data" title="Permalink to this heading">#</a></h2>
+<h2>Data Preparation: Loading and Converting SMPS Data<a class="headerlink" href="#data-preparation-loading-and-converting-smps-data" title="Link to this heading">#</a></h2>
 <p>In this section, we focus on preparing the data necessary for our particle simulation and optimization process. This involves setting the data directory, loading the data, and performing initial conversions.</p>
 <p><strong>Steps:</strong></p>
 <ul class="simple">
@@ -647,7 +661,7 @@ document.write(`
 </div>
 </section>
 <section id="data-preparation-time-window-selection-and-data-cleaning">
-<h2>Data Preparation: Time Window Selection and Data Cleaning<a class="headerlink" href="#data-preparation-time-window-selection-and-data-cleaning" title="Permalink to this heading">#</a></h2>
+<h2>Data Preparation: Time Window Selection and Data Cleaning<a class="headerlink" href="#data-preparation-time-window-selection-and-data-cleaning" title="Link to this heading">#</a></h2>
 <p>In this section, we focus on refining our dataset by selecting specific time windows and cleaning the data. This step is crucial to ensure the accuracy and relevance of our particle simulation and optimization.</p>
 <p><strong>Steps</strong>:</p>
 <ul class="simple">
@@ -726,7 +740,7 @@ python</p></li>
 </div>
 </section>
 <section id="visualization-of-processed-data">
-<h2>Visualization of Processed Data<a class="headerlink" href="#visualization-of-processed-data" title="Permalink to this heading">#</a></h2>
+<h2>Visualization of Processed Data<a class="headerlink" href="#visualization-of-processed-data" title="Link to this heading">#</a></h2>
 <p>After refining our dataset, the next step is to visualize the data. This allows us to observe trends and patterns in the particle concentration over time, which is crucial for understanding the behavior of aerosols in the chamber. We expect to see decrease particle concentrations.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -751,7 +765,7 @@ python</p></li>
 </div>
 </section>
 <section id="setting-simulation-properties-chamber-flow-rates-and-dilution-correction">
-<h2>Setting Simulation Properties: Chamber Flow Rates and Dilution Correction<a class="headerlink" href="#setting-simulation-properties-chamber-flow-rates-and-dilution-correction" title="Permalink to this heading">#</a></h2>
+<h2>Setting Simulation Properties: Chamber Flow Rates and Dilution Correction<a class="headerlink" href="#setting-simulation-properties-chamber-flow-rates-and-dilution-correction" title="Link to this heading">#</a></h2>
 <p>In this section, we define and apply key simulation properties related to the chamber flow rates and dilution correction. This is an important step to ensure that the simulation accurately represents the physical conditions of the experiment.</p>
 <p><strong>Steps</strong>:</p>
 <ul class="simple">
@@ -786,10 +800,10 @@ python</p></li>
 </div>
 </section>
 <section id="defining-simulation-functions">
-<h2>Defining Simulation Functions<a class="headerlink" href="#defining-simulation-functions" title="Permalink to this heading">#</a></h2>
+<h2>Defining Simulation Functions<a class="headerlink" href="#defining-simulation-functions" title="Link to this heading">#</a></h2>
 <p>To simulate and optimize the chamber conditions for aerosol particles, we define several key functions. Each function plays a specific role in simulating the chamber environment, calculating error metrics, and optimizing parameters.</p>
 <section id="functions">
-<h3>Functions:<a class="headerlink" href="#functions" title="Permalink to this heading">#</a></h3>
+<h3>Functions:<a class="headerlink" href="#functions" title="Link to this heading">#</a></h3>
 <ol class="arabic simple">
 <li><p><strong>simulate_chamber_interval</strong>:</p>
 <ul class="simple">
@@ -980,10 +994,10 @@ python</p></li>
 </section>
 </section>
 <section id="performing-chamber-simulation-and-optimization">
-<h2>Performing Chamber Simulation and Optimization<a class="headerlink" href="#performing-chamber-simulation-and-optimization" title="Permalink to this heading">#</a></h2>
+<h2>Performing Chamber Simulation and Optimization<a class="headerlink" href="#performing-chamber-simulation-and-optimization" title="Link to this heading">#</a></h2>
 <p>In this step, we use the previously defined functions to perform the actual simulation and optimization of the chamber environment. The focus here is to fine-tune the parameters for the an accurate representation of aerosol particle behavior in the chamber.</p>
 <section id="setting-input-parameters">
-<h3>Setting Input Parameters:<a class="headerlink" href="#setting-input-parameters" title="Permalink to this heading">#</a></h3>
+<h3>Setting Input Parameters:<a class="headerlink" href="#setting-input-parameters" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Define a range of indices to select a subset of data for the simulation.</p></li>
 <li><p>Extract the corresponding concentration and time array data from the dataset.</p></li>
@@ -991,14 +1005,14 @@ python</p></li>
 </ul>
 </section>
 <section id="optimizing-ktp-value">
-<h3>Optimizing ktp Value:<a class="headerlink" href="#optimizing-ktp-value" title="Permalink to this heading">#</a></h3>
+<h3>Optimizing ktp Value:<a class="headerlink" href="#optimizing-ktp-value" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Utilize the <code class="docutils literal notranslate"><span class="pre">optimize_ktp_value</span></code> function to find the optimal ktp value that minimizes the error between the simulated and observed particle distributions.</p></li>
 <li><p>Display the optimized ktp value.</p></li>
 </ul>
 </section>
 <section id="running-final-simulation">
-<h3>Running Final Simulation:<a class="headerlink" href="#running-final-simulation" title="Permalink to this heading">#</a></h3>
+<h3>Running Final Simulation:<a class="headerlink" href="#running-final-simulation" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Update the particle parameters with the optimized ktp value.</p></li>
 <li><p>Run the simulate_chamber_interval function with the updated parameters to simulate the chamber environment.</p></li>
@@ -1053,7 +1067,7 @@ Fit error: 92.00172725493776
 </section>
 </section>
 <section id="visualization-of-simulation-results">
-<h2>Visualization of Simulation Results<a class="headerlink" href="#visualization-of-simulation-results" title="Permalink to this heading">#</a></h2>
+<h2>Visualization of Simulation Results<a class="headerlink" href="#visualization-of-simulation-results" title="Link to this heading">#</a></h2>
 <p>In this section, we plot the results of our simulation to visualize how the particle size distribution changes over time in the chamber. This comparison between the initial and final states of both the simulation and experimental data provides valuable insights into the accuracy and dynamics of our model.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1107,10 +1121,10 @@ Fit error: 92.00172725493776
 </div>
 </section>
 <section id="summary-of-the-notebook">
-<h2>Summary of the Notebook<a class="headerlink" href="#summary-of-the-notebook" title="Permalink to this heading">#</a></h2>
+<h2>Summary of the Notebook<a class="headerlink" href="#summary-of-the-notebook" title="Link to this heading">#</a></h2>
 <p>This Jupyter Notebook presents first approach to simulating and analyzing the behavior of aerosol particles in a chamber environment.</p>
 <section id="achievements">
-<h3>Achievements:<a class="headerlink" href="#achievements" title="Permalink to this heading">#</a></h3>
+<h3>Achievements:<a class="headerlink" href="#achievements" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Successfully combined particle simulations with data import tools to optimize the wall-loss parameters in a chamber.</p></li>
 <li><p>Refined the dataset for analysis through careful selection and cropping of time windows.</p></li>
@@ -1119,7 +1133,7 @@ Fit error: 92.00172725493776
 </ul>
 </section>
 <section id="next-steps">
-<h3>Next Steps:<a class="headerlink" href="#next-steps" title="Permalink to this heading">#</a></h3>
+<h3>Next Steps:<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h3>
 <p>As a continuation of this research, the next step is to explore another method for solving the ordinary differential equation (ODE) problem. This will involve differentiating the data and fitting the aerosol rates more directly. This exploration aims to compare the effectiveness and efficiency of different approaches in modeling the dynamics of aerosol particles in a chamber environment.</p>
 </section>
 </section>
@@ -1234,7 +1248,7 @@ By particula contributors
 
   <p class="copyright">
     
-      © Copyright 2022.
+      © Copyright 2023.
       <br/>
     
   </p>

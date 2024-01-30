@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Liquid Vapor Equilibrium &#8212; Particula Book</title>
   
@@ -29,39 +28,43 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
 const thebe_selector = ".thebe,.cell"
 const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
-    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=afe5de03"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/equilibria/equilibria_part1';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -160,7 +163,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -549,7 +563,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="liquid-vapor-equilibrium">
-<h1>Liquid Vapor Equilibrium<a class="headerlink" href="#liquid-vapor-equilibrium" title="Permalink to this heading">#</a></h1>
+<h1>Liquid Vapor Equilibrium<a class="headerlink" href="#liquid-vapor-equilibrium" title="Link to this heading">#</a></h1>
 <p>This notebook explores the calculation of equilibrium composition in liquid-vapor mixtures, a crucial concept in aerosol science and environmental studies. We utilize an activity coefficient model to understand how different volatile organic compounds distribute between the liquid and vapor phases. This analysis is particularly important for predicting aerosol behavior and understanding atmospheric processes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -564,7 +578,7 @@ document.write(`
 </div>
 </div>
 <section id="setup-the-system">
-<h2>Setup the System<a class="headerlink" href="#setup-the-system" title="Permalink to this heading">#</a></h2>
+<h2>Setup the System<a class="headerlink" href="#setup-the-system" title="Link to this heading">#</a></h2>
 <p>To simulate the liquid-vapor equilibrium, we define several key parameters:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">c_star_j_dry</span></code>: Represents the volatility distribution of organic compounds in dry air, calculable from vapor pressure.</p></li>
@@ -597,7 +611,7 @@ document.write(`
 </div>
 </section>
 <section id="calculate-the-activity-coefficients">
-<h2>Calculate the Activity Coefficients<a class="headerlink" href="#calculate-the-activity-coefficients" title="Permalink to this heading">#</a></h2>
+<h2>Calculate the Activity Coefficients<a class="headerlink" href="#calculate-the-activity-coefficients" title="Link to this heading">#</a></h2>
 <p>The next step involves calculating the activity coefficients, which are pivotal in determining how the organic compounds distribute between the liquid and vapor phases. We use the <code class="docutils literal notranslate"><span class="pre">partitioning.get_properties_for_liquid_vapor_equilibrium</span></code> function, a specialized tool that simplifies the process by returning only the essential properties: activity coefficients, mass fractions, and the two-phase <em>q</em> values for the alpha-beta equilibrium.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -636,7 +650,7 @@ mass in water [ug/3]: 4.826984126401714
 </div>
 </section>
 <section id="activity-coefficients-as-a-function-of-relative-humidity-f-rh">
-<h2>Activity Coefficients as a Function of Relative Humidity (f(RH))<a class="headerlink" href="#activity-coefficients-as-a-function-of-relative-humidity-f-rh" title="Permalink to this heading">#</a></h2>
+<h2>Activity Coefficients as a Function of Relative Humidity (f(RH))<a class="headerlink" href="#activity-coefficients-as-a-function-of-relative-humidity-f-rh" title="Link to this heading">#</a></h2>
 <p>The binary activity model’s key feature is its interaction with water, particularly through relative humidity (RH). Here, we will calculate how the activity coefficients vary as a function of RH. This is done by iterating over a range of RH values and computing the corresponding activity coefficients, providing insights into how atmospheric humidity influences the equilibrium behavior of the system.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -684,7 +698,7 @@ mass in water [ug/3]: 4.826984126401714
 </div>
 </section>
 <section id="plotting-the-equilibrium-composition-vs-relative-humidity">
-<h2>Plotting the Equilibrium Composition vs. Relative Humidity<a class="headerlink" href="#plotting-the-equilibrium-composition-vs-relative-humidity" title="Permalink to this heading">#</a></h2>
+<h2>Plotting the Equilibrium Composition vs. Relative Humidity<a class="headerlink" href="#plotting-the-equilibrium-composition-vs-relative-humidity" title="Link to this heading">#</a></h2>
 <p>Now that we have calculated the equilibrium composition for a range of RH values, we will visualize these results. The plot will show how the total organic aerosol concentration and the water concentration in the aerosol vary with changing RH. This visualization is crucial for understanding the dynamic behavior of aerosols in different atmospheric humidity conditions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -715,7 +729,7 @@ mass in water [ug/3]: 4.826984126401714
 </div>
 </section>
 <section id="summary">
-<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h2>
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
 <p>In this notebook, we have journeyed through the process of defining a liquid-vapor equilibrium system and employing the binary activity model to calculate activity coefficients as a function of relative humidity (RH). We then used these coefficients to determine the equilibrium composition of the liquid and vapor phases. Finally, the results were visualized to demonstrate the impact of RH on aerosol behavior, which is essential for understanding atmospheric aerosol dynamics and their environmental implications.</p>
 </section>
 </section>
@@ -813,7 +827,7 @@ By particula contributors
 
   <p class="copyright">
     
-      © Copyright 2022.
+      © Copyright 2023.
       <br/>
     
   </p>

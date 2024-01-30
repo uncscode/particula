@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="./" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Contributor Guidelines &#8212; Particula Book</title>
   
@@ -29,39 +28,43 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/clipboard.min.js"></script>
-    <script src="_static/copybutton.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="_static/togglebutton.js"></script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="_static/design-tabs.js"></script>
+    <script src="_static/design-tabs.js?v=36754332"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
 const thebe_selector = ".thebe,.cell"
 const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
-    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script async="async" src="_static/sphinx-thebe.js?v=afe5de03"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'CONTRIBUTING';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -160,7 +163,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -487,7 +501,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="contributor-guidelines">
-<h1>Contributor Guidelines<a class="headerlink" href="#contributor-guidelines" title="Permalink to this heading">#</a></h1>
+<h1>Contributor Guidelines<a class="headerlink" href="#contributor-guidelines" title="Link to this heading">#</a></h1>
 <p>First of all, thank you for considering contributing to this project!
 While we have specific guidelines below, <em>we also encourage you to
 contribute to the best of your ability and not let these guidelines
@@ -544,7 +558,7 @@ Expect to have speedy feedback and help from us to finalize the PR.</p></li>
 We are excited and looking forward to your contribution!</p>
 <hr class="docutils" />
 <section id="github">
-<h2>GitHub<a class="headerlink" href="#github" title="Permalink to this heading">#</a></h2>
+<h2>GitHub<a class="headerlink" href="#github" title="Link to this heading">#</a></h2>
 <p>We use GitHub to develop <code class="docutils literal notranslate"><span class="pre">particula</span></code> completely in the open. Our repository is available here: <a class="reference external" href="https://uncscode.github.io/particula/">https://uncscode.github.io/particula/</a>.
 There are several ways to use GitHub: through the command line via <code class="docutils literal notranslate"><span class="pre">git</span></code> and/or <code class="docutils literal notranslate"><span class="pre">gh</span></code>, through the web interface and/or the GitHub web editor, or through an IDE like PyCharm or a code editor like Visual Studio Code.
 In general, we recommend that you fork our repository, that you work with VS Code, and that submit a pull request based on an issue.
@@ -553,12 +567,12 @@ We look forward to getting you started and up to speed on this project with us!<
 <p>Links: <a class="reference external" href="https://docs.github.com/en/get-started">https://docs.github.com/en/get-started</a></p>
 </section>
 <section id="vs-code">
-<h2>VS Code<a class="headerlink" href="#vs-code" title="Permalink to this heading">#</a></h2>
+<h2>VS Code<a class="headerlink" href="#vs-code" title="Link to this heading">#</a></h2>
 <p>Visual Studio Code is a free and open-source code editor for writing code and it has a rich ecosystem of extensions that allow you to write code in a variety of languages with a lot of helpful features and tools.</p>
 <p>Links: <a class="reference external" href="https://code.visualstudio.com/">https://code.visualstudio.com/</a></p>
 </section>
 <section id="devcontainer">
-<h2><code class="docutils literal notranslate"><span class="pre">.devcontainer</span></code><a class="headerlink" href="#devcontainer" title="Permalink to this heading">#</a></h2>
+<h2><code class="docutils literal notranslate"><span class="pre">.devcontainer</span></code><a class="headerlink" href="#devcontainer" title="Link to this heading">#</a></h2>
 <p>In the root of our repository, we have a <code class="docutils literal notranslate"><span class="pre">.devcontainer</span></code> folder that contains the environment variables required for development.
 This is a convenient way to set up the environment for development.
 It requires Docker to be installed and running.
@@ -566,25 +580,25 @@ And the first time it runs it may take a few minutes to install the Docker image
 <p>Links: <a class="reference external" href="https://code.visualstudio.com/docs/remote/containers">https://code.visualstudio.com/docs/remote/containers</a></p>
 </section>
 <section id="python-code-style">
-<h2>Python code style<a class="headerlink" href="#python-code-style" title="Permalink to this heading">#</a></h2>
+<h2>Python code style<a class="headerlink" href="#python-code-style" title="Link to this heading">#</a></h2>
 <p>We follow the Google’s Python style guide.
 We encourage you to follow it too, but we also encourage you to contribute to the best of your ability and not let these guidelines hinder your productivity and creativity.</p>
 <p>Links: <a class="reference external" href="https://google.github.io/styleguide/pyguide.html">https://google.github.io/styleguide/pyguide.html</a></p>
 </section>
 <section id="running-particula-locally">
-<h2>Running <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally<a class="headerlink" href="#running-particula-locally" title="Permalink to this heading">#</a></h2>
+<h2>Running <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally<a class="headerlink" href="#running-particula-locally" title="Link to this heading">#</a></h2>
 <p>Once you are in the root directory, you will be able to import <code class="docutils literal notranslate"><span class="pre">particula</span></code> as a package/model and thus all documentation on website applies.
 You must be in the root directory.</p>
 </section>
 <section id="writing-tests">
-<h2>Writing tests<a class="headerlink" href="#writing-tests" title="Permalink to this heading">#</a></h2>
+<h2>Writing tests<a class="headerlink" href="#writing-tests" title="Link to this heading">#</a></h2>
 <p>It is essential that every piece of code has an associated test.
 This is a good way to ensure that the code is working as intended.
 It also ensures that the code is not broken and that the code is not too complex.
 However small or big, a test is always required.</p>
 </section>
 <section id="running-testing-linting-locally">
-<h2>Running testing/linting locally<a class="headerlink" href="#running-testing-linting-locally" title="Permalink to this heading">#</a></h2>
+<h2>Running testing/linting locally<a class="headerlink" href="#running-testing-linting-locally" title="Link to this heading">#</a></h2>
 <p>We use <code class="docutils literal notranslate"><span class="pre">pytest</span></code>, <code class="docutils literal notranslate"><span class="pre">pylint</span></code>, and <code class="docutils literal notranslate"><span class="pre">flake8</span></code> to run tests and linting.
 The command below can be run in the root directory like you’d run the package above.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pylint<span class="w"> </span><span class="k">$(</span>find<span class="w"> </span>particula/<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.py&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="k">)</span>
@@ -598,7 +612,7 @@ The command below can be run in the root directory like you’d run the package 
 </div>
 </section>
 <section id="building-particula-locally">
-<h2>Building <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally<a class="headerlink" href="#building-particula-locally" title="Permalink to this heading">#</a></h2>
+<h2>Building <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally<a class="headerlink" href="#building-particula-locally" title="Link to this heading">#</a></h2>
 <p>To build <code class="docutils literal notranslate"><span class="pre">particula</span></code> locally, you must be in the root directory.
 You have two options, depending on your usage case.</p>
 <ol class="arabic simple">
@@ -608,13 +622,13 @@ You have two options, depending on your usage case.</p>
 <p>Links: <a class="reference external" href="https://packaging.python.org/en/latest/tutorials/packaging-projects/">https://packaging.python.org/en/latest/tutorials/packaging-projects/</a> and <a class="reference external" href="https://docs.conda.io/projects/conda-build/en/latest/user-guide/index.html">https://docs.conda.io/projects/conda-build/en/latest/user-guide/index.html</a></p>
 </section>
 <section id="documentation-writing">
-<h2>Documentation writing<a class="headerlink" href="#documentation-writing" title="Permalink to this heading">#</a></h2>
+<h2>Documentation writing<a class="headerlink" href="#documentation-writing" title="Link to this heading">#</a></h2>
 <p>We prefer that the tutorials are written in the form of Jupyter notebooks after the package is released and published.
 A convenient option is using Google’s Colaboratory to write the notebooks.</p>
 <p>Links: <a class="reference external" href="https://colab.research.google.com/">https://colab.research.google.com/</a></p>
 </section>
 <section id="more-information">
-<h2>More information<a class="headerlink" href="#more-information" title="Permalink to this heading">#</a></h2>
+<h2>More information<a class="headerlink" href="#more-information" title="Link to this heading">#</a></h2>
 <p>We will update this regularly with more information, but in the meanwhile, please feel free to contact us directly on GitHub.</p>
 </section>
 </section>
@@ -717,7 +731,7 @@ By particula contributors
 
   <p class="copyright">
     
-      © Copyright 2022.
+      © Copyright 2023.
       <br/>
     
   </p>

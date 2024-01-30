@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Particula tour &#8212; Particula Book</title>
   
@@ -29,39 +28,43 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
 const thebe_selector = ".thebe,.cell"
 const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
-    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=afe5de03"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tour/part-tour';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -160,7 +163,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -558,7 +572,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="particula-tour">
-<h1>Particula tour<a class="headerlink" href="#particula-tour" title="Permalink to this heading">#</a></h1>
+<h1>Particula tour<a class="headerlink" href="#particula-tour" title="Link to this heading">#</a></h1>
 <p>We have designed <code class="docutils literal notranslate"><span class="pre">particula</span></code> around object-oriented programming principles where physics entities inherit from each other.</p>
 <ol class="arabic simple">
 <li><p>It all starts with an <code class="docutils literal notranslate"><span class="pre">Environment</span></code> object (class) where temperature, pressure, and other derived properties are defined. For now, the two main derived properties are the dynamic viscosity and mean free path.</p></li>
@@ -568,7 +582,7 @@ document.write(`
 <li><p>Finally, a dynamic <code class="docutils literal notranslate"><span class="pre">Solver</span></code> object builds on <code class="docutils literal notranslate"><span class="pre">Rates</span></code> and propagates the <code class="docutils literal notranslate"><span class="pre">Particle</span></code> object in time.</p></li>
 </ol>
 <section id="setup">
-<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this heading">#</a></h2>
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
 <p>Let’s first get the needed packages and set up our computational environment.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -589,7 +603,7 @@ document.write(`
 </div>
 </section>
 <section id="defining-a-distribution">
-<h2>Defining a distribution<a class="headerlink" href="#defining-a-distribution" title="Permalink to this heading">#</a></h2>
+<h2>Defining a distribution<a class="headerlink" href="#defining-a-distribution" title="Link to this heading">#</a></h2>
 <p>Defining a distribution in <code class="docutils literal notranslate"><span class="pre">particula</span></code> is easy! Simply import the <code class="docutils literal notranslate"><span class="pre">Particle</span></code> class and pass some keyword arguments to it. Here we interested in a bimodal particle distribution, with different modes and different geometric standard deviations (<code class="docutils literal notranslate"><span class="pre">gsigma</span></code>) and different amplitude (<code class="docutils literal notranslate"><span class="pre">particle_number</span></code>). While at it, we might as well calculate rates and disabling the <code class="docutils literal notranslate"><span class="pre">lazy</span></code> execution so that we do not recalculate the rates at every call.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -623,7 +637,7 @@ document.write(`
 </div>
 </div>
 <section id="particle-number-concentration-density">
-<h3>Particle number concentration density<a class="headerlink" href="#particle-number-concentration-density" title="Permalink to this heading">#</a></h3>
+<h3>Particle number concentration density<a class="headerlink" href="#particle-number-concentration-density" title="Link to this heading">#</a></h3>
 <p>One way to think about this is to integrate the curve, that yields exactly 1e5 /cc which is the total number concentration. Try it! (Copy the code block below and execute it after or before the next cell.)</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">part_dist</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">(),</span> <span class="n">part_dist</span><span class="o">.</span><span class="n">particle_radius</span><span class="p">)</span>
 </pre></div>
@@ -644,7 +658,7 @@ document.write(`
 </div>
 </section>
 <section id="the-coagulation-kernel">
-<h3>The coagulation kernel<a class="headerlink" href="#the-coagulation-kernel" title="Permalink to this heading">#</a></h3>
+<h3>The coagulation kernel<a class="headerlink" href="#the-coagulation-kernel" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -662,7 +676,7 @@ document.write(`
 </div>
 </section>
 <section id="the-coagulation-loss-rate">
-<h3>The coagulation loss rate<a class="headerlink" href="#the-coagulation-loss-rate" title="Permalink to this heading">#</a></h3>
+<h3>The coagulation loss rate<a class="headerlink" href="#the-coagulation-loss-rate" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -679,7 +693,7 @@ document.write(`
 </div>
 </section>
 <section id="the-coagulation-gain-rate">
-<h3>The coagulation gain rate<a class="headerlink" href="#the-coagulation-gain-rate" title="Permalink to this heading">#</a></h3>
+<h3>The coagulation gain rate<a class="headerlink" href="#the-coagulation-gain-rate" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -696,7 +710,7 @@ document.write(`
 </div>
 </section>
 <section id="the-coagulation-net-rate">
-<h3>The coagulation net rate<a class="headerlink" href="#the-coagulation-net-rate" title="Permalink to this heading">#</a></h3>
+<h3>The coagulation net rate<a class="headerlink" href="#the-coagulation-net-rate" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -713,7 +727,7 @@ document.write(`
 </div>
 </section>
 <section id="the-condensation-growth-speed">
-<h3>The condensation growth speed<a class="headerlink" href="#the-condensation-growth-speed" title="Permalink to this heading">#</a></h3>
+<h3>The condensation growth speed<a class="headerlink" href="#the-condensation-growth-speed" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -730,7 +744,7 @@ document.write(`
 </div>
 </section>
 <section id="the-condensation-growth-rate">
-<h3>The condensation growth rate<a class="headerlink" href="#the-condensation-growth-rate" title="Permalink to this heading">#</a></h3>
+<h3>The condensation growth rate<a class="headerlink" href="#the-condensation-growth-rate" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -747,7 +761,7 @@ document.write(`
 </div>
 </section>
 <section id="the-condensation-growth-rate-volume-wise">
-<h3>The condensation growth rate (volume-wise)<a class="headerlink" href="#the-condensation-growth-rate-volume-wise" title="Permalink to this heading">#</a></h3>
+<h3>The condensation growth rate (volume-wise)<a class="headerlink" href="#the-condensation-growth-rate-volume-wise" title="Link to this heading">#</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_some</span><span class="p">(</span>
@@ -764,7 +778,7 @@ document.write(`
 </div>
 </section>
 <section id="the-coagulation-net-rate-volume-wise">
-<h3>The coagulation net rate (volume-wise)<a class="headerlink" href="#the-coagulation-net-rate-volume-wise" title="Permalink to this heading">#</a></h3>
+<h3>The coagulation net rate (volume-wise)<a class="headerlink" href="#the-coagulation-net-rate-volume-wise" title="Link to this heading">#</a></h3>
 <p>Note the integration yields a small number, meaning the mass is conserved!</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -783,7 +797,7 @@ document.write(`
 </div>
 </section>
 <section id="a-solver">
-<h3>A solver<a class="headerlink" href="#a-solver" title="Permalink to this heading">#</a></h3>
+<h3>A solver<a class="headerlink" href="#a-solver" title="Link to this heading">#</a></h3>
 <p>If you are adventurous, you can even propagate the define distribution in time! We use a rather simple solver here, but it still takes time as it has to recalculate all the rates at every time step. We reduce the <code class="docutils literal notranslate"><span class="pre">nbins</span></code> to make it slightly faster, but it may not even run on a super tiny (free) machine.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -942,7 +956,7 @@ By particula contributors
 
   <p class="copyright">
     
-      © Copyright 2022.
+      © Copyright 2023.
       <br/>
     
   </p>

@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Loading Part 2: Sizer Data &#8212; Particula Book</title>
   
@@ -29,39 +28,43 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
 const thebe_selector = ".thebe,.cell"
 const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
-    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=afe5de03"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/streamlake/loading_data_part2';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -160,7 +163,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -577,10 +591,10 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="loading-part-2-sizer-data">
-<h1>Loading Part 2: Sizer Data<a class="headerlink" href="#loading-part-2-sizer-data" title="Permalink to this heading">#</a></h1>
+<h1>Loading Part 2: Sizer Data<a class="headerlink" href="#loading-part-2-sizer-data" title="Link to this heading">#</a></h1>
 <p>Welcome to Part 2 of our data loading series! This section builds upon the concepts and techniques introduced in Part 1. If you haven’t gone through the first part, we highly recommend you do so to get a firm foundation. Here, we’ll dive into handling 2-dimensional data, such as size distributions, which are common in fields like environmental science and engineering.</p>
 <section id="setting-up-your-working-path">
-<h2>Setting Up Your Working Path<a class="headerlink" href="#setting-up-your-working-path" title="Permalink to this heading">#</a></h2>
+<h2>Setting Up Your Working Path<a class="headerlink" href="#setting-up-your-working-path" title="Link to this heading">#</a></h2>
 <p>Before we begin, let’s set up the working path, which is the location on your computer where your data files are stored. In this example, we’ll use data provided in the current directory of this notebook. However, you can easily change this to any directory where your data files are located. For instance, if you have a folder named “data” in your home directory for a project called “Campaign2023_of_awesome”, you would set the path like this:</p>
 <p><code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">=</span> <span class="pre">&quot;U:\\data\\processing\\Campaign2023_of_awesome\\data&quot;</span></code></p>
 <p>Let’s start by importing the necessary Python libraries and modules. We’ll explain each one as we use them throughout this notebook.</p>
@@ -623,7 +637,7 @@ Path to data folder:
 </div>
 </section>
 <section id="load-the-data">
-<h2>Load the Data<a class="headerlink" href="#load-the-data" title="Permalink to this heading">#</a></h2>
+<h2>Load the Data<a class="headerlink" href="#load-the-data" title="Link to this heading">#</a></h2>
 <p>Now that we’ve set our working directory, the next step is to load the data. We’ll be using the <code class="docutils literal notranslate"><span class="pre">loader</span></code> module from the Particula package for this task. The function <code class="docutils literal notranslate"><span class="pre">loader.data_raw_loader()</span></code> is specifically designed to read data from a file, which we’ll specify using its file path. This approach is straightforward and efficient for loading data into Python for analysis.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -668,7 +682,7 @@ Sample #,Date,Start Time,Sample Temp (C),Sample Pressure (kPa),Relative Humidity
 </section>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="formatting-the-data">
-<h1>Formatting the Data<a class="headerlink" href="#formatting-the-data" title="Permalink to this heading">#</a></h1>
+<h1>Formatting the Data<a class="headerlink" href="#formatting-the-data" title="Link to this heading">#</a></h1>
 <p>When dealing with 2-dimensional data, such as size distributions, the formatting process can be a bit more complex compared to 1-dimensional data. For our data, we need to extract size bins and use them as headers for our dataset. This involves specifying the start and end points within the data that define our size bins. In our specific example, the start point is indicated by the keyword “Date Time” and the end point by “Total Conc”. Understanding where your data starts and ends is crucial for accurate formatting and analysis.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -718,7 +732,7 @@ Header (First 10 Entries):
 </div>
 </div>
 <section id="pause-to-plot">
-<h2>Pause to Plot<a class="headerlink" href="#pause-to-plot" title="Permalink to this heading">#</a></h2>
+<h2>Pause to Plot<a class="headerlink" href="#pause-to-plot" title="Link to this heading">#</a></h2>
 <p>Visualizing your data is a crucial step in the data analysis process. It allows you to see patterns, trends, and potential anomalies that might not be evident from the raw data alone. Now that we have formatted the data and extracted the time information, let’s create a plot. This will help us get a visual sense of the data’s characteristics, such as the concentration of particles in different size bins over time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -755,7 +769,7 @@ Header (First 10 Entries):
 </div>
 </section>
 <section id="dates-in-plots">
-<h2>Dates in Plots<a class="headerlink" href="#dates-in-plots" title="Permalink to this heading">#</a></h2>
+<h2>Dates in Plots<a class="headerlink" href="#dates-in-plots" title="Link to this heading">#</a></h2>
 <p>When working with time-series data, it’s often helpful to have dates on the x-axis of your plots for better readability and understanding. However, to display dates effectively in plots using <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>, we need to convert our time data into a format that <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> can recognize and work with.</p>
 <p>One common format for this purpose is <code class="docutils literal notranslate"><span class="pre">np.datetime64</span></code>. This format represents dates and times in a way that is compatible with numpy arrays, making it ideal for plotting time-related data. In our case, we can convert our epoch time (time since a fixed point in the past, typically January 1, 1970) to <code class="docutils literal notranslate"><span class="pre">np.datetime64</span></code> using the <code class="docutils literal notranslate"><span class="pre">convert.datetime64_from_epoch_array</span></code> function from the Particula package.</p>
 <p>Additionally, to make the plot more readable, especially when there are many data points, it’s a good practice to rotate the x-axis labels. This prevents overlapping and makes each date and time label clear. We can achieve this rotation using <code class="docutils literal notranslate"><span class="pre">plt.xticks(rotation=45)</span></code>.</p>
@@ -800,10 +814,10 @@ Header (First 10 Entries):
 </div>
 </section>
 <section id="contour-plot-of-data">
-<h2>Contour Plot of Data<a class="headerlink" href="#contour-plot-of-data" title="Permalink to this heading">#</a></h2>
+<h2>Contour Plot of Data<a class="headerlink" href="#contour-plot-of-data" title="Link to this heading">#</a></h2>
 <p>Contour plots are a powerful tool for visualizing how data changes over time and space. In the context of size distribution data, a contour plot can effectively show the variation in particle concentration across different sizes over time. It’s like looking at a topographic map where different colors or shades represent varying concentrations of particles at different sizes and times.</p>
 <section id="preparing-the-data-for-contour-plotting">
-<h3>Preparing the Data for Contour Plotting<a class="headerlink" href="#preparing-the-data-for-contour-plotting" title="Permalink to this heading">#</a></h3>
+<h3>Preparing the Data for Contour Plotting<a class="headerlink" href="#preparing-the-data-for-contour-plotting" title="Link to this heading">#</a></h3>
 <p>Before we plot, it’s a good practice to set limits on our data to ensure that extreme values don’t skew the visualization. This helps in highlighting the relevant ranges of our data. Here’s how we do it:</p>
 <ol class="arabic simple">
 <li><p><strong>Setting Lower and Upper Limits</strong>: We impose a lower limit to avoid plotting extremely low concentrations (which might be less relevant or below detection limits) and an upper limit to avoid letting very high concentrations dominate the plot.</p></li>
@@ -811,7 +825,7 @@ Header (First 10 Entries):
 </ol>
 </section>
 <section id="creating-the-contour-plot">
-<h3>Creating the Contour Plot<a class="headerlink" href="#creating-the-contour-plot" title="Permalink to this heading">#</a></h3>
+<h3>Creating the Contour Plot<a class="headerlink" href="#creating-the-contour-plot" title="Link to this heading">#</a></h3>
 <p>With our data prepared, we can now create the contour plot. This type of plot will use different colors or shades to represent the concentration of particles at various sizes and times.</p>
 <ul class="simple">
 <li><p><strong>X-Axis (Epoch Time)</strong>: Represents the time dimension of our data.</p></li>
@@ -876,14 +890,14 @@ Header (First 10 Entries):
 </section>
 </section>
 <section id="simplifying-data-import-with-the-settings-generator">
-<h2>Simplifying Data Import with the Settings Generator<a class="headerlink" href="#simplifying-data-import-with-the-settings-generator" title="Permalink to this heading">#</a></h2>
+<h2>Simplifying Data Import with the Settings Generator<a class="headerlink" href="#simplifying-data-import-with-the-settings-generator" title="Link to this heading">#</a></h2>
 <p>In the same way we handled 1-dimensional (1d) data, we can also streamline the import process for 2-dimensional (2d) data using the settings generator. This tool is particularly useful for creating a structured approach to loading complex datasets. By using the <code class="docutils literal notranslate"><span class="pre">settings_generator.for_general_sizer_1d_2d_load()</span></code> function, we can generate a comprehensive settings dictionary that directs how data should be imported and formatted.</p>
 <section id="understanding-the-settings-generator-function">
-<h3>Understanding the Settings Generator Function<a class="headerlink" href="#understanding-the-settings-generator-function" title="Permalink to this heading">#</a></h3>
+<h3>Understanding the Settings Generator Function<a class="headerlink" href="#understanding-the-settings-generator-function" title="Link to this heading">#</a></h3>
 <p>This function is designed to be flexible and accommodate a wide range of data types and formats. It comes with numerous arguments that allow you to specify details like data checks, column information, time format, etc., tailored to your specific dataset. However, it’s important to note that you don’t have to be overwhelmed by these options.</p>
 </section>
 <section id="using-default-settings">
-<h3>Using Default Settings<a class="headerlink" href="#using-default-settings" title="Permalink to this heading">#</a></h3>
+<h3>Using Default Settings<a class="headerlink" href="#using-default-settings" title="Link to this heading">#</a></h3>
 <p>For many users, especially those just starting out or working with standard data formats, the default settings of the <code class="docutils literal notranslate"><span class="pre">settings_generator</span></code> function may work. These defaults are configured to align with the example data provided in the Particula package. This means that if your data structure is similar to the example data, you can call this function without passing any arguments, and it will automatically set up the settings for you.</p>
 <p>This approach not only saves time but also reduces the potential for errors in the data import process, making it a quick and reliable way to get your data ready for analysis.</p>
 <div class="cell docutils container">
@@ -974,14 +988,14 @@ timezone_identifier: UTC
 </section>
 </section>
 <section id="efficient-data-loading-with-the-interface">
-<h2>Efficient Data Loading with the Interface<a class="headerlink" href="#efficient-data-loading-with-the-interface" title="Permalink to this heading">#</a></h2>
+<h2>Efficient Data Loading with the Interface<a class="headerlink" href="#efficient-data-loading-with-the-interface" title="Link to this heading">#</a></h2>
 <p>After configuring our settings dictionaries for 1-dimensional and 2-dimensional data, we’re set to leverage the interface for data loading. This interface, a key component of the Particula package, streamlines the process, making it more efficient and straightforward, especially after you have a good grasp of how the settings work.</p>
 <section id="understanding-the-interface-s-role">
-<h3>Understanding the Interface’s Role<a class="headerlink" href="#understanding-the-interface-s-role" title="Permalink to this heading">#</a></h3>
+<h3>Understanding the Interface’s Role<a class="headerlink" href="#understanding-the-interface-s-role" title="Link to this heading">#</a></h3>
 <p>The interface acts as a facilitator that intelligently uses the settings we’ve established to manage the data loading process. It eliminates the need for manual execution of multiple steps, thereby integrating and automating the data import based on our predefined preferences.</p>
 </section>
 <section id="the-advantages-of-mastery">
-<h3>The Advantages of Mastery<a class="headerlink" href="#the-advantages-of-mastery" title="Permalink to this heading">#</a></h3>
+<h3>The Advantages of Mastery<a class="headerlink" href="#the-advantages-of-mastery" title="Link to this heading">#</a></h3>
 <p>Once you’re comfortable with setting up your data parameters, using the interface offers several key benefits:</p>
 <ul class="simple">
 <li><p><strong>Enhanced Efficiency</strong>: It consolidates several operations into a single action, significantly speeding up the data loading process.</p></li>
@@ -1088,10 +1102,10 @@ timezone_identifier: UTC
 </section>
 </section>
 <section id="printing-data-stream-summaries">
-<h2>Printing Data Stream Summaries<a class="headerlink" href="#printing-data-stream-summaries" title="Permalink to this heading">#</a></h2>
+<h2>Printing Data Stream Summaries<a class="headerlink" href="#printing-data-stream-summaries" title="Link to this heading">#</a></h2>
 <p>After loading our data using the loader interface, it’s a good practice to take a moment and review what we have loaded. This helps us confirm that the data is imported correctly and gives us an initial overview of its structure. We’ll do this by printing summaries of the <code class="docutils literal notranslate"><span class="pre">data_stream_1d</span></code> and <code class="docutils literal notranslate"><span class="pre">data_stream_2d</span></code> objects.</p>
 <section id="understanding-the-data-stream-summary">
-<h3>Understanding the Data Stream Summary<a class="headerlink" href="#understanding-the-data-stream-summary" title="Permalink to this heading">#</a></h3>
+<h3>Understanding the Data Stream Summary<a class="headerlink" href="#understanding-the-data-stream-summary" title="Link to this heading">#</a></h3>
 <p>When we print a <code class="docutils literal notranslate"><span class="pre">data_stream</span></code> object, it provides us with a summary of its contents. This includes information like the size of the data, the headers (which represent different data types or measurements), and a glimpse into the actual data values. These summaries are especially useful for:</p>
 <ul class="simple">
 <li><p><strong>Verifying Data Integrity</strong>: Ensuring that the data has been loaded as expected and is ready for analysis.</p></li>
@@ -1099,7 +1113,7 @@ timezone_identifier: UTC
 </ul>
 </section>
 <section id="code-for-printing-summaries">
-<h3>Code for Printing Summaries<a class="headerlink" href="#code-for-printing-summaries" title="Permalink to this heading">#</a></h3>
+<h3>Code for Printing Summaries<a class="headerlink" href="#code-for-printing-summaries" title="Link to this heading">#</a></h3>
 <p>Here’s how we print the summaries for our 1-dimensional and 2-dimensional data streams:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1158,7 +1172,7 @@ Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39
 </section>
 </section>
 <section id="plotting-again">
-<h2>Plotting Again<a class="headerlink" href="#plotting-again" title="Permalink to this heading">#</a></h2>
+<h2>Plotting Again<a class="headerlink" href="#plotting-again" title="Link to this heading">#</a></h2>
 <p>Plotting is an integral part of the data analysis process. It transforms raw data into visual representations that can reveal insights, patterns, and anomalies that might not be immediately apparent in numerical form. Let’s delve into why plotting is so crucial in understanding your data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1221,7 +1235,7 @@ Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39
 </div>
 </section>
 <section id="summary-of-loading-data-part-2">
-<h2>Summary of Loading Data Part 2<a class="headerlink" href="#summary-of-loading-data-part-2" title="Permalink to this heading">#</a></h2>
+<h2>Summary of Loading Data Part 2<a class="headerlink" href="#summary-of-loading-data-part-2" title="Link to this heading">#</a></h2>
 <p>In this section, we delved into the process of loading and handling 2-dimensional data, focusing on a size distribution dataset. We walked through several crucial steps, providing a comprehensive guide to managing and visualizing complex data structures. Here’s a recap of what we covered:</p>
 <ul class="simple">
 <li><p>Setting the Working Path: We began by establishing the working directory for our data, a foundational step in ensuring our scripts access the correct files.</p></li>
@@ -1357,7 +1371,7 @@ By particula contributors
 
   <p class="copyright">
     
-      © Copyright 2022.
+      © Copyright 2023.
       <br/>
     
   </p>

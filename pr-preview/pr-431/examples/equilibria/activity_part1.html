@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Activity Example &#8212; Particula Book</title>
   
@@ -29,39 +28,43 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
 const thebe_selector = ".thebe,.cell"
 const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
-    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=afe5de03"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/equilibria/activity_part1';</script>
@@ -162,7 +165,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -559,7 +573,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="activity-example">
-<h1>Activity Example<a class="headerlink" href="#activity-example" title="Permalink to this heading">#</a></h1>
+<h1>Activity Example<a class="headerlink" href="#activity-example" title="Link to this heading">#</a></h1>
 <p>This notebook demonstrates the Binary Activity Theory (BAT) model application, crucial for calculating the activity of water and organic compounds in mixtures and understanding phase separation. This model, as detailed in Gorkowski, K., Preston, T. C., &amp; Zuend, A. (2019), provides critical insights into aerosol particle behavior, essential in environmental and climate change research.</p>
 <p>Reference: Gorkowski, K., Preston, T. C., &amp; Zuend, A. (2019).
 Relative-humidity-dependent organic aerosol thermodynamics Via an efficient
@@ -576,7 +590,7 @@ reduced-complexity model. Atmospheric Chemistry and Physics
 </div>
 </div>
 <section id="activity-calculation">
-<h2>Activity Calculation<a class="headerlink" href="#activity-calculation" title="Permalink to this heading">#</a></h2>
+<h2>Activity Calculation<a class="headerlink" href="#activity-calculation" title="Link to this heading">#</a></h2>
 <p>Define the parameters required by the activity module to calculate the activity of water and organic compounds in a mixture, as well as phase separation. These parameters include organic mole fraction, density, molecular weight ratio [water/organic], and the density of the organic compound. Using these parameters helps in accurately modeling the behavior of aerosol particles in various environmental conditions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -604,7 +618,7 @@ reduced-complexity model. Atmospheric Chemistry and Physics
 </div>
 </section>
 <section id="plotting-the-activity-and-phase-separation">
-<h2>Plotting the Activity and Phase Separation<a class="headerlink" href="#plotting-the-activity-and-phase-separation" title="Permalink to this heading">#</a></h2>
+<h2>Plotting the Activity and Phase Separation<a class="headerlink" href="#plotting-the-activity-and-phase-separation" title="Link to this heading">#</a></h2>
 <p>Here we plot the activity of water and the organic compound as a function of the organic mole fraction. Visualizing these activities helps in identifying phase separation or miscibility gaps, crucial for understanding the behavior of aerosols under different environmental conditions. Phase separation is indicated by activities greater than 1.0 or non-monotonic behavior in the activity curve, as shown below.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -653,7 +667,7 @@ reduced-complexity model. Atmospheric Chemistry and Physics
 </div>
 </section>
 <section id="q-alpha">
-<h2><span class="math notranslate nohighlight">\( q^\alpha \)</span><a class="headerlink" href="#q-alpha" title="Permalink to this heading">#</a></h2>
+<h2><span class="math notranslate nohighlight">\( q^\alpha \)</span><a class="headerlink" href="#q-alpha" title="Link to this heading">#</a></h2>
 <p>The <span class="math notranslate nohighlight">\(q^\alpha\)</span> parameter signifies the transition from an organic-rich phase to a water-rich phase. This transition is crucial for understanding the phase behavior of aerosol particles. It can be calculated using the <code class="docutils literal notranslate"><span class="pre">particula.activity.phase_separation</span></code> function. The plot below illustrates <span class="math notranslate nohighlight">\(q^\alpha\)</span> based on the activity calculations performed earlier.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -679,7 +693,7 @@ reduced-complexity model. Atmospheric Chemistry and Physics
 </div>
 </section>
 <section id="water-activity-focus">
-<h2>Water Activity Focus<a class="headerlink" href="#water-activity-focus" title="Permalink to this heading">#</a></h2>
+<h2>Water Activity Focus<a class="headerlink" href="#water-activity-focus" title="Link to this heading">#</a></h2>
 <p>In atmospheric aerosol modeling, water activity is often a more critical parameter than mole fraction. This is because water activity is typically a controllable or known variable in atmospheric conditions, unlike the exact mole fractions in a solution. To correlate water activity with the mole fraction required to achieve it, we utilize functions from the <code class="docutils literal notranslate"><span class="pre">particula.activity</span></code> module.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -728,7 +742,7 @@ reduced-complexity model. Atmospheric Chemistry and Physics
 </div>
 </section>
 <section id="higher-oxygen-to-carbon-ratios">
-<h2>Higher Oxygen to Carbon Ratios<a class="headerlink" href="#higher-oxygen-to-carbon-ratios" title="Permalink to this heading">#</a></h2>
+<h2>Higher Oxygen to Carbon Ratios<a class="headerlink" href="#higher-oxygen-to-carbon-ratios" title="Link to this heading">#</a></h2>
 <p>Higher oxygen to carbon ratios in the mixture tend to inhibit phase separation. The following analysis demonstrates this effect. This observation is crucial in predicting the behavior of aerosol particles under varying chemical compositions (more or less ‘aged’).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -779,12 +793,12 @@ reduced-complexity model. Atmospheric Chemistry and Physics
 </section>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="summary">
-<h1>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h1>
+<h1>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h1>
 <p>This notebook demonstrates how to use the activity module for calculating the activity of water and organic compounds in a mixture and assessing phase separation. The insights gained are vital for applications in aerosol thermodynamics, cloud condensation nuclei, and cloud microphysics.</p>
 <p>This is an implementation of the Binary Activity Theory (BAT) model
 developed in Gorkowski, K., Preston, T. C., &amp; Zuend, A. (2019).</p>
 <section id="further-documentation">
-<h2>Further Documentation<a class="headerlink" href="#further-documentation" title="Permalink to this heading">#</a></h2>
+<h2>Further Documentation<a class="headerlink" href="#further-documentation" title="Link to this heading">#</a></h2>
 <p>For more in-depth understanding and additional functionalities, refer to the documentation, or call the <code class="docutils literal notranslate"><span class="pre">help</span></code> function on any of the functions in the <code class="docutils literal notranslate"><span class="pre">particula.activity</span></code> module.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1083,7 +1097,7 @@ By particula contributors
 
   <p class="copyright">
     
-      © Copyright 2022.
+      © Copyright 2023.
       <br/>
     
   </p>

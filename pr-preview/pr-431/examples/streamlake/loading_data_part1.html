@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Loading Part 1: Into &amp; 1D Data &#8212; Particula Book</title>
   
@@ -29,39 +28,43 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
 const thebe_selector = ".thebe,.cell"
 const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
-    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=afe5de03"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/streamlake/loading_data_part1';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -160,7 +163,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -576,16 +590,16 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="loading-part-1-into-1d-data">
-<h1>Loading Part 1: Into &amp; 1D Data<a class="headerlink" href="#loading-part-1-into-1d-data" title="Permalink to this heading">#</a></h1>
+<h1>Loading Part 1: Into &amp; 1D Data<a class="headerlink" href="#loading-part-1-into-1d-data" title="Link to this heading">#</a></h1>
 <p>This notebook is designed to guide you through the process of loading, cleaning, formatting, and processing data, a common task in aerosol research. You’ll learn how to automate these repetitive tasks using Python scripts, specifically leveraging the functionalities of the <code class="docutils literal notranslate"><span class="pre">particula.data</span></code> package. This will streamline your data handling process, making your research more efficient.</p>
 <section id="setting-the-working-path">
-<h2>Setting the Working Path<a class="headerlink" href="#setting-the-working-path" title="Permalink to this heading">#</a></h2>
+<h2>Setting the Working Path<a class="headerlink" href="#setting-the-working-path" title="Link to this heading">#</a></h2>
 <p>The first step in data processing is to set the working path where your data files are located. In this example, we’ll use example data from the data/examples directory. However, you can easily adapt this to point to any directory on your computer.</p>
 <p>For instance, if you have a data folder in your home directory, you might set the path like this:
 <code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">=</span> <span class="pre">&quot;U:\\data\\processing\\Campaign2023_of_awesome\\data&quot;</span></code></p>
 <p>This flexibility allows you to work with data stored in different locations on your computer.</p>
 <section id="importing-packages">
-<h3>Importing Packages<a class="headerlink" href="#importing-packages" title="Permalink to this heading">#</a></h3>
+<h3>Importing Packages<a class="headerlink" href="#importing-packages" title="Link to this heading">#</a></h3>
 <p>Before we get started, we need to import the packages we’ll be using.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -629,7 +643,7 @@ Path to data folder:
 </section>
 </section>
 <section id="loading-the-data">
-<h2>Loading the Data<a class="headerlink" href="#loading-the-data" title="Permalink to this heading">#</a></h2>
+<h2>Loading the Data<a class="headerlink" href="#loading-the-data" title="Link to this heading">#</a></h2>
 <p>With the working directory set, we’re ready to load the data. For this task, we’ll use the <code class="docutils literal notranslate"><span class="pre">loader</span></code> module from the <code class="docutils literal notranslate"><span class="pre">particula</span></code> package. The <code class="docutils literal notranslate"><span class="pre">loader.data_raw_loader()</span></code> function allows us to easily load data files by providing the file path. This simplifies the initial step of any data analysis process, especially for those new to Python.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -657,7 +671,7 @@ Path to data folder:
 </div>
 </section>
 <section id="clean-up-data">
-<h2>Clean Up Data<a class="headerlink" href="#clean-up-data" title="Permalink to this heading">#</a></h2>
+<h2>Clean Up Data<a class="headerlink" href="#clean-up-data" title="Link to this heading">#</a></h2>
 <p>To facilitate data cleaning, we utilize <code class="docutils literal notranslate"><span class="pre">loader.data_format_checks</span></code>. This function performs a series of checks on the data, ensuring it meets specified criteria. The checks include:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">characters</span></code>: Validates the minimum and maximum number of characters in each data line, ensuring data integrity and uniformity.</p></li>
@@ -709,7 +723,7 @@ There was 26 lines removed from the data
 </div>
 </section>
 <section id="data-and-time">
-<h2>Data and Time<a class="headerlink" href="#data-and-time" title="Permalink to this heading">#</a></h2>
+<h2>Data and Time<a class="headerlink" href="#data-and-time" title="Link to this heading">#</a></h2>
 <p>Once the data is cleaned, the next crucial step is extracting and standardizing the time and data columns. This process is particularly important because time data can come in many formats, and standardizing it to a single format, like epoch time, facilitates analysis and comparison. Epoch time, also known as Unix time, is a system for describing points in time as the number of seconds elapsed since January 1, 1970. It’s a widely used standard in computing and data processing.</p>
 <p>To handle the conversion and extraction of time and data, we use the <code class="docutils literal notranslate"><span class="pre">loader.sample_data()</span></code> function. This function is designed to:</p>
 <ol class="arabic simple">
@@ -762,7 +776,7 @@ First 5 data entries: [[3.3510e+04 1.7000e+01]
 </div>
 </section>
 <section id="pause-to-plot-verifying-data-integrity">
-<h2>Pause to Plot: Verifying Data Integrity<a class="headerlink" href="#pause-to-plot-verifying-data-integrity" title="Permalink to this heading">#</a></h2>
+<h2>Pause to Plot: Verifying Data Integrity<a class="headerlink" href="#pause-to-plot-verifying-data-integrity" title="Link to this heading">#</a></h2>
 <p>After successfully importing the data and converting time information, it’s crucial to pause and visually inspect our dataset. Plotting the data serves as an essential checkpoint to verify that the import process has been executed correctly. This step is vital for several reasons:</p>
 <ol class="arabic simple">
 <li><p><strong>Data Integrity Check</strong>: Visualizing the data helps in quickly identifying any anomalies or irregularities that might indicate issues in the data import or cleaning processes.</p></li>
@@ -807,11 +821,11 @@ First 5 data entries: [[3.3510e+04 1.7000e+01]
 </div>
 </section>
 <section id="stream-object-streamlining-your-analysis">
-<h2>Stream Object: Streamlining Your Analysis<a class="headerlink" href="#stream-object-streamlining-your-analysis" title="Permalink to this heading">#</a></h2>
+<h2>Stream Object: Streamlining Your Analysis<a class="headerlink" href="#stream-object-streamlining-your-analysis" title="Link to this heading">#</a></h2>
 <p>Once you have the cleaned and formatted data, you might find yourself repeatedly using the same code to analyze different datasets. To avoid the tedium of copying and pasting the same code, we can utilize the <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object provided by the <code class="docutils literal notranslate"><span class="pre">loader</span></code> module. The <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object allows for more automated and efficient analysis, significantly simplifying repetitive tasks.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object requires a settings dictionary that encapsulates all necessary parameters for data loading. Below, we’ll explore how to create this settings dictionary and use it to initialize a <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object.</p>
 <section id="settings-dictionary-centralizing-data-loading-parameters">
-<h3>Settings Dictionary: Centralizing Data Loading Parameters<a class="headerlink" href="#settings-dictionary-centralizing-data-loading-parameters" title="Permalink to this heading">#</a></h3>
+<h3>Settings Dictionary: Centralizing Data Loading Parameters<a class="headerlink" href="#settings-dictionary-centralizing-data-loading-parameters" title="Link to this heading">#</a></h3>
 <p>The settings dictionary is a crucial component in the data loading process. It consolidates all the necessary settings for loading your data into a single, easily manageable structure. This includes parameters for data checks, specification of time and data columns, as well as the time format.</p>
 <p>There are two primary methods to generate this settings dictionary:</p>
 <ol class="arabic simple">
@@ -881,7 +895,7 @@ timezone_identifier: UTC
 </section>
 </section>
 <section id="load-the-data-with-the-interface">
-<h2>Load the Data with the Interface<a class="headerlink" href="#load-the-data-with-the-interface" title="Permalink to this heading">#</a></h2>
+<h2>Load the Data with the Interface<a class="headerlink" href="#load-the-data-with-the-interface" title="Link to this heading">#</a></h2>
 <p>With our settings dictionary in hand, we can now streamline the data loading process using a specialized interface. This interface acts as a bridge between our predefined settings and the actual data loading steps. It essentially automates the sequence of actions we performed manually earlier, like data cleaning and formatting, based on the parameters specified in the settings dictionary.</p>
 <p>By utilizing this interface, we can efficiently load our data with a few lines of code, ensuring consistency and accuracy. This approach is particularly beneficial when dealing with multiple datasets or when needing to replicate the same data processing steps in different projects.</p>
 <p>The interface function we’ll use is designed to accept the settings dictionary and the location of the data. It then internally calls the necessary functions to execute the data loading process. This includes:</p>
@@ -1006,10 +1020,10 @@ timezone_identifier: UTC
 </section>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="exploring-the-stream-class-in-particula">
-<h1>Exploring the Stream Class in Particula<a class="headerlink" href="#exploring-the-stream-class-in-particula" title="Permalink to this heading">#</a></h1>
+<h1>Exploring the Stream Class in Particula<a class="headerlink" href="#exploring-the-stream-class-in-particula" title="Link to this heading">#</a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">Stream</span></code> class in the Particula package is a sophisticated tool for data management, akin to a well-organized filing cabinet for your data. Let’s dive into its features and functionalities to understand how it can streamline your data analysis tasks.</p>
 <section id="key-features-of-the-stream-class">
-<h2>Key Features of the Stream Class<a class="headerlink" href="#key-features-of-the-stream-class" title="Permalink to this heading">#</a></h2>
+<h2>Key Features of the Stream Class<a class="headerlink" href="#key-features-of-the-stream-class" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p><strong>Header</strong>: Just as labels on filing cabinet drawers help you identify contents, the <code class="docutils literal notranslate"><span class="pre">header</span></code> in <code class="docutils literal notranslate"><span class="pre">Stream</span></code> serves a similar purpose. It’s a list of strings that represent the column names of your data, guiding you to understand what each column in your dataset signifies.</p></li>
 <li><p><strong>Data</strong>: Imagine each drawer in a filing cabinet filled with files; <code class="docutils literal notranslate"><span class="pre">data</span></code> in <code class="docutils literal notranslate"><span class="pre">Stream</span></code> is akin to this. It’s a numpy array containing your dataset, neatly organized where each row represents a point in time and each column corresponds to one of the headers.</p></li>
@@ -1018,7 +1032,7 @@ timezone_identifier: UTC
 </ul>
 </section>
 <section id="functionalities-and-tools">
-<h2>Functionalities and Tools<a class="headerlink" href="#functionalities-and-tools" title="Permalink to this heading">#</a></h2>
+<h2>Functionalities and Tools<a class="headerlink" href="#functionalities-and-tools" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p><strong>validate_inputs</strong>: This function acts like a checklist ensuring all your files are correctly formatted before being placed in the cabinet. In <code class="docutils literal notranslate"><span class="pre">Stream</span></code>, it checks the validity of header, data, and time inputs, ensuring everything is in order for smooth data handling.</p></li>
 <li><p><strong>datetime64</strong>: Think of it as a tool that standardizes the dates and times on your documents into a uniform format (datetime64), making them easier to understand and use, particularly for plotting and time-based operations.</p></li>
@@ -1026,7 +1040,7 @@ timezone_identifier: UTC
 </ul>
 </section>
 <section id="practical-application">
-<h2>Practical Application<a class="headerlink" href="#practical-application" title="Permalink to this heading">#</a></h2>
+<h2>Practical Application<a class="headerlink" href="#practical-application" title="Link to this heading">#</a></h2>
 <p>For beginners and experienced users alike, the Stream class in Particula package is your organized, efficient data manager. It takes the complexity out of data handling, allowing you to focus more on insightful analysis and less on the intricacies of data organization.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1095,7 +1109,7 @@ Names of the Source Files for the Data Stream:
 </section>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="plotting-data-using-the-stream-object">
-<h1>Plotting Data Using the Stream Object<a class="headerlink" href="#plotting-data-using-the-stream-object" title="Permalink to this heading">#</a></h1>
+<h1>Plotting Data Using the Stream Object<a class="headerlink" href="#plotting-data-using-the-stream-object" title="Link to this heading">#</a></h1>
 <p>Visualizing your data is a crucial step in understanding its patterns and behavior. With the <code class="docutils literal notranslate"><span class="pre">data_stream</span></code> object from the Particula package, plotting time-series data becomes straightforward and efficient. Here’s how you can use <code class="docutils literal notranslate"><span class="pre">data_stream</span></code> for plotting:</p>
 <ol class="arabic simple">
 <li><p><strong>Preparing the Plot</strong>: Start by creating a figure and an axis using <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>’s <code class="docutils literal notranslate"><span class="pre">plt.subplots()</span></code>. This sets up the canvas on which you’ll draw your plot.</p></li>
@@ -1169,7 +1183,7 @@ Names of the Source Files for the Data Stream:
 </div>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="summary">
-<h1>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h1>
+<h1>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h1>
 <p>In this section, we explored a comprehensive approach to handling data using the functionalities provided by the Particula package. Key takeaways include:</p>
 <ol class="arabic simple">
 <li><p><strong>Data Loading and Cleaning</strong>: We began by loading data from files, emphasizing the importance of automating the cleaning process. This step involved removing errors, handling missing values, and ensuring the data is in a consistent format, which is crucial for accurate analysis.</p></li>
@@ -1180,10 +1194,10 @@ Names of the Source Files for the Data Stream:
 </ol>
 <p>In conclusion, this section provided a solid foundation for efficiently managing and processing data in Python, setting the stage for more advanced analysis and applications in future sections.</p>
 <section id="bonus-utilizing-python-s-help-function">
-<h2>Bonus: Utilizing Python’s Help Function<a class="headerlink" href="#bonus-utilizing-python-s-help-function" title="Permalink to this heading">#</a></h2>
+<h2>Bonus: Utilizing Python’s Help Function<a class="headerlink" href="#bonus-utilizing-python-s-help-function" title="Link to this heading">#</a></h2>
 <p>One of Python’s most useful built-in functions for learners and developers alike is the <code class="docutils literal notranslate"><span class="pre">help</span></code> function. It provides detailed information about objects, functions, modules, and more, directly within your Python environment. This can be particularly helpful when exploring new libraries or understanding the functionalities of different components in your code.</p>
 <section id="how-to-use-the-help-function">
-<h3>How to Use the Help Function<a class="headerlink" href="#how-to-use-the-help-function" title="Permalink to this heading">#</a></h3>
+<h3>How to Use the Help Function<a class="headerlink" href="#how-to-use-the-help-function" title="Link to this heading">#</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">help</span></code> function can be invoked directly in your Python code or interactive session. Simply pass the object or function you’re curious about as an argument to <code class="docutils literal notranslate"><span class="pre">help()</span></code>, and it will display documentation including descriptions, available methods, attributes, and other relevant details.</p>
 <p>For example, to learn more about the <code class="docutils literal notranslate"><span class="pre">data_stream</span></code> object we’ve been working with, you can use:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">data_stream</span><span class="p">)</span>
@@ -1192,7 +1206,7 @@ Names of the Source Files for the Data Stream:
 <p>This command will display information about the Stream class, including its methods, attributes, and how to use them.</p>
 </section>
 <section id="applying-help-to-explore-functionality">
-<h3>Applying Help to Explore Functionality<a class="headerlink" href="#applying-help-to-explore-functionality" title="Permalink to this heading">#</a></h3>
+<h3>Applying Help to Explore Functionality<a class="headerlink" href="#applying-help-to-explore-functionality" title="Link to this heading">#</a></h3>
 <p>You can use help with any object or function in Python. For instance, if you want to understand more about a function from the Particula package or even a built-in Python function, simply pass it to help(). Here’s how you can use it:</p>
 <p>To explore a module: help(particula)
 To learn about a specific function: help(particula.some_function)
@@ -1437,7 +1451,7 @@ By particula contributors
 
   <p class="copyright">
     
-      © Copyright 2022.
+      © Copyright 2023.
       <br/>
     
   </p>
