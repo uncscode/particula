@@ -1,4 +1,5 @@
 # %% # Import necessary libraries
+from scipy.signal import savgol_filter
 from scipy.interpolate import UnivariateSpline
 from scipy.interpolate import UnivariateSpline, SmoothBivariateSpline
 import numpy as np
@@ -38,6 +39,10 @@ stream_smps_2d = loader_interface.load_files_interface(
     path=path,
     settings=smps_2d_stream_settings
 )
+
+# delete the first 10 bins
+stream_smps_2d.header = stream_smps_2d.header[15:]
+stream_smps_2d.data = stream_smps_2d.data[:, 15:]
 
 # Convert from dn/dlogDp
 stream_smps_2d.data = convert.convert_sizer_dn(
@@ -91,7 +96,7 @@ stream_smps_2d = stream_stats.remove_time_window(
 )
 
 # Average to 15 minute intervals
-average_interval = 60 * 20  # seconds
+average_interval = 60 * 10  # seconds
 stream_averaged_2d = stream_stats.average_std(
     stream=stream_smps_2d,
     average_interval=average_interval,
@@ -160,13 +165,15 @@ def sizer_smooth_and_slope(
     smoothing_factor: float = 1e4,
     k_degree: int = 5,
     spline_kwargs: dict = {},
+    sg_window_length: int = 11,
+    sg_poly_order: int = 3,
 ) -> tuple:
     """
-    Apply a smoothing spline to each size bin of the 2D sizer data and
+    Apply a Savitzky-Golay smoothing filter and then a smoothing spline to each size bin of the 2D sizer data and
     calculate the first derivative (slope).
 
-    The function iterates over each column (size bin) in the data, fits a
-    smoothing spline, and computes the first derivative.
+    The function iterates over each column (size bin) in the data, applies a Savitzky-Golay filter,
+    fits a smoothing spline, and computes the first derivative.
 
     Args:
     -----
@@ -177,14 +184,14 @@ def sizer_smooth_and_slope(
             trade-off between fidelity to the data and roughness of the spline
             fit. The number of knots will be increased until the smoothing
             condition is satisfied. Default is 1e4.
-
-        k_degree: int, optional
-            Degree of the smoothing spline. Must be in the range 1 <= k <= 5.
+        k_degree: Degree of the smoothing spline. Must be in the range 1 <= k <= 5.
             Default is 5 (quintic spline).
-
-        spline_kwargs: dict, optional
-            Additional keyword arguments to pass to the UnivariateSpline
+        spline_kwargs: Additional keyword arguments to pass to the UnivariateSpline
             constructor.
+        sg_window_length: The length of the filter window (i.e., the number of coefficients).
+            `sg_window_length` must be a positive odd integer.
+        sg_poly_order: The order of the polynomial used to fit the samples.
+            `sg_poly_order` must be less than `sg_window_length`.
 
     Returns:
     -------
@@ -208,18 +215,31 @@ def sizer_smooth_and_slope(
     if not (1 <= k_degree <= 5):
         raise ValueError("k_degree must be between 1 and 5, inclusive.")
 
+    if sg_window_length % 2 == 0 or sg_window_length <= 1:
+        raise ValueError("sg_window_length must be a positive odd integer.")
+
+    if not (0 <= sg_poly_order < sg_window_length):
+        raise ValueError("sg_poly_order must be less than sg_window_length.")
+
     # Prepare arrays for results
     spline_values = np.zeros_like(data)
     spline_derivative = np.zeros_like(data)
 
-    # Fit a spline for each size bin (column in data)
+    # Apply Savitzky-Golay filter and fit a spline for each size bin (column
+    # in data)
     for i in range(data.shape[1]):
+        # Smooth the data using the Savitzky-Golay filter
+        smoothed_data = savgol_filter(
+            data[:, i], sg_window_length, sg_poly_order)
+
+        # Fit a spline to the smoothed data
         spline = UnivariateSpline(
-            time, data[:, i], s=smoothing_factor, k=k_degree, **spline_kwargs)
+            time, smoothed_data, s=smoothing_factor, k=k_degree, **spline_kwargs)
         spline_values[:, i] = spline(time)
         spline_derivative[:, i] = spline.derivative()(time)
 
     return spline_values, spline_derivative
+
 
 
 
@@ -279,7 +299,7 @@ particle_kwargs = {
     "wall_loss_approximation": "rectangle",  # Method for approximating wall loss
     # Dimensions of the chamber in meters
     "chamber_dimension": [0.739, 0.739, 1.663] * u.m,
-    "chamber_ktp_value": 0.5 * u.s**-1,  # Rate of wall eddy diffusivity
+    "chamber_ktp_value": 1 * u.s**-1,  # Rate of wall eddy diffusivity
 }
 
 # Convert size distribution to PDF
@@ -297,11 +317,13 @@ time = time_manage.relative_time(
 values_smooth, slope_smooth = sizer_smooth_and_slope(
     data=concentration_pdf,
     time=time,
-    smoothing_factor=1e18,
-    k_degree=3,
+    smoothing_factor=0,
+    k_degree=5,
+    sg_window_length=7,
+    sg_poly_order=3,
 )
 
-time_index = 5
+time_index = 20
 
 rates_i = size_distribution_rates(
     particle_kwargs=particle_kwargs,
@@ -313,6 +335,8 @@ rates_i = size_distribution_rates(
 coagulation = rates_i.coagulation_rate()
 dilution_rate = rates_i.dilution_rate()
 wall_loss = rates_i.wall_loss_rate()
+rates_i.particle.chamber_ktp_value = 5 * u.s**-1  # how to vary the ktp value
+wall_loss2 = rates_i.wall_loss_rate()
 total = coagulation + dilution_rate + wall_loss
 
 # %% plot rates
@@ -360,7 +384,7 @@ ax.set_xscale('log')
 #%%
 fig, ax1 = plt.subplots()
 
-index = 150
+index = 100
 data = concentration_pdf[:, index]
 # Plot the data and the spline on the primary y-axis
 ax1.plot(time, data, 'g-', label='Data')
