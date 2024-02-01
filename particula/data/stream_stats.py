@@ -109,6 +109,7 @@ def filtering(
     clone: Optional[bool] = True,
     replace_with: Optional[Union[float, int]] = None,
     drop: Optional[bool] = True,
+    header: Optional[list] = None,
 ) -> Stream:
     """
     Filters the data of the given 'stream' object based on the specified
@@ -134,6 +135,7 @@ def filtering(
         Defaults to None.
     - drop (bool, optional): If True, filtered-out data points are dropped
         from the dataset. Defaults to False.
+    - header (list, optional): Header name or header indexes to filter on.
 
     Returns:
     - Stream: The 'stream' object with data filtered as specified.
@@ -147,9 +149,13 @@ def filtering(
     # copy of stream object to avoid modifying original
     if clone:
         stream = copy.copy(stream)
+    if header is not None:
+        data = stream[header]
+    else:
+        data = stream.data
     # Create a mask for the data that should be retained or replaced
     mask = stats.mask_outliers(
-        data=stream.data,
+        data=data,
         bottom=bottom,
         top=top,
         value=value,
