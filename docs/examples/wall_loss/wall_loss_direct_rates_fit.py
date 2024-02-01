@@ -1,10 +1,10 @@
 # %% # Import necessary libraries
-from scipy.signal import savgol_filter
+from scipy.signal import savgol_filter, wiener
 from scipy.interpolate import UnivariateSpline
 from scipy.interpolate import UnivariateSpline
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import least_squares
+from scipy.optimize import least_squares, curve_fit
 
 from particula import u
 from particula.data import loader_interface, settings_generator
@@ -34,6 +34,8 @@ def sizer_smooth_and_slope(
     spline_kwargs: dict = {},
     sg_window_length: int = 11,
     sg_poly_order: int = 3,
+    sg_radius_window_length: int = 23,
+    sg_radius_poly_order: int = 3,
 ) -> tuple:
     """
     Apply a Savitzky-Golay smoothing filter and then a smoothing spline to
@@ -95,12 +97,24 @@ def sizer_smooth_and_slope(
     spline_values = np.zeros_like(data)
     spline_derivative = np.zeros_like(data)
 
+    # # smooth across the rows first
+    # for i in range(data.shape[0]):
+    #     # Smooth the data using the Savitzky-Golay filter
+    #     data[i, :] = savgol_filter(
+    #         data[i, :], sg_radius_window_length, sg_radius_poly_order)
+
+    # Smooth across the rows
+    for i in range(data.shape[0]):
+        # Apply the Wiener filter
+        data[i, :] = wiener(data[i, :], mysize=sg_radius_window_length)
+
     # Apply Savitzky-Golay filter and fit a spline for each size bin (column
     # in data)
     for i in range(data.shape[1]):
-        # Smooth the data using the Savitzky-Golay filter
-        smoothed_data = savgol_filter(
-            data[:, i], sg_window_length, sg_poly_order)
+        # # Smooth the data using the Savitzky-Golay filter
+        # smoothed_data = savgol_filter(
+        #     data[:, i], sg_window_length, sg_poly_order)
+        smoothed_data = wiener(data[:, i], mysize=sg_window_length)
 
         # Fit a spline to the smoothed data
         spline = UnivariateSpline(
@@ -408,7 +422,12 @@ values_smooth, slope_smooth = sizer_smooth_and_slope(
     k_degree=3,
     sg_window_length=7,
     sg_poly_order=3,
+    sg_radius_window_length=25,
+    sg_radius_poly_order=3,
 )
+
+
+
 
 # %% Bulk properties
 # convert back to dn/dlogdp for bulk properties
@@ -504,7 +523,7 @@ plt.show()
 
 # %% plot rates at 1 hour mark
 
-time_index = 5
+time_index = 50
 
 particle_kwargs["chamber_ktp_value"] = ktp_values[time_index] * u.s**-1
 
@@ -573,7 +592,7 @@ ax.legend()
 # ax.set_yscale('log')
 ax.set_xscale('log')
 
-
+# %%
 
 
 
