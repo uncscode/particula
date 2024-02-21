@@ -17,27 +17,27 @@ from tqdm import tqdm
 from scipy.optimize import fminbound
 from particula.util import convert
 
-
 from typing import Tuple, Union
 from functools import lru_cache
 import PyMieScatt as ps
 
+
 @lru_cache(maxsize=100000)
 def discretize_AutoMieQ(
-    m: Union[complex, float],
+    mSphere: Union[complex, float],
     wavelength: float,
-    dp: float,
-    nMedium: Union[complex, float] = 1.0,
+    diameter: float,
+    mMedium: Union[complex, float] = 1.0,
 ) -> Tuple[float, float, float, float, float, float, float]:
     """
     Computes Mie coefficients for a spherical particle based on its material
     properties, size, and the properties of the surrounding medium.
 
     This function leverages the PyMieScatt library to calculate the extinction
-    (Q_ext), scattering (Q_sca), absorption (Q_abs) efficiencies, the
-    asymmetry factor (g), radiation pressure efficiency (Q_pr), backscatter
-    efficiency (Q_back), and the ratio of backscatter to extinction efficiency
-    (Q_ratio) for a single sphere under specified conditions.
+    (q_ext), scattering (q_sca), absorption (q_abs) efficiencies, the
+    asymmetry factor (g), radiation pressure efficiency (q_pr), backscatter
+    efficiency (q_back), and the ratio of backscatter to extinction efficiency
+    (q_ratio) for a single sphere under specified conditions.
 
     This function is optimized with an LRU (Least Recently Used) cache to
     enhance performance by storing up to 100,000 recent calls. The cache
@@ -47,71 +47,96 @@ def discretize_AutoMieQ(
 
     Args
     ----------
-    m : The complex refractive index of the sphere. For non-absorbing material
-        a real number can be provided.
+    mSphere : The complex refractive index of the sphere. For non-absorbing
+        material a real number can be provided.
     wavelength : The wavelength of the incident light in nanometers (nm).
-    dp : The diameter of the sphere in nanometers (nm).
-    nMedium : The refractive index of the surrounding medium.
+    diameter : The diameter of the sphere in nanometers (nm).
+    mMedium : The refractive index of the surrounding medium.
         Defaults to 1.0, corresponding to vacuum.
 
     Returns
     -------
     Tuple[float, float, float, float, float, float, float]
         A tuple containing the calculated Mie efficiencies and parameters:
-        Q_ext (extinction efficiency), Q_sca (scattering efficiency),
-        Q_abs (absorption efficiency), g (asymmetry factor),
-        Q_pr (radiation pressure efficiency), Q_back (backscatter efficiency),
-        and Q_ratio (the ratio of backscatter to extinction efficiency).
+        q_ext (extinction efficiency), q_sca (scattering efficiency),
+        q_abs (absorption efficiency), g (asymmetry factor),
+        q_pr (radiation pressure efficiency), q_back (backscatter efficiency),
+        and q_ratio (the ratio of backscatter to extinction efficiency).
     """
-    return ps.AutoMieQ(m=m,
+    return ps.AutoMieQ(m=mSphere,
                        wavelength=wavelength,
-                       diameter=dp,
-                       nMedium=nMedium)
+                       diameter=diameter,
+                       nMedium=mMedium)
 
 
-def discretize_parameters(
-    m: Union[complex, float],
+def discretize_Mie_parameters(
+    mSphere: Union[complex, float],
     wavelength: float,
-    dp: np.ndarray
+    diameter: np.ndarray,
+    base_mSphere: float = 0.001,
+    base_wavelength: float = 1,
+    base_diameter: float = 5,
 ) -> Tuple[Union[complex, float], float, np.ndarray]:
     """
-    Discretizes material refractive index, wavelength, and particle diameters.
+    Discretizes the refractive index of the material, the wavelength of
+    incident light, and the diameters of particles to enhance the numerical
+    stability and performance of Mie scattering calculations. This approach is
+    particularly useful for caching Mie scattering computations, as it reduces
+    the variability in input parameters leading to a more manageable set of
+    unique calculations.
 
     Parameters
     ----------
-    m : Union[complex, float]
-        The complex or real refractive index of the particles.
+    mSphere : Union[complex, float]
+        The complex or real refractive index of the particles. This value is
+        discretized to a specified base to reduce the granularity of input
+        variations.
     wavelength : float
-        The incident light wavelength in nanometers.
-    dp : np.ndarray
-        An array of particle diameters in nanometers.
+        The wavelength of incident light in nanometers (nm). It is discretized
+        to minimize the variations in computations related to different
+        wavelengths.
+    diameter : np.ndarray
+        An array of particle diameters in nanometers (nm), each of which is
+        discretized to a specified base to standardize the input sizes for
+        calculations.
+    base_mSphere : float, optional
+        The base value to which the real and imaginary parts of the refractive
+        index are rounded. Defaults to 0.001.
+    base_wavelength : float, optional
+        The base value to which the wavelength is rounded. Defaults to 1 nm.
+    base_diameter : float, optional
+        The base value to which particle diameters are rounded.
+        Defaults to 5 nm.
 
     Returns
     -------
     Tuple[Union[complex, float], float, np.ndarray]
-        The discretized values of m, wavelength, and dp.
+    A tuple containing the discretized refractive index (mSphere), wavelength,
+    and diameters (diameter), suitable for use in further Mie scattering
+    calculations with potentially improved performance and reduced
+    computational overhead.
     """
     m_real = convert.round_arbitrary(
-        values=np.real(m),
-        base=0.001,
+        values=np.real(mSphere),
+        base=base_mSphere,
         mode='round')
     m_imag = convert.round_arbitrary(
-        values=np.imag(m),
-        base=0.001,
+        values=np.imag(mSphere),
+        base=base_mSphere,
         mode='round')
-    # recombine the discretized real and imaginary parts
+    # Recombine the discretized real and imaginary parts
     m_discretized = m_real + 1j * m_imag if m_imag != 0 else m_real
 
-    # discretize the wavelength assumes nm
+    # Discretize the wavelength, assuming nm units
     wavelength_discretized = convert.round_arbitrary(
         values=wavelength,
-        base=1,
+        base=base_wavelength,
         mode='round')
 
-    # discretize the particle diameters assumes nm
+    # Discretize the particle diameters, assuming nm units
     dp_discretized = convert.round_arbitrary(
-        values=dp,
-        base=5,
+        values=diameter,
+        base=base_diameter,
         mode='round',
         nonzero_edge=True)
 
@@ -128,10 +153,10 @@ def compute_bulk_optics(
     extinction_only: np.ndarray,
     pms: np.ndarray,
     dp: np.ndarray
-):
+) -> tuple[np.ndarray, ...]:
     """
-    Computes bulk optical properties from individual efficiency factors and
-    size distribution.
+    Computes bulk optical properties from size dependent efficiency factors for
+    the size distribution.
 
     Parameters
     ----------
@@ -152,36 +177,44 @@ def compute_bulk_optics(
     Tuple containing bulk optical properties.
     """
     if pms:
-        Bext = np.sum(q_ext * aSDn)
+        b_ext = np.sum(q_ext * aSDn)
         if extinction_only:
-            return Bext
-        Bsca = np.sum(q_sca * aSDn)
-        Babs = Bext - Bsca
-        Bback = np.sum(q_back * aSDn)
-        Bratio = np.sum(q_ratio * aSDn)
-        bigG = np.sum(g * q_sca * aSDn) / Bsca if Bsca != 0 else 0
-        Bpr = Bext - bigG * Bsca
-    else:
-        Bext = np.trapz(q_ext * aSDn, dp)
+            return b_ext
+        b_sca = np.sum(q_sca * aSDn)
+        b_abs = b_ext - b_sca
+        b_back = np.sum(q_back * aSDn)
+        b_ratio = np.sum(q_ratio * aSDn)
+        bigG = np.sum(g * q_sca * aSDn) / b_sca if b_sca != 0 else 0
+        b_pr = b_ext - bigG * b_sca
+    else:  # then pdf so the integral is used
+        b_ext = np.trapz(q_ext * aSDn, dp)
         if extinction_only:
-            return Bext
-        Bsca = np.trapz(q_sca * aSDn, dp)
-        Babs = Bext - Bsca
-        Bback = np.trapz(q_back * aSDn, dp)
-        Bratio = np.trapz(q_ratio * aSDn, dp)
-        bigG = np.trapz(g * q_sca * aSDn, dp) / Bsca if Bsca != 0 else 0
-        Bpr = Bext - bigG * Bsca
+            return b_ext
+        b_sca = np.trapz(q_sca * aSDn, dp)
+        b_abs = b_ext - b_sca
+        b_back = np.trapz(q_back * aSDn, dp)
+        b_ratio = np.trapz(q_ratio * aSDn, dp)
+        bigG = np.trapz(g * q_sca * aSDn, dp) / b_sca if b_sca != 0 else 0
+        b_pr = b_ext - bigG * b_sca
+    return b_ext, b_sca, b_abs, b_pr, b_back, b_ratio, bigG
 
-    return Bext, Bsca, Babs, Bpr, Bback, Bratio, bigG
 
-
-def format_results(Bext, Bsca, Babs, bigG, Bpr, Bback, Bratio, asDict: bool) -> Union[Dict[str, float], Tuple[float, ...]]:
+def format_Mie_results(
+    b_ext,
+    b_sca,
+    b_abs,
+    bigG,
+    b_pr,
+    b_back,
+    b_ratio,
+    asDict: bool
+) -> Union[dict[str, float], tuple[float, ...]]:
     """
-    Formats the results of the Mie scattering calculations.
+    Formats the output results of the Mie scattering calculations.
 
     Parameters
     ----------
-    Bext, Bsca, Babs, bigG, Bpr, Bback, Bratio : float
+    b_ext, b_sca, b_abs, bigG, b_pr, b_back, b_ratio : float
         Bulk optical properties.
     asDict : bool
         Determines the format of the results.
@@ -192,31 +225,31 @@ def format_results(Bext, Bsca, Babs, bigG, Bpr, Bback, Bratio, asDict: bool) -> 
     """
     if asDict:
         return {
-            'Bext': Bext,
-            'Bsca': Bsca,
-            'Babs': Babs,
+            'b_ext': b_ext,
+            'b_sca': b_sca,
+            'b_abs': b_abs,
             'G': bigG,
-            'Bpr': Bpr,
-            'Bback': Bback,
-            'Bratio': Bratio
+            'b_pr': b_pr,
+            'b_back': b_back,
+            'b_ratio': b_ratio
         }
     else:
-        return Bext, Bsca, Babs, bigG, Bpr, Bback, Bratio
+        return b_ext, b_sca, b_abs, bigG, b_pr, b_back, b_ratio
 
 
-def Mie_SD(
-    m: Union[complex, float],
+def mie_size_distribution(
+    mSphere: Union[complex, float],
     wavelength: float,
-    dp: np.ndarray,
-    ndp: np.ndarray,
+    diameter: np.ndarray,
+    number_per_cm3: np.ndarray,
     nMedium: Union[complex, float] = 1.0,
-    SMPS: bool = True,
+    pms: bool = True,
     asDict: bool = False,
     extinction_only: bool = False,
     discretize: bool = False,
     truncation_calculation: bool = False,
-    truncation_Bsca_multiple: Optional[float] = None
-) -> Union[float, Dict[str, float], Tuple[float, ...]]:
+    truncation_b_sca_multiple: Optional[float] = None
+) -> Union[float, dict[str, float], Tuple[float, ...]]:
     """
     Calculates Mie scattering parameters for a size distribution of spherical particles.
 
@@ -228,37 +261,38 @@ def Mie_SD(
 
     Parameters
     ----------
-    m : Union[complex, float]
+    mSphere : Union[complex, float]
         The complex refractive index of the particles. Real values can be used for
         non-absorbing materials.
     wavelength : float
         The wavelength of the incident light in nanometers (nm).
-    dp : np.ndarray
+    diameter : np.ndarray
         An array of particle diameters in nanometers (nm).
-    ndp : np.ndarray
+    number_per_cm3 : np.ndarray
         The number distribution of particles per cubic centimeter (#/cm^3).
     nMedium : Union[complex, float], optional
         The refractive index of the medium. Defaults to 1.0 (air or vacuum).
-    SMPS : bool, optional
-        Specifies if the size distribution follows the SMPS (Scanning Mobility Particle Sizer) convention.
-        Defaults to True.
+    pms : bool, optional
+        Specifies if the size distribution is in probability mass form.
     asDict : bool, optional
-        If True, results are returned as a dictionary. Otherwise, as a tuple. Defaults to False.
+        If True, results are returned as a dictionary. Otherwise, as a tuple.
     extinction_only : bool, optional
-        If True, only the extinction coefficient is calculated and returned. Defaults to False.
+        If True, only the extinction coefficient is calculated and returned.
     discretize : bool, optional
-        If True, input parameters (m, wavelength, dp) are discretized for computation. Defaults to False.
+        If True, input parameters (m, wavelength, dp) are discretized for
+        computation. Defaults to False.
     truncation_calculation : bool, optional
-        Enables truncation of the scattering efficiency based on a multiple of the backscattering coefficient.
-        Defaults to False.
-    truncation_Bsca_multiple : Optional[float], optional
-        The multiple of the backscattering coefficient used for truncating the scattering efficiency.
-        Required if `truncation_calculation` is True.
+        Enables truncation of the scattering efficiency based on a multiple
+        of the backscattering coefficient. Defaults to False.
+    truncation_b_sca_multiple : Optional[float], optional
+        The multiple of the backscattering coefficient used for truncating the
+        scattering efficiency. Required if `truncation_calculation` is True.
 
     Returns
     -------
     Union[float, Dict[str, float], Tuple[float, ...]]
-        Depending on the parameters `asDict` and `extinction_only`, the function can return:
+        Depending on the parameters `asDict` and `extinction_only`, the
+        function can return:
         - A single float (extinction coefficient) if `extinction_only` is True.
         - A dictionary of computed optical properties if `asDict` is True.
         - A tuple of computed optical properties.
@@ -266,180 +300,63 @@ def Mie_SD(
     Raises
     ------
     ValueError
-        If `truncation_calculation` is True but `truncation_Bsca_multiple` is not specified.
-
-    Notes
-    -----
-    The discretization and truncation features allow for finer control over the calculation
-    precision and the handling of outliers in size distribution, respectively. The use of SMPS
-    convention influences the integration method for computing bulk properties from the size
-    distribution.
+        If `truncation_calculation` is True but `truncation_b_sca_multiple`
+        is not specified.
     """
     # Adjust input parameters for medium's refractive index
     m /= nMedium
     wavelength /= nMedium
 
     # Ensure inputs are numpy arrays for vectorized operations
-    dp, ndp = map(lambda x: convert.coerce_type(x, np.ndarray), (dp, ndp))
+    diameter, number_per_cm3 = map(
+        lambda x: convert.coerce_type(x, np.ndarray),
+        (diameter, number_per_cm3))
 
     # Initialize arrays for Mie efficiencies and asymmetry factor
-    Q_ext, Q_sca, Q_abs, Q_pr, Q_back, Q_ratio, g = (np.zeros(dp.size) for _ in range(7))
+    q_ext, q_sca, q_abs, q_pr, q_back, q_ratio, g = (
+        np.zeros(diameter.size) for _ in range(7))
 
     # Calculate area size distribution normalized to inverse megameters
-    aSDn = np.pi * (dp / 2)**2 * ndp * 1e-6
+    aSDn = np.pi * (diameter / 2)**2 * number_per_cm3 * 1e-6
 
-    # Perform computations, optionally with discretization
+    # discretize parameters
     if discretize:
         # Discretize parameters for potentially improved stability/performance
-        m_discretized, wavelength_discretized, dp_discretized = discretize_parameters(m, wavelength, dp)
-        for i in range(dp.size):
-            Q_ext[i], Q_sca[i], Q_abs[i], g[i], Q_pr[i], Q_back[i], Q_ratio[i] = discretize_AutoMieQ(
-                m_discretized, wavelength_discretized, dp_discretized[i], nMedium)
-    else:
-        for i in range(dp.size):
-            Q_ext[i], Q_sca[i], Q_abs[i], g[i], Q_pr[i], Q_back[i], Q_ratio[i] = ps.AutoMieQ(
-                m, wavelength, dp[i], nMedium)
+        mSphere, wavelength, diameter = discretize_Mie_parameters(
+            mSphere=mSphere,
+            wavelength=wavelength,
+            diameter=diameter
+        )
+
+    # applying discretized parameters if they were set else full MieQ
+    for i in range(diameter.size):
+        # Select the appropriate Mie calculation function with discretize flag
+        mie_function = discretize_AutoMieQ if discretize else ps.AutoMieQ
+        # Perform the calculation
+        q_ext[i], q_sca[i], q_abs[i], g[i], q_pr[i], q_back[i], q_ratio[i] = \
+            mie_function(
+            mSphere, wavelength, diameter[i], nMedium
+        )
 
     # Apply optional truncation to scattering efficiency
     if truncation_calculation:
-        if truncation_Bsca_multiple is None:
-            raise ValueError("truncation_Bsca_multiple must be specified for truncation calculation.")
-        Q_sca *= truncation_Bsca_multiple
+        if truncation_b_sca_multiple is None:
+            raise ValueError(
+                "truncation_b_sca_multiple must be specified \
+                    for truncation calculation.")
+        q_sca *= truncation_b_sca_multiple
 
-    # Compute bulk optical properties based on size distribution and selected mode
-    Bext, Bsca, Babs, Bpr, Bback, Bratio, bigG = compute_bulk_properties(
-        Q_ext, Q_sca, Q_abs, Q_pr, Q_back, Q_ratio, g, aSDn, extinction_only, SMPS, dp)
+    # Compute bulk optical properties based on size distribution and selected
+    # mode
+    b_ext, b_sca, b_abs, b_pr, b_back, b_ratio, bigG = compute_bulk_optics(
+        q_ext, q_sca, q_abs, q_pr, q_back, q_ratio,
+        g, aSDn, extinction_only, pms, diameter)
 
     # Return results based on requested format
     if extinction_only:
-        return Bext
-    return format_results(Bext, Bsca, Babs, bigG, Bpr, Bback, Bratio, asDict)
-
-
-def Mie_SD(
-        m: Union[complex, float],
-        wavelength: float,
-        dp: np.ndarray,
-        ndp: np.ndarray,
-        nMedium: Union[complex, float]=1.0,
-        SMPS: bool=True,
-        asDict: bool=False,
-        extinction_only: bool=False,
-        discretize: bool=False,
-        truncation_calculation: bool=False,
-        truncation_Bsca_multiple=None):  # sourcery skip
-    """Return the extinction coefficient only if set to true
-
-    Args
-    ----------
-    m : Complex refractive index of the sphere
-    wavelength :      Wavelength of the incident light in nm
-    dp : Diameter of the sphere in nm
-    ndp :   Number distribution of the sphere #/cm^3
-    nMedium : Refractive index of the medium, by default 1.0
-    SMPS :True if the size distribution is SMPS, by default True
-    interpolate :     True if the size distribution is interpolated, by default False
-    asDict : if the output is a dictionary, by default False
-    extinction_only : if only the extinction coefficient is returned, by default False
-    discretize :    True if the size distribution is discretized, by default False
-    truncation_calculation : if the size distribution is truncated, by default False
-    truncation_Bsca_multiple :  multiple of the backscattering coefficient to truncate the Qsca
-        coefficent by default None. Qsca_trunc = Qsca*truncation_Bsca_multiple
-
-    Returns
-    -------
-    B_ext, B_sca, B_abs, g, B_pr, B_back, B_ratio
-        Returns as a comma separated list or dictionary if asDict is True
-    extinction_only : True
-        Returns only the extinction coefficient 1/Mm
-    """
-    #  http://pymiescatt.readthedocs.io/en/latest/forward.html#Mie_SD
-    nMedium = nMedium.real
-    m /= nMedium
-    wavelength /= nMedium
-    dp = convert.coerce_type(dp, np.ndarray)
-    ndp = convert.coerce_type(ndp, np.ndarray)
-    _length = np.size(dp)
-    Q_ext = np.zeros(_length)
-    Q_sca = np.zeros(_length)
-    Q_abs = np.zeros(_length)
-    Q_pr = np.zeros(_length)
-    Q_back = np.zeros(_length)
-    Q_ratio = np.zeros(_length)
-    g = np.zeros(_length)
-
-    # scaling of 1e-6 to cast in units of inverse megameters - see docs
-    aSDn = np.pi * ((dp / 2)**2) * ndp * (1e-6)
-
-    if discretize:
-        m_real = convert.round_arbitrary(np.real(m), base=0.001, mode='round')
-        m_imag = convert.round_arbitrary(np.imag(m), base=0.001, mode='round')
-        if m_imag == 0:
-            m_discretized = m_real
-        else:
-            m_discretized = m_real + 1j * m_imag
-        wavelength_discretized = convert.round_arbitrary(
-            wavelength,
-            base=1,
-            mode='round'
-        )
-        dp_discretized = convert.round_arbitrary(
-            dp,
-            base=5,
-            mode='round',
-            nonzero_edge=True
-        )
-        for i in range(_length):
-            Q_ext[i], Q_sca[i], Q_abs[i], g[i], Q_pr[i], Q_back[i], Q_ratio[i]\
-                = discretize_AutoMieQ(
-                    m_discretized,
-                    wavelength_discretized,
-                    dp_discretized[i],
-                    nMedium
-            )
-    else:
-        for i in range(_length):
-            Q_ext[i], Q_sca[i], Q_abs[i], g[i], Q_pr[i], Q_back[i], Q_ratio[i]\
-                = ps.AutoMieQ(m, wavelength, dp[i], nMedium)
-
-    # apply truncation of bsca if requested
-    if truncation_calculation:
-        if truncation_Bsca_multiple is None:
-            raise ValueError('truncation_Bsca_multiple must be specified')
-        else:
-            Q_sca = Q_sca * truncation_Bsca_multiple
-
-    if SMPS:
-        if extinction_only:
-            Bext = np.sum(Q_ext * aSDn)
-        else:
-            Bext = np.sum(Q_ext * aSDn)
-            Bsca = np.sum(Q_sca * aSDn)
-            Babs = Bext - Bsca
-            Bback = np.sum(Q_back * aSDn)
-            Bratio = np.sum(Q_ratio * aSDn)
-            bigG = np.sum(g * Q_sca * aSDn) / np.sum(Q_sca * aSDn)
-            Bpr = Bext - bigG * Bsca
-    else:
-        if extinction_only:
-            Bext = trapz(Q_ext * aSDn, dp)
-        else:
-            Bext = trapz(Q_ext * aSDn, dp)
-            Bsca = trapz(Q_sca * aSDn, dp)
-            Babs = Bext - Bsca
-            Bback = trapz(Q_back * aSDn, dp)
-            Bratio = trapz(Q_ratio * aSDn, dp)
-            bigG = trapz(g * Q_sca * aSDn, dp) / trapz(Q_sca * aSDn, dp)
-            Bpr = Bext - bigG * Bsca
-
-    if extinction_only:
-        return Bext
-    else:
-        if asDict:
-            return dict(Bext=Bext, Bsca=Bsca, Babs=Babs, G=bigG,
-                        Bpr=Bpr, Bback=Bback, Bratio=Bratio)
-        else:
-            return Bext, Bsca, Babs, bigG, Bpr, Bback, Bratio
+        return b_ext
+    return format_Mie_results(b_ext, b_sca, b_abs, bigG,
+                          b_pr, b_back, b_ratio, asDict)
 
 
 def extinction_ratio_wet_dry(
@@ -557,8 +474,8 @@ def extinction_ratio_wet_dry(
 
 
 def fit_extinction_ratio_with_kappa(
-        Bext_dry,
-        Bext_wet,
+        b_ext_dry,
+        b_ext_wet,
         particle_counts,
         diameters,
         water_activity_sizer,
@@ -579,9 +496,9 @@ def fit_extinction_ratio_with_kappa(
 
     Args
     ----------
-    Bext_dry : float
+    b_ext_dry : float
         measured extinction of the dry aerosol
-    Bext_wet : float
+    b_ext_wet : float
         measured extinction of the wet aerosol
     particle_counts : array_like
         particle counts for each diameter bin
@@ -629,7 +546,7 @@ def fit_extinction_ratio_with_kappa(
             return_coefficients=False
         )
         # sourcery skip
-        return np.abs(ratio_guess - Bext_wet / Bext_dry)
+        return np.abs(ratio_guess - b_ext_wet / b_ext_dry)
 
     out = fminbound(
         objective_function,
@@ -795,14 +712,6 @@ def trunc_mono(
             angularResolution=angRes
         )
 
-        # theta, _, _, su = ps.ScatteringFunction(
-        #     m,
-        #     wavelength,
-        #     diameter,
-        #     minAngle=0,
-        #     maxAngle=180,
-        #     angularResolution=angRes
-        #     )
     else:
         theta, _, _, su = ps.ScatteringFunction(
             m,
@@ -917,15 +826,6 @@ def truncation_for_diameters(
 
     truncation_array = np.zeros(len(diameter_array))
 
-    # self_cal = trunc_mono(
-    #     refractive_index,
-    #     calibration_diameter,
-    #     wavelength=wavelength,
-    #     fullOutput=False,
-    #     calTrunc=False,
-    #     discretize=discretize
-    #     )
-
     for i, diameter in enumerate(diameter_array):
         if discretize:
             m_real = convert.round_arbitrary(
@@ -997,10 +897,10 @@ def bsca_correction_for_distribution_measurements(
 
     Returns
     -------
-    Bsca_correction : float
-        Truncation correction. (dimensionless) Multiply the measured Bscat by
+    b_sca_correction : float
+        Truncation correction. (dimensionless) Multiply the measured b_scat by
         this number to correct for turncation.
-        Bsca_corrected = Bsca_measured * Bsca_correction
+        b_sca_corrected = b_sca_measured * b_sca_correction
     """
     trunc_corr = truncation_for_diameters(
         refractive_index,
@@ -1010,8 +910,8 @@ def bsca_correction_for_distribution_measurements(
         discretize=discretize
     )
 
-    # calculate the truncation Bsca
-    _, Bsca_trunc, _, _, _, _, _ = Mie_SD(
+    # calculate the truncation b_sca
+    _, b_sca_trunc, _, _, _, _, _ = Mie_SD(
         refractive_index,
         wavelength,
         dp=diameter_array,
@@ -1019,11 +919,11 @@ def bsca_correction_for_distribution_measurements(
         SMPS=True,
         discretize=discretize,
         truncation_calculation=True,
-        truncation_Bsca_multiple=1 / trunc_corr
+        truncation_b_sca_multiple=1 / trunc_corr
     )
 
-    # calculate the ideal Bsca
-    _, Bsca_ideal, _, _, _, _, _ = Mie_SD(
+    # calculate the ideal b_sca
+    _, b_sca_ideal, _, _, _, _, _ = Mie_SD(
         refractive_index,
         wavelength,
         dp=diameter_array,
@@ -1032,7 +932,7 @@ def bsca_correction_for_distribution_measurements(
         discretize=discretize,
     )
 
-    return Bsca_ideal / Bsca_trunc
+    return b_sca_ideal / b_sca_trunc
 
 
 def bsca_correction_for_humidified_measurements(
@@ -1076,10 +976,10 @@ def bsca_correction_for_humidified_measurements(
 
     Returns
     -------
-    Bsca_correction : float
-        Truncation correction. (dimensionless) Multiply the measured Bscat by
+    b_sca_correction : float
+        Truncation correction. (dimensionless) Multiply the measured b_scat by
         this number to correct for turncation.
-        Bsca_corrected = Bsca_measured * Bsca_correction
+        b_sca_corrected = b_sca_measured * b_sca_correction
     """
 
     # calculate the volume of the dry aerosol
@@ -1104,7 +1004,7 @@ def bsca_correction_for_humidified_measurements(
         volume_dry[-1]
     )
 
-    # calculate the Bsca correction
+    # calculate the b_sca correction
     bsca_correction = bsca_correction_for_distribution_measurements(
         n_effective,
         diameter_array=convert.volume_to_length(
@@ -1149,13 +1049,13 @@ def kappa_fitting_caps_data(
     for i in tqdm(range(len(kappa_fit))):
         caps_dry = datalake.datastreams['CAPS_data'].return_data(
             keys=[
-                'Bext_dry_CAPS_450nm[1/Mm]',
+                'b_ext_dry_CAPS_450nm[1/Mm]',
                 'dualCAPS_inlet_RH[%]'
             ]
         )[:, i]
         caps_wet = datalake.datastreams['CAPS_data'].return_data(
             keys=[
-                'Bext_wet_CAPS_450nm[1/Mm]',
+                'b_ext_wet_CAPS_450nm[1/Mm]',
                 'Wet_RH_preCAPS[%]',
                 'Wet_RH_postCAPS[%]'
             ]
@@ -1193,8 +1093,8 @@ def kappa_fitting_caps_data(
                 bsca_truncation_wet[i] = np.nan
         else:
             kappa_fit[i, 0] = fit_extinction_ratio_with_kappa(
-                Bext_dry=caps_dry[0],
-                Bext_wet=caps_wet[0],
+                b_ext_dry=caps_dry[0],
+                b_ext_wet=caps_wet[0],
                 particle_counts=sizer_dn,
                 diameters=sizer_diameter,
                 water_activity_sizer=sizer_humidity / 100,
@@ -1210,8 +1110,8 @@ def kappa_fitting_caps_data(
             )
 
             kappa_fit[i, 1] = fit_extinction_ratio_with_kappa(
-                Bext_dry=caps_dry[0],
-                Bext_wet=caps_wet[0],
+                b_ext_dry=caps_dry[0],
+                b_ext_wet=caps_wet[0],
                 particle_counts=sizer_dn,
                 diameters=sizer_diameter,
                 water_activity_sizer=sizer_humidity / 100,
@@ -1227,8 +1127,8 @@ def kappa_fitting_caps_data(
             )
 
             kappa_fit[i, 2] = fit_extinction_ratio_with_kappa(
-                Bext_dry=caps_dry[0],
-                Bext_wet=caps_wet[0],
+                b_ext_dry=caps_dry[0],
+                b_ext_wet=caps_wet[0],
                 particle_counts=sizer_dn,
                 diameters=sizer_diameter,
                 water_activity_sizer=sizer_humidity / 100,
@@ -1256,7 +1156,7 @@ def kappa_fitting_caps_data(
                         wavelength=450,
                         discretize=True,
                         calibration_diameter=150,
-                    )
+                )
                 bsca_truncation_wet[i] = \
                     bsca_correction_for_humidified_measurements(
                         kappa=kappa_fit[i, 0],
@@ -1269,16 +1169,8 @@ def kappa_fitting_caps_data(
                         wavelength=450,
                         discretize=True,
                         calibration_diameter=150,
-                    )
+                )
     return kappa_fit, bsca_truncation_dry, bsca_truncation_wet
-
-
-
-
-
-
-
-
 
 
 def caps_processing(
@@ -1404,39 +1296,39 @@ def caps_processing(
             raw=True
         )
 
-    # index for Bsca wet and dry
+    # index for b_sca wet and dry
     index_dic = datalake.datastreams['CAPS_data'].return_header_dict()
     index_dic = datalake.datastreams['CAPS_data'].return_header_dict()
 
     # check if raw in dict
-    if 'raw_Bsca_dry_CAPS_450nm[1/Mm]' in index_dic:
+    if 'raw_b_sca_dry_CAPS_450nm[1/Mm]' in index_dic:
         pass
     else:
         # save raw data
         datalake.datastreams['CAPS_data'].add_processed_data(
             data_new=datalake.datastreams['CAPS_data'].data_stream[
-                index_dic['Bsca_wet_CAPS_450nm[1/Mm]'], :],
+                index_dic['b_sca_wet_CAPS_450nm[1/Mm]'], :],
             time_new=time,
-            header_new=['raw_Bsca_wet_CAPS_450nm[1/Mm]'],
+            header_new=['raw_b_sca_wet_CAPS_450nm[1/Mm]'],
         )
         datalake.datastreams['CAPS_data'].add_processed_data(
             data_new=datalake.datastreams['CAPS_data'].data_stream[
-                index_dic['Bsca_dry_CAPS_450nm[1/Mm]'], :],
+                index_dic['b_sca_dry_CAPS_450nm[1/Mm]'], :],
             time_new=time,
-            header_new=['raw_Bsca_dry_CAPS_450nm[1/Mm]'],
+            header_new=['raw_b_sca_dry_CAPS_450nm[1/Mm]'],
         )
         index_dic = datalake.datastreams['CAPS_data'].return_header_dict()
 
     datalake.datastreams['CAPS_data'].data_stream[
-        index_dic['Bsca_wet_CAPS_450nm[1/Mm]'], :] = \
+        index_dic['b_sca_wet_CAPS_450nm[1/Mm]'], :] = \
         datalake.datastreams['CAPS_data'].data_stream[
-            index_dic['raw_Bsca_wet_CAPS_450nm[1/Mm]'], :] \
+            index_dic['raw_b_sca_wet_CAPS_450nm[1/Mm]'], :] \
         * bsca_truncation_wet.T * calibration_wet
 
     datalake.datastreams['CAPS_data'].data_stream[
-        index_dic['Bsca_dry_CAPS_450nm[1/Mm]'], :] = \
+        index_dic['b_sca_dry_CAPS_450nm[1/Mm]'], :] = \
         datalake.datastreams['CAPS_data'].data_stream[
-            index_dic['raw_Bsca_dry_CAPS_450nm[1/Mm]'], :] \
+            index_dic['raw_b_sca_dry_CAPS_450nm[1/Mm]'], :] \
         * bsca_truncation_dry.T * calibration_dry
 
     datalake.datastreams['CAPS_data'].reaverage(
@@ -1465,38 +1357,38 @@ def albedo_processing(
     """
 
     ssa_wet = datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bsca_wet_CAPS_450nm[1/Mm]'])[0] \
+        keys=['b_sca_wet_CAPS_450nm[1/Mm]'])[0] \
         / datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bext_wet_CAPS_450nm[1/Mm]'])[0]
+        keys=['b_ext_wet_CAPS_450nm[1/Mm]'])[0]
     ssa_dry = datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bsca_dry_CAPS_450nm[1/Mm]'])[0] \
+        keys=['b_sca_dry_CAPS_450nm[1/Mm]'])[0] \
         / datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bext_dry_CAPS_450nm[1/Mm]'])[0]
+        keys=['b_ext_dry_CAPS_450nm[1/Mm]'])[0]
     ssa_wet = datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bsca_wet_CAPS_450nm[1/Mm]'])[0] \
+        keys=['b_sca_wet_CAPS_450nm[1/Mm]'])[0] \
         / datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bext_wet_CAPS_450nm[1/Mm]'])[0]
+        keys=['b_ext_wet_CAPS_450nm[1/Mm]'])[0]
     ssa_dry = datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bsca_dry_CAPS_450nm[1/Mm]'])[0] \
+        keys=['b_sca_dry_CAPS_450nm[1/Mm]'])[0] \
         / datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bext_dry_CAPS_450nm[1/Mm]'])[0]
+        keys=['b_ext_dry_CAPS_450nm[1/Mm]'])[0]
 
     babs_wet = datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bext_wet_CAPS_450nm[1/Mm]'])[0] \
+        keys=['b_ext_wet_CAPS_450nm[1/Mm]'])[0] \
         - datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bsca_wet_CAPS_450nm[1/Mm]'])[0]
+        keys=['b_sca_wet_CAPS_450nm[1/Mm]'])[0]
     babs_dry = datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bext_dry_CAPS_450nm[1/Mm]'])[0] \
+        keys=['b_ext_dry_CAPS_450nm[1/Mm]'])[0] \
         - datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bsca_dry_CAPS_450nm[1/Mm]'])[0]
+        keys=['b_sca_dry_CAPS_450nm[1/Mm]'])[0]
     babs_wet = datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bext_wet_CAPS_450nm[1/Mm]'])[0] \
+        keys=['b_ext_wet_CAPS_450nm[1/Mm]'])[0] \
         - datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bsca_wet_CAPS_450nm[1/Mm]'])[0]
+        keys=['b_sca_wet_CAPS_450nm[1/Mm]'])[0]
     babs_dry = datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bext_dry_CAPS_450nm[1/Mm]'])[0] \
+        keys=['b_ext_dry_CAPS_450nm[1/Mm]'])[0] \
         - datalake.datastreams['CAPS_data'].return_data(
-        keys=['Bsca_dry_CAPS_450nm[1/Mm]'])[0]
+        keys=['b_sca_dry_CAPS_450nm[1/Mm]'])[0]
 
     time = datalake.datastreams['CAPS_data'].return_time(datetime64=False)
     time = datalake.datastreams['CAPS_data'].return_time(datetime64=False)
@@ -1514,12 +1406,12 @@ def albedo_processing(
     datalake.datastreams['CAPS_data'].add_processed_data(
         data_new=babs_wet,
         time_new=time,
-        header_new=['Babs_wet_CAPS_450nm[1/Mm]'],
+        header_new=['b_abs_wet_CAPS_450nm[1/Mm]'],
     )
     datalake.datastreams['CAPS_data'].add_processed_data(
         data_new=babs_dry,
         time_new=time,
-        header_new=['Babs_dry_CAPS_450nm[1/Mm]'],
+        header_new=['b_abs_dry_CAPS_450nm[1/Mm]'],
     )
     return datalake
 
@@ -1547,16 +1439,16 @@ def pass3_processing(
     datalake : object
         DataLake object with the processed data added.
     """
-    # index for Bsca wet and dry
+    # index for b_sca wet and dry
     index_dic = datalake.datastreams['pass3'].return_header_dict()
     time = datalake.datastreams['pass3'].return_time(
         datetime64=False,
         raw=True
     )
-    babs_list = ['Babs405nm[1/Mm]', 'Babs532nm[1/Mm]', 'Babs781nm[1/Mm]']
-    bsca_list = ['Bsca405nm[1/Mm]', 'Bsca532nm[1/Mm]', 'Bsca781nm[1/Mm]']
+    babs_list = ['b_abs405nm[1/Mm]', 'b_abs532nm[1/Mm]', 'b_abs781nm[1/Mm]']
+    bsca_list = ['b_sca405nm[1/Mm]', 'b_sca532nm[1/Mm]', 'b_sca781nm[1/Mm]']
 
-    if 'raw_Babs405nm[1/Mm]' not in index_dic:
+    if 'raw_b_abs405nm[1/Mm]' not in index_dic:
         print('Copy raw babs Pass-3')
         for babs in babs_list:
             raw_name = f'raw_{babs}'
@@ -1567,7 +1459,7 @@ def pass3_processing(
                 time_new=time,
                 header_new=[raw_name],
             )
-    if 'raw_Bsca405nm[1/Mm]' not in index_dic:
+    if 'raw_b_sca405nm[1/Mm]' not in index_dic:
         print('Copy raw bsca Pass-3')
         for bsca in bsca_list:
             raw_name = f'raw_{bsca}'
