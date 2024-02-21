@@ -28,7 +28,7 @@ def for_general_1d_load(
     Generate a settings dictionary for loading and checking 1D data from CSV
     files.
 
-    Parameters:
+    Args:
     ------------
     - relative_data_folder (str): The folder path relative to the main script
         where data files are located. Default is 'instrument_data'.
@@ -106,7 +106,7 @@ def for_general_sizer_1d_2d_load(
     Generate settings for the 1D general file loader and the 2D general sizer
         file loader.
 
-    Parameters:
+    Args:
     - relative_data_folder (str): Path to the folder containing data files,
         relative to the script's location.
     - filename_regex (str): Regex pattern to match filenames for loading.

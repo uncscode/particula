@@ -27,7 +27,7 @@ def discretize_AutoMieQ(
 ):  # sourcery skip
     """Return the extinction coefficient only
 
-    Parameters
+    Args
     ----------
     m : complex
         Complex refractive index of the sphere
@@ -65,7 +65,7 @@ def Mie_SD(
         truncation_Bsca_multiple=None):  # sourcery skip
     """Return the extinction coefficient only if set to true
 
-    Parameters
+    Args
     ----------
     m : complex
         Complex refractive index of the sphere
@@ -208,7 +208,7 @@ def extinction_ratio_wet_dry(
     Calculate the extinction ratio of a dry aerosol to a wet aerosol.
     Using a kappa for water uptake. Uses Mie theory to calculate the extinction
 
-    Parameters
+    Args
     ----------
     kappa : float
         kappa parameter
@@ -325,7 +325,7 @@ def fit_extinction_ratio_with_kappa(
     Using a kappa for water uptake. Uses Mie theory to calculate the extinction
     The defaults are for the 450 nm wavelength.
 
-    Parameters
+    Args
     ----------
     Bext_dry : float
         measured extinction of the dry aerosol
@@ -406,7 +406,7 @@ def discretize_ScatteringFunction(
     The function is cached so it can be used multiple times without
     recalculating.
 
-    Parameters
+    Args
     ----------
     m : float
         refractive index of the aerosol
@@ -464,7 +464,7 @@ def trunc_mono(
     efficiencies, and angles used to compute truncated Mie scattering
     efficiencies can be output by setting fullOutput=True.
 
-    Parameters
+    Args
     ----------
     m: complex float
         Complex refrative index of the aerosol.
@@ -646,7 +646,7 @@ def truncation_for_diameters(
     Calculate the truncation correction for a given refractive index and
     diameter array.
 
-    Parameters
+    Args
     ----------
     refractive_index : float
         Refractive index of the particle.
@@ -727,7 +727,7 @@ def bsca_correction_for_distribution_measurements(
     Calculate the truncation correction for a given refractive index and
     size distribution.
 
-    Parameters
+    Args
     ----------
     refractive_index : float
         Refractive index of the particle.
@@ -800,7 +800,7 @@ def bsca_correction_for_humidified_measurements(
     size distribution. This function is for humidified measurements.
     Need to provide the kappa values for particles.
 
-    Parameters
+    Args
     ----------
     kappa : float
         Kappa value of the particle material.
@@ -874,7 +874,7 @@ def kappa_fitting_caps_data(
 ):  # sourcery skip
     """Fit the extinction ratio with kappa
 
-    Parameters
+    Args
     ----------
     datalake : DataLake
         DataLake object
@@ -1044,7 +1044,7 @@ def caps_processing(
     Function to process the CAPS data, and smps for kappa fitting, and then add
     it to the datalake. Also applies truncation corrections to the CAPS data.
 
-    Parameters
+    Args
     ----------
     datalake : object
         DataLake object to add the processed data to.
@@ -1201,7 +1201,7 @@ def albedo_processing(
     """
     Calculates the albedo from the CAPS data and updates the datastream.
 
-    Parameters
+    Args
     ----------
     datalake : object
         DataLake object with the processed data added.
@@ -1281,7 +1281,7 @@ def pass3_processing(
     Processing PASS3 data applying the calibration factors
     TODO: add the background correction
 
-    Parameters
+    Args
     ----------
     datalake : object
         DataLake object to add the processed data to.

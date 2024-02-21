@@ -21,7 +21,7 @@ def leapfrog(
     and is known for its simple implementation and stability over
     large time steps.
 
-    Parameters:
+    Args:
     - position (Tensor): The current position of the particle.
     - velocity (Tensor): The current velocity of the particle.
     - force (Tensor): The current force acting on the particle.

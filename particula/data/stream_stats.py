@@ -11,7 +11,7 @@ from particula.data.stream import StreamAveraged, Stream
 def drop_masked(stream: Stream, mask: np.ndarray) -> Stream:
     """Drop rows where mask is false, and return data stream.
 
-    Parameters
+    Args
     ----------
     stream : object
         data stream object
