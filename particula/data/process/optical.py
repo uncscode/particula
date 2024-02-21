@@ -18,79 +18,332 @@ from scipy.optimize import fminbound
 from particula.util import convert
 
 
+from typing import Tuple, Union
+from functools import lru_cache
+import PyMieScatt as ps
+
 @lru_cache(maxsize=100000)
 def discretize_AutoMieQ(
-    m,
-    wavelength,
-    dp,
-    nMedium=1.0,
-):  # sourcery skip
-    """Return the extinction coefficient only
+    m: Union[complex, float],
+    wavelength: float,
+    dp: float,
+    nMedium: Union[complex, float] = 1.0,
+) -> Tuple[float, float, float, float, float, float, float]:
+    """
+    Computes Mie coefficients for a spherical particle based on its material
+    properties, size, and the properties of the surrounding medium.
+
+    This function leverages the PyMieScatt library to calculate the extinction
+    (Q_ext), scattering (Q_sca), absorption (Q_abs) efficiencies, the
+    asymmetry factor (g), radiation pressure efficiency (Q_pr), backscatter
+    efficiency (Q_back), and the ratio of backscatter to extinction efficiency
+    (Q_ratio) for a single sphere under specified conditions.
+
+    This function is optimized with an LRU (Least Recently Used) cache to
+    enhance performance by storing up to 100,000 recent calls. The cache
+    memorizes the results of expensive function calls and returns the cached
+    result when the same inputs occur again, reducing the need to recompute
+    these values.
 
     Args
     ----------
-    m : complex
-        Complex refractive index of the sphere
-    wavelength : float
-        Wavelength of the incident light in nm
-    dp : array_like
-        Diameter of the sphere in nm
-    nMedium : float, optional
-        Refractive index of the medium, by default 1.0
+    m : The complex refractive index of the sphere. For non-absorbing material
+        a real number can be provided.
+    wavelength : The wavelength of the incident light in nanometers (nm).
+    dp : The diameter of the sphere in nanometers (nm).
+    nMedium : The refractive index of the surrounding medium.
+        Defaults to 1.0, corresponding to vacuum.
 
     Returns
     -------
-    Q_ext, Q_sca, Q_abs, g, Q_pr, Q_back, Q_ratio
+    Tuple[float, float, float, float, float, float, float]
+        A tuple containing the calculated Mie efficiencies and parameters:
+        Q_ext (extinction efficiency), Q_sca (scattering efficiency),
+        Q_abs (absorption efficiency), g (asymmetry factor),
+        Q_pr (radiation pressure efficiency), Q_back (backscatter efficiency),
+        and Q_ratio (the ratio of backscatter to extinction efficiency).
     """
-    Q_ext, Q_sca, Q_abs, g, Q_pr, Q_back, Q_ratio = ps.AutoMieQ(
-        m=m,
-        wavelength=wavelength,
-        diameter=dp,
-        nMedium=nMedium)
-    return Q_ext, Q_sca, Q_abs, g, Q_pr, Q_back, Q_ratio
+    return ps.AutoMieQ(m=m,
+                       wavelength=wavelength,
+                       diameter=dp,
+                       nMedium=nMedium)
+
+
+def discretize_parameters(
+    m: Union[complex, float],
+    wavelength: float,
+    dp: np.ndarray
+) -> Tuple[Union[complex, float], float, np.ndarray]:
+    """
+    Discretizes material refractive index, wavelength, and particle diameters.
+
+    Parameters
+    ----------
+    m : Union[complex, float]
+        The complex or real refractive index of the particles.
+    wavelength : float
+        The incident light wavelength in nanometers.
+    dp : np.ndarray
+        An array of particle diameters in nanometers.
+
+    Returns
+    -------
+    Tuple[Union[complex, float], float, np.ndarray]
+        The discretized values of m, wavelength, and dp.
+    """
+    m_real = convert.round_arbitrary(
+        values=np.real(m),
+        base=0.001,
+        mode='round')
+    m_imag = convert.round_arbitrary(
+        values=np.imag(m),
+        base=0.001,
+        mode='round')
+    # recombine the discretized real and imaginary parts
+    m_discretized = m_real + 1j * m_imag if m_imag != 0 else m_real
+
+    # discretize the wavelength assumes nm
+    wavelength_discretized = convert.round_arbitrary(
+        values=wavelength,
+        base=1,
+        mode='round')
+
+    # discretize the particle diameters assumes nm
+    dp_discretized = convert.round_arbitrary(
+        values=dp,
+        base=5,
+        mode='round',
+        nonzero_edge=True)
+
+    return m_discretized, wavelength_discretized, dp_discretized
+
+
+def compute_bulk_optics(
+    q_ext: np.ndarray,
+    q_sca: np.ndarray,
+    q_back: np.ndarray,
+    q_ratio: np.ndarray,
+    g: np.ndarray,
+    aSDn: np.ndarray,
+    extinction_only: np.ndarray,
+    pms: np.ndarray,
+    dp: np.ndarray
+):
+    """
+    Computes bulk optical properties from individual efficiency factors and
+    size distribution.
+
+    Parameters
+    ----------
+    q_ext, q_sca, q_abs, q_pr, q_back, q_ratio, g : np.ndarray
+        Arrays of efficiency factors and the asymmetry factor.
+    aSDn : np.ndarray
+        Number size distribution.
+    extinction_only : bool
+        Flag to compute only the extinction coefficient.
+    pms : bool
+        Flag indicating if probability mass distribution, where sum of
+        all bins is total number of particles, is used.
+    dp : np.ndarray
+        An array of particle diameters in nanometers.
+
+    Returns
+    -------
+    Tuple containing bulk optical properties.
+    """
+    if pms:
+        Bext = np.sum(q_ext * aSDn)
+        if extinction_only:
+            return Bext
+        Bsca = np.sum(q_sca * aSDn)
+        Babs = Bext - Bsca
+        Bback = np.sum(q_back * aSDn)
+        Bratio = np.sum(q_ratio * aSDn)
+        bigG = np.sum(g * q_sca * aSDn) / Bsca if Bsca != 0 else 0
+        Bpr = Bext - bigG * Bsca
+    else:
+        Bext = np.trapz(q_ext * aSDn, dp)
+        if extinction_only:
+            return Bext
+        Bsca = np.trapz(q_sca * aSDn, dp)
+        Babs = Bext - Bsca
+        Bback = np.trapz(q_back * aSDn, dp)
+        Bratio = np.trapz(q_ratio * aSDn, dp)
+        bigG = np.trapz(g * q_sca * aSDn, dp) / Bsca if Bsca != 0 else 0
+        Bpr = Bext - bigG * Bsca
+
+    return Bext, Bsca, Babs, Bpr, Bback, Bratio, bigG
+
+
+def format_results(Bext, Bsca, Babs, bigG, Bpr, Bback, Bratio, asDict: bool) -> Union[Dict[str, float], Tuple[float, ...]]:
+    """
+    Formats the results of the Mie scattering calculations.
+
+    Parameters
+    ----------
+    Bext, Bsca, Babs, bigG, Bpr, Bback, Bratio : float
+        Bulk optical properties.
+    asDict : bool
+        Determines the format of the results.
+
+    Returns
+    -------
+    Either a dictionary or a tuple of the computed bulk optical properties.
+    """
+    if asDict:
+        return {
+            'Bext': Bext,
+            'Bsca': Bsca,
+            'Babs': Babs,
+            'G': bigG,
+            'Bpr': Bpr,
+            'Bback': Bback,
+            'Bratio': Bratio
+        }
+    else:
+        return Bext, Bsca, Babs, bigG, Bpr, Bback, Bratio
 
 
 def Mie_SD(
-        m,
-        wavelength,
-        dp,
-        ndp,
-        nMedium=1.0,
-        SMPS=True,
-        interpolate=False,
-        asDict=False,
-        extinction_only=False,
-        discretize=False,
-        truncation_calculation=False,
+    m: Union[complex, float],
+    wavelength: float,
+    dp: np.ndarray,
+    ndp: np.ndarray,
+    nMedium: Union[complex, float] = 1.0,
+    SMPS: bool = True,
+    asDict: bool = False,
+    extinction_only: bool = False,
+    discretize: bool = False,
+    truncation_calculation: bool = False,
+    truncation_Bsca_multiple: Optional[float] = None
+) -> Union[float, Dict[str, float], Tuple[float, ...]]:
+    """
+    Calculates Mie scattering parameters for a size distribution of spherical particles.
+
+    This function computes optical properties such as extinction, scattering, absorption
+    coefficients, asymmetry factor, backscatter efficiency, and their ratios for a given
+    size distribution of spherical particles. It supports various modes of calculation,
+    including discretization of input parameters and optional truncation of the scattering
+    efficiency.
+
+    Parameters
+    ----------
+    m : Union[complex, float]
+        The complex refractive index of the particles. Real values can be used for
+        non-absorbing materials.
+    wavelength : float
+        The wavelength of the incident light in nanometers (nm).
+    dp : np.ndarray
+        An array of particle diameters in nanometers (nm).
+    ndp : np.ndarray
+        The number distribution of particles per cubic centimeter (#/cm^3).
+    nMedium : Union[complex, float], optional
+        The refractive index of the medium. Defaults to 1.0 (air or vacuum).
+    SMPS : bool, optional
+        Specifies if the size distribution follows the SMPS (Scanning Mobility Particle Sizer) convention.
+        Defaults to True.
+    asDict : bool, optional
+        If True, results are returned as a dictionary. Otherwise, as a tuple. Defaults to False.
+    extinction_only : bool, optional
+        If True, only the extinction coefficient is calculated and returned. Defaults to False.
+    discretize : bool, optional
+        If True, input parameters (m, wavelength, dp) are discretized for computation. Defaults to False.
+    truncation_calculation : bool, optional
+        Enables truncation of the scattering efficiency based on a multiple of the backscattering coefficient.
+        Defaults to False.
+    truncation_Bsca_multiple : Optional[float], optional
+        The multiple of the backscattering coefficient used for truncating the scattering efficiency.
+        Required if `truncation_calculation` is True.
+
+    Returns
+    -------
+    Union[float, Dict[str, float], Tuple[float, ...]]
+        Depending on the parameters `asDict` and `extinction_only`, the function can return:
+        - A single float (extinction coefficient) if `extinction_only` is True.
+        - A dictionary of computed optical properties if `asDict` is True.
+        - A tuple of computed optical properties.
+
+    Raises
+    ------
+    ValueError
+        If `truncation_calculation` is True but `truncation_Bsca_multiple` is not specified.
+
+    Notes
+    -----
+    The discretization and truncation features allow for finer control over the calculation
+    precision and the handling of outliers in size distribution, respectively. The use of SMPS
+    convention influences the integration method for computing bulk properties from the size
+    distribution.
+    """
+    # Adjust input parameters for medium's refractive index
+    m /= nMedium
+    wavelength /= nMedium
+
+    # Ensure inputs are numpy arrays for vectorized operations
+    dp, ndp = map(lambda x: convert.coerce_type(x, np.ndarray), (dp, ndp))
+
+    # Initialize arrays for Mie efficiencies and asymmetry factor
+    Q_ext, Q_sca, Q_abs, Q_pr, Q_back, Q_ratio, g = (np.zeros(dp.size) for _ in range(7))
+
+    # Calculate area size distribution normalized to inverse megameters
+    aSDn = np.pi * (dp / 2)**2 * ndp * 1e-6
+
+    # Perform computations, optionally with discretization
+    if discretize:
+        # Discretize parameters for potentially improved stability/performance
+        m_discretized, wavelength_discretized, dp_discretized = discretize_parameters(m, wavelength, dp)
+        for i in range(dp.size):
+            Q_ext[i], Q_sca[i], Q_abs[i], g[i], Q_pr[i], Q_back[i], Q_ratio[i] = discretize_AutoMieQ(
+                m_discretized, wavelength_discretized, dp_discretized[i], nMedium)
+    else:
+        for i in range(dp.size):
+            Q_ext[i], Q_sca[i], Q_abs[i], g[i], Q_pr[i], Q_back[i], Q_ratio[i] = ps.AutoMieQ(
+                m, wavelength, dp[i], nMedium)
+
+    # Apply optional truncation to scattering efficiency
+    if truncation_calculation:
+        if truncation_Bsca_multiple is None:
+            raise ValueError("truncation_Bsca_multiple must be specified for truncation calculation.")
+        Q_sca *= truncation_Bsca_multiple
+
+    # Compute bulk optical properties based on size distribution and selected mode
+    Bext, Bsca, Babs, Bpr, Bback, Bratio, bigG = compute_bulk_properties(
+        Q_ext, Q_sca, Q_abs, Q_pr, Q_back, Q_ratio, g, aSDn, extinction_only, SMPS, dp)
+
+    # Return results based on requested format
+    if extinction_only:
+        return Bext
+    return format_results(Bext, Bsca, Babs, bigG, Bpr, Bback, Bratio, asDict)
+
+
+def Mie_SD(
+        m: Union[complex, float],
+        wavelength: float,
+        dp: np.ndarray,
+        ndp: np.ndarray,
+        nMedium: Union[complex, float]=1.0,
+        SMPS: bool=True,
+        asDict: bool=False,
+        extinction_only: bool=False,
+        discretize: bool=False,
+        truncation_calculation: bool=False,
         truncation_Bsca_multiple=None):  # sourcery skip
     """Return the extinction coefficient only if set to true
 
     Args
     ----------
-    m : complex
-        Complex refractive index of the sphere
-    wavelength : float
-        Wavelength of the incident light in nm
-    dp : array_like
-        Diameter of the sphere in nm
-    ndp : array_like
-        Number distribution of the sphere #/cm^3
-    nMedium : float, optional
-        Refractive index of the medium, by default 1.0
-    SMPS : bool, optional
-        True if the size distribution is SMPS, by default True
-    interpolate : bool, optional
-        True if the size distribution is interpolated, by default False
-    asDict : bool, optional
-        True if the output is a dictionary, by default False
-    extinction_only : bool, optional
-        True if only the extinction coefficient is returned, by default False
-    discretize : bool, optional
-        True if the size distribution is discretized, by default False
-    truncation_calculation : bool, optional
-        True if the size distribution is truncated, by default False
-    truncation_Bsca_multiple : float, optional
-        The multiple of the backscattering coefficient to truncate the Qsca
+    m : Complex refractive index of the sphere
+    wavelength :      Wavelength of the incident light in nm
+    dp : Diameter of the sphere in nm
+    ndp :   Number distribution of the sphere #/cm^3
+    nMedium : Refractive index of the medium, by default 1.0
+    SMPS :True if the size distribution is SMPS, by default True
+    interpolate :     True if the size distribution is interpolated, by default False
+    asDict : if the output is a dictionary, by default False
+    extinction_only : if only the extinction coefficient is returned, by default False
+    discretize :    True if the size distribution is discretized, by default False
+    truncation_calculation : if the size distribution is truncated, by default False
+    truncation_Bsca_multiple :  multiple of the backscattering coefficient to truncate the Qsca
         coefficent by default None. Qsca_trunc = Qsca*truncation_Bsca_multiple
 
     Returns
@@ -117,7 +370,6 @@ def Mie_SD(
 
     # scaling of 1e-6 to cast in units of inverse megameters - see docs
     aSDn = np.pi * ((dp / 2)**2) * ndp * (1e-6)
-    # _logdp = np.log10(dp)
 
     if discretize:
         m_real = convert.round_arbitrary(np.real(m), base=0.001, mode='round')
