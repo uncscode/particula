@@ -108,7 +108,7 @@ def stream_add_data(
     Adds a new data stream and corresponding time stream to the
     existing data.
 
-    Parameters
+    Args
     ----------
     stream : object
         A Stream object, containing the existing data.

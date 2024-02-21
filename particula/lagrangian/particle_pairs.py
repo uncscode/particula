@@ -16,7 +16,7 @@ def remove_duplicates(
     pair of indices. It removes rows containing duplicate entries in the
     specified column.
 
-    Parameters:
+    Args:
     - index_pairs (torch.Tensor): A 2D tensor of shape [n, 2], where n is the
         number of index pairs.
     - index_to_remove (int): The column index (0 or 1) from which to remove
@@ -56,7 +56,7 @@ def calculate_pairwise_distance(position: torch.Tensor) -> torch.Tensor:
     in the input tensor. Each row of the input tensor is considered a point in
     n-dimensional space.
 
-    Parameters:
+    Args:
     position (torch.Tensor): A 2D tensor of shape [n_dimensions, n_points]
 
     Returns:

@@ -36,8 +36,8 @@ class MaterialProperties:
         try:
             if species == 'water':
                 return in_latent_heat(
-                        self[species]['latent_heat'](temperature)
-                    )
+                    self[species]['latent_heat'](temperature)
+                )
             else:
                 return in_latent_heat(self[species]['latent_heat'])
         except KeyError:
@@ -53,24 +53,24 @@ def water_buck_psat(temperature):
 
     return in_pressure(
         6.1115 * np.exp(
-            (23.036-temp/333.7)*(temp/(279.82+temp))
-        )*u.hPa * (temp < 0.0) + 6.1121 * np.exp(
-            (18.678-temp/234.5)*(temp/(257.14+temp))
-        )*u.hPa * (temp >= 0.0)
+            (23.036 - temp / 333.7) * (temp / (279.82 + temp))
+        ) * u.hPa * (temp < 0.0) + 6.1121 * np.exp(
+            (18.678 - temp / 234.5) * (temp / (257.14 + temp))
+        ) * u.hPa * (temp >= 0.0)
     )
 
 
 def clausius_clapeyron(
-            temperature,
-            vapor_pressure,
-            temperature_new,
-            heat_vaporization
-        ):
+    temperature,
+    vapor_pressure,
+    temperature_new,
+    heat_vaporization
+):
     """
     Calculates the vapor pressure of a substance at a given temperature
     using the Clausius-Clapeyron equation.
 
-    Parameters
+    Args
     ----------
         temperature (float): Temperature reference in Kelvin
         vapor_pressure (float): Vapor pressure reference in Pa
@@ -115,10 +115,10 @@ species_properties = {
         "vapor_attachment": 1.0 * u.dimensionless,
         "saturation_pressure": water_buck_psat,
         "latent_heat": lambda T: (
-                2500.8 - 2.36*T.m_as('degC')
-                + 0.0016*T.m_as('degC')**2
-                - 0.00006*T.m_as('degC')**3
-            ) * u.J/u.g,
+            2500.8 - 2.36 * T.m_as('degC')
+            + 0.0016 * T.m_as('degC')**2
+            - 0.00006 * T.m_as('degC')**3
+        ) * u.J / u.g,
         "heat_vaporization": 2.257e6 * u.J / u.kg,
         "kappa": 0.2 * u.dimensionless,
     },
@@ -130,7 +130,7 @@ species_properties = {
         "vapor_radius": 1.6e-9 * u.m,
         "vapor_attachment": 1.0 * u.dimensionless,
         "saturation_pressure": 1e-14 * u.Pa,
-        "latent_heat": 0.0 * u.J/u.g,
+        "latent_heat": 0.0 * u.J / u.g,
         "heat_vaporization": 0.0 * u.J / u.kg,
         "kappa": 0.53 * u.dimensionless,
     }
@@ -140,7 +140,7 @@ species_properties = {
 def material_properties(property, species="water", temperature=298.15 * u.K):
     """Return the material properties for a given species.
 
-    Parameters
+    Args
     ----------
     property : str
         Property to return. Options are: 'all', 'molecular_weight',
@@ -178,10 +178,10 @@ def vapor_concentration(
         saturation_ratio,
         temperature=298.15 * u.K,
         species="water"
-        ):
+):
     """Convert saturation ratio to mass concentration at a given temperature.
 
-    Parameters
+    Args
     ----------
     sat_ratio : float
         saturation ratio.
@@ -201,10 +201,10 @@ def vapor_concentration(
     saturation_ratio = in_scalar(saturation_ratio)
     # Calculate saturation vapor pressure
     saturation_pressure = material_properties(
-            'saturation_pressure',
-            species,
-            temperature
-        )
+        'saturation_pressure',
+        species,
+        temperature
+    )
 
     return in_concentration(
         saturation_ratio
