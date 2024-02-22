@@ -22,7 +22,7 @@ def round_arbitrary(
         base: float = 1.0,
         mode: str = 'round',
         nonzero_edge: bool = False
-) -> Union[float, list[float]]:
+) -> Union[float, list[float], np.ndarray]:
     """
     Rounds the input values to the nearest multiple of the base.
 
@@ -113,7 +113,8 @@ def volume_to_length(volume: float, length_type: str = 'radius') -> float:
     return radius if length_type == 'radius' else radius * 2
 
 
-def length_to_volume(length: float, length_type: str = 'radius') -> float:
+def length_to_volume(length: Union[float, np.ndarray],
+                     length_type: str = 'radius') -> Union[float, np.ndarray]:
     """
     Convert radius or diameter to volume.
 
@@ -135,10 +136,10 @@ def length_to_volume(length: float, length_type: str = 'radius') -> float:
 
 
 def kappa_volume_solute(
-    volume_total: float,
-    kappa: float,
-    water_activity: float
-) -> np.ndarray:
+    volume_total: Union[float, np.ndarray],
+    kappa: Union[float, np.ndarray],
+    water_activity: Union[float, np.ndarray]
+) -> Union[float, np.ndarray]:
     """
     Calculate the volume of solute in a volume of total solution,
     given the kappa parameter and water activity.
@@ -159,14 +160,14 @@ def kappa_volume_solute(
     vol_factor = (water_activity - 1) / (
         water_activity * (1 - kappa - 1 / water_activity)
     )
-    return volume_total * np.array(vol_factor)
+    return volume_total * np.ndarray(vol_factor)
 
 
 def kappa_volume_water(
-    volume_solute: float,
-    kappa: float,
-    water_activity: float
-) -> float:
+    volume_solute: Union[float, np.ndarray],
+    kappa: Union[float, np.ndarray],
+    water_activity: Union[float, np.ndarray]
+) -> Union[float, np.ndarray]:
     """
     Calculate the volume of water given volume of solute, kappa parameter,
     and water activity.
@@ -188,10 +189,10 @@ def kappa_volume_water(
 
 
 def kappa_from_volume(
-    volume_solute: float,
-    volume_water: float,
-    water_activity: float
-) -> float:
+    volume_solute: Union[float, np.ndarray],
+    volume_water: Union[float, np.ndarray],
+    water_activity: Union[float, np.ndarray]
+) -> Union[float, np.ndarray]:
     """
     Calculate the kappa parameter from the volume of solute and water,
     given the water activity.

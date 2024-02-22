@@ -6,6 +6,7 @@
 
 from typing import Optional, Union
 import numpy as np
+from numpy.typing import NDArray
 from scipy.interpolate import interp1d
 from particula.data.stream import Stream
 
@@ -28,7 +29,7 @@ def discretize_AutoMieQ(
     wavelength: float,
     diameter: float,
     mMedium: Union[complex, float] = 1.0,
-) -> Tuple[float, float, float, float, float, float, float]:
+) -> Tuple[float, ...]:
     """
     Computes Mie coefficients for a spherical particle based on its material
     properties, size, and the properties of the surrounding medium.
@@ -72,11 +73,11 @@ def discretize_AutoMieQ(
 def discretize_Mie_parameters(
     mSphere: Union[complex, float],
     wavelength: float,
-    diameter: np.ndarray,
+    diameter: NDArray[np.float64],
     base_mSphere: float = 0.001,
     base_wavelength: float = 1,
     base_diameter: float = 5,
-) -> Tuple[Union[complex, float], float, np.ndarray]:
+) -> Tuple[Union[complex, float], float, NDArray[np.float64]]:
     """
     Discretizes the refractive index of the material, the wavelength of
     incident light, and the diameters of particles to enhance the numerical
@@ -95,7 +96,7 @@ def discretize_Mie_parameters(
         The wavelength of incident light in nanometers (nm). It is discretized
         to minimize the variations in computations related to different
         wavelengths.
-    diameter : np.ndarray
+    diameter : NDArray[np.float64]
         An array of particle diameters in nanometers (nm), each of which is
         discretized to a specified base to standardize the input sizes for
         calculations.
@@ -110,7 +111,7 @@ def discretize_Mie_parameters(
 
     Returns
     -------
-    Tuple[Union[complex, float], float, np.ndarray]
+    Tuple[Union[complex, float], float, NDArray[np.float64]]
     A tuple containing the discretized refractive index (mSphere), wavelength,
     and diameters (diameter), suitable for use in further Mie scattering
     calculations with potentially improved performance and reduced
@@ -144,32 +145,32 @@ def discretize_Mie_parameters(
 
 
 def compute_bulk_optics(
-    q_ext: np.ndarray,
-    q_sca: np.ndarray,
-    q_back: np.ndarray,
-    q_ratio: np.ndarray,
-    g: np.ndarray,
-    aSDn: np.ndarray,
-    extinction_only: np.ndarray,
-    pms: np.ndarray,
-    dp: np.ndarray
-) -> tuple[np.ndarray, ...]:
+    q_ext: NDArray[np.float64],
+    q_sca: NDArray[np.float64],
+    q_back: NDArray[np.float64],
+    q_ratio: NDArray[np.float64],
+    g: NDArray[np.float64],
+    aSDn: NDArray[np.float64],
+    extinction_only: bool,
+    pms: bool,
+    dp: NDArray[np.float64]
+) -> Union[NDArray[np.float64], tuple[NDArray[np.float64], ...]]:
     """
     Computes bulk optical properties from size dependent efficiency factors for
     the size distribution.
 
     Parameters
     ----------
-    q_ext, q_sca, q_abs, q_pr, q_back, q_ratio, g : np.ndarray
+    q_ext, q_sca, q_abs, q_pr, q_back, q_ratio, g : NDArray[np.float64]
         Arrays of efficiency factors and the asymmetry factor.
-    aSDn : np.ndarray
+    aSDn : NDArray[np.float64]
         Number size distribution.
     extinction_only : bool
         Flag to compute only the extinction coefficient.
     pms : bool
         Flag indicating if probability mass distribution, where sum of
         all bins is total number of particles, is used.
-    dp : np.ndarray
+    dp : NDArray[np.float64]
         An array of particle diameters in nanometers.
 
     Returns
@@ -184,7 +185,8 @@ def compute_bulk_optics(
         b_abs = b_ext - b_sca
         b_back = np.sum(q_back * aSDn)
         b_ratio = np.sum(q_ratio * aSDn)
-        bigG = np.sum(g * q_sca * aSDn) / b_sca if b_sca != 0 else 0
+        bigG = np.sum(g * q_sca * aSDn) / b_sca \
+            if b_sca != 0 else 0
         b_pr = b_ext - bigG * b_sca
     else:  # then pdf so the integral is used
         b_ext = np.trapz(q_ext * aSDn, dp)
@@ -194,21 +196,22 @@ def compute_bulk_optics(
         b_abs = b_ext - b_sca
         b_back = np.trapz(q_back * aSDn, dp)
         b_ratio = np.trapz(q_ratio * aSDn, dp)
-        bigG = np.trapz(g * q_sca * aSDn, dp) / b_sca if b_sca != 0 else 0
+        bigG = np.trapz(g * q_sca * aSDn, dp) / b_sca \
+            if b_sca != 0 else 0
         b_pr = b_ext - bigG * b_sca
     return b_ext, b_sca, b_abs, b_pr, b_back, b_ratio, bigG
 
 
 def format_Mie_results(
-    b_ext,
-    b_sca,
-    b_abs,
-    bigG,
-    b_pr,
-    b_back,
-    b_ratio,
+    b_ext: NDArray[np.float64],
+    b_sca: NDArray[np.float64],
+    b_abs: NDArray[np.float64],
+    bigG: NDArray[np.float64],
+    b_pr: NDArray[np.float64],
+    b_back: NDArray[np.float64],
+    b_ratio: NDArray[np.float64],
     asDict: bool
-) -> Union[dict[str, float], tuple[float, ...]]:
+) -> Union[dict[str, NDArray[np.float64]], tuple[NDArray[np.float64], ...]]:
     """
     Formats the output results of the Mie scattering calculations.
 
@@ -240,8 +243,8 @@ def format_Mie_results(
 def mie_size_distribution(
     mSphere: Union[complex, float],
     wavelength: float,
-    diameter: np.ndarray,
-    number_per_cm3: np.ndarray,
+    diameter: NDArray[np.float64],
+    number_per_cm3: NDArray[np.float64],
     nMedium: Union[complex, float] = 1.0,
     pms: bool = True,
     asDict: bool = False,
@@ -249,7 +252,7 @@ def mie_size_distribution(
     discretize: bool = False,
     truncation_calculation: bool = False,
     truncation_b_sca_multiple: Optional[float] = None
-) -> Union[float, dict[str, float], Tuple[float, ...]]:
+) -> Union[NDArray[np.float64], dict[str, NDArray[np.float64]], Tuple[NDArray[np.float64], ...]]:
     """
     Calculates Mie scattering parameters for a size distribution of spherical particles.
 
@@ -266,9 +269,9 @@ def mie_size_distribution(
         non-absorbing materials.
     wavelength : float
         The wavelength of the incident light in nanometers (nm).
-    diameter : np.ndarray
+    diameter : NDArray[np.float64]
         An array of particle diameters in nanometers (nm).
-    number_per_cm3 : np.ndarray
+    number_per_cm3 : NDArray[np.float64]
         The number distribution of particles per cubic centimeter (#/cm^3).
     nMedium : Union[complex, float], optional
         The refractive index of the medium. Defaults to 1.0 (air or vacuum).
@@ -304,12 +307,12 @@ def mie_size_distribution(
         is not specified.
     """
     # Adjust input parameters for medium's refractive index
-    m /= nMedium
-    wavelength /= nMedium
+    mSphere /= nMedium
+    wavelength /= np.real(nMedium)
 
     # Ensure inputs are numpy arrays for vectorized operations
     diameter, number_per_cm3 = map(
-        lambda x: convert.coerce_type(x, np.ndarray),
+        lambda x: convert.coerce_type(x, NDArray[np.float64]),
         (diameter, number_per_cm3))
 
     # Initialize arrays for Mie efficiencies and asymmetry factor
@@ -328,10 +331,10 @@ def mie_size_distribution(
             diameter=diameter
         )
 
+    # Select the appropriate Mie calculation function with discretize flag
+    mie_function = discretize_AutoMieQ if discretize else ps.AutoMieQ
     # applying discretized parameters if they were set else full MieQ
     for i in range(diameter.size):
-        # Select the appropriate Mie calculation function with discretize flag
-        mie_function = discretize_AutoMieQ if discretize else ps.AutoMieQ
         # Perform the calculation
         q_ext[i], q_sca[i], q_abs[i], g[i], q_pr[i], q_back[i], q_ratio[i] = \
             mie_function(
@@ -349,32 +352,32 @@ def mie_size_distribution(
     # Compute bulk optical properties based on size distribution and selected
     # mode
     b_ext, b_sca, b_abs, b_pr, b_back, b_ratio, bigG = compute_bulk_optics(
-        q_ext, q_sca, q_abs, q_pr, q_back, q_ratio,
+        q_ext, q_sca, q_back, q_ratio,
         g, aSDn, extinction_only, pms, diameter)
 
     # Return results based on requested format
     if extinction_only:
         return b_ext
     return format_Mie_results(b_ext, b_sca, b_abs, bigG,
-                          b_pr, b_back, b_ratio, asDict)
+                              b_pr, b_back, b_ratio, asDict)
 
 
 def extinction_ratio_wet_dry(
-        kappa,
-        particle_counts,
-        diameters,
-        water_activity_sizer,
-        water_activity_dry,
-        water_activity_wet,
-        refractive_index_dry=1.45,
-        water_refractive_index=1.33,
-        wavelength=450,
-        discretize_Mie=True,
-        return_coefficients=False,
-        return_all_optics=False,
+        kappa: Union[float, NDArray[np.float64]],
+        number_per_cm3: NDArray[np.float64],
+        diameters: NDArray[np.float64],
+        water_activity_sizer: NDArray[np.float64],
+        water_activity_dry: NDArray[np.float64],
+        water_activity_wet: NDArray[np.float64],
+        refractive_index_dry: Union[complex, float, np.float16] = 1.45,
+        water_refractive_index: Union[complex, float] = 1.33,
+        wavelength: float = 450,
+        discretize_Mie: bool = True,
+        return_coefficients: bool = False,
+        return_all_optics: bool = False,
 ):  # sourcery skip
     """
-    Calculate the extinction ratio of a dry aerosol to a wet aerosol.
+    Calculate the extinction ratio of a dryer aerosol to a wetter aerosol.
     Using a kappa for water uptake. Uses Mie theory to calculate the extinction
 
     Args
