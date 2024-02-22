@@ -1,26 +1,21 @@
 """Functions for processing optical data."""
 # linting disabled until reformatting of this file
-# pylint: disable=all
-# pytype: skip-file
-# flake8: noqa
+# ************************pylint: disable=all
+# ***pytype: skip-file
+# **flake8: noqa
 
-from typing import Optional, Union
+from typing import Union, Tuple, Optional
 import numpy as np
 from numpy.typing import NDArray
 from scipy.interpolate import interp1d
 from particula.data.stream import Stream
 
-import numpy as np
 import PyMieScatt as ps
 from scipy.integrate import trapz
 from functools import lru_cache
 from tqdm import tqdm
 from scipy.optimize import fminbound
 from particula.util import convert
-
-from typing import Tuple, Union
-from functools import lru_cache
-import PyMieScatt as ps
 
 
 @lru_cache(maxsize=100000)
@@ -252,21 +247,26 @@ def mie_size_distribution(
     discretize: bool = False,
     truncation_calculation: bool = False,
     truncation_b_sca_multiple: Optional[float] = None
-) -> Union[NDArray[np.float64], dict[str, NDArray[np.float64]], Tuple[NDArray[np.float64], ...]]:
+) -> Union[
+        NDArray[np.float64],
+        dict[str, NDArray[np.float64]],
+        Tuple[NDArray[np.float64], ...]
+        ]:
     """
-    Calculates Mie scattering parameters for a size distribution of spherical particles.
+    Calculates Mie scattering parameters for a size distribution of spherical
+    particles.
 
-    This function computes optical properties such as extinction, scattering, absorption
-    coefficients, asymmetry factor, backscatter efficiency, and their ratios for a given
-    size distribution of spherical particles. It supports various modes of calculation,
-    including discretization of input parameters and optional truncation of the scattering
-    efficiency.
+    This function computes optical properties such as extinction, scattering,
+    absorption coefficients, asymmetry factor, backscatter efficiency, and
+    their ratios for a given size distribution of spherical particles. It
+    supports various modes of calculation, including discretization of input
+    parameters and optional truncation of the scattering efficiency.
 
     Parameters
     ----------
     mSphere : Union[complex, float]
-        The complex refractive index of the particles. Real values can be used for
-        non-absorbing materials.
+        The complex refractive index of the particles. Real values can be used
+        for non-absorbing materials.
     wavelength : float
         The wavelength of the incident light in nanometers (nm).
     diameter : NDArray[np.float64]
@@ -363,113 +363,111 @@ def mie_size_distribution(
 
 
 def extinction_ratio_wet_dry(
-        kappa: Union[float, NDArray[np.float64]],
-        number_per_cm3: NDArray[np.float64],
-        diameters: NDArray[np.float64],
-        water_activity_sizer: NDArray[np.float64],
-        water_activity_dry: NDArray[np.float64],
-        water_activity_wet: NDArray[np.float64],
-        refractive_index_dry: Union[complex, float, np.float16] = 1.45,
-        water_refractive_index: Union[complex, float] = 1.33,
-        wavelength: float = 450,
-        discretize_Mie: bool = True,
-        return_coefficients: bool = False,
-        return_all_optics: bool = False,
-):  # sourcery skip
+    kappa: Union[float, NDArray[np.float64]],
+    number_per_cm3: NDArray[np.float64],
+    diameters: NDArray[np.float64],
+    water_activity_sizer: NDArray[np.float64],
+    water_activity_dry: NDArray[np.float64],
+    water_activity_wet: NDArray[np.float64],
+    refractive_index_dry: Union[complex, float, np.float16] = 1.45,
+    water_refractive_index: Union[complex, float] = 1.33,
+    wavelength: float = 450,
+    discretize_Mie: bool = True,
+    return_coefficients: bool = False,
+    return_all_optics: bool = False,
+) -> Union[float, Tuple[NDArray, NDArray]]:
     """
-    Calculate the extinction ratio of a dryer aerosol to a wetter aerosol.
-    Using a kappa for water uptake. Uses Mie theory to calculate the extinction
+    Calculates the extinction ratio between wet and dry aerosols, considering
+    water uptake through kappa. This function uses Mie theory to determine the
+    optical properties of aerosols with varying water content, allowing for
+    analysis of hygroscopic growth and its impact on aerosol optical
+    characteristics.
 
-    Args
+    Parameters
     ----------
-    kappa : float
-        kappa parameter
-    particle_counts : array_like
-        particle counts for each diameter bin
-    diameters : array_like
-        diameter of each bin
-    water_activity_sizer : float
-        water activity of the size distribution
-    water_activity_dry : float
-        water activity of the 'dry' aerosol extinction
-    water_activity_wet : float
-        water activity of the 'wet' aerosol extinction
-    refractive_index_dry : float optional
-        refractive index of the dry aerosol
-    water_refractive_index : float optional
-        refractive index of water
-    wavelength : float optional
-        wavelength of light in nm
-    discretize_Mie : bool optional
-        discretize the Mie calculation so it can be cached
-    return_coefficients : bool optional
-        return the extinction of the wet and dry aerosol
-    return_all_optics : bool optional
-        return all the optics of the wet and dry aerosol
+    kappa : Union[float, NDArray[np.float64]]
+        Hygroscopicity parameter, defining water uptake ability of particles.
+    number_per_cm3 : NDArray[np.float64]
+        Number concentration of particles per cubic centimeter for each size
+        bin.
+    diameters : NDArray[np.float64]
+        Diameters of particles in nanometers for each size bin.
+    water_activity_sizer : NDArray[np.float64]
+        Water activity of the aerosol size distribution.
+    water_activity_dry : NDArray[np.float64]
+        Water activity for the calculation of 'dry' aerosol properties.
+    water_activity_wet : NDArray[np.float64]
+        Water activity for the calculation of 'wet' aerosol properties.
+    refractive_index_dry : Union[complex, float, np.float16], optional
+        Refractive index of the dry aerosol particles.
+    water_refractive_index : Union[complex, float], optional
+        Refractive index of water.
+    wavelength : float, optional
+        Wavelength of the incident light in nanometers.
+    discretize_Mie : bool, optional
+        If True, discretizes input parameters for Mie calculations to enable
+        caching.
+    return_coefficients : bool, optional
+        If True, returns the individual extinction coefficients for wet and
+        dry aerosols instead of their ratio.
+    return_all_optics : bool, optional
+        If True, returns all optical properties calculated by Mie theory,
+        not just extinction.
 
     Returns
     -------
-    extinction_ratio : float
-        extinction ratio of wet / dry aerosol
+    Union[float, Tuple[NDArray, NDArray]]
+        By default, returns the ratio of wet to dry aerosol extinction.
+        If `return_coefficients` is True, returns a tuple of NDArrays
+        containing the extinction coefficients for wet and dry aerosols,
+        respectively.
     """
-
-    # calculate the volume of the dry aerosol
+    # Convert particle diameters to volumes for dry aerosol calculations
     volume_sizer = convert.length_to_volume(diameters, length_type='diameter')
 
+    # Calculate volumes for solute and water in dry and wet conditions
     volume_dry = convert.kappa_volume_solute(
-        volume_sizer,
-        kappa,
-        water_activity_sizer
-    )
+        volume_sizer, kappa, water_activity_sizer)
     volume_water_dry = convert.kappa_volume_water(
-        volume_dry,
-        kappa,
-        water_activity_dry
-    )
+        volume_dry, kappa, water_activity_dry)
     volume_water_wet = convert.kappa_volume_water(
-        volume_dry,
-        kappa,
-        water_activity_wet
-    )
+        volume_dry, kappa, water_activity_wet)
 
-    # calculate the effective refractive index of the dry and wet aerosol
+    # Determine effective refractive indices for dry and wet aerosols
     n_effective_dry = convert.effective_refractive_index(
-        refractive_index_dry,
-        water_refractive_index,
-        volume_dry[-1],
-        volume_water_dry[-1]
-    )
+        refractive_index_dry, water_refractive_index,
+        volume_dry[-1], volume_water_dry[-1])
     n_effective_wet = convert.effective_refractive_index(
-        refractive_index_dry,
-        water_refractive_index,
-        volume_dry[-1],
-        volume_water_wet[-1]
-    )
+        refractive_index_dry, water_refractive_index,
+        volume_dry[-1], volume_water_wet[-1])
 
-    # calculate the extinction for the dry and wet aerosol
-    optics_dry = Mie_SD(
-        n_effective_dry,
-        wavelength,
-        dp=convert.volume_to_length(
-            volume_dry + volume_water_dry,
-            length_type='diameter'),
-        ndp=particle_counts,
-        SMPS=True,
-        extinction_only=not (return_all_optics),
-        discretize=discretize_Mie
-    )
-    optics_wet = Mie_SD(
-        n_effective_wet,
-        wavelength,
-        dp=convert.volume_to_length(
-            volume_dry + volume_water_wet,
-            length_type='diameter'),
-        ndp=particle_counts,
-        SMPS=True,
-        extinction_only=not (return_all_optics),
-        discretize=discretize_Mie
-    )
+    # Adjust diameters for wet and dry conditions and calculate optical
+    # properties
+    diameters_dry = convert.volume_to_length(
+        volume_dry + volume_water_dry, length_type='diameter')
+    diameters_wet = convert.volume_to_length(
+        volume_dry + volume_water_wet, length_type='diameter')
 
+    optics_dry = mie_size_distribution(
+        mSphere=n_effective_dry,
+        wavelength=wavelength,
+        diameter=diameters_dry,
+        number_per_cm3=number_per_cm3,
+        pms=True,
+        extinction_only=not return_all_optics,
+        discretize=discretize_Mie)
+
+    optics_wet = mie_size_distribution(
+        mSphere=n_effective_wet,
+        wavelength=wavelength,
+        diameter=diameters_wet,
+        number_per_cm3=number_per_cm3,
+        pms=True,
+        extinction_only=not return_all_optics,
+        discretize=discretize_Mie)
+
+    # Return either the extinction coefficients or their ratio based on user
+    # choice
     if return_coefficients:
         return optics_wet, optics_dry
     else:
@@ -477,67 +475,76 @@ def extinction_ratio_wet_dry(
 
 
 def fit_extinction_ratio_with_kappa(
-        b_ext_dry,
-        b_ext_wet,
-        particle_counts,
-        diameters,
-        water_activity_sizer,
-        water_activity_dry,
-        water_activity_wet,
-        refractive_index_dry=1.45,
-        water_refractive_index=1.33,
-        wavelength=450,
-        discretize_Mie=True,
-        kappa_bounds=(0, 1),
-        kappa_tolerance=1e-6,
-        kappa_maxiter=100,
-):  # sourcery skip
+    b_ext_dry: Union[float, np.float64],
+    b_ext_wet: Union[float, np.float64],
+    number_per_cm3: NDArray[np.float64],
+    diameters: NDArray[np.float64],
+    water_activity_sizer: NDArray[np.float64],
+    water_activity_dry: NDArray[np.float64],
+    water_activity_wet: NDArray[np.float64],
+    refractive_index_dry: Union[complex, float, np.float16] = 1.45,
+    water_refractive_index: Union[complex, float] = 1.33,
+    wavelength: float = 450,
+    discretize_Mie: bool = True,
+    kappa_bounds: Tuple[float, float] = (0, 1),
+    kappa_tolerance: float = 1e-6,
+    kappa_maxiter: int = 100,
+) -> Union[float, np.float64]:
     """
-    Fit the extinction ratio of a dry aerosol to a wet aerosol.
-    Using a kappa for water uptake. Uses Mie theory to calculate the extinction
-    The defaults are for the 450 nm wavelength.
+    Fits the kappa parameter based on the measured extinction ratios of dry
+    and wet aerosols, utilizing Mie theory to account for water uptake
+    effects. This method optimizes kappa to minimize the difference between
+    the calculated and observed extinction ratio of wet to dry aerosols.
 
-    Args
+    Parameters
     ----------
-    b_ext_dry : float
-        measured extinction of the dry aerosol
-    b_ext_wet : float
-        measured extinction of the wet aerosol
-    particle_counts : array_like
-        particle counts for each diameter bin
-    diameters : array_like
-        diameter of each bin
-    water_activity_sizer : float
-        water activity of the size distribution
-    water_activity_dry : float
-        water activity of the 'dry' aerosol extinction
-    water_activity_wet : float
-        water activity of the 'wet' aerosol extinction
-    refractive_index_dry : float optional
-        refractive index of the dry aerosol
-    water_refractive_index : float optional
-        refractive index of water
-    wavelength : float optional
-        wavelength of light in nm
-    discretize_Mie : bool optional
-        discretize the Mie calculation so it can be cached
-    kappa_bounds : tuple optional
-        bounds for the kappa value
-    kappa_tolerance : float optional
-        tolerance for the kappa value
-    kappa_maxiter : int optional
-        maximum number of iterations for the kappa fit
+    b_ext_dry : Union[float, np.float64]
+        The measured extinction of the dry aerosol.
+    b_ext_wet : Union[float, np.float64]
+        The measured extinction of the wet aerosol.
+    number_per_cm3 : NDArray[np.float64]
+        The number concentration of particles per cubic centimeter for each
+        size bin.
+    diameters : NDArray[np.float64]
+        The diameters of particles in nanometers for each size bin.
+    water_activity_sizer : NDArray[np.float64]
+        The water activity corresponding to the aerosol size distribution.
+    water_activity_dry : NDArray[np.float64]
+        The water activity for the 'dry' aerosol condition.
+    water_activity_wet : NDArray[np.float64]
+        The water activity for the 'wet' aerosol condition.
+    refractive_index_dry : Union[complex, float, np.float16], optional
+        The refractive index of the dry aerosol particles.
+    water_refractive_index : Union[complex, float], optional
+        The refractive index of water.
+    wavelength : float, optional
+        The wavelength of incident light in nanometers.
+    discretize_Mie : bool, optional
+        If True, discretizes input parameters for Mie calculations to enable
+        caching.
+    kappa_bounds : Tuple[float, float], optional
+        The bounds within which to fit the kappa parameter.
+    kappa_tolerance : float, optional
+        The tolerance level for the optimization of kappa.
+    kappa_maxiter : int, optional
+        The maximum number of iterations allowed in the optimization process.
 
     Returns
     -------
-    kappa : float
-        kappa parameter
+    Union[float, np.float64]
+        The optimized kappa parameter that best fits the observed extinction
+        ratios.
     """
 
-    def objective_function(kappa_guess):  # negative of the activity
+    def objective_function(kappa_guess):
+        """
+        Objective function to minimize: the difference between the guessed
+        extinction ratio (based on the current kappa guess) and the observed
+        extinction ratio (wet/dry).
+        """
         ratio_guess = extinction_ratio_wet_dry(
-            kappa_guess,
-            particle_counts=particle_counts,
+            kappa=kappa_guess,
+            number_per_cm3=number_per_cm3,
             diameters=diameters,
             water_activity_sizer=water_activity_sizer,
             water_activity_dry=water_activity_dry,
@@ -548,10 +555,11 @@ def fit_extinction_ratio_with_kappa(
             discretize_Mie=discretize_Mie,
             return_coefficients=False
         )
-        # sourcery skip
         return np.abs(ratio_guess - b_ext_wet / b_ext_dry)
 
-    out = fminbound(
+    # Use fminbound to optimize the kappa value within the specified bounds
+    # and tolerance
+    kappa_opt, _, _, _ = fminbound(
         objective_function,
         x1=kappa_bounds[0],
         x2=kappa_bounds[1],
@@ -560,54 +568,55 @@ def fit_extinction_ratio_with_kappa(
         full_output=True,
         disp=0
     )
-    return out[0]
+    return kappa_opt
 
 
 @lru_cache(maxsize=100000)
 def discretize_ScatteringFunction(
-        m,
-        wavelength,
-        diameter,
-        minAngle=0,
-        maxAngle=180,
-        angularResolution=1
-):  # sourcery skip
+    mSphere: Union[complex, float],
+    wavelength: float,
+    diameter: Union[float, np.float64],
+    minAngle: float = 0,
+    maxAngle: float = 180,
+    angularResolution: float = 1
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    Discretize the scattering function for a given aerosol size and refractive
-    index. This is used to speed up the calculation of the scattering function.
-    The function is cached so it can be used multiple times without
-    recalculating.
+    Discretizes and caches the scattering function for a spherical particle
+    with specified material properties and size. This function aims to optimize
+    the performance of scattering calculations by caching results for
+    frequently used parameters, reducing the need for repeated calculations.
 
-    Args
+    Parameters
     ----------
-    m : float
-        refractive index of the aerosol
-    wavlength : float
-        wavelength of light in nm
-    diameter : float
-        diameter of the aerosol in nm
-    minAngle : float optional
-        minimum angle to calculate the scattering function
-    maxAngle : float optional
-        maximum angle to calculate the scattering function
-    angularResolution : float optional
-        angular resolution to calculate the scattering function
+    mSphere : Union[complex, float]
+        The complex or real refractive index of the particle.
+    wavelength : float
+        The wavelength of the incident light in nanometers (nm).
+    diameter : Union[float, np.float64]
+        The diameter of the particle in nanometers (nm).
+    minAngle : float, optional
+        The minimum scattering angle in degrees to be considered in the
+        calculation. Defaults to 0.
+    maxAngle : float, optional
+        The maximum scattering angle in degrees to be considered in the
+        calculation. Defaults to 180.
+    angularResolution : float, optional
+        The resolution in degrees between calculated scattering angles.
+        Defaults to 1.
 
     Returns
     -------
-    measure : array_like
-        scattering function
-    SL : array_like
-        scattering function
-    SR : array_like
-        scattering function
-    SU : array_like
-        scattering function
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]
+    A tuple containing numpy arrays for the scattering function measurements:
+        - measure: The scattering intensity as a function of angle.
+        - SL: The scattering intensity for left-handed polarization.
+        - SR: The scattering intensity for right-handed polarization.
+        - SU: The unpolarized scattering intensity.
     """
     measure, SL, SR, SU = ps.ScatteringFunction(
-        m,
-        wavelength,
-        diameter,
+        m=mSphere,
+        wavelength=wavelength,
+        diameter=diameter,
         minAngle=minAngle,
         maxAngle=maxAngle,
         angularResolution=angularResolution
@@ -615,14 +624,262 @@ def discretize_ScatteringFunction(
     return measure, SL, SR, SU
 
 
+def calculate_scattering_angles(
+    z_position: Union[float, np.float64],
+    integrate_sphere_diameter_cm: float,
+    tube_diameter_cm: float
+) -> Tuple[float, float]:
+    """
+    Calculates forward and backward scattering angles for a given position
+    along the z-axis within the CAPS instrument geometry.
+
+    Parameters
+    ----------
+    z_position : Union[float, np.float64]
+        The position along the z-axis (in cm).
+    integrate_sphere_diameter_cm : float
+        The diameter of the integrating sphere (in cm).
+    tube_diameter_cm : float
+        The diameter of the sample tube (in cm).
+
+    Returns
+    -------
+    Tuple[float, float]
+        A tuple containing the forward (alpha) and backward (beta)
+        scattering angles in radians.
+    """
+    sphere_radius_cm = integrate_sphere_diameter_cm / 2
+    tube_radius_cm = tube_diameter_cm / 2
+
+    # Calculate forward scattering angle alpha
+    if z_position != sphere_radius_cm:
+        alpha = np.arctan(tube_radius_cm / abs(sphere_radius_cm - z_position))
+    else:
+        alpha = np.pi / 2  # Edge case when directly at the edge of the sphere
+
+    # Calculate backward scattering angle beta
+    if z_position != -sphere_radius_cm:
+        beta = np.arctan(tube_radius_cm / abs(sphere_radius_cm + z_position))
+    else:
+        beta = np.pi / 2  # Edge case when directly at the other edge of sphere
+
+    return alpha, beta
+
+
+def assign_scattering_thetas(
+    alpha: float,
+    beta: float,
+    q_mie: float,
+    z_position: Union[float, np.float64],
+    integrate_sphere_diameter_cm: float
+) -> Tuple[float, float, float]:
+    """
+    Assigns scattering angles and efficiencies based on the z-axis position
+    within the CAPS instrument.
+
+    Parameters
+    ----------
+    alpha : float
+        Forward scattering angle in radians.
+    beta : float
+        Backward scattering angle in radians.
+    q_mie : float
+        The Mie scattering efficiency.
+    z_position : Union[float, np.float64]
+        The position along the z-axis (in cm).
+    integrate_sphere_diameter_cm : float
+        The diameter of the integrating sphere (in cm).
+
+    Returns
+    -------
+    Tuple[float, float, float]
+        A tuple containing the forward scattering angle (theta1), backward
+        scattering angle (theta2), and the ideal scattering efficiency
+        (qsca_ideal) for the given z-axis position.
+    """
+    sphere_radius_cm = integrate_sphere_diameter_cm / 2
+
+    # Determine the location of z_position relative to the sphere's center
+    # Outside the sphere
+    if z_position < -sphere_radius_cm or z_position > sphere_radius_cm:
+        qsca_ideal = 0
+    else:  # Inside the sphere
+        qsca_ideal = q_mie
+
+    # Calculate the effective scattering angles based on z_position
+    theta1 = alpha if z_position <= sphere_radius_cm else np.pi - alpha
+    theta2 = np.pi - beta if z_position >= -sphere_radius_cm else beta
+
+    return theta1, theta2, qsca_ideal
+
+
+def get_truncated_scattering(
+    scattering_unpolarized: np.ndarray,
+    theta: np.ndarray,
+    theta1: float,
+    theta2: float
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Extracts the truncated scattering intensity and corresponding angles based
+    on the given truncation angles.
+
+    Parameters
+    ----------
+    su : np.ndarray
+        The scattering intensity for unpolarized light as a function of angle.
+    theta : np.ndarray
+        The array of angles corresponding to the scattering intensity
+        measurements.
+    theta1 : float
+        The lower bound of the angle range for truncation in radians.
+    theta2 : float
+        The upper bound of the angle range for truncation in radians.
+
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray]
+        A tuple containing the truncated scattering intensity and the
+        corresponding angles within the truncated range.
+    """
+    trunc_indices = np.where((theta >= theta1) & (theta <= theta2))
+    scattering_unpolarized_trunc = scattering_unpolarized[trunc_indices]
+    theta_trunc = theta[trunc_indices]
+
+    return scattering_unpolarized_trunc, theta_trunc
+
+
 @lru_cache(maxsize=100000)
 def trunc_mono(
-        m,
+    mSphere: Union[complex, float],
+    wavelength: float,
+    diameter: Union[float, np.float64],
+    fullOutput: bool = False,
+    calTrunc: bool = False,
+    discretize: bool = True,
+) -> Union[float,
+           Tuple[
+                float, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
+                np.ndarray]]:
+    """
+    Calculates the single scattering albedo (SSA) correction due to truncation
+    for monodisperse aerosol measurements using the CAPS-PM-SSA instrument. The
+    correction accounts for the incomplete angular range of scattering
+    measurements due to the instrument's geometry.
+
+    Parameters
+    ----------
+    mSphere : Union[complex, float]
+        Complex or real refractive index of the aerosol.
+    wavelength : float
+        Wavelength of light in nanometers used in the CAPS instrument.
+    diameter : Union[float, np.float64]
+        Diameter of the monodisperse aerosol in nanometers.
+    fullOutput : bool, optional
+        If True, additional details about the calculation are returned,
+        including z-axis values, angles of integration, and both truncated and
+        ideal scattering efficiencies.
+    calTrunc : bool, optional
+        If True, applies a calibration factor to the truncation correction.
+        Default is False.
+    discretize : bool, optional
+        If True, discretizes the input parameters for potentially improved
+        stability/performance in scattering function calculations.
+
+    Returns
+    -------
+    Union[float, Tuple[float, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
+    np.ndarray]]
+    If fullOutput is False, returns only the truncation correction factor.
+    If fullOutput is True, returns a tuple containing the truncation correction
+    factor, z-axis positions, truncated scattering efficiency, ideal scattering
+    efficiency, forward scattering angle, and backward scattering angle.
+    """
+    # Constants defining the geometry of the CAPS instrument
+    diam_sphere = 10.0  # Diameter of integrating sphere in cm
+    diam_tube = 1.0  # Diameter of sample tube in cm
+    extra_length = 0.6  # Extra length considered outside the integrating
+    # sphere in cm
+    z1 = -0.5 * diam_sphere - extra_length  # Start of the z-axis integral
+    # range
+    z2 = 0.5 * diam_sphere + extra_length  # End of the z-axis integral range
+    npos = 100  # Number of positions along the z-axis
+    angRes = 0.2  # Angular resolution in degrees
+
+    # Calibration value for truncation at a reference diameter of 150nm
+    trunc_calibration = 1.02245612148504
+
+    # Calculate the size parameter
+    size_param = (np.pi * diameter) / wavelength
+
+    # Discretize parameters if enabled
+    if discretize:
+        mSphere, wavelength, diameter = discretize_Mie_parameters(
+            mSphere=mSphere,
+            wavelength=wavelength,
+            diameter=diameter
+        )
+
+    # Choose the appropriate scattering function based on discretization
+    # preference
+    scattering_function = discretize_ScatteringFunction \
+        if discretize else ps.ScatteringFunction
+    theta, _, _, su = scattering_function(
+        mSphere,
+        wavelength,
         diameter,
-        wavelength=450,
-        fullOutput=False,
-        calTrunc=False,
-        discretize=True,
+        minAngle=0,
+        maxAngle=180,
+        angularResolution=angRes
+    )
+
+    # Integrate the Mie scattering efficiency over all angles
+    q_mie = trapz((2 * su * np.sin(theta)) / size_param**2, theta)
+
+    # Initialize arrays for z-axis positions, angles, and scattering
+    # efficiencies
+    z_axis = np.linspace(z1, z2, npos)
+    theta1 = np.zeros(len(z_axis))
+    theta2 = np.zeros(len(z_axis))
+    qsca_trunc = np.zeros(len(z_axis))
+    qsca_ideal = np.zeros(len(z_axis))
+
+    # Calculate truncated and ideal scattering efficiencies across the z-axis
+    for i, z in enumerate(z_axis):
+        # Calculate forward and backward scattering angles based on geometry
+        alpha, beta = calculate_scattering_angles(z, diam_sphere, diam_tube)
+
+        # Assign scattering angles and efficiencies based on z-axis position
+        theta1[i], theta2[i], qsca_ideal[i] = assign_scattering_thetas(
+            alpha, beta, q_mie, z, diam_sphere)
+
+        # Calculate truncated scattering efficiency for this z-axis position
+        su_trunc, theta_trunc = get_truncated_scattering(
+            su, theta, theta1[i], theta2[i])
+        qsca_trunc[i] = trapz(
+            (2 * su_trunc * np.sin(theta_trunc)) / size_param**2,
+            theta_trunc)
+
+    # Integrate scattering efficiencies over the z-axis to get total
+    # efficiencies
+    trunc = trapz(qsca_trunc, z_axis)
+    ideal = trapz(qsca_ideal, z_axis)
+
+    # Apply calibration factor to truncation correction if requested
+    trunc_corr = (ideal / trunc) / \
+        trunc_calibration if calTrunc else ideal / trunc
+
+    return (trunc_corr, z_axis, qsca_trunc, qsca_ideal,
+            theta1, theta2) if fullOutput else trunc_corr
+
+
+@lru_cache(maxsize=100000)
+def trunc_mono_legacey(
+    mSphere: Union[complex, float],
+    wavelength: float,
+    diameter: Union[float, np.float64],
+    fullOutput=False,
+    calTrunc=False,
+    discretize=True,
 ):  # sourcery skip
     """
     Compute the SSA correction due to truncation for the CAPS-PM-SSA for
@@ -669,8 +926,6 @@ def trunc_mono(
             Backward scattering angle in radians truncated by opening on near
             side of cavity.
     """
-    # diameter=list(diameter)
-
     # constants for the geometry of the CAPS
     diam_sphere = 10.0  # diameter of integrating tube in CAPS in cm
     diam_tube = 1.0  # diameter of tube in CAPS in cm
@@ -679,7 +934,7 @@ def trunc_mono(
     z1 = -0.5 * diam_sphere - extra_length  # lower limit of z-axis integral
     z2 = 0.5 * diam_sphere + extra_length  # upper limit of z-axis integral
     npos = 100
-    angRes = 0.2
+    angRes = 0.2  # Do not set angular resolution higher than 0.1
 
     trunc_calibration = 1.02245612148504  # truncation at calibration diameter
     # of 150nm trunc_calibration value seems to be dependent on angular
@@ -687,48 +942,25 @@ def trunc_mono(
 
     size_param = (np.pi * diameter) / wavelength  # size parameter
 
+    # discretize parameters
     if discretize:
-        m_real = convert.round_arbitrary(np.real(m), base=0.002, mode='round')
-        m_imag = convert.round_arbitrary(np.imag(m), base=0.002, mode='round')
-        if m_imag == 0:
-            m_discretized = m_real
-        else:
-            m_discretized = m_real + 1j * m_imag
-        wavelength_discretized = convert.round_arbitrary(
-            wavelength,
-            base=1,
-            mode='round'
+        # Discretize parameters for potentially improved stability/performance
+        mSphere, wavelength, diameter = discretize_Mie_parameters(
+            mSphere=mSphere,
+            wavelength=wavelength,
+            diameter=diameter
         )
-        dp_discretized = float(convert.round_arbitrary(
-            diameter,
-            base=5,
-            mode='round',
-            nonzero_edge=True
-        ))
+    scattering_function = discretize_ScatteringFunction \
+        if discretize else ps.ScatteringFunction
+    theta, _, _, su = scattering_function(
+        mSphere,
+        wavelength,
+        diameter,
+        minAngle=0,
+        maxAngle=180,
+        angularResolution=angRes
+    )
 
-        theta, _, _, su = discretize_ScatteringFunction(
-            m_discretized,
-            wavelength_discretized,
-            dp_discretized,
-            minAngle=0,
-            maxAngle=180,
-            angularResolution=angRes
-        )
-
-    else:
-        theta, _, _, su = ps.ScatteringFunction(
-            m,
-            wavelength,
-            diameter,
-            minAngle=0,
-            maxAngle=180,
-            angularResolution=angRes
-        )
-        # Do not set angular resolution higher than 0.1
-
-    # q_mie = ps.MieQ(n, wavelength, diameter)#Mie efficiencies, 0-360 degrees
-    # q_mie to high for <100nm particles in the center of integrating sphere.
-    # Must integrate su instead
     q_mie = trapz((2 * su * np.sin(theta)) / size_param**2, theta)
 
     z_axis = np.linspace(z1, z2, npos)
@@ -800,156 +1032,143 @@ def trunc_mono(
 
 
 def truncation_for_diameters(
-    refractive_index,
-    diameter_array,
-    calibration_diameter,
-    wavelength,
-    discretize=True
-):  # sourcery skip
+    mSphere: Union[complex, float],
+    wavelength: float,
+    diameter_sizes: NDArray[np.float64],
+    discretize: bool = True
+) -> NDArray[np.float64]:
     """
-    Calculate the truncation correction for a given refractive index and
-    diameter array.
+    Calculates the truncation correction for an array of particle diameters
+    given a specific refractive index and wavelength. This function is
+    particularly useful for aerosol optical property measurements where
+    truncation effects due to instrument geometry need to be accounted for.
 
-    Args
+    Parameters
     ----------
-    refractive_index : float
-        Refractive index of the particle.
-    diameter_array : array_like
-        Array of particle diameters.
-    calibration_diameter : float
-        Diameter of the calibration sphere.
+    mSphere : Union[complex, float]
+        The complex or real refractive index of the particles.
     wavelength : float
-        Wavelength of the light source.
+        The wavelength of the incident light in nanometers (nm).
+    diameter_sizes : NDArray[np.float64]
+        An array of particle diameters in nanometers (nm) for which the
+        truncation correction will be calculated.
+    discretize : bool, optional
+        A flag indicating whether to discretize the input parameters for
+        potentially improved calculation performance. Default is True.
 
     Returns
     -------
-    truncation_array : array_like
-        Array of truncation corrections.
+    NDArray[np.float64]
+        An array of truncation corrections corresponding to the input array of
+        particle diameters.
     """
+    truncation_array = np.zeros_like(diameter_sizes, dtype=np.float64)
 
-    truncation_array = np.zeros(len(diameter_array))
-
-    for i, diameter in enumerate(diameter_array):
-        if discretize:
-            m_real = convert.round_arbitrary(
-                np.real(refractive_index),
-                base=0.002,
-                mode='round'
-            )
-            m_imag = convert.round_arbitrary(
-                np.imag(refractive_index),
-                base=0.002,
-                mode='round'
-            )
-            if m_imag == 0:
-                refractive_index = m_real
-            else:
-                refractive_index = m_real + 1j * m_imag
-            wavelength = convert.round_arbitrary(
-                wavelength,
-                base=1,
-                mode='round'
-            )
-            diameter = float(convert.round_arbitrary(
-                diameter,
-                base=20,
-                mode='round',
-                nonzero_edge=True
-            ))
-        else:
-            pass
-
-        truncation_array[i] = trunc_mono(
-            refractive_index,
-            diameter,
+    if discretize:
+        mSphere, wavelength, diameter_sizes = discretize_Mie_parameters(
+            mSphere=mSphere,
             wavelength=wavelength,
+            diameter=diameter_sizes)
+
+    # For each diameter, calculate the truncation correction
+    for i, diameter in enumerate(diameter_sizes):
+        truncation_array[i] = trunc_mono(
+            mSphere=mSphere,
+            wavelength=wavelength,
+            diameter=diameter,
             fullOutput=False,
             calTrunc=False,
-            discretize=True
+            discretize=discretize
         )
-    return truncation_array  # /self_cal
+    return truncation_array
 
 
 def bsca_correction_for_distribution_measurements(
-    refractive_index,
-    diameter_array,
-    particle_counts,
-    calibration_diameter,
-    wavelength,
-    discretize=True
-):  # sourcery skip
+    mSphere: Union[complex, float],
+    wavelength: float,
+    diameter_sizes: NDArray[np.float64],
+    number_per_cm3: NDArray[np.float64],
+    discretize: bool = True
+) -> Union[float, np.float64]:
     """
-    Calculate the truncation correction for a given refractive index and
-    size distribution.
+    Calculates the correction factor for backscattering measurements due to
+    truncation effects in aerosol size distribution measurements. This
+    correction factor is used to adjust the measured backscattering
+    coefficient, accounting for the limited angular range of the instrument.
 
-    Args
+    Parameters
     ----------
-    refractive_index : float
-        Refractive index of the particle.
-    diameter_array : array_like
-        Array of particle diameters.
-    particle_counts : array_like
-        Array of particle concentrations in #/cm^3.
-    calibration_diameter : float
-        Diameter of the calibration PSLs. (The SSA normalization point)
+    mSphere : Union[complex, float]
+        The complex or real refractive index of the particles.
     wavelength : float
-        Wavelength of the light source.
+        The wavelength of the incident light in nanometers (nm).
+    diameter_sizes : NDArray[np.float64]
+        An array of particle diameters in nanometers (nm) corresponding to the
+        size distribution.
+    number_per_cm3 : NDArray[np.float64]
+        An array of particle number concentrations (#/cm^3) for each diameter
+        in the size distribution.
     discretize : bool, optional
-        If True, the calculation will be done with discretized values of
-        refractive index, wavelength, and diameter. (Default is True)
+        If True, the calculation will use discretized values for the
+        refractive index, wavelength, and diameters to potentially improve
+        computation performance. Default is True.
 
     Returns
     -------
-    b_sca_correction : float
-        Truncation correction. (dimensionless) Multiply the measured b_scat by
-        this number to correct for turncation.
-        b_sca_corrected = b_sca_measured * b_sca_correction
+    float
+        The correction factor for backscattering measurements. This factor is
+        dimensionless and is used to correct the measured backscattering
+        coefficient for truncation effects, calculated as the ratio of
+        the ideal (full angular range) to truncated backscattering coefficient.
+
+    Example
+    -------
+    b_sca_corrected = b_sca_measured * bsca_correction
     """
+    # Calculate the truncation correction array for each diameter
     trunc_corr = truncation_for_diameters(
-        refractive_index,
-        diameter_array,
-        calibration_diameter,
+        mSphere=mSphere,
         wavelength=wavelength,
+        diameter_sizes=diameter_sizes,
         discretize=discretize
     )
 
-    # calculate the truncation b_sca
-    _, b_sca_trunc, _, _, _, _, _ = Mie_SD(
-        refractive_index,
-        wavelength,
-        dp=diameter_array,
-        ndp=particle_counts,
-        SMPS=True,
+    # Calculate the backscattering coefficient with truncation effects
+    _, b_sca_trunc, _, _, _, _ = mie_size_distribution(
+        mSphere=mSphere,
+        wavelength=wavelength,
+        diameter_sizes=diameter_sizes,
+        number_per_cm3=number_per_cm3,
         discretize=discretize,
         truncation_calculation=True,
-        truncation_b_sca_multiple=1 / trunc_corr
+        truncation_bsca_multiple=1 / trunc_corr
+        )
+
+    # Calculate the ideal (non-truncated) backscattering coefficient
+    _, b_sca_ideal, _, _, _, _ = mie_size_distribution(
+        mSphere=mSphere,
+        wavelength=wavelength,
+        diameter_sizes=diameter_sizes,
+        number_per_cm3=number_per_cm3,
+        discretize=discretize
     )
 
-    # calculate the ideal b_sca
-    _, b_sca_ideal, _, _, _, _, _ = Mie_SD(
-        refractive_index,
-        wavelength,
-        dp=diameter_array,
-        ndp=particle_counts,
-        SMPS=True,
-        discretize=discretize,
-    )
-
+    # Return the correction factor as the ratio of ideal to truncated
+    # backscattering coefficients
     return b_sca_ideal / b_sca_trunc
 
 
 def bsca_correction_for_humidified_measurements(
-        kappa,
-        particle_counts,
-        diameters,
-        water_activity_sizer,
-        water_activity_sample,
-        refractive_index_dry=1.45,
-        water_refractive_index=1.33,
-        wavelength=450,
-        discretize=True,
-        calibration_diameter=150,
-):  # sourcery skip
+    kappa: Union[float, NDArray[np.float64]],
+    number_per_cm3: NDArray[np.float64],
+    diameters: NDArray[np.float64],
+    water_activity_sizer: NDArray[np.float64],
+    water_activity_sample: NDArray[np.float64],
+    refractive_index_dry: Union[complex, float, np.float16] = 1.45,
+    water_refractive_index: Union[complex, float] = 1.33,
+    wavelength: float = 450,
+    discretize: bool = True
+) -> NDArray[np.float64]:
     """
     Calculate the truncation correction for a given refractive index and
     size distribution. This function is for humidified measurements.
@@ -987,7 +1206,6 @@ def bsca_correction_for_humidified_measurements(
 
     # calculate the volume of the dry aerosol
     volume_sizer = convert.length_to_volume(diameters, length_type='diameter')
-
     volume_dry = convert.kappa_volume_solute(
         volume_sizer,
         kappa,
@@ -1000,7 +1218,7 @@ def bsca_correction_for_humidified_measurements(
     )
 
     # calculate the effective refractive index of the dry+water aerosol
-    n_effective = convert.effective_refractive_index(
+    mSphere = convert.effective_refractive_index(
         refractive_index_dry,
         water_refractive_index,
         volume_water_sample[-1],
@@ -1009,14 +1227,13 @@ def bsca_correction_for_humidified_measurements(
 
     # calculate the b_sca correction
     bsca_correction = bsca_correction_for_distribution_measurements(
-        n_effective,
-        diameter_array=convert.volume_to_length(
+        mSphere=mSphere,
+        wavelength=wavelength,
+        diameter_sizes=convert.volume_to_length(
             volume_dry + volume_water_sample,
             length_type='diameter'
         ),
-        particle_counts=particle_counts,
-        calibration_diameter=calibration_diameter,
-        wavelength=wavelength,
+        number_per_cm3=number_per_cm3,
         discretize=discretize
     )
     return bsca_correction
