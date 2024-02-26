@@ -1258,11 +1258,20 @@ def scattering_correction_for_humidified_measurements(
 
 
 def kappa_fitting_caps_data(
-        datalake,
-        truncation_bsca=True,
-        refractive_index=1.45,
-):  # sourcery skip
-    """Fit the extinction ratio with kappa
+        extinction_dry: NDArray[np.float64],
+        extinction_wet: NDArray[np.float64],
+        number_per_cm3: NDArray[np.float64],
+        diameter: NDArray[np.float64],
+        water_activity_sizer: NDArray[np.float64],
+        water_activity_sample_dry: NDArray[np.float64],
+        water_activity_sample_wet: NDArray[np.float64],
+        refractive_index_dry: complex | float = 1.45,
+        water_refractive_index: complex | float = 1.33,
+        wavelength: float = 450,
+        discretize: bool = True,
+) -> NDArray[np.float64]:
+    """Fit he extinction ratio with kappa, looping over the time indexes
+    in number_per_cm3
 
     Args
     ----------
@@ -1276,111 +1285,78 @@ def kappa_fitting_caps_data(
     bsca_truncation : array
         bsca truncation correction factor.
     """
-    kappa_fit = np.zeros(
-        (len(datalake.datastreams['smps_1D'].return_data(
-            keys=['Relative_Humidity_(%)'])[0]), 3),
-        dtype=float
-    )
-    bsca_truncation_dry = np.zeros(len(kappa_fit), dtype=float)
-    bsca_truncation_wet = np.zeros(len(kappa_fit), dtype=float)
+    kappa_fit = np.zeros((extinction_wet, 3), dtype=np.float64)
+    # Check for NaNs in 1D arrays
+    nan_check_1d = np.isnan(extinction_dry) | np.isnan(extinction_wet) \
+        | np.isnan(water_activity_sample_wet) | np.isnan(water_activity_sizer)\
+            | np.isnan(water_activity_sample_dry)
+    # Check for NaNs in 2D array along a specific
+    nan_check_2d = np.isnan(number_per_cm3).any(axis=1)
+    # Combine the checks
+    skip_data = nan_check_1d | nan_check_2d
 
-    for i in tqdm(range(len(kappa_fit))):
-        caps_dry = datalake.datastreams['CAPS_data'].return_data(
-            keys=[
-                'b_ext_dry_CAPS_450nm[1/Mm]',
-                'dualCAPS_inlet_RH[%]'
-            ]
-        )[:, i]
-        caps_wet = datalake.datastreams['CAPS_data'].return_data(
-            keys=[
-                'b_ext_wet_CAPS_450nm[1/Mm]',
-                'Wet_RH_preCAPS[%]',
-                'Wet_RH_postCAPS[%]'
-            ]
-        )[:, i]
-        sizer_diameter = np.array(
-            datalake.datastreams['smps_2D'].return_header_list()
-        ).astype(float)
-        sizer_dndlogdp = np.nan_to_num(
-            datalake.datastreams['smps_2D'].return_data()[:, i])
-        sizer_humidity = datalake.datastreams['smps_1D'].return_data(
-            keys=['Relative_Humidity_(%)'])[0, i]
-        sizer_total_n = datalake.datastreams['smps_1D'].return_data(
-            keys=['Total_Conc_(#/cc)'])[0, i]
+    # Loop over the time indexes
+    for index, row_number_per_cm3 in enumerate(number_per_cm3):
 
-        sizer_dn = convert.convert_sizer_dn(sizer_diameter, sizer_dndlogdp)
-        sizer_dn = sizer_dn * sizer_total_n / np.sum(sizer_dn)
+        if skip_data[index]:
+            kappa_fit[index, :] = np.nan
+            continue  # skip if nan values
 
-        if np.isnan(caps_dry).any():
-            blank_value = True
-        elif np.isnan(caps_wet).any():
-            blank_value = True
-        elif np.isnan(sizer_diameter).any():
-            blank_value = True
-        elif np.isnan(sizer_humidity).any():
-            blank_value = True
-        elif np.sum(np.isnan(sizer_dn)) == len(sizer_dn):
-            blank_value = True
-        else:
-            blank_value = False
+        kappa_fit[index, 0] = fit_extinction_ratio_with_kappa(
+            b_ext_dry=extinction_dry[index],
+            b_ext_wet=caps_wet[0],
+            particle_counts=sizer_dn,
+            diameters=sizer_diameter,
+            water_activity_sizer=sizer_humidity / 100,
+            water_activity_dry=caps_dry[1] / 100,
+            water_activity_wet=np.mean(caps_wet[1:]) / 100,
+            refractive_index_dry=refractive_index,
+            water_refractive_index=1.33,
+            wavelength=450,
+            discretize_Mie=True,
+            kappa_bounds=(0, 1),
+            kappa_tolerance=1e-6,
+            kappa_maxiter=100,
+        )
 
-        if blank_value:
-            kappa_fit[i, :] = np.nan
-            if truncation_bsca:
-                bsca_truncation_dry[i] = np.nan
-                bsca_truncation_wet[i] = np.nan
-        else:
-            kappa_fit[i, 0] = fit_extinction_ratio_with_kappa(
-                b_ext_dry=caps_dry[0],
-                b_ext_wet=caps_wet[0],
-                particle_counts=sizer_dn,
-                diameters=sizer_diameter,
-                water_activity_sizer=sizer_humidity / 100,
-                water_activity_dry=caps_dry[1] / 100,
-                water_activity_wet=np.mean(caps_wet[1:]) / 100,
-                refractive_index_dry=refractive_index,
-                water_refractive_index=1.33,
-                wavelength=450,
-                discretize_Mie=True,
-                kappa_bounds=(0, 1),
-                kappa_tolerance=1e-6,
-                kappa_maxiter=100,
-            )
+        kappa_fit[i, 1] = fit_extinction_ratio_with_kappa(
+            b_ext_dry=caps_dry[0],
+            b_ext_wet=caps_wet[0],
+            particle_counts=sizer_dn,
+            diameters=sizer_diameter,
+            water_activity_sizer=sizer_humidity / 100,
+            water_activity_dry=caps_dry[1] / 100,
+            water_activity_wet=np.mean(caps_wet[1:]) / 100,
+            refractive_index_dry=refractive_index * 1.05,
+            water_refractive_index=1.33,
+            wavelength=450,
+            discretize_Mie=True,
+            kappa_bounds=(0, 1),
+            kappa_tolerance=1e-6,
+            kappa_maxiter=100,
+        )
 
-            kappa_fit[i, 1] = fit_extinction_ratio_with_kappa(
-                b_ext_dry=caps_dry[0],
-                b_ext_wet=caps_wet[0],
-                particle_counts=sizer_dn,
-                diameters=sizer_diameter,
-                water_activity_sizer=sizer_humidity / 100,
-                water_activity_dry=caps_dry[1] / 100,
-                water_activity_wet=np.mean(caps_wet[1:]) / 100,
-                refractive_index_dry=refractive_index * 1.05,
-                water_refractive_index=1.33,
-                wavelength=450,
-                discretize_Mie=True,
-                kappa_bounds=(0, 1),
-                kappa_tolerance=1e-6,
-                kappa_maxiter=100,
-            )
+        kappa_fit[i, 2] = fit_extinction_ratio_with_kappa(
+            b_ext_dry=caps_dry[0],
+            b_ext_wet=caps_wet[0],
+            particle_counts=sizer_dn,
+            diameters=sizer_diameter,
+            water_activity_sizer=sizer_humidity / 100,
+            water_activity_dry=caps_dry[1] / 100,
+            water_activity_wet=np.mean(caps_wet[1:]) / 100,
+            refractive_index_dry=refractive_index * 0.95,
+            water_refractive_index=1.33,
+            wavelength=450,
+            discretize_Mie=True,
+            kappa_bounds=(0, 1),
+            kappa_tolerance=1e-6,
+            kappa_maxiter=100,
+        )
 
-            kappa_fit[i, 2] = fit_extinction_ratio_with_kappa(
-                b_ext_dry=caps_dry[0],
-                b_ext_wet=caps_wet[0],
-                particle_counts=sizer_dn,
-                diameters=sizer_diameter,
-                water_activity_sizer=sizer_humidity / 100,
-                water_activity_dry=caps_dry[1] / 100,
-                water_activity_wet=np.mean(caps_wet[1:]) / 100,
-                refractive_index_dry=refractive_index * 0.95,
-                water_refractive_index=1.33,
-                wavelength=450,
-                discretize_Mie=True,
-                kappa_bounds=(0, 1),
-                kappa_tolerance=1e-6,
-                kappa_maxiter=100,
-            )
+    return kappa_fit
 
+
+def truncation_precessing():
             if truncation_bsca:
                 bsca_truncation_dry[i] = \
                     bsca_correction_for_humidified_measurements(
