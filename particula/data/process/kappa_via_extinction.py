@@ -1,4 +1,17 @@
 """Calculate Kappa hygroscopic parameters from extinction data."""
+# pyright: reportReturnType=false, reportAssignmentType=false
+# pyright: reportIndexIssue=false
+# pyright: reportArgumentType=false, reportOperatorIssue=false
+# pylint: disable=too-many-arguments, too-many-locals
+
+
+from typing import Union, Tuple
+import numpy as np
+from scipy.optimize import fminbound
+from numpy.typing import NDArray
+from particula.util import convert
+from particula.data.process import mie_bulk
+
 
 def extinction_ratio_wet_dry(
     kappa: Union[float, NDArray[np.float64]],
@@ -90,7 +103,7 @@ def extinction_ratio_wet_dry(
     diameters_wet = convert.volume_to_length(
         volume_dry + volume_water_wet, length_type='diameter')
 
-    optics_dry = mie_size_distribution(
+    optics_dry = mie_bulk.mie_size_distribution(
         m_sphere=n_effective_dry,
         wavelength=wavelength,
         diameter=diameters_dry,  # pyright: ignore[reportArgumentType]
@@ -99,7 +112,7 @@ def extinction_ratio_wet_dry(
         extinction_only=not return_all_optics,
         discretize=discretize)
 
-    optics_wet = mie_size_distribution(
+    optics_wet = mie_bulk.mie_size_distribution(
         m_sphere=n_effective_wet,
         wavelength=wavelength,
         diameter=diameters_wet,  # pyright: ignore[reportArgumentType]
