@@ -1,6 +1,5 @@
 # For data processing of caps data
 
-# pylint: ignore
 # flake8: noqa
 
 
@@ -254,7 +253,7 @@
 # ):
 #     """
 #     Processing PASS3 data applying the calibration factors
-#     TODO: add the background correction
+#     add the background correction
 
 #     Args
 #     ----------
