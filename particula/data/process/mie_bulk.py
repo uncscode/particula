@@ -1,5 +1,18 @@
 """Calculate Mie optical properties for a size distribution of
 spherical particles. With discretization options."""
+# pyright: reportReturnType=false, reportAssignmentType=false
+# pyright: reportIndexIssue=false
+# pyright: reportArgumentType=false, reportOperatorIssue=false
+# pylint: disable=too-many-arguments, too-many-locals
+
+
+from typing import Union, Tuple, Optional
+from functools import lru_cache
+import numpy as np
+from numpy.typing import NDArray
+import PyMieScatt as ps
+from particula.util import convert
+
 
 @lru_cache(maxsize=100000)
 def discretize_auto_mieq(

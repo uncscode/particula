@@ -1,4 +1,15 @@
 """Caculate Mie angular scattering properties for aerosol particles."""
+# pyright: reportReturnType=false, reportAssignmentType=false
+# pyright: reportIndexIssue=false
+# pyright: reportArgumentType=false, reportOperatorIssue=false
+# pylint: disable=too-many-arguments, too-many-locals
+
+
+from typing import Union, Tuple
+from functools import lru_cache
+import numpy as np
+import PyMieScatt as ps
+
 
 @lru_cache(maxsize=100000)
 def discretize_scattering_angles(
