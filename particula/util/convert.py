@@ -44,7 +44,7 @@ def round_arbitrary(
         rounded: The rounded values.
     """
     # Check if values is a NumPy array
-    values = coerce_type(values, NDArray[np.float64])
+    values = coerce_type(values, np.ndarray)
     base = coerce_type(base, float)
 
     # Validate base parameter
@@ -164,7 +164,7 @@ def kappa_volume_solute(
     vol_factor = (water_activity - 1) / (
         water_activity * (1 - kappa - 1 / water_activity)
     )
-    return volume_total * np.ndarray(vol_factor)
+    return volume_total * np.array(vol_factor)
 
 
 def kappa_volume_water(
