@@ -231,8 +231,7 @@ def format_mie_results(
             'b_back': b_back,
             'b_ratio': b_ratio
         }
-    else:
-        return b_ext, b_sca, b_abs, big_g, b_pr, b_back, b_ratio
+    return b_ext, b_sca, b_abs, big_g, b_pr, b_back, b_ratio
 
 
 def mie_size_distribution(
