@@ -79,7 +79,6 @@ def test_discretize_with_custom_bases():
                ), "Custom base diameters were not applied correctly"
 
 
-
 def test_format_mie_results_as_dict():
     """Test that results are correctly formatted as a dictionary."""
     # Sample input arrays
