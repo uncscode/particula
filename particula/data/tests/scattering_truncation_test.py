@@ -1,4 +1,5 @@
 """Test initialize"""
+# pylint --disable=duplicate-code
 
 import numpy as np
 import pytest
@@ -91,7 +92,9 @@ def test_trunc_mono_full_output():
             wavelength=GLOBAL_WAVELENGTH,
             diameter=500.0,
             discretize=False,
-            full_output=True)
+            full_output=True
+        )  # type: ignore
+
     # expected values
     exp_trunc_corr = 1.0984704282875792
 
