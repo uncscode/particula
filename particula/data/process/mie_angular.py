@@ -49,9 +49,10 @@ def discretize_scattering_angles(
     Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]
     A tuple containing numpy arrays for the scattering function measurements:
         - measure: The scattering intensity as a function of angle.
-        - SL: The scattering intensity for parallel polarization.
-        - SR: The scattering intensity for perpendicular polarization.
-        - SU: The unpolarized scattering intensity.
+        - parallel: The scattering intensity for parallel polarization.
+        - perpendicular: The scattering intensity for
+            perpendicular polarization.
+        - unpolarized: The unpolarized scattering intensity.
     """
     measure, parallel, perpendicular, unpolarized = ps.ScatteringFunction(
         m=m_sphere,

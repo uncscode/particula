@@ -133,7 +133,7 @@ def length_to_volume(length: Union[float, np.ndarray],
         The volume.
     """
     if length_type == 'diameter':
-        length /= 2
+        length = length / 2
     elif length_type != 'radius':
         raise ValueError('length_type must be radius or diameter')
     return (4 / 3) * np.pi * (length**3)

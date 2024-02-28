@@ -284,7 +284,7 @@ def kappa_from_extinction_looped(
     # Configuration for kappa fitting
     kappa_bounds = (0, 1.5)
     kappa_tolerance = 1e-6
-    kappa_maxiter = 100
+    kappa_maxiter = 250
     upper_scale = 1.05
     lower_scale = 0.95
 
