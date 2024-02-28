@@ -74,8 +74,10 @@ def test_discretize_with_custom_bases():
         expected_m_sphere), "Custom base m_sphere"
     assert wavelength == pytest.approx(
         expected_wavelength), "Custom base wavelength"
-    assert all([d == pytest.approx(d_val) for d, d_val in zip(
-        diameters, expected_diameters)]), "Custom base diameters"
+    assert all(d == pytest.approx(d_val)
+               for d, d_val in zip(diameters, expected_diameters)
+               ), "Custom base diameters were not applied correctly"
+
 
 
 def test_format_mie_results_as_dict():
