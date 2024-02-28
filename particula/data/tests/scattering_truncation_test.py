@@ -1,6 +1,6 @@
 """Test initialize"""
 
 
-def initialize_file():
+def test_initialize_file():
     """just loads the file"""
     assert True

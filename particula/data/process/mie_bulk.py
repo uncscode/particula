@@ -175,7 +175,7 @@ def compute_bulk_optics(
     if pms:
         b_ext = np.sum(q_ext * area_dist)
         if extinction_only:
-            return b_ext
+            return b_ext, None, None, None, None, None, None
         b_sca = np.sum(q_sca * area_dist)
         b_abs = b_ext - b_sca
         b_back = np.sum(q_back * area_dist)
@@ -186,7 +186,7 @@ def compute_bulk_optics(
     else:  # then pdf so the integral is used
         b_ext = np.trapz(q_ext * area_dist, dp)
         if extinction_only:
-            return b_ext
+            return b_ext, None, None, None, None, None, None
         b_sca = np.trapz(q_sca * area_dist, dp)
         b_abs = b_ext - b_sca
         b_back = np.trapz(q_back * area_dist, dp)
@@ -310,7 +310,7 @@ def mie_size_distribution(
 
     # Ensure inputs are numpy arrays for vectorized operations
     diameter, number_per_cm3 = map(
-        lambda x: convert.coerce_type(x, NDArray[np.float64]),
+        lambda x: convert.coerce_type(x, np.ndarray),
         (diameter, number_per_cm3))
 
     # Initialize arrays for Mie efficiencies and asymmetry factor
