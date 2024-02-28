@@ -239,12 +239,12 @@ def truncation_for_diameters(
 
 
 def correction_for_distribution(
-    m_sphere: complex | float,
+    m_sphere: Union[complex, float],
     wavelength: float,
     diameter_sizes: NDArray[np.float64],
     number_per_cm3: NDArray[np.float64],
     discretize: bool = True
-) -> float | np.float64:
+) -> Union[float, np.float64]:
     """
     Calculates the correction factor for scattering measurements due to
     truncation effects in aerosol size distribution measurements. This
@@ -314,13 +314,13 @@ def correction_for_distribution(
 
 
 def correction_for_humidified(
-    kappa: float | np.float64,
+    kappa: Union[float, np.float64],
     number_per_cm3: NDArray[np.float64],
     diameter: NDArray[np.float64],
     water_activity_sizer: np.float64,
     water_activity_sample: np.float64,
-    refractive_index_dry: complex | float = 1.45,
-    water_refractive_index: complex | float = 1.33,
+    refractive_index_dry: Union[complex, float] = 1.45,
+    water_refractive_index: Union[complex, float] = 1.33,
     wavelength: float = 450,
     discretize: bool = True
 ) -> np.float64:
@@ -405,8 +405,8 @@ def correction_for_humidified_looped(
     diameter: NDArray[np.float64],
     water_activity_sizer: NDArray[np.float64],
     water_activity_sample: NDArray[np.float64],
-    refractive_index_dry: complex | float = 1.45,
-    water_refractive_index: complex | float = 1.33,
+    refractive_index_dry: Union[complex, float] = 1.45,
+    water_refractive_index: Union[complex, float] = 1.33,
     wavelength: float = 450,
     discretize: bool = True
 ) -> NDArray[np.float64]:
