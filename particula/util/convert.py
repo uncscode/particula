@@ -44,7 +44,7 @@ def round_arbitrary(
         rounded: The rounded values.
     """
     # Check if values is a NumPy array
-    values = coerce_type(values, np.ndarray)
+    working_values = coerce_type(values, np.ndarray)
     base = coerce_type(base, float)
 
     # Validate base parameter
@@ -59,7 +59,7 @@ def round_arbitrary(
 
     # Compute rounded values
     rounded = base * np.round(
-        values / base
+        working_values / base
         + factor[
             np.array(
                 ['floor', 'round', 'ceil']
@@ -69,9 +69,9 @@ def round_arbitrary(
 
     # Apply round_nonzero mode
     if nonzero_edge:
-        rounded = np.where(rounded != 0, rounded, values)
+        rounded = np.where(rounded != 0, rounded, working_values)
 
-    return rounded.tolist() if isinstance(values, list) else rounded
+    return float(rounded) if isinstance(values, float) else rounded
 
 
 def radius_diameter(value: float, to_diameter: bool = True) -> float:

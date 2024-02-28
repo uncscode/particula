@@ -231,14 +231,14 @@ def truncation_for_diameters(
             m_sphere=m_sphere,
             wavelength=wavelength,
             diameter=diameter,
-            fullOutput=False,
-            calTrunc=False,
+            full_output=False,
+            cal_trunc=False,
             discretize=discretize
         )
     return truncation_array
 
 
-def scattering_correction_for_distribution(
+def correction_for_distribution(
     m_sphere: complex | float,
     wavelength: float,
     diameter_sizes: NDArray[np.float64],
@@ -289,7 +289,7 @@ def scattering_correction_for_distribution(
     )
 
     # Calculate the scattering coefficient with truncation effects
-    _, b_sca_trunc, _, _, _, _ = mie_bulk.mie_size_distribution(
+    _, b_sca_trunc, _, _, _, _, _ = mie_bulk.mie_size_distribution(
         m_sphere=m_sphere,
         wavelength=wavelength,
         diameter=diameter_sizes,
@@ -300,7 +300,7 @@ def scattering_correction_for_distribution(
     )
 
     # Calculate the ideal (non-truncated) scattering coefficient
-    _, b_sca_ideal, _, _, _, _ = mie_bulk.mie_size_distribution(
+    _, b_sca_ideal, _, _, _, _, _ = mie_bulk.mie_size_distribution(
         m_sphere=m_sphere,
         wavelength=wavelength,
         diameter=diameter_sizes,
@@ -313,17 +313,17 @@ def scattering_correction_for_distribution(
     return b_sca_ideal / b_sca_trunc
 
 
-def scattering_correction_for_humidified(
-    kappa: float | NDArray[np.float64],
+def correction_for_humidified(
+    kappa: float | np.float64,
     number_per_cm3: NDArray[np.float64],
     diameter: NDArray[np.float64],
-    water_activity_sizer: NDArray[np.float64],
-    water_activity_sample: NDArray[np.float64],
+    water_activity_sizer: np.float64,
+    water_activity_sample: np.float64,
     refractive_index_dry: complex | float = 1.45,
     water_refractive_index: complex | float = 1.33,
     wavelength: float = 450,
     discretize: bool = True
-) -> NDArray[np.float64]:
+) -> np.float64:
     """
     Calculates the scattering correction for humidified aerosol measurements,
     accounting for water uptake by adjusting the aerosol's refractive index.
@@ -358,7 +358,7 @@ def scattering_correction_for_humidified(
 
     Returns
     -------
-    NDArray[np.float64]
+    np.float64
         A numpy array of scattering correction factors for each particle size
         in the distribution, to be applied to measured backscatter
         coefficients to account for truncation effects due to humidity.
@@ -389,7 +389,7 @@ def scattering_correction_for_humidified(
         length_type='diameter'
     )
     # calculate the b_sca correction
-    bsca_correction = scattering_correction_for_distribution(
+    bsca_correction = correction_for_distribution(
         m_sphere=m_sphere,
         wavelength=wavelength,
         diameter_sizes=diameter_sizes,
@@ -399,7 +399,7 @@ def scattering_correction_for_humidified(
     return bsca_correction
 
 
-def scattering_correction_looped(
+def correction_for_humidified_looped(
     kappa: NDArray[np.float64],
     number_per_cm3: NDArray[np.float64],
     diameter: NDArray[np.float64],
@@ -475,7 +475,7 @@ def scattering_correction_looped(
         # Correct scattering for the current time index using the specified
         # parameters
         correction_multiple[index] = \
-            scattering_correction_for_humidified(
+            correction_for_humidified(
                 kappa=kappa[index],
                 number_per_cm3=row_number_per_cm3,
                 diameter=diameter,

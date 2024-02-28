@@ -79,6 +79,46 @@ def test_discretize_with_custom_bases():
                ), "Custom base diameters were not applied correctly"
 
 
+def test_discretize_diameter_float():
+    """Test that a float diameter input remains a float after discretization."""
+    m_sphere_input = 1.54321 + 0.01234j
+    wavelength_input = 532.123
+    diameter_input = 158.76  # Single float value for diameter
+    base_m_sphere = 0.01
+    base_wavelength = 5
+    base_diameter = 10
+
+    m_sphere, wavelength, diameter = mie_bulk.discretize_mie_parameters(
+        m_sphere=m_sphere_input,
+        wavelength=wavelength_input,
+        diameter=diameter_input,  # Passing a single float value
+        base_m_sphere=base_m_sphere,
+        base_wavelength=base_wavelength,
+        base_diameter=base_diameter
+    )
+
+    # Expected values, adjusted based on the discretization strategy
+    expected_m_sphere = 1.54 + 0.01j
+    expected_wavelength = 530
+    expected_diameter = 160  # Expected discretized value for the diameter
+
+    # Check if the discretized m_sphere matches the expected complex value
+    assert m_sphere == pytest.approx(
+        expected_m_sphere), "Custom base m_sphere was not applied correctly"
+
+    # Check if the discretized wavelength matches the expected value
+    assert wavelength == pytest.approx(
+        expected_wavelength), "Custom base wavelength was not applied right"
+
+    # Check if the discretized diameter remains a float and matches the
+    # expected value
+    assert isinstance(
+        diameter, float
+        ), "Diameter input was not maintained as a float after discretization"
+    assert diameter == pytest.approx(
+        expected_diameter), "Custom base diameter was not applied correctly"
+
+
 def test_format_mie_results_as_dict():
     """Test that results are correctly formatted as a dictionary."""
     # Sample input arrays
