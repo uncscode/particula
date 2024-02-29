@@ -142,7 +142,7 @@ def fit_extinction_ratio_with_kappa(
     discretize: bool = True,
     kappa_bounds: Tuple[float, float] = (0, 1),
     kappa_tolerance: float = 1e-6,
-    kappa_maxiter: int = 100,
+    kappa_maxiter: int = 200,
 ) -> Union[float, np.float64]:
     """
     Fits the kappa parameter based on the measured extinction ratios of dry
