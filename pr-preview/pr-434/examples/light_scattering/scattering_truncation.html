@@ -647,7 +647,7 @@ Truncation correction factor: 0.99888593093735
 <p>The size-dependent nature of scattering truncation necessitates a thorough understanding of how the phenomenon varies across different particle sizes. This section explores the full size dependence of scattering truncation and introduces the <code class="docutils literal notranslate"><span class="pre">scattering_truncation.truncation_for_diameters</span></code> function to correct for truncation effects across a range of particle sizes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>  <span class="c1"># From 20 nm to 1000 nm with 500 points</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">1500</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>  <span class="c1"># From 20 nm to 1000 nm with 500 points</span>
 
 <span class="n">truncation_array</span> <span class="o">=</span> <span class="n">scattering_truncation</span><span class="o">.</span><span class="n">truncation_for_diameters</span><span class="p">(</span>
     <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
@@ -668,7 +668,106 @@ Truncation correction factor: 0.99888593093735
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/702529e871f9e280df1298281448097f134e6593c6a244798ac18beccfa823e6.png" src="../../_images/702529e871f9e280df1298281448097f134e6593c6a244798ac18beccfa823e6.png" />
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">1500</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>  <span class="c1"># From 20 nm to 1000 nm with 500 points</span>
+<span class="ne">----&gt; </span><span class="mi">3</span> <span class="n">truncation_array</span> <span class="o">=</span> <span class="n">scattering_truncation</span><span class="o">.</span><span class="n">truncation_for_diameters</span><span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span>     <span class="n">diameter_sizes</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="n">discretize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span>     <span class="n">calibrate_trunc</span><span class="o">=</span><span class="kc">True</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">11</span> <span class="c1"># Plot the truncation correction factor as a function of particle diameter</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/process/scattering_truncation.py:238,</span> in <span class="ni">truncation_for_diameters</span><span class="nt">(m_sphere, wavelength, diameter_sizes, discretize, calibrate_trunc)</span>
+<span class="g g-Whitespace">    </span><span class="mi">236</span> <span class="c1"># For each diameter, calculate the truncation correction</span>
+<span class="g g-Whitespace">    </span><span class="mi">237</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">diameter</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">diameter_sizes</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">238</span>     <span class="n">truncation_array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">trunc_mono</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">239</span>         <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">240</span>         <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">241</span>         <span class="n">diameter</span><span class="o">=</span><span class="n">diameter</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">242</span>         <span class="n">full_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">243</span>         <span class="n">calibrate_trunc</span><span class="o">=</span><span class="n">calibrate_trunc</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">244</span>         <span class="n">discretize</span><span class="o">=</span><span class="n">discretize</span>
+<span class="g g-Whitespace">    </span><span class="mi">245</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">246</span> <span class="k">return</span> <span class="n">truncation_array</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/process/scattering_truncation.py:132,</span> in <span class="ni">trunc_mono</span><span class="nt">(m_sphere, wavelength, diameter, full_output, calibrate_trunc, discretize)</span>
+<span class="g g-Whitespace">    </span><span class="mi">129</span> <span class="c1"># Choose the appropriate scattering function based on discretization</span>
+<span class="g g-Whitespace">    </span><span class="mi">130</span> <span class="c1"># preference</span>
+<span class="g g-Whitespace">    </span><span class="mi">131</span> <span class="k">if</span> <span class="n">discretize</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">132</span>     <span class="n">theta</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">su</span> <span class="o">=</span> <span class="n">mie_angular</span><span class="o">.</span><span class="n">discretize_scattering_angles</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">133</span>         <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">134</span>         <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">135</span>         <span class="n">diameter</span><span class="o">=</span><span class="n">diameter</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">136</span>         <span class="n">min_angle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">137</span>         <span class="n">max_angle</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">138</span>         <span class="n">angular_resolution</span><span class="o">=</span><span class="n">ang_res</span>
+<span class="g g-Whitespace">    </span><span class="mi">139</span>     <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">140</span> <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">141</span>     <span class="n">theta</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">su</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">ScatteringFunction</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">142</span>         <span class="n">m</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">143</span>         <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">147</span>         <span class="n">angularResolution</span><span class="o">=</span><span class="n">ang_res</span>
+<span class="g g-Whitespace">    </span><span class="mi">148</span>     <span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/process/mie_angular.py:57,</span> in <span class="ni">discretize_scattering_angles</span><span class="nt">(m_sphere, wavelength, diameter, min_angle, max_angle, angular_resolution)</span>
+<span class="g g-Whitespace">     </span><span class="mi">14</span> <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">15</span> <span class="k">def</span> <span class="nf">discretize_scattering_angles</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">16</span>     <span class="n">m_sphere</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">complex</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">21</span>     <span class="n">angular_resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="g g-Whitespace">     </span><span class="mi">22</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="g g-Whitespace">     </span><span class="mi">23</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">24</span><span class="sd">     Discretizes and caches the scattering function for a spherical particle</span>
+<span class="g g-Whitespace">     </span><span class="mi">25</span><span class="sd">     with specified material properties and size. This function aims to optimize</span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">     </span><span class="mi">55</span><span class="sd">         - unpolarized: The unpolarized scattering intensity.</span>
+<span class="g g-Whitespace">     </span><span class="mi">56</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">---&gt; </span><span class="mi">57</span>     <span class="n">measure</span><span class="p">,</span> <span class="n">parallel</span><span class="p">,</span> <span class="n">perpendicular</span><span class="p">,</span> <span class="n">unpolarized</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">ScatteringFunction</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">58</span>         <span class="n">m</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">59</span>         <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">60</span>         <span class="n">diameter</span><span class="o">=</span><span class="n">diameter</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">61</span>         <span class="n">minAngle</span><span class="o">=</span><span class="n">min_angle</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">62</span>         <span class="n">maxAngle</span><span class="o">=</span><span class="n">max_angle</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">63</span>         <span class="n">angularResolution</span><span class="o">=</span><span class="n">angular_resolution</span>
+<span class="g g-Whitespace">     </span><span class="mi">64</span>     <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">65</span>     <span class="k">return</span> <span class="n">measure</span><span class="p">,</span> <span class="n">parallel</span><span class="p">,</span> <span class="n">perpendicular</span><span class="p">,</span> <span class="n">unpolarized</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/PyMieScatt/Mie.py:335,</span> in <span class="ni">ScatteringFunction</span><span class="nt">(m, wavelength, diameter, nMedium, minAngle, maxAngle, angularResolution, space, angleMeasure, normalization)</span>
+<span class="g g-Whitespace">    </span><span class="mi">333</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_steps</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">334</span>   <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">_measure</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+<span class="ne">--&gt; </span><span class="mi">335</span>   <span class="n">S1</span><span class="p">,</span> <span class="n">S2</span> <span class="o">=</span> <span class="n">MieS1S2</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">u</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">336</span>   <span class="n">SL</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">S1</span><span class="p">)</span><span class="o">*</span><span class="n">S1</span><span class="p">))</span><span class="o">.</span><span class="n">real</span>
+<span class="g g-Whitespace">    </span><span class="mi">337</span>   <span class="n">SR</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">S2</span><span class="p">)</span><span class="o">*</span><span class="n">S2</span><span class="p">))</span><span class="o">.</span><span class="n">real</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/PyMieScatt/Mie.py:391,</span> in <span class="ni">MieS1S2</span><span class="nt">(m, x, mu)</span>
+<span class="g g-Whitespace">    </span><span class="mi">388</span> <span class="k">def</span> <span class="nf">MieS1S2</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">mu</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">389</span> <span class="c1">#  http://pymiescatt.readthedocs.io/en/latest/forward.html#MieS1S2</span>
+<span class="g g-Whitespace">    </span><span class="mi">390</span>   <span class="n">nmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="o">+</span><span class="n">x</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">))</span>
+<span class="ne">--&gt; </span><span class="mi">391</span>   <span class="n">an</span><span class="p">,</span> <span class="n">bn</span> <span class="o">=</span> <span class="n">AutoMie_ab</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">392</span>   <span class="n">pin</span><span class="p">,</span> <span class="n">taun</span> <span class="o">=</span> <span class="n">MiePiTau</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span><span class="n">nmax</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">393</span>   <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">nmax</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/PyMieScatt/Mie.py:253,</span> in <span class="ni">AutoMie_ab</span><span class="nt">(m, x)</span>
+<span class="g g-Whitespace">    </span><span class="mi">251</span>   <span class="k">return</span> <span class="n">LowFrequencyMie_ab</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">252</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">253</span>   <span class="k">return</span> <span class="n">Mie_ab</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/PyMieScatt/Mie.py:76,</span> in <span class="ni">Mie_ab</span><span class="nt">(m, x)</span>
+<span class="g g-Whitespace">     </span><span class="mi">72</span> <span class="n">nu</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="c1">#</span>
+<span class="g g-Whitespace">     </span><span class="mi">74</span> <span class="n">sx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">76</span> <span class="n">px</span> <span class="o">=</span> <span class="n">sx</span><span class="o">*</span><span class="n">jv</span><span class="p">(</span><span class="n">nu</span><span class="p">,</span><span class="n">x</span><span class="p">)</span> <span class="c1">#</span>
+<span class="g g-Whitespace">     </span><span class="mi">77</span> <span class="n">p1x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">px</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="n">nmax</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c1">#</span>
+<span class="g g-Whitespace">     </span><span class="mi">79</span> <span class="n">chx</span> <span class="o">=</span> <span class="o">-</span><span class="n">sx</span><span class="o">*</span><span class="n">yv</span><span class="p">(</span><span class="n">nu</span><span class="p">,</span><span class="n">x</span><span class="p">)</span> <span class="c1">#</span>
+
+<span class="ne">KeyboardInterrupt</span>: 
+</pre></div>
+</div>
 </div>
 </div>
 </section>
