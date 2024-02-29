@@ -35,6 +35,9 @@ parts:
     sections:
     - file: examples/equilibria/activity_part1
     - file: examples/equilibria/equilibria_part1
+  - file: examples/light_scattering/aerosol_optics_intro
+    sections:
+    - file: examples/light_scattering/mie_basics
 - caption: Documentation
   numbered: false
   chapters:
