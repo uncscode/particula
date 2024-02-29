@@ -80,7 +80,8 @@ def test_discretize_with_custom_bases():
 
 
 def test_discretize_diameter_float():
-    """Test that a float diameter input remains a float after discretization."""
+    """Test that a float diameter input remains a float after
+    discretization."""
     m_sphere_input = 1.54321 + 0.01234j
     wavelength_input = 532.123
     diameter_input = 158.76  # Single float value for diameter
