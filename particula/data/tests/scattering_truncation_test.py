@@ -108,9 +108,9 @@ def test_trunc_mono_full_output():
         trunc_corr, float), "Truncation correction factor should be a float"
     assert isinstance(z_axis, np.ndarray), "z_axis should be a numpy array"
     assert isinstance(
-        qsca_trunc, np.ndarray), "qsca_trunc should be a numpy array"
+        qsca_trunc, float), "qsca_trunc should be a float"
     assert isinstance(
-        qsca_ideal, np.ndarray), "qsca_ideal should be a numpy array"
+        qsca_ideal, float), "qsca_ideal should be a float"
     assert isinstance(theta1, np.ndarray), "theta1 should be a numpy array"
     assert isinstance(theta2, np.ndarray), "theta2 should be a numpy array"
 
@@ -118,10 +118,6 @@ def test_trunc_mono_full_output():
     # expectations
     npos = 100  # Expected number of positions along the z-axis
     assert len(z_axis) == npos, "Length of z_axis not match expected value"
-    assert len(
-        qsca_trunc) == npos, "Length of qsca_trunc not match expected value"
-    assert len(
-        qsca_ideal) == npos, "Length of qsca_ideal not match expected value"
     assert len(theta1) == npos, "Length of theta1 not match expected value"
     assert len(theta2) == npos, "Length of theta2 not match expected value"
 

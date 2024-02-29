@@ -57,7 +57,7 @@ def trunc_mono(
     wavelength: float,
     diameter: float,
     full_output: bool = False,
-    cal_trunc: bool = False,
+    calibrate_trunc: bool = False,
     discretize: bool = True,
 ) -> Union[float,
            Tuple[
@@ -81,12 +81,13 @@ def trunc_mono(
         If True, additional details about the calculation are returned,
         including z-axis values, angles of integration, and both truncated and
         ideal scattering efficiencies.
-    cal_trunc : bool, optional
+    calibrate_trunc : bool, optional
         If True, applies a calibration factor to the truncation correction.
         Default is False.
     discretize : bool, optional
         If True, discretizes the input parameters for potentially improved
-        stability/performance in scattering function calculations.
+        stability/performance in scattering function calculations. Can not be
+        done for full_output=True
 
     Returns
     -------
@@ -97,6 +98,9 @@ def trunc_mono(
     factor, z-axis positions, truncated scattering efficiency, ideal scattering
     efficiency, forward scattering angle, and backward scattering angle.
     """
+    if full_output:
+        discretize = False  # can not have full output discretized due to hash
+
     # Constants defining the geometry of the CAPS instrument
     diam_sphere = 10.0  # Diameter of integrating sphere in cm
     diam_tube = 1.0  # Diameter of sample tube in cm
@@ -179,9 +183,9 @@ def trunc_mono(
 
     # Apply calibration factor to truncation correction if requested
     trunc_corr = (ideal / trunc) / \
-        trunc_calibration if cal_trunc else ideal / trunc
+        trunc_calibration if calibrate_trunc else ideal / trunc
 
-    return (trunc_corr, z_axis, qsca_trunc, qsca_ideal,
+    return (trunc_corr, z_axis, trunc, ideal,
             theta1, theta2) if full_output else trunc_corr
 
 
@@ -189,7 +193,8 @@ def truncation_for_diameters(
     m_sphere: Union[complex, float],
     wavelength: float,
     diameter_sizes: NDArray[np.float64],
-    discretize: bool = True
+    discretize: bool = True,
+    calibrate_trunc: bool = False
 ) -> NDArray[np.float64]:
     """
     Calculates the truncation correction for an array of particle diameters
@@ -209,6 +214,9 @@ def truncation_for_diameters(
     discretize : bool, optional
         A flag indicating whether to discretize the input parameters for
         potentially improved calculation performance. Default is True.
+    calibrate_trunc : bool, optional
+        If True, applies a calibration factor to the truncation correction.
+        Default is False.
 
     Returns
     -------
@@ -232,7 +240,7 @@ def truncation_for_diameters(
             wavelength=wavelength,
             diameter=diameter,
             full_output=False,
-            cal_trunc=False,
+            calibrate_trunc=calibrate_trunc,
             discretize=discretize
         )
     return truncation_array
