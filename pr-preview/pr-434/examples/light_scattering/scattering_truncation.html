@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Aerosol Optics &#8212; Particula Book</title>
+    <title>Scattering Truncation Corrections &#8212; Particula Book</title>
   
   
   
@@ -57,11 +57,11 @@
     <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/light_scattering/aerosol_optics_intro';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/light_scattering/scattering_truncation';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Mie Scattering" href="mie_basics.html" />
-    <link rel="prev" title="Liquid Vapor Equilibrium" href="../equilibria/equilibria_part1.html" />
+    <link rel="next" title="The Environment Class" href="../../documentation/environment.html" />
+    <link rel="prev" title="Fitting Kappa-HGF from Light Extinction" href="kappa_vs_extinction.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -230,11 +230,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Aerosol Optics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="aerosol_optics_intro.html">Aerosol Optics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="mie_basics.html">Mie Scattering</a></li>
 <li class="toctree-l2"><a class="reference internal" href="humid_scattering.html">Scattering for Humidified Particles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="scattering_truncation.html">Scattering Truncation Corrections</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Scattering Truncation Corrections</a></li>
 </ul>
 </li>
 </ul>
@@ -312,6 +312,73 @@
 
 
 
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/light_scattering/scattering_truncation.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/light_scattering/scattering_truncation.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
 <div class="dropdown dropdown-source-buttons">
   <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
     <i class="fab fa-github"></i>
@@ -337,7 +404,7 @@
       
       
       
-      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/light_scattering/aerosol_optics_intro.md" target="_blank"
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/light_scattering/scattering_truncation.ipynb" target="_blank"
    class="btn btn-sm btn-source-edit-button dropdown-item"
    title="Suggest edit"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -354,7 +421,7 @@
       
       
       
-      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/light_scattering/aerosol_optics_intro.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/light_scattering/scattering_truncation.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -384,7 +451,7 @@
       
       
       
-      <li><a href="../../_sources/examples/light_scattering/aerosol_optics_intro.md" target="_blank"
+      <li><a href="../../_sources/examples/light_scattering/scattering_truncation.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -394,7 +461,7 @@
 <span class="btn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="btn__text-container">.md</span>
+<span class="btn__text-container">.ipynb</span>
 </a>
 </li>
       
@@ -468,7 +535,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Aerosol Optics</h1>
+    <h1>Scattering Truncation Corrections</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -478,19 +545,17 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mie-scattering">Mie Scattering</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-concepts">Key Concepts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-importance-of-correcting-for-scattering-truncation">The Importance of Correcting for Scattering Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#size-dependent-nature-of-scattering-truncation">Size-Dependent Nature of Scattering Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-the-challenge">Addressing the Challenge</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-scattering-truncation-for-single-particle-measurements">Addressing Scattering Truncation for Single Particle Measurements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-truncation-correction-with-python">Implementing Truncation Correction with Python</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#insights-from-truncation-correction">Insights from Truncation Correction</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particle-distributions">Particle Distributions</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distribution-types">Distribution Types</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#truncation-errors-in-instrument-measurements">Truncation Errors in Instrument Measurements</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#impact-of-truncation-errors">Impact of Truncation Errors</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#here-in">Here in</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-size-dependence-of-truncation">Full Size Dependence of Truncation</a></li>
 </ul>
             </nav>
         </div>
@@ -502,49 +567,111 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="aerosol-optics">
-<h1>Aerosol Optics<a class="headerlink" href="#aerosol-optics" title="Link to this heading">#</a></h1>
-<p>Aerosol optics involves the study of how light interacts with small particles suspended in the air. These interactions include absorption, scattering, and emission of light, which are critical for understanding aerosol properties and their effects on the environment.</p>
-<section id="mie-scattering">
-<h2>Mie Scattering<a class="headerlink" href="#mie-scattering" title="Link to this heading">#</a></h2>
-<p>Mie scattering theory is a powerful tool for understanding light scattering by spherical particles. Developed by Gustav Mie in 1908, this theory provides a way to calculate the scattering and absorption of light by particles based on their size, composition, and the wavelength of light. We are building on pyMieScatt <a class="reference external" href="https://pymiescatt.readthedocs.io/en/latest/">link</a>, a Python package that implements the Mie scattering calculations.</p>
-<section id="key-concepts">
-<h3>Key Concepts<a class="headerlink" href="#key-concepts" title="Link to this heading">#</a></h3>
-<ul class="simple">
-<li><p><strong>Scattering Efficiency</strong>: A measure of how effectively a particle scatters light.</p></li>
-<li><p><strong>Absorption Efficiency</strong>: Indicates how much light is absorbed by the particle.</p></li>
-<li><p><strong>Single Scattering Albedo (SSA)</strong>: The ratio of scattering efficiency to the sum of scattering and absorption efficiencies, representing the particle’s propensity to scatter light rather than absorb it.</p></li>
-</ul>
+  <section class="tex2jax_ignore mathjax_ignore" id="scattering-truncation-corrections">
+<h1>Scattering Truncation Corrections<a class="headerlink" href="#scattering-truncation-corrections" title="Link to this heading">#</a></h1>
+<p>The study of aerosol optical properties, such as Single Scattering Albedo (SSA), plays a crucial role in understanding the effects of aerosols on climate and air quality. SSA, a measure of the fraction of light scattered by particles relative to the total light extinction (scattering plus absorption), is essential for assessing aerosol radiative forcing. Instruments like the Cavity Attenuated Phase Shift (CAPS) SSA instrument are pivotal in making these measurements with high accuracy and reliability. However, one of the critical challenges in accurately determining SSA, especially with the CAPS instrument, is the phenomenon of scattering truncation.</p>
+<section id="the-importance-of-correcting-for-scattering-truncation">
+<h2>The Importance of Correcting for Scattering Truncation<a class="headerlink" href="#the-importance-of-correcting-for-scattering-truncation" title="Link to this heading">#</a></h2>
+<p>Scattering truncation occurs due to the limited angular range over which scattering measurements can be made, leading to an underestimation of the total scattering by aerosol particles. This limitation is particularly pronounced in instruments like the CAPS, where the design inherently restricts the detection of scattered light to a finite angular range (missing some back scatter and forward scattering light). The consequence of this truncation is a potential bias (low) in the measured SSA values, which can significantly affect the interpretation of aerosol optical properties and, by extension, their climatic and environmental impacts.</p>
 </section>
+<section id="size-dependent-nature-of-scattering-truncation">
+<h2>Size-Dependent Nature of Scattering Truncation<a class="headerlink" href="#size-dependent-nature-of-scattering-truncation" title="Link to this heading">#</a></h2>
+<p>The extent of scattering truncation is not uniform across all particle sizes; rather, it exhibits a pronounced size dependency. This variation arises because the scattering efficiency and the angular distribution of scattered light are functions of particle size relative to the wavelength of the incident light. Smaller particles tend to scatter light more isotropically, while larger particles preferentially scatter light in the forward direction. As a result, instruments with limited angular detection ranges may miss a substantial portion of the forward-scattered light from larger particles, leading to more significant truncation effects for these particle sizes.</p>
 </section>
-<section id="particle-distributions">
-<h2>Particle Distributions<a class="headerlink" href="#particle-distributions" title="Link to this heading">#</a></h2>
-<p>Aerosol particles are not uniform; they vary in size, shape, and composition. Understanding these particle distributions is essential for accurate modeling of aerosol optics.</p>
-<section id="distribution-types">
-<h3>Distribution Types<a class="headerlink" href="#distribution-types" title="Link to this heading">#</a></h3>
-<ul class="simple">
-<li><p><strong>Monodisperse</strong>: All particles have the same size.</p></li>
-<li><p><strong>Polydisperse</strong>: Particles have a range of sizes, typically described by a distribution function (e.g., log-normal distribution).</p></li>
-</ul>
-</section>
-</section>
-<section id="truncation-errors-in-instrument-measurements">
-<h2>Truncation Errors in Instrument Measurements<a class="headerlink" href="#truncation-errors-in-instrument-measurements" title="Link to this heading">#</a></h2>
-<p>Instrumental measurements of aerosols are often subject to truncation errors due to limitations in detecting the full angular range of scattered light.</p>
-<section id="impact-of-truncation-errors">
-<h3>Impact of Truncation Errors<a class="headerlink" href="#impact-of-truncation-errors" title="Link to this heading">#</a></h3>
-<ul class="simple">
-<li><p><strong>Underestimation of Scattering Coefficients</strong>: Limited angular range can lead to underestimation of particle scattering, affecting aerosol optical depth (AOD) calculations.</p></li>
-<li><p><strong>Correction Methods</strong>: Various approaches, including mathematical corrections and calibration techniques, are used to mitigate truncation errors and improve measurement accuracy.</p></li>
-</ul>
-</section>
-</section>
-<section id="here-in">
-<h2>Here in<a class="headerlink" href="#here-in" title="Link to this heading">#</a></h2>
-<p>These example code study of aerosol optics through Mie scattering, particle distributions, and the understanding of truncation errors in measurements provides essential insights into aerosol behavior.</p>
-</section>
-<div class="toctree-wrapper compound">
+<section id="addressing-the-challenge">
+<h2>Addressing the Challenge<a class="headerlink" href="#addressing-the-challenge" title="Link to this heading">#</a></h2>
+<p>Correcting for scattering truncation is thus vital for ensuring the accuracy of SSA measurements and, by extension, our understanding of aerosol optical properties. This notebook focuses on methodologies for correcting scattering truncation effects in SSA measurements made using the CAPS instrument. By implementing these corrections, we aim to achieve more accurate and representative SSA values, enhancing our ability to model and predict aerosol impacts on atmospheric processes.</p>
+<p>The following sections will delve into scattering truncation, explore its size-dependent characteristics, and introduce correction techniques tailored to the CAPS SSA instrument.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># particula imports</span>
+<span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">distribution_discretization</span>
+<span class="kn">from</span> <span class="nn">particula.data.process</span> <span class="kn">import</span> <span class="n">scattering_truncation</span>
+</pre></div>
 </div>
+</div>
+</div>
+</section>
+<section id="addressing-scattering-truncation-for-single-particle-measurements">
+<h2>Addressing Scattering Truncation for Single Particle Measurements<a class="headerlink" href="#addressing-scattering-truncation-for-single-particle-measurements" title="Link to this heading">#</a></h2>
+<p>In the quest to accurately assess aerosol optical properties using the Cavity Attenuated Phase Shift (CAPS) SSA instrument, accounting for scattering truncation is paramount. Scattering truncation arises due to the instrument’s limited angular range in capturing scattered light, necessitating corrections to obtain true scattering coefficients. This section introduces the methodology to correct for scattering truncation for a single aerosol particle using the <code class="docutils literal notranslate"><span class="pre">scattering_truncation.trunc_mono</span></code> function.</p>
+<section id="implementing-truncation-correction-with-python">
+<h3>Implementing Truncation Correction with Python<a class="headerlink" href="#implementing-truncation-correction-with-python" title="Link to this heading">#</a></h3>
+<p>The process begins by defining the optical properties of the particle (refractive index and wavelength) and calculating both the ideal (untruncated) and the actual (truncated) scattering efficiencies. We then determine the correction factor needed to adjust for the truncation effect observed with the CAPS instrument.</p>
+<section id="insights-from-truncation-correction">
+<h4>Insights from Truncation Correction<a class="headerlink" href="#insights-from-truncation-correction" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><strong>Ideal vs. Truncated Scattering Efficiency</strong>: The <code class="docutils literal notranslate"><span class="pre">qsca_ideal</span></code> output represents the scattering efficiency as if measured by a perfect instrument with no angular limitations. In contrast, <code class="docutils literal notranslate"><span class="pre">qsca_trunc</span></code> reflects the efficiency as captured by the CAPS instrument, which is inherently limited by scattering truncation.</p></li>
+<li><p><strong>Correction Factor</strong>: The <code class="docutils literal notranslate"><span class="pre">trunc_corr</span></code> value indicates the factor by which the measured (truncated) scattering efficiency needs to be adjusted to align with the ideal, untruncated scenario. This correction is crucial for accurately interpreting SSA measurements and understanding aerosol scattering behaviors.</p></li>
+</ul>
+<p>This correction approach for a single particle lays the groundwork for more comprehensive analyses.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the refractive index of the aerosol particle and the light wavelength</span>
+<span class="n">m_sphere</span> <span class="o">=</span> <span class="mf">1.5</span>  <span class="c1"># Refractive index of the particle</span>
+<span class="n">wavelength</span> <span class="o">=</span> <span class="mf">450.0</span>  <span class="c1"># Wavelength of incident light in nanometers (nm)</span>
+
+<span class="c1"># Perform the truncation correction for a single particle of a given diameter</span>
+<span class="n">trunc_corr</span><span class="p">,</span> <span class="n">z_axis</span><span class="p">,</span> <span class="n">qsca_trunc</span><span class="p">,</span> <span class="n">qsca_ideal</span><span class="p">,</span> <span class="n">theta1</span><span class="p">,</span> <span class="n">theta2</span> <span class="o">=</span> <span class="n">scattering_truncation</span><span class="o">.</span><span class="n">trunc_mono</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>  <span class="c1"># Refractive index of the particle</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>  <span class="c1"># Wavelength of incident light</span>
+    <span class="n">diameter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>  <span class="c1"># Diameter of the particle in nanometers</span>
+    <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Request full output for detailed analysis</span>
+    <span class="n">calibrate_trunc</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Output the calculated scattering efficiencies and truncation correction</span>
+<span class="c1"># factor</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ideal Q_sca: </span><span class="si">{</span><span class="n">qsca_ideal</span><span class="si">}</span><span class="s2"> for a perfect instrument&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Truncated Q_sca: </span><span class="si">{</span><span class="n">qsca_trunc</span><span class="si">}</span><span class="s2"> for a truncated CAPS instrument&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Truncation correction factor: </span><span class="si">{</span><span class="n">trunc_corr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Ideal Q_sca: 0.5478174528225521 for a perfect instrument
+Truncated Q_sca: 0.5363833503036406 for a truncated CAPS instrument
+Truncation correction factor: 0.99888593093735
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="full-size-dependence-of-truncation">
+<h2>Full Size Dependence of Truncation<a class="headerlink" href="#full-size-dependence-of-truncation" title="Link to this heading">#</a></h2>
+<p>The size-dependent nature of scattering truncation necessitates a thorough understanding of how the phenomenon varies across different particle sizes. This section explores the full size dependence of scattering truncation and introduces the <code class="docutils literal notranslate"><span class="pre">scattering_truncation.truncation_for_diameters</span></code> function to correct for truncation effects across a range of particle sizes.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>  <span class="c1"># From 20 nm to 1000 nm with 500 points</span>
+
+<span class="n">truncation_array</span> <span class="o">=</span> <span class="n">scattering_truncation</span><span class="o">.</span><span class="n">truncation_for_diameters</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">diameter_sizes</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">discretize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">calibrate_trunc</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Plot the truncation correction factor as a function of particle diameter</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">diameters</span><span class="p">,</span> <span class="n">truncation_array</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Particle diameter (nm)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Truncation correction factor&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Truncation correction factor as a function of particle diameter&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/702529e871f9e280df1298281448097f134e6593c6a244798ac18beccfa823e6.png" src="../../_images/702529e871f9e280df1298281448097f134e6593c6a244798ac18beccfa823e6.png" />
+</div>
+</div>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -578,20 +705,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../equilibria/equilibria_part1.html"
+       href="kappa_vs_extinction.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Liquid Vapor Equilibrium</p>
+        <p class="prev-next-title">Fitting Kappa-HGF from Light Extinction</p>
       </div>
     </a>
     <a class="right-next"
-       href="mie_basics.html"
+       href="../../documentation/environment.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Mie Scattering</p>
+        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -611,19 +738,17 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mie-scattering">Mie Scattering</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-concepts">Key Concepts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-importance-of-correcting-for-scattering-truncation">The Importance of Correcting for Scattering Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#size-dependent-nature-of-scattering-truncation">Size-Dependent Nature of Scattering Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-the-challenge">Addressing the Challenge</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-scattering-truncation-for-single-particle-measurements">Addressing Scattering Truncation for Single Particle Measurements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-truncation-correction-with-python">Implementing Truncation Correction with Python</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#insights-from-truncation-correction">Insights from Truncation Correction</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particle-distributions">Particle Distributions</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distribution-types">Distribution Types</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#truncation-errors-in-instrument-measurements">Truncation Errors in Instrument Measurements</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#impact-of-truncation-errors">Impact of Truncation Errors</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#here-in">Here in</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-size-dependence-of-truncation">Full Size Dependence of Truncation</a></li>
 </ul>
   </nav></div>
 
