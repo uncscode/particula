@@ -39,6 +39,7 @@ parts:
     sections:
     - file: examples/light_scattering/mie_basics
     - file: examples/light_scattering/humid_scattering
+    - file: examples/light_scattering/kappa_vs_extinction
 - caption: Documentation
   numbered: false
   chapters:

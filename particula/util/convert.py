@@ -160,6 +160,8 @@ def kappa_volume_solute(
     """
 
     kappa = max(kappa, 1e-16)  # Avoid division by zero
+    if water_activity <= 1e-16:  # early return for low water activity
+        return volume_total
 
     vol_factor = (water_activity - 1) / (
         water_activity * (1 - kappa - 1 / water_activity)
@@ -188,6 +190,9 @@ def kappa_volume_water(
     """
     # Avoid division by zero
     water_activity = min(water_activity, 1 - 1e-16)
+
+    if water_activity <= 1e-16:  # early return for low water activity
+        return volume_solute*0
 
     return volume_solute * kappa / (1 / water_activity - 1)
 
