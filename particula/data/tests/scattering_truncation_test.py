@@ -1,5 +1,4 @@
 """Test initialize"""
-# pylint --disable=duplicate-code
 
 import numpy as np
 import pytest
@@ -7,15 +6,15 @@ import pytest
 from particula.data.process import scattering_truncation
 
 # Global parameters for the aerosol distribution and optics
-GLOBAL_KAPPA = 0.8
-GLOBAL_NUMBER_PER_CM3 = np.array([1000.0, 1500.0, 1000.0])
-GLOBAL_DIAMETERS = np.array([100.0, 200.0, 300.0])
-GLOBAL_WATER_ACTIVITY_SIZER = 0.2
-GLOBAL_WATER_ACTIVITY_DRY = 0.3
-GLOBAL_WATER_ACTIVITY_WET = 0.9
-GLOBAL_REFRACTIVE_INDEX_DRY = 1.45
-GLOBAL_WATER_REFRACTIVE_INDEX = 1.33
-GLOBAL_WAVELENGTH = 450
+KAPPA = 0.8
+NUMBER_PER_CM3 = np.array([1000.0, 1500.0, 1000.0])
+DIAMETERS = np.array([100.0, 200.0, 300.0])
+WATER_ACTIVITY_SIZER = 0.2
+WATER_ACTIVITY_DRY = 0.3
+WATER_ACTIVITY_WET = 0.9
+REFRACTIVE_INDEX_DRY = 1.45
+WATER_REFRACTIVE_INDEX = 1.33
+WAVELENGTH = 450
 
 
 def test_get_truncated_scattering():
@@ -54,8 +53,8 @@ def test_trunc_mono_basic():
     # No discretization
     # Execute the function under test with minimal parameters
     trunc_corr = scattering_truncation.trunc_mono(
-        m_sphere=GLOBAL_REFRACTIVE_INDEX_DRY,
-        wavelength=GLOBAL_WAVELENGTH,
+        m_sphere=REFRACTIVE_INDEX_DRY,
+        wavelength=WAVELENGTH,
         diameter=500.0,
         discretize=False,
     )
@@ -69,8 +68,8 @@ def test_trunc_mono_basic():
     # With discretization
     # Execute the function under test with minimal parameters
     trunc_corr = scattering_truncation.trunc_mono(
-        m_sphere=GLOBAL_REFRACTIVE_INDEX_DRY,
-        wavelength=GLOBAL_WAVELENGTH,
+        m_sphere=REFRACTIVE_INDEX_DRY,
+        wavelength=WAVELENGTH,
         diameter=500.0,
         discretize=True,
     )
@@ -88,8 +87,8 @@ def test_trunc_mono_full_output():
     # Execute the function under test with full_output enabled
     trunc_corr, z_axis, qsca_trunc, qsca_ideal, theta1, theta2 = \
         scattering_truncation.trunc_mono(
-            m_sphere=GLOBAL_REFRACTIVE_INDEX_DRY,
-            wavelength=GLOBAL_WAVELENGTH,
+            m_sphere=REFRACTIVE_INDEX_DRY,
+            wavelength=WAVELENGTH,
             diameter=500.0,
             discretize=False,
             full_output=True
@@ -131,9 +130,9 @@ def test_truncation_for_diameters():
     """Test the calculation of truncations for an array of diameters."""
     # Call the function under test
     truncation_corrections = scattering_truncation.truncation_for_diameters(
-        m_sphere=GLOBAL_WATER_ACTIVITY_DRY,
-        wavelength=GLOBAL_WAVELENGTH,
-        diameter_sizes=GLOBAL_DIAMETERS
+        m_sphere=WATER_ACTIVITY_DRY,
+        wavelength=WAVELENGTH,
+        diameter_sizes=DIAMETERS
     )
     # Expected values
     exp_truncation_corrections = np.array([1.02127865, 1.02514909, 1.03708443])
@@ -153,10 +152,10 @@ def test_correction_for_distribution():
     # Execute the function under test
     correction_factor = \
         scattering_truncation.correction_for_distribution(
-            m_sphere=GLOBAL_REFRACTIVE_INDEX_DRY,
-            wavelength=GLOBAL_WAVELENGTH,
-            diameter_sizes=GLOBAL_DIAMETERS,
-            number_per_cm3=GLOBAL_NUMBER_PER_CM3
+            m_sphere=REFRACTIVE_INDEX_DRY,
+            wavelength=WAVELENGTH,
+            diameter_sizes=DIAMETERS,
+            number_per_cm3=NUMBER_PER_CM3
         )
     # Expected values
     exp_correction_factor = 1.0393553004800333
@@ -179,14 +178,14 @@ def test_correction_for_humidified():
 
     # Execute the function under test with global parameters
     bsca_correction = scattering_truncation.correction_for_humidified(
-        kappa=GLOBAL_KAPPA,
-        number_per_cm3=GLOBAL_NUMBER_PER_CM3,
-        diameter=GLOBAL_DIAMETERS,
-        water_activity_sizer=GLOBAL_WATER_ACTIVITY_SIZER,
-        water_activity_sample=GLOBAL_WATER_ACTIVITY_WET,
-        refractive_index_dry=GLOBAL_REFRACTIVE_INDEX_DRY,
-        water_refractive_index=GLOBAL_WATER_REFRACTIVE_INDEX,
-        wavelength=GLOBAL_WAVELENGTH
+        kappa=KAPPA,
+        number_per_cm3=NUMBER_PER_CM3,
+        diameter=DIAMETERS,
+        water_activity_sizer=WATER_ACTIVITY_SIZER,
+        water_activity_sample=WATER_ACTIVITY_WET,
+        refractive_index_dry=REFRACTIVE_INDEX_DRY,
+        water_refractive_index=WATER_REFRACTIVE_INDEX,
+        wavelength=WAVELENGTH
     )
     # Expected values
     exp_bsca_correction = 1.0993407004235503
@@ -204,7 +203,7 @@ def test_correction_for_humidified_looped():
         [1000.0, 1500.0, 1000.0],
         [1000.0, 1500.0, 1000.0],
         [1000.0, 1500.0, 1000.0]])  # Time-indexed number concentration
-    diameter = GLOBAL_DIAMETERS  # Use the global diameters for simplicity
+    diameter = DIAMETERS  # Use the global diameters for simplicity
     # Varying sizing instrument water activity
     water_activity_sizer = np.array([0.2, 0.25, 0.3])
     # Sample water activity under different conditions
@@ -218,9 +217,9 @@ def test_correction_for_humidified_looped():
             diameter=diameter,
             water_activity_sizer=water_activity_sizer,
             water_activity_sample=water_activity_sample,
-            refractive_index_dry=GLOBAL_REFRACTIVE_INDEX_DRY,
-            water_refractive_index=GLOBAL_WATER_REFRACTIVE_INDEX,
-            wavelength=GLOBAL_WAVELENGTH
+            refractive_index_dry=REFRACTIVE_INDEX_DRY,
+            water_refractive_index=WATER_REFRACTIVE_INDEX,
+            wavelength=WAVELENGTH
         )
 
     # Expected values
