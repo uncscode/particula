@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Aerosol Optics &#8212; Particula Book</title>
+    <title>Introduction to Aerosol Optics &#8212; Particula Book</title>
   
   
   
@@ -230,7 +230,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Aerosol Optics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Introduction to Aerosol Optics</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="mie_basics.html">Mie Scattering</a></li>
 <li class="toctree-l2"><a class="reference internal" href="humid_scattering.html">Scattering for Humidified Particles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
@@ -468,7 +468,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Aerosol Optics</h1>
+    <h1>Introduction to Aerosol Optics</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -478,19 +478,19 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mie-scattering">Mie Scattering</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-concepts">Key Concepts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mie-scattering-theory">Mie Scattering Theory</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fundamental-concepts">Fundamental Concepts</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particle-distributions">Particle Distributions</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distribution-types">Distribution Types</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-particle-distributions">Understanding Particle Distributions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#types-of-distributions">Types of Distributions</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#truncation-errors-in-instrument-measurements">Truncation Errors in Instrument Measurements</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#impact-of-truncation-errors">Impact of Truncation Errors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-truncation-errors-in-measurements">Addressing Truncation Errors in Measurements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consequences-and-mitigation-strategies">Consequences and Mitigation Strategies</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#here-in">Here in</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
 </ul>
             </nav>
         </div>
@@ -502,46 +502,53 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="aerosol-optics">
-<h1>Aerosol Optics<a class="headerlink" href="#aerosol-optics" title="Link to this heading">#</a></h1>
-<p>Aerosol optics involves the study of how light interacts with small particles suspended in the air. These interactions include absorption, scattering, and emission of light, which are critical for understanding aerosol properties and their effects on the environment.</p>
-<section id="mie-scattering">
-<h2>Mie Scattering<a class="headerlink" href="#mie-scattering" title="Link to this heading">#</a></h2>
-<p>Mie scattering theory is a powerful tool for understanding light scattering by spherical particles. Developed by Gustav Mie in 1908, this theory provides a way to calculate the scattering and absorption of light by particles based on their size, composition, and the wavelength of light. We are building on pyMieScatt <a class="reference external" href="https://pymiescatt.readthedocs.io/en/latest/">link</a>, a Python package that implements the Mie scattering calculations.</p>
-<section id="key-concepts">
-<h3>Key Concepts<a class="headerlink" href="#key-concepts" title="Link to this heading">#</a></h3>
+  <section id="introduction-to-aerosol-optics">
+<h1>Introduction to Aerosol Optics<a class="headerlink" href="#introduction-to-aerosol-optics" title="Link to this heading">#</a></h1>
+<p>Aerosol optics examines the interaction between light and aerosol particles suspended in the atmosphere. These interactions, encompassing absorption, scattering, and the emission of light, are pivotal in deciphering the physical properties of aerosols and their environmental ramifications.</p>
+<section id="mie-scattering-theory">
+<h2>Mie Scattering Theory<a class="headerlink" href="#mie-scattering-theory" title="Link to this heading">#</a></h2>
+<p>Central to aerosol optics is Mie scattering theory, formulated by Gustav Mie in 1908. This foundational theory enables the precise calculation of light scattering and absorption by spherical particles, taking into account their size, material composition, and the incident light’s wavelength. In this context, we leverage the capabilities of pyMieScatt, a comprehensive Python library designed to facilitate Mie scattering computations.</p>
+<section id="fundamental-concepts">
+<h3>Fundamental Concepts<a class="headerlink" href="#fundamental-concepts" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p><strong>Scattering Efficiency</strong>: A measure of how effectively a particle scatters light.</p></li>
-<li><p><strong>Absorption Efficiency</strong>: Indicates how much light is absorbed by the particle.</p></li>
-<li><p><strong>Single Scattering Albedo (SSA)</strong>: The ratio of scattering efficiency to the sum of scattering and absorption efficiencies, representing the particle’s propensity to scatter light rather than absorb it.</p></li>
+<li><p><strong>Scattering Efficiency</strong>: Quantifies the efficacy of particles in deflecting light in various directions.</p></li>
+<li><p><strong>Absorption Efficiency</strong>: Assesses the extent to which particles absorb incident light.</p></li>
+<li><p><strong>Single Scattering Albedo (SSA)</strong>: This ratio of scattering to total light extinction (scattering plus absorption) provides insight into whether particles are more likely to scatter light rather than absorb it.</p></li>
 </ul>
 </section>
 </section>
-<section id="particle-distributions">
-<h2>Particle Distributions<a class="headerlink" href="#particle-distributions" title="Link to this heading">#</a></h2>
-<p>Aerosol particles are not uniform; they vary in size, shape, and composition. Understanding these particle distributions is essential for accurate modeling of aerosol optics.</p>
-<section id="distribution-types">
-<h3>Distribution Types<a class="headerlink" href="#distribution-types" title="Link to this heading">#</a></h3>
+<section id="understanding-particle-distributions">
+<h2>Understanding Particle Distributions<a class="headerlink" href="#understanding-particle-distributions" title="Link to this heading">#</a></h2>
+<p>Aerosol particles exhibit a vast diversity in terms of size, shape, and chemical composition, making the study of their distributions crucial for accurate optical modeling.</p>
+<section id="types-of-distributions">
+<h3>Types of Distributions<a class="headerlink" href="#types-of-distributions" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p><strong>Monodisperse</strong>: All particles have the same size.</p></li>
-<li><p><strong>Polydisperse</strong>: Particles have a range of sizes, typically described by a distribution function (e.g., log-normal distribution).</p></li>
+<li><p><strong>Monodisperse</strong>: A scenario where all particles are of identical size.</p></li>
+<li><p><strong>Polydisperse</strong>: Represents a realistic distribution where particles vary in size, often characterized by statistical distribution models, such as the log-normal distribution.</p></li>
 </ul>
 </section>
 </section>
-<section id="truncation-errors-in-instrument-measurements">
-<h2>Truncation Errors in Instrument Measurements<a class="headerlink" href="#truncation-errors-in-instrument-measurements" title="Link to this heading">#</a></h2>
-<p>Instrumental measurements of aerosols are often subject to truncation errors due to limitations in detecting the full angular range of scattered light.</p>
-<section id="impact-of-truncation-errors">
-<h3>Impact of Truncation Errors<a class="headerlink" href="#impact-of-truncation-errors" title="Link to this heading">#</a></h3>
+<section id="addressing-truncation-errors-in-measurements">
+<h2>Addressing Truncation Errors in Measurements<a class="headerlink" href="#addressing-truncation-errors-in-measurements" title="Link to this heading">#</a></h2>
+<p>Measurements of aerosol optical properties can be compromised by truncation errors, stemming from the inability of instruments to capture the complete angular range of scattered light.</p>
+<section id="consequences-and-mitigation-strategies">
+<h3>Consequences and Mitigation Strategies<a class="headerlink" href="#consequences-and-mitigation-strategies" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p><strong>Underestimation of Scattering Coefficients</strong>: Limited angular range can lead to underestimation of particle scattering, affecting aerosol optical depth (AOD) calculations.</p></li>
-<li><p><strong>Correction Methods</strong>: Various approaches, including mathematical corrections and calibration techniques, are used to mitigate truncation errors and improve measurement accuracy.</p></li>
+<li><p><strong>Scattering Coefficient Underestimation</strong>: The restricted detection of scattered light may lead to inaccuracies in determining aerosol optical depth (AOD) and other key optical properties.</p></li>
+<li><p><strong>Correction Techniques</strong>: A variety of correction methods, including analytical adjustments and empirical calibration, are employed to counteract truncation errors and refine the accuracy of aerosol optical measurements.</p></li>
 </ul>
 </section>
 </section>
-<section id="here-in">
-<h2>Here in<a class="headerlink" href="#here-in" title="Link to this heading">#</a></h2>
-<p>These example code study of aerosol optics through Mie scattering, particle distributions, and the understanding of truncation errors in measurements provides essential insights into aerosol behavior.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>This series offers a detailed exploration of aerosol optical phenomena through the lens of Mie scattering theory, analysis of particle size distributions, and methodologies for correcting truncation errors in aerosol instrumentation. By enhancing our understanding of these areas, we aim to further our knowledge of aerosol behavior and its environmental impact.</p>
+<p>Following notebooks delve deeper into these topics:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="mie_basics.html"><span class="std std-doc">Mie Scattering Basics</span></a></p></li>
+<li><p><a class="reference internal" href="humid_scattering.html"><span class="std std-doc">Humidified Particle Scattering</span></a></p></li>
+<li><p><a class="reference internal" href="kappa_vs_extinction.html"><span class="std std-doc">Kappa-HGF Estimation from Light Extinction</span></a></p></li>
+<li><p><a class="reference internal" href="scattering_truncation.html"><span class="std std-doc">Correcting for Scattering Truncation</span></a></p></li>
+</ul>
 </section>
 <div class="toctree-wrapper compound">
 </div>
@@ -611,19 +618,19 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mie-scattering">Mie Scattering</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-concepts">Key Concepts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mie-scattering-theory">Mie Scattering Theory</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fundamental-concepts">Fundamental Concepts</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particle-distributions">Particle Distributions</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distribution-types">Distribution Types</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#understanding-particle-distributions">Understanding Particle Distributions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#types-of-distributions">Types of Distributions</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#truncation-errors-in-instrument-measurements">Truncation Errors in Instrument Measurements</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#impact-of-truncation-errors">Impact of Truncation Errors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-truncation-errors-in-measurements">Addressing Truncation Errors in Measurements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consequences-and-mitigation-strategies">Consequences and Mitigation Strategies</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#here-in">Here in</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
 </ul>
   </nav></div>
 
