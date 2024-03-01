@@ -57,6 +57,7 @@ def test_trunc_mono_basic():
         wavelength=WAVELENGTH,
         diameter=500.0,
         discretize=False,
+        calibrated_trunc=False
     )
     exp_trunc_corr = 1.0984704282875792
     # Assert the type and a basic range check for the truncation correction
@@ -72,6 +73,7 @@ def test_trunc_mono_basic():
         wavelength=WAVELENGTH,
         diameter=500.0,
         discretize=True,
+        calibrated_trunc=False
     )
     exp_trunc_corr = 1.0984704282875792
     # Assert the type and a basic range check for the truncation correction
@@ -91,7 +93,8 @@ def test_trunc_mono_full_output():
             wavelength=WAVELENGTH,
             diameter=500.0,
             discretize=False,
-            full_output=True
+            full_output=True,
+            calibrated_trunc=False
         )  # type: ignore
 
     # expected values
@@ -128,7 +131,8 @@ def test_truncation_for_diameters():
     truncation_corrections = scattering_truncation.truncation_for_diameters(
         m_sphere=WATER_ACTIVITY_DRY,
         wavelength=WAVELENGTH,
-        diameter_sizes=DIAMETERS
+        diameter_sizes=DIAMETERS,
+        calibrated_trunc=False
     )
     # Expected values
     exp_truncation_corrections = np.array([1.02127865, 1.02514909, 1.03708443])
@@ -154,7 +158,7 @@ def test_correction_for_distribution():
             number_per_cm3=NUMBER_PER_CM3
         )
     # Expected values
-    exp_correction_factor = 1.0393553004800333
+    exp_correction_factor = 1.0165280236871668
 
     # Assert the type of the return value
     assert isinstance(
@@ -184,7 +188,7 @@ def test_correction_for_humidified():
         wavelength=WAVELENGTH
     )
     # Expected values
-    exp_bsca_correction = 1.0993407004235503
+    exp_bsca_correction = 1.0751959691207493
     # test value
     assert bsca_correction == pytest.approx(
         exp_bsca_correction, abs=1e-6
@@ -219,7 +223,8 @@ def test_correction_for_humidified_looped():
         )
 
     # Expected values
-    exp_correction_factors = np.array([1.04646649, 1.0639512, 1.07071085])
+    exp_correction_factors = np.array(
+        [1.0234830302, 1.0405837279854753, 1.04719491370677])
 
     # Assert the output is a numpy array with the correct length
     assert isinstance(correction_factors,
