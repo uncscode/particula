@@ -1,35 +1,42 @@
-# Aerosol Optics
+## Introduction to Aerosol Optics
 
-Aerosol optics involves the study of how light interacts with small particles suspended in the air. These interactions include absorption, scattering, and emission of light, which are critical for understanding aerosol properties and their effects on the environment.
+Aerosol optics examines the interaction between light and aerosol particles suspended in the atmosphere. These interactions, encompassing absorption, scattering, and the emission of light, are pivotal in deciphering the physical properties of aerosols and their environmental ramifications.
 
-## Mie Scattering
+### Mie Scattering Theory
 
-Mie scattering theory is a powerful tool for understanding light scattering by spherical particles. Developed by Gustav Mie in 1908, this theory provides a way to calculate the scattering and absorption of light by particles based on their size, composition, and the wavelength of light. We are building on pyMieScatt [link](https://pymiescatt.readthedocs.io/en/latest/), a Python package that implements the Mie scattering calculations.
+Central to aerosol optics is Mie scattering theory, formulated by Gustav Mie in 1908. This foundational theory enables the precise calculation of light scattering and absorption by spherical particles, taking into account their size, material composition, and the incident light's wavelength. In this context, we leverage the capabilities of pyMieScatt, a comprehensive Python library designed to facilitate Mie scattering computations.
 
-### Key Concepts
+#### Fundamental Concepts
 
-- **Scattering Efficiency**: A measure of how effectively a particle scatters light.
-- **Absorption Efficiency**: Indicates how much light is absorbed by the particle.
-- **Single Scattering Albedo (SSA)**: The ratio of scattering efficiency to the sum of scattering and absorption efficiencies, representing the particle's propensity to scatter light rather than absorb it.
+- **Scattering Efficiency**: Quantifies the efficacy of particles in deflecting light in various directions.
+- **Absorption Efficiency**: Assesses the extent to which particles absorb incident light.
+- **Single Scattering Albedo (SSA)**: This ratio of scattering to total light extinction (scattering plus absorption) provides insight into whether particles are more likely to scatter light rather than absorb it.
 
-## Particle Distributions
+### Understanding Particle Distributions
 
-Aerosol particles are not uniform; they vary in size, shape, and composition. Understanding these particle distributions is essential for accurate modeling of aerosol optics.
+Aerosol particles exhibit a vast diversity in terms of size, shape, and chemical composition, making the study of their distributions crucial for accurate optical modeling.
 
-### Distribution Types
+#### Types of Distributions
 
-- **Monodisperse**: All particles have the same size.
-- **Polydisperse**: Particles have a range of sizes, typically described by a distribution function (e.g., log-normal distribution).
+- **Monodisperse**: A scenario where all particles are of identical size.
+- **Polydisperse**: Represents a realistic distribution where particles vary in size, often characterized by statistical distribution models, such as the log-normal distribution.
 
-## Truncation Errors in Instrument Measurements
+### Addressing Truncation Errors in Measurements
 
-Instrumental measurements of aerosols are often subject to truncation errors due to limitations in detecting the full angular range of scattered light.
+Measurements of aerosol optical properties can be compromised by truncation errors, stemming from the inability of instruments to capture the complete angular range of scattered light.
 
-### Impact of Truncation Errors
+#### Consequences and Mitigation Strategies
 
-- **Underestimation of Scattering Coefficients**: Limited angular range can lead to underestimation of particle scattering, affecting aerosol optical depth (AOD) calculations.
-- **Correction Methods**: Various approaches, including mathematical corrections and calibration techniques, are used to mitigate truncation errors and improve measurement accuracy.
+- **Scattering Coefficient Underestimation**: The restricted detection of scattered light may lead to inaccuracies in determining aerosol optical depth (AOD) and other key optical properties.
+- **Correction Techniques**: A variety of correction methods, including analytical adjustments and empirical calibration, are employed to counteract truncation errors and refine the accuracy of aerosol optical measurements.
 
-## Here in
+### Overview
 
-These example code study of aerosol optics through Mie scattering, particle distributions, and the understanding of truncation errors in measurements provides essential insights into aerosol behavior. 
+This series offers a detailed exploration of aerosol optical phenomena through the lens of Mie scattering theory, analysis of particle size distributions, and methodologies for correcting truncation errors in aerosol instrumentation. By enhancing our understanding of these areas, we aim to further our knowledge of aerosol behavior and its environmental impact.
+
+Following notebooks delve deeper into these topics:
+
+- [Mie Scattering Basics](./mie_basics.ipynb)
+- [Humidified Particle Scattering](./humid_scattering.ipynb)
+- [Kappa-HGF Estimation from Light Extinction](./kappa_vs_extinction.ipynb)
+- [Correcting for Scattering Truncation](./scattering_truncation.ipynb)
