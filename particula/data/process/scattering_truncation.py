@@ -57,7 +57,7 @@ def trunc_mono(
     wavelength: float,
     diameter: float,
     full_output: bool = False,
-    calibrate_trunc: bool = False,
+    calibrated_trunc: bool = True,
     discretize: bool = True,
 ) -> Union[float,
            Tuple[
@@ -81,9 +81,9 @@ def trunc_mono(
         If True, additional details about the calculation are returned,
         including z-axis values, angles of integration, and both truncated and
         ideal scattering efficiencies.
-    calibrate_trunc : bool, optional
-        If True, applies a calibration factor to the truncation correction.
-        Default is False.
+    calibrated_trunc : bool, optional
+        If True, applies a numberical calibration factor to the truncation
+        correction, so 150 is 1. Default is True.
     discretize : bool, optional
         If True, discretizes the input parameters for potentially improved
         stability/performance in scattering function calculations. Can not be
@@ -183,7 +183,7 @@ def trunc_mono(
 
     # Apply calibration factor to truncation correction if requested
     trunc_corr = (ideal / trunc) / \
-        trunc_calibration if calibrate_trunc else ideal / trunc
+        trunc_calibration if calibrated_trunc else ideal / trunc
 
     return (trunc_corr, z_axis, trunc, ideal,
             theta1, theta2) if full_output else trunc_corr
@@ -194,7 +194,7 @@ def truncation_for_diameters(
     wavelength: float,
     diameter_sizes: NDArray[np.float64],
     discretize: bool = True,
-    calibrate_trunc: bool = False
+    calibrated_trunc: bool = True
 ) -> NDArray[np.float64]:
     """
     Calculates the truncation correction for an array of particle diameters
@@ -214,9 +214,9 @@ def truncation_for_diameters(
     discretize : bool, optional
         A flag indicating whether to discretize the input parameters for
         potentially improved calculation performance. Default is True.
-    calibrate_trunc : bool, optional
-        If True, applies a calibration factor to the truncation correction.
-        Default is False.
+    calibrated_trunc : bool, optional
+        If True, applies a numberical calibration factor to the truncation
+        correction, so 150 is 1. Default is True.
 
     Returns
     -------
@@ -240,7 +240,7 @@ def truncation_for_diameters(
             wavelength=wavelength,
             diameter=diameter,
             full_output=False,
-            calibrate_trunc=calibrate_trunc,
+            calibrated_trunc=calibrated_trunc,
             discretize=discretize
         )
     return truncation_array
@@ -251,7 +251,7 @@ def correction_for_distribution(
     wavelength: float,
     diameter_sizes: NDArray[np.float64],
     number_per_cm3: NDArray[np.float64],
-    discretize: bool = True
+    discretize: bool = True,
 ) -> Union[float, np.float64]:
     """
     Calculates the correction factor for scattering measurements due to
