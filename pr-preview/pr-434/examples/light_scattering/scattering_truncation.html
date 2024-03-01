@@ -556,6 +556,16 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-size-dependence-of-truncation">Full Size Dependence of Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#correcting-scattering-truncation-250-nm-distribution">Correcting Scattering Truncation 250 nm Distribution</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generating-a-representative-aerosol-distribution">Generating a Representative Aerosol Distribution</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#correcting-scattering-truncation-1000-nm-distribution">Correcting Scattering Truncation 1000 nm Distribution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-humidified-aerosol-measurements">Addressing Humidified Aerosol Measurements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#leveraging-truncation-corrections-for-broader-applications">Leveraging Truncation Corrections for Broader Applications</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -608,6 +618,7 @@ document.write(`
 <li><p><strong>Correction Factor</strong>: The <code class="docutils literal notranslate"><span class="pre">trunc_corr</span></code> value indicates the factor by which the measured (truncated) scattering efficiency needs to be adjusted to align with the ideal, untruncated scenario. This correction is crucial for accurately interpreting SSA measurements and understanding aerosol scattering behaviors.</p></li>
 </ul>
 <p>This correction approach for a single particle lays the groundwork for more comprehensive analyses.</p>
+<p><strong>Note</strong>: The <code class="docutils literal notranslate"><span class="pre">calibrated_trunc</span></code> boolean applies an additional correction factor of 1.0224, so at a 150 nm diameter the truncation correction is 1. This factor is numerically determined and it is not clear where this error is introduced in the angular truncation calculation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the refractive index of the aerosol particle and the light wavelength</span>
@@ -620,7 +631,7 @@ document.write(`
     <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>  <span class="c1"># Wavelength of incident light</span>
     <span class="n">diameter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>  <span class="c1"># Diameter of the particle in nanometers</span>
     <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Request full output for detailed analysis</span>
-    <span class="n">calibrate_trunc</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">calibrated_trunc</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 
 <span class="c1"># Output the calculated scattering efficiencies and truncation correction</span>
@@ -647,19 +658,20 @@ Truncation correction factor: 0.99888593093735
 <p>The size-dependent nature of scattering truncation necessitates a thorough understanding of how the phenomenon varies across different particle sizes. This section explores the full size dependence of scattering truncation and introduces the <code class="docutils literal notranslate"><span class="pre">scattering_truncation.truncation_for_diameters</span></code> function to correct for truncation effects across a range of particle sizes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">1500</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>  <span class="c1"># From 20 nm to 1000 nm with 500 points</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generating diameters in lin space from 50 nm to 1000 nm with 200 points</span>
+<span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 
 <span class="n">truncation_array</span> <span class="o">=</span> <span class="n">scattering_truncation</span><span class="o">.</span><span class="n">truncation_for_diameters</span><span class="p">(</span>
     <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
     <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
     <span class="n">diameter_sizes</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
-    <span class="n">discretize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">calibrate_trunc</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">discretize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">calibrated_trunc</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 
 <span class="c1"># Plot the truncation correction factor as a function of particle diameter</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">diameters</span><span class="p">,</span> <span class="n">truncation_array</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">diameters</span><span class="p">,</span> <span class="n">truncation_array</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Particle diameter (nm)&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Truncation correction factor&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Truncation correction factor as a function of particle diameter&#39;</span><span class="p">)</span>
@@ -668,108 +680,340 @@ Truncation correction factor: 0.99888593093735
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">1500</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>  <span class="c1"># From 20 nm to 1000 nm with 500 points</span>
-<span class="ne">----&gt; </span><span class="mi">3</span> <span class="n">truncation_array</span> <span class="o">=</span> <span class="n">scattering_truncation</span><span class="o">.</span><span class="n">truncation_for_diameters</span><span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span>     <span class="n">diameter_sizes</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="n">discretize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span>     <span class="n">calibrate_trunc</span><span class="o">=</span><span class="kc">True</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">11</span> <span class="c1"># Plot the truncation correction factor as a function of particle diameter</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<img alt="../../_images/512e3569898148bb0a4dce92eb187e23be1dffccdeb190bc54d55889c1582671.png" src="../../_images/512e3569898148bb0a4dce92eb187e23be1dffccdeb190bc54d55889c1582671.png" />
+</div>
+</div>
+</section>
+<section id="correcting-scattering-truncation-250-nm-distribution">
+<h2>Correcting Scattering Truncation 250 nm Distribution<a class="headerlink" href="#correcting-scattering-truncation-250-nm-distribution" title="Link to this heading">#</a></h2>
+<p>Aerosol populations in the atmosphere exhibit a broad range of particle sizes, each contributing distinctively to the overall optical scattering properties. This section demonstrates the application of the <code class="docutils literal notranslate"><span class="pre">scattering_truncation.correction_for_distribution</span></code> function, which facilitates the adjustment for scattering truncation across an aerosol size distributions measurement.</p>
+<section id="generating-a-representative-aerosol-distribution">
+<h3>Generating a Representative Aerosol Distribution<a class="headerlink" href="#generating-a-representative-aerosol-distribution" title="Link to this heading">#</a></h3>
+<p>For this analysis, we focus on a distribution centered around 250 nm, a size range significant for many atmospheric aerosol studies. We simulate this aerosol population using a log-normal distribution, a common representation for atmospheric aerosol size distributions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the refractive index and wavelength for the aerosols</span>
+<span class="n">m_sphere</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="n">wavelength</span> <span class="o">=</span> <span class="mf">450.0</span>  <span class="c1"># in nanometers</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/process/scattering_truncation.py:238,</span> in <span class="ni">truncation_for_diameters</span><span class="nt">(m_sphere, wavelength, diameter_sizes, discretize, calibrate_trunc)</span>
-<span class="g g-Whitespace">    </span><span class="mi">236</span> <span class="c1"># For each diameter, calculate the truncation correction</span>
-<span class="g g-Whitespace">    </span><span class="mi">237</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">diameter</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">diameter_sizes</span><span class="p">):</span>
-<span class="ne">--&gt; </span><span class="mi">238</span>     <span class="n">truncation_array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">trunc_mono</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">239</span>         <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">240</span>         <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">241</span>         <span class="n">diameter</span><span class="o">=</span><span class="n">diameter</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">242</span>         <span class="n">full_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">243</span>         <span class="n">calibrate_trunc</span><span class="o">=</span><span class="n">calibrate_trunc</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">244</span>         <span class="n">discretize</span><span class="o">=</span><span class="n">discretize</span>
-<span class="g g-Whitespace">    </span><span class="mi">245</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">246</span> <span class="k">return</span> <span class="n">truncation_array</span>
+<span class="c1"># Generate diameters using a log-spaced array for better representation</span>
+<span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">800</span><span class="p">),</span> <span class="mi">100</span><span class="p">)</span>  <span class="c1"># From 50 nm to 800 nm</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/process/scattering_truncation.py:132,</span> in <span class="ni">trunc_mono</span><span class="nt">(m_sphere, wavelength, diameter, full_output, calibrate_trunc, discretize)</span>
-<span class="g g-Whitespace">    </span><span class="mi">129</span> <span class="c1"># Choose the appropriate scattering function based on discretization</span>
-<span class="g g-Whitespace">    </span><span class="mi">130</span> <span class="c1"># preference</span>
-<span class="g g-Whitespace">    </span><span class="mi">131</span> <span class="k">if</span> <span class="n">discretize</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">132</span>     <span class="n">theta</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">su</span> <span class="o">=</span> <span class="n">mie_angular</span><span class="o">.</span><span class="n">discretize_scattering_angles</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">133</span>         <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">134</span>         <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">135</span>         <span class="n">diameter</span><span class="o">=</span><span class="n">diameter</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">136</span>         <span class="n">min_angle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">137</span>         <span class="n">max_angle</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">138</span>         <span class="n">angular_resolution</span><span class="o">=</span><span class="n">ang_res</span>
-<span class="g g-Whitespace">    </span><span class="mi">139</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">140</span> <span class="k">else</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">141</span>     <span class="n">theta</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">su</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">ScatteringFunction</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">142</span>         <span class="n">m</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">143</span>         <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">147</span>         <span class="n">angularResolution</span><span class="o">=</span><span class="n">ang_res</span>
-<span class="g g-Whitespace">    </span><span class="mi">148</span>     <span class="p">)</span>
+<span class="c1"># Parameters for the log-normal size distribution</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.4</span>  <span class="c1"># Geometric standard deviation</span>
+<span class="n">modes</span> <span class="o">=</span> <span class="mi">250</span>  <span class="c1"># Peak diameter for monomodal distribution</span>
+<span class="n">number_total</span> <span class="o">=</span> <span class="mf">1e3</span>  <span class="c1"># Total number of particles</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/process/mie_angular.py:57,</span> in <span class="ni">discretize_scattering_angles</span><span class="nt">(m_sphere, wavelength, diameter, min_angle, max_angle, angular_resolution)</span>
-<span class="g g-Whitespace">     </span><span class="mi">14</span> <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">15</span> <span class="k">def</span> <span class="nf">discretize_scattering_angles</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">16</span>     <span class="n">m_sphere</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">complex</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">21</span>     <span class="n">angular_resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="g g-Whitespace">     </span><span class="mi">22</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="g g-Whitespace">     </span><span class="mi">23</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">24</span><span class="sd">     Discretizes and caches the scattering function for a spherical particle</span>
-<span class="g g-Whitespace">     </span><span class="mi">25</span><span class="sd">     with specified material properties and size. This function aims to optimize</span>
-<span class="sd">   (...)</span>
-<span class="g g-Whitespace">     </span><span class="mi">55</span><span class="sd">         - unpolarized: The unpolarized scattering intensity.</span>
-<span class="g g-Whitespace">     </span><span class="mi">56</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">---&gt; </span><span class="mi">57</span>     <span class="n">measure</span><span class="p">,</span> <span class="n">parallel</span><span class="p">,</span> <span class="n">perpendicular</span><span class="p">,</span> <span class="n">unpolarized</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">ScatteringFunction</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">58</span>         <span class="n">m</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">59</span>         <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">60</span>         <span class="n">diameter</span><span class="o">=</span><span class="n">diameter</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">61</span>         <span class="n">minAngle</span><span class="o">=</span><span class="n">min_angle</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">62</span>         <span class="n">maxAngle</span><span class="o">=</span><span class="n">max_angle</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">63</span>         <span class="n">angularResolution</span><span class="o">=</span><span class="n">angular_resolution</span>
-<span class="g g-Whitespace">     </span><span class="mi">64</span>     <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">65</span>     <span class="k">return</span> <span class="n">measure</span><span class="p">,</span> <span class="n">parallel</span><span class="p">,</span> <span class="n">perpendicular</span><span class="p">,</span> <span class="n">unpolarized</span>
+<span class="c1"># Create a log-normal size distribution</span>
+<span class="n">pdf_dist</span> <span class="o">=</span> <span class="n">distribution_discretization</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span>
+    <span class="n">interval</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">disttype</span><span class="o">=</span><span class="s2">&quot;lognormal&quot;</span><span class="p">,</span>
+    <span class="n">gsigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="n">modes</span><span class="p">,</span>
+    <span class="n">nparticles</span><span class="o">=</span><span class="n">number_total</span>
+<span class="p">)</span><span class="o">.</span><span class="n">m</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/PyMieScatt/Mie.py:335,</span> in <span class="ni">ScatteringFunction</span><span class="nt">(m, wavelength, diameter, nMedium, minAngle, maxAngle, angularResolution, space, angleMeasure, normalization)</span>
-<span class="g g-Whitespace">    </span><span class="mi">333</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_steps</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">334</span>   <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">_measure</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
-<span class="ne">--&gt; </span><span class="mi">335</span>   <span class="n">S1</span><span class="p">,</span> <span class="n">S2</span> <span class="o">=</span> <span class="n">MieS1S2</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">u</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">336</span>   <span class="n">SL</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">S1</span><span class="p">)</span><span class="o">*</span><span class="n">S1</span><span class="p">))</span><span class="o">.</span><span class="n">real</span>
-<span class="g g-Whitespace">    </span><span class="mi">337</span>   <span class="n">SR</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">S2</span><span class="p">)</span><span class="o">*</span><span class="n">S2</span><span class="p">))</span><span class="o">.</span><span class="n">real</span>
+<span class="c1"># Convert the size distribution to a probability mass function (PMF)</span>
+<span class="n">number_conc_pms</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">distribution_convert_pdf_pms</span><span class="p">(</span>
+    <span class="n">x_array</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">distribution</span><span class="o">=</span><span class="n">pdf_dist</span><span class="p">,</span>
+    <span class="n">to_pdf</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span> <span class="o">*</span> <span class="n">number_total</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/PyMieScatt/Mie.py:391,</span> in <span class="ni">MieS1S2</span><span class="nt">(m, x, mu)</span>
-<span class="g g-Whitespace">    </span><span class="mi">388</span> <span class="k">def</span> <span class="nf">MieS1S2</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">mu</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">389</span> <span class="c1">#  http://pymiescatt.readthedocs.io/en/latest/forward.html#MieS1S2</span>
-<span class="g g-Whitespace">    </span><span class="mi">390</span>   <span class="n">nmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="o">+</span><span class="n">x</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">))</span>
-<span class="ne">--&gt; </span><span class="mi">391</span>   <span class="n">an</span><span class="p">,</span> <span class="n">bn</span> <span class="o">=</span> <span class="n">AutoMie_ab</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">392</span>   <span class="n">pin</span><span class="p">,</span> <span class="n">taun</span> <span class="o">=</span> <span class="n">MiePiTau</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span><span class="n">nmax</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">393</span>   <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">nmax</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># Calculate the truncation correction for the entire size distribution</span>
+<span class="n">trunc_correction</span> <span class="o">=</span> <span class="n">scattering_truncation</span><span class="o">.</span><span class="n">correction_for_distribution</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">diameter_sizes</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">number_per_cm3</span><span class="o">=</span><span class="n">number_conc_pms</span><span class="p">,</span>
+    <span class="n">discretize</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/PyMieScatt/Mie.py:253,</span> in <span class="ni">AutoMie_ab</span><span class="nt">(m, x)</span>
-<span class="g g-Whitespace">    </span><span class="mi">251</span>   <span class="k">return</span> <span class="n">LowFrequencyMie_ab</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">252</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">253</span>   <span class="k">return</span> <span class="n">Mie_ab</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+<span class="c1"># Visualize the size distribution and truncation correction</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">diameters</span><span class="p">,</span> <span class="n">number_conc_pms</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Size Distribution&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Particle Diameter (nm)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Number Concentration (#/cm³)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Truncation Correction: </span><span class="si">{</span><span class="n">trunc_correction</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> for the entire distribution&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/PyMieScatt/Mie.py:76,</span> in <span class="ni">Mie_ab</span><span class="nt">(m, x)</span>
-<span class="g g-Whitespace">     </span><span class="mi">72</span> <span class="n">nu</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="c1">#</span>
-<span class="g g-Whitespace">     </span><span class="mi">74</span> <span class="n">sx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
-<span class="ne">---&gt; </span><span class="mi">76</span> <span class="n">px</span> <span class="o">=</span> <span class="n">sx</span><span class="o">*</span><span class="n">jv</span><span class="p">(</span><span class="n">nu</span><span class="p">,</span><span class="n">x</span><span class="p">)</span> <span class="c1">#</span>
-<span class="g g-Whitespace">     </span><span class="mi">77</span> <span class="n">p1x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">px</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="n">nmax</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c1">#</span>
-<span class="g g-Whitespace">     </span><span class="mi">79</span> <span class="n">chx</span> <span class="o">=</span> <span class="o">-</span><span class="n">sx</span><span class="o">*</span><span class="n">yv</span><span class="p">(</span><span class="n">nu</span><span class="p">,</span><span class="n">x</span><span class="p">)</span> <span class="c1">#</span>
-
-<span class="ne">KeyboardInterrupt</span>: 
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Overall truncation correction for the distribution: </span><span class="si">{</span><span class="n">trunc_correction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/94f99138411d9dfde184c46d92296420f355997fff39b7d7b442be52fdcc2adf.png" src="../../_images/94f99138411d9dfde184c46d92296420f355997fff39b7d7b442be52fdcc2adf.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Overall truncation correction for the distribution: 1.0416062342287755
 </pre></div>
 </div>
 </div>
 </div>
+</section>
+</section>
+<section id="correcting-scattering-truncation-1000-nm-distribution">
+<h2>Correcting Scattering Truncation 1000 nm Distribution<a class="headerlink" href="#correcting-scattering-truncation-1000-nm-distribution" title="Link to this heading">#</a></h2>
+<p>In addition to the 250 nm distribution, we also explore the correction of scattering truncation for a larger aerosol population centered around 1000 nm. This size range is particularly relevant for understanding the scattering properties of coarse-mode aerosols, which play a crucial role in atmospheric processes.</p>
+<p>The truncation factor is much larger for the 1000 nm distribution, indicating the more significant impact of truncation for larger particles. This underscores the importance of accounting for scattering truncation across the full range of aerosol sizes to obtain accurate SSA measurements.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the refractive index and wavelength for the aerosols</span>
+<span class="n">m_sphere</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="n">wavelength</span> <span class="o">=</span> <span class="mf">450.0</span>  <span class="c1"># in nanometers</span>
+
+<span class="c1"># Generate diameters using a log-spaced array for better representation</span>
+<span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">2500</span><span class="p">),</span>
+    <span class="mi">100</span><span class="p">)</span>  <span class="c1"># From 50 nm to 800 nm</span>
+
+<span class="c1"># Parameters for the log-normal size distribution</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.4</span>  <span class="c1"># Geometric standard deviation</span>
+<span class="n">modes</span> <span class="o">=</span> <span class="mi">1000</span>  <span class="c1"># Peak diameter for monomodal distribution</span>
+<span class="n">number_total</span> <span class="o">=</span> <span class="mf">1e3</span>  <span class="c1"># Total number of particles</span>
+
+<span class="c1"># Create a log-normal size distribution</span>
+<span class="n">pdf_dist</span> <span class="o">=</span> <span class="n">distribution_discretization</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span>
+    <span class="n">interval</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">disttype</span><span class="o">=</span><span class="s2">&quot;lognormal&quot;</span><span class="p">,</span>
+    <span class="n">gsigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="n">modes</span><span class="p">,</span>
+    <span class="n">nparticles</span><span class="o">=</span><span class="n">number_total</span>
+<span class="p">)</span><span class="o">.</span><span class="n">m</span>
+
+<span class="c1"># Convert the size distribution to a probability mass function (PMF)</span>
+<span class="n">number_conc_pms</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">distribution_convert_pdf_pms</span><span class="p">(</span>
+    <span class="n">x_array</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">distribution</span><span class="o">=</span><span class="n">pdf_dist</span><span class="p">,</span>
+    <span class="n">to_pdf</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span> <span class="o">*</span> <span class="n">number_total</span>
+
+<span class="c1"># Calculate the truncation correction for the entire size distribution</span>
+<span class="n">trunc_correction</span> <span class="o">=</span> <span class="n">scattering_truncation</span><span class="o">.</span><span class="n">correction_for_distribution</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">diameter_sizes</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">number_per_cm3</span><span class="o">=</span><span class="n">number_conc_pms</span><span class="p">,</span>
+    <span class="n">discretize</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Visualize the size distribution and truncation correction</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">diameters</span><span class="p">,</span> <span class="n">number_conc_pms</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Size Distribution&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Particle Diameter (nm)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Number Concentration (#/cm³)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Truncation Correction: </span><span class="si">{</span><span class="n">trunc_correction</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> for the entire distribution&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Overall truncation correction for the distribution: </span><span class="si">{</span><span class="n">trunc_correction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/d3f947358d3dd90dd765aeab44ea5b8f169a04fef75e527dcd89b3f3bdbbaa4b.png" src="../../_images/d3f947358d3dd90dd765aeab44ea5b8f169a04fef75e527dcd89b3f3bdbbaa4b.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Overall truncation correction for the distribution: 1.1821845913839402
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<p>Understanding the climatic and environmental impacts of aerosols necessitates accurate determinations of their optical properties, especially Single Scattering Albedo (SSA). The challenge of scattering truncation, however, complicates the precise measurement of SSA, a dilemma particularly pronounced with the use of the Cavity Attenuated Phase Shift (CAPS) SSA instrument. Throughout this notebook, we have explored and applied methodologies to correct for the effects of scattering truncation, delving into its size-dependent characteristics and the broader implications for accurately assessing SSA.</p>
+<section id="addressing-humidified-aerosol-measurements">
+<h3>Addressing Humidified Aerosol Measurements<a class="headerlink" href="#addressing-humidified-aerosol-measurements" title="Link to this heading">#</a></h3>
+<p>Our exploration does extend to humidified aerosol measurements, where changes in particle refractive index and diameter under varying humidity levels introduce additional complexity. The <code class="docutils literal notranslate"><span class="pre">scattering_truncation</span></code> module, through its <code class="docutils literal notranslate"><span class="pre">correction_for_humidified</span></code> and <code class="docutils literal notranslate"><span class="pre">correction_for_humidified_looped</span></code> functions, offers robust solutions for incorporating these dynamic factors into SSA calculations, ensuring that measurements remain reflective of actual atmospheric conditions.</p>
+</section>
+<section id="leveraging-truncation-corrections-for-broader-applications">
+<h3>Leveraging Truncation Corrections for Broader Applications<a class="headerlink" href="#leveraging-truncation-corrections-for-broader-applications" title="Link to this heading">#</a></h3>
+<p>The adaptability of these correction techniques to a wide range of real-world aerosol distributions highlights their significance. Aerosols in the atmosphere exhibit a vast diversity in size, composition, and behavior, necessitating flexible and accurate measurement and analysis methods. By enhancing the precision of SSA and other optical property measurements, we lay a stronger foundation for atmospheric modeling, contributing to more reliable predictions of aerosol impacts on climate and environmental health.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">scattering_truncation</span><span class="o">.</span><span class="n">trunc_mono</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on _lru_cache_wrapper in module particula.data.process.scattering_truncation:
+
+trunc_mono(m_sphere: Union[complex, float], wavelength: float, diameter: float, full_output: bool = False, calibrated_trunc: bool = True, discretize: bool = True) -&gt; Union[float, Tuple[float, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]]
+    Calculates the single scattering albedo (SSA) correction due to truncation
+    for monodisperse aerosol measurements using the CAPS-PM-SSA instrument. The
+    correction accounts for the incomplete angular range of scattering
+    measurements due to the instrument&#39;s geometry.
+    
+    Parameters
+    ----------
+    m_sphere : Union[complex, float]
+        Complex or real refractive index of the aerosol.
+    wavelength : float
+        Wavelength of light in nanometers used in the CAPS instrument.
+    diameter : Union[float, np.float64]
+        Diameter of the monodisperse aerosol in nanometers.
+    full_output : bool, optional
+        If True, additional details about the calculation are returned,
+        including z-axis values, angles of integration, and both truncated and
+        ideal scattering efficiencies.
+    calibrated_trunc : bool, optional
+        If True, applies a numberical calibration factor to the truncation
+        correction, so 150 is 1. Default is True.
+    discretize : bool, optional
+        If True, discretizes the input parameters for potentially improved
+        stability/performance in scattering function calculations. Can not be
+        done for full_output=True
+    
+    Returns
+    -------
+    Union[float, Tuple[float, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
+    np.ndarray]]
+    If fullOutput is False, returns only the truncation correction factor.
+    If fullOutput is True, returns a tuple containing the truncation correction
+    factor, z-axis positions, truncated scattering efficiency, ideal scattering
+    efficiency, forward scattering angle, and backward scattering angle.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">scattering_truncation</span><span class="o">.</span><span class="n">truncation_for_diameters</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function truncation_for_diameters in module particula.data.process.scattering_truncation:
+
+truncation_for_diameters(m_sphere: Union[complex, float], wavelength: float, diameter_sizes: numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]], discretize: bool = True, calibrated_trunc: bool = True) -&gt; numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]]
+    Calculates the truncation correction for an array of particle diameters
+    given a specific refractive index and wavelength. This function is
+    particularly useful for aerosol optical property measurements where
+    truncation effects due to instrument geometry need to be accounted for.
+    
+    Parameters
+    ----------
+    m_sphere : Union[complex, float]
+        The complex or real refractive index of the particles.
+    wavelength : float
+        The wavelength of the incident light in nanometers (nm).
+    diameter_sizes : NDArray[np.float64]
+        An array of particle diameters in nanometers (nm) for which the
+        truncation correction will be calculated.
+    discretize : bool, optional
+        A flag indicating whether to discretize the input parameters for
+        potentially improved calculation performance. Default is True.
+    calibrated_trunc : bool, optional
+        If True, applies a numberical calibration factor to the truncation
+        correction, so 150 is 1. Default is True.
+    
+    Returns
+    -------
+    NDArray[np.float64]
+        An array of truncation corrections corresponding to the input array of
+        particle diameters.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">scattering_truncation</span><span class="o">.</span><span class="n">correction_for_distribution</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function correction_for_distribution in module particula.data.process.scattering_truncation:
+
+correction_for_distribution(m_sphere: Union[complex, float], wavelength: float, diameter_sizes: numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]], number_per_cm3: numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]], discretize: bool = True) -&gt; Union[float, numpy.float64]
+    Calculates the correction factor for scattering measurements due to
+    truncation effects in aerosol size distribution measurements. This
+    correction factor is used to adjust the measured scattering
+    coefficient, accounting for the limited angular range of the instrument.
+    
+    Parameters
+    ----------
+    m_sphere : Union[complex, float]
+        The complex or real refractive index of the particles.
+    wavelength : float
+        The wavelength of the incident light in nanometers (nm).
+    diameter_sizes : NDArray[np.float64]
+        An array of particle diameters in nanometers (nm) corresponding to the
+        size distribution.
+    number_per_cm3 : NDArray[np.float64]
+        An array of particle number concentrations (#/cm^3) for each diameter
+        in the size distribution.
+    discretize : bool, optional
+        If True, the calculation will use discretized values for the
+        refractive index, wavelength, and diameters to potentially improve
+        computation performance. Default is True.
+    
+    Returns
+    -------
+    float
+        The correction factor for scattering measurements. This factor is
+        dimensionless and is used to correct the measured scattering
+        coefficient for truncation effects, calculated as the ratio of
+        the ideal (full angular range) to truncated scattering coefficient.
+    
+    Example
+    -------
+    b_sca_corrected = b_sca_measured * bsca_correction
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">scattering_truncation</span><span class="o">.</span><span class="n">correction_for_humidified</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function correction_for_humidified in module particula.data.process.scattering_truncation:
+
+correction_for_humidified(kappa: Union[float, numpy.float64], number_per_cm3: numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]], diameter: numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]], water_activity_sizer: numpy.float64, water_activity_sample: numpy.float64, refractive_index_dry: Union[complex, float] = 1.45, water_refractive_index: Union[complex, float] = 1.33, wavelength: float = 450, discretize: bool = True) -&gt; numpy.float64
+    Calculates the scattering correction for humidified aerosol measurements,
+    accounting for water uptake by adjusting the aerosol&#39;s refractive index.
+    This function requires the kappa values for the particles, which describe
+    their hygroscopic growth.
+    
+    Parameters
+    ----------
+    kappa : Union[float, NDArray[np.float64]]
+        Hygroscopicity parameter kappa, indicating the water uptake capability
+        of the particles.
+    number_per_cm3 : NDArray[np.float64]
+        Number concentration of particles per cubic centimeter (#/cm³) for
+        each size bin.
+    diameter : NDArray[np.float64]
+        Array of particle diameters in nanometers (nm).
+    water_activity_sizer : NDArray[np.float64]
+        Water activity (relative humidity/100) of the air sample used for
+        sizing.
+    water_activity_sample : NDArray[np.float64]
+        Water activity (relative humidity/100) of the air sample in optical
+        measurements.
+    refractive_index_dry : Union[complex, float], optional
+        Refractive index of the dry particles. Default is 1.45.
+    water_refractive_index : Union[complex, float], optional
+        Refractive index of water. Default is 1.33.
+    wavelength : float, optional
+        Wavelength of the incident light in nanometers (nm). Default is 450.
+    discretize : bool, optional
+        If True, calculation uses discretized values for refractive index,
+        wavelength, and diameters to improve performance. Default is True.
+    
+    Returns
+    -------
+    np.float64
+        A numpy array of scattering correction factors for each particle size
+        in the distribution, to be applied to measured backscatter
+        coefficients to account for truncation effects due to humidity.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
 </section>
 </section>
 
@@ -848,6 +1092,16 @@ Truncation correction factor: 0.99888593093735
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-size-dependence-of-truncation">Full Size Dependence of Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#correcting-scattering-truncation-250-nm-distribution">Correcting Scattering Truncation 250 nm Distribution</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generating-a-representative-aerosol-distribution">Generating a Representative Aerosol Distribution</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#correcting-scattering-truncation-1000-nm-distribution">Correcting Scattering Truncation 1000 nm Distribution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-humidified-aerosol-measurements">Addressing Humidified Aerosol Measurements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#leveraging-truncation-corrections-for-broader-applications">Leveraging Truncation Corrections for Broader Applications</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
