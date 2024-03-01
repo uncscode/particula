@@ -714,13 +714,13 @@ document.write(`
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Diameter (nm)&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number concentration (#/cm^3)&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/0c4f0d60bcf9af84fd0b890106df00c18c281ea6e71e2c6a3111bd815b03b8d5.png" src="../../_images/0c4f0d60bcf9af84fd0b890106df00c18c281ea6e71e2c6a3111bd815b03b8d5.png" />
+<img alt="../../_images/2c6cfab8165395d3a7f6b65fc0229aa9acf06abfaa1420de408903ca2d070f7c.png" src="../../_images/2c6cfab8165395d3a7f6b65fc0229aa9acf06abfaa1420de408903ca2d070f7c.png" />
 </div>
 </div>
 </section>
@@ -867,7 +867,7 @@ Effective Refractive Index at High Water Activity: (1.363603614921365+0.06976083
 </section>
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
-<p>In this notebook, we delved into the phenomenon of hygroscopic growth of aerosol particles and investigated its consequential effects on their optical characteristics. Our journey commenced with the construction of a bimodal log-normal distribution, aimed at depicting the number concentration of aerosol particles across a spectrum of diameters. This foundational step allowed us to simulate the real-world complexity of aerosol size distributions.</p>
+<p>In this notebook, we delved into the phenomenon of hygroscopic growth of aerosol particles and investigated its consequential effects on their optical characteristics. We started with the construction of a bimodal log-normal distribution, aimed at depicting the number concentration of aerosol particles across a spectrum of diameters. This foundational step allowed us to simulate the real-world complexity of aerosol size distributions.</p>
 <p>Moving forward, we calculated the hygroscopic growth of these particles under different humidity conditions, employing varying water activities to simulate environmental changes. Through visualization, we effectively illustrated the shifts in particle size distribution resulting from this growth, providing a clear depiction of how particles expand as they absorb moisture.</p>
 <p>In our subsequent analysis, we determined the refractive index of the humidified particles. This was achieved by applying the Lorentz-Lorenz mixing rule, a theoretical framework that facilitated the computation of the effective refractive index of the particles post-hydration.</p>
 <p>Our exploration ended in the calculation of the optical properties of aerosol particles across different levels of humidity. By doing so, we unveiled the ways in which hygroscopic growth influences the scattering and absorption behaviors of particles. The insights garnered from this analysis are instrumental in comprehending the broader implications of particle growth on atmospheric optics and climate dynamics.</p>
