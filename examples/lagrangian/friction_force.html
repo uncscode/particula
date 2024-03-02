@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Realistic Drag, Mass, and Velocity &#8212; Particula Book</title>
   
@@ -19,49 +18,45 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../../_static/design-tabs.js"></script>
-    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
-const thebe_selector = ".thebe,.cell"
-const thebe_selector_input = "pre"
-const thebe_selector_output = ".output, .cell_output"
-</script>
-    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/lagrangian/friction_force';</script>
@@ -81,7 +76,6 @@ const thebe_selector_output = ".output, .cell_output"
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -121,20 +115,15 @@ const thebe_selector_output = ".output, .cell_output"
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
-    </div>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
       
-      
-        
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -168,7 +157,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -232,17 +232,24 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
 </ul>
 </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../light_scattering/aerosol_optics_intro.html">Introduction to Aerosol Optics</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/mie_basics.html">Mie Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/humid_scattering.html">Scattering for Humidified Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/scattering_truncation.html">Scattering Truncation Corrections</a></li>
+</ul>
+</li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
@@ -581,7 +588,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="realistic-drag-mass-and-velocity">
-<h1>Realistic Drag, Mass, and Velocity<a class="headerlink" href="#realistic-drag-mass-and-velocity" title="Permalink to this heading">#</a></h1>
+<h1>Realistic Drag, Mass, and Velocity<a class="headerlink" href="#realistic-drag-mass-and-velocity" title="Link to this heading">#</a></h1>
 <p>This notebook section focuses on simulating cloud droplet-sized aerosol particles (around 100 microns) with accurate mass and velocity. Key improvements include:</p>
 <ol class="arabic simple">
 <li><p><strong>Refining Initial Conditions</strong>: Setting precise starting values for particle mass and velocity.</p></li>
@@ -606,7 +613,7 @@ document.write(`
 </div>
 </div>
 <section id="initialization-of-particles">
-<h2>Initialization of Particles<a class="headerlink" href="#initialization-of-particles" title="Permalink to this heading">#</a></h2>
+<h2>Initialization of Particles<a class="headerlink" href="#initialization-of-particles" title="Link to this heading">#</a></h2>
 <p>In this section, we’ll enhance particle initialization for realism:</p>
 <ul class="simple">
 <li><p><strong>Particle Masses</strong>: Implementing a narrow log-normal distribution to better represent real-world mass variation.</p></li>
@@ -691,14 +698,14 @@ document.write(`
 </div>
 </section>
 <section id="plotting-initial-conditions">
-<h2>Plotting Initial Conditions<a class="headerlink" href="#plotting-initial-conditions" title="Permalink to this heading">#</a></h2>
+<h2>Plotting Initial Conditions<a class="headerlink" href="#plotting-initial-conditions" title="Link to this heading">#</a></h2>
 <p>To verify the realism of our particle model, we’ll plot the initial distributions of particle size and velocity. This step ensures that the initial setup aligns with our expectations and the intended simulation parameters.</p>
 <section id="particle-size-distribution">
-<h3>Particle Size Distribution<a class="headerlink" href="#particle-size-distribution" title="Permalink to this heading">#</a></h3>
+<h3>Particle Size Distribution<a class="headerlink" href="#particle-size-distribution" title="Link to this heading">#</a></h3>
 <p>First, we examine the distribution of particle radii. The goal is to confirm that the radii follow the specified log-normal distribution.</p>
 </section>
 <section id="particle-velocity-distribution">
-<h3>Particle Velocity Distribution<a class="headerlink" href="#particle-velocity-distribution" title="Permalink to this heading">#</a></h3>
+<h3>Particle Velocity Distribution<a class="headerlink" href="#particle-velocity-distribution" title="Link to this heading">#</a></h3>
 <p>Next, we assess the distribution of particle velocities. This is crucial for ensuring that the initial velocities reflect thermal motion as intended.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -732,19 +739,19 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/e28a3ef07ead4d1c4d8896c51e04a046ba7776e400089756f366794a7cc6dd0a.png" src="../../_images/e28a3ef07ead4d1c4d8896c51e04a046ba7776e400089756f366794a7cc6dd0a.png" />
-<img alt="../../_images/e8e00de78dbb82fef1d78d5c411bef0a80964dfa7401e5b06a25d5dbabc04525.png" src="../../_images/e8e00de78dbb82fef1d78d5c411bef0a80964dfa7401e5b06a25d5dbabc04525.png" />
+<img alt="../../_images/25b86ce879fe3e343beb40d588e5665430dc89c75fd5f0bd2f6b3abd757315ce.png" src="../../_images/25b86ce879fe3e343beb40d588e5665430dc89c75fd5f0bd2f6b3abd757315ce.png" />
+<img alt="../../_images/a4969958697a748b2d013d00ab146f29e5bfab4fdf4f8b9fde9aad7350611f00.png" src="../../_images/a4969958697a748b2d013d00ab146f29e5bfab4fdf4f8b9fde9aad7350611f00.png" />
 </div>
 </div>
 </section>
 </section>
 <section id="friction-factor-in-particle-dynamics">
-<h2>Friction Factor in Particle Dynamics<a class="headerlink" href="#friction-factor-in-particle-dynamics" title="Permalink to this heading">#</a></h2>
+<h2>Friction Factor in Particle Dynamics<a class="headerlink" href="#friction-factor-in-particle-dynamics" title="Link to this heading">#</a></h2>
 <section id="understanding-the-friction-force">
-<h3>Understanding the Friction Force<a class="headerlink" href="#understanding-the-friction-force" title="Permalink to this heading">#</a></h3>
+<h3>Understanding the Friction Force<a class="headerlink" href="#understanding-the-friction-force" title="Link to this heading">#</a></h3>
 <p>As we simulate particles at a realistic scale, accounting for forces acting on them becomes crucial. The first significant force is friction, which opposes the particle’s motion and is proportional to its velocity.</p>
 <section id="mathematical-representation">
-<h4>Mathematical Representation<a class="headerlink" href="#mathematical-representation" title="Permalink to this heading">#</a></h4>
+<h4>Mathematical Representation<a class="headerlink" href="#mathematical-representation" title="Link to this heading">#</a></h4>
 <p>The friction factor <span class="math notranslate nohighlight">\((f_p)\)</span> is described by:</p>
 <div class="math notranslate nohighlight">
 \[ f_p = \frac{3 \pi D_p \mu}{D_c} \]</div>
@@ -759,13 +766,13 @@ document.write(`
 </section>
 </section>
 <section id="implementing-the-friction-factor-in-the-simulation">
-<h3>Implementing the Friction Factor in the Simulation<a class="headerlink" href="#implementing-the-friction-factor-in-the-simulation" title="Permalink to this heading">#</a></h3>
+<h3>Implementing the Friction Factor in the Simulation<a class="headerlink" href="#implementing-the-friction-factor-in-the-simulation" title="Link to this heading">#</a></h3>
 <section id="efficiency-considerations">
-<h4>Efficiency Considerations<a class="headerlink" href="#efficiency-considerations" title="Permalink to this heading">#</a></h4>
+<h4>Efficiency Considerations<a class="headerlink" href="#efficiency-considerations" title="Link to this heading">#</a></h4>
 <p>Calculating the friction factor at each simulation step could be computationally intensive. However, it’s important to note that <span class="math notranslate nohighlight">\(f_p\)</span> is dependent on environmental variables like pressure and temperature, which might change.</p>
 </section>
 <section id="current-approach">
-<h4>Current Approach<a class="headerlink" href="#current-approach" title="Permalink to this heading">#</a></h4>
+<h4>Current Approach<a class="headerlink" href="#current-approach" title="Link to this heading">#</a></h4>
 <p>For the current stage of the simulation, we’ll compute <span class="math notranslate nohighlight">\(f_p\)</span> initially and use nearest neighbor interpolation for each particle. This approach balances efficiency with accuracy, keeping in mind that future iterations may include dynamic adjustments for varying environmental conditions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -809,14 +816,14 @@ document.write(`
 Min Radius [m]:  tensor(2.9795e-06)
 </pre></div>
 </div>
-<img alt="../../_images/506f2ac621e8b5d90126114dfadc856c2d26750db5562419711c2ba2fa7ccdb7.png" src="../../_images/506f2ac621e8b5d90126114dfadc856c2d26750db5562419711c2ba2fa7ccdb7.png" />
+<img alt="../../_images/808bc02a59ca0a5acd4031a99640a2640e726eb2eda25e05e41f6006527f0e41.png" src="../../_images/808bc02a59ca0a5acd4031a99640a2640e726eb2eda25e05e41f6006527f0e41.png" />
 </div>
 </div>
 </section>
 </section>
 </section>
 <section id="running-the-particle-simulation">
-<h2>Running the Particle Simulation<a class="headerlink" href="#running-the-particle-simulation" title="Permalink to this heading">#</a></h2>
+<h2>Running the Particle Simulation<a class="headerlink" href="#running-the-particle-simulation" title="Link to this heading">#</a></h2>
 <p>In this part of the notebook, we execute the core simulation loop. This involves integrating the motion of the particles over time while considering the forces acting on them, including friction and gravity. Several key updates and optimizations are included:</p>
 <ol class="arabic simple">
 <li><p><strong>Friction Factor Initialization</strong>: Before entering the main loop, the friction factor for each particle is calculated. This is an essential step for accurately simulating the drag force on particles.</p></li>
@@ -898,15 +905,15 @@ Min Radius [m]:  tensor(2.9795e-06)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 8.455162525177002 seconds
-Ratio of wall time to simulation time: 0.08455162525177001
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 8.664973974227905 seconds
+Ratio of wall time to simulation time: 0.08664973974227905
 </pre></div>
 </div>
 </div>
 </div>
 </section>
 <section id="plotting-particle-positions">
-<h2>Plotting Particle Positions<a class="headerlink" href="#plotting-particle-positions" title="Permalink to this heading">#</a></h2>
+<h2>Plotting Particle Positions<a class="headerlink" href="#plotting-particle-positions" title="Link to this heading">#</a></h2>
 <p>After running the simulation, we’ll plot the particle positions to visualize their movement.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -966,12 +973,12 @@ Ratio of wall time to simulation time: 0.08455162525177001
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 1510
 </pre></div>
 </div>
-<img alt="../../_images/ce6e55417aac803114ab29ffb23839c7c9bb9702feae96bc8d81fdfdb09c6732.png" src="../../_images/ce6e55417aac803114ab29ffb23839c7c9bb9702feae96bc8d81fdfdb09c6732.png" />
+<img alt="../../_images/f5648a27e756dfa18b2472d69519e57d317d33362b6459240c3c0618fd69510c.png" src="../../_images/f5648a27e756dfa18b2472d69519e57d317d33362b6459240c3c0618fd69510c.png" />
 </div>
 </div>
 </section>
 <section id="size-distribution-of-particles">
-<h2>Size Distribution of Particles<a class="headerlink" href="#size-distribution-of-particles" title="Permalink to this heading">#</a></h2>
+<h2>Size Distribution of Particles<a class="headerlink" href="#size-distribution-of-particles" title="Link to this heading">#</a></h2>
 <p>Given particle collision and coagulation, we’ll plot the distribution of particle sizes at the end of the simulation. This step ensures that the particle size distribution aligns with our expectations and the intended simulation parameters. That being, both a decrease in the number of particles and an increase in the average particle size.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -994,7 +1001,7 @@ Ratio of wall time to simulation time: 0.08455162525177001
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/5b8ea439ef3edf6e1972aee34493ec63dd8a0acf86489dcb5fb633a722cea1cb.png" src="../../_images/5b8ea439ef3edf6e1972aee34493ec63dd8a0acf86489dcb5fb633a722cea1cb.png" />
+<img alt="../../_images/6a1158b9027648804617db342c2da47236b9f37b896b3e81fdd7c4c8c291e928.png" src="../../_images/6a1158b9027648804617db342c2da47236b9f37b896b3e81fdd7c4c8c291e928.png" />
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial Max Radius [m]:  0.0006300950772128999
 Final Max Radius [m]:  0.0007361950668992882
 </pre></div>
@@ -1003,9 +1010,9 @@ Final Max Radius [m]:  0.0007361950668992882
 </div>
 </section>
 <section id="summary-of-cloud-droplet-simulation">
-<h2>Summary of Cloud Droplet Simulation<a class="headerlink" href="#summary-of-cloud-droplet-simulation" title="Permalink to this heading">#</a></h2>
+<h2>Summary of Cloud Droplet Simulation<a class="headerlink" href="#summary-of-cloud-droplet-simulation" title="Link to this heading">#</a></h2>
 <section id="achievements-in-realism">
-<h3>Achievements in Realism<a class="headerlink" href="#achievements-in-realism" title="Permalink to this heading">#</a></h3>
+<h3>Achievements in Realism<a class="headerlink" href="#achievements-in-realism" title="Link to this heading">#</a></h3>
 <p>In this iteration of the cloud droplet simulation, we’ve significantly advanced towards realism:</p>
 <ul class="simple">
 <li><p><strong>Enhanced Initial Conditions</strong>: The simulation now starts with more realistically distributed particle sizes and velocities.</p></li>
@@ -1014,11 +1021,11 @@ Final Max Radius [m]:  0.0007361950668992882
 </ul>
 </section>
 <section id="performance-considerations">
-<h3>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permalink to this heading">#</a></h3>
+<h3>Performance Considerations<a class="headerlink" href="#performance-considerations" title="Link to this heading">#</a></h3>
 <p>While these enhancements bring us closer to real-world scenarios, they also slow down the simulation. However, it still runs at a reasonable pace relative to real time.</p>
 </section>
 <section id="challenges-with-sub-micron-aerosols">
-<h3>Challenges with Sub-Micron Aerosols<a class="headerlink" href="#challenges-with-sub-micron-aerosols" title="Permalink to this heading">#</a></h3>
+<h3>Challenges with Sub-Micron Aerosols<a class="headerlink" href="#challenges-with-sub-micron-aerosols" title="Link to this heading">#</a></h3>
 <p>The next goal is to simulate sub-micron aerosol sizes accurately. The main challenge here lies in particle velocity:</p>
 <ul class="simple">
 <li><p><strong>High Speeds and Domain Size</strong>: At sub-micron scales, particles can travel multiple domain lengths in a single time step. This necessitates extremely small time steps for accuracy, which is computationally inefficient.</p></li>
@@ -1026,14 +1033,14 @@ Final Max Radius [m]:  0.0007361950668992882
 </ul>
 </section>
 <section id="positive-observations">
-<h3>Positive Observations<a class="headerlink" href="#positive-observations" title="Permalink to this heading">#</a></h3>
+<h3>Positive Observations<a class="headerlink" href="#positive-observations" title="Link to this heading">#</a></h3>
 <p>Despite these challenges, there are encouraging signs:</p>
 <ul class="simple">
 <li><p><strong>Evolving Size Distribution</strong>: The simulation shows a trend towards fewer, larger particles over time. This behavior mirrors what is expected in cloud formation, where larger particles are more likely to collide and grow.</p></li>
 </ul>
 </section>
 <section id="conclusion">
-<h3>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">#</a></h3>
+<h3>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">#</a></h3>
 <p>These observations suggest that we are moving in the right direction towards a realistic and efficient simulation of particle dynamics. Future improvements will focus on addressing the challenges with sub-micron aerosols and further refining the simulation model.</p>
 </section>
 </section>
@@ -1156,7 +1163,7 @@ By particula contributors
 
   <p class="copyright">
     
-      © Copyright 2022.
+      © Copyright 2023.
       <br/>
     
   </p>
@@ -1180,8 +1187,8 @@ By particula contributors
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
   </footer>

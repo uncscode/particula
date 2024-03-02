@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Sweep and Prune Algorithm &#8212; Particula Book</title>
   
@@ -19,49 +18,45 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../../_static/design-tabs.js"></script>
-    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
-const thebe_selector = ".thebe,.cell"
-const thebe_selector_input = "pre"
-const thebe_selector_output = ".output, .cell_output"
-</script>
-    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/lagrangian/sweep_and_prune';</script>
@@ -81,7 +76,6 @@ const thebe_selector_output = ".output, .cell_output"
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -121,20 +115,15 @@ const thebe_selector_output = ".output, .cell_output"
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
-    </div>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
       
-      
-        
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -168,7 +157,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -232,17 +232,24 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
 </ul>
 </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../light_scattering/aerosol_optics_intro.html">Introduction to Aerosol Optics</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/mie_basics.html">Mie Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/humid_scattering.html">Scattering for Humidified Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/scattering_truncation.html">Scattering Truncation Corrections</a></li>
+</ul>
+</li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
@@ -568,17 +575,17 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="sweep-and-prune-algorithm">
-<h1>Sweep and Prune Algorithm<a class="headerlink" href="#sweep-and-prune-algorithm" title="Permalink to this heading">#</a></h1>
+<h1>Sweep and Prune Algorithm<a class="headerlink" href="#sweep-and-prune-algorithm" title="Link to this heading">#</a></h1>
 <p>In our previous approach to collision detection, we compared each particle with every other particle, resulting in a computationally expensive <span class="math notranslate nohighlight">\(O(N^2)\)</span> operation, where <span class="math notranslate nohighlight">\(N\)</span> is the number of particles. To enhance efficiency, we now implement the sweep and prune algorithm.</p>
 <section id="concept-of-sweep-and-prune">
-<h2>Concept of Sweep and Prune<a class="headerlink" href="#concept-of-sweep-and-prune" title="Permalink to this heading">#</a></h2>
+<h2>Concept of Sweep and Prune<a class="headerlink" href="#concept-of-sweep-and-prune" title="Link to this heading">#</a></h2>
 <p>The sweep and prune algorithm is a more efficient method for collision detection. Its efficiency stems from reducing the number of particle pairs we need to check. The key steps of this algorithm are:</p>
 <p><strong>Sweep:</strong> Sort the particles along one axis, typically the <span class="math notranslate nohighlight">\(x\)</span>-axis. This step orders the particles in a way that adjacent particles in the sorted list are likely to be close in space.</p>
 <p><strong>Prune:</strong> After sorting, we then check for potential collisions only between neighboring particles in this sorted list. This pruning significantly reduces the number of comparisons.</p>
 <p><strong>Repeat for Other Axes:</strong> The process is repeated for the <span class="math notranslate nohighlight">\(y\)</span>-axis and the <span class="math notranslate nohighlight">\(z\)</span>-axis. In each iteration, we eliminate pairs of particles that are too far apart to collide based on their coordinates in the respective axis.</p>
 <p><strong>Euclidean Distance Check:</strong> Finally, we validate potential collisions by checking the actual Euclidean distance between particle pairs that remained after the pruning steps. This step ensures accurate detection of collisions.</p>
 <section id="efficiency-gains">
-<h3>Efficiency Gains<a class="headerlink" href="#efficiency-gains" title="Permalink to this heading">#</a></h3>
+<h3>Efficiency Gains<a class="headerlink" href="#efficiency-gains" title="Link to this heading">#</a></h3>
 <p>This method dramatically reduces the number of comparisons from <span class="math notranslate nohighlight">\(O(N^2)\)</span> to approximately <span class="math notranslate nohighlight">\(O(N \log N)\)</span>, mainly due to sorting. The actual number of particle pairs checked for collision is usually much less than <span class="math notranslate nohighlight">\(N\)</span>, especially in sparsely populated spaces. This makes the sweep and prune algorithm significantly more efficient for collision detection in systems with a large number of particles.</p>
 <p>Note: The exact efficiency depends on the distribution and density of particles. In cases where particles are uniformly distributed, the sweep and prune method shows substantial efficiency improvements. However, in highly clustered scenarios, the performance gain might be less pronounced, but it still outperforms the brute-force <span class="math notranslate nohighlight">\(N^2\)</span> approach.</p>
 <div class="cell docutils container">
@@ -600,7 +607,7 @@ document.write(`
 </section>
 </section>
 <section id="initialization">
-<h2>Initialization<a class="headerlink" href="#initialization" title="Permalink to this heading">#</a></h2>
+<h2>Initialization<a class="headerlink" href="#initialization" title="Link to this heading">#</a></h2>
 <p>We’ll use the same initialization as in the previous notebook.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -706,15 +713,15 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 8.515022039413452 seconds
-Ratio of wall time to simulation time: 0.08515022039413452
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 8.662063837051392 seconds
+Ratio of wall time to simulation time: 0.08662063837051391
 </pre></div>
 </div>
 </div>
 </div>
 </section>
 <section id="plot-positions">
-<h2>Plot Positions<a class="headerlink" href="#plot-positions" title="Permalink to this heading">#</a></h2>
+<h2>Plot Positions<a class="headerlink" href="#plot-positions" title="Link to this heading">#</a></h2>
 <p>Compared to the previous notebook, the sweep and prune is about 2x faster for this scenario. The exact speedup depends on the number of particles and the distribution of particles in space.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -771,12 +778,12 @@ Ratio of wall time to simulation time: 0.08515022039413452
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 90
 </pre></div>
 </div>
-<img alt="../../_images/86e0e030c72e0243c8390e2a463d546787afd56aab5a554b0cd22585703133bb.png" src="../../_images/86e0e030c72e0243c8390e2a463d546787afd56aab5a554b0cd22585703133bb.png" />
+<img alt="../../_images/516b0b8fe86e5ad0d74c2fd47a7093f1267addfe2ab9e483efce1327cba8df45.png" src="../../_images/516b0b8fe86e5ad0d74c2fd47a7093f1267addfe2ab9e483efce1327cba8df45.png" />
 </div>
 </div>
 </section>
 <section id="analyzing-the-mass-distribution-of-particles">
-<h2>Analyzing the Mass Distribution of Particles<a class="headerlink" href="#analyzing-the-mass-distribution-of-particles" title="Permalink to this heading">#</a></h2>
+<h2>Analyzing the Mass Distribution of Particles<a class="headerlink" href="#analyzing-the-mass-distribution-of-particles" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualizing the Mass Distribution at Different Stages</span>
@@ -812,19 +819,19 @@ Ratio of wall time to simulation time: 0.08515022039413452
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/a0a86736b6aa2affe3ec81b863f0cd7ee85966977a8696c3320df0d7062b3292.png" src="../../_images/a0a86736b6aa2affe3ec81b863f0cd7ee85966977a8696c3320df0d7062b3292.png" />
+<img alt="../../_images/86302be77bde6cbf9a82c074f0649804d4ceb2360776a099e25079a8f0e67d62.png" src="../../_images/86302be77bde6cbf9a82c074f0649804d4ceb2360776a099e25079a8f0e67d62.png" />
 </div>
 </div>
 </section>
 <section id="summary-of-the-sweep-and-prune-algorithm">
-<h2>Summary of the Sweep and Prune Algorithm<a class="headerlink" href="#summary-of-the-sweep-and-prune-algorithm" title="Permalink to this heading">#</a></h2>
+<h2>Summary of the Sweep and Prune Algorithm<a class="headerlink" href="#summary-of-the-sweep-and-prune-algorithm" title="Link to this heading">#</a></h2>
 <p>In our recent work, we’ve successfully implemented the sweep and prune algorithm for efficient collision detection. This method has demonstrated a notable efficiency improvement over the traditional brute-force approach. As we progress, the next notebook will introduce realistic aerosol initialization and dynamics, further enhancing our simulation’s applicability.</p>
 <section id="understanding-sweep-and-prune-aabb-algorithm">
-<h3>Understanding Sweep and Prune (AABB Algorithm)<a class="headerlink" href="#understanding-sweep-and-prune-aabb-algorithm" title="Permalink to this heading">#</a></h3>
+<h3>Understanding Sweep and Prune (AABB Algorithm)<a class="headerlink" href="#understanding-sweep-and-prune-aabb-algorithm" title="Link to this heading">#</a></h3>
 <p>The sweep and prune algorithm is often referred to as the Axis-Aligned Bounding Box (AABB) algorithm. This designation stems from the technique’s reliance on comparing axis-aligned bounding boxes of particles to detect potential collisions. An axis-aligned bounding box is the smallest box that entirely encapsulates a particle and is aligned with the coordinate axes. By working with these boxes, the algorithm efficiently narrows down collision checks to only those particles whose bounding boxes overlap, significantly reducing the number of necessary calculations.</p>
 </section>
 <section id="additional-context-on-aabb">
-<h3>Additional Context on AABB<a class="headerlink" href="#additional-context-on-aabb" title="Permalink to this heading">#</a></h3>
+<h3>Additional Context on AABB<a class="headerlink" href="#additional-context-on-aabb" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Efficient Sorting: The key to its efficiency lies in sorting particles along each axis and then checking for overlap, which is computationally less intensive than checking every pair of particles.</p></li>
 <li><p>Use in Various Domains: While commonly used in computer graphics and game development for spatial partitioning and collision detection, the AABB approach is also highly relevant in scientific simulations like aerosol dynamics.</p></li>
@@ -832,7 +839,7 @@ Ratio of wall time to simulation time: 0.08515022039413452
 </section>
 </section>
 <section id="exploring-other-collision-detection-methods">
-<h2>Exploring Other Collision Detection Methods<a class="headerlink" href="#exploring-other-collision-detection-methods" title="Permalink to this heading">#</a></h2>
+<h2>Exploring Other Collision Detection Methods<a class="headerlink" href="#exploring-other-collision-detection-methods" title="Link to this heading">#</a></h2>
 <p>Beyond sweep and prune, several other advanced collision detection techniques offer improved efficiency over brute-force methods, albeit with increased complexity in implementation. Some noteworthy methods include:</p>
 <ul class="simple">
 <li><p>K-d Tree (Smarter Space Partitioning): This method involves partitioning space into regions using a k-dimensional tree, allowing for efficient searching and nearest-neighbor queries, particularly useful in sparsely populated spaces.</p></li>
@@ -840,7 +847,7 @@ Ratio of wall time to simulation time: 0.08515022039413452
 <li><p>GJK Algorithm (Gilbert-Johnson-Keerthi): The GJK algorithm is used for collision detection between convex shapes. It efficiently determines whether two convex shapes intersect and can be extended to calculate the minimum distance between them.</p></li>
 </ul>
 <section id="additional-considerations">
-<h3>Additional Considerations<a class="headerlink" href="#additional-considerations" title="Permalink to this heading">#</a></h3>
+<h3>Additional Considerations<a class="headerlink" href="#additional-considerations" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Choosing the Right Method: The choice of collision detection algorithm depends on the specific requirements of the simulation, such as the number of particles, their distribution, and the required accuracy.</p></li>
 <li><p>Hybrid Approaches: In practice, a combination of these methods can be used, depending on the scale and complexity of the simulation environment.
@@ -981,7 +988,7 @@ By particula contributors
 
   <p class="copyright">
     
-      © Copyright 2022.
+      © Copyright 2023.
       <br/>
     
   </p>
@@ -1005,8 +1012,8 @@ By particula contributors
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
   </footer>

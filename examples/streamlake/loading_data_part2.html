@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Loading Part 2: Sizer Data &#8212; Particula Book</title>
   
@@ -19,49 +18,45 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../../_static/design-tabs.js"></script>
-    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
-const thebe_selector = ".thebe,.cell"
-const thebe_selector_input = "pre"
-const thebe_selector_output = ".output, .cell_output"
-</script>
-    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/streamlake/loading_data_part2';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -79,7 +74,6 @@ const thebe_selector_output = ".output, .cell_output"
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -119,20 +113,15 @@ const thebe_selector_output = ".output, .cell_output"
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
-    </div>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
       
-      
-        
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -166,7 +155,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -230,17 +230,24 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
 </ul>
 </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../light_scattering/aerosol_optics_intro.html">Introduction to Aerosol Optics</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/mie_basics.html">Mie Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/humid_scattering.html">Scattering for Humidified Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/scattering_truncation.html">Scattering Truncation Corrections</a></li>
+</ul>
+</li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
@@ -583,10 +590,10 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="loading-part-2-sizer-data">
-<h1>Loading Part 2: Sizer Data<a class="headerlink" href="#loading-part-2-sizer-data" title="Permalink to this heading">#</a></h1>
+<h1>Loading Part 2: Sizer Data<a class="headerlink" href="#loading-part-2-sizer-data" title="Link to this heading">#</a></h1>
 <p>Welcome to Part 2 of our data loading series! This section builds upon the concepts and techniques introduced in Part 1. If you haven’t gone through the first part, we highly recommend you do so to get a firm foundation. Here, we’ll dive into handling 2-dimensional data, such as size distributions, which are common in fields like environmental science and engineering.</p>
 <section id="setting-up-your-working-path">
-<h2>Setting Up Your Working Path<a class="headerlink" href="#setting-up-your-working-path" title="Permalink to this heading">#</a></h2>
+<h2>Setting Up Your Working Path<a class="headerlink" href="#setting-up-your-working-path" title="Link to this heading">#</a></h2>
 <p>Before we begin, let’s set up the working path, which is the location on your computer where your data files are stored. In this example, we’ll use data provided in the current directory of this notebook. However, you can easily change this to any directory where your data files are located. For instance, if you have a folder named “data” in your home directory for a project called “Campaign2023_of_awesome”, you would set the path like this:</p>
 <p><code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">=</span> <span class="pre">&quot;U:\\data\\processing\\Campaign2023_of_awesome\\data&quot;</span></code></p>
 <p>Let’s start by importing the necessary Python libraries and modules. We’ll explain each one as we use them throughout this notebook.</p>
@@ -629,7 +636,7 @@ Path to data folder:
 </div>
 </section>
 <section id="load-the-data">
-<h2>Load the Data<a class="headerlink" href="#load-the-data" title="Permalink to this heading">#</a></h2>
+<h2>Load the Data<a class="headerlink" href="#load-the-data" title="Link to this heading">#</a></h2>
 <p>Now that we’ve set our working directory, the next step is to load the data. We’ll be using the <code class="docutils literal notranslate"><span class="pre">loader</span></code> module from the Particula package for this task. The function <code class="docutils literal notranslate"><span class="pre">loader.data_raw_loader()</span></code> is specifically designed to read data from a file, which we’ll specify using its file path. This approach is straightforward and efficient for loading data into Python for analysis.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -674,7 +681,7 @@ Sample #,Date,Start Time,Sample Temp (C),Sample Pressure (kPa),Relative Humidity
 </section>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="formatting-the-data">
-<h1>Formatting the Data<a class="headerlink" href="#formatting-the-data" title="Permalink to this heading">#</a></h1>
+<h1>Formatting the Data<a class="headerlink" href="#formatting-the-data" title="Link to this heading">#</a></h1>
 <p>When dealing with 2-dimensional data, such as size distributions, the formatting process can be a bit more complex compared to 1-dimensional data. For our data, we need to extract size bins and use them as headers for our dataset. This involves specifying the start and end points within the data that define our size bins. In our specific example, the start point is indicated by the keyword “Date Time” and the end point by “Total Conc”. Understanding where your data starts and ends is crucial for accurate formatting and analysis.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -724,7 +731,7 @@ Header (First 10 Entries):
 </div>
 </div>
 <section id="pause-to-plot">
-<h2>Pause to Plot<a class="headerlink" href="#pause-to-plot" title="Permalink to this heading">#</a></h2>
+<h2>Pause to Plot<a class="headerlink" href="#pause-to-plot" title="Link to this heading">#</a></h2>
 <p>Visualizing your data is a crucial step in the data analysis process. It allows you to see patterns, trends, and potential anomalies that might not be evident from the raw data alone. Now that we have formatted the data and extracted the time information, let’s create a plot. This will help us get a visual sense of the data’s characteristics, such as the concentration of particles in different size bins over time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -756,12 +763,12 @@ Header (First 10 Entries):
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/00bc4560887c2ec74cdf1052ad887e46c426b8bd86531d332ff84dc6bd1abce9.png" src="../../_images/00bc4560887c2ec74cdf1052ad887e46c426b8bd86531d332ff84dc6bd1abce9.png" />
+<img alt="../../_images/e86cf4287aa9d5f9ea9b809155d23745a4d968ca20d05ea63bb37645557650d3.png" src="../../_images/e86cf4287aa9d5f9ea9b809155d23745a4d968ca20d05ea63bb37645557650d3.png" />
 </div>
 </div>
 </section>
 <section id="dates-in-plots">
-<h2>Dates in Plots<a class="headerlink" href="#dates-in-plots" title="Permalink to this heading">#</a></h2>
+<h2>Dates in Plots<a class="headerlink" href="#dates-in-plots" title="Link to this heading">#</a></h2>
 <p>When working with time-series data, it’s often helpful to have dates on the x-axis of your plots for better readability and understanding. However, to display dates effectively in plots using <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>, we need to convert our time data into a format that <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> can recognize and work with.</p>
 <p>One common format for this purpose is <code class="docutils literal notranslate"><span class="pre">np.datetime64</span></code>. This format represents dates and times in a way that is compatible with numpy arrays, making it ideal for plotting time-related data. In our case, we can convert our epoch time (time since a fixed point in the past, typically January 1, 1970) to <code class="docutils literal notranslate"><span class="pre">np.datetime64</span></code> using the <code class="docutils literal notranslate"><span class="pre">convert.datetime64_from_epoch_array</span></code> function from the Particula package.</p>
 <p>Additionally, to make the plot more readable, especially when there are many data points, it’s a good practice to rotate the x-axis labels. This prevents overlapping and makes each date and time label clear. We can achieve this rotation using <code class="docutils literal notranslate"><span class="pre">plt.xticks(rotation=45)</span></code>.</p>
@@ -801,15 +808,15 @@ Header (First 10 Entries):
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/9aa5bd047b4dabb67621f80320fb76d60763f45993f1e118e385def746d842d2.png" src="../../_images/9aa5bd047b4dabb67621f80320fb76d60763f45993f1e118e385def746d842d2.png" />
+<img alt="../../_images/effdf03333be1721d78abc2a16b80dc447b4212c43e7b9c4bf47e09ae646f140.png" src="../../_images/effdf03333be1721d78abc2a16b80dc447b4212c43e7b9c4bf47e09ae646f140.png" />
 </div>
 </div>
 </section>
 <section id="contour-plot-of-data">
-<h2>Contour Plot of Data<a class="headerlink" href="#contour-plot-of-data" title="Permalink to this heading">#</a></h2>
+<h2>Contour Plot of Data<a class="headerlink" href="#contour-plot-of-data" title="Link to this heading">#</a></h2>
 <p>Contour plots are a powerful tool for visualizing how data changes over time and space. In the context of size distribution data, a contour plot can effectively show the variation in particle concentration across different sizes over time. It’s like looking at a topographic map where different colors or shades represent varying concentrations of particles at different sizes and times.</p>
 <section id="preparing-the-data-for-contour-plotting">
-<h3>Preparing the Data for Contour Plotting<a class="headerlink" href="#preparing-the-data-for-contour-plotting" title="Permalink to this heading">#</a></h3>
+<h3>Preparing the Data for Contour Plotting<a class="headerlink" href="#preparing-the-data-for-contour-plotting" title="Link to this heading">#</a></h3>
 <p>Before we plot, it’s a good practice to set limits on our data to ensure that extreme values don’t skew the visualization. This helps in highlighting the relevant ranges of our data. Here’s how we do it:</p>
 <ol class="arabic simple">
 <li><p><strong>Setting Lower and Upper Limits</strong>: We impose a lower limit to avoid plotting extremely low concentrations (which might be less relevant or below detection limits) and an upper limit to avoid letting very high concentrations dominate the plot.</p></li>
@@ -817,7 +824,7 @@ Header (First 10 Entries):
 </ol>
 </section>
 <section id="creating-the-contour-plot">
-<h3>Creating the Contour Plot<a class="headerlink" href="#creating-the-contour-plot" title="Permalink to this heading">#</a></h3>
+<h3>Creating the Contour Plot<a class="headerlink" href="#creating-the-contour-plot" title="Link to this heading">#</a></h3>
 <p>With our data prepared, we can now create the contour plot. This type of plot will use different colors or shades to represent the concentration of particles at various sizes and times.</p>
 <ul class="simple">
 <li><p><strong>X-Axis (Epoch Time)</strong>: Represents the time dimension of our data.</p></li>
@@ -876,20 +883,20 @@ Header (First 10 Entries):
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/122d1ea6a4c2d3fb8a7ace1a108e2d22196f20676b7766e09d5ba716f21c6d5a.png" src="../../_images/122d1ea6a4c2d3fb8a7ace1a108e2d22196f20676b7766e09d5ba716f21c6d5a.png" />
+<img alt="../../_images/ccee91eef6afeb9ce14ed0c596a557b6bea13dcf415f8618afde8561837c960e.png" src="../../_images/ccee91eef6afeb9ce14ed0c596a557b6bea13dcf415f8618afde8561837c960e.png" />
 </div>
 </div>
 </section>
 </section>
 <section id="simplifying-data-import-with-the-settings-generator">
-<h2>Simplifying Data Import with the Settings Generator<a class="headerlink" href="#simplifying-data-import-with-the-settings-generator" title="Permalink to this heading">#</a></h2>
+<h2>Simplifying Data Import with the Settings Generator<a class="headerlink" href="#simplifying-data-import-with-the-settings-generator" title="Link to this heading">#</a></h2>
 <p>In the same way we handled 1-dimensional (1d) data, we can also streamline the import process for 2-dimensional (2d) data using the settings generator. This tool is particularly useful for creating a structured approach to loading complex datasets. By using the <code class="docutils literal notranslate"><span class="pre">settings_generator.for_general_sizer_1d_2d_load()</span></code> function, we can generate a comprehensive settings dictionary that directs how data should be imported and formatted.</p>
 <section id="understanding-the-settings-generator-function">
-<h3>Understanding the Settings Generator Function<a class="headerlink" href="#understanding-the-settings-generator-function" title="Permalink to this heading">#</a></h3>
+<h3>Understanding the Settings Generator Function<a class="headerlink" href="#understanding-the-settings-generator-function" title="Link to this heading">#</a></h3>
 <p>This function is designed to be flexible and accommodate a wide range of data types and formats. It comes with numerous arguments that allow you to specify details like data checks, column information, time format, etc., tailored to your specific dataset. However, it’s important to note that you don’t have to be overwhelmed by these options.</p>
 </section>
 <section id="using-default-settings">
-<h3>Using Default Settings<a class="headerlink" href="#using-default-settings" title="Permalink to this heading">#</a></h3>
+<h3>Using Default Settings<a class="headerlink" href="#using-default-settings" title="Link to this heading">#</a></h3>
 <p>For many users, especially those just starting out or working with standard data formats, the default settings of the <code class="docutils literal notranslate"><span class="pre">settings_generator</span></code> function may work. These defaults are configured to align with the example data provided in the Particula package. This means that if your data structure is similar to the example data, you can call this function without passing any arguments, and it will automatically set up the settings for you.</p>
 <p>This approach not only saves time but also reduces the potential for errors in the data import process, making it a quick and reliable way to get your data ready for analysis.</p>
 <div class="cell docutils container">
@@ -980,14 +987,14 @@ timezone_identifier: UTC
 </section>
 </section>
 <section id="efficient-data-loading-with-the-interface">
-<h2>Efficient Data Loading with the Interface<a class="headerlink" href="#efficient-data-loading-with-the-interface" title="Permalink to this heading">#</a></h2>
+<h2>Efficient Data Loading with the Interface<a class="headerlink" href="#efficient-data-loading-with-the-interface" title="Link to this heading">#</a></h2>
 <p>After configuring our settings dictionaries for 1-dimensional and 2-dimensional data, we’re set to leverage the interface for data loading. This interface, a key component of the Particula package, streamlines the process, making it more efficient and straightforward, especially after you have a good grasp of how the settings work.</p>
 <section id="understanding-the-interface-s-role">
-<h3>Understanding the Interface’s Role<a class="headerlink" href="#understanding-the-interface-s-role" title="Permalink to this heading">#</a></h3>
+<h3>Understanding the Interface’s Role<a class="headerlink" href="#understanding-the-interface-s-role" title="Link to this heading">#</a></h3>
 <p>The interface acts as a facilitator that intelligently uses the settings we’ve established to manage the data loading process. It eliminates the need for manual execution of multiple steps, thereby integrating and automating the data import based on our predefined preferences.</p>
 </section>
 <section id="the-advantages-of-mastery">
-<h3>The Advantages of Mastery<a class="headerlink" href="#the-advantages-of-mastery" title="Permalink to this heading">#</a></h3>
+<h3>The Advantages of Mastery<a class="headerlink" href="#the-advantages-of-mastery" title="Link to this heading">#</a></h3>
 <p>Once you’re comfortable with setting up your data parameters, using the interface offers several key benefits:</p>
 <ul class="simple">
 <li><p><strong>Enhanced Efficiency</strong>: It consolidates several operations into a single action, significantly speeding up the data loading process.</p></li>
@@ -1027,66 +1034,14 @@ timezone_identifier: UTC
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
-  Loading file: 2022-07-07_095151_SMPS.csv
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
+  Loading file: 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">IndexError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">line</span> <span class="mi">13</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="n">working_path</span> <span class="o">=</span> <span class="n">get_data_folder</span><span class="p">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="c1"># Using the settings dictionaries created earlier for 1d and 2d data</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> 
-<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="c1"># Loading 1-dimensional data using the loader interface</span>
-<span class="g g-Whitespace">     </span><span class="mi">11</span> <span class="c1"># The interface takes the path and settings for 1d data and loads the data</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="c1"># accordingly</span>
-<span class="ne">---&gt; </span><span class="mi">13</span> <span class="n">data_stream_1d</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">14</span>     <span class="n">path</span><span class="o">=</span><span class="n">working_path</span><span class="p">,</span>  <span class="c1"># The path where data files are stored</span>
-<span class="g g-Whitespace">     </span><span class="mi">15</span>     <span class="n">settings</span><span class="o">=</span><span class="n">settings_1d</span><span class="p">,</span>  <span class="c1"># Settings dictionary for 1d data</span>
-<span class="g g-Whitespace">     </span><span class="mi">16</span> <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">18</span> <span class="c1"># Loading 2-dimensional data using the loader interface</span>
-<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="c1"># Similar to the 1d data, but using the settings for 2d data</span>
-<span class="g g-Whitespace">     </span><span class="mi">20</span> <span class="n">data_stream_2d</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">21</span>     <span class="n">path</span><span class="o">=</span><span class="n">working_path</span><span class="p">,</span>  <span class="c1"># The path where data files are stored</span>
-<span class="g g-Whitespace">     </span><span class="mi">22</span>     <span class="n">settings</span><span class="o">=</span><span class="n">settings_2d</span><span class="p">,</span>  <span class="c1"># Settings dictionary for 2d data</span>
-<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:152,</span> in <span class="ni">load_files_interface</span><span class="nt">(path, settings, stream)</span>
-<span class="g g-Whitespace">    </span><span class="mi">149</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Loading file:&#39;</span><span class="p">,</span> <span class="n">file_info</span><span class="p">[</span><span class="n">file_i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-<span class="g g-Whitespace">    </span><span class="mi">151</span> <span class="k">if</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_1d_load&#39;</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">152</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_1d_stream</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">153</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">154</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">155</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">156</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">157</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">159</span> <span class="k">elif</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_2d_load&#39;</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">160</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_2d_stream</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">161</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">162</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">163</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">165</span>     <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:323,</span> in <span class="ni">get_1d_stream</span><span class="nt">(file_path, settings, first_pass, stream)</span>
-<span class="g g-Whitespace">    </span><span class="mi">321</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">epoch_time</span>
-<span class="g g-Whitespace">    </span><span class="mi">322</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">323</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">merger</span><span class="o">.</span><span class="n">stream_add_data</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">324</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">325</span>         <span class="n">time_new</span><span class="o">=</span><span class="n">epoch_time</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">326</span>         <span class="n">data_new</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">327</span>         <span class="n">header_check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">328</span>         <span class="n">header_new</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_header&#39;</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">329</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">330</span> <span class="k">return</span> <span class="n">stream</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages/particula/data/merger.py:182,</span> in <span class="ni">stream_add_data</span><span class="nt">(stream, time_new, data_new, header_check, header_new)</span>
-<span class="g g-Whitespace">    </span><span class="mi">180</span>     <span class="n">sorted_time_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">181</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">sorted_time_index</span><span class="p">]</span>
-<span class="ne">--&gt; </span><span class="mi">182</span>     <span class="n">stream</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">sorted_time_index</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">return</span> <span class="n">stream</span>
-
-<span class="ne">IndexError</span>: index 1015 is out of bounds for axis 1 with size 11
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
 </pre></div>
 </div>
 </div>
@@ -1094,10 +1049,10 @@ timezone_identifier: UTC
 </section>
 </section>
 <section id="printing-data-stream-summaries">
-<h2>Printing Data Stream Summaries<a class="headerlink" href="#printing-data-stream-summaries" title="Permalink to this heading">#</a></h2>
+<h2>Printing Data Stream Summaries<a class="headerlink" href="#printing-data-stream-summaries" title="Link to this heading">#</a></h2>
 <p>After loading our data using the loader interface, it’s a good practice to take a moment and review what we have loaded. This helps us confirm that the data is imported correctly and gives us an initial overview of its structure. We’ll do this by printing summaries of the <code class="docutils literal notranslate"><span class="pre">data_stream_1d</span></code> and <code class="docutils literal notranslate"><span class="pre">data_stream_2d</span></code> objects.</p>
 <section id="understanding-the-data-stream-summary">
-<h3>Understanding the Data Stream Summary<a class="headerlink" href="#understanding-the-data-stream-summary" title="Permalink to this heading">#</a></h3>
+<h3>Understanding the Data Stream Summary<a class="headerlink" href="#understanding-the-data-stream-summary" title="Link to this heading">#</a></h3>
 <p>When we print a <code class="docutils literal notranslate"><span class="pre">data_stream</span></code> object, it provides us with a summary of its contents. This includes information like the size of the data, the headers (which represent different data types or measurements), and a glimpse into the actual data values. These summaries are especially useful for:</p>
 <ul class="simple">
 <li><p><strong>Verifying Data Integrity</strong>: Ensuring that the data has been loaded as expected and is ready for analysis.</p></li>
@@ -1105,7 +1060,7 @@ timezone_identifier: UTC
 </ul>
 </section>
 <section id="code-for-printing-summaries">
-<h3>Code for Printing Summaries<a class="headerlink" href="#code-for-printing-summaries" title="Permalink to this heading">#</a></h3>
+<h3>Code for Printing Summaries<a class="headerlink" href="#code-for-printing-summaries" title="Link to this heading">#</a></h3>
 <p>Here’s how we print the summaries for our 1-dimensional and 2-dimensional data streams:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1140,7 +1095,7 @@ Stream(header=[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample
         2.31800e+00, 2.10616e+03],
        [2.05000e+01, 7.91500e+02, 2.35000e+01, ..., 2.07210e+01,
         2.24800e+00, 2.45781e+03]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
-       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5620804], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2004838]])
+       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
 
 Data stream 2d summary:
 Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39;, &#39;22.27&#39;, &#39;22.67&#39;, &#39;23.08&#39;, &#39;23.50&#39;, &#39;23.93&#39;, &#39;24.36&#39;, &#39;24.80&#39;, &#39;25.25&#39;, &#39;25.71&#39;, &#39;26.18&#39;, &#39;26.66&#39;, &#39;27.14&#39;, &#39;27.63&#39;, &#39;28.13&#39;, &#39;28.64&#39;, &#39;29.16&#39;, &#39;29.69&#39;, &#39;30.23&#39;, &#39;30.78&#39;, &#39;31.34&#39;, &#39;31.91&#39;, &#39;32.49&#39;, &#39;33.08&#39;, &#39;33.68&#39;, &#39;34.29&#39;, &#39;34.91&#39;, &#39;35.55&#39;, &#39;36.19&#39;, &#39;36.85&#39;, &#39;37.52&#39;, &#39;38.20&#39;, &#39;38.89&#39;, &#39;39.60&#39;, &#39;40.32&#39;, &#39;41.05&#39;, &#39;41.79&#39;, &#39;42.55&#39;, &#39;43.32&#39;, &#39;44.11&#39;, &#39;44.91&#39;, &#39;45.73&#39;, &#39;46.56&#39;, &#39;47.40&#39;, &#39;48.26&#39;, &#39;49.14&#39;, &#39;50.03&#39;, &#39;50.94&#39;, &#39;51.86&#39;, &#39;52.80&#39;, &#39;53.76&#39;, &#39;54.74&#39;, &#39;55.73&#39;, &#39;56.74&#39;, &#39;57.77&#39;, &#39;58.82&#39;, &#39;59.89&#39;, &#39;60.98&#39;, &#39;62.08&#39;, &#39;63.21&#39;, &#39;64.36&#39;, &#39;65.52&#39;, &#39;66.71&#39;, &#39;67.93&#39;, &#39;69.16&#39;, &#39;70.41&#39;, &#39;71.69&#39;, &#39;72.99&#39;, &#39;74.32&#39;, &#39;75.67&#39;, &#39;77.04&#39;, &#39;78.44&#39;, &#39;79.86&#39;, &#39;81.31&#39;, &#39;82.79&#39;, &#39;84.29&#39;, &#39;85.82&#39;, &#39;87.38&#39;, &#39;88.96&#39;, &#39;90.58&#39;, &#39;92.22&#39;, &#39;93.90&#39;, &#39;95.60&#39;, &#39;97.34&#39;, &#39;99.10&#39;, &#39;100.90&#39;, &#39;102.74&#39;, &#39;104.60&#39;, &#39;106.50&#39;, &#39;108.43&#39;, &#39;110.40&#39;, &#39;112.40&#39;, &#39;114.44&#39;, &#39;116.52&#39;, &#39;118.64&#39;, &#39;120.79&#39;, &#39;122.98&#39;, &#39;125.21&#39;, &#39;127.49&#39;, &#39;129.80&#39;, &#39;132.16&#39;, &#39;134.56&#39;, &#39;137.00&#39;, &#39;139.49&#39;, &#39;142.02&#39;, &#39;144.60&#39;, &#39;147.22&#39;, &#39;149.89&#39;, &#39;152.61&#39;, &#39;155.38&#39;, &#39;158.20&#39;, &#39;161.08&#39;, &#39;164.00&#39;, &#39;166.98&#39;, &#39;170.01&#39;, &#39;173.09&#39;, &#39;176.24&#39;, &#39;179.43&#39;, &#39;182.69&#39;, &#39;186.01&#39;, &#39;189.38&#39;, &#39;192.82&#39;, &#39;196.32&#39;, &#39;199.89&#39;, &#39;203.51&#39;, &#39;207.21&#39;, &#39;210.97&#39;, &#39;214.80&#39;, &#39;218.70&#39;, &#39;222.67&#39;, &#39;226.71&#39;, &#39;230.82&#39;, &#39;235.01&#39;, &#39;239.28&#39;, &#39;243.62&#39;, &#39;248.05&#39;, &#39;252.55&#39;, &#39;257.13&#39;, &#39;261.80&#39;, &#39;266.55&#39;, &#39;271.39&#39;, &#39;276.32&#39;, &#39;281.33&#39;, &#39;286.44&#39;, &#39;291.64&#39;, &#39;296.93&#39;, &#39;302.32&#39;, &#39;307.81&#39;, &#39;313.40&#39;, &#39;319.08&#39;, &#39;324.88&#39;, &#39;330.77&#39;, &#39;336.78&#39;, &#39;342.89&#39;, &#39;349.12&#39;, &#39;355.45&#39;, &#39;361.90&#39;, &#39;368.47&#39;, &#39;375.16&#39;, &#39;381.97&#39;, &#39;388.91&#39;, &#39;395.96&#39;, &#39;403.15&#39;, &#39;410.47&#39;, &#39;417.92&#39;, &#39;425.51&#39;, &#39;433.23&#39;, &#39;441.09&#39;, &#39;449.10&#39;, &#39;457.25&#39;, &#39;465.55&#39;, &#39;474.00&#39;, &#39;482.61&#39;, &#39;491.37&#39;, &#39;500.29&#39;, &#39;509.37&#39;, &#39;518.61&#39;, &#39;528.03&#39;, &#39;537.61&#39;, &#39;547.37&#39;, &#39;557.31&#39;, &#39;567.42&#39;, &#39;577.72&#39;, &#39;588.21&#39;, &#39;598.89&#39;, &#39;609.76&#39;, &#39;620.82&#39;, &#39;632.09&#39;, &#39;643.57&#39;, &#39;655.25&#39;, &#39;667.14&#39;, &#39;679.25&#39;, &#39;691.58&#39;, &#39;704.14&#39;, &#39;716.92&#39;, &#39;729.93&#39;, &#39;743.18&#39;, &#39;756.67&#39;, &#39;770.40&#39;, &#39;784.39&#39;], data=array([[ 6103.186,  2832.655,  4733.553, ...,    93.413,   122.992,
@@ -1156,7 +1111,7 @@ Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39
           372.433],
        [14380.528, 11524.35 , 13632.727, ...,     0.   ,     0.   ,
             0.   ]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
-       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5620804], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2004838]])
+       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
 </pre></div>
 </div>
 </div>
@@ -1164,7 +1119,7 @@ Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39
 </section>
 </section>
 <section id="plotting-again">
-<h2>Plotting Again<a class="headerlink" href="#plotting-again" title="Permalink to this heading">#</a></h2>
+<h2>Plotting Again<a class="headerlink" href="#plotting-again" title="Link to this heading">#</a></h2>
 <p>Plotting is an integral part of the data analysis process. It transforms raw data into visual representations that can reveal insights, patterns, and anomalies that might not be immediately apparent in numerical form. Let’s delve into why plotting is so crucial in understanding your data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1222,12 +1177,12 @@ Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/f7a21ee18fc0fa1366bf5e2692e0d2504e07b3881bb170df0e9529cffa6bc97a.png" src="../../_images/f7a21ee18fc0fa1366bf5e2692e0d2504e07b3881bb170df0e9529cffa6bc97a.png" />
+<img alt="../../_images/932e8c0cdf83ad68d653d2163320d0840f9e98950743280fea2df506e37aeb24.png" src="../../_images/932e8c0cdf83ad68d653d2163320d0840f9e98950743280fea2df506e37aeb24.png" />
 </div>
 </div>
 </section>
 <section id="summary-of-loading-data-part-2">
-<h2>Summary of Loading Data Part 2<a class="headerlink" href="#summary-of-loading-data-part-2" title="Permalink to this heading">#</a></h2>
+<h2>Summary of Loading Data Part 2<a class="headerlink" href="#summary-of-loading-data-part-2" title="Link to this heading">#</a></h2>
 <p>In this section, we delved into the process of loading and handling 2-dimensional data, focusing on a size distribution dataset. We walked through several crucial steps, providing a comprehensive guide to managing and visualizing complex data structures. Here’s a recap of what we covered:</p>
 <ul class="simple">
 <li><p>Setting the Working Path: We began by establishing the working directory for our data, a foundational step in ensuring our scripts access the correct files.</p></li>
@@ -1363,7 +1318,7 @@ By particula contributors
 
   <p class="copyright">
     
-      © Copyright 2022.
+      © Copyright 2023.
       <br/>
     
   </p>
@@ -1387,8 +1342,8 @@ By particula contributors
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
   </footer>

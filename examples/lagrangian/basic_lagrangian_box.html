@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Introduction to the Lagrangian Box Model &#8212; Particula Book</title>
   
@@ -19,49 +18,45 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
-    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../../_static/design-tabs.js"></script>
-    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
-const thebe_selector = ".thebe,.cell"
-const thebe_selector_input = "pre"
-const thebe_selector_output = ".output, .cell_output"
-</script>
-    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script src="../../_static/design-tabs.js?v=36754332"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/lagrangian/basic_lagrangian_box';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -79,7 +74,6 @@ const thebe_selector_output = ".output, .cell_output"
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -119,20 +113,15 @@ const thebe_selector_output = ".output, .cell_output"
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
-    </div>
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
       
-      
-        
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -166,7 +155,18 @@ const thebe_selector_output = ".output, .cell_output"
   
   
 </a></div>
-        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
@@ -230,17 +230,24 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
 </ul>
 </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../light_scattering/aerosol_optics_intro.html">Introduction to Aerosol Optics</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/mie_basics.html">Mie Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/humid_scattering.html">Scattering for Humidified Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/scattering_truncation.html">Scattering Truncation Corrections</a></li>
+</ul>
+</li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
@@ -566,18 +573,18 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="introduction-to-the-lagrangian-box-model">
-<h1>Introduction to the Lagrangian Box Model<a class="headerlink" href="#introduction-to-the-lagrangian-box-model" title="Permalink to this heading">#</a></h1>
+<h1>Introduction to the Lagrangian Box Model<a class="headerlink" href="#introduction-to-the-lagrangian-box-model" title="Link to this heading">#</a></h1>
 <p>In this notebook, we will develop a simple box model for a Lagrangian particle. This model serves as a foundational tool to understand how various processes influence the evolution of a particle. We will start with a basic framework and gradually introduce more complex elements.</p>
 <section id="understanding-particle-dynamics-in-a-cube">
-<h2>Understanding Particle Dynamics in a Cube<a class="headerlink" href="#understanding-particle-dynamics-in-a-cube" title="Permalink to this heading">#</a></h2>
+<h2>Understanding Particle Dynamics in a Cube<a class="headerlink" href="#understanding-particle-dynamics-in-a-cube" title="Link to this heading">#</a></h2>
 <p>Here, we simulate particles moving within a cubic space. When these particles collide, they coagulate. This initial model does not include processes like condensation, evaporation, or forces such as drag. However, these elements will be integrated in subsequent steps to enhance realism.</p>
 </section>
 <section id="enhancing-particle-realism-and-model-complexity">
-<h2>Enhancing Particle Realism and Model Complexity<a class="headerlink" href="#enhancing-particle-realism-and-model-complexity" title="Permalink to this heading">#</a></h2>
+<h2>Enhancing Particle Realism and Model Complexity<a class="headerlink" href="#enhancing-particle-realism-and-model-complexity" title="Link to this heading">#</a></h2>
 <p>Currently, the particles lack realistic properties, but we plan to incorporate these features progressively. The model’s complexity will also be scaled up, which is where the flexibility of the <code class="docutils literal notranslate"><span class="pre">particula.lagrangian</span></code> module becomes crucial.</p>
 </section>
 <section id="leveraging-pytorch-for-enhanced-computational-performance">
-<h2>Leveraging PyTorch for Enhanced Computational Performance<a class="headerlink" href="#leveraging-pytorch-for-enhanced-computational-performance" title="Permalink to this heading">#</a></h2>
+<h2>Leveraging PyTorch for Enhanced Computational Performance<a class="headerlink" href="#leveraging-pytorch-for-enhanced-computational-performance" title="Link to this heading">#</a></h2>
 <p>This model is designed with a focus on PyTorch, allowing us to seamlessly switch between CPU and GPU computations. This capability becomes increasingly important as we add more particles and complexity to the model, necessitating the use of GPU for efficient computation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -597,7 +604,7 @@ document.write(`
 </div>
 </section>
 <section id="defining-the-system-parameters-and-initial-conditions">
-<h2>Defining the System: Parameters and Initial Conditions<a class="headerlink" href="#defining-the-system-parameters-and-initial-conditions" title="Permalink to this heading">#</a></h2>
+<h2>Defining the System: Parameters and Initial Conditions<a class="headerlink" href="#defining-the-system-parameters-and-initial-conditions" title="Link to this heading">#</a></h2>
 <p>The first step in our simulation is to define the system. This involves setting up a combination of fixed parameters and initializing the conditions for our particles. These parameters include the total number of particles, time step for the simulation, mass of each particle, dimensions of the cubic space, and other physical properties. The initial positions and velocities of the particles are generated randomly within this defined space, laying the groundwork for the subsequent simulation dynamics.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -647,7 +654,7 @@ document.write(`
 </div>
 </section>
 <section id="setting-up-data-saving-mechanism">
-<h2>Setting Up Data Saving Mechanism<a class="headerlink" href="#setting-up-data-saving-mechanism" title="Permalink to this heading">#</a></h2>
+<h2>Setting Up Data Saving Mechanism<a class="headerlink" href="#setting-up-data-saving-mechanism" title="Link to this heading">#</a></h2>
 <p>To effectively monitor and analyze the simulation, we will record specific variables at predetermined intervals. In this case, we’ll focus on saving the position and mass of each particle. These variables will be captured at a set number of ‘save points’ throughout the simulation, allowing us to track the dynamic changes over time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -665,7 +672,7 @@ document.write(`
 </div>
 </section>
 <section id="executing-the-box-model-simulation">
-<h2>Executing the Box Model Simulation<a class="headerlink" href="#executing-the-box-model-simulation" title="Permalink to this heading">#</a></h2>
+<h2>Executing the Box Model Simulation<a class="headerlink" href="#executing-the-box-model-simulation" title="Link to this heading">#</a></h2>
 <p>With our system defined and data saving mechanisms in place, we now proceed to run the simulation. The process involves a series of steps that are iteratively executed to simulate the dynamics of the particles within the box. The steps are as follows:</p>
 <ul class="simple">
 <li><p>Boundary Check: Verify if any particles have moved outside the boundaries of the box and handle accordingly.</p></li>
@@ -737,15 +744,15 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 15.735045671463013 seconds
-Ratio of wall time to simulation time: 0.15735045671463013
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 16.969643115997314 seconds
+Ratio of wall time to simulation time: 0.16969643115997315
 </pre></div>
 </div>
 </div>
 </div>
 </section>
 <section id="visualizing-the-final-3d-positions-of-particles">
-<h2>Visualizing the Final 3D Positions of Particles<a class="headerlink" href="#visualizing-the-final-3d-positions-of-particles" title="Permalink to this heading">#</a></h2>
+<h2>Visualizing the Final 3D Positions of Particles<a class="headerlink" href="#visualizing-the-final-3d-positions-of-particles" title="Link to this heading">#</a></h2>
 <p>In the final step of our analysis, we focus on visualizing the 3D positions of the particles at the end of the simulation. To accurately represent the final state, we will exclude particles that have effectively zero mass, as these have merged with other particles during the coalescence process. This visualization will provide us with an insightful view of the particle distribution and the results of the dynamic interactions that have occurred throughout the simulation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -802,12 +809,12 @@ Ratio of wall time to simulation time: 0.15735045671463013
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 64
 </pre></div>
 </div>
-<img alt="../../_images/baf822ddf3fc6b4858d6a28ed0b150e60a97398cb5eeb4d3a2ddcd25ed03e939.png" src="../../_images/baf822ddf3fc6b4858d6a28ed0b150e60a97398cb5eeb4d3a2ddcd25ed03e939.png" />
+<img alt="../../_images/f3d766682b0d3e6f8134572eae30fff598d000e1861defed08a55352d95f56bc.png" src="../../_images/f3d766682b0d3e6f8134572eae30fff598d000e1861defed08a55352d95f56bc.png" />
 </div>
 </div>
 </section>
 <section id="analyzing-the-mass-distribution-of-particles">
-<h2>Analyzing the Mass Distribution of Particles<a class="headerlink" href="#analyzing-the-mass-distribution-of-particles" title="Permalink to this heading">#</a></h2>
+<h2>Analyzing the Mass Distribution of Particles<a class="headerlink" href="#analyzing-the-mass-distribution-of-particles" title="Link to this heading">#</a></h2>
 <p>Next, we turn our attention to understanding how the mass distribution of the particles has evolved over the course of the simulation. To achieve this, we will analyze the mass data normalized by the initial MASS value. This normalization allows us to observe changes in the mass distribution as multiples of the initial mass, providing insights into the extent of coalescence and mass variation among the particles.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -845,39 +852,39 @@ Ratio of wall time to simulation time: 0.15735045671463013
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/e1ef362feed676e530411324e0f44febd03f2c81042375be7c8a26b0e8f33a0a.png" src="../../_images/e1ef362feed676e530411324e0f44febd03f2c81042375be7c8a26b0e8f33a0a.png" />
+<img alt="../../_images/b152d1a4867ffef13017ed5e979fcbadb72ebfb5de1b4d5228483cc3b4be9ded.png" src="../../_images/b152d1a4867ffef13017ed5e979fcbadb72ebfb5de1b4d5228483cc3b4be9ded.png" />
 </div>
 </div>
 </section>
 <section id="summary-of-the-lagrangian-particle-simulation">
-<h2>Summary of the Lagrangian Particle Simulation<a class="headerlink" href="#summary-of-the-lagrangian-particle-simulation" title="Permalink to this heading">#</a></h2>
+<h2>Summary of the Lagrangian Particle Simulation<a class="headerlink" href="#summary-of-the-lagrangian-particle-simulation" title="Link to this heading">#</a></h2>
 <p>In this Jupyter Notebook, we have explored the dynamics of a Lagrangian particle system within a defined cubic space. Our focus has been on simulating and analyzing the interactions and evolution of particles under a set of initial conditions and physical laws. Here is a brief overview of what we covered:</p>
 <section id="system-definition-and-initialization">
-<h3>System Definition and Initialization<a class="headerlink" href="#system-definition-and-initialization" title="Permalink to this heading">#</a></h3>
+<h3>System Definition and Initialization<a class="headerlink" href="#system-definition-and-initialization" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>We began by defining the simulation space and initial conditions for our particle system. This included setting parameters such as the number of particles, mass, and dimensions of the cubic space, as well as initializing the positions and velocities of the particles.</p></li>
 </ul>
 </section>
 <section id="simulation-process">
-<h3>Simulation Process<a class="headerlink" href="#simulation-process" title="Permalink to this heading">#</a></h3>
+<h3>Simulation Process<a class="headerlink" href="#simulation-process" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>The core of our simulation involved a series of iterative steps to simulate particle dynamics. These steps included checking boundary conditions, calculating distances, detecting and handling collisions, coalescing particles, applying forces, and integrating the equations of motion.</p></li>
 </ul>
 </section>
 <section id="data-saving-and-analysis">
-<h3>Data Saving and Analysis<a class="headerlink" href="#data-saving-and-analysis" title="Permalink to this heading">#</a></h3>
+<h3>Data Saving and Analysis<a class="headerlink" href="#data-saving-and-analysis" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Throughout the simulation, we saved key data points, such as the position and mass of particles at specified intervals. This allowed us to track and analyze the changes in the system over time.</p></li>
 </ul>
 </section>
 <section id="visualization-and-interpretation">
-<h3>Visualization and Interpretation<a class="headerlink" href="#visualization-and-interpretation" title="Permalink to this heading">#</a></h3>
+<h3>Visualization and Interpretation<a class="headerlink" href="#visualization-and-interpretation" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>We utilized various visualization techniques to interpret the simulation results. This included creating 3D plots to visualize the final positions of particles and histograms to analyze the distribution of mass at different stages of the simulation.</p></li>
 </ul>
 </section>
 <section id="insights-gained">
-<h3>Insights Gained<a class="headerlink" href="#insights-gained" title="Permalink to this heading">#</a></h3>
+<h3>Insights Gained<a class="headerlink" href="#insights-gained" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>The simulation provided valuable insights into the behavior of particles in a Lagrangian framework. We observed how particles interact, coalesce, and evolve over time under the influence of set physical parameters and forces.</p></li>
 </ul>
@@ -989,7 +996,7 @@ By particula contributors
 
   <p class="copyright">
     
-      © Copyright 2022.
+      © Copyright 2023.
       <br/>
     
   </p>
@@ -1013,8 +1020,8 @@ By particula contributors
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
   </footer>
