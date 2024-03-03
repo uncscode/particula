@@ -3,6 +3,7 @@
 
 from typing import Union, Tuple, Any, List, Dict
 import numpy as np
+from numpy.typing import NDArray
 
 
 def coerce_type(data, dtype):
@@ -19,10 +20,10 @@ def coerce_type(data, dtype):
 
 def round_arbitrary(
         values: Union[float, list[float], np.ndarray],
-        base: float = 1.0,
+        base: Union[float, np.float64] = 1.0,
         mode: str = 'round',
         nonzero_edge: bool = False
-) -> Union[float, list[float]]:
+) -> Union[float, NDArray[np.float64]]:
     """
     Rounds the input values to the nearest multiple of the base.
 
@@ -43,7 +44,7 @@ def round_arbitrary(
         rounded: The rounded values.
     """
     # Check if values is a NumPy array
-    values = coerce_type(values, np.ndarray)
+    working_values = coerce_type(values, np.ndarray)
     base = coerce_type(base, float)
 
     # Validate base parameter
@@ -58,7 +59,7 @@ def round_arbitrary(
 
     # Compute rounded values
     rounded = base * np.round(
-        values / base
+        working_values / base
         + factor[
             np.array(
                 ['floor', 'round', 'ceil']
@@ -68,9 +69,9 @@ def round_arbitrary(
 
     # Apply round_nonzero mode
     if nonzero_edge:
-        rounded = np.where(rounded != 0, rounded, values)
+        rounded = np.where(rounded != 0, rounded, working_values)
 
-    return rounded.tolist() if isinstance(values, list) else rounded
+    return float(rounded) if isinstance(values, float) else rounded
 
 
 def radius_diameter(value: float, to_diameter: bool = True) -> float:
@@ -90,7 +91,10 @@ def radius_diameter(value: float, to_diameter: bool = True) -> float:
     return value * 2 if to_diameter else value / 2
 
 
-def volume_to_length(volume: float, length_type: str = 'radius') -> float:
+def volume_to_length(
+        volume: Union[float, NDArray[np.float64]],
+        length_type: str = 'radius'
+) -> Union[float, NDArray[np.float64]]:
     """
     Convert a volume to a radius or diameter.
 
@@ -113,7 +117,8 @@ def volume_to_length(volume: float, length_type: str = 'radius') -> float:
     return radius if length_type == 'radius' else radius * 2
 
 
-def length_to_volume(length: float, length_type: str = 'radius') -> float:
+def length_to_volume(length: Union[float, np.ndarray],
+                     length_type: str = 'radius') -> Union[float, np.ndarray]:
     """
     Convert radius or diameter to volume.
 
@@ -128,17 +133,17 @@ def length_to_volume(length: float, length_type: str = 'radius') -> float:
         The volume.
     """
     if length_type == 'diameter':
-        length /= 2
+        length = length / 2
     elif length_type != 'radius':
         raise ValueError('length_type must be radius or diameter')
     return (4 / 3) * np.pi * (length**3)
 
 
 def kappa_volume_solute(
-    volume_total: float,
-    kappa: float,
-    water_activity: float
-) -> np.ndarray:
+    volume_total: Union[float, np.ndarray],
+    kappa: Union[float, np.ndarray],
+    water_activity: Union[float, np.ndarray]
+) -> Union[float, np.ndarray]:
     """
     Calculate the volume of solute in a volume of total solution,
     given the kappa parameter and water activity.
@@ -155,6 +160,8 @@ def kappa_volume_solute(
     """
 
     kappa = max(kappa, 1e-16)  # Avoid division by zero
+    if water_activity <= 1e-16:  # early return for low water activity
+        return volume_total
 
     vol_factor = (water_activity - 1) / (
         water_activity * (1 - kappa - 1 / water_activity)
@@ -163,10 +170,10 @@ def kappa_volume_solute(
 
 
 def kappa_volume_water(
-    volume_solute: float,
-    kappa: float,
-    water_activity: float
-) -> float:
+    volume_solute: Union[float, NDArray[np.float64]],
+    kappa: Union[float, NDArray[np.float64]],
+    water_activity: Union[float, NDArray[np.float64]]
+) -> Union[float, NDArray[np.float64]]:
     """
     Calculate the volume of water given volume of solute, kappa parameter,
     and water activity.
@@ -184,14 +191,17 @@ def kappa_volume_water(
     # Avoid division by zero
     water_activity = min(water_activity, 1 - 1e-16)
 
+    if water_activity <= 1e-16:  # early return for low water activity
+        return volume_solute*0
+
     return volume_solute * kappa / (1 / water_activity - 1)
 
 
 def kappa_from_volume(
-    volume_solute: float,
-    volume_water: float,
-    water_activity: float
-) -> float:
+    volume_solute: Union[float, np.ndarray],
+    volume_water: Union[float, np.ndarray],
+    water_activity: Union[float, np.ndarray]
+) -> Union[float, np.ndarray]:
     """
     Calculate the kappa parameter from the volume of solute and water,
     given the water activity.

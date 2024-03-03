@@ -23,7 +23,7 @@ def mean_properties(
     """
     Calculates the mean properties of the size distribution.
 
-    Parameters
+    Args
     ----------
     sizer_dndlogdp : List[float]
         Concentration of particles in each bin.
@@ -120,7 +120,7 @@ def sizer_mean_properties(
     Calculates the mean properties of the size distribution, and returns a
     stream.
 
-    Parameters
+    Args
     ----------
     stream : Stream
         The stream to process.

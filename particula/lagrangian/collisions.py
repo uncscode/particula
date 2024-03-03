@@ -20,7 +20,7 @@ def find_collisions(
     distance threshold (<0), indicating a collision.
     It filters out pairs involving particles with zero mass.
 
-    Parameters:
+    Args:
     distance_matrix (torch.Tensor): A 2D tensor containing the pairwise
         distances between particles.
     indices (torch.Tensor): A 1D tensor containing the indices of the
@@ -81,7 +81,7 @@ def coalescence(
     handling, and then updates the mass and velocity of colliding particles
     according to the conservation of mass and momentum.
 
-    Parameters:
+    Args:
     position (torch.Tensor): A 2D tensor of shape [n_dimensions, n_particles]
         representing the positions of particles.
     velocity (torch.Tensor): A 2D tensor of shape [n_dimensions, n_particles]
@@ -142,7 +142,7 @@ def elastic_collision(
     Update velocities of particles based on elastic collision pairs using
     matrix operations, conserving kinetic energy and momentum.
 
-    Parameters:
+    Args:
     velocity (torch.Tensor): A 2D tensor of shape [n_dimensions, n_particles]
         representing the velocities of particles.
     mass (torch.Tensor): A 1D tensor containing the mass of each particle.

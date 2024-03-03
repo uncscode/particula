@@ -424,7 +424,7 @@ def sizer_data_formatter(
     """
     Formats data from a particle sizer.
 
-    Parameters
+    Args
     ----------
     data : List[str]
         The data to be formatted.
@@ -597,7 +597,7 @@ def save_lake(
     """
     Save lake object as a pickle file.
 
-    Parameters
+    Args
     ----------
     data_lake : DataLake
         DataLake object to be saved.
@@ -626,7 +626,7 @@ def load_lake(path: str, sufix_name: Optional[str] = None) -> object:
     """
     Load datalake object from a pickle file.
 
-    Parameters
+    Args
     ----------
     path : str
         Path to load pickle file.

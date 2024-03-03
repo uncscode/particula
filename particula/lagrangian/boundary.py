@@ -14,7 +14,7 @@ def wrapped_cube(
     at zero. If a particle is way outside the cube, it is wrapped around to
     the opposite side of the cube.
 
-    Parameters:
+    Args:
     - position (torch.Tensor): A tensor representing positions that might
         exceed the domain boundaries. [3, num_particles]
     - cube_side (float): The cube side length of the domain.
