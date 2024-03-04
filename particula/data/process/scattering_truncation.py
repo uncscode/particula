@@ -1,7 +1,4 @@
 """Scattering Truncation Correction Functions"""
-# pyright: reportReturnType=false, reportAssignmentType=false
-# pyright: reportIndexIssue=false
-# pyright: reportArgumentType=false, reportOperatorIssue=false
 # pylint: disable=too-many-arguments, too-many-locals
 
 from typing import Union, Tuple
