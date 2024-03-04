@@ -110,6 +110,7 @@ def load_files_interface(
         path: str,
         settings: dict,
         stream: Optional[Stream] = None,
+        sub_sample: Optional[int] = None,
 ) -> Stream:
     """
     Load files into a stream object based on settings.
@@ -125,6 +126,8 @@ def load_files_interface(
     stream : Stream, optional
         An instance of Stream class to be updated with loaded data. Defaults
         to a new Stream object.
+    sub_sample: int, optional
+        sub-sample only the first n files. Defaults to None.
 
     Returns:
     -------
@@ -143,6 +146,8 @@ def load_files_interface(
         import_settings=settings,
         loaded_list=stream.files
     )
+    # sub sample the file list
+    full_paths = full_paths[:sub_sample] if sub_sample else full_paths
 
     # load the data type
     for file_i, file_path in enumerate(full_paths):

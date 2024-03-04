@@ -108,7 +108,8 @@ def filtering(
     invert: Optional[bool] = False,
     clone: Optional[bool] = True,
     replace_with: Optional[Union[float, int]] = None,
-    drop: Optional[bool] = True,
+    drop: Optional[bool] = False,
+    header: Optional[Union[list, int, str]] = None
 ) -> Stream:
     """
     Filters the data of the given 'stream' object based on the specified
@@ -134,6 +135,9 @@ def filtering(
         Defaults to None.
     - drop (bool, optional): If True, filtered-out data points are dropped
         from the dataset. Defaults to False.
+    - header (list, optional): The header of the data to filter on. This can
+        same as calling Stream['header']
+        Defaults to None.
 
     Returns:
     - Stream: The 'stream' object with data filtered as specified.
@@ -147,9 +151,11 @@ def filtering(
     # copy of stream object to avoid modifying original
     if clone:
         stream = copy.copy(stream)
+    # Get the data to be filtered
+    data_is = stream[header] if header is not None else stream.data
     # Create a mask for the data that should be retained or replaced
     mask = stats.mask_outliers(
-        data=stream.data,
+        data=data_is,
         bottom=bottom,
         top=top,
         value=value,
@@ -157,7 +163,7 @@ def filtering(
     )
     if drop and replace_with is None:
         # Apply mask to data and time, dropping filtered values
-        # if any rows are then drop that whole column
+        # if any rows are then drop that whole row
         mask_sum = np.invert(np.sum(np.invert(mask), axis=1) > 0)
         stream = drop_masked(stream, mask_sum)
     elif replace_with is not None:
