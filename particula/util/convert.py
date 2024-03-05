@@ -596,3 +596,41 @@ def distribution_convert_pdf_pms(
     # Converting PDF to PMS by multiplying the PDF values by the bin widths.
     return distribution / delta_x_array if to_pdf \
         else distribution * delta_x_array
+
+
+def convert_concentration_scale(
+    concentration: np.ndarray,
+    diameters: np.ndarray,
+    input_scale: str,
+    output_scale: str
+) -> np.ndarray:
+    """
+    Convert the concentration scale of a particle size distribution
+    between specified scales.
+
+    Args:
+        concentration (np.ndarray): The concentration values to convert.
+        diameters (np.ndarray): The diameters corresponding to the
+        concentration values.
+        input_scale (str): The initial concentration scale
+        output_scale (str): The target concentration scale
+            options ('dn/dlogdp', 'dn', 'pms', 'pdf').
+    Returns:
+        np.ndarray: The concentration converted to the target scale.
+    """
+    # replace dn with pms
+    output_scale = 'pms' if output_scale == 'dn' else output_scale
+    input_scale = 'pms' if input_scale == 'dn' else input_scale
+
+    # You'll need to adjust it based on the actual conversion functions
+    # available in your code.
+    if input_scale == output_scale:
+        # No conversion needed if scales are the same
+        return concentration
+    elif input_scale == 'dn/dlogdp' and output_scale == 'pms':
+        return convert_sizer_dn(diameters, concentration, inverse=False)
+    elif input_scale == 'pms' and output_scale == 'dn/dlogdp':
+        return convert_sizer_dn(diameters, concentration, inverse=True)
+    else:
+        raise ValueError(
+            f"Unsupported conversion from {input_scale} to {output_scale}")

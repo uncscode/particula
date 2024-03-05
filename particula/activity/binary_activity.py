@@ -11,7 +11,7 @@ from typing import Optional, Union, Tuple
 from numpy.typing import ArrayLike
 import numpy as np
 
-from particula.activity.machine_limit import safe_exp
+from particula.util.machine_limit import safe_exp
 from particula.activity import phase_separation
 from particula.activity.species_density import organic_density_estimate
 

@@ -1,6 +1,6 @@
 """Calculates the Gibbs free energy of mixing for a binary solution."""
 
-from particula.activity.machine_limit import safe_log
+from particula.util.machine_limit import safe_log
 
 
 def gibbs_free_engery(
