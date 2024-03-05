@@ -1,5 +1,6 @@
 """File readers and loaders for datacula."""
 
+from typing import Union, List
 from typing import List, Union, Tuple, Dict, Any, Optional
 import warnings
 import glob
@@ -12,6 +13,7 @@ import pandas as pd
 from particula.util import convert
 from particula.util.time_manage import time_str_to_epoch
 from particula.data.lake import Lake
+from particula.data.stream import Stream
 
 FILTER_WARNING_FRACTION = 0.5
 
@@ -409,6 +411,40 @@ def general_data_formatter(
     return epoch_time, data_array
 
 
+def keyword_to_index(keyword: Union[str, int], header: List[str]) -> int:
+    """
+    Convert a keyword indicating a position in the header to its index.
+
+    This function takes a keyword which can be either an integer index or
+    a string representing the column name. If the keyword is an integer,
+    it's assumed to directly represent the index. If it's a string, the
+    function searches for the keyword in the header list and returns its index.
+
+    Args:
+        keyword (Union[str, int]):
+            The keyword representing the column's position in the header.
+            It can be an integer index or a string for the column name.
+        header (List[str]): The list of column names (header) of the data.
+
+    Returns:
+        int: The index of the column in the header.
+
+    Raises:
+        ValueError:
+            If the keyword is a string and is not found in the header,
+            or if the keyword is an integer but out of range of the header.
+    """
+    if isinstance(keyword, int):
+        if keyword < 0 or keyword >= len(header):
+            raise ValueError(
+                f"Index {keyword} is out of range for the header.")
+        return keyword
+    elif keyword in header:
+        return header.index(keyword)
+    else:
+        raise ValueError(f"Cannot find '{keyword}' in header {header[:20]}...")
+
+
 def sizer_data_formatter(
     data: List[str],
     data_checks: Dict[str, Any],
@@ -450,29 +486,24 @@ def sizer_data_formatter(
     Tuple[np.ndarray, List(str) np.ndarray, np.ndarray]
         A tuple containing the epoch time, the Dp header, and the data arrays.
     """
-
-    # Get Dp range and columns
+    # Split header data using the provided delimiter
     data_header = data[header_row].split(delimiter)
-    # check if start and end keywords are in the header
-    if data_sizer_reader["Dp_start_keyword"] not in data_header:
-        # rise error with snip of data header
+    # Convert start and end keywords to indices
+    dp_start_index = keyword_to_index(
+        data_sizer_reader["Dp_start_keyword"], data_header)
+    dp_end_index = keyword_to_index(
+        data_sizer_reader["Dp_end_keyword"], data_header)
+
+    # Ensure dp_start_index and dp_end_index are within valid range
+    if dp_start_index > dp_end_index:
         raise ValueError(
-            f"Cannot find '{data_sizer_reader['Dp_start_keyword']}' in header"
-            + f" {data_header[:20]}..."
-        )
-    if data_sizer_reader["Dp_end_keyword"] not in data_header:
-        # rise error with snip of data header
-        raise ValueError(
-            f"Cannot find '{data_sizer_reader['Dp_end_keyword']}' in header"
-            + f" {data_header[:20]}..."
-        )
-    dp_range = [
-        data_header.index(data_sizer_reader["Dp_start_keyword"]),
-        data_header.index(data_sizer_reader["Dp_end_keyword"])
-    ]
-    dp_columns = list(range(dp_range[0], dp_range[1] + 1))  # +1 to include end
+            "Dp_start_keyword must come before Dp_end_keyword in the header")
+    # Generate the range of column indices to include
+    dp_columns = list(
+        range(dp_start_index, dp_end_index + 1)
+        )  # +1 to include the end index
+    # Extract headers for the specified range
     header = [data_header[i] for i in dp_columns]
-    # change from np.array
 
     # Format data
     data = data_format_checks(data, data_checks)
@@ -590,10 +621,80 @@ def get_files_in_folder_with_size(
     return file_list, full_path, file_size_in_bytes
 
 
+def save_stream(
+    path: str,
+    stream: Stream,
+    sufix_name: Optional[str] = None,
+    folder: Optional[str] = 'output'
+) -> None:
+    """
+    Save stream object as a pickle file.
+    
+    Args
+    ----------
+    stream : Stream
+        Stream object to be saved.
+    path : str
+        Path to save pickle file.
+    sufix_name : str, optional
+        Suffix to add to pickle file name. The default is None.
+    """
+    # create output folder if it does not exist
+    output_folder = os.path.join(path, folder)
+    os.makedirs(output_folder, exist_ok=True)
+
+    # add suffix to file name if present
+    file_name = f'stream{sufix_name}.pk' \
+        if sufix_name is not None else 'stream.pk'
+    # path to save pickle file
+    file_path = os.path.join(output_folder, file_name)
+
+    # save stream
+    with open(file_path, 'wb') as file:
+        pickle.dump(stream, file)
+    print(f"Stream saved: {file_name}")
+
+
+def load_stream(
+    path: str,
+    sufix_name: Optional[str] = None,
+    folder: Optional[str] = 'output'
+) -> Stream:
+    """
+    Load stream object from a pickle file.
+    
+    Args
+    ----------
+    path : str
+        Path to load pickle file.
+    sufix_name : str, optional
+        Suffix to add to pickle file name. The default is None.
+    folder : str, optional
+        Folder to load pickle file from. The default is 'output'.
+    
+    Returns
+    -------
+    Stream
+        Loaded Stream object.
+    """
+    file_name = f'stream{sufix_name}.pk' \
+        if sufix_name is not None else 'stream.pk'
+    # path to load pickle file
+    file_path = os.path.join(path, folder, file_name)
+
+    # load stream
+    with open(file_path, 'rb') as file:
+        stream = pickle.load(file)
+
+    return stream
+
+
 def save_lake(
-        path: str,
-        lake: Lake,
-        sufix_name: Optional[str] = None):
+    path: str,
+    lake: Lake,
+    sufix_name: Optional[str] = None,
+    folder: Optional[str] = 'output'
+) -> None:
     """
     Save lake object as a pickle file.
 
@@ -608,21 +709,25 @@ def save_lake(
     """
     print('Saving lake...')
     # create output folder if it does not exist
-    output_folder = os.path.join(path, 'output')
+    output_folder = os.path.join(path, folder)
     os.makedirs(output_folder, exist_ok=True)
 
     # add suffix to file name if present
-    file_name = f'lake_{sufix_name}.pk' if sufix_name is not None else 'lake.pk'
+    file_name = f'lake{sufix_name}.pk' \
+        if sufix_name is not None else 'lake.pk'
     # path to save pickle file
     file_path = os.path.join(output_folder, file_name)
 
     # save datalake
     with open(file_path, 'wb') as file:
         pickle.dump(lake, file)
-    print('Lake saved')
+    print(f"Lake saved: {file_name}")
 
 
-def load_lake(path: str, sufix_name: Optional[str] = None) -> object:
+def load_lake(
+    path: str,
+    sufix_name: Optional[str] = None
+) -> Lake:
     """
     Load datalake object from a pickle file.
 
@@ -636,7 +741,8 @@ def load_lake(path: str, sufix_name: Optional[str] = None) -> object:
     data_lake : DataLake
         Loaded DataLake object.
     """
-    file_name = f'lake_{sufix_name}.pk' if sufix_name is not None else 'lake.pk'
+    file_name = f'lake{sufix_name}.pk' \
+        if sufix_name is not None else 'lake.pk'
     # path to load pickle file
     file_path = os.path.join(path, 'output', file_name)
 
@@ -647,7 +753,6 @@ def load_lake(path: str, sufix_name: Optional[str] = None) -> object:
     return lake
 
 
-# pylint: disable-all
 def netcdf_get_epoch_time(
         file_path: str,
         settings: dict
@@ -679,7 +784,6 @@ def netcdf_get_epoch_time(
     return epoch_time
 
 
-# pylint: disable-all
 def netcdf_data_1d_load(
         file_path: str,
         settings: dict

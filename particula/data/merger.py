@@ -179,5 +179,5 @@ def stream_add_data(
         # sort the time stream
         sorted_time_index = np.argsort(stream.time)
         stream.time = stream.time[sorted_time_index]
-        stream.data = stream.data[:, sorted_time_index]
+        stream.data = stream.data[sorted_time_index, :]
     return stream
