@@ -5,6 +5,7 @@ merge distributions."""
 
 from typing import Optional, List, Tuple
 
+import copy
 from math import pi
 import numpy as np
 from scipy.stats.mstats import gmean
@@ -369,15 +370,15 @@ def iterate_merge_distributions(
     """
     # Iterate over all columns in the concentration datastream
     merged_2d_list = []
-    for i in range(concentration_lower.shape[1]):
+    for i in range(concentration_lower.shape[0]):
         # Get the current column of the lower concentration distribution
-        concentration_lower_col = concentration_lower[:, i]
+        concentration_lower_col = concentration_lower[i, :]
 
         # Merge the current column of the lower and upper concentration
         merged_2d, merged_diameter = merge_distributions(
             concentration_lower_col,
             diameters_lower,
-            concentration_upper[:, i],
+            concentration_upper[i, :],
             diameters_upper
         )
 
@@ -385,7 +386,7 @@ def iterate_merge_distributions(
         merged_2d_list.append(merged_2d)
 
     # Combine the merged concentration distributions into a single array
-    merged_2d_array = np.column_stack(merged_2d_list)
+    merged_2d_array = np.row_stack(merged_2d_list)
 
     # Return the merged diameter distribution and the merged concentration
     return merged_diameter, merged_2d_array
@@ -429,3 +430,85 @@ def merge_size_distribution(
         data=merged_2d,
         time=stream_lower.time,
     )
+
+
+def resample_distribution(
+    stream: Stream,
+    new_diameters: np.ndarray,
+    concentration_scale: str = 'dn/dlogdp',
+    clone: bool = False,
+) -> Stream:
+    """
+    Resample a particle size distribution to a new set of diameters.
+    Using np interpolation, and extrapolation is nan.
+
+    Args:
+    stream: (Stream)
+        The stream to resample.
+    new_diameters: (np.ndarry)
+        The new diameters to resample to.
+    concentration_scale: (str)
+        The concentration scale of the distribution. Either, 'dn/dlogdp',
+        'dn', 'pms' (which is dn), or 'pdf'.
+
+    Returns:
+    Stream: The resampled stream.
+    """
+    # copy of stream object to avoid modifying original
+    if clone:
+        stream = copy.copy(stream)
+    # old data
+    concentration = stream.data
+    diameters = stream.header_float
+    # new data placeholder
+    new_concentration = np.zeros((concentration.shape[0], len(new_diameters)))
+
+    # convert to dn
+    if concentration_scale == 'dn/dlogdp':
+        concentration = convert.convert_sizer_dn(
+            diameter=diameters,
+            dn_dlogdp=concentration,
+            inverse=False,
+        )
+    # convert to pdf
+    if concentration_scale == 'dn' or concentration_scale == 'pms':
+        concentration_pdf = convert.distribution_convert_pdf_pms(
+            x_array=diameters,
+            distribution=concentration,
+            to_pdf=True,
+        )
+
+    # resample the pdf
+    for i, row in enumerate(concentration_pdf):
+        is_nan = np.isnan(row)  # nan mask
+        new_concentration[i, :] = np.interp(
+            new_diameters,
+            diameters[~is_nan],
+            row[~is_nan],
+            left=np.nan,
+            right=np.nan,
+        )
+
+    # assemble the stream
+    stream.data = new_concentration
+    stream.header = new_diameters.astype(str)
+
+    # if pdf then early return
+    if concentration_scale == 'pdf':
+        return stream
+    # if pms or dn or dn/dlogdpthen convert to pms
+    stream.data = convert.distribution_convert_pdf_pms(
+        x_array=stream.data,
+        distribution=stream.header_float,
+        to_pdf=False,
+    )
+    if concentration_scale == 'pms' or concentration_scale == 'dn':
+        return stream
+
+    # convert to dn/dlogdp
+    stream.data = convert.convert_sizer_dn(
+        diameter=stream.data,
+        dn_dlogdp=stream.header_float,
+        inverse=True,
+    )
+    return stream

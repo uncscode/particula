@@ -14,7 +14,7 @@ from typing import Union
 from numpy.typing import ArrayLike
 import numpy as np
 
-from particula.activity.machine_limit import safe_exp, safe_log
+from particula.util.machine_limit import safe_exp, safe_log
 
 MIN_SPREAD_IN_AW = 10**-6
 Q_ALPHA_AT_1PHASE_AW = 0.99
