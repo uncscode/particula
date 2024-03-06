@@ -78,12 +78,17 @@ class DNdlogDPtoPDFConversionStrategy(ConversionStrategy):
 
     def convert(self, diameters: np.ndarray, concentration: np.ndarray,
                 inverse: bool = False) -> np.ndarray:
-        # First converts dn/dlogdp to PMS or the inverse, then to PDF or back
-        # to dn/dlogdp
+        # if the inverse, then to PDF to dn/dlogdp
+        if inverse:
+            concentration_pms = convert.distribution_convert_pdf_pms(
+                diameters, concentration, to_pdf=False)
+            return convert.convert_sizer_dn(
+                diameters, concentration_pms, inverse=True)
+        # if not inverse, then dn/dlogdp to PDF
         concentration_pms = convert.convert_sizer_dn(
-            diameters, concentration, inverse=~inverse)
+            diameters, concentration, inverse=False)
         return convert.distribution_convert_pdf_pms(
-            diameters, concentration_pms, to_pdf=~inverse)
+            diameters, concentration_pms, to_pdf=True)
 
 
 class Converter:
