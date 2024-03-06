@@ -471,7 +471,7 @@ def resample_distribution(
             inverse=False,
         )
     # convert to pdf
-    if concentration_scale == 'dn' or concentration_scale == 'pms':
+    if concentration_scale in ('dn', 'pms'):
         concentration_pdf = convert.distribution_convert_pdf_pms(
             x_array=diameters,
             distribution=concentration,
@@ -502,7 +502,7 @@ def resample_distribution(
         distribution=stream.header_float,
         to_pdf=False,
     )
-    if concentration_scale == 'pms' or concentration_scale == 'dn':
+    if concentration_scale in ('dn', 'pms'):
         return stream
 
     # convert to dn/dlogdp

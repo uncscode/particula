@@ -1,5 +1,5 @@
 """Converts between different size distribution formats
-written with composition in mind and using a factory pattern
+written with composition in mind and using a factory pattern.
 
 Converter does not inherit from different classes for different conversion
 behaviors. Instead, it composes its behavior by holding a ConversionStrategy
