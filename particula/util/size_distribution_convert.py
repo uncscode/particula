@@ -122,12 +122,15 @@ class Converter:
 def get_conversion_strategy(input_scale: str,
                             output_scale: str) -> ConversionStrategy:
     """Factory function to create and return an appropriate conversion
-    strategy based on input and output scales.
+    strategy based on input and output scales. Use the inverse flag in the
+    converter to invert the directions of the input and output scales.
 
     Args:
         input_scale (str): The scale of the input concentration values.
+            Either 'dn/dlogdp' or 'pms'.
         output_scale (str): The desired scale of the output concentration
-        values.
+        values. Either 'pms' or 'pdf'. Use inverse flag to invert the input
+        and output scales.
 
     Returns:
         ConversionStrategy: A strategy object capable of converting between
