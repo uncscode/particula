@@ -32,8 +32,7 @@ class ConversionStrategy:
                 diameters: np.ndarray,
                 concentration: np.ndarray,
                 inverse: bool = False) -> np.ndarray:
-        """Placeholder for the converter method that should be overridden by
-        subclasses.
+        """Converter method common interface, for subclasses.
 
         Args:
             diameters (np.ndarray): The particle diameters.
@@ -69,7 +68,7 @@ class PMStoPDFConversionStrategy(ConversionStrategy):
                 inverse: bool = False) -> np.ndarray:
         # Converts to PDF or back to PMS based on the inverse flag
         return convert.distribution_convert_pdf_pms(
-            diameters, concentration, to_pdf=~inverse)
+            diameters, concentration, to_pdf=not inverse)
 
 
 class DNdlogDPtoPDFConversionStrategy(ConversionStrategy):
