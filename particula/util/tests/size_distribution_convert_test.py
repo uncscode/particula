@@ -3,7 +3,7 @@ import numpy as np
 
 
 from particula.util.size_distribution_convert import (
-    Converter,
+    SizerConverter,
     get_conversion_strategy,
     DNdlogDPtoPMSConversionStrategy,
     PMStoPDFConversionStrategy,
@@ -59,7 +59,7 @@ def test_dndlogdp_to_pdf_conversion_strategy():
 def test_converter():
     """Test the Converter class."""
     strategy = DNdlogDPtoPMSConversionStrategy()
-    converter = Converter(strategy)
+    converter = SizerConverter(strategy)
     diameters = np.array([1, 2, 3])
     concentration = np.array([0.1, 0.2, 0.3])
     expected = np.array([0.04771213, 0.04436975, 0.04383841])
