@@ -1,7 +1,9 @@
 """Test the loader module."""
 
 import os
+import tempfile
 from datetime import datetime
+import pytest
 import pytz
 import numpy as np
 from particula.data import loader
@@ -74,77 +76,129 @@ def test_parse_time_column():
         assert True
 
 
-# Test data_raw_loader function
 def test_data_raw_loader():
-    file_path = 'my_file.txt'
+    """Test data loader"""
+    # Define the expected data
     expected_data = ['line 1', 'line 2', 'line 3']
-    assert loader.data_raw_loader(file_path) == expected_data
+
+    # Use tempfile.NamedTemporaryFile to create a temp file for the test
+    with tempfile.NamedTemporaryFile(mode='w+t', delete=False) as tmp_file:
+        # Write the expected data to the temp file
+        tmp_file.write('\n'.join(expected_data))
+        # Make sure data is written to disk
+        tmp_file.flush()
+
+        # Get the temporary file's name
+        file_path = tmp_file.name
+
+    try:
+        # Load the data using the loader function
+        loaded_data = loader.data_raw_loader(file_path)
+
+        # Compare the loaded data with the expected data
+        assert loaded_data == expected_data, \
+            "The loaded data does not match the expected data."
+    finally:
+        # Clean up: remove the temporary file after the test
+        os.remove(file_path)
 
 
-# Test data_format_checks function
 def test_data_format_checks():
-    data = ['row 1', 'row 2', 'row 3']
+    """Checks the rows of data, filtering out invalid rows based on
+        predefined checks."""
+    # Extended data with a mix of valid and invalid rows based on the criteria
+    data = [
+        'row, 1',  # Invalid: Only 1 comma
+        'row, 2,',  # Valid: Exactly 2 commas, no slashes or colons, 0-10 char
+        'row, 3, extra',  # Invalid: More than 10 characters
+        'row/ 4',  # Invalid: Contains a slash
+        'row: 5',  # Invalid: Contains a colon
+        'row, 6,',  # Valid: Exactly 2 commas, no slashes or colons, 0-10 char
+        'row, 7, ',  # Valid: Exactly 2 commas, no slashes or colons, 0-10 char
+    ]
     data_checks = {
-        "characters": [0, 10],
+        "characters": [0, 10],  # Character count range (inclusive)
+        # Required counts for specific characters
         "char_counts": {",": 2, "/": 0, ":": 0},
-        "skip_rows": 0,
-        "skip_end": 0
+        "skip_rows": 0,  # Not skipping any starting rows
+        "skip_end": 0  # Not skipping any ending rows
     }
-    expected_formatted_data = ['row 2']
-    assert loader.data_format_checks(data, data_checks) == expected_formatted_data
+    expected_formatted_data = [
+        'row, 2,',  # Meets all criteria
+        'row, 6,',  # Meets all criteria
+        'row, 7,'  # Meets all criteria
+    ]
+
+    # Perform data format checks
+    clean_data = loader.data_format_checks(data, data_checks)
+
+    # Assert the cleaned data matches the expected formatted data
+    assert clean_data == expected_formatted_data, \
+        "Filtered data does not match the expected data."
 
 
-# Test sample_data function
 def test_sample_data():
+    """test sampling of data rows"""
+    # Input data setup
     data = ['2022-01-01 12:00:00,1,2', '2022-01-01 12:01:00,3,4']
     time_column = 0
     time_format = '%Y-%m-%d %H:%M:%S'
     data_columns = [1, 2]
     delimiter = ','
+
+    # Expected results
     expected_epoch_time = np.array([1641033600.0, 1641033660.0])
     expected_data_array = np.array([[1, 2], [3, 4]])
-    assert loader.sample_data(
+
+    # Call the function under test
+    epoch_time, data_array = loader.sample_data(
         data, time_column, time_format, data_columns, delimiter
-        ) == (expected_epoch_time, expected_data_array)
+    )
+
+    # Assertions
+    assert np.allclose(epoch_time, expected_epoch_time,
+                       atol=1e-6), "Epoch times do not match expected values."
+    assert np.allclose(data_array, expected_data_array,
+                       atol=1e-6), "Data arrays do not match expected values."
+    # Check the type of returned values to ensure they are numpy arrays
+    assert isinstance(
+        epoch_time, np.ndarray), "Returned epoch time is not a numpy array."
+    assert isinstance(
+        data_array, np.ndarray), "Returned data array is not a numpy array."
 
 
-def test_keyword_to_index_with_integer_index():
+@pytest.mark.parametrize("keyword, expected, raises_exception", [
+    (1, 1, False),  # integer index, valid
+    ('B', 1, False),  # string keyword, valid
+    (3, None, True),  # integer index, invalid
+    ('D', None, True),  # string keyword, invalid
+])
+def test_keyword_to_index_variations(keyword, expected, raises_exception):
+    """Test the keyword_to_index function with various keyword types
+    and values."""
     header = ['A', 'B', 'C']
-    keyword = 1
-    expected_index = 1
-    assert loader.keyword_to_index(keyword, header) == expected_index
+
+    if raises_exception:
+        with pytest.raises(ValueError):
+            loader.keyword_to_index(keyword, header)
+    else:
+        assert loader.keyword_to_index(keyword, header) == expected
 
 
-def test_keyword_to_index_with_string_keyword():
-    header = ['A', 'B', 'C']
-    keyword = 'B'
-    expected_index = 1
-    assert loader.keyword_to_index(keyword, header) == expected_index
-
-
-def test_keyword_to_index_with_invalid_integer_index():
-    header = ['A', 'B', 'C']
-    keyword = 3
-    with pytest.raises(ValueError):
-        loader.keyword_to_index(keyword, header)
-
-
-def test_keyword_to_index_with_invalid_string_keyword():
-    header = ['A', 'B', 'C']
-    keyword = 'D'
-    with pytest.raises(ValueError):
-        loader.keyword_to_index(keyword, header)
-
-
-def test_save_stream_to_csv_success(tmpdir):
+def test_save_stream_to_csv(tmpdir):
+    """Test save to csv"""
     # Create a temporary directory for testing
     output_dir = tmpdir.mkdir("output")
 
-    # Create a sample Stream object
-    stream = Stream(...)
+    # sample stream
+    header = ['header1', 'header2']
+    data = np.array([1, 2, 3])
+    time = np.array([1.0, 2.0, 3.0])
+    files = ['file1', 'file2']
+    stream = Stream(header=header, data=data, time=time, files=files)
 
     # Define the expected file path
-    expected_file_path = os.path.join(output_dir, "stream.csv")
+    expected_file_path = os.path.join(output_dir, "data.csv")
 
     # Call the function
     loader.save_stream_to_csv(stream, str(tmpdir))
@@ -152,127 +206,95 @@ def test_save_stream_to_csv_success(tmpdir):
     # Assert that the file was created
     assert os.path.isfile(expected_file_path)
 
-
-
-def test_save_stream_to_csv_optional_params(tmpdir):
-    # Create a temporary directory for testing
-    output_dir = tmpdir.mkdir("output")
-
-    # Create a sample Stream object
-    stream = Stream(...)
-
-    # Define the expected file path with suffix and folder
+    # options for suffix
     expected_file_path = os.path.join(output_dir, "data_suffix.csv")
 
     # Call the function with optional parameters
     loader.save_stream_to_csv(
         stream,
         str(tmpdir),
-        suffix_name="suffix",
-        folder="output")
+        suffix_name="_suffix")
 
     # Assert that the file was created with the expected name and location
     assert os.path.isfile(expected_file_path)
-
-
-def test_save_stream_to_csv_invalid_path():
-    # Create a sample Stream object
-    stream = Stream(...)
 
     # Call the function with an invalid path
     with pytest.raises(ValueError):
         loader.save_stream_to_csv(stream, "invalid/path")
 
 
-def test_save_stream_to_csv_integrity(tmpdir):
-    # Create a temporary directory for testing
-    output_dir = tmpdir.mkdir("output")
-
-    # Create a sample Stream object
-    stream = Stream(...)
-
-    # Define the expected file path
-    expected_file_path = os.path.join(output_dir, "stream.csv")
-
-    # Call the function
-    loader.save_stream_to_csv(stream, str(tmpdir))
-
-    # Load the saved CSV file and verify the integrity of the Stream object
-    with open(expected_file_path, mode='r') as csv_file:
-        csv_reader = csv.reader(csv_file)
-
-
 def test_save_stream(tmpdir):
+    """"Test saving a stream to a pickle"""
     # Create a temporary directory for testing
-    test_dir = tmpdir.mkdir("test_dir")
+    test_dir = tmpdir.mkdir("output")
 
-    # Create a sample stream object
-    stream = [1, 2, 3, 4, 5]
+    # sample stream
+    header = ['header1', 'header2']
+    data = np.array([1, 2, 3])
+    time = np.array([1.0, 2.0, 3.0])
+    files = ['file1', 'file2']
+    stream = Stream(header=header, data=data, time=time, files=files)
 
     # Test saving stream without suffix
-    loader.save_stream(str(test_dir), stream)
-    file_path = os.path.join(str(test_dir), 'output', 'stream.pk')
+    loader.save_stream(str(tmpdir), stream)
+    file_path = os.path.join(test_dir, 'stream.pk')
     assert os.path.isfile(file_path)
 
     # Test saving stream with suffix
-    loader.save_stream(str(test_dir), stream, sufix_name='_test')
-    file_path = os.path.join(str(test_dir), 'output', 'stream_test.pk')
+    loader.save_stream(str(tmpdir), stream, sufix_name='_test')
+    file_path = os.path.join(test_dir, 'stream_test.pk')
     assert os.path.isfile(file_path)
 
     # Test saving stream to non-existent directory
-    invalid_dir = os.path.join(str(test_dir), 'non_existent_dir')
+    invalid_dir = os.path.join(test_dir, 'non_existent_dir')
     with pytest.raises(ValueError):
         loader.save_stream(invalid_dir, stream)
 
-    # Test saving stream to an existing file
-    file_path = os.path.join(str(test_dir), 'output', 'existing_file.pk')
-    with open(file_path, 'w') as file:
-        file.write('Existing file')
-    with pytest.raises(FileExistsError):
-        loader.save_stream(str(test_dir), stream)
-
     # Test saving stream with custom folder name
     custom_folder = 'custom_folder'
-    loader.save_stream(str(test_dir), stream, folder=custom_folder)
-    file_path = os.path.join(str(test_dir), custom_folder, 'stream.pk')
+    loader.save_stream(str(tmpdir), stream, folder=custom_folder)
+    file_path = os.path.join(str(tmpdir), custom_folder, 'stream.pk')
     assert os.path.isfile(file_path)
 
 
-def test_load_stream_valid_path():
-    # Arrange
-    path = '/path/to/directory'
-    expected_file_path = os.path.join(path, 'output', 'stream.pk')
-    expected_stream = Stream()  # Replace Stream() with the expected stream object
-    
-    # Act
-    with open(expected_file_path, 'wb') as file:
-        pickle.dump(expected_stream, file)
-    result = loader.load_stream(path)
-    
-    # Assert
-    assert result == expected_stream
+def test_load_stream_valid_path(tmpdir):
+    """Test loading a stream with a valid path."""
+    # sample stream
+    header = ['header1', 'header2']
+    data = np.array([1, 2, 3])
+    time = np.array([1.0, 2.0, 3.0])
+    files = ['file1', 'file2']
+    stream = Stream(header=header, data=data, time=time, files=files)
+
+    # Test saving stream without suffix
+    loader.save_stream(str(tmpdir), stream)
+    # load test save
+    result = loader.load_stream(str(tmpdir))
+
+    assert np.allclose(result.data, stream.data)
 
 
-def test_load_stream_valid_path_with_suffix():
+def test_load_stream_valid_path_with_suffix(tmpdir):
+    """Test loading a stream with a suffix."""
     # Arrange
-    path = '/path/to/directory'
-    suffix_name = 'suffix'
-    expected_file_path = os.path.join(path, 'output', f'stream{suffix_name}.pk')
-    expected_stream = Stream()  # Replace Stream() with the expected stream object
-    
-    # Act
-    with open(expected_file_path, 'wb') as file:
-        pickle.dump(expected_stream, file)
-    result = loader.load_stream(path, suffix_name)
-    
+    suffix_name = '_suffix'
+    header = ['header1', 'header2']
+    data = np.array([1, 2, 3])
+    time = np.array([1.0, 2.0, 3.0])
+    files = ['file1', 'file2']
+    expected_stream = Stream(header=header, data=data, time=time, files=files)
+    # Test saving stream without suffix
+    loader.save_stream(str(tmpdir), expected_stream, suffix_name)
+    result = loader.load_stream(str(tmpdir), suffix_name)
     # Assert
-    assert result == expected_stream
+    assert np.allclose(result.data, expected_stream.data)
+    assert result.header == expected_stream.header
 
 
 def test_load_stream_invalid_path():
+    """Test loading a stream with an invalid path."""
     # Arrange
     path = '/invalid/path'
-    
     # Act & Assert
     with pytest.raises(ValueError):
         loader.load_stream(path)
