@@ -9,6 +9,13 @@ import numpy as np
 from particula.data import loader
 from particula.data.stream import Stream
 
+# sample stream
+header = ['header1', 'header3']
+data = np.array([1, 2, 4])
+time = np.array([1.0, 2.0, 4.0])
+files = ['file1', 'file3']
+stream = Stream(header=header, data=data, time=time, files=files)
+
 
 def test_filter_list():
     """Test the filter_list function."""
@@ -190,12 +197,6 @@ def test_save_stream_to_csv(tmpdir):
     # Create a temporary directory for testing
     output_dir = tmpdir.mkdir("output")
 
-    # sample stream
-    header = ['header1', 'header2']
-    data = np.array([1, 2, 3])
-    time = np.array([1.0, 2.0, 3.0])
-    files = ['file1', 'file2']
-    stream = Stream(header=header, data=data, time=time, files=files)
 
     # Define the expected file path
     expected_file_path = os.path.join(output_dir, "data.csv")
@@ -228,13 +229,6 @@ def test_save_stream(tmpdir):
     # Create a temporary directory for testing
     test_dir = tmpdir.mkdir("output")
 
-    # sample stream
-    header = ['header1', 'header2']
-    data = np.array([1, 2, 3])
-    time = np.array([1.0, 2.0, 3.0])
-    files = ['file1', 'file2']
-    stream = Stream(header=header, data=data, time=time, files=files)
-
     # Test saving stream without suffix
     loader.save_stream(str(tmpdir), stream)
     file_path = os.path.join(test_dir, 'stream.pk')
@@ -259,13 +253,6 @@ def test_save_stream(tmpdir):
 
 def test_load_stream_valid_path(tmpdir):
     """Test loading a stream with a valid path."""
-    # sample stream
-    header = ['header1', 'header2']
-    data = np.array([1, 2, 3])
-    time = np.array([1.0, 2.0, 3.0])
-    files = ['file1', 'file2']
-    stream = Stream(header=header, data=data, time=time, files=files)
-
     # Test saving stream without suffix
     loader.save_stream(str(tmpdir), stream)
     # load test save
@@ -278,17 +265,12 @@ def test_load_stream_valid_path_with_suffix(tmpdir):
     """Test loading a stream with a suffix."""
     # Arrange
     suffix_name = '_suffix'
-    header = ['header1', 'header2']
-    data = np.array([1, 2, 3])
-    time = np.array([1.0, 2.0, 3.0])
-    files = ['file1', 'file2']
-    expected_stream = Stream(header=header, data=data, time=time, files=files)
     # Test saving stream without suffix
-    loader.save_stream(str(tmpdir), expected_stream, suffix_name)
+    loader.save_stream(str(tmpdir), stream, suffix_name)
     result = loader.load_stream(str(tmpdir), suffix_name)
     # Assert
-    assert np.allclose(result.data, expected_stream.data)
-    assert result.header == expected_stream.header
+    assert np.allclose(result.data, stream.data)
+    assert result.header == stream.header
 
 
 def test_load_stream_invalid_path():
