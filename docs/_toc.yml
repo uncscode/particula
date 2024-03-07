@@ -59,6 +59,8 @@ parts:
     - file: documentation/utilities/slip_correction
     - file: documentation/utilities/friction_factor
     - file: documentation/utilities/dimensionless_coagulation
+  - file: documentation/utilities_overview
+    sections:
     - file: documentation/utilities/convert_size_dist_scales
 - caption: Strategic Plan
   numbered: false
