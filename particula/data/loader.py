@@ -653,7 +653,7 @@ def save_stream_to_csv(
 
     # Add suffix to file name if present
     file_name = f'data{suffix_name}.csv' \
-        if suffix_name is not None else 'stream.csv'
+        if suffix_name is not None else 'data.csv'
     file_path = os.path.join(output_folder, file_name)
 
     try:
@@ -716,10 +716,6 @@ def save_stream(
         if sufix_name is not None else 'stream.pk'
     # path to save pickle file
     file_path = os.path.join(output_folder, file_name)
-
-    # Validate file_path
-    if not os.path.isfile(file_path):
-        raise ValueError(f"Provided path '{file_path}' is not found.")
 
     try:
         # Attempt to save the stream
