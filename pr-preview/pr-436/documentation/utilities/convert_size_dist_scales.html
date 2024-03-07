@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Aerosol Size Distribution Scales: &#8212; Particula Book</title>
+    <title>Converting Distributions &#8212; Particula Book</title>
   
   
   
@@ -62,8 +62,6 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'documentation/utilities/convert_size_dist_scales';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="FY24 Plan" href="../../strategic_plan/strategic_planning_FY24.html" />
-    <link rel="prev" title="dimensionless_coagulation" href="dimensionless_coagulation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -124,6 +122,8 @@
     <div class="bd-container__inner bd-page-width">
       
       
+      
+        
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -241,7 +241,7 @@
 </li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
@@ -249,7 +249,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
@@ -257,13 +257,6 @@
 <li class="toctree-l2"><a class="reference internal" href="slip_correction.html"><code class="docutils literal notranslate"><span class="pre">slip_correction</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="friction_factor.html"><code class="docutils literal notranslate"><span class="pre">friction_factor</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Aerosol Size Distribution Scales:</a></li>
-
-
-
-
-
-
 </ul>
 </li>
 </ul>
@@ -544,7 +537,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Aerosol Size Distribution Scales:</h1>
+    <h1>Converting Distributions</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -554,17 +547,20 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Aerosol Size Distribution Scales:</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#the-converter-class-and-factory-pattern">The Converter Class and Factory Pattern:</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples:</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-pdf">Generate PDF</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#variables">Variables</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Converting Distributions</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aerosol-size-distribution-scales">Aerosol Size Distribution Scales:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-converter-class-and-factory-pattern">The Converter Class and Factory Pattern:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-pdf">Generate PDF</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#variables">Variables</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#pdf-to-pms-conversion">PDF to PMS Conversion</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-from-pms-to-pdf">Conversion from PMS to PDF</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-description">Code Description</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison-insights">Comparison Insights</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pdf-to-pms-conversion">PDF to PMS Conversion</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-from-pms-to-pdf">Conversion from PMS to PDF</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-description">Code Description</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison-insights">Comparison Insights</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#pdf-to-dn-dlogdp-conversion">PDF to dN/dlogDp Conversion</a><ul class="visible nav section-nav flex-column">
@@ -589,30 +585,30 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <p>Particle size distributions play a critical role in aerosol science, impacting areas such as air quality monitoring, environmental health, and various industrial processes. These distributions provide insights into the number, volume, or mass concentration of aerosol particles across different size ranges, aiding in the analysis of aerosol behavior and effects. For specific analyses or models, converting between size distribution scales, like from number to volume concentration, is often necessary. This document introduces a Python-based size distribution converter designed to facilitate conversions across different aerosol size distribution scales without the need to manually handle conversion formulas or functions, employing a factory pattern to determine the appropriate conversion strategy based on the scales involved.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="converting-distributions">
+<h1>Converting Distributions<a class="headerlink" href="#converting-distributions" title="Link to this heading">#</a></h1>
+<p>Particle size distributions play a critical role in aerosol science, impacting areas such as air quality monitoring, environmental health, and various industrial processes. These distributions provide insights into the number, volume, or mass concentration of aerosol particles across different size ranges, aiding in the analysis of aerosol behavior and effects. For specific analyses or models, converting between size distribution scales, like from number to volume concentration, is often necessary. This document introduces a Python-based size distribution converter designed to facilitate conversions across different aerosol size distribution scales without the need to manually handle conversion formulas or functions, employing a factory pattern to determine the appropriate conversion strategy based on the scales involved.</p>
 <section id="aerosol-size-distribution-scales">
-<h1>Aerosol Size Distribution Scales:<a class="headerlink" href="#aerosol-size-distribution-scales" title="Link to this heading">#</a></h1>
-<p>Aerosol size distributions are described using various scales and metrics, each catering to distinct analytical needs or practical applications:</p>
+<h2>Aerosol Size Distribution Scales:<a class="headerlink" href="#aerosol-size-distribution-scales" title="Link to this heading">#</a></h2>
+<p>Aerosol size distributions are characterized through various metrics and scales, with each serving specific purposes in analysis and practical application. These descriptions offer a more nuanced understanding of each type:</p>
 <ol class="arabic simple">
-<li><p><strong>Number Concentration (dN/dlogDp)</strong>: Represents the count of particles per unit volume of air for a specified size, crucial for assessing inhalation risks.</p></li>
-<li><p><strong>Volume or Mass Concentration (dV/dlogDp or dM/dlogDp)</strong>: Indicates aerosol mass-related characteristics, like visibility reduction. <em>Not yet implemented.</em></p></li>
-<li><p><strong>Surface Area Concentration (dA/dlogDp)</strong>: Evaluates aerosols’ reactive surface area with other substances. <em>Not yet implemented.</em></p></li>
-<li><p><strong>Probability Density Function (PDF)</strong>: Offers a statistical view of particle sizes, aiding in stochastic modeling. <a class="reference external" href="https://en.wikipedia.org/wiki/Probability_density_function">Wikipedia link</a></p></li>
-<li><p><strong>Probability Mass Spectrum (PMS)</strong>: Provides a discrete approximation of the PDF, facilitating computational modeling. <a class="reference external" href="https://en.wikipedia.org/wiki/Probability_mass_function">Wikipedia link</a></p>
-<ul class="simple">
-<li><p>PMS is the measured dN (number concentration).</p></li>
-</ul>
-</li>
+<li><p><strong>Number Concentration (dN/dlogDp)</strong>: This metric quantifies the number of aerosol particles within a specified size range per unit volume of air. It is essential for assessing particle prevalence in environmental and health-related studies, providing a direct measure of how many particles are present in a given volume.</p></li>
+<li><p>NOT IMPLEMENTED <strong>Mass Concentration (dM/dlogDp)</strong>: Indicates the total mass of particles within a specific size range per unit volume of air. This measure is crucial for understanding the mass-related impacts of aerosols on health, visibility, and climate, as it relates directly to the amount of material in the atmosphere.</p></li>
+<li><p>NOT IMPLEMENTED <strong>Volume Concentration (dV/dlogDp)</strong>: This scale measures the collective volume of particles within a specified size range per unit volume of air. It’s particularly useful for understanding the packing density and potential space occupancy of aerosols in a given volume, affecting light scattering and particle deposition processes.</p></li>
+<li><p>NOT IMPLEMENTED <strong>Surface Area Concentration (dA/dlogDp)</strong>: Provides the total surface area of particles within each size bin per unit volume of air. Though not implemented yet, this metric is vital for evaluating the interaction potential of aerosols with gases and other particles, as well as their reactivity and potential health impacts related to surface chemistry.</p></li>
+<li><p><strong>Probability Density Function (PDF)</strong>: <a class="reference external" href="https://en.wikipedia.org/wiki/Probability_density_function">Wikipedia link</a> A statistical representation that describes the likelihood of particles existing within specific size intervals. The PDF is instrumental in stochastic modeling, offering insights into the overall shape and characteristics of the size distribution, which helps in predicting aerosol behavior under various conditions.</p></li>
+<li><p><strong>Probability Mass Spectrum (PMS)</strong>: <a class="reference external" href="https://en.wikipedia.org/wiki/Probability_mass_function">Wikipedia link</a> Acts as a discrete counterpart to the PDF, providing a quantized view of the size distribution that is especially useful for numerical and computational modeling. The PMS is essentially a snapshot of the number concentration (dN) distributed across discrete size bins, enabling detailed analysis and simulation of aerosol dynamics.</p></li>
 </ol>
+<p>These metrics facilitate a comprehensive analysis of aerosol properties and behaviors, enabling researchers and practitioners to tailor their approaches based on the specific requirements of their work, whether it be in environmental monitoring, health impact assessment, or atmospheric science.</p>
 </section>
 <section id="the-converter-class-and-factory-pattern">
-<h1>The Converter Class and Factory Pattern:<a class="headerlink" href="#the-converter-class-and-factory-pattern" title="Link to this heading">#</a></h1>
+<h2>The Converter Class and Factory Pattern:<a class="headerlink" href="#the-converter-class-and-factory-pattern" title="Link to this heading">#</a></h2>
 <p>The converter class is structured to allow for the conversion between different aerosol size distribution formats efficiently.</p>
 <p>The core <code class="docutils literal notranslate"><span class="pre">Converter</span></code> class is designed not to implement conversion behaviors directly. Instead, it utilizes a <code class="docutils literal notranslate"><span class="pre">ConversionStrategy</span></code> object that follows a specified interface to carry out conversions. This strategy-based design permits the flexible exchange of conversion methodologies without requiring changes to the <code class="docutils literal notranslate"><span class="pre">Converter</span></code> class, promoting maintainability.</p>
 <p>A key component of this system is the <code class="docutils literal notranslate"><span class="pre">get_conversion_strategy</span></code> factory function, which streamlines the acquisition of an appropriate conversion strategy based on the provided input and output scales. This function assesses the scales and furnishes an instance of the suitable strategy class, thus simplifying the conversion operation.</p>
 </section>
 <section id="examples">
-<h1>Examples:<a class="headerlink" href="#examples" title="Link to this heading">#</a></h1>
+<h2>Examples:<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
 <p>Subsequent sections will showcase the practical application of the size distribution converter through examples. These examples will cover conversions such as transforming number concentration to the probability mass spectrum and the reverse process, illustrating the converter’s utility and flexibility.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -628,12 +624,12 @@ document.write(`
 </div>
 </section>
 <section id="generate-pdf">
-<h1>Generate PDF<a class="headerlink" href="#generate-pdf" title="Link to this heading">#</a></h1>
+<h2>Generate PDF<a class="headerlink" href="#generate-pdf" title="Link to this heading">#</a></h2>
 <p>To understand the behavior these different representations, we start by making a PDF. Probability Density Function (PDF), offers a continuous function representing the relative likelihood of particle sizes within a specific range.</p>
 <p>Lognormal distributions are characterized by their ability to model particle sizes that cannot be negative and are skewed towards larger sizes. This distribution is defined by a geometric mean diameter and a geometric standard deviation, indicating the spread of particle sizes.</p>
 <p>Expanding on the markdown for generating a Probability Density Function (PDF) for a lognormal distribution, including details for the code example provided:</p>
 <section id="variables">
-<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading">#</a></h2>
+<h3>Variables<a class="headerlink" href="#variables" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><strong>Diameters</strong>: A range of particle diameters is defined from 20 nm to 1000 nm, discretized into 500 points, to cover the typical size range of interest in aerosol studies.</p></li>
 <li><p><strong>Sigma &amp; Modes</strong>: The lognormal distribution’s geometric standard deviation (sigma) and modes (peak diameters) are specified, reflecting the distribution’s breadth and the sizes most represented in the sample.</p></li>
@@ -682,14 +678,14 @@ document.write(`
 </section>
 </section>
 <section id="pdf-to-pms-conversion">
-<h1>PDF to PMS Conversion<a class="headerlink" href="#pdf-to-pms-conversion" title="Link to this heading">#</a></h1>
+<h2>PDF to PMS Conversion<a class="headerlink" href="#pdf-to-pms-conversion" title="Link to this heading">#</a></h2>
 <p>The PDF provides a continuous function indicating the likelihood of particle sizes within a specific range, while the PMS offers a discrete representation, particularly useful for computational modeling and real measurements.</p>
 <section id="conversion-from-pms-to-pdf">
-<h2>Conversion from PMS to PDF<a class="headerlink" href="#conversion-from-pms-to-pdf" title="Link to this heading">#</a></h2>
+<h3>Conversion from PMS to PDF<a class="headerlink" href="#conversion-from-pms-to-pdf" title="Link to this heading">#</a></h3>
 <p>In practice, converting between these distributions allows researchers to leverage the strengths of both representations for comprehensive analysis. The provided code snippet illustrates how to convert a PMS distribution to a PDF using a predefined conversion strategy within a Python implementation. This process involves obtaining the appropriate conversion strategy from <code class="docutils literal notranslate"><span class="pre">pms</span></code> to <code class="docutils literal notranslate"><span class="pre">pdf</span></code>, creating a converter with this strategy, and then applying the conversion to a given distribution.</p>
 </section>
 <section id="code-description">
-<h2>Code Description<a class="headerlink" href="#code-description" title="Link to this heading">#</a></h2>
+<h3>Code Description<a class="headerlink" href="#code-description" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><strong>Conversion Strategy</strong>: A strategy for converting from PMS to PDF is obtained using <code class="docutils literal notranslate"><span class="pre">get_conversion_strategy</span></code>, indicating that the conversion will take the form of a probability mass spectrum to a probability density function.</p>
 <ul>
@@ -703,7 +699,7 @@ document.write(`
 </ul>
 </section>
 <section id="comparison-insights">
-<h2>Comparison Insights<a class="headerlink" href="#comparison-insights" title="Link to this heading">#</a></h2>
+<h3>Comparison Insights<a class="headerlink" href="#comparison-insights" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><strong>Scale Adaptability</strong>: The logarithmic scale for diameters effectively demonstrates the wide range of particle sizes and emphasizes the adaptability of both distributions across this range.</p></li>
 <li><p><strong>Distribution Form</strong>: The PDF, being continuous, smoothly varies across sizes, while the PMS, as a discrete spectrum, provides specific values at each size interval, useful for detailed numerical analysis.</p></li>
@@ -743,6 +739,7 @@ document.write(`
 <img alt="../../_images/7c19486716e1aead21af080cdbd2f0c8bf1184142d198fbf1bf82ea79d2d2f3f.png" src="../../_images/7c19486716e1aead21af080cdbd2f0c8bf1184142d198fbf1bf82ea79d2d2f3f.png" />
 </div>
 </div>
+</section>
 </section>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="pdf-to-dn-dlogdp-conversion">
@@ -931,24 +928,6 @@ class SizerConverter(builtins.object)
                 <footer class="prev-next-footer">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="dimensionless_coagulation.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="../../strategic_plan/strategic_planning_FY24.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">FY24 Plan</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -965,17 +944,20 @@ class SizerConverter(builtins.object)
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Aerosol Size Distribution Scales:</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#the-converter-class-and-factory-pattern">The Converter Class and Factory Pattern:</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples:</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-pdf">Generate PDF</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#variables">Variables</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Converting Distributions</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aerosol-size-distribution-scales">Aerosol Size Distribution Scales:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-converter-class-and-factory-pattern">The Converter Class and Factory Pattern:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-pdf">Generate PDF</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#variables">Variables</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#pdf-to-pms-conversion">PDF to PMS Conversion</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-from-pms-to-pdf">Conversion from PMS to PDF</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-description">Code Description</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison-insights">Comparison Insights</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pdf-to-pms-conversion">PDF to PMS Conversion</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-from-pms-to-pdf">Conversion from PMS to PDF</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-description">Code Description</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison-insights">Comparison Insights</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#pdf-to-dn-dlogdp-conversion">PDF to dN/dlogDp Conversion</a><ul class="visible nav section-nav flex-column">
