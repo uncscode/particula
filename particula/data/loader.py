@@ -644,6 +644,9 @@ def save_stream_to_csv(
     include_time : bool, optional
         Whether to include time data in the first column. The default is True.
     """
+    # Validate path
+    if not os.path.isdir(path):
+        raise ValueError(f"Provided path '{path}' is not a directory.")
     # Create the output folder if it does not exist
     output_folder = os.path.join(path, folder)
     os.makedirs(output_folder, exist_ok=True)
@@ -653,23 +656,33 @@ def save_stream_to_csv(
         if suffix_name is not None else 'stream.csv'
     file_path = os.path.join(output_folder, file_name)
 
-    # Save stream data to CSV
-    with open(file_path, mode='w', newline='') as csv_file:
-        csv_writer = csv.writer(csv_file)
-        
-        # Prepare header
-        header = stream.header
-        if include_time:
-            header = ['Epoch_UTC'] + header
-        csv_writer.writerow(header)
-        # Write data rows
-        for i in range(len(stream.data)):
-            row = stream.data[i, :].tolist()
-            if include_time and len(stream.time) == len(stream.data):
-                time_val = stream.time[i]
-                row = [time_val] + row
-            csv_writer.writerow(row)
-    print(f"Stream saved to CSV: {file_name}")
+    try:
+        # Save stream data to CSV
+        with open(file_path, mode='w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            
+            # Prepare header
+            header = stream.header
+            if include_time:
+                header = ['Epoch_UTC'] + header
+            csv_writer.writerow(header)
+            
+            # Write data rows
+            for i in range(len(stream.data)):
+                row = stream.data[i, :].tolist()
+                if include_time and len(stream.time) == len(stream.data):
+                    time_val = stream.time[i]
+                    row = [time_val] + row
+                csv_writer.writerow(row)
+        print(f"Stream saved to CSV: {file_name}")
+    except (FileNotFoundError, PermissionError, IOError, OSError) as e:
+        print(f"Failed to save the stream to CSV: {e}")
+    except ValueError as e:
+        print(f"Data format error: {e}")
+    except UnicodeEncodeError as e:
+        print(f"Encoding error while writing to CSV: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
 
 
 def save_stream(
@@ -690,6 +703,10 @@ def save_stream(
     sufix_name : str, optional
         Suffix to add to pickle file name. The default is None.
     """
+    # Validate path
+    if not os.path.isdir(path):
+        raise ValueError(f"Provided path '{path}' is not a directory.")
+
     # create output folder if it does not exist
     output_folder = os.path.join(path, folder)
     os.makedirs(output_folder, exist_ok=True)
@@ -700,10 +717,24 @@ def save_stream(
     # path to save pickle file
     file_path = os.path.join(output_folder, file_name)
 
-    # save stream
-    with open(file_path, 'wb') as file:
-        pickle.dump(stream, file)
-    print(f"Stream saved: {file_name}")
+    # Validate file_path
+    if not os.path.isfile(file_path):
+        raise ValueError(f"Provided path '{file_path}' is not found.")
+
+    try:
+        # Attempt to save the stream
+        with open(file_path, 'wb') as file:
+            pickle.dump(stream, file)
+        print(f"Stream saved: {file_name}")
+    except IOError as e:
+        # Handles I/O errors (e.g., file not found, no permissions)
+        print(f"Failed to save the stream due to an I/O error: {e}")
+    except pickle.PickleError as e:
+        # Handles errors specifically related to the pickling process
+        print(f"Failed to save the stream due to a pickling error: {e}")
+    except Exception as e:
+        # Handles any other unexpected errors
+        print(f"An unexpected error occurred: {e}")
 
 
 def load_stream(
@@ -728,6 +759,10 @@ def load_stream(
     Stream
         Loaded Stream object.
     """
+    # Validate path
+    if not os.path.isdir(path):
+        raise ValueError(f"Provided path '{path}' is not a directory.")
+    # add suffix to file name if present
     file_name = f'stream{sufix_name}.pk' \
         if sufix_name is not None else 'stream.pk'
     # path to load pickle file
@@ -759,6 +794,9 @@ def save_lake(
         Suffix to add to pickle file name. The default is None.
     """
     print('Saving lake...')
+    # Validate path
+    if not os.path.isdir(path):
+        raise ValueError(f"Provided path '{path}' is not a directory.")
     # create output folder if it does not exist
     output_folder = os.path.join(path, folder)
     os.makedirs(output_folder, exist_ok=True)
@@ -769,10 +807,20 @@ def save_lake(
     # path to save pickle file
     file_path = os.path.join(output_folder, file_name)
 
-    # save datalake
-    with open(file_path, 'wb') as file:
-        pickle.dump(lake, file)
-    print(f"Lake saved: {file_name}")
+    try:
+        # Attempt to save the datalake
+        with open(file_path, 'wb') as file:
+            pickle.dump(lake, file)
+        print(f"Lake saved: {file_name}")
+    except IOError as e:
+        # Handles I/O errors (e.g., file not found, no permissions)
+        print(f"Failed to save the lake due to an I/O error: {e}")
+    except pickle.PickleError as e:
+        # Handles errors specifically related to the pickling process
+        print(f"Failed to save the lake due to a pickling error: {e}")
+    except Exception as e:
+        # Handles any other unexpected errors
+        print(f"An unexpected error occurred: {e}")
 
 
 def load_lake(
