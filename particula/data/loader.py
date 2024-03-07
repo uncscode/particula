@@ -8,7 +8,7 @@ import os
 import pickle
 import netCDF4 as nc
 import numpy as np
-import pandas as pd
+import csv
 
 from particula.util import convert
 from particula.util.time_manage import time_str_to_epoch
@@ -619,6 +619,57 @@ def get_files_in_folder_with_size(
     file_size_in_bytes = [os.path.getsize(path) for path in full_path]
 
     return file_list, full_path, file_size_in_bytes
+
+
+def save_stream_to_csv(
+    stream: Stream,
+    path: str,
+    suffix_name: Optional[str] = None,
+    folder: Optional[str] = 'output',
+    include_time: bool = True,
+) -> None:
+    """
+    Save stream object as a CSV file, with an option to include formatted time.
+    
+    Args:
+    ----------
+    stream : Stream
+        Stream object to be saved.
+    path : str
+        Path where the CSV file will be saved.
+    suffix_name : str, optional
+        Suffix to add to CSV file name. The default is None.
+    folder : str, optional
+        Subfolder within path to save the CSV file. The default is 'output'.
+    include_time : bool, optional
+        Whether to include time data in the first column. The default is True.
+    """
+    # Create the output folder if it does not exist
+    output_folder = os.path.join(path, folder)
+    os.makedirs(output_folder, exist_ok=True)
+
+    # Add suffix to file name if present
+    file_name = f'data{suffix_name}.csv' \
+        if suffix_name is not None else 'stream.csv'
+    file_path = os.path.join(output_folder, file_name)
+
+    # Save stream data to CSV
+    with open(file_path, mode='w', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        
+        # Prepare header
+        header = stream.header
+        if include_time:
+            header = ['Epoch_UTC'] + header
+        csv_writer.writerow(header)
+        # Write data rows
+        for i in range(len(stream.data)):
+            row = stream.data[i, :].tolist()
+            if include_time and len(stream.time) == len(stream.data):
+                time_val = stream.time[i]
+                row = [time_val] + row
+            csv_writer.writerow(row)
+    print(f"Stream saved to CSV: {file_name}")
 
 
 def save_stream(
