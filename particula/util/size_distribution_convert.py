@@ -4,7 +4,7 @@ written with composition in mind and using a factory pattern.
 Converter does not inherit from different classes for different conversion
 behaviors. Instead, it composes its behavior by holding a ConversionStrategy
 object, which can be any strategy conforming to the ConversionStrategy
-interface. This is a clearer example of "composition over inheritance",
+interface. This is an example of "composition over inheritance",
 where behavior is composed at runtime through objects rather than fixed at
 compile-time through class hierarchies.
 
@@ -49,6 +49,15 @@ class ConversionStrategy:
             "This method should be overridden by subclasses.")
 
 
+class SameScaleConversionStrategy(ConversionStrategy):
+    """Implements conversion between the same scales, which is a no-op."""
+
+    def convert(self, diameters: np.ndarray, concentration: np.ndarray,
+                inverse: bool = False) -> np.ndarray:
+        # No conversion needed, return the input concentration
+        return concentration
+
+
 class DNdlogDPtoPMSConversionStrategy(ConversionStrategy):
     """Implements conversion between dn/dlogdp and PMS formats using the
     convert_sizer_dn method."""
@@ -90,7 +99,7 @@ class DNdlogDPtoPDFConversionStrategy(ConversionStrategy):
             diameters, concentration_pms, to_pdf=True)
 
 
-class Converter:
+class SizerConverter:
     """A converter that uses a specified ConversionStrategy to convert
     particle size distribution data between different formats."""
 
@@ -145,10 +154,16 @@ def get_conversion_strategy(input_scale: str,
         converted_concentration = converter.convert(
             diameters, concentration, inverse=False)
     """
+    # force lower case scales
+    input_scale = input_scale.lower()
+    output_scale = output_scale.lower()
+
+    if input_scale == output_scale:  # early return for same scales
+        return SameScaleConversionStrategy()
+
     # Validate input and output scales
     valid_input_scales = ['dn/dlogdp', 'pms']
     valid_output_scales = ['pms', 'pdf']
-
     if input_scale not in valid_input_scales:
         raise ValueError(
             f"input_scale '{input_scale}' is not supported."

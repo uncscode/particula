@@ -12,6 +12,8 @@ from scipy.stats.mstats import gmean
 
 from particula.util.input_handling import convert_units
 from particula.util import convert
+from particula.util.size_distribution_convert import (
+    get_conversion_strategy, SizerConverter)
 from particula.data.stream import Stream
 
 
@@ -463,20 +465,17 @@ def resample_distribution(
     # new data placeholder
     new_concentration = np.zeros((concentration.shape[0], len(new_diameters)))
 
-    # convert to dn
-    if concentration_scale == 'dn/dlogdp':
-        concentration = convert.convert_sizer_dn(
-            diameter=diameters,
-            dn_dlogdp=concentration,
-            inverse=False,
-        )
-    # convert to pdf
-    if concentration_scale in {'dn', 'pms'}:
-        concentration_pdf = convert.distribution_convert_pdf_pms(
-            x_array=diameters,
-            distribution=concentration,
-            to_pdf=True,
-        )
+    # get the conversion strategy
+    conversion_strategy = get_conversion_strategy(
+        concentration_scale, 'pdf')
+    # create the converter
+    sizer_to_pdf = SizerConverter(conversion_strategy)
+    # convert distribution
+    concentration_pdf = sizer_to_pdf.convert(
+        diameters=diameters,
+        concentration=concentration,
+        inverse=False,
+    )
 
     # resample the pdf
     for i, row in enumerate(concentration_pdf):
@@ -488,27 +487,15 @@ def resample_distribution(
             left=np.nan,
             right=np.nan,
         )
+    # inverse the conversion
+    new_concentration = sizer_to_pdf.convert(
+        diameters=new_diameters,
+        concentration=new_concentration,
+        inverse=True,
+    )
 
     # assemble the stream
     stream.data = new_concentration
     stream.header = new_diameters.astype(str)
 
-    # if pdf then early return
-    if concentration_scale == 'pdf':
-        return stream
-    # if pms or dn or dn/dlogdpthen convert to pms
-    stream.data = convert.distribution_convert_pdf_pms(
-        x_array=stream.data,
-        distribution=stream.header_float,
-        to_pdf=False,
-    )
-    if concentration_scale in {'dn', 'pms'}:
-        return stream
-
-    # convert to dn/dlogdp
-    stream.data = convert.convert_sizer_dn(
-        diameter=stream.data,
-        dn_dlogdp=stream.header_float,
-        inverse=True,
-    )
     return stream
