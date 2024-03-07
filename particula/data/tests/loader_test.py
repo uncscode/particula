@@ -10,11 +10,12 @@ from particula.data import loader
 from particula.data.stream import Stream
 
 # sample stream
-header = ['header1', 'header3']
-data = np.array([1, 2, 4])
-time = np.array([1.0, 2.0, 4.0])
-files = ['file1', 'file3']
-stream = Stream(header=header, data=data, time=time, files=files)
+stream = Stream(
+    header=['header1', 'header3'],
+    data=np.array([1, 2, 4]),
+    time=np.array([1.0, 2.0, 4.0]),
+    files=['file1', 'file3']
+    )
 
 
 def test_filter_list():
@@ -196,26 +197,19 @@ def test_save_stream_to_csv(tmpdir):
     """Test save to csv"""
     # Create a temporary directory for testing
     output_dir = tmpdir.mkdir("output")
-
-
     # Define the expected file path
     expected_file_path = os.path.join(output_dir, "data.csv")
-
     # Call the function
     loader.save_stream_to_csv(stream, str(tmpdir))
-
     # Assert that the file was created
     assert os.path.isfile(expected_file_path)
-
     # options for suffix
     expected_file_path = os.path.join(output_dir, "data_suffix.csv")
-
     # Call the function with optional parameters
     loader.save_stream_to_csv(
         stream,
         str(tmpdir),
         suffix_name="_suffix")
-
     # Assert that the file was created with the expected name and location
     assert os.path.isfile(expected_file_path)
 
