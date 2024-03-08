@@ -257,6 +257,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/utilities/utilities_overview.html">Utilities Functions</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/convert_size_dist_scales.html">Converting Distributions</a></li>
+
+
+</ul>
+</li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Strategic Plan</span></p>
 <ul class="nav bd-sidenav">
@@ -651,9 +657,6 @@ Path to data folder:
     <span class="s1">&#39;CPC_3010_data&#39;</span><span class="p">,</span>
     <span class="s1">&#39;CPC_3010_data_20220709_Jul.csv&#39;</span><span class="p">)</span>
 
-<span class="c1"># print the file path</span>
-<span class="c1"># print(data_file)</span>
-
 <span class="c1"># load the data</span>
 <span class="n">raw_data</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">data_raw_loader</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
 
@@ -959,61 +962,6 @@ timezone_identifier: UTC
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: CPC_3010_data_20220709_Jul.csv
 </pre></div>
 </div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">MemoryError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">line</span> <span class="mi">37</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="n">cpc_settings</span> <span class="o">=</span> <span class="p">{</span>
-<span class="g g-Whitespace">     </span><span class="mi">11</span>     <span class="c1"># Folder name containing the data files</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span>     <span class="s1">&#39;relative_data_folder&#39;</span><span class="p">:</span> <span class="s1">&#39;CPC_3010_data&#39;</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">33</span>     <span class="s1">&#39;timezone_identifier&#39;</span><span class="p">:</span> <span class="s1">&#39;UTC&#39;</span>  <span class="c1"># Timezone identifier for the time data</span>
-<span class="g g-Whitespace">     </span><span class="mi">34</span> <span class="p">}</span>
-<span class="g g-Whitespace">     </span><span class="mi">36</span> <span class="c1"># Now call the loader interface to load the data using the specified settings</span>
-<span class="ne">---&gt; </span><span class="mi">37</span> <span class="n">data_stream</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">38</span>     <span class="n">path</span><span class="o">=</span><span class="n">working_path</span><span class="p">,</span>  <span class="c1"># Path to the data folder</span>
-<span class="g g-Whitespace">     </span><span class="mi">39</span>     <span class="n">settings</span><span class="o">=</span><span class="n">cpc_settings</span><span class="p">,</span>  <span class="c1"># Settings defined above</span>
-<span class="g g-Whitespace">     </span><span class="mi">40</span> <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">42</span> <span class="c1"># The data_stream object now contains the loaded and formatted data ready</span>
-<span class="g g-Whitespace">     </span><span class="mi">43</span> <span class="c1"># for analysis</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:152,</span> in <span class="ni">load_files_interface</span><span class="nt">(path, settings, stream)</span>
-<span class="g g-Whitespace">    </span><span class="mi">149</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Loading file:&#39;</span><span class="p">,</span> <span class="n">file_info</span><span class="p">[</span><span class="n">file_i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-<span class="g g-Whitespace">    </span><span class="mi">151</span> <span class="k">if</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_1d_load&#39;</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">152</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_1d_stream</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">153</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">154</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">155</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">156</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">157</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">159</span> <span class="k">elif</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_2d_load&#39;</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">160</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_2d_stream</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">161</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">162</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">163</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">165</span>     <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:323,</span> in <span class="ni">get_1d_stream</span><span class="nt">(file_path, settings, first_pass, stream)</span>
-<span class="g g-Whitespace">    </span><span class="mi">321</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">epoch_time</span>
-<span class="g g-Whitespace">    </span><span class="mi">322</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">323</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">merger</span><span class="o">.</span><span class="n">stream_add_data</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">324</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">325</span>         <span class="n">time_new</span><span class="o">=</span><span class="n">epoch_time</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">326</span>         <span class="n">data_new</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">327</span>         <span class="n">header_check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">328</span>         <span class="n">header_new</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_header&#39;</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">329</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">330</span> <span class="k">return</span> <span class="n">stream</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/merger.py:182,</span> in <span class="ni">stream_add_data</span><span class="nt">(stream, time_new, data_new, header_check, header_new)</span>
-<span class="g g-Whitespace">    </span><span class="mi">180</span>     <span class="n">sorted_time_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">181</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">sorted_time_index</span><span class="p">]</span>
-<span class="ne">--&gt; </span><span class="mi">182</span>     <span class="n">stream</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">sorted_time_index</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">return</span> <span class="n">stream</span>
-
-<span class="ne">MemoryError</span>: Unable to allocate 35.0 GiB for an array with shape (68551, 68551) and data type float64
-</pre></div>
-</div>
 </div>
 </div>
 </section>
@@ -1089,7 +1037,7 @@ Time Stamps for the First 5 Data Entries:
 [1.65734280e+09 1.65734281e+09 1.65734281e+09 1.65734281e+09
  1.65734282e+09]
 
-Data from Column &#39;data 1&#39;:
+5 Entries from data Column &#39;data 1&#39;:
 [33510. 33465. 32171. 32889. 32706.]
 
 Number of Data Entries in the Time Stream:
@@ -1100,7 +1048,7 @@ First 5 Time Entries in datetime64 Format:
  &#39;2022-07-09T05:00:13&#39; &#39;2022-07-09T05:00:16&#39;]
 
 Names of the Source Files for the Data Stream:
-[[&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1044534], [&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1113488]]
+[[&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1078191], [&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1011254]]
 </pre></div>
 </div>
 </div>
@@ -1177,7 +1125,7 @@ Names of the Source Files for the Data Stream:
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/5afc75e1b48d40919b0db688e929153c1d86a4b67dd6b42e4003c513625210d3.png" src="../../_images/5afc75e1b48d40919b0db688e929153c1d86a4b67dd6b42e4003c513625210d3.png" />
+<img alt="../../_images/0e3b1d1bb7ec5cca64e3ea450f81c29a4092d8afb7b78d3d79bc57b935e610cf.png" src="../../_images/0e3b1d1bb7ec5cca64e3ea450f81c29a4092d8afb7b78d3d79bc57b935e610cf.png" />
 </div>
 </div>
 </section>
@@ -1254,6 +1202,7 @@ class Stream(builtins.object)
  |  Methods defined here:
  |  
  |  __eq__(self, other)
+ |      Return self==value.
  |  
  |  __getitem__(self, index: Union[int, str])
  |      Allows for indexing of the data stream.
@@ -1267,6 +1216,7 @@ class Stream(builtins.object)
  |          The data stream at the specified index.
  |  
  |  __init__(self, header: List[str] = &lt;factory&gt;, data: numpy.ndarray = &lt;factory&gt;, time: numpy.ndarray = &lt;factory&gt;, files: List[str] = &lt;factory&gt;) -&gt; None
+ |      Initialize self.  See help(type(self)) for accurate signature.
  |  
  |  __len__(self)
  |      Returns the length of the time stream.
@@ -1274,6 +1224,7 @@ class Stream(builtins.object)
  |  __post_init__(self)
  |  
  |  __repr__(self)
+ |      Return repr(self).
  |  
  |  __setitem__(self, index: Union[int, str], value)
  |      Allows for setting or adding of a row of data in the stream.
@@ -1307,10 +1258,10 @@ class Stream(builtins.object)
  |  Data descriptors defined here:
  |  
  |  __dict__
- |      dictionary for instance variables (if defined)
+ |      dictionary for instance variables
  |  
  |  __weakref__
- |      list of weak references to the object (if defined)
+ |      list of weak references to the object
  |  
  |  ----------------------------------------------------------------------
  |  Data and other attributes defined here:
@@ -1322,6 +1273,8 @@ class Stream(builtins.object)
  |  __dataclass_params__ = _DataclassParams(init=True,repr=True,eq=True,or...
  |  
  |  __hash__ = None
+ |  
+ |  __match_args__ = (&#39;header&#39;, &#39;data&#39;, &#39;time&#39;, &#39;files&#39;)
 </pre></div>
 </div>
 </div>

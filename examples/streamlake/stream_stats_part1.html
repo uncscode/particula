@@ -257,6 +257,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/utilities/utilities_overview.html">Utilities Functions</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/convert_size_dist_scales.html">Converting Distributions</a></li>
+
+
+</ul>
+</li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Strategic Plan</span></p>
 <ul class="nav bd-sidenav">
@@ -645,59 +651,6 @@ load the data.</p>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: CPC_3010_data_20220709_Jul.csv
 </pre></div>
 </div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">MemoryError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">22</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">settings</span> <span class="o">=</span> <span class="n">settings_generator</span><span class="o">.</span><span class="n">for_general_1d_load</span><span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">relative_data_folder</span><span class="o">=</span><span class="s1">&#39;CPC_3010_data&#39;</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">filename_regex</span><span class="o">=</span><span class="s1">&#39;*.csv&#39;</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">18</span>     <span class="n">timezone_identifier</span><span class="o">=</span><span class="s1">&#39;UTC&#39;</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">21</span> <span class="c1"># now call the loader interface</span>
-<span class="ne">---&gt; </span><span class="mi">22</span> <span class="n">data_stream</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">23</span>     <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">24</span>     <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">25</span> <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:152,</span> in <span class="ni">load_files_interface</span><span class="nt">(path, settings, stream)</span>
-<span class="g g-Whitespace">    </span><span class="mi">149</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Loading file:&#39;</span><span class="p">,</span> <span class="n">file_info</span><span class="p">[</span><span class="n">file_i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-<span class="g g-Whitespace">    </span><span class="mi">151</span> <span class="k">if</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_1d_load&#39;</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">152</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_1d_stream</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">153</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">154</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">155</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">156</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">157</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">159</span> <span class="k">elif</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_2d_load&#39;</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">160</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_2d_stream</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">161</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">162</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">163</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">165</span>     <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:323,</span> in <span class="ni">get_1d_stream</span><span class="nt">(file_path, settings, first_pass, stream)</span>
-<span class="g g-Whitespace">    </span><span class="mi">321</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">epoch_time</span>
-<span class="g g-Whitespace">    </span><span class="mi">322</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">323</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">merger</span><span class="o">.</span><span class="n">stream_add_data</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">324</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">325</span>         <span class="n">time_new</span><span class="o">=</span><span class="n">epoch_time</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">326</span>         <span class="n">data_new</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">327</span>         <span class="n">header_check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">328</span>         <span class="n">header_new</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_header&#39;</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">329</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">330</span> <span class="k">return</span> <span class="n">stream</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/merger.py:182,</span> in <span class="ni">stream_add_data</span><span class="nt">(stream, time_new, data_new, header_check, header_new)</span>
-<span class="g g-Whitespace">    </span><span class="mi">180</span>     <span class="n">sorted_time_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">181</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">sorted_time_index</span><span class="p">]</span>
-<span class="ne">--&gt; </span><span class="mi">182</span>     <span class="n">stream</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">sorted_time_index</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">return</span> <span class="n">stream</span>
-
-<span class="ne">MemoryError</span>: Unable to allocate 35.0 GiB for an array with shape (68551, 68551) and data type float64
-</pre></div>
-</div>
 </div>
 </div>
 <div class="cell docutils container">
@@ -717,7 +670,7 @@ Stream(header=[&#39;CPC_count[#/sec]&#39;, &#39;Temperature[degC]&#39;], data=ar
        [1.9403e+04, 1.6900e+01],
        [2.0230e+04, 1.7000e+01],
        [1.9521e+04, 1.6800e+01]]), time=array([1.65734280e+09, 1.65734281e+09, 1.65734281e+09, ...,
-       1.65751559e+09, 1.65751560e+09, 1.65751560e+09]), files=[[&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1044534], [&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1113488]])
+       1.65751559e+09, 1.65751560e+09, 1.65751560e+09]), files=[[&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1078191], [&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1011254]])
 </pre></div>
 </div>
 </div>
@@ -741,7 +694,7 @@ Stream(header=[&#39;CPC_count[#/sec]&#39;, &#39;Temperature[degC]&#39;], data=ar
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/db87bafe76d91107284de99ac0f422522efba9031df874d02423cd62a1171faf.png" src="../../_images/db87bafe76d91107284de99ac0f422522efba9031df874d02423cd62a1171faf.png" />
+<img alt="../../_images/40acb0d4649ab2a919cf11de77e7681f7dc03317d3a531be619f7e1b2a66a7fe.png" src="../../_images/40acb0d4649ab2a919cf11de77e7681f7dc03317d3a531be619f7e1b2a66a7fe.png" />
 </div>
 </div>
 </section>
@@ -786,7 +739,7 @@ object with the averaged data and the standard deviation of the data.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/514eaf885329a58ee969fc87d43ad73c3531152697b90cef4ebc3bca5385ba74.png" src="../../_images/514eaf885329a58ee969fc87d43ad73c3531152697b90cef4ebc3bca5385ba74.png" />
+<img alt="../../_images/59f5060d5cb2eef6d418910fa163030c466b0a55272b763912afd1cb08d5a61f.png" src="../../_images/59f5060d5cb2eef6d418910fa163030c466b0a55272b763912afd1cb08d5a61f.png" />
 </div>
 </div>
 <section id="clean-up-the-data">
@@ -816,7 +769,7 @@ removed.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/a64cef9fd1553997bd306795d27d48bde4eac52b89553f5f283ebc99df0272c0.png" src="../../_images/a64cef9fd1553997bd306795d27d48bde4eac52b89553f5f283ebc99df0272c0.png" />
+<img alt="../../_images/b1c1eaf771e8fa7c2ea2ac64eb3509fbeabbb4e3ee7b019dfa30b770171cde58.png" src="../../_images/b1c1eaf771e8fa7c2ea2ac64eb3509fbeabbb4e3ee7b019dfa30b770171cde58.png" />
 </div>
 </div>
 </section>
@@ -827,6 +780,151 @@ and averaging the values over time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">stream_stats</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on module particula.data.stream_stats in particula.data:
+
+NAME
+    particula.data.stream_stats - Functions to operate on stream objects.
+
+FUNCTIONS
+    average_std(stream: particula.data.stream.Stream, average_interval: Union[float, int] = 60, new_time_array: Optional[numpy.ndarray] = None) -&gt; particula.data.stream.StreamAveraged
+        Calculate the average and standard deviation of data within a given
+        &#39;stream&#39; object over specified intervals.
+        
+        This function takes a &#39;stream&#39; object, which should contain time-series
+        data, and computes the average and standard deviation of the data at
+        intervals specified by &#39;average_interval&#39;. If data.time is in seconds
+        then the units of the interval are seconds (hour in hours etc). The
+        results are returned as a new &#39;StreamAveraged&#39; object containing the
+        processed data.
+        
+        Args:
+        - stream (object): The input stream object containing &#39;time&#39; and &#39;data&#39;
+            arrays along with other associated metadata.
+        - average_interval (float|int, optional): The time interval over which the
+            averaging is to be performed.
+        - new_time_array (np.ndarray, optional): An optional array of time points
+            at which the average and standard deviation are computed.
+            If not provided, a new time array is generated based on the start and
+            end times within the &#39;stream.time&#39; object.
+        
+        Returns:
+        - StreamAveraged (object): An object of type &#39;StreamAveraged&#39; containing
+            the averaged data, time array, start and stop times, the standard
+            deviation of the averaged data, and other metadata from the original
+            &#39;stream&#39; object.
+        
+        The function checks for an existing &#39;new_time_array&#39; and generates one if
+        needed. It then calculates the average and standard deviation for each
+        interval and constructs a &#39;StreamAveraged&#39; object with the results and
+        metadata from the original &#39;stream&#39; object.
+    
+    drop_masked(stream: particula.data.stream.Stream, mask: numpy.ndarray) -&gt; particula.data.stream.Stream
+        Drop rows where mask is false, and return data stream.
+        
+        Args
+        ----------
+        stream : object
+            data stream object
+        mask : np.ndarray
+            mask to apply to data stream
+        
+        Returns
+        -------
+        object
+            stream object
+    
+    filtering(stream: particula.data.stream.Stream, bottom: Optional[float] = None, top: Optional[float] = None, value: Optional[float] = None, invert: Optional[bool] = False, clone: Optional[bool] = True, replace_with: Union[float, int, NoneType] = None, drop: Optional[bool] = False, header: Union[list, int, str, NoneType] = None) -&gt; particula.data.stream.Stream
+        Filters the data of the given &#39;stream&#39; object based on the specified
+        bounds or specific value. The filtered data can be either dropped or
+        replaced with a specified value.  Note, not all parameters need to be
+        specified, but at least one must be provided (top, bottom, value)
+        
+        Args:
+        - stream (Stream): The input stream object containing &#39;data&#39; and &#39;time&#39;
+            attributes.
+        - bottom (float, optional): The lower bound for filtering data. Defaults
+            to None.
+        - top (float, optional): The upper bound for filtering data.
+            Defaults to None.
+        - value (float, optional): Specific value to filter from data.
+            Defaults to None.
+        - invert (bool): If True, inverts the filter criteria.
+            Defaults to False.
+        - clone (bool): If True, returns a copy of the &#39;stream&#39; object, with
+            filtered data. If False, modifies the &#39;stream&#39; object in-place.
+            Defaults to True.
+        - replace_with (float|int, optional): Value to replace filtered-out data.
+            Defaults to None.
+        - drop (bool, optional): If True, filtered-out data points are dropped
+            from the dataset. Defaults to False.
+        - header (list, optional): The header of the data to filter on. This can
+            same as calling Stream[&#39;header&#39;]
+            Defaults to None.
+        
+        Returns:
+        - Stream: The &#39;stream&#39; object with data filtered as specified.
+        
+        If &#39;drop&#39; is True, &#39;replace_with&#39; is ignored and filtered data points are
+        removed from the &#39;stream&#39; object. Otherwise, filtered data points are
+        replaced with &#39;replace_with&#39; value.
+        
+        add specific data row to filter on
+    
+    remove_time_window(stream: particula.data.stream.Stream, epoch_start: Union[float, int], epoch_end: Union[float, int, NoneType] = None) -&gt; particula.data.stream.Stream
+        Remove a time window from a stream object.
+        
+        Args:
+        - stream: The input stream object containing &#39;data&#39; and &#39;time&#39;
+            attributes.
+        - epoch_start: The start time of the time window to be
+            removed.
+        - epoch_end: The end time of the time window to be
+            removed. If not provided, the time window is the closest time point to
+            &#39;epoch_start&#39;.
+        
+        Returns:
+        - Stream: The &#39;stream&#39; object with the specified time window removed.
+
+DATA
+    Optional = typing.Optional
+        Optional[X] is equivalent to Union[X, None].
+    
+    Union = typing.Union
+        Union type; Union[X, Y] means either X or Y.
+        
+        On Python 3.10 and higher, the | operator
+        can also be used to denote unions;
+        X | Y means the same thing to the type checker as Union[X, Y].
+        
+        To define a union, use e.g. Union[int, str]. Details:
+        - The arguments must be types and there must be at least one.
+        - None as an argument is a special case and is replaced by
+          type(None).
+        - Unions of unions are flattened, e.g.::
+        
+            assert Union[Union[int, str], float] == Union[int, str, float]
+        
+        - Unions of a single argument vanish, e.g.::
+        
+            assert Union[int] == int  # The constructor actually returns int
+        
+        - Redundant arguments are skipped, e.g.::
+        
+            assert Union[int, str, int] == Union[int, str]
+        
+        - When comparing unions, the argument order is ignored, e.g.::
+        
+            assert Union[int, str] == Union[str, int]
+        
+        - You cannot subclass or instantiate a union.
+        - You can use Optional[X] as a shorthand for Union[X, None].
+
+FILE
+    /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/stream_stats.py
 </pre></div>
 </div>
 </div>

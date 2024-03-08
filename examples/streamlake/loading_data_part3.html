@@ -257,6 +257,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/utilities/utilities_overview.html">Utilities Functions</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/convert_size_dist_scales.html">Converting Distributions</a></li>
+
+
+</ul>
+</li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Strategic Plan</span></p>
 <ul class="nav bd-sidenav">
@@ -715,68 +721,20 @@ document.write(`
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: CPC_3010_data_20220709_Jul.csv
 </pre></div>
 </div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">MemoryError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">75</span>
-<span class="g g-Whitespace">     </span><span class="mi">68</span> <span class="n">combined_settings</span> <span class="o">=</span> <span class="p">{</span>
-<span class="g g-Whitespace">     </span><span class="mi">69</span>     <span class="s1">&#39;cpc&#39;</span><span class="p">:</span> <span class="n">cpc_settings</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">70</span>     <span class="s1">&#39;smps_1d&#39;</span><span class="p">:</span> <span class="n">smps_1d_settings</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">71</span>     <span class="s1">&#39;smps_2d&#39;</span><span class="p">:</span> <span class="n">smps_2d_settings</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">72</span> <span class="p">}</span>
-<span class="g g-Whitespace">     </span><span class="mi">74</span> <span class="c1"># now call the loader interface for files</span>
-<span class="ne">---&gt; </span><span class="mi">75</span> <span class="n">lake</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_folders_interface</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">76</span>     <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">77</span>     <span class="n">folder_settings</span><span class="o">=</span><span class="n">combined_settings</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">78</span> <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">80</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">81</span> <span class="nb">print</span><span class="p">(</span><span class="n">lake</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:213,</span> in <span class="ni">load_folders_interface</span><span class="nt">(path, folder_settings, lake)</span>
-<span class="g g-Whitespace">    </span><span class="mi">211</span>     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Folder Settings:&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">212</span>     <span class="c1"># call the load files interface</span>
-<span class="ne">--&gt; </span><span class="mi">213</span>     <span class="n">lake</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_files_interface</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">214</span>         <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">215</span>         <span class="n">settings</span><span class="o">=</span><span class="n">file_settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">216</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">217</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">218</span> <span class="k">return</span> <span class="n">lake</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:152,</span> in <span class="ni">load_files_interface</span><span class="nt">(path, settings, stream)</span>
-<span class="g g-Whitespace">    </span><span class="mi">149</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Loading file:&#39;</span><span class="p">,</span> <span class="n">file_info</span><span class="p">[</span><span class="n">file_i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-<span class="g g-Whitespace">    </span><span class="mi">151</span> <span class="k">if</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_1d_load&#39;</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">152</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_1d_stream</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">153</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">154</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">155</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">156</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">157</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">159</span> <span class="k">elif</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_loading_function&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;general_2d_load&#39;</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">160</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">get_2d_stream</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">161</span>         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">162</span>         <span class="n">first_pass</span><span class="o">=</span><span class="n">first_pass</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">163</span>         <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span>
-<span class="g g-Whitespace">    </span><span class="mi">165</span>     <span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/loader_interface.py:323,</span> in <span class="ni">get_1d_stream</span><span class="nt">(file_path, settings, first_pass, stream)</span>
-<span class="g g-Whitespace">    </span><span class="mi">321</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">epoch_time</span>
-<span class="g g-Whitespace">    </span><span class="mi">322</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">323</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">merger</span><span class="o">.</span><span class="n">stream_add_data</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">324</span>         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">325</span>         <span class="n">time_new</span><span class="o">=</span><span class="n">epoch_time</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">326</span>         <span class="n">data_new</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">327</span>         <span class="n">header_check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">328</span>         <span class="n">header_new</span><span class="o">=</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;data_header&#39;</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">329</span>     <span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">330</span> <span class="k">return</span> <span class="n">stream</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/data/merger.py:182,</span> in <span class="ni">stream_add_data</span><span class="nt">(stream, time_new, data_new, header_check, header_new)</span>
-<span class="g g-Whitespace">    </span><span class="mi">180</span>     <span class="n">sorted_time_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">181</span>     <span class="n">stream</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">sorted_time_index</span><span class="p">]</span>
-<span class="ne">--&gt; </span><span class="mi">182</span>     <span class="n">stream</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">sorted_time_index</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">return</span> <span class="n">stream</span>
-
-<span class="ne">MemoryError</span>: Unable to allocate 35.0 GiB for an array with shape (68551, 68551) and data type float64
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_1d
+  Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+Folder Settings: smps_2d
+  Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 
+Lake with streams: [&#39;cpc&#39;, &#39;smps_1d&#39;, &#39;smps_2d&#39;]
 </pre></div>
 </div>
 </div>
@@ -871,7 +829,7 @@ The streams:
        [1.9403e+04, 1.6900e+01],
        [2.0230e+04, 1.7000e+01],
        [1.9521e+04, 1.6800e+01]]), time=array([1.65734280e+09, 1.65734281e+09, 1.65734281e+09, ...,
-       1.65751559e+09, 1.65751560e+09, 1.65751560e+09]), files=[[&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1044534], [&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1113488]]))
+       1.65751559e+09, 1.65751560e+09, 1.65751560e+09]), files=[[&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1078191], [&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1011254]]))
 (&#39;smps_1d&#39;, Stream(header=[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample_Temp_(C)&#39;, &#39;Sample_Pressure_(kPa)&#39;, &#39;Relative_Humidity_(%)&#39;, &#39;Median_(nm)&#39;, &#39;Mean_(nm)&#39;, &#39;Geo_Mean_(nm)&#39;, &#39;Mode_(nm)&#39;, &#39;Geo_Std_Dev.&#39;, &#39;Total_Conc_(#/cc)&#39;], data=array([[2.05000e+01, 7.91500e+02, 2.37000e+01, ..., 2.07210e+01,
         2.17900e+00, 2.16900e+03],
        [2.05000e+01, 7.91500e+02, 2.36000e+01, ..., 2.52550e+01,
@@ -885,7 +843,7 @@ The streams:
         2.31800e+00, 2.10616e+03],
        [2.05000e+01, 7.91500e+02, 2.35000e+01, ..., 2.07210e+01,
         2.24800e+00, 2.45781e+03]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
-       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5620804], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2004838]]))
+       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]]))
 (&#39;smps_2d&#39;, Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39;, &#39;22.27&#39;, &#39;22.67&#39;, &#39;23.08&#39;, &#39;23.50&#39;, &#39;23.93&#39;, &#39;24.36&#39;, &#39;24.80&#39;, &#39;25.25&#39;, &#39;25.71&#39;, &#39;26.18&#39;, &#39;26.66&#39;, &#39;27.14&#39;, &#39;27.63&#39;, &#39;28.13&#39;, &#39;28.64&#39;, &#39;29.16&#39;, &#39;29.69&#39;, &#39;30.23&#39;, &#39;30.78&#39;, &#39;31.34&#39;, &#39;31.91&#39;, &#39;32.49&#39;, &#39;33.08&#39;, &#39;33.68&#39;, &#39;34.29&#39;, &#39;34.91&#39;, &#39;35.55&#39;, &#39;36.19&#39;, &#39;36.85&#39;, &#39;37.52&#39;, &#39;38.20&#39;, &#39;38.89&#39;, &#39;39.60&#39;, &#39;40.32&#39;, &#39;41.05&#39;, &#39;41.79&#39;, &#39;42.55&#39;, &#39;43.32&#39;, &#39;44.11&#39;, &#39;44.91&#39;, &#39;45.73&#39;, &#39;46.56&#39;, &#39;47.40&#39;, &#39;48.26&#39;, &#39;49.14&#39;, &#39;50.03&#39;, &#39;50.94&#39;, &#39;51.86&#39;, &#39;52.80&#39;, &#39;53.76&#39;, &#39;54.74&#39;, &#39;55.73&#39;, &#39;56.74&#39;, &#39;57.77&#39;, &#39;58.82&#39;, &#39;59.89&#39;, &#39;60.98&#39;, &#39;62.08&#39;, &#39;63.21&#39;, &#39;64.36&#39;, &#39;65.52&#39;, &#39;66.71&#39;, &#39;67.93&#39;, &#39;69.16&#39;, &#39;70.41&#39;, &#39;71.69&#39;, &#39;72.99&#39;, &#39;74.32&#39;, &#39;75.67&#39;, &#39;77.04&#39;, &#39;78.44&#39;, &#39;79.86&#39;, &#39;81.31&#39;, &#39;82.79&#39;, &#39;84.29&#39;, &#39;85.82&#39;, &#39;87.38&#39;, &#39;88.96&#39;, &#39;90.58&#39;, &#39;92.22&#39;, &#39;93.90&#39;, &#39;95.60&#39;, &#39;97.34&#39;, &#39;99.10&#39;, &#39;100.90&#39;, &#39;102.74&#39;, &#39;104.60&#39;, &#39;106.50&#39;, &#39;108.43&#39;, &#39;110.40&#39;, &#39;112.40&#39;, &#39;114.44&#39;, &#39;116.52&#39;, &#39;118.64&#39;, &#39;120.79&#39;, &#39;122.98&#39;, &#39;125.21&#39;, &#39;127.49&#39;, &#39;129.80&#39;, &#39;132.16&#39;, &#39;134.56&#39;, &#39;137.00&#39;, &#39;139.49&#39;, &#39;142.02&#39;, &#39;144.60&#39;, &#39;147.22&#39;, &#39;149.89&#39;, &#39;152.61&#39;, &#39;155.38&#39;, &#39;158.20&#39;, &#39;161.08&#39;, &#39;164.00&#39;, &#39;166.98&#39;, &#39;170.01&#39;, &#39;173.09&#39;, &#39;176.24&#39;, &#39;179.43&#39;, &#39;182.69&#39;, &#39;186.01&#39;, &#39;189.38&#39;, &#39;192.82&#39;, &#39;196.32&#39;, &#39;199.89&#39;, &#39;203.51&#39;, &#39;207.21&#39;, &#39;210.97&#39;, &#39;214.80&#39;, &#39;218.70&#39;, &#39;222.67&#39;, &#39;226.71&#39;, &#39;230.82&#39;, &#39;235.01&#39;, &#39;239.28&#39;, &#39;243.62&#39;, &#39;248.05&#39;, &#39;252.55&#39;, &#39;257.13&#39;, &#39;261.80&#39;, &#39;266.55&#39;, &#39;271.39&#39;, &#39;276.32&#39;, &#39;281.33&#39;, &#39;286.44&#39;, &#39;291.64&#39;, &#39;296.93&#39;, &#39;302.32&#39;, &#39;307.81&#39;, &#39;313.40&#39;, &#39;319.08&#39;, &#39;324.88&#39;, &#39;330.77&#39;, &#39;336.78&#39;, &#39;342.89&#39;, &#39;349.12&#39;, &#39;355.45&#39;, &#39;361.90&#39;, &#39;368.47&#39;, &#39;375.16&#39;, &#39;381.97&#39;, &#39;388.91&#39;, &#39;395.96&#39;, &#39;403.15&#39;, &#39;410.47&#39;, &#39;417.92&#39;, &#39;425.51&#39;, &#39;433.23&#39;, &#39;441.09&#39;, &#39;449.10&#39;, &#39;457.25&#39;, &#39;465.55&#39;, &#39;474.00&#39;, &#39;482.61&#39;, &#39;491.37&#39;, &#39;500.29&#39;, &#39;509.37&#39;, &#39;518.61&#39;, &#39;528.03&#39;, &#39;537.61&#39;, &#39;547.37&#39;, &#39;557.31&#39;, &#39;567.42&#39;, &#39;577.72&#39;, &#39;588.21&#39;, &#39;598.89&#39;, &#39;609.76&#39;, &#39;620.82&#39;, &#39;632.09&#39;, &#39;643.57&#39;, &#39;655.25&#39;, &#39;667.14&#39;, &#39;679.25&#39;, &#39;691.58&#39;, &#39;704.14&#39;, &#39;716.92&#39;, &#39;729.93&#39;, &#39;743.18&#39;, &#39;756.67&#39;, &#39;770.40&#39;, &#39;784.39&#39;], data=array([[ 6103.186,  2832.655,  4733.553, ...,    93.413,   122.992,
             0.   ],
        [ 5621.118,  5867.747,  6233.403, ...,     0.   ,     0.   ,
@@ -899,7 +857,7 @@ The streams:
           372.433],
        [14380.528, 11524.35 , 13632.727, ...,     0.   ,     0.   ,
             0.   ]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
-       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5620804], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2004838]]))
+       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]]))
 </pre></div>
 </div>
 </div>
@@ -944,7 +902,7 @@ Stream(header=[&#39;CPC_count[#/sec]&#39;, &#39;Temperature[degC]&#39;], data=ar
        [1.9403e+04, 1.6900e+01],
        [2.0230e+04, 1.7000e+01],
        [1.9521e+04, 1.6800e+01]]), time=array([1.65734280e+09, 1.65734281e+09, 1.65734281e+09, ...,
-       1.65751559e+09, 1.65751560e+09, 1.65751560e+09]), files=[[&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1044534], [&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1113488]])
+       1.65751559e+09, 1.65751560e+09, 1.65751560e+09]), files=[[&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1078191], [&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1011254]])
 Stream(header=[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample_Temp_(C)&#39;, &#39;Sample_Pressure_(kPa)&#39;, &#39;Relative_Humidity_(%)&#39;, &#39;Median_(nm)&#39;, &#39;Mean_(nm)&#39;, &#39;Geo_Mean_(nm)&#39;, &#39;Mode_(nm)&#39;, &#39;Geo_Std_Dev.&#39;, &#39;Total_Conc_(#/cc)&#39;], data=array([[2.05000e+01, 7.91500e+02, 2.37000e+01, ..., 2.07210e+01,
         2.17900e+00, 2.16900e+03],
        [2.05000e+01, 7.91500e+02, 2.36000e+01, ..., 2.52550e+01,
@@ -958,7 +916,7 @@ Stream(header=[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample
         2.31800e+00, 2.10616e+03],
        [2.05000e+01, 7.91500e+02, 2.35000e+01, ..., 2.07210e+01,
         2.24800e+00, 2.45781e+03]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
-       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5620804], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2004838]])
+       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
 Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39;, &#39;22.27&#39;, &#39;22.67&#39;, &#39;23.08&#39;, &#39;23.50&#39;, &#39;23.93&#39;, &#39;24.36&#39;, &#39;24.80&#39;, &#39;25.25&#39;, &#39;25.71&#39;, &#39;26.18&#39;, &#39;26.66&#39;, &#39;27.14&#39;, &#39;27.63&#39;, &#39;28.13&#39;, &#39;28.64&#39;, &#39;29.16&#39;, &#39;29.69&#39;, &#39;30.23&#39;, &#39;30.78&#39;, &#39;31.34&#39;, &#39;31.91&#39;, &#39;32.49&#39;, &#39;33.08&#39;, &#39;33.68&#39;, &#39;34.29&#39;, &#39;34.91&#39;, &#39;35.55&#39;, &#39;36.19&#39;, &#39;36.85&#39;, &#39;37.52&#39;, &#39;38.20&#39;, &#39;38.89&#39;, &#39;39.60&#39;, &#39;40.32&#39;, &#39;41.05&#39;, &#39;41.79&#39;, &#39;42.55&#39;, &#39;43.32&#39;, &#39;44.11&#39;, &#39;44.91&#39;, &#39;45.73&#39;, &#39;46.56&#39;, &#39;47.40&#39;, &#39;48.26&#39;, &#39;49.14&#39;, &#39;50.03&#39;, &#39;50.94&#39;, &#39;51.86&#39;, &#39;52.80&#39;, &#39;53.76&#39;, &#39;54.74&#39;, &#39;55.73&#39;, &#39;56.74&#39;, &#39;57.77&#39;, &#39;58.82&#39;, &#39;59.89&#39;, &#39;60.98&#39;, &#39;62.08&#39;, &#39;63.21&#39;, &#39;64.36&#39;, &#39;65.52&#39;, &#39;66.71&#39;, &#39;67.93&#39;, &#39;69.16&#39;, &#39;70.41&#39;, &#39;71.69&#39;, &#39;72.99&#39;, &#39;74.32&#39;, &#39;75.67&#39;, &#39;77.04&#39;, &#39;78.44&#39;, &#39;79.86&#39;, &#39;81.31&#39;, &#39;82.79&#39;, &#39;84.29&#39;, &#39;85.82&#39;, &#39;87.38&#39;, &#39;88.96&#39;, &#39;90.58&#39;, &#39;92.22&#39;, &#39;93.90&#39;, &#39;95.60&#39;, &#39;97.34&#39;, &#39;99.10&#39;, &#39;100.90&#39;, &#39;102.74&#39;, &#39;104.60&#39;, &#39;106.50&#39;, &#39;108.43&#39;, &#39;110.40&#39;, &#39;112.40&#39;, &#39;114.44&#39;, &#39;116.52&#39;, &#39;118.64&#39;, &#39;120.79&#39;, &#39;122.98&#39;, &#39;125.21&#39;, &#39;127.49&#39;, &#39;129.80&#39;, &#39;132.16&#39;, &#39;134.56&#39;, &#39;137.00&#39;, &#39;139.49&#39;, &#39;142.02&#39;, &#39;144.60&#39;, &#39;147.22&#39;, &#39;149.89&#39;, &#39;152.61&#39;, &#39;155.38&#39;, &#39;158.20&#39;, &#39;161.08&#39;, &#39;164.00&#39;, &#39;166.98&#39;, &#39;170.01&#39;, &#39;173.09&#39;, &#39;176.24&#39;, &#39;179.43&#39;, &#39;182.69&#39;, &#39;186.01&#39;, &#39;189.38&#39;, &#39;192.82&#39;, &#39;196.32&#39;, &#39;199.89&#39;, &#39;203.51&#39;, &#39;207.21&#39;, &#39;210.97&#39;, &#39;214.80&#39;, &#39;218.70&#39;, &#39;222.67&#39;, &#39;226.71&#39;, &#39;230.82&#39;, &#39;235.01&#39;, &#39;239.28&#39;, &#39;243.62&#39;, &#39;248.05&#39;, &#39;252.55&#39;, &#39;257.13&#39;, &#39;261.80&#39;, &#39;266.55&#39;, &#39;271.39&#39;, &#39;276.32&#39;, &#39;281.33&#39;, &#39;286.44&#39;, &#39;291.64&#39;, &#39;296.93&#39;, &#39;302.32&#39;, &#39;307.81&#39;, &#39;313.40&#39;, &#39;319.08&#39;, &#39;324.88&#39;, &#39;330.77&#39;, &#39;336.78&#39;, &#39;342.89&#39;, &#39;349.12&#39;, &#39;355.45&#39;, &#39;361.90&#39;, &#39;368.47&#39;, &#39;375.16&#39;, &#39;381.97&#39;, &#39;388.91&#39;, &#39;395.96&#39;, &#39;403.15&#39;, &#39;410.47&#39;, &#39;417.92&#39;, &#39;425.51&#39;, &#39;433.23&#39;, &#39;441.09&#39;, &#39;449.10&#39;, &#39;457.25&#39;, &#39;465.55&#39;, &#39;474.00&#39;, &#39;482.61&#39;, &#39;491.37&#39;, &#39;500.29&#39;, &#39;509.37&#39;, &#39;518.61&#39;, &#39;528.03&#39;, &#39;537.61&#39;, &#39;547.37&#39;, &#39;557.31&#39;, &#39;567.42&#39;, &#39;577.72&#39;, &#39;588.21&#39;, &#39;598.89&#39;, &#39;609.76&#39;, &#39;620.82&#39;, &#39;632.09&#39;, &#39;643.57&#39;, &#39;655.25&#39;, &#39;667.14&#39;, &#39;679.25&#39;, &#39;691.58&#39;, &#39;704.14&#39;, &#39;716.92&#39;, &#39;729.93&#39;, &#39;743.18&#39;, &#39;756.67&#39;, &#39;770.40&#39;, &#39;784.39&#39;], data=array([[ 6103.186,  2832.655,  4733.553, ...,    93.413,   122.992,
             0.   ],
        [ 5621.118,  5867.747,  6233.403, ...,     0.   ,     0.   ,
@@ -972,7 +930,7 @@ Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39
           372.433],
        [14380.528, 11524.35 , 13632.727, ...,     0.   ,     0.   ,
             0.   ]]), time=array([1.65718376e+09, 1.65718385e+09, 1.65718394e+09, ...,
-       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5620804], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2004838]])
+       1.65753440e+09, 1.65753450e+09, 1.65753459e+09]), files=[[&#39;2022-07-07_095151_SMPS.csv&#39;, 5617925], [&#39;2022-07-10_094659_SMPS.csv&#39;, 2003798]])
 </pre></div>
 </div>
 </div>
@@ -1042,7 +1000,7 @@ Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/84c074f633922b4bf481fd463c5c1912d9deeac3d86d114bd04b4defb124f523.png" src="../../_images/84c074f633922b4bf481fd463c5c1912d9deeac3d86d114bd04b4defb124f523.png" />
+<img alt="../../_images/ae1b3b886c09c047fbf8d23c3fc28d0c9e965587b739702b061abace761de01c.png" src="../../_images/ae1b3b886c09c047fbf8d23c3fc28d0c9e965587b739702b061abace761de01c.png" />
 </div>
 </div>
 <section id="data-averaging">
@@ -1114,7 +1072,7 @@ Stream(header=[&#39;20.72&#39;, &#39;21.10&#39;, &#39;21.48&#39;, &#39;21.87&#39
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/db4fbead22a5d8816617ee11c638a87299164efbbb058123bfbc4a9f5cdf9993.png" src="../../_images/db4fbead22a5d8816617ee11c638a87299164efbbb058123bfbc4a9f5cdf9993.png" />
+<img alt="../../_images/ac025dcf673d9dbad258350c725d7da33c33827c918ecd9153fc96ff026bc932.png" src="../../_images/ac025dcf673d9dbad258350c725d7da33c33827c918ecd9153fc96ff026bc932.png" />
 </div>
 </div>
 </section>
@@ -1150,6 +1108,7 @@ class Lake(builtins.object)
  |      Example: dir(lake)
  |  
  |  __eq__(self, other)
+ |      Return self==value.
  |  
  |  __getattr__(self, name: str) -&gt; Any
  |      Allow accessing streams as an attributes.
@@ -1162,6 +1121,7 @@ class Lake(builtins.object)
  |      Example: lake[&#39;stream_name&#39;]
  |  
  |  __init__(self, streams: Dict[str, particula.data.stream.Stream] = &lt;factory&gt;) -&gt; None
+ |      Initialize self.  See help(type(self)) for accurate signature.
  |  
  |  __iter__(self) -&gt; Iterator[Any]
  |      Iterate over the streams in the lake.
@@ -1213,10 +1173,10 @@ class Lake(builtins.object)
  |  Data descriptors defined here:
  |  
  |  __dict__
- |      dictionary for instance variables (if defined)
+ |      dictionary for instance variables
  |  
  |  __weakref__
- |      list of weak references to the object (if defined)
+ |      list of weak references to the object
  |  
  |  ----------------------------------------------------------------------
  |  Data and other attributes defined here:
@@ -1228,6 +1188,8 @@ class Lake(builtins.object)
  |  __dataclass_params__ = _DataclassParams(init=True,repr=True,eq=True,or...
  |  
  |  __hash__ = None
+ |  
+ |  __match_args__ = (&#39;streams&#39;,)
 </pre></div>
 </div>
 </div>
