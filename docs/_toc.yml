@@ -66,6 +66,7 @@ parts:
   numbered: false
   chapters:
   - file: strategic_plan/strategic_planning_FY24
+  - file: strategic_plan/Aerosol_patterns
 - caption: Community
   numbered: false
   chapters:
