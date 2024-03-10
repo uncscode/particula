@@ -268,6 +268,8 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="strategic_planning_FY24.html">FY24 Plan</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Program Outline Revision Draft</a></li>
+
+
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
 <ul class="nav bd-sidenav">
@@ -485,6 +487,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Program Outline Revision Draft</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aerosol-data-objects">Aerosol Data objects</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example">Example</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gas-module-with-builder-pattern">Gas Module with Builder Pattern</a><ul class="nav section-nav flex-column">
@@ -503,6 +506,11 @@ document.write(`
 </ul>
 </li>
 </ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#or-equivalently">Or equivalently:</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence-runnablesequence-first-runnable-1-last-runnable-2">sequence = RunnableSequence(first=runnable_1, last=runnable_2)</a></li>
+</ul>
+
             </nav>
         </div>
     </div>
@@ -705,8 +713,25 @@ document.write(`
 <section id="implementation-consideration">
 <h3>Implementation Consideration<a class="headerlink" href="#implementation-consideration" title="Link to this heading">#</a></h3>
 <p>While the Abstract Factory and Factory Pattern combination provides a robust structure for your aerosol modeling application, it’s important to ensure that the design remains flexible and doesn’t introduce unnecessary complexity. Keep the interface of your abstract factory and concrete factories clear and intuitive, and only define separate factories for processes that genuinely require different instantiation logic or have distinctly different configurations.</p>
+<p>from langchain_core.runnables import RunnableLambda</p>
+<p>def mass_condensation(input = Aerosol, other_settings) -&gt; Aerosol:
+# Perform mass condensation calculations
+return Aerosol</p>
+<p>def mass_coagulation(input = Aerosol, other_setting2) -&gt; Aerosol:
+# Perform mass coagulation calculations
+return Aerosol</p>
+<p>runnable_1 = mass_condensation(other_settings)
+runnable_2 = mass_coagulation(other_settings2)
+sequence = runnable_1 | runnable_2</p>
 </section>
 </section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="or-equivalently">
+<h1>Or equivalently:<a class="headerlink" href="#or-equivalently" title="Link to this heading">#</a></h1>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="sequence-runnablesequence-first-runnable-1-last-runnable-2">
+<h1>sequence = RunnableSequence(first=runnable_1, last=runnable_2)<a class="headerlink" href="#sequence-runnablesequence-first-runnable-1-last-runnable-2" title="Link to this heading">#</a></h1>
+<p>sequence.invoke(input=Aerosol)</p>
 </section>
 
     <script type="text/x-thebe-config">
@@ -773,6 +798,7 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Program Outline Revision Draft</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aerosol-data-objects">Aerosol Data objects</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example">Example</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gas-module-with-builder-pattern">Gas Module with Builder Pattern</a><ul class="nav section-nav flex-column">
@@ -791,6 +817,11 @@ document.write(`
 </ul>
 </li>
 </ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#or-equivalently">Or equivalently:</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence-runnablesequence-first-runnable-1-last-runnable-2">sequence = RunnableSequence(first=runnable_1, last=runnable_2)</a></li>
+</ul>
+
   </nav></div>
 
 </div></div>
