@@ -207,3 +207,24 @@ This is the abstract class that declares a set of methods for creating different
 ### Implementation Consideration
 
 While the Abstract Factory and Factory Pattern combination provides a robust structure for your aerosol modeling application, it's important to ensure that the design remains flexible and doesn't introduce unnecessary complexity. Keep the interface of your abstract factory and concrete factories clear and intuitive, and only define separate factories for processes that genuinely require different instantiation logic or have distinctly different configurations.
+
+
+
+
+from langchain_core.runnables import RunnableLambda
+
+def mass_condensation(input = Aerosol, other_settings) -> Aerosol:
+    # Perform mass condensation calculations
+    return Aerosol
+
+def mass_coagulation(input = Aerosol, other_setting2) -> Aerosol:
+    # Perform mass coagulation calculations
+    return Aerosol
+
+runnable_1 = mass_condensation(other_settings)
+runnable_2 = mass_coagulation(other_settings2)
+sequence = runnable_1 | runnable_2
+# Or equivalently:
+# sequence = RunnableSequence(first=runnable_1, last=runnable_2)
+
+sequence.invoke(input=Aerosol)
