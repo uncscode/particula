@@ -35,11 +35,11 @@ class GasSpecies:
     name, mass, vapor pressure, and whether it is condensable.
 
     Attributes:
-        name (str): The name of the gas species.
-        mass (float): The mass of the gas species.
-        vapor_pressure (Optional[float]): The vapor pressure of the gas
-            species. None if not applicable.
-        condensable (bool): Indicates whether the gas species is condensable.
+    - name (str): The name of the gas species.
+    - mass (float): The mass of the gas species.
+    - vapor_pressure (Optional[float]): The vapor pressure of the gas
+        species. None if not applicable.
+    - condensable (bool): Indicates whether the gas species is condensable.
     """
     name: str
     mass: float
@@ -83,10 +83,20 @@ class Gas:
     temperature, total pressure, and a list of gas species components.
 
     Attributes:
-        temperature (float): The temperature of the gas mixture.
-        total_pressure (float): The total pressure of the gas mixture.
-        components (List[GasSpecies]): A list of GasSpecies objects
-            representing the components of the gas mixture.
+    - temperature (float): The temperature of the gas mixture.
+    - total_pressure (float): The total pressure of the gas mixture.
+    - components (List[GasSpecies]): A list of GasSpecies objects
+        representing the components of the gas mixture.
+
+    Methods:
+    - add_species: Adds a gas species to the mixture.
+    - remove_species: Removes a gas species from the mixture by name.
+    - get_mass: Returns the mass of a specified species or the masses of all
+        species in the gas mixture as an np.ndarray.
+    - get_mass_condensable: Returns the mass of a specific condensable species
+        or the masses of all condensable species in the gas mixture as an
+        np.ndarray.
+
     """
     temperature: float = 298.15
     total_pressure: float = 101325
@@ -102,12 +112,12 @@ class Gas:
         Adds a gas species to the mixture.
 
         Parameters:
-            name (str): The name of the gas species.
-            mass (float): The mass of the gas species.
-            vapor_pressure (Optional[float]): The vapor pressure of the gas
-                species. None if not applicable.
-            condensable (bool): Indicates whether the gas species is
-                condensable.
+        - name (str): The name of the gas species.
+        - mass (float): The mass of the gas species.
+        - vapor_pressure (Optional[float]): The vapor pressure of the gas
+            species. None if not applicable.
+        - condensable (bool): Indicates whether the gas species is
+            condensable.
         """
         species = GasSpecies(name, mass, vapor_pressure, condensable)
         self.components.append(species)
@@ -117,7 +127,7 @@ class Gas:
         Removes a gas species from the mixture by name.
 
         Parameters:
-            name (str): The name of the gas species to be removed.
+        - name (str): The name of the gas species to be removed.
         """
         self.components = [c for c in self.components if c.name != name]
 
