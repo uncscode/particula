@@ -30,7 +30,6 @@ class ParticleStrategy(ABC):
         Returns:
         - NDArray[np.float64]: The mass of the particles.
         """
-        pass
 
     @abstractmethod
     def get_radius(
@@ -50,7 +49,6 @@ class ParticleStrategy(ABC):
         Returns:
         - NDArray[np.float64]: The radius of the particles.
         """
-        pass
 
     @abstractmethod
     def get_total_mass(
@@ -73,7 +71,6 @@ class ParticleStrategy(ABC):
         Returns:
         - np.float64: The total mass of the particles.
         """
-        pass
 
 
 class MassBasedStrategy(ParticleStrategy):
