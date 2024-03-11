@@ -73,7 +73,7 @@ parts:
   - file: documentation/base/base_overview
   - file: documentation/base/gas
   - file: documentation/base/base_particle
-  - file: documentation/base/aerosol
+  - file: documentation/base/base_aerosol
   - file: documentation/base/base_runnable_process
 - caption: Community
   numbered: false
