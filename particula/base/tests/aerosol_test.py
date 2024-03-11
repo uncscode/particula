@@ -13,6 +13,7 @@ from particula.base.particle import Particle, create_particle_strategy
 
 @pytest.fixture
 def sample_gas():
+    """Fixture for creating a Gas instance for testing."""
     gas = Gas()
     gas.add_species("Oxygen", 32.0)
     gas.add_species("Nitrogen", 28.0)
