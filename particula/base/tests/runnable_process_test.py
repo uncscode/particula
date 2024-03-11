@@ -45,6 +45,7 @@ def mass_coagulation():
 
 
 def test_mass_condensation_execute(aerosol, mass_condensation):
+    """Test the MassCondensation process execute method."""
     original_distribution = aerosol.particle.distribution.copy()
     modified_aerosol = mass_condensation.execute(aerosol)
     np.testing.assert_array_equal(
@@ -53,6 +54,7 @@ def test_mass_condensation_execute(aerosol, mass_condensation):
 
 
 def test_mass_coagulation_execute(aerosol, mass_coagulation):
+    """Test the MassCoagulation process execute method."""
     original_distribution = aerosol.particle.distribution.copy()
     modified_aerosol = mass_coagulation.execute(aerosol)
     np.testing.assert_array_equal(
@@ -61,6 +63,7 @@ def test_mass_coagulation_execute(aerosol, mass_coagulation):
 
 
 def test_process_sequence(aerosol, mass_condensation, mass_coagulation):
+    """Test the ProcessSequence class."""
     sequence = ProcessSequence()
     sequence.add_process(mass_condensation)
     sequence.add_process(mass_coagulation)
@@ -79,6 +82,7 @@ def test_process_sequence(aerosol, mass_condensation, mass_coagulation):
 
 def test_process_sequence_chaining(
         aerosol, mass_condensation, mass_coagulation):
+    """Test the ProcessSequence class chaining with the | operator."""
     sequence = mass_condensation | mass_coagulation
     modified_aerosol = sequence.execute(aerosol)
 
@@ -90,8 +94,10 @@ def test_process_sequence_chaining(
 
 
 def test_mass_condensation_rate(aerosol, mass_condensation):
+    """Test the MassCondensation process rate method."""
     assert mass_condensation.rate(aerosol) == 0.5
 
 
 def test_mass_coagulation_rate(aerosol, mass_coagulation):
+    """Test the MassCoagulation process rate method."""
     assert mass_coagulation.rate(aerosol) == 0.5

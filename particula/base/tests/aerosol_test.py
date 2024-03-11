@@ -21,6 +21,7 @@ def sample_gas():
 
 @pytest.fixture
 def sample_particles():
+    """Fixture for creating a Particle instance for testing."""
     strategy = create_particle_strategy('mass_based')
     return Particle(
         strategy,
@@ -30,6 +31,7 @@ def sample_particles():
 
 
 def test_initialization(sample_gas, sample_particles):
+    """Test the initialization of an Aerosol object."""
     aerosol = Aerosol(sample_gas, sample_particles)
     # Test for dynamic attachment and correct initialization
     # These tests should align with your Aerosol's implementation details
@@ -38,6 +40,7 @@ def test_initialization(sample_gas, sample_particles):
 
 
 def test_replace_gas(sample_gas, sample_particles):
+    """Test replacing the Gas instance in an Aerosol object."""
     aerosol = Aerosol(sample_gas, sample_particles)
     new_gas = Gas()
     new_gas.add_species("H2O", 18.0)
@@ -50,6 +53,7 @@ def test_replace_gas(sample_gas, sample_particles):
 
 
 def test_replace_particle(sample_gas, sample_particles):
+    """Test replacing the Particle instance in an Aerosol object."""
     aerosol = Aerosol(sample_gas, sample_particles)
     new_strategy = create_particle_strategy(
         'number_based')  # Assuming this changes the behavior
