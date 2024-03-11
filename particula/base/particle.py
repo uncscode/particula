@@ -84,7 +84,7 @@ class MassBasedStrategy(ParticleStrategy):
             self,
             distribution: NDArray[np.float64],
             density: NDArray[np.float64]
-            ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float64]:
         # In a mass-based strategy, the mass distribution is directly returned.
         return distribution
 
@@ -92,7 +92,7 @@ class MassBasedStrategy(ParticleStrategy):
             self,
             distribution: NDArray[np.float64],
             density: NDArray[np.float64]
-            ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float64]:
         # Calculate the volume of each particle from its mass and density,
         # then calculate the radius.
         volumes = distribution / density
@@ -103,13 +103,13 @@ class MassBasedStrategy(ParticleStrategy):
             distribution: NDArray[np.float64],
             concentration: NDArray[np.float64],
             density: NDArray[np.float64]
-            ) -> np.float64:
+    ) -> np.float64:
         # Calculate the total mass by summing the product of the mass
         # distribution and its concentration.
         return np.sum(distribution * concentration)
 
 
-class NumberBasedStrategy(ParticleStrategy):
+class RadiiBasedStrategy(ParticleStrategy):
     """
     A strategy for particles represented by their radius (distribution),
     and particle conentraiton. Implementing the ParticleStrategy interface.
@@ -121,7 +121,7 @@ class NumberBasedStrategy(ParticleStrategy):
             self,
             distribution: NDArray[np.float64],
             density: NDArray[np.float64]
-            ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float64]:
         # Calculate the volume of each particle
         volumes = 4 / 3 * np.pi * distribution ** 3
         return volumes * density  # Mass is volume multiplied by density
@@ -130,7 +130,7 @@ class NumberBasedStrategy(ParticleStrategy):
             self,
             distribution: NDArray[np.float64],
             density: NDArray[np.float64],
-            ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float64]:
         return distribution  # Radii are directly available
 
     def get_total_mass(
@@ -156,7 +156,7 @@ class SpeciatedMassStrategy(ParticleStrategy):
             self,
             distribution: NDArray[np.float64],
             density: NDArray[np.float64]
-            ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float64]:
         """
         Calculates the mass for each mass and species, leveraging densities
         for adjustment.
@@ -178,7 +178,7 @@ class SpeciatedMassStrategy(ParticleStrategy):
             self,
             distribution: NDArray[np.float64],
             density: NDArray[np.float64]
-            ) -> NDArray[np.float64]:
+    ) -> NDArray[np.float64]:
         """
         Calculates the radius for each mass bin and species, based on the
         volume derived from mass and density.
@@ -203,7 +203,7 @@ class SpeciatedMassStrategy(ParticleStrategy):
             distribution: NDArray[np.float64],
             concentration: NDArray[np.float64],
             density: NDArray[np.float64]
-            ) -> np.float64:
+    ) -> np.float64:
         """
         Calculates the total mass of all species, incorporating the
         concentration of particles per species.
@@ -231,6 +231,7 @@ def create_particle_strategy(particle_representation: str) -> ParticleStrategy:
     Parameters:
     - particle_type (str): The type of particle representation, determining
     which strategy instance to create.
+    [mass_based, radii_based, speciated_mass]
 
     Returns:
     - An instance of ParticleStrategy corresponding to the specified
@@ -241,8 +242,8 @@ def create_particle_strategy(particle_representation: str) -> ParticleStrategy:
     """
     if particle_representation == "mass_based":
         return MassBasedStrategy()
-    if particle_representation == "number_based":
-        return NumberBasedStrategy()
+    if particle_representation == "radii_based":
+        return RadiiBasedStrategy()
     if particle_representation == "speciated_mass":
         return SpeciatedMassStrategy()
     raise ValueError(f"Unknown particle strategy: {particle_representation}")

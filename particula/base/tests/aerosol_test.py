@@ -56,7 +56,7 @@ def test_replace_particle(sample_gas, sample_particles):
     """Test replacing the Particle instance in an Aerosol object."""
     aerosol = Aerosol(sample_gas, sample_particles)
     new_strategy = create_particle_strategy(
-        'number_based')  # Assuming this changes the behavior
+        'radii_based')  # Assuming this changes the behavior
     new_particles = Particle(
         new_strategy,
         np.array([50, 100, 150], dtype=np.float64),

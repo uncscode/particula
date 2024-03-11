@@ -3,12 +3,12 @@
 import numpy as np
 import pytest
 from particula.base.particle import (
-    MassBasedStrategy, NumberBasedStrategy, SpeciatedMassStrategy,
+    MassBasedStrategy, RadiiBasedStrategy, SpeciatedMassStrategy,
     create_particle_strategy, Particle)
 
 
 mass_based_strategy = MassBasedStrategy()
-number_based_strategy = NumberBasedStrategy()
+radii_based_strategy = RadiiBasedStrategy()
 speciated_mass_strategy = SpeciatedMassStrategy()
 
 
@@ -46,37 +46,37 @@ def test_mass_based_strategy_total_mass():
         distribution, concentration, density) == expected_total_mass
 
 
-def test_number_based_get_mass():
+def test_radii_based_get_mass():
     """Test number-based strategy mass calculation."""
     distribution = np.array([1, 2, 3], dtype=np.float64)  # Example radii
     density = np.float64(5)  # Example density
     expected_volumes = 4 / 3 * np.pi * distribution ** 3
     expected_mass = expected_volumes * density
     np.testing.assert_array_almost_equal(
-        number_based_strategy.get_mass(distribution, density),
+        radii_based_strategy.get_mass(distribution, density),
         expected_mass
     )
 
 
-def test_number_based_get_radius():
+def test_radii_based_get_radius():
     """Test number-based strategy radius calculation."""
     distribution = np.array([1, 2, 3], dtype=np.float64)  # Example radii
     # Density, not used in get_radius, provided for consistency
     density = np.float64(5)
     np.testing.assert_array_equal(
-        number_based_strategy.get_radius(distribution, density),
+        radii_based_strategy.get_radius(distribution, density),
         distribution
     )
 
 
-def test_number_based_get_total_mass():
+def test_radii_based_get_total_mass():
     """Test number-based strategy total mass calculation."""
     distribution = np.array([1, 2, 3], dtype=np.float64)  # Example radii
     density = np.float64(5)  # Example density
     concentration = np.array([10, 20, 30], dtype=np.float64)  # concentrations
     expected_masses = 4 / 3 * np.pi * distribution ** 3 * density
     expected_total_mass = np.sum(expected_masses * concentration)
-    assert number_based_strategy.get_total_mass(
+    assert radii_based_strategy.get_total_mass(
         distribution, concentration, density) \
         == pytest.approx(expected_total_mass)
 
@@ -131,9 +131,9 @@ def test_speciated_mass_strategy_get_total_mass():
 
 @pytest.mark.parametrize("representation, expected_strategy_type", [
     ("mass_based", MassBasedStrategy),
-    ("number_based", NumberBasedStrategy),
+    ("radii_based", RadiiBasedStrategy),
     ("speciated_mass", SpeciatedMassStrategy),
-    ])
+])
 def test_create_particle_strategy(representation, expected_strategy_type):
     """Parameterized test for create_particle_strategy."""
     strategy = create_particle_strategy(representation)
@@ -145,7 +145,7 @@ def test_create_particle_strategy(representation, expected_strategy_type):
      np.array([100, 200, 300], dtype=np.float64),
      np.float64(2.5),
      np.array([10, 20, 30], dtype=np.float64)),
-    (NumberBasedStrategy(), np.array([1, 2, 3], dtype=np.float64),
+    (RadiiBasedStrategy(), np.array([1, 2, 3], dtype=np.float64),
      np.float64(5), np.array([10, 20, 30], dtype=np.float64)),
     # For SpeciatedMassStrategy, ensure distribution aligns with expected 2D
     # shape and densities are properly set
@@ -153,7 +153,7 @@ def test_create_particle_strategy(representation, expected_strategy_type):
      np.array([[100, 200], [300, 400]], dtype=np.float64),
      np.array([2.5, 3.5], dtype=np.float64),
      np.array([10, 20], dtype=np.float64)),
-    ])
+])
 def test_particle_properties(strategy, distribution, density, concentration):
     """Parameterized test for Particle properties."""
     particle = Particle(strategy, distribution, density, concentration)
