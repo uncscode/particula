@@ -1,6 +1,5 @@
 """Test Particles and Strategies."""
 
-from numpy.typing import NDArray
 import numpy as np
 import pytest
 from particula.base.particle import (
