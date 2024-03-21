@@ -196,6 +196,8 @@ class Gas:
                         f"Gas species '{name}' is not condensable.")
             raise ValueError(f"Gas species '{name}' not found in the mixture.")
 
-        masses_condensable = [component.get_mass(
-        ) for component in self.components if component.is_condensable()]
+        masses_condensable = [
+            component.get_mass()
+            for component in self.components if component.is_condensable()
+        ]
         return np.array(masses_condensable, dtype=np.float64)
