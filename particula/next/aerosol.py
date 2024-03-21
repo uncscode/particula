@@ -1,8 +1,8 @@
 """Aerosol class definition."""
 
 from typing import Union
-from particula.base.gas import Gas
-from particula.base.particle import Particle
+from particula.next.gas import Gas
+from particula.next.particle import Particle
 
 
 class Aerosol:

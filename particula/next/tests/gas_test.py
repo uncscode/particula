@@ -2,7 +2,7 @@
 
 import pytest
 import numpy as np
-from particula.base.gas import Gas, GasSpecies
+from particula.next.gas import Gas, GasSpecies
 
 
 def test_gas_species_init():
