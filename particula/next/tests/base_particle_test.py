@@ -2,7 +2,7 @@
 
 import numpy as np
 import pytest
-from particula.base.particle import (
+from particula.next.particle import (
     MassBasedStrategy, RadiiBasedStrategy, SpeciatedMassStrategy,
     create_particle_strategy, Particle)
 

@@ -6,9 +6,9 @@
 
 import pytest
 import numpy as np
-from particula.base.aerosol import Aerosol
-from particula.base.gas import Gas
-from particula.base.particle import Particle, create_particle_strategy
+from particula.next.aerosol import Aerosol
+from particula.next.gas import Gas
+from particula.next.particle import Particle, create_particle_strategy
 
 
 @pytest.fixture

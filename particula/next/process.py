@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from particula.base.aerosol import Aerosol
+from particula.next.aerosol import Aerosol
 
 
 class RunnableProcess(ABC):
