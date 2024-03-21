@@ -22,10 +22,10 @@ mixture as a whole or interact with its individual components seamlessly.
 """
 
 
-from typing import Optional, List
+from typing import Optional
 from dataclasses import dataclass, field
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
 
 @dataclass
@@ -100,7 +100,7 @@ class Gas:
     """
     temperature: float = 298.15
     total_pressure: float = 101325
-    components: List[GasSpecies] = field(default_factory=list)
+    components: list[GasSpecies] = field(default_factory=list)
 
     def add_species(
             self,

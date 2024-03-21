@@ -1,8 +1,8 @@
 """Particle distribution classes and factory."""
 
 from abc import ABC, abstractmethod
-from numpy.typing import NDArray
 import numpy as np
+from numpy.typing import NDArray
 
 
 class ParticleStrategy(ABC):
