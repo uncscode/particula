@@ -1,0 +1,72 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/nbclient/client.py", line 1314, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# Example demonstrating the usage of particle distribution strategies
+
+# Assuming necessary imports
+import numpy as np
+from particula.base.particle import (
+    create_particle_strategy,
+    Particle,
+    MassBasedStrategy,
+    RadiiBasedStrategy,
+    SpeciatedMassStrategy,
+)
+
+# Creating particle distribution examples
+mass_distribution = np.array([100, 200, 300], dtype=np.float64)
+density = np.float64(2.5)
+concentration = np.array([10, 20, 30], dtype=np.float64)
+
+# Instantiate a particle strategy
+mass_based_strategy = MassBasedStrategy()
+
+# Create a Particle instance using the MassBasedStrategy
+particle = Particle(strategy=mass_based_strategy,
+                    distribution=mass_distribution,
+                    density=density,
+                    concentration=concentration)
+
+# Accessing calculated properties
+print("Mass of particles:", particle.get_mass())
+print("Radius of particles:", particle.get_radius())
+print("Total mass of the particle distribution:", particle.get_total_mass())
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+Cell [0;32mIn[1], line 5[0m
+[1;32m      1[0m [38;5;66;03m# Example demonstrating the usage of particle distribution strategies[39;00m
+[1;32m      2[0m 
+[1;32m      3[0m [38;5;66;03m# Assuming necessary imports[39;00m
+[1;32m      4[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[0;32m----> 5[0m [38;5;28;01mfrom[39;00m [38;5;21;01mparticula[39;00m[38;5;21;01m.[39;00m[38;5;21;01mbase[39;00m[38;5;21;01m.[39;00m[38;5;21;01mparticle[39;00m [38;5;28;01mimport[39;00m (
+[1;32m      6[0m     create_particle_strategy,
+[1;32m      7[0m     Particle,
+[1;32m      8[0m     MassBasedStrategy,
+[1;32m      9[0m     RadiiBasedStrategy,
+[1;32m     10[0m     SpeciatedMassStrategy,
+[1;32m     11[0m )
+[1;32m     13[0m [38;5;66;03m# Creating particle distribution examples[39;00m
+[1;32m     14[0m mass_distribution [38;5;241m=[39m np[38;5;241m.[39marray([[38;5;241m100[39m, [38;5;241m200[39m, [38;5;241m300[39m], dtype[38;5;241m=[39mnp[38;5;241m.[39mfloat64)
+
+[0;31mModuleNotFoundError[0m: No module named 'particula.base'
+
