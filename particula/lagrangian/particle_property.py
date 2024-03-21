@@ -163,7 +163,8 @@ def generate_particle_masses(
     # Sample radii from the log-normal distribution
     radius_samples = torch.distributions.log_normal.LogNormal(
         mean_log, std_dev_log).sample((num_particles,))
-    radius_samples *= convert_units(radius_input_units, "m")
+    radius_samples *= torch.asarray(
+        convert_units(radius_input_units, "m"))
 
     # Calculate mass of each particle
     return mass_calculation(radius=radius_samples, density=density)
