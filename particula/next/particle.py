@@ -218,9 +218,7 @@ class SpeciatedMassStrategy(ParticleStrategy):
         """
         # Calculate mass for each bin and species, then sum for total mass
         mass_per_species = self.get_mass(distribution, density)
-        # Sum over rows for each species
-        total_mass = np.sum(mass_per_species * concentration)
-        return total_mass
+        return np.sum(mass_per_species * concentration)
 
 
 def create_particle_strategy(particle_representation: str) -> ParticleStrategy:
