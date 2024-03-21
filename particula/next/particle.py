@@ -195,8 +195,7 @@ class SpeciatedMassStrategy(ParticleStrategy):
         """
         # Calculate volume from mass and density, then derive radius
         volumes = np.sum(distribution / density, axis=0)
-        radii = (3 * volumes / (4 * np.pi)) ** (1 / 3)
-        return radii
+        return (3 * volumes / (4 * np.pi)) ** (1 / 3)
 
     def get_total_mass(
             self,
