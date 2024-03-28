@@ -66,6 +66,15 @@ parts:
   numbered: false
   chapters:
   - file: strategic_plan/strategic_planning_FY24
+  - file: strategic_plan/Aerosol_patterns
+- caption: Prototype
+  numbered: false
+  chapters:
+  - file: documentation/base/base_overview
+  - file: documentation/base/gas
+  - file: documentation/base/base_particle
+  - file: documentation/base/base_aerosol
+  - file: documentation/base/base_runnable_process
 - caption: Community
   numbered: false
   chapters:
