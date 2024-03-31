@@ -620,25 +620,11 @@ document.write(`
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">particula.lagrangian</span> <span class="kn">import</span> <span class="n">boundary</span><span class="p">,</span> <span class="n">integration</span><span class="p">,</span> <span class="n">collisions</span><span class="p">,</span> <span class="n">particle_property</span><span class="p">,</span> <span class="n">particle_pairs</span>
-<span class="kn">from</span> <span class="nn">particula.activity</span> <span class="kn">import</span> <span class="n">machine_limit</span>
+<span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">machine_limit</span>
 <span class="c1"># Initializing the Torch Generator and setting the data type</span>
 <span class="n">seed</span> <span class="o">=</span> <span class="mi">1234</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>  <span class="c1"># Set the seed for reproducibility</span>
 <span class="n">t_type</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">7</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="kn">from</span> <span class="nn">particula.lagrangian</span> <span class="kn">import</span> <span class="n">boundary</span><span class="p">,</span> <span class="n">integration</span><span class="p">,</span> <span class="n">collisions</span><span class="p">,</span> <span class="n">particle_property</span><span class="p">,</span> <span class="n">particle_pairs</span>
-<span class="ne">----&gt; </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">particula.activity</span> <span class="kn">import</span> <span class="n">machine_limit</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="c1"># Initializing the Torch Generator and setting the data type</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">1234</span>
-
-<span class="ne">ImportError</span>: cannot import name &#39;machine_limit&#39; from &#39;particula.activity&#39; (/opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/activity/__init__.py)
 </pre></div>
 </div>
 </div>
@@ -770,8 +756,8 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/95c0e57d1efb52ce781068e59752e777806ea13294670574e0e382b97bc1ed80.png" src="../../_images/95c0e57d1efb52ce781068e59752e777806ea13294670574e0e382b97bc1ed80.png" />
-<img alt="../../_images/3dbf6c0f3b7b2a66ad155afe60dad33d250592de02d2a27a5fd70843b36f16a2.png" src="../../_images/3dbf6c0f3b7b2a66ad155afe60dad33d250592de02d2a27a5fd70843b36f16a2.png" />
+<img alt="../../_images/25b86ce879fe3e343beb40d588e5665430dc89c75fd5f0bd2f6b3abd757315ce.png" src="../../_images/25b86ce879fe3e343beb40d588e5665430dc89c75fd5f0bd2f6b3abd757315ce.png" />
+<img alt="../../_images/a4969958697a748b2d013d00ab146f29e5bfab4fdf4f8b9fde9aad7350611f00.png" src="../../_images/a4969958697a748b2d013d00ab146f29e5bfab4fdf4f8b9fde9aad7350611f00.png" />
 </div>
 </div>
 </section>
@@ -844,10 +830,10 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Max Radius [m]:  tensor(0.0006)
-Min Radius [m]:  tensor(6.2121e-06)
+Min Radius [m]:  tensor(2.9795e-06)
 </pre></div>
 </div>
-<img alt="../../_images/5bae33957c2ccef657b97508b407508ede19e656a126c41196b37b5c14e00ec6.png" src="../../_images/5bae33957c2ccef657b97508b407508ede19e656a126c41196b37b5c14e00ec6.png" />
+<img alt="../../_images/808bc02a59ca0a5acd4031a99640a2640e726eb2eda25e05e41f6006527f0e41.png" src="../../_images/808bc02a59ca0a5acd4031a99640a2640e726eb2eda25e05e41f6006527f0e41.png" />
 </div>
 </div>
 </section>
@@ -936,8 +922,8 @@ Min Radius [m]:  tensor(6.2121e-06)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 22.354511499404907 seconds
-Ratio of wall time to simulation time: 0.22354511499404908
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 8.82828974723816 seconds
+Ratio of wall time to simulation time: 0.08828289747238159
 </pre></div>
 </div>
 </div>
@@ -1001,10 +987,10 @@ Ratio of wall time to simulation time: 0.22354511499404908
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 1260
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 1510
 </pre></div>
 </div>
-<img alt="../../_images/71778c18cfdb5818ea4094fc2040e7dd3fa68f0eafa89458948552275535ae68.png" src="../../_images/71778c18cfdb5818ea4094fc2040e7dd3fa68f0eafa89458948552275535ae68.png" />
+<img alt="../../_images/f5648a27e756dfa18b2472d69519e57d317d33362b6459240c3c0618fd69510c.png" src="../../_images/f5648a27e756dfa18b2472d69519e57d317d33362b6459240c3c0618fd69510c.png" />
 </div>
 </div>
 </section>
@@ -1032,9 +1018,9 @@ Ratio of wall time to simulation time: 0.22354511499404908
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/7d74a9c775811386553f2dd398e7b94a7636898a8cd9f9eb86435f8a09dac781.png" src="../../_images/7d74a9c775811386553f2dd398e7b94a7636898a8cd9f9eb86435f8a09dac781.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial Max Radius [m]:  0.0005869632004760206
-Final Max Radius [m]:  0.0007475933229391738
+<img alt="../../_images/6a1158b9027648804617db342c2da47236b9f37b896b3e81fdd7c4c8c291e928.png" src="../../_images/6a1158b9027648804617db342c2da47236b9f37b896b3e81fdd7c4c8c291e928.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial Max Radius [m]:  0.0006300950772128999
+Final Max Radius [m]:  0.0007361950668992882
 </pre></div>
 </div>
 </div>

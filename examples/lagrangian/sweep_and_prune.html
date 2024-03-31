@@ -614,6 +614,10 @@ document.write(`
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">particula.lagrangian</span> <span class="kn">import</span> <span class="n">boundary</span><span class="p">,</span> <span class="n">integration</span><span class="p">,</span> <span class="n">collisions</span><span class="p">,</span> <span class="n">particle_property</span><span class="p">,</span> <span class="n">particle_pairs</span>
 
+<span class="c1"># device = torch.device(&#39;cuda&#39;)  # or &#39;cuda:0&#39; to specify a particular GPU</span>
+<span class="c1"># torch.set_default_device(device)</span>
+
+
 <span class="c1"># Initializing the Torch Generator and setting the data type</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>  <span class="c1"># Set the seed for reproducibility</span>
 <span class="n">t_type</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span>
@@ -632,7 +636,7 @@ document.write(`
 <span class="c1"># Define fixed parameters</span>
 <span class="n">TOTAL_NUMBER_OF_PARTICLES</span> <span class="o">=</span> <span class="mi">500</span>
 <span class="n">TIME_STEP</span> <span class="o">=</span> <span class="mf">0.01</span>
-<span class="n">SIMULATION_TIME</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">SIMULATION_TIME</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">MASS</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">CUBE_SIDE</span> <span class="o">=</span> <span class="mi">50</span>
 <span class="n">speed</span> <span class="o">=</span> <span class="mi">5</span>
@@ -714,13 +718,13 @@ document.write(`
 
     <span class="c1"># Save the position and mass data at designated save points</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">save_iterations</span><span class="p">[</span><span class="n">save_counter</span><span class="p">]:</span>
-        <span class="n">save_position</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">save_counter</span><span class="p">]</span> <span class="o">=</span> <span class="n">position</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-        <span class="n">save_mass</span><span class="p">[:,</span> <span class="n">save_counter</span><span class="p">]</span> <span class="o">=</span> <span class="n">mass</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">save_position</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">save_counter</span><span class="p">]</span> <span class="o">=</span> <span class="n">position</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">save_mass</span><span class="p">[:,</span> <span class="n">save_counter</span><span class="p">]</span> <span class="o">=</span> <span class="n">mass</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
         <span class="n">save_counter</span> <span class="o">+=</span> <span class="mi">1</span>
 
 <span class="c1"># Perform a final save of the position and mass data</span>
-<span class="n">save_position</span><span class="p">[:,</span> <span class="p">:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">position</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-<span class="n">save_mass</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mass</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">save_position</span><span class="p">[:,</span> <span class="p">:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">position</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">save_mass</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mass</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 
 <span class="c1"># Calculate the total simulation time</span>
 <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -730,8 +734,8 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 8.639173030853271 seconds
-Ratio of wall time to simulation time: 0.08639173030853271
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 1.0389204025268555 seconds
+Ratio of wall time to simulation time: 0.10389204025268554
 </pre></div>
 </div>
 </div>
@@ -753,7 +757,8 @@ Ratio of wall time to simulation time: 0.08639173030853271
 <span class="n">filter_zero_mass</span> <span class="o">=</span> <span class="n">mass_final</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
 <span class="c1"># Calculate the radius and area of each particle</span>
-<span class="n">radius_final</span> <span class="o">=</span> <span class="n">particle_property</span><span class="o">.</span><span class="n">radius_calculation</span><span class="p">(</span><span class="n">mass</span><span class="o">=</span><span class="n">mass_final</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+<span class="n">radius_final</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">mass_final</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span>
+                <span class="n">density</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()))</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
 <span class="n">particle_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_final</span><span class="o">**</span><span class="mi">2</span>
 
 <span class="c1"># Display the number of remaining particles</span>
@@ -792,10 +797,10 @@ Ratio of wall time to simulation time: 0.08639173030853271
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 90
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 366
 </pre></div>
 </div>
-<img alt="../../_images/516b0b8fe86e5ad0d74c2fd47a7093f1267addfe2ab9e483efce1327cba8df45.png" src="../../_images/516b0b8fe86e5ad0d74c2fd47a7093f1267addfe2ab9e483efce1327cba8df45.png" />
+<img alt="../../_images/2427ab8931ea9e0d2a7a3172eede042a7bb0c4964a879b0140db5b1986f924c7.png" src="../../_images/2427ab8931ea9e0d2a7a3172eede042a7bb0c4964a879b0140db5b1986f924c7.png" />
 </div>
 </div>
 </section>
@@ -836,7 +841,7 @@ Ratio of wall time to simulation time: 0.08639173030853271
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/86302be77bde6cbf9a82c074f0649804d4ceb2360776a099e25079a8f0e67d62.png" src="../../_images/86302be77bde6cbf9a82c074f0649804d4ceb2360776a099e25079a8f0e67d62.png" />
+<img alt="../../_images/b11f7317d77bb87e679498ff8c163c5002d5c09a7f4e27b45ca39d821fa3fca2.png" src="../../_images/b11f7317d77bb87e679498ff8c163c5002d5c09a7f4e27b45ca39d821fa3fca2.png" />
 </div>
 </div>
 </section>
