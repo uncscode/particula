@@ -7,7 +7,7 @@
 
 This module represents the gaseous environment in which aerosols are suspended. It should encapsulate properties such as vapor pressure, humidity (or water activity), temperature, total pressure, and the masses of each vapor present.
 
-- **Design Suggestion**: Use the **Builder Pattern** to incrementally construct a complex `Gas` object. This pattern can handle various combinations of properties efficiently, allowing for clear and flexible gas object creation.
+- **Design Suggestion**: Use the **Builder Pattern** to incrementally construct a complex `Gas` object . This pattern can handle various combinations of properties efficiently, allowing for clear and flexible gas object creation.
 
 **Particle Module**
 
