@@ -32,28 +32,28 @@ from numpy.typing import NDArray
 class GasSpecies:
     """
     Represents a single species of gas, including its properties such as
-    name, mass, vapor pressure, and whether it is condensable.
+    name, molar_mass, vapor pressure, and whether it is condensable.
 
     Attributes:
     - name (str): The name of the gas species.
-    - mass (float): The mass of the gas species.
+    - molar_mass (float): The molar_mass of the gas species. Units kg/mole
     - vapor_pressure (Optional[float]): The vapor pressure of the gas
-        species. None if not applicable.
+        species. None if not applicable. Units kg m s-2
     - condensable (bool): Indicates whether the gas species is condensable.
     """
     name: str
-    mass: float
-    vapor_pressure: Optional[float] = None
+    molar_mass: float
+    pure_vapor_pressure: Optional[float] = None
     condensable: bool = field(default=False)
 
-    def get_mass(self) -> np.float64:
+    def get_molar_mass(self) -> np.float64:
         """
-        Returns the mass of the gas species as an np.float64.
+        Returns the molar_mass of the gas species as an np.float64.
 
         Returns:
-            np.float64: The mass of the gas species.
+            np.float64: The molar_mass of the gas species.
         """
-        return np.float64(self.mass)
+        return np.float64(self.molar_mass)
 
     def is_condensable(self) -> bool:
         """
@@ -64,7 +64,7 @@ class GasSpecies:
         """
         return self.condensable
 
-    def get_mass_condensable(self) -> np.float64:
+    def get_condensable(self) -> np.float64:
         """
         Returns the mass of the gas species if it is condensable,
         otherwise returns 0.
@@ -73,7 +73,7 @@ class GasSpecies:
             np.float64: The mass of the gas species if it is condensable,
             otherwise 0.
         """
-        return np.float64(self.mass) if self.condensable else np.float64(0)
+        return np.float64(self.molar_mass) if self.condensable else np.float64(0)
 
 
 @dataclass
@@ -105,7 +105,7 @@ class Gas:
     def add_species(
             self,
             name: str,
-            mass: float,
+            molar_mass: float,
             vapor_pressure: Optional[float] = None,
             condensable: bool = False) -> None:
         """
@@ -113,13 +113,13 @@ class Gas:
 
         Parameters:
         - name (str): The name of the gas species.
-        - mass (float): The mass of the gas species.
+        - molar_mass (float): The molar_mass of the gas species.
         - vapor_pressure (Optional[float]): The vapor pressure of the gas
-            species. None if not applicable.
+            species. Units N/m2 (base, 1 kg⋅m⋅s-2) None if not applicable.
         - condensable (bool): Indicates whether the gas species is
             condensable.
         """
-        species = GasSpecies(name, mass, vapor_pressure, condensable)
+        species = GasSpecies(name, molar_mass, vapor_pressure, condensable)
         self.components.append(species)
 
     def remove_species(self, name: str) -> None:
@@ -131,7 +131,7 @@ class Gas:
         """
         self.components = [c for c in self.components if c.name != name]
 
-    def get_mass(self, name: Optional[str] = None) -> NDArray[np.float64]:
+    def get_molar_mass(self, name: Optional[str] = None) -> NDArray[np.float64]:
         """
         Returns the mass of a specified species or the masses of all species
         in the gas mixture as an np.ndarray.
@@ -152,7 +152,7 @@ class Gas:
             ValueError: If the specified name is not found in the mixture.
         """
         if name:
-            matching_masses = [component.get_mass()
+            matching_masses = [component.get_molar_mass()
                                for component in self.components
                                if component.name == name]
             if not matching_masses:
@@ -161,7 +161,7 @@ class Gas:
             return np.array(matching_masses, dtype=np.float64)
 
         # Return the masses of all components if no name is specified.
-        masses = [component.get_mass() for component in self.components]
+        masses = [component.get_molar_mass() for component in self.components]
         return np.array(masses, dtype=np.float64)
 
     def get_mass_condensable(
