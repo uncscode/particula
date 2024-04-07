@@ -7,13 +7,13 @@ from particula.next.gas_species import GasSpecies
 class Gas:
     """
     Represents a mixture of gas species, including properties such as
-    temperature, total pressure, and a list of gas species components.
+    temperature, total pressure, and a list of gas species species.
 
     Attributes:
     - temperature (float): The temperature of the gas mixture.
     - total_pressure (float): The total pressure of the gas mixture.
-    - components (List[GasSpecies]): A list of GasSpecies objects
-        representing the components of the gas mixture.
+    - species (List[GasSpecies]): A list of GasSpecies objects
+        representing the species of the gas mixture.
 
     Methods:
     - add_species: Adds a gas species to the mixture.
@@ -25,11 +25,11 @@ class Gas:
         self,
         temperature: float,
         total_pressure: float,
-        components: list[GasSpecies],
+        species: list[GasSpecies],
     ):
         self.temperature = temperature
         self.total_pressure = total_pressure
-        self.components = components
+        self.species = species
 
     def add_species(
             self,
@@ -45,16 +45,16 @@ class Gas:
         - condensable (bool): Indicates whether the gas species is
             condensable.
         """
-        self.components.append(gas_species)
+        self.species.append(gas_species)
 
-    def remove_species(self, name: str) -> None:
+    def remove_species(self, index: int) -> None:
         """
         Removes a gas species from the mixture by name.
 
         Parameters:
-        - name (str): The name of the gas species to be removed.
+        - index int: The name of the gas species to be removed.
         """
-        self.components = [c for c in self.components if c.name != name]
+        self.species.pop(index)
 
 
 class GasBuilder:
@@ -63,7 +63,7 @@ class GasBuilder:
     def __init__(self):
         self._temperature: float = 298.15
         self._total_pressure: float = 101325
-        self._components: List[GasSpecies] = []
+        self._species: List[GasSpecies] = []
 
     def temperature(self, temperature: float):
         """Set the temperature of the gas mixture, in Kelvin."""
@@ -75,18 +75,18 @@ class GasBuilder:
         self._total_pressure = total_pressure
         return self
 
-    def add_component(self, component: GasSpecies):
+    def add_species(self, species: GasSpecies):
         """Add a gas species component to the gas mixture."""
-        self._components.append(component)
+        self._species.append(species)
         return self
 
     def build(self) -> Gas:
         """Build and return the Gas object."""
-        if not self._components:
+        if not self._species:
             raise ValueError("At least one gas component must be added.")
         gas = Gas(
             temperature=self._temperature,
             total_pressure=self._total_pressure,
-            components=self._components,
+            species=self._species,
         )
         return gas

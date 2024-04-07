@@ -1,89 +1,80 @@
 """Testing Gas class"""
 
-import pytest
 import numpy as np
-from particula.next.gas import Gas, GasSpecies
+from particula.next.gas import Gas, GasBuilder
+from particula.next.gas_species import GasSpeciesBuilder
+from particula.next.vapor_pressure import ConstantVaporPressureStrategy
+import pytest
 
 
-def test_gas_species_init():
-    """Test the initialization of a GasSpecies object."""
-    species = GasSpecies(
-        name="Oxygen",
-        mass=32.0,
-        vapor_pressure=213.0,
-        condensable=True)
-    assert species.name == "Oxygen"
-    assert species.mass == 32.0
-    assert species.vapor_pressure == 213.0
-    assert species.condensable is True
+def test_gas_initialization():
+    """Test the initialization of a Gas object."""
+    vapor_pressure_strategy = ConstantVaporPressureStrategy(
+        vapor_pressure=np.array([101325, 101325]))
+    names = np.array(["Oxygen", "Nitrogen"])
+    molar_masses = np.array([0.032, 0.028])  # kg/mol
+    condensables = np.array([False, False])
+    concentrations = np.array([1.2, 0.8])  # kg/m^3
+
+    gas_species = (GasSpeciesBuilder()
+                   .name(names)
+                   .molar_mass(molar_masses)
+                   .vapor_pressure_strategy(vapor_pressure_strategy)
+                   .condensable(condensables)
+                   .concentration(concentrations)
+                   .build())
+
+    temperature = 298.15  # Kelvin
+    total_pressure = 101325  # Pascals
+
+    gas = Gas(temperature, total_pressure, [gas_species])
+
+    assert gas.temperature == temperature
+    assert gas.total_pressure == total_pressure
+
+    # test add_species
+    assert len(gas.species) == 1
+
+    # Add a species
+    gas.add_species(gas_species=gas_species)
+    assert len(gas.species) == 2
+
+    # Remove a species
+    gas.remove_species(1)
+    assert len(gas.species) == 1
 
 
-def test_gas_species_mass():
-    """Test the get_mass method of GasSpecies."""
-    species = GasSpecies(name="Oxygen", mass=32.0)
-    assert species.get_mass() == np.float64(32.0)
+def test_gas_builder_with_species():
+    """Test building a Gas object with the GasBuilder."""
+    vapor_pressure_strategy = ConstantVaporPressureStrategy(
+        vapor_pressure=np.array([101325, 101325]))
+    names = np.array(["Oxygen", "Nitrogen"])
+    molar_masses = np.array([0.032, 0.028])  # kg/mol
+    condensables = np.array([False, False])
+    concentrations = np.array([1.2, 0.8])  # kg/m^3
 
+    gas_species = (GasSpeciesBuilder()
+                   .name(names)
+                   .molar_mass(molar_masses)
+                   .vapor_pressure_strategy(vapor_pressure_strategy)
+                   .condensable(condensables)
+                   .concentration(concentrations)
+                   .build())
 
-def test_gas_species_condensable():
-    """Test the is_condensable method of GasSpecies."""
-    species = GasSpecies(name="Oxygen", mass=32.0, condensable=True)
-    assert species.is_condensable() is True
+    gas = (GasBuilder()
+           .temperature(298.15)
+           .total_pressure(101325)
+           .add_species(gas_species)
+           .build())
 
-
-def test_gas_init():
-    """Test the initialization of a Gas object with default values."""
-    gas = Gas()
     assert gas.temperature == 298.15
     assert gas.total_pressure == 101325
-    assert len(gas.components) == 0
+    assert len(gas.species) == 1
 
 
-def test_gas_add_species():
-    """Test adding a species to a Gas object."""
-    gas = Gas()
-    gas.add_species("Oxygen", 32.0, 213.0, True)
-    assert len(gas.components) == 1
-    assert gas.components[0].name == "Oxygen"
-
-
-def test_gas_remove_species():
-    """Test removing a species from a Gas object."""
-    gas = Gas()
-    gas.add_species("Oxygen", 32.0)
-    gas.add_species("Nitrogen", 28.0)
-    gas.remove_species("Oxygen")
-    assert len(gas.components) == 1
-    assert gas.components[0].name == "Nitrogen"
-
-
-def test_gas_get_mass():
-    """Test getting the mass of all species in a Gas object."""
-    gas = Gas()
-    gas.add_species("Oxygen", 32.0)
-    gas.add_species("Nitrogen", 28.0)
-    expected_masses = np.array([32.0, 28.0], dtype=np.float64)
-    np.testing.assert_array_equal(gas.get_mass(), expected_masses)
-
-
-def test_gas_get_mass_condensable():
-    """Test getting the mass of all condensable species in a Gas object."""
-    gas = Gas()
-    gas.add_species("Oxygen", 32.0, condensable=False)
-    gas.add_species("Water", 18.0, condensable=True)
-    expected_masses = np.array([18.0], dtype=np.float64)
-    np.testing.assert_array_equal(gas.get_mass_condensable(), expected_masses)
-
-
-def test_gas_get_mass_nonexistent_species():
-    """Test getting the mass of a nonexistent species raises a ValueError."""
-    gas = Gas()
-    with pytest.raises(ValueError):
-        gas.get_mass(name="Helium")
-
-
-def test_gas_get_mass_condensable_nonexistent_species():
-    """Test getting the mass of a nonexistent condensable species raises a
-    ValueError."""
-    gas = Gas()
-    with pytest.raises(ValueError):
-        gas.get_mass_condensable(name="Helium")
+def test_gas_builder_without_species_raises_error():
+    builder = GasBuilder()
+    # Omit adding any species to trigger the validation error
+    with pytest.raises(ValueError) as e:
+        builder.build()
+    assert "At least one gas component must be added." in str(e.value)

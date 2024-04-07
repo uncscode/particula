@@ -172,14 +172,14 @@ class GasSpeciesBuilder:
 
     def build(self) -> GasSpecies:
         """Validate and return the GasSpecies object."""
-        if not self.gas_species.name:
+        if self.gas_species.name is None:
             raise ValueError("Gas species name is required.")
-        if not self.gas_species.molar_mass:
+        if self.gas_species.molar_mass is None:
             raise ValueError("Gas species molar mass is required")
-        if not self.gas_species.pure_vapor_pressure_strategy:
+        if self.gas_species.pure_vapor_pressure_strategy is None:
             raise ValueError("Vapor pressure strategy is required")
         if self.gas_species.condensable is None:
             raise ValueError("Condensable property is required")
-        if not self.gas_species.concentration:
+        if self.gas_species.concentration is None:
             raise ValueError("Concentration property is required")
         return self.gas_species
