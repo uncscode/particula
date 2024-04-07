@@ -1,82 +1,9 @@
-"""
-This module demonstrates the Composite Pattern through the modeling of gases
-and their constituent species. In this pattern, both composite objects (gases)
-and leaf objects (gas species) are treated uniformly.
+"""Gas module."""
 
-The Composite Pattern is particularly useful in scenarios where a part-whole
-hierarchy is present. In our case, a `Gas` represents the whole, which can be
-composed of various parts - the `GasSpecies`. Each `GasSpecies` can have
-distinct properties such as mass and vapor pressure, and the `Gas` itself can
-consist of multiple species, mimicking real-world gas mixtures.
-
-Classes:
-- GasSpecies: Represents an individual gas species with properties like name,
-mass, and vapor pressure. Acts as a leaf in the composite structure.
-- Gas: Represents a composite object that can contain multiple GasSpecies.
-It manages the collection of these species and performs operations on them as
-a group.
-
-The Composite Pattern allows for the Gas class to manage an arbitrary number
-of GasSpecies objects, facilitating operations that need to consider the gas
-mixture as a whole or interact with its individual components seamlessly.
-"""
+from typing import List
+from particula.next.gas_species import GasSpecies
 
 
-from typing import Optional
-from dataclasses import dataclass, field
-import numpy as np
-from numpy.typing import NDArray
-
-
-@dataclass
-class GasSpecies:
-    """
-    Represents a single species of gas, including its properties such as
-    name, molar_mass, vapor pressure, and whether it is condensable.
-
-    Attributes:
-    - name (str): The name of the gas species.
-    - molar_mass (float): The molar_mass of the gas species. Units kg/mole
-    - vapor_pressure (Optional[float]): The vapor pressure of the gas
-        species. None if not applicable. Units kg m s-2
-    - condensable (bool): Indicates whether the gas species is condensable.
-    """
-    name: str
-    molar_mass: float
-    pure_vapor_pressure: Optional[float] = None
-    condensable: bool = field(default=False)
-
-    def get_molar_mass(self) -> np.float64:
-        """
-        Returns the molar_mass of the gas species as an np.float64.
-
-        Returns:
-            np.float64: The molar_mass of the gas species.
-        """
-        return np.float64(self.molar_mass)
-
-    def is_condensable(self) -> bool:
-        """
-        Checks if the gas species is condensable.
-
-        Returns:
-            bool: True if the gas species is condensable, False otherwise.
-        """
-        return self.condensable
-
-    def get_condensable(self) -> np.float64:
-        """
-        Returns the mass of the gas species if it is condensable,
-        otherwise returns 0.
-
-        Returns:
-            np.float64: The mass of the gas species if it is condensable,
-            otherwise 0.
-        """
-        return np.float64(self.molar_mass) if self.condensable else np.float64(0)
-
-
-@dataclass
 class Gas:
     """
     Represents a mixture of gas species, including properties such as
@@ -91,23 +18,22 @@ class Gas:
     Methods:
     - add_species: Adds a gas species to the mixture.
     - remove_species: Removes a gas species from the mixture by name.
-    - get_mass: Returns the mass of a specified species or the masses of all
-        species in the gas mixture as an np.ndarray.
-    - get_mass_condensable: Returns the mass of a specific condensable species
-        or the masses of all condensable species in the gas mixture as an
-        np.ndarray.
 
     """
-    temperature: float = 298.15
-    total_pressure: float = 101325
-    components: list[GasSpecies] = field(default_factory=list)
+
+    def __init__(
+        self,
+        temperature: float,
+        total_pressure: float,
+        components: list[GasSpecies],
+    ):
+        self.temperature = temperature
+        self.total_pressure = total_pressure
+        self.components = components
 
     def add_species(
             self,
-            name: str,
-            molar_mass: float,
-            vapor_pressure: Optional[float] = None,
-            condensable: bool = False) -> None:
+            gas_species: GasSpecies) -> None:
         """
         Adds a gas species to the mixture.
 
@@ -119,8 +45,7 @@ class Gas:
         - condensable (bool): Indicates whether the gas species is
             condensable.
         """
-        species = GasSpecies(name, molar_mass, vapor_pressure, condensable)
-        self.components.append(species)
+        self.components.append(gas_species)
 
     def remove_species(self, name: str) -> None:
         """
@@ -131,73 +56,37 @@ class Gas:
         """
         self.components = [c for c in self.components if c.name != name]
 
-    def get_molar_mass(self, name: Optional[str] = None) -> NDArray[np.float64]:
-        """
-        Returns the mass of a specified species or the masses of all species
-        in the gas mixture as an np.ndarray.
 
-        If a name is specified, the method returns an array containing the
-        mass of the named species. If the specified name is not found in the
-        mixture, a ValueError is raised. If no name is specified, it returns
-        an array of the masses of all species in the mixture.
+class GasBuilder:
+    """A builder class for creating Gas objects with a fluent interface."""
 
-        Parameters:
-            name (Optional[str]): The name of the gas species for which to
-            return the mass. If None, returns masses of all species.
+    def __init__(self):
+        self._temperature: float = 298.15
+        self._total_pressure: float = 101325
+        self._components: List[GasSpecies] = []
 
-        Returns:
-            NDArray[np.float64]: An array containing the requested mass(es).
+    def temperature(self, temperature: float):
+        """Set the temperature of the gas mixture, in Kelvin."""
+        self._temperature = temperature
+        return self
 
-        Raises:
-            ValueError: If the specified name is not found in the mixture.
-        """
-        if name:
-            matching_masses = [component.get_molar_mass()
-                               for component in self.components
-                               if component.name == name]
-            if not matching_masses:
-                raise ValueError(
-                    f"Gas species '{name}' not found in the mixture.")
-            return np.array(matching_masses, dtype=np.float64)
+    def total_pressure(self, total_pressure: float):
+        """Set the total pressure of the gas mixture, in Pascals."""
+        self._total_pressure = total_pressure
+        return self
 
-        # Return the masses of all components if no name is specified.
-        masses = [component.get_molar_mass() for component in self.components]
-        return np.array(masses, dtype=np.float64)
+    def add_component(self, component: GasSpecies):
+        """Add a gas species component to the gas mixture."""
+        self._components.append(component)
+        return self
 
-    def get_mass_condensable(
-            self, name: Optional[str] = None) -> NDArray[np.float64]:
-        """
-        Returns the mass of a specific condensable species or the masses of
-        all condensable species in the gas mixture as an np.ndarray. If a name
-        is provided, only the mass of that specific condensable species is
-        returned.
-
-        Parameters:
-            name (Optional[str]): The name of the specific condensable gas
-            species to retrieve the mass for. If None (the default), the
-            masses of all condensable species are returned.
-
-        Returns:
-            NDArray[np.float64]: An array of the mass of the specified
-            condensable species, or an array of the masses of all condensable
-            species in the gas mixture.
-
-        Raises:
-            ValueError: If a specific species name is provided but not found
-            in the mixture, or if it's not condensable.
-        """
-        if name:
-            for component in self.components:
-                if component.name == name:
-                    if component.is_condensable():
-                        return np.array(
-                            [component.get_mass()], dtype=np.float64)
-                    raise ValueError(
-                        f"Gas species '{name}' is not condensable.")
-            raise ValueError(f"Gas species '{name}' not found in the mixture.")
-
-        masses_condensable = [
-            component.get_mass()
-            for component in self.components if component.is_condensable()
-        ]
-        return np.array(masses_condensable, dtype=np.float64)
+    def build(self) -> Gas:
+        """Build and return the Gas object."""
+        if not self._components:
+            raise ValueError("At least one gas component must be added.")
+        gas = Gas(
+            temperature=self._temperature,
+            total_pressure=self._total_pressure,
+            components=self._components,
+        )
+        return gas

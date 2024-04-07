@@ -8,18 +8,160 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.constants import GAS_CONSTANT
+from particula.constants import GAS_CONSTANT  # pyright: ignore
+
+
+def calculate_partial_pressure(
+            concentration: Union[float, NDArray[np.float_]],
+            molar_mass: Union[float, NDArray[np.float_]],
+            temperature: Union[float, NDArray[np.float_]]
+        ) -> Union[float, NDArray[np.float_]]:
+    """
+    Calculate the partial pressure of a gas from its concentration, molar mass,
+    and temperature.
+
+    Parameters:
+    - concentration (float): Concentration of the gas in kg/m^3.
+    - molar_mass (float): Molar mass of the gas in kg/mol.
+    - temperature (float): Temperature in Kelvin.
+
+    Returns:
+    - float: Partial pressure of the gas in Pascals (Pa).
+    """
+    # Calculate the partial pressure
+    return (
+        concentration * float(GAS_CONSTANT.m) * temperature) / molar_mass
+
+
+def calculate_concentration(
+    partial_pressure: Union[float, NDArray[np.float_]],
+    molar_mass: Union[float, NDArray[np.float_]],
+    temperature: Union[float, NDArray[np.float_]]
+) -> Union[float, NDArray[np.float_]]:
+    """
+    Calculate the concentration of a gas from its partial pressure, molar mass,
+    and temperature using the ideal gas law.
+
+    Parameters:
+    - pressure (float or NDArray[np.float_]): Partial pressure of the gas
+    in Pascals (Pa).
+    - molar_mass (float or NDArray[np.float_]): Molar mass of the gas in kg/mol
+    - temperature (float or NDArray[np.float_]): Temperature in Kelvin.
+
+    Returns:
+    - concentration (float or NDArray[np.float_]): Concentration of the gas
+    in kg/m^3.
+    """
+    return (partial_pressure * molar_mass
+            ) / (float(GAS_CONSTANT.m) * temperature)
+
 
 class VaporPressureStrategy(ABC):
     """Abstract class for vapor pressure calculations. The methods
     defined here must be implemented by subclasses below."""
+
+    def partial_pressure(
+                self, concentration: Union[float, NDArray[np.float_]],
+                molar_mass: Union[float, NDArray[np.float_]],
+                temperature: Union[float, NDArray[np.float_]]
+            ) -> Union[float, NDArray[np.float_]]:
+        """
+        Calculate the partial pressure of the gas from its concentration, molar
+        mass, and temperature.
+
+        Args:
+        ----
+        - concentration (float or NDArray[np.float_]): Concentration of the gas
+        in kg/m^3.
+        - molar_mass (float or NDArray[np.float_]): Molar mass of the gas in
+        kg/mol.
+        - temperature (float or NDArray[np.float_]): Temperature in Kelvin.
+
+        Returns:
+        -------
+        - partial_pressure (float or NDArray[np.float_]): Partial pressure of
+        the gas in Pascals.
+        """
+        return calculate_partial_pressure(
+            concentration, molar_mass, temperature)
+
+    def concentration(
+                self, partial_pressure: Union[float, NDArray[np.float_]],
+                molar_mass: Union[float, NDArray[np.float_]],
+                temperature: Union[float, NDArray[np.float_]],
+            ) -> Union[float, NDArray[np.float_]]:
+        """
+        Calculate the concentration of the gas at a given pressure and
+        temperature.
+
+        Args:
+        ----
+        - partial_pressure (float or NDArray[np.float_]): Pressure in Pascals.
+        - molar_mass (float or NDArray[np.float_]): Molar mass of the gas in
+        kg/mol.
+        - temperature (float or NDArray[np.float_]): Temperature in Kelvin.
+
+        Returns:
+        -------
+        - concentration (float or NDArray[np.float_]): The concentration of the
+        gas in kg/m^3.
+        """
+        return calculate_concentration(
+            partial_pressure, molar_mass, temperature)
+
+    def saturation_ratio(
+                self, concentration: Union[float, NDArray[np.float_]],
+                molar_mass: Union[float, NDArray[np.float_]],
+                temperature: Union[float, NDArray[np.float_]]
+            ) -> Union[float, NDArray[np.float_]]:
+        """
+        Calculate the saturation ratio of the gas at a given pressure and
+        temperature.
+
+        Args:
+        ----
+        - pressure (float or NDArray[np.float_]): Pressure in Pascals.
+        - temperature (float or NDArray[np.float_]): Temperature in Kelvin.
+
+        Returns:
+        -------
+        - saturation_ratio (float or NDArray[np.float_]): The saturation ratio
+        of the gas.
+        """
+        return self.partial_pressure(
+            concentration, molar_mass, temperature
+            ) / self.pure_vapor_pressure(temperature)
+
+    def saturation_concentration(
+                self,
+                molar_mass: Union[float, NDArray[np.float_]],
+                temperature: Union[float, NDArray[np.float_]]
+            ) -> Union[float, NDArray[np.float_]]:
+        """
+        Calculate the saturation concentration of the gas at a given
+        temperature.
+
+        Args:
+        ----
+        - molar_mass (float or NDArray[np.float_]): Molar mass of the gas in
+        kg/mol.
+        - temperature (float or NDArray[np.float_]): Temperature in Kelvin.
+
+        Returns:
+        -------
+        - saturation_concentration (float or NDArray[np.float_]):
+        The saturation concentration of the gas in kg/m^3.
+        """
+
+        return self.concentration(
+            self.pure_vapor_pressure(temperature), molar_mass, temperature)
 
     @abstractmethod
     def pure_vapor_pressure(
                 self, temperature: Union[float, NDArray[np.float_]]
             ) -> Union[float, NDArray[np.float_]]:
         """Calculate the pure (saturation) vapor pressure at a given
-        temperature.
+        temperature. Units are in Pascals Pa=kg/(m·s²).
 
         Args:
             temperature (float or NDArray[np.float_]): Temperature in Kelvin.
@@ -189,3 +331,29 @@ class WaterBuckStrategy(VaporPressureStrategy):
         vapor_pressure = (vapor_pressure_below_freezing * temp_below_freezing +
                           vapor_pressure_above_freezing * temp_above_freezing)
         return vapor_pressure
+
+
+def vapor_pressure_factory(
+            strategy: str, **kwargs  # pyright: ignore
+        ) -> VaporPressureStrategy:
+    """Factory method to create a concrete VaporPressureStrategy object.
+
+    Args:
+    ----
+    - strategy (str): The strategy to use for vapor pressure calculations.
+    - **kwargs: Additional keyword arguments required for the strategy.
+
+    Returns:
+    -------
+    - vapor_pressure_strategy (VaporPressureStrategy): A concrete
+    implementation of the VaporPressureStrategy.
+    """
+    if strategy.lower() == "constant":
+        return ConstantVaporPressureStrategy(**kwargs)  # pyright: ignore
+    if strategy.lower() == "antoine":
+        return AntoineVaporPressureStrategy(**kwargs)  # pyright: ignore
+    if strategy.lower() == "clausius_clapeyron":
+        return ClausiusClapeyronStrategy(**kwargs)  # pyright: ignore
+    if strategy.lower() == "water_buck":
+        return WaterBuckStrategy()
+    raise ValueError(f"Unknown vapor pressure strategy: {strategy}")
