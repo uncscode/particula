@@ -1,70 +1,64 @@
-"""Aerosol class definition."""
-
-from typing import Union
+"""Aerosol class just a list of gas classes and particle classes."""
+from typing import List, Union, Iterator
 from particula.next.gas import Gas
 from particula.next.particle import Particle
 
 
 class Aerosol:
     """
-    A class that acts as a facade for interacting with a single Gas and a
-    single Particle object. It dynamically attaches methods and properties of
-    Gas and Particle objects to itself.
+    A class for interacting with collections of Gas and Particle objects.
+    Allows for the representation and manipulation of an aerosol, which
+    is composed of various gases and particles.
     """
 
-    def __init__(self, gas: Gas, particle: Particle):
+    def __init__(self, gases: Union[Gas, List[Gas]],
+                 particles: Union[Particle, List[Particle]]):
         """
-        Initializes an Aerosol instance with a single Gas and Particle.
-        Dynamically attaches methods and properties of these objects to the
-        Aerosol instance.
+        Initializes an Aerosol instance with Gas and Particle instances.
 
         Parameters:
-        - gas (Gas): A single Gas instance.
-        - particle (Particle): A single Particle instance.
+        - gases (Union[Gas, List[Gas]]): One or more Gas instances.
+        - particles (Union[Particle, List[Particle]]): One or more Particle
+        instances.
         """
-        self.replace_gas(gas)
-        self.replace_particle(particle)
+        # Ensure gases and particles are stored as lists, even if a single
+        # instance is passed
+        self.gases: List[Gas] = [gases] if isinstance(gases, Gas) else gases
+        self.particles: List[Particle] = [particles] if isinstance(
+            particles, Particle) else particles
 
-    def attach_methods_and_properties(
-            self,
-            obj_to_attach: Union[Gas, Particle],
-            prefix: str):
+    def iterate(self, item_type: str) -> Iterator[Union[Gas, Particle]]:
         """
-        Dynamically attaches methods and properties from the given object to
-        the Aerosol instance, prefixing them to distinguish between Gas and
-        Particle attributes.
-
-        Parameters:
-        - obj: The object whose methods and properties are to be attached.
-        - prefix (str): The prefix to apply to the attached attributes.
-        """
-        for attr_name in dir(obj_to_attach):
-            if not attr_name.startswith("__"):
-                attribute = getattr(obj_to_attach, attr_name)
-                # Prefix the attribute name to distinguish between Gas and
-                # Particle attributes
-                prefixed_attr_name = f"{prefix}_{attr_name}"
-                setattr(self, prefixed_attr_name, attribute)
-
-    def replace_gas(self, gas: Gas):
-        """
-        Replaces the current Gas instance with a new one and dynamically
-        attaches its methods and properties.
+        Returns an iterator for either gases or particles based on the
+        item_type parameter.
 
         Parameters:
-        - gas (Gas): A new Gas instance to replace the current one.
-        """
-        self.gas = gas
-        self.attach_methods_and_properties(gas, 'gas')
+        - item_type (str): Specifies the type of items to iterate over
+        ('gas' or 'particle').
 
-    def replace_particle(self, particle: Particle):
+        Returns:
+        Iterator[Union[Gas, Particle]]: An iterator over the specified type.
         """
-        Replaces the current Particle instance with a new one and dynamically
-        attaches its methods and properties.
+        if item_type == 'gas':
+            return iter(self.gases)
+        if item_type == 'particle':
+            return iter(self.particles)
+        raise ValueError("Invalid item_type. Use 'gas' or 'particle'.")
+
+    def add_gas(self, gas: Gas):
+        """
+        Adds a Gas instance to the aerosol.
 
         Parameters:
-        - particle (Particle): A new Particle instance to replace the current
-        one.
+        - gas (Gas): The Gas instance to add.
         """
-        self.particle = particle
-        self.attach_methods_and_properties(particle, 'particle')
+        self.gases.append(gas)
+
+    def add_particle(self, particle: Particle):
+        """
+        Adds a Particle instance to the aerosol.
+
+        Parameters:
+        - particle (Particle): The Particle instance to add.
+        """
+        self.particles.append(particle)
