@@ -315,7 +315,7 @@ class WaterBuckStrategy(VaporPressureStrategy):
         """
         # Constants for the Buck equation
         # Ensure input is numpy array for vectorized operations
-        temp = np.array(temperature)
+        temp = np.array(temperature) - 273.15  # Convert to Celsius
         temp_below_freezing = temp < 0.0
         temp_above_freezing = temp >= 0.0
 
