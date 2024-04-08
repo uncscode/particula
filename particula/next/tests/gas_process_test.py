@@ -1,6 +1,7 @@
 """Tests for gas_process"""
 
 # pylint: disable=redefined-outer-name
+# pylint: disable=R0801
 
 import pytest
 import numpy as np
