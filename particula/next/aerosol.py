@@ -27,23 +27,23 @@ class Aerosol:
         self.particles: List[Particle] = [particles] if isinstance(
             particles, Particle) else particles
 
-    def iterate(self, item_type: str) -> Iterator[Union[Gas, Particle]]:
+    def iterate_gas(self) -> Iterator[Gas]:
         """
-        Returns an iterator for either gases or particles based on the
-        item_type parameter.
-
-        Parameters:
-        - item_type (str): Specifies the type of items to iterate over
-        ('gas' or 'particle').
+        Returns an iterator for gas.
 
         Returns:
-        Iterator[Union[Gas, Particle]]: An iterator over the specified type.
+        Iterator[Gas]: An iterator over the gas type.
         """
-        if item_type == 'gas':
-            return iter(self.gases)
-        if item_type == 'particle':
-            return iter(self.particles)
-        raise ValueError("Invalid item_type. Use 'gas' or 'particle'.")
+        return iter(self.gases)
+
+    def iterate_particle(self) -> Iterator[Particle]:
+        """
+        Returns an iterator for particle.
+
+        Returns:
+        Iterator[Particle]: An iterator over the particle type.
+        """
+        return iter(self.particles)
 
     def add_gas(self, gas: Gas):
         """

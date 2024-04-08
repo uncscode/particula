@@ -70,17 +70,11 @@ def test_add_particle(aerosol_with_fixtures, sample_particles):
 
 def test_iterate_gases(aerosol_with_fixtures):
     """Test iterating over Gas instances."""
-    for gas in aerosol_with_fixtures.iterate('gas'):
+    for gas in aerosol_with_fixtures.iterate_gas():
         assert type(gas) == Gas
 
 
 def test_iterate_particles(aerosol_with_fixtures):
     """Test iterating over Particle instances."""
-    for particle in aerosol_with_fixtures.iterate('particle'):
+    for particle in aerosol_with_fixtures.iterate_particle():
         assert type(particle) == Particle
-
-
-def test_invalid_iterate_type(aerosol_with_fixtures):
-    """Test iterating with an invalid type."""
-    with pytest.raises(ValueError):
-        next(aerosol_with_fixtures.iterate('invalid_type'))
