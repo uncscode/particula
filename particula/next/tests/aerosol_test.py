@@ -3,6 +3,7 @@
 # to handle pytest fixture call error
 # https://docs.pytest.org/en/stable/deprecations.html#calling-fixtures-directly
 # pylint: disable=redefined-outer-name
+# pylint: disable=similar-lines
 
 import pytest
 import numpy as np

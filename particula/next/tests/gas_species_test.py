@@ -1,5 +1,7 @@
 """Test the gas species builder"""
 
+# pylint: disable=similar-lines
+
 import pytest
 import numpy as np
 from particula.next.gas_species import GasSpeciesBuilder

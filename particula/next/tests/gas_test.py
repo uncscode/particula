@@ -1,5 +1,7 @@
 """Testing Gas class"""
 
+# pylint: disable=similar-lines
+
 import pytest
 import numpy as np
 from particula.next.gas import Gas, GasBuilder
@@ -11,7 +13,7 @@ def test_gas_initialization():
     """Test the initialization of a Gas object."""
     vapor_pressure_strategy = ConstantVaporPressureStrategy(
         vapor_pressure=np.array([101325, 101325]))
-    names = np.array(["Oxygen", "Nitrogen"])
+    names = np.array(["Oxygen1", "Nitrogen2"])
     molar_masses = np.array([0.032, 0.028])  # kg/mol
     condensables = np.array([False, False])
     concentrations = np.array([1.2, 0.8])  # kg/m^3
