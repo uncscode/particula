@@ -1,6 +1,7 @@
 """Test the gas species builder"""
 
-# pylint: disable=similar-lines
+# pylint: disable=R0801
+
 
 import pytest
 import numpy as np
