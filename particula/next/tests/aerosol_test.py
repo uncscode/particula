@@ -71,10 +71,10 @@ def test_add_particle(aerosol_with_fixtures, sample_particles):
 def test_iterate_gases(aerosol_with_fixtures):
     """Test iterating over Gas instances."""
     for gas in aerosol_with_fixtures.iterate_gas():
-        assert type(gas) == Gas
+        assert isinstance(gas, Gas)
 
 
 def test_iterate_particles(aerosol_with_fixtures):
     """Test iterating over Particle instances."""
     for particle in aerosol_with_fixtures.iterate_particle():
-        assert type(particle) == Particle
+        assert isinstance(particle, Particle)

@@ -1,10 +1,10 @@
 """Testing Gas class"""
 
+import pytest
 import numpy as np
 from particula.next.gas import Gas, GasBuilder
 from particula.next.gas_species import GasSpeciesBuilder
 from particula.next.vapor_pressure import ConstantVaporPressureStrategy
-import pytest
 
 
 def test_gas_initialization():
@@ -73,6 +73,7 @@ def test_gas_builder_with_species():
 
 
 def test_gas_builder_without_species_raises_error():
+    """Test that building a Gas object without any species raises an error."""
     builder = GasBuilder()
     # Omit adding any species to trigger the validation error
     with pytest.raises(ValueError) as e:
