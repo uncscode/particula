@@ -1,6 +1,7 @@
 """RunnableProcess classes for modifying aerosol instances."""
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from particula.next.aerosol import Aerosol
 
@@ -16,7 +17,7 @@ class Runnable(ABC):
         - aerosol (Aerosol): The aerosol instance to modify."""
 
     @abstractmethod
-    def rate(self, aerosol: Aerosol) -> float:
+    def rate(self, aerosol: Aerosol) -> Any:
         """Return the rate of the process.
 
         Parameters:
