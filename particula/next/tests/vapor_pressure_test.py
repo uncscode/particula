@@ -79,7 +79,7 @@ def test_antoine_vapor_pressure_strategy():
     a, b, c = 8.07131, 1730.63, 233.426
     strategy = vapor_pressure_factory("antoine", a=a, b=b, c=c)
     temperature = 100 + 273.15  # Convert 100°C to Kelvin
-    expected_pressure = 10**(a - (b / (temperature - c))) * strategy.MMHG_TO_PA
+    expected_pressure = 10**(a - (b / (temperature - c))) * 133.322
     assert strategy.pure_vapor_pressure(
         temperature) == pytest.approx(expected_pressure)
 
