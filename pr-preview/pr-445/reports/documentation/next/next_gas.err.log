@@ -18,14 +18,46 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-from particula.base.gas import Gas, GasSpecies
+# Assuming the GasSpecies class definition as provided in the module
+oxygen = GasSpecies(
+    name="Oxygen",
+    mass=32,
+    vapor_pressure=0.21,
+    condensable=False)
+water_vapor = GasSpecies(
+    name="Water Vapor",
+    mass=18,
+    vapor_pressure=2.3,
+    condensable=True)
+
+print(
+    f"Oxygen (O2) is {'condensable' if oxygen.is_condensable() else 'non-condensable'}.")
+print(
+    f"Water Vapor (H2O) is {'condensable' if water_vapor.is_condensable() else 'non-condensable'}.")
+
+# Demonstrating the use of get_mass_condensable
+print(
+    f"Mass of Water Vapor if condensable: {water_vapor.get_mass_condensable()} g/mol")
+print(f"Mass of Oxygen if condensable: {oxygen.get_mass_condensable()} g/mol")
 ------------------
 
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
-Cell [0;32mIn[1], line 1[0m
-[0;32m----> 1[0m [38;5;28;01mfrom[39;00m [38;5;21;01mparticula[39;00m[38;5;21;01m.[39;00m[38;5;21;01mbase[39;00m[38;5;21;01m.[39;00m[38;5;21;01mgas[39;00m [38;5;28;01mimport[39;00m Gas, GasSpecies
+[0;31mTypeError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[2], line 2[0m
+[1;32m      1[0m [38;5;66;03m# Assuming the GasSpecies class definition as provided in the module[39;00m
+[0;32m----> 2[0m oxygen [38;5;241m=[39m [43mGasSpecies[49m[43m([49m
+[1;32m      3[0m [43m    [49m[43mname[49m[38;5;241;43m=[39;49m[38;5;124;43m"[39;49m[38;5;124;43mOxygen[39;49m[38;5;124;43m"[39;49m[43m,[49m
+[1;32m      4[0m [43m    [49m[43mmass[49m[38;5;241;43m=[39;49m[38;5;241;43m32[39;49m[43m,[49m
+[1;32m      5[0m [43m    [49m[43mvapor_pressure[49m[38;5;241;43m=[39;49m[38;5;241;43m0.21[39;49m[43m,[49m
+[1;32m      6[0m [43m    [49m[43mcondensable[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m)[49m
+[1;32m      7[0m water_vapor [38;5;241m=[39m GasSpecies(
+[1;32m      8[0m     name[38;5;241m=[39m[38;5;124m"[39m[38;5;124mWater Vapor[39m[38;5;124m"[39m,
+[1;32m      9[0m     mass[38;5;241m=[39m[38;5;241m18[39m,
+[1;32m     10[0m     vapor_pressure[38;5;241m=[39m[38;5;241m2.3[39m,
+[1;32m     11[0m     condensable[38;5;241m=[39m[38;5;28;01mTrue[39;00m)
+[1;32m     13[0m [38;5;28mprint[39m(
+[1;32m     14[0m     [38;5;124mf[39m[38;5;124m"[39m[38;5;124mOxygen (O2) is [39m[38;5;132;01m{[39;00m[38;5;124m'[39m[38;5;124mcondensable[39m[38;5;124m'[39m[38;5;250m [39m[38;5;28;01mif[39;00m[38;5;250m [39moxygen[38;5;241m.[39mis_condensable()[38;5;250m [39m[38;5;28;01melse[39;00m[38;5;250m [39m[38;5;124m'[39m[38;5;124mnon-condensable[39m[38;5;124m'[39m[38;5;132;01m}[39;00m[38;5;124m.[39m[38;5;124m"[39m)
 
-[0;31mModuleNotFoundError[0m: No module named 'particula.base'
+[0;31mTypeError[0m: GasSpecies.__init__() got an unexpected keyword argument 'name'
 
