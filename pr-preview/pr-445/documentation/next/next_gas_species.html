@@ -283,6 +283,8 @@
 
 
 <li class="toctree-l1"><a class="reference internal" href="next_gas.html">Gases</a></li>
+
+
 <li class="toctree-l1"><a class="reference internal" href="next_particle.html">Strategies in Particle Distributions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="next_aerosol.html">Aerosol</a></li>
 <li class="toctree-l1"><a class="reference internal" href="next_runnable_process.html">Modeling Aerosol Dynamics with Runnable Processes</a></li>
@@ -696,6 +698,12 @@ document.write(`
     <span class="o">.</span><span class="n">concentration</span><span class="p">(</span><span class="mf">0.017</span><span class="p">)</span> \
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>  <span class="c1"># Finalize and create the GasSpecies object</span>
 <span class="c1"># molar mass in kg/mol, concentration in kg/m3</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">water_species</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Water
 </pre></div>
 </div>
 </div>
@@ -731,6 +739,12 @@ document.write(`
 
 <span class="c1"># The `build()` method validates all the properties are set and returns the constructed GasSpecies object(s).</span>
 <span class="c1"># Here, organic_species will contain the built GasSpecies instances for Butanol and Styrene.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">organic_species</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;butanol&#39; &#39;styrene&#39;]
 </pre></div>
 </div>
 </div>
