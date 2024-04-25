@@ -33,7 +33,7 @@ class GasSpecies:
 
     def __str__(self):
         """Return a string representation of the GasSpecies object."""
-        return f"GasSpecies(name={self.name})"
+        return str(self.name)
 
     def set_name(self, name: Union[str, NDArray[np.str_]]):
         """Set the name of the gas species.
