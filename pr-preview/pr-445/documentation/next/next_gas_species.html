@@ -617,7 +617,6 @@ document.write(`
 <section id="example-usage">
 <h2>Example Usage<a class="headerlink" href="#example-usage" title="Link to this heading">#</a></h2>
 <p>We utilize the <code class="docutils literal notranslate"><span class="pre">GasSpeciesBuilder</span></code> to create instances of <code class="docutils literal notranslate"><span class="pre">GasSpecies</span></code>. This approach not only ensures that the species properties are well-defined but also verifies the integrity of the data before the object is finalized. The builder pattern is particularly useful in scenarios where a species must meet certain criteria or possess specific properties for accurate simulation and analysis.</p>
-<p>This introduction sets the stage for detailed discussions and examples of how to effectively use the <code class="docutils literal notranslate"><span class="pre">GasSpecies</span></code> and <code class="docutils literal notranslate"><span class="pre">GasSpeciesBuilder</span></code> classes to manage gas species in various applications.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -705,8 +704,7 @@ document.write(`
 <section id="building-gas-species-for-organics">
 <h3>Building Gas Species for Organics<a class="headerlink" href="#building-gas-species-for-organics" title="Link to this heading">#</a></h3>
 <p>Following Water, you can apply a similar process to build gas species for Organics like Butanol and Styrene. Each will have its set of properties based on the chemical’s nature and the desired simulation context.</p>
-<p>Here is an example of setting up orgnaics, with an array for Butanol and Styrene properties.</p>
-<p>Each call to <code class="docutils literal notranslate"><span class="pre">.build()</span></code> checks that all required properties are set correctly, raising an error if any essential attribute is missing or improperly configured. This ensures that each <code class="docutils literal notranslate"><span class="pre">GasSpecies</span></code> instance is valid and ready for precise and accurate use in further modeling or experimental setups.</p>
+<p>When calling <code class="docutils literal notranslate"><span class="pre">.build()</span></code>, it checks that all required properties are set correctly, raising an error if any essential attribute is missing or improperly configured. This ensures that each <code class="docutils literal notranslate"><span class="pre">GasSpecies</span></code> instance is valid and ready usage.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define molar masses for organic species (Butanol and Styrene) in kilograms per mole (kg/mol).</span>
@@ -788,7 +786,7 @@ document.write(`
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">organic_names</span><span class="p">)):</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature_range</span><span class="p">,</span> <span class="n">organic_saturation_ratio</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">organic_names</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature_range</span><span class="p">,</span> <span class="n">water_saturation_ratio</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Water&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Temperature (K)&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Saturation Ratio&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
@@ -797,7 +795,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/05785f1844fb4837a87644c66178e109f648ded3b29a8b2a3907ed00bfdc89d3.png" src="../../_images/05785f1844fb4837a87644c66178e109f648ded3b29a8b2a3907ed00bfdc89d3.png" />
+<img alt="../../_images/f6225337bff1f0ab8295764a3ff8a1d14235fd0368b89ab99c6af941d5051614.png" src="../../_images/f6225337bff1f0ab8295764a3ff8a1d14235fd0368b89ab99c6af941d5051614.png" />
 </div>
 </div>
 </section>
