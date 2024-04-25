@@ -190,7 +190,8 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy):
         - vapor_pressure (float or NDArray[np.float_]): The constant vapor
         pressure value in Pascals.
         """
-        return self.vapor_pressure
+        # repeat the constant value for each element temperature
+        return np.full_like(temperature, self.vapor_pressure)
 
 
 class AntoineVaporPressureStrategy(VaporPressureStrategy):
@@ -251,10 +252,12 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
 
         Args:
         ----
-        - latent_heat (float or NDArray[np.float_]): Latent heat of
-        vaporization in J/kg.
-        - gas_constant (float or NDArray[np.float_]): Specific gas
-        constant in J/(kg·K).
+        - latent_heat (float or NDArray[np.float_]): specific Latent heat of
+        in J/mol.
+        - temperature_initial (float or NDArray[np.float_]): Initial
+        temperature in Kelvin.
+        - pressure_initial (float or NDArray[np.float_]): Initial vapor
+        pressure in Pascals.
         """
         self.latent_heat = latent_heat
         self.temperature_initial = temperature_initial
@@ -265,7 +268,7 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
             ) -> Union[float, NDArray[np.float_]]:
         """
         Calculate the vapor pressure at a new temperature using the
-        Clausius-Clapeyron equation.
+        Clausius-Clapeyron equation. For ideal gases at low temperatures.
 
         Args:
         ----
@@ -279,6 +282,11 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
         Returns:
         - vapor_pressure_final (float or NDArray[np.float_]): Final vapor
         pressure in Pascals.
+
+        References:
+        ----------
+        - https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation
+        Ideal_gas_approximation_at_low_temperatures
         """
         return self.pressure_initial * np.exp(
             (self.latent_heat / np.array(GAS_CONSTANT.m))
@@ -341,6 +349,7 @@ def vapor_pressure_factory(
     Args:
     ----
     - strategy (str): The strategy to use for vapor pressure calculations.
+    options: "constant", "antoine", "clausius_clapeyron", "water_buck".
     - **kwargs: Additional keyword arguments required for the strategy.
 
     Returns:

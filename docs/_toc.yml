@@ -71,6 +71,7 @@ parts:
   numbered: false
   chapters:
   - file: documentation/next/next_overview
+  - file: documentation/next/next_vapor_pressure
   - file: documentation/next/next_gas
   - file: documentation/next/next_particle
   - file: documentation/next/next_aerosol
