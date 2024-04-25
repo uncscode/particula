@@ -1,60 +1,67 @@
 """Gas module."""
 
-from typing import List
+from dataclasses import dataclass, field
 from particula.next.gas_species import GasSpecies
 
 
+@dataclass
 class Gas:
     """
-    Represents a mixture of gas species, including properties such as
-    temperature, total pressure, and a list of gas species species.
+    Represents a mixture of gas species, detailing properties such as
+    temperature, total pressure, and the list of gas species in the mixture.
 
     Attributes:
-    - temperature (float): The temperature of the gas mixture.
-    - total_pressure (float): The total pressure of the gas mixture.
-    - species (List[GasSpecies]): A list of GasSpecies objects
-        representing the species of the gas mixture.
+    - temperature (float): The temperature of the gas mixture in Kelvin.
+    - total_pressure (float): The total pressure of the gas mixture in Pascals.
+    - species (List[GasSpecies]): A list of GasSpecies objects representing the
+        species in the gas mixture.
 
     Methods:
     - add_species: Adds a gas species to the mixture.
-    - remove_species: Removes a gas species from the mixture by name.
-
+    - remove_species: Removes a gas species from the mixture by index.
     """
 
-    def __init__(
-        self,
-        temperature: float,
-        total_pressure: float,
-        species: list[GasSpecies],
-    ):
-        self.temperature = temperature
-        self.total_pressure = total_pressure
-        self.species = species
+    temperature: float
+    total_pressure: float
+    species: list[GasSpecies] = field(default_factory=list)
 
-    def add_species(
-            self,
-            gas_species: GasSpecies) -> None:
+    def add_species(self, gas_species: GasSpecies) -> None:
         """
         Adds a gas species to the mixture.
 
         Parameters:
-        - name (str): The name of the gas species.
-        - molar_mass (float): The molar_mass of the gas species.
-        - vapor_pressure (Optional[float]): The vapor pressure of the gas
-            species. Units N/m2 (base, 1 kg⋅m⋅s-2) None if not applicable.
-        - condensable (bool): Indicates whether the gas species is
-            condensable.
+        - gas_species (GasSpecies): The GasSpecies object to be added to the
+        mixture.
         """
         self.species.append(gas_species)
 
     def remove_species(self, index: int) -> None:
         """
-        Removes a gas species from the mixture by name.
+        Removes a gas species from the mixture by index.
 
         Parameters:
-        - index int: The name of the gas species to be removed.
+        - index (int): The index of the gas species to be removed from the
+        list.
         """
-        self.species.pop(index)
+        if 0 <= index < len(self.species):
+            self.species.pop(index)
+        else:
+            raise IndexError("No gas species at the provided index.")
+
+    def __iter__(self):
+        """Allows iteration over the species in the gas mixture."""
+        return iter(self.species)
+
+    def __len__(self):
+        """Returns the number of species in the gas mixture."""
+        return len(self.species)
+    
+    def __str__(self):
+        """Returns a string representation of the Gas object."""
+        return (
+            f"Gas mixture at {self.temperature} K and {self.total_pressure} Pa "
+            f"consisting of {[str(species) for species in self.species]}"
+        )
 
 
 class GasBuilder:
@@ -63,7 +70,7 @@ class GasBuilder:
     def __init__(self):
         self._temperature: float = 298.15
         self._total_pressure: float = 101325
-        self._species: List[GasSpecies] = []
+        self._species: list[GasSpecies] = []
 
     def temperature(self, temperature: float):
         """Set the temperature of the gas mixture, in Kelvin."""
