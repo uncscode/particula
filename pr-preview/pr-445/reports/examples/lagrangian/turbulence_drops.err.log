@@ -154,19 +154,19 @@ File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/
 [1;32m     52[0m     [38;5;28;01mreturn[39;00m torch[38;5;241m.[39mbroadcast_tensors([38;5;241m*[39mnew_values)
 [1;32m     53[0m [38;5;28;01mreturn[39;00m torch[38;5;241m.[39mbroadcast_tensors([38;5;241m*[39mvalues)
 
-File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/utils/_device.py:77[0m, in [0;36mDeviceContext.__torch_function__[0;34m(self, func, types, args, kwargs)[0m
-[1;32m     75[0m [38;5;28;01mif[39;00m func [38;5;129;01min[39;00m _device_constructors() [38;5;129;01mand[39;00m kwargs[38;5;241m.[39mget([38;5;124m'[39m[38;5;124mdevice[39m[38;5;124m'[39m) [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m:
-[1;32m     76[0m     kwargs[[38;5;124m'[39m[38;5;124mdevice[39m[38;5;124m'[39m] [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39mdevice
-[0;32m---> 77[0m [38;5;28;01mreturn[39;00m [43mfunc[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/utils/_device.py:78[0m, in [0;36mDeviceContext.__torch_function__[0;34m(self, func, types, args, kwargs)[0m
+[1;32m     76[0m [38;5;28;01mif[39;00m func [38;5;129;01min[39;00m _device_constructors() [38;5;129;01mand[39;00m kwargs[38;5;241m.[39mget([38;5;124m'[39m[38;5;124mdevice[39m[38;5;124m'[39m) [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m:
+[1;32m     77[0m     kwargs[[38;5;124m'[39m[38;5;124mdevice[39m[38;5;124m'[39m] [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39mdevice
+[0;32m---> 78[0m [38;5;28;01mreturn[39;00m [43mfunc[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
 
-File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/cuda/__init__.py:302[0m, in [0;36m_lazy_init[0;34m()[0m
-[1;32m    300[0m [38;5;28;01mif[39;00m [38;5;124m"[39m[38;5;124mCUDA_MODULE_LOADING[39m[38;5;124m"[39m [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m os[38;5;241m.[39menviron:
-[1;32m    301[0m     os[38;5;241m.[39menviron[[38;5;124m"[39m[38;5;124mCUDA_MODULE_LOADING[39m[38;5;124m"[39m] [38;5;241m=[39m [38;5;124m"[39m[38;5;124mLAZY[39m[38;5;124m"[39m
-[0;32m--> 302[0m [43mtorch[49m[38;5;241;43m.[39;49m[43m_C[49m[38;5;241;43m.[39;49m[43m_cuda_init[49m[43m([49m[43m)[49m
-[1;32m    303[0m [38;5;66;03m# Some of the queued calls may reentrantly call _lazy_init();[39;00m
-[1;32m    304[0m [38;5;66;03m# we need to just return without initializing in that case.[39;00m
-[1;32m    305[0m [38;5;66;03m# However, we must not let any *other* threads in![39;00m
-[1;32m    306[0m _tls[38;5;241m.[39mis_initializing [38;5;241m=[39m [38;5;28;01mTrue[39;00m
+File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/cuda/__init__.py:293[0m, in [0;36m_lazy_init[0;34m()[0m
+[1;32m    291[0m [38;5;28;01mif[39;00m [38;5;124m"[39m[38;5;124mCUDA_MODULE_LOADING[39m[38;5;124m"[39m [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m os[38;5;241m.[39menviron:
+[1;32m    292[0m     os[38;5;241m.[39menviron[[38;5;124m"[39m[38;5;124mCUDA_MODULE_LOADING[39m[38;5;124m"[39m] [38;5;241m=[39m [38;5;124m"[39m[38;5;124mLAZY[39m[38;5;124m"[39m
+[0;32m--> 293[0m [43mtorch[49m[38;5;241;43m.[39;49m[43m_C[49m[38;5;241;43m.[39;49m[43m_cuda_init[49m[43m([49m[43m)[49m
+[1;32m    294[0m [38;5;66;03m# Some of the queued calls may reentrantly call _lazy_init();[39;00m
+[1;32m    295[0m [38;5;66;03m# we need to just return without initializing in that case.[39;00m
+[1;32m    296[0m [38;5;66;03m# However, we must not let any *other* threads in![39;00m
+[1;32m    297[0m _tls[38;5;241m.[39mis_initializing [38;5;241m=[39m [38;5;28;01mTrue[39;00m
 
 [0;31mRuntimeError[0m: Found no NVIDIA driver on your system. Please check that you have an NVIDIA GPU and installed a driver from http://www.nvidia.com/Download/index.aspx
 
