@@ -570,6 +570,7 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Vapor Pressure</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#units">Units</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#strategies-for-vapor-pressure-calculations">Strategies for Vapor Pressure Calculations</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#core-functions">Core Functions</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract-base-class">Abstract Base Class</a></li>
@@ -606,9 +607,18 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="vapor-pressure">
 <h1>Vapor Pressure<a class="headerlink" href="#vapor-pressure" title="Link to this heading">#</a></h1>
-<p>For an aerosol (ga phase + particle phase) in equilibrium with a liquid phase, the vapor pressure is the pressure of the vapor in equilibrium with the liquid phase. The vapor pressure is a measure of the tendency of particles to escape from the liquid phase and enter the gas phase. The vapor pressure dependence on temperature can take a few forms.</p>
-<p>In this notebook, we will cover the vapor pressure strategies currently implemented in the <code class="docutils literal notranslate"><span class="pre">vapor_presure</span></code> module.</p>
-<p>Units are always in base SI units (kg/mol, kg/m^3, K, Pa).</p>
+<p>Vapor pressure is defined as the pressure exerted by a vapor in equilibrium with its liquid or solid phase. It is a crucial measure for understanding the tendency of molecules to transition from the liquid phase to the gas phase. This property is particularly important in systems where an aerosol (gas phase + particle phase) is in equilibrium with both phases.</p>
+<p>The vapor pressure varies with temperature, and this variation can manifest in several forms. Understanding these changes is key to predicting how substances will behave under different temperature conditions.</p>
+<p>In this notebook, we will explore the strategies for calculating vapor pressure as implemented in the <code class="docutils literal notranslate"><span class="pre">vapor_pressure</span></code> module. These strategies are essential for accurately modeling and understanding the behavior of aerosols in equilibrium with a liquid phase.</p>
+<section id="units">
+<h2>Units<a class="headerlink" href="#units" title="Link to this heading">#</a></h2>
+<p>All measurements and calculations in this module adhere to the base SI units:</p>
+<ul class="simple">
+<li><p>Molar mass is in kilograms per mole (kg/mol).</p></li>
+<li><p>Concentration is in kilograms per cubic meter (kg/m^3).</p></li>
+<li><p>Temperature is in Kelvin (K).</p></li>
+<li><p>Pressure is in Pascals (Pa).</p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -620,6 +630,7 @@ document.write(`
 </div>
 </div>
 </div>
+</section>
 <section id="strategies-for-vapor-pressure-calculations">
 <h2>Strategies for Vapor Pressure Calculations<a class="headerlink" href="#strategies-for-vapor-pressure-calculations" title="Link to this heading">#</a></h2>
 <p>In our framework, all strategies for calculating vapor pressure are encapsulated within classes that inherit from the <code class="docutils literal notranslate"><span class="pre">VaporPressureStrategy</span></code> abstract base class. This design ensures that each strategy conforms to a standardized interface, making them interchangeable and simplifying integration with other components of our system.</p>
@@ -1739,6 +1750,7 @@ class WaterBuckStrategy(VaporPressureStrategy)
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Vapor Pressure</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#units">Units</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#strategies-for-vapor-pressure-calculations">Strategies for Vapor Pressure Calculations</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#core-functions">Core Functions</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract-base-class">Abstract Base Class</a></li>
