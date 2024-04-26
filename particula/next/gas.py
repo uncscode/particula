@@ -55,12 +55,12 @@ class Gas:
     def __len__(self):
         """Returns the number of species in the gas mixture."""
         return len(self.species)
-    
+
     def __str__(self):
         """Returns a string representation of the Gas object."""
         return (
-            f"Gas mixture at {self.temperature} K and {self.total_pressure} Pa "
-            f"consisting of {[str(species) for species in self.species]}"
+            f"Gas mixture at {self.temperature} K and {self.total_pressure} Pa"
+            f" consisting of {[str(species) for species in self.species]}"
         )
 
 
