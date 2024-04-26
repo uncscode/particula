@@ -7,6 +7,7 @@ from particula.next.particle import (
     create_particle_strategy, Particle)
 from particula.next.surface import VolumeSurfaceStrategy
 from particula.next.particle_activity import MassIdealActivity
+from particula.next.surface import surface_strategy_factory
 
 
 mass_based_strategy = MassBasedStrategy()
@@ -14,6 +15,7 @@ radii_based_strategy = RadiiBasedStrategy()
 speciated_mass_strategy = SpeciatedMassStrategy()
 surface_strategy = VolumeSurfaceStrategy()
 activity_strategy = MassIdealActivity()
+surface = surface_strategy_factory()
 
 
 def test_mass_based_strategy_mass():
@@ -161,7 +163,8 @@ def test_create_particle_strategy(representation, expected_strategy_type):
 ])
 def test_particle_properties(strategy, distribution, density, concentration):
     """Parameterized test for Particle properties."""
-    particle = Particle(strategy, activity_strategy, distribution, density, concentration)
+    particle = Particle(strategy, activity_strategy, surface,
+                        distribution, density, concentration)
     mass = particle.get_mass()
     radius = particle.get_radius()
     total_mass = particle.get_total_mass()
