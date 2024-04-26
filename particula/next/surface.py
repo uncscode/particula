@@ -287,7 +287,7 @@ class VolumeSurfaceStrategy(SurfaceStrategy):
 
 # Surface strategies factory
 def surface_strategy_factory(
-    strategy_type: str,
+    strategy_type: str = "default",
     **kwargs: dict  # type: ignore
 ) -> SurfaceStrategy:
     """

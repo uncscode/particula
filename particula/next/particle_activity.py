@@ -215,7 +215,7 @@ class KappaParameterActivity(ParticleActivityStrategy):
 
 # Factory function for creating activity strategies
 def particle_activity_strategy_factory(
-            strategy_type: str,
+            strategy_type: str = "mass_ideal",
             **kwargs: dict  # type: ignore
         ):
     """
@@ -234,4 +234,4 @@ def particle_activity_strategy_factory(
         return MassIdealActivity()
     if strategy_type.lower() == "kappa":
         return KappaParameterActivity(**kwargs)
-    raise ValueError("Unknown strategy type")
+    raise ValueError(f"Unknown strategy type call: {strategy_type}")
