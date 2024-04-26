@@ -213,7 +213,6 @@ class KappaParameterActivity(ParticleActivityStrategy):
         return activity
 
 
-
 # Factory function for creating activity strategies
 def particle_activity_strategy_factory(
             strategy_type: str,
@@ -229,10 +228,10 @@ def particle_activity_strategy_factory(
         - mass_ideal: Ideal activity based on mass fractions.
         - kappa: Non-ideal activity based on kappa hygroscopic parameter.
     - kwargs: Arguments for the activity strategy."""
-    if strategy_type == "molar_ideal":
+    if strategy_type.lower() == "molar_ideal":
         return MolarIdealActivity(**kwargs)
-    if strategy_type == "mass_ideal":
+    if strategy_type.lower() == "mass_ideal":
         return MassIdealActivity()
-    if strategy_type == "kappa":
+    if strategy_type.lower() == "kappa":
         return KappaParameterActivity(**kwargs)
     raise ValueError("Unknown strategy type")

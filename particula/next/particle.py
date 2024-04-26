@@ -4,6 +4,9 @@ from abc import ABC, abstractmethod
 import numpy as np
 from numpy.typing import NDArray
 
+# From Particula
+from particula.next.particle_activity import ParticleActivityStrategy
+
 
 class ParticleStrategy(ABC):
     """
@@ -273,6 +276,7 @@ class Particle:
 
     def __init__(self,
                  strategy: ParticleStrategy,
+                 activity: ParticleActivityStrategy,
                  distribution: NDArray[np.float64],
                  density: NDArray[np.float64],
                  concentration: NDArray[np.float64]):
@@ -290,6 +294,7 @@ class Particle:
         or mass in the distribution.
         """
         self.strategy = strategy
+        self.activity = activity
         self.distribution = distribution
         self.density = density
         self.concentration = concentration

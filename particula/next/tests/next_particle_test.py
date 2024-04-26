@@ -5,11 +5,15 @@ import pytest
 from particula.next.particle import (
     MassBasedStrategy, RadiiBasedStrategy, SpeciatedMassStrategy,
     create_particle_strategy, Particle)
+from particula.next.surface import VolumeSurfaceStrategy
+from particula.next.particle_activity import MassIdealActivity
 
 
 mass_based_strategy = MassBasedStrategy()
 radii_based_strategy = RadiiBasedStrategy()
 speciated_mass_strategy = SpeciatedMassStrategy()
+surface_strategy = VolumeSurfaceStrategy()
+activity_strategy = MassIdealActivity()
 
 
 def test_mass_based_strategy_mass():
@@ -145,7 +149,8 @@ def test_create_particle_strategy(representation, expected_strategy_type):
      np.array([100, 200, 300], dtype=np.float64),
      np.float64(2.5),
      np.array([10, 20, 30], dtype=np.float64)),
-    (RadiiBasedStrategy(), np.array([1, 2, 3], dtype=np.float64),
+    (RadiiBasedStrategy(),
+     np.array([1, 2, 3], dtype=np.float64),
      np.float64(5), np.array([10, 20, 30], dtype=np.float64)),
     # For SpeciatedMassStrategy, ensure distribution aligns with expected 2D
     # shape and densities are properly set
@@ -156,7 +161,7 @@ def test_create_particle_strategy(representation, expected_strategy_type):
 ])
 def test_particle_properties(strategy, distribution, density, concentration):
     """Parameterized test for Particle properties."""
-    particle = Particle(strategy, distribution, density, concentration)
+    particle = Particle(strategy, activity_strategy, distribution, density, concentration)
     mass = particle.get_mass()
     radius = particle.get_radius()
     total_mass = particle.get_total_mass()
