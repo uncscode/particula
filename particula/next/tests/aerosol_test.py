@@ -10,7 +10,7 @@ import numpy as np
 from particula.next.aerosol import Aerosol
 from particula.next.gas import Gas, GasBuilder
 from particula.next.gas_species import GasSpeciesBuilder
-from particula.next.vapor_pressure import ConstantVaporPressureStrategy
+from particula.next.gas_vapor_pressure import ConstantVaporPressureStrategy
 from particula.next.particle import Particle, create_particle_strategy
 
 
