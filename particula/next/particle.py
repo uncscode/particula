@@ -293,30 +293,6 @@ class Particle:
         self.distribution = distribution
         self.density = density
         self.concentration = concentration
-        # Initialize optional attributes
-        self.charge = None
-        self.shape_factor = None
-        # self.viscosity = None
-
-    def set_charge(self, charge: NDArray[np.float64]):
-        """
-        Sets the charge distribution for the particles.
-
-        Parameters:
-        - charge (NDArray[np.float64]): The charge distribution across the
-        particles.
-        """
-        self.charge = charge
-
-    def set_shape_factor(self, shape_factor: NDArray[np.float64]):
-        """
-        Sets the shape factor distribution for the particles.
-
-        Parameters:
-        - shape_factor (NDArray[np.float64]): The shape factor distribution
-        across the particles.
-        """
-        self.shape_factor = shape_factor
 
     def get_mass(self) -> NDArray[np.float64]:
         """
