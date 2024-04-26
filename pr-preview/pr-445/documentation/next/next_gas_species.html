@@ -625,7 +625,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="c1"># Particula imports</span>
-<span class="kn">from</span> <span class="nn">particula.next.vapor_pressure</span> <span class="kn">import</span> <span class="n">vapor_pressure_factory</span>
+<span class="kn">from</span> <span class="nn">particula.next.gas_vapor_pressure</span> <span class="kn">import</span> <span class="n">vapor_pressure_factory</span>
 <span class="kn">from</span> <span class="nn">particula.next.gas_species</span> <span class="kn">import</span> <span class="n">GasSpecies</span><span class="p">,</span> <span class="n">GasSpeciesBuilder</span>
 </pre></div>
 </div>
@@ -868,7 +868,7 @@ class GasSpeciesBuilder(builtins.object)
  |  name(self, name: Union[str, numpy.ndarray[Any, numpy.dtype[numpy.str_]]])
  |      Set the name of the gas species.
  |  
- |  vapor_pressure_strategy(self, strategy: Union[particula.next.vapor_pressure.VaporPressureStrategy, list[particula.next.vapor_pressure.VaporPressureStrategy]])
+ |  vapor_pressure_strategy(self, strategy: Union[particula.next.gas_vapor_pressure.VaporPressureStrategy, list[particula.next.gas_vapor_pressure.VaporPressureStrategy]])
  |      Set the vapor pressure strategy for the gas species.
  |  
  |  ----------------------------------------------------------------------
@@ -1024,7 +1024,7 @@ class GasSpecies(builtins.object)
  |      Args:
  |      - name (str or NDArray[np.str_]): The name of the gas species.
  |  
- |  set_vapor_pressure_strategy(self, strategy: Union[particula.next.vapor_pressure.VaporPressureStrategy, list[particula.next.vapor_pressure.VaporPressureStrategy]])
+ |  set_vapor_pressure_strategy(self, strategy: Union[particula.next.gas_vapor_pressure.VaporPressureStrategy, list[particula.next.gas_vapor_pressure.VaporPressureStrategy]])
  |      Set the vapor pressure strategies for the gas species.
  |      
  |      Args:

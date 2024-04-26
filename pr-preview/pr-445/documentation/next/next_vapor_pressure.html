@@ -630,7 +630,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="c1"># Import the functions from the particula package</span>
-<span class="kn">from</span> <span class="nn">particula.next</span> <span class="kn">import</span> <span class="n">vapor_pressure</span>
+<span class="kn">from</span> <span class="nn">particula.next</span> <span class="kn">import</span> <span class="n">gas_vapor_pressure</span>
 </pre></div>
 </div>
 </div>
@@ -690,20 +690,20 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize a specific strategy for calculating butanol&#39;s vapor pressure using Antoine&#39;s equation.</span>
 <span class="c1"># We set the coefficients &#39;a&#39;, &#39;b&#39;, and &#39;c&#39; which are specific to butanol.</span>
-<span class="n">butanol_antione</span> <span class="o">=</span> <span class="n">vapor_pressure</span><span class="o">.</span><span class="n">AntoineVaporPressureStrategy</span><span class="p">(</span>
+<span class="n">butanol_antione</span> <span class="o">=</span> <span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">AntoineVaporPressureStrategy</span><span class="p">(</span>
     <span class="n">a</span><span class="o">=</span><span class="mf">7.838</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">1558.19</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">196.881</span><span class="p">)</span>
 
 <span class="c1"># Initialize a strategy for styrene using a factory method.</span>
 <span class="c1"># A factory method is a way to create objects without specifying the exact class of object that will be created.</span>
 <span class="c1"># We pass &#39;antoine&#39; as the strategy name and the coefficients as a dictionary.</span>
 <span class="n">styrene_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mf">6.924</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">1420</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mi">226</span><span class="p">}</span>
-<span class="n">styrene_antione</span> <span class="o">=</span> <span class="n">vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
+<span class="n">styrene_antione</span> <span class="o">=</span> <span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
     <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;antoine&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">styrene_coefficients</span><span class="p">)</span>
 
 <span class="c1"># Similar to styrene, initialize a strategy for water using the factory method.</span>
 <span class="c1"># note the strategy name is case-insensitive.</span>
 <span class="n">water_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mf">7.949017</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mf">1657.462</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mf">227.02</span><span class="p">}</span>
-<span class="n">water_antione</span> <span class="o">=</span> <span class="n">vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
+<span class="n">water_antione</span> <span class="o">=</span> <span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
     <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;Antoine&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">water_coefficients</span><span class="p">)</span>
 
 <span class="c1"># Calculate and print the vapor pressures at 300 Kelvin for each substance using the initialized strategies.</span>
@@ -933,7 +933,7 @@ SR = \frac{P}{P_{sat}}
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setting a constant vapor pressure at 300 K for water</span>
 <span class="n">water_pure_at_300K</span> <span class="o">=</span> <span class="mf">1234.56</span>  <span class="c1"># in Pascals (Pa)</span>
-<span class="n">water_constant_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
+<span class="n">water_constant_strategy</span> <span class="o">=</span> <span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
     <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">vapor_pressure</span><span class="o">=</span><span class="n">water_pure_at_300K</span><span class="p">)</span>
 
 <span class="c1"># Setting parameters for the Clausius-Clapeyron equation for water</span>
@@ -942,11 +942,11 @@ SR = \frac{P}{P_{sat}}
     <span class="s1">&#39;temperature_initial&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>  <span class="c1"># Initial temperature in Kelvin</span>
     <span class="s1">&#39;pressure_initial&#39;</span><span class="p">:</span> <span class="n">water_pure_at_300K</span>  <span class="c1"># Initial pressure in Pascals</span>
 <span class="p">}</span>
-<span class="n">water_clausius_clapeyron_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
+<span class="n">water_clausius_clapeyron_strategy</span> <span class="o">=</span> <span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
     <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;clausius_clapeyron&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">water_clausius_clapeyron_parameters</span><span class="p">)</span>
 
 <span class="c1"># Using the Water Buck strategy, no additional parameters needed</span>
-<span class="n">water_buck_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
+<span class="n">water_buck_strategy</span> <span class="o">=</span> <span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
     <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;water_buck&#39;</span><span class="p">)</span>
 
 <span class="c1"># Define a range of temperatures for which to calculate vapor pressures</span>
@@ -997,12 +997,12 @@ SR = \frac{P}{P_{sat}}
 <p>Below is the help for each of the classes and methods used in this notebook.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">calculate_concentration</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">calculate_concentration</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function calculate_concentration in module particula.next.vapor_pressure:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function calculate_concentration in module particula.next.gas_vapor_pressure:
 
 calculate_concentration(partial_pressure: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], molar_mass: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], temperature: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]) -&gt; Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
     Calculate the concentration of a gas from its partial pressure, molar mass,
@@ -1023,12 +1023,12 @@ calculate_concentration(partial_pressure: Union[float, numpy.ndarray[Any, numpy.
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">calculate_partial_pressure</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">calculate_partial_pressure</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function calculate_partial_pressure in module particula.next.vapor_pressure:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function calculate_partial_pressure in module particula.next.gas_vapor_pressure:
 
 calculate_partial_pressure(concentration: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], molar_mass: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], temperature: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]) -&gt; Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
     Calculate the partial pressure of a gas from its concentration, molar mass,
@@ -1047,12 +1047,12 @@ calculate_partial_pressure(concentration: Union[float, numpy.ndarray[Any, numpy.
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">VaporPressureStrategy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">VaporPressureStrategy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class VaporPressureStrategy in module particula.next.vapor_pressure:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class VaporPressureStrategy in module particula.next.gas_vapor_pressure:
 
 class VaporPressureStrategy(abc.ABC)
  |  Abstract class for vapor pressure calculations. The methods
@@ -1153,14 +1153,14 @@ class VaporPressureStrategy(abc.ABC)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function vapor_pressure_factory in module particula.next.vapor_pressure:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function vapor_pressure_factory in module particula.next.gas_vapor_pressure:
 
-vapor_pressure_factory(strategy: str, **kwargs) -&gt; particula.next.vapor_pressure.VaporPressureStrategy
+vapor_pressure_factory(strategy: str, **kwargs) -&gt; particula.next.gas_vapor_pressure.VaporPressureStrategy
     Factory method to create a concrete VaporPressureStrategy object.
     
     Args:
@@ -1179,12 +1179,12 @@ vapor_pressure_factory(strategy: str, **kwargs) -&gt; particula.next.vapor_press
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class ConstantVaporPressureStrategy in module particula.next.vapor_pressure:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class ConstantVaporPressureStrategy in module particula.next.gas_vapor_pressure:
 
 class ConstantVaporPressureStrategy(VaporPressureStrategy)
  |  ConstantVaporPressureStrategy(vapor_pressure: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]])
@@ -1299,12 +1299,12 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">AntoineVaporPressureStrategy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">AntoineVaporPressureStrategy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class AntoineVaporPressureStrategy in module particula.next.vapor_pressure:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class AntoineVaporPressureStrategy in module particula.next.gas_vapor_pressure:
 
 class AntoineVaporPressureStrategy(VaporPressureStrategy)
  |  AntoineVaporPressureStrategy(a: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]] = 0.0, b: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]] = 0.0, c: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]] = 0.0)
@@ -1425,12 +1425,12 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">ClausiusClapeyronStrategy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">ClausiusClapeyronStrategy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class ClausiusClapeyronStrategy in module particula.next.vapor_pressure:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class ClausiusClapeyronStrategy in module particula.next.gas_vapor_pressure:
 
 class ClausiusClapeyronStrategy(VaporPressureStrategy)
  |  ClausiusClapeyronStrategy(latent_heat: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], temperature_initial: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], pressure_initial: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]])
@@ -1566,12 +1566,12 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">WaterBuckStrategy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">gas_vapor_pressure</span><span class="o">.</span><span class="n">WaterBuckStrategy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class WaterBuckStrategy in module particula.next.vapor_pressure:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class WaterBuckStrategy in module particula.next.gas_vapor_pressure:
 
 class WaterBuckStrategy(VaporPressureStrategy)
  |  Concrete implementation of the VaporPressureStrategy using the
