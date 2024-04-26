@@ -13,8 +13,10 @@ from particula.next.gas_species import GasSpeciesBuilder
 from particula.next.gas_vapor_pressure import ConstantVaporPressureStrategy
 from particula.next.particle import Particle, create_particle_strategy
 from particula.next.particle_activity import MassIdealActivity
+from particula.next.surface import surface_strategy_factory
 
 activity_strategy = MassIdealActivity()
+surface_strategy = surface_strategy_factory()
 
 @pytest.fixture
 def sample_gas():
@@ -49,6 +51,7 @@ def sample_particles():
     return Particle(
         strategy,
         activity_strategy,
+        surface_strategy,
         np.array([100, 200, 300], dtype=np.float64),
         np.float64([2.5]),
         np.array([10, 20, 30], dtype=np.float64))

@@ -6,6 +6,7 @@ from numpy.typing import NDArray
 
 # From Particula
 from particula.next.particle_activity import ParticleActivityStrategy
+from particula.next.surface import SurfaceStrategy
 
 
 class ParticleStrategy(ABC):
@@ -274,12 +275,15 @@ class Particle:
     distribution of the particles.
     """
 
-    def __init__(self,
-                 strategy: ParticleStrategy,
-                 activity: ParticleActivityStrategy,
-                 distribution: NDArray[np.float64],
-                 density: NDArray[np.float64],
-                 concentration: NDArray[np.float64]):
+    def __init__(
+                self,
+                strategy: ParticleStrategy,
+                activity: ParticleActivityStrategy,
+                surface: SurfaceStrategy,
+                distribution: NDArray[np.float64],
+                density: NDArray[np.float64],
+                concentration: NDArray[np.float64]
+            ):  # pylint: disable=too-many-arguments
         """
         Initializes a Particle instance with a strategy, distribution,
         density, and concentration.
@@ -295,6 +299,7 @@ class Particle:
         """
         self.strategy = strategy
         self.activity = activity
+        self.surface = surface
         self.distribution = distribution
         self.density = density
         self.concentration = concentration

@@ -14,8 +14,10 @@ from particula.next.aerosol import Aerosol
 from particula.next.gas_process import adiabatic_pressure_change, \
     AdiabaticPressureChange
 from particula.next.particle_activity import MassIdealActivity
+from particula.next.surface import surface_strategy_factory
 
 activity_strategy = MassIdealActivity()
+surface = surface_strategy_factory()
 
 def test_adiabatic_pressure_change():
     """Test the adiabatic_pressure_change function."""
@@ -66,6 +68,7 @@ def sample_particles():
     return Particle(
         strategy,
         activity_strategy,
+        surface,
         np.array([100, 200, 350], dtype=np.float64),
         np.float64([2.5]),
         np.array([10, 20, 50], dtype=np.float64))
