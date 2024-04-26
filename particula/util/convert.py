@@ -2,8 +2,8 @@
 """
 
 from typing import Union, Tuple, Any, List, Dict
-import numpy as np
 from numpy.typing import NDArray
+import numpy as np
 
 
 def coerce_type(data, dtype):
@@ -277,6 +277,75 @@ def mole_fraction_to_mass_fraction_multi(
         mf * mw / total_molecular_weight for mf,
         mw in zip(mole_fractions, molecular_weights)
     ]
+
+
+def mass_concentration_to_mole_fraction(
+    mass_concentrations: NDArray[np.float_],
+    molar_masses: NDArray[np.float_]
+) -> NDArray[np.float_]:
+    """Convert mass concentrations to mole fractions for N components.
+
+    Args:
+    -----------
+    - mass_concentrations: A list or ndarray of mass concentrations
+    (e.g., kg/m^3).
+    - molar_masses: A list or ndarray of molecular weights (e.g., g/mol).
+
+    Returns:
+    --------
+    - An ndarray of mole fractions.
+
+    Note:
+    ----
+    The mole fraction of a component is given by the ratio of its molar
+    concentration to the total molar concentration of all components.
+    """
+    # Convert mass concentrations to moles for each component
+    moles = mass_concentrations / molar_masses
+
+    # Calculate total moles in the mixture
+    total_moles = np.sum(moles)
+
+    # Calculate mole fractions by dividing moles of each component by total
+    # moles
+    mole_fractions = moles / total_moles
+
+    return mole_fractions
+
+
+def mass_concentration_to_volume_fraction(
+    mass_concentrations: NDArray[np.float_],
+    densities: NDArray[np.float_]
+) -> NDArray[np.float_]:
+    """Convert mass concentrations to volume fractions for N components.
+
+    Args:
+    -----------
+    - mass_concentrations: A list or ndarray of mass concentrations
+    (e.g., kg/m^3).
+    - densities: A list or ndarray of densities of each component (e.g., kg/m^3).
+
+    Returns:
+    --------
+    - An ndarray of volume fractions.
+
+    Note:
+    ----
+    The volume fraction of a component is calculated by dividing the volume
+    of that component (derived from mass concentration and density) by the
+    total volume of all components.
+    """
+    # Calculate volumes for each component using mass concentration and density
+    volumes = mass_concentrations / densities
+
+    # Calculate total volume of the mixture
+    total_volume = np.sum(volumes)
+
+    # Calculate volume fractions by dividing the volume of each component by
+    # the total volume
+    volume_fractions = volumes / total_volume
+
+    return volume_fractions
 
 
 def mass_fraction_to_volume_fraction(
