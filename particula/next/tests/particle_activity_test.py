@@ -10,6 +10,7 @@ from particula.next.particle_activity import (
     particle_activity_strategy_factory
 )
 
+
 # Test MolarIdealActivity
 def test_molar_ideal_activity_single_species():
     """Test activity calculation for a single species."""
@@ -29,6 +30,7 @@ def test_molar_ideal_activity_multiple_species():
         expected_activity,
         atol=1e-4
     )
+
 
 # Test MassIdealActivity
 def test_mass_ideal_activity_single_species():
@@ -65,6 +67,7 @@ def test_kappa_parameter_activity_multiple_species():
         activity_strategy.activity(mass_concentration),
         expected_activity
     )
+
 
 # Test particle_activity_strategy_factory
 def test_particle_activity_strategy_factory_molar_ideal():
