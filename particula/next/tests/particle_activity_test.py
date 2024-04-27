@@ -1,13 +1,14 @@
 """Tests for the particle activity module.
 Replace with real values in the future."""
 
+
 import pytest
 import numpy as np
 from particula.next.particle_activity import (
     MolarIdealActivity,
     MassIdealActivity,
     KappaParameterActivity,
-    particle_activity_strategy_factory
+    particle_activity_strategy_factory  # type: ignore
 )
 
 
@@ -22,7 +23,8 @@ def test_molar_ideal_activity_single_species():
 
 def test_molar_ideal_activity_multiple_species():
     """Test activity calculation for multiple species."""
-    activity_strategy = MolarIdealActivity(molar_mass=[1.0, 2.0, 3.0])
+    activity_strategy = MolarIdealActivity(
+        molar_mass=np.array([1.0, 2.0, 3.0]))
     mass_concentration = np.array([100.0, 200.0, 300.0])
     expected_activity = np.array([0.33333, 0.333333, 0.333333])
     np.testing.assert_allclose(
@@ -75,7 +77,7 @@ def test_particle_activity_strategy_factory_molar_ideal():
     strategy_type = "molar_ideal"
     kwargs = {"molar_mass": np.array([1.0, 2.0, 3.0])}
     activity_strategy = particle_activity_strategy_factory(
-        strategy_type, **kwargs)
+        strategy_type, **kwargs)  # type: ignore
     assert isinstance(activity_strategy, MolarIdealActivity)
 
 
@@ -84,7 +86,7 @@ def test_particle_activity_strategy_factory_mass_ideal():
     strategy_type = "mass_ideal"
     kwargs = {}
     activity_strategy = particle_activity_strategy_factory(
-        strategy_type, **kwargs)
+        strategy_type, **kwargs)  # type: ignore
     assert isinstance(activity_strategy, MassIdealActivity)
 
 
@@ -97,7 +99,7 @@ def test_particle_activity_strategy_factory_kappa():
         "water_index": 0
     }
     activity_strategy = particle_activity_strategy_factory(
-        strategy_type, **kwargs)
+        strategy_type, **kwargs)  # type: ignore
     assert isinstance(activity_strategy, KappaParameterActivity)
 
 
@@ -106,4 +108,5 @@ def test_particle_activity_strategy_factory_unknown_type():
     strategy_type = "unknown_type"
     kwargs = {}
     with pytest.raises(ValueError):
-        particle_activity_strategy_factory(strategy_type, **kwargs)
+        particle_activity_strategy_factory(
+            strategy_type, **kwargs)  # type: ignore
