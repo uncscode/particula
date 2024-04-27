@@ -367,7 +367,7 @@ class CondensationStrategy(ABC):
     def mass_transfer_rate(
         self,
         particle: Particle,
-        partial_pressure_gas: Union[float, NDArray[np.float_]],
+        gas_species: GasSpecies,
         temperature: float,
         pressure: float,
         dynamic_viscosity: Optional[float] = None
@@ -380,8 +380,8 @@ class CondensationStrategy(ABC):
         -----
         - particle (Particle class): The particle for which the mass transfer
         rate is to be calculated.
-        - partial_pressure_gas (Union[float, NDArray[np.float_]]): The partial
-        pressure of the species in the gas phase.
+        - gas_species (GasSpecies class): The gas species with which the
+        particle is in contact.
         - temperature (float): The temperature at which the mass transfer rate
         is to be calculated.
         - pressure (float): The pressure of the gas phase.
@@ -423,27 +423,6 @@ class CondesnationIsothermal(CondensationStrategy):
         pressure: float,
         dynamic_viscosity: Optional[float] = None
     ) -> Union[float, NDArray[np.float_]]:
-        """
-        Calculate the mass transfer rate based on the difference in partial
-        pressure and the first-order mass transport coefficient.
-
-        Args:
-        -----
-        - particle (Particle class): The particle for which the mass transfer
-        rate is to be calculated.
-        - partial_pressure_gas (Union[float, NDArray[np.float_]]): The partial
-        pressure of the species in the gas phase.
-        - temperature (float): The temperature at which the mass transfer rate
-        is to be calculated.
-        - pressure (float): The pressure of the gas phase.
-        - dynamic_viscosity (Optional[float]): The dynamic viscosity of the gas
-        [Pa*s]. If not provided, it will be calculated based on the temperature
-
-        Returns:
-        --------
-        - Union[float, NDArray[np.float_]]: The mass transfer rate for the
-        particle [kg/s].
-        """
 
         # Calculate the first-order mass transport coefficient
         first_order_mass_transport = self.first_order_mass_transport(
