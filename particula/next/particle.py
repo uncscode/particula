@@ -262,17 +262,17 @@ class Particle:
 
     Attributes:
     - strategy (ParticleStrategy): The computation strategy for particle
-    properties.
+    representations.
+    - activity (ParticleActivityStrategy): The activity strategy for the
+    partial pressure calculations.
+    - surface (SurfaceStrategy): The surface strategy for surface tension and
+    Kelvin effect.
     - distribution (NDArray[np.float64]): The distribution data for the
     particles, which could represent sizes, masses, or another relevant metric.
     - density (np.float64): The density of the material from which the
     particles are made.
     - concentration (NDArray[np.float64]): The concentration of particles
     within the distribution.
-    - charge (Optional[NDArray[np.float64]]): The charge distribution of the
-    particles.
-    - shape_factor (Optional[NDArray[np.float64]]): The shape factor
-    distribution of the particles.
     """
 
     def __init__(
