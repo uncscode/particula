@@ -372,6 +372,7 @@ class CondensationStrategy(ABC):
         pressure: float,
         dynamic_viscosity: Optional[float] = None
     ) -> Union[float, NDArray[np.float_]]:
+        # pylint: disable=too-many-arguments
         """
         Calculate the mass transfer rate based on the difference in partial
         pressure and the first-order mass transport coefficient.
@@ -423,6 +424,7 @@ class CondesnationIsothermal(CondensationStrategy):
         pressure: float,
         dynamic_viscosity: Optional[float] = None
     ) -> Union[float, NDArray[np.float_]]:
+        # pylint: disable=too-many-arguments
 
         # Calculate the first-order mass transport coefficient
         first_order_mass_transport = self.first_order_mass_transport(
@@ -432,7 +434,7 @@ class CondesnationIsothermal(CondensationStrategy):
             dynamic_viscosity=dynamic_viscosity
         )
 
-        # Calculate the difference in partial pressure
+        # Calculate the partial pressure
         partial_pressure_particle = particle.activity.partial_pressure(
             pure_vapor_pressure=gas_species.get_vapor_pressure(temperature),
             mass_concentration=particle.get_mass()
@@ -445,7 +447,7 @@ class CondesnationIsothermal(CondensationStrategy):
             mass_concentration=particle.get_mass(),
             temperature=temperature
         )
-        # calculate the pressure delta
+        # calculate the pressure delta accounting for the kelvin term
         pressure_delta = partial_pressure_delta(
             partial_pressure_gas=partial_pressure_gas,
             partial_pressure_particle=partial_pressure_particle,

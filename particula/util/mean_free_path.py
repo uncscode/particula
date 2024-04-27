@@ -14,7 +14,7 @@ from numpy.typing import NDArray
 import numpy as np
 from particula import u
 from particula.constants import (
-    GAS_CONSTANT, MOLECULAR_WEIGHT_AIR, BOLTZMANN_CONSTANT)
+    GAS_CONSTANT, MOLECULAR_WEIGHT_AIR)
 from particula.util.dynamic_viscosity import dyn_vis
 from particula.util.input_handling import (in_gas_constant,
                                            in_molecular_weight, in_pressure,

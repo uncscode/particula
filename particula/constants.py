@@ -48,7 +48,3 @@ SUTHERLAND_CONSTANT = 110.4 * u.K
 MOLECULAR_WEIGHT_AIR = (28.9644 * u.g / u.mol).to_base_units()
 
 STANDARD_GRAVITY = (1*u.gravity).to_base_units()
-
-# Diffusion coefficient of water vapor in air at 298.15 K
-# and 101325 Pa in m^2/s
-# See https://doi.org/10.1021/je00019a006
