@@ -63,5 +63,5 @@ Cell [0;32mIn[1], line 22[0m
 [1;32m     27[0m [38;5;66;03m# Accessing calculated properties[39;00m
 [1;32m     28[0m [38;5;28mprint[39m([38;5;124m"[39m[38;5;124mMass of particles:[39m[38;5;124m"[39m, particle[38;5;241m.[39mget_mass())
 
-[0;31mTypeError[0m: Particle.__init__() missing 1 required positional argument: 'activity'
+[0;31mTypeError[0m: Particle.__init__() missing 2 required positional arguments: 'activity' and 'surface'
 
