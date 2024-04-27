@@ -1,3 +1,4 @@
+"""Test the surface module."""
 import numpy as np
 import pytest
 from particula.next.surface import (
@@ -128,6 +129,7 @@ def test_volume_surface_strategy():
 
 # Test case for Kelvin term calculation
 def test_kelvin_term():
+    """Test the Kelvin term calculation."""
     strategy = MolarSurfaceStrategy()
     radius = 1.0
     molar_mass = 0.01815
