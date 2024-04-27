@@ -6,8 +6,7 @@ from particula.next.condensation import (
     partial_pressure_delta,
     thermal_conductivity,
     first_order_mass_transport_k,
-    mass_transfer_rate,
-    CondesnationIsothermal,
+    mass_transfer_rate
 )
 
 
