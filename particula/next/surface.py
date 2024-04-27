@@ -17,6 +17,7 @@ from particula.util.convert import (
 from particula.constants import GAS_CONSTANT
 
 
+# Kelvin effect
 def kelvin_radius(
     effective_surface_tension: Union[float, NDArray[np.float_]],
     effective_density: Union[float, NDArray[np.float_]],
@@ -79,6 +80,7 @@ def kelvin_term(
     return np.exp(kelvin_radius_value / radius)
 
 
+# Surface tension strategies and Kelvin effect
 class SurfaceStrategy(ABC):
     """
     Abstract class for implementing strategies to calculate surface tension and

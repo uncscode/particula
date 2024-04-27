@@ -3,7 +3,7 @@
 
 import pytest
 from particula import u
-from particula.util.mean_free_path import mfp
+from particula.util.mean_free_path import mfp, molecule_mean_free_path
 
 
 def test_mfp():
@@ -40,3 +40,14 @@ def test_mfp():
             pressure=101325*u.Pa,
             molecular_weight=0.03*u.m/u.mol,
             )
+
+
+def test_molecule_mean_free_path():
+    """ Testing the mean free path of a molecule compare with mfp"""
+
+    a_mfp = mfp(temperature=298, pressure=101325, molecular_weight=0.03)
+    b_molecule_mfp = molecule_mean_free_path(
+        temperature=298, pressure=101325, molar_mass=0.03
+    )
+
+    assert a_mfp.m == b_molecule_mfp
