@@ -18,6 +18,7 @@ from particula.next.surface import surface_strategy_factory
 activity_strategy = MassIdealActivity()
 surface_strategy = surface_strategy_factory()
 
+
 @pytest.fixture
 def sample_gas():
     """Fixture for creating a Gas instance for testing."""

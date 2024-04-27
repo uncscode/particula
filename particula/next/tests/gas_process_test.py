@@ -19,6 +19,7 @@ from particula.next.surface import surface_strategy_factory
 activity_strategy = MassIdealActivity()
 surface = surface_strategy_factory()
 
+
 def test_adiabatic_pressure_change():
     """Test the adiabatic_pressure_change function."""
     # Example conditions: Air compressed adiabatically
