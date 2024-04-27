@@ -5,6 +5,7 @@ import pytest
 import numpy as np
 from particula import u
 from particula.util.mean_free_path import mfp, molecule_mean_free_path
+from particula.util.mean_free_path import mfp, molecule_mean_free_path
 
 
 def test_mfp():
