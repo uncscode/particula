@@ -145,7 +145,7 @@ class MassBasedMovingBin(ParticleStrategy):
         added_mass: NDArray[np.float_]
     ) -> tuple[NDArray[np.float_], NDArray[np.float_]]:
         # Add the mass to the distribution moving the bins
-        return (distribution+added_mass, concentration)
+        return (distribution + added_mass, concentration)
 
 
 class RadiiBasedMovingBin(ParticleStrategy):
@@ -277,10 +277,11 @@ class SpeciatedMassMovingBin(ParticleStrategy):
         added_mass: NDArray[np.float_]
     ) -> tuple[NDArray[np.float_], NDArray[np.float_]]:
         # Add the mass to the distribution moving the bins
-        return (distribution+added_mass, concentration)
+        return (distribution + added_mass, concentration)
 
 
-def create_particle_strategy(particle_representation: str) -> ParticleStrategy:
+def particle_strategy_factory(
+        particle_representation: str) -> ParticleStrategy:
     """
     Factory function for creating instances of particle strategies based on
     the specified representation type.
@@ -334,14 +335,14 @@ class Particle:
     """
 
     def __init__(
-                self,
-                strategy: ParticleStrategy,
-                activity: ParticleActivityStrategy,
-                surface: SurfaceStrategy,
-                distribution: NDArray[np.float_],
-                density: NDArray[np.float_],
-                concentration: NDArray[np.float_]
-            ):  # pylint: disable=too-many-arguments
+        self,
+        strategy: ParticleStrategy,
+        activity: ParticleActivityStrategy,
+        surface: SurfaceStrategy,
+        distribution: NDArray[np.float_],
+        density: NDArray[np.float_],
+        concentration: NDArray[np.float_]
+    ):  # pylint: disable=too-many-arguments
         """
         Initializes a Particle instance with a strategy, distribution,
         density, and concentration.
