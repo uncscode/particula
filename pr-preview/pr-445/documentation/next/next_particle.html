@@ -606,38 +606,47 @@ document.write(`
 </section>
 <section id="key-components">
 <h2>Key Components:<a class="headerlink" href="#key-components" title="Link to this heading">#</a></h2>
+<p><strong><code class="docutils literal notranslate"><span class="pre">ParticleStrategy</span></code></strong>: An abstract base class that outlines the common interface for calculating particle mass, radius, and total mass.</p>
 <ul class="simple">
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">ParticleStrategy</span></code></strong>: An abstract base class that outlines the common interface for calculating particle mass, radius, and total mass.</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">MassBasedStrategy</span></code></strong>: A concrete strategy for particles represented by their mass distribution.</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">RadiiBasedStrategy</span></code></strong>: Focuses on particles defined by their radius (size distribution).</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">SpeciatedMassStrategy</span></code></strong>: Tailored for particles with a distribution across different species, each potentially having distinct densities.</p></li>
+<li><p><strong>MovingBins</strong>: Are a collection of strategies that move the bins in a distribution, when mass is added or removed from the system. This is useful for simulating the movement of particles in a system.</p>
+<ul>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">MassBaseMovingBin</span></code></strong>: A concrete strategy for particles represented by their mass distribution.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">RadiiBasedMovingBin</span></code></strong>: Focuses on particles defined by their radius (size distribution).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">SpeciatedMassMovingBin</span></code></strong>: Tailored for particles with a distribution across different species, each potentially having distinct densities.</p></li>
+</ul>
+</li>
 </ul>
 <p>The <code class="docutils literal notranslate"><span class="pre">distribution</span></code> is the x-axis of a particle distribution, so it can be mass, radius, or species-masses. The <code class="docutils literal notranslate"><span class="pre">concentration</span></code> are the y-axis of the distribution, currently all number-concentration. It is these two parameters that define the particle distribution, and they change depending on the strategy.</p>
+<p>Additional strategies can be added to the system <code class="docutils literal notranslate"><span class="pre">ParticleStrategy</span></code>, such as a PDF representation of the distribution, or fixed bins that do not move.</p>
 <p>By adopting these strategies, we can easily switch between different methods of representing particle distributions, enabling more nuanced simulations and analyses of aerosol behavior.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example demonstrating the usage of particle distribution strategies</span>
 
-<span class="c1"># Assuming necessary imports</span>
+<span class="c1"># necessary imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">particula.next.particle</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">create_particle_strategy</span><span class="p">,</span>
     <span class="n">Particle</span><span class="p">,</span>
-    <span class="n">MassBasedStrategy</span><span class="p">,</span>
-    <span class="n">RadiiBasedStrategy</span><span class="p">,</span>
-    <span class="n">SpeciatedMassStrategy</span><span class="p">,</span>
+    <span class="n">MassBasedMovingBin</span><span class="p">,</span>
+    <span class="n">RadiiBasedMovingBin</span><span class="p">,</span>
+    <span class="n">SpeciatedMassMovingBin</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">particula.next.particle_activity</span> <span class="kn">import</span> <span class="n">particle_activity_strategy_factory</span>
+<span class="kn">from</span> <span class="nn">particula.next.surface</span> <span class="kn">import</span> <span class="n">surface_strategy_factory</span>
 
 <span class="c1"># Creating particle distribution examples</span>
-<span class="n">mass_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-<span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
-<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">mass_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">)</span>
+<span class="n">density</span> <span class="o">=</span> <span class="mf">2.5</span>
+<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">)</span>
 
 <span class="c1"># Instantiate a particle strategy</span>
-<span class="n">mass_based_strategy</span> <span class="o">=</span> <span class="n">MassBasedStrategy</span><span class="p">()</span>
+<span class="n">mass_based_strategy</span> <span class="o">=</span> <span class="n">MassBasedMovingBin</span><span class="p">()</span>
 
 <span class="c1"># Create a Particle instance using the MassBasedStrategy</span>
 <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">mass_based_strategy</span><span class="p">,</span>
+                    <span class="n">activity</span><span class="o">=</span><span class="n">particle_activity_strategy_factory</span><span class="p">(),</span>
+                    <span class="n">surface</span><span class="o">=</span><span class="n">surface_strategy_factory</span><span class="p">(),</span>
                     <span class="n">distribution</span><span class="o">=</span><span class="n">mass_distribution</span><span class="p">,</span>
                     <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
                     <span class="n">concentration</span><span class="o">=</span><span class="n">concentration</span><span class="p">)</span>
@@ -650,24 +659,9 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># Example demonstrating the usage of particle distribution strategies</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> 
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="c1"># Assuming necessary imports</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="ne">----&gt; </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">particula.next.particle</span> <span class="kn">import</span> <span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span>     <span class="n">create_particle_strategy</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="n">Particle</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span>     <span class="n">MassBasedStrategy</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span>     <span class="n">RadiiBasedStrategy</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span>     <span class="n">SpeciatedMassStrategy</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">11</span> <span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">13</span> <span class="c1"># Creating particle distribution examples</span>
-<span class="g g-Whitespace">     </span><span class="mi">14</span> <span class="n">mass_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-
-<span class="ne">ImportError</span>: cannot import name &#39;MassBasedStrategy&#39; from &#39;particula.next.particle&#39; (/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/particle.py)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mass of particles: [100. 200. 300.]
+Radius of particles: [2.12156884 2.67300924 3.05983174]
+Total mass of the particle distribution: 14000.0
 </pre></div>
 </div>
 </div>
@@ -687,14 +681,14 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Creating a mass-based particle strategy</span>
-<span class="n">mass_based_strategy</span> <span class="o">=</span> <span class="n">create_particle_strategy</span><span class="p">(</span><span class="s2">&quot;mass_based&quot;</span><span class="p">)</span>
+<span class="n">mass_based_strategy</span> <span class="o">=</span> <span class="n">create_particle_strategy</span><span class="p">(</span><span class="s2">&quot;mass_based_moving_bin&quot;</span><span class="p">)</span>
 
 <span class="c1"># Now, initialize a Particle instance using the mass-based strategy</span>
 <span class="c1"># Example particle sizes in meters</span>
-<span class="n">particle_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">2e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-<span class="n">particle_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>  <span class="c1"># Example density in kg/m^3</span>
+<span class="n">particle_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">2e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">)</span>
+<span class="n">particle_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>  <span class="c1"># Example density in kg/m^3</span>
 <span class="n">particle_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-    <span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>  <span class="c1"># Example concentrations</span>
+    <span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">)</span>  <span class="c1"># Example concentrations</span>
 
 <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span>
     <span class="n">strategy</span><span class="o">=</span><span class="n">mass_based_strategy</span><span class="p">,</span>
@@ -711,9 +705,22 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Particle Masses: [1.e-09 2.e-09 3.e-09]
-Particle Radii: [6.20350491e-05 7.81592642e-05 8.94700229e-05]
-Total Particle Mass: 1.4000000000000001e-05
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">11</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">particle_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>  <span class="c1"># Example density in kg/m^3</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="n">particle_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span>     <span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">)</span>  <span class="c1"># Example concentrations</span>
+<span class="ne">---&gt; </span><span class="mi">11</span> <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span>     <span class="n">strategy</span><span class="o">=</span><span class="n">mass_based_strategy</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">13</span>     <span class="n">distribution</span><span class="o">=</span><span class="n">particle_distribution</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">14</span>     <span class="n">density</span><span class="o">=</span><span class="n">particle_density</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">15</span>     <span class="n">concentration</span><span class="o">=</span><span class="n">particle_concentration</span>
+<span class="g g-Whitespace">     </span><span class="mi">16</span> <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">18</span> <span class="c1"># Demonstrate the usage of the Particle instance</span>
+<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Particle Masses: </span><span class="si">{</span><span class="n">particle</span><span class="o">.</span><span class="n">get_mass</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="ne">TypeError</span>: Particle.__init__() missing 2 required positional arguments: &#39;activity&#39; and &#39;surface&#39;
 </pre></div>
 </div>
 </div>
@@ -744,9 +751,9 @@ Total Particle Mass: 1.4000000000000001e-05
 <span class="n">mass_based_particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span>
     <span class="n">strategy</span><span class="o">=</span><span class="n">mass_based_strategy</span><span class="p">,</span>
     <span class="c1"># Example mass distribution</span>
-    <span class="n">distribution</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-    <span class="n">density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">2.5</span><span class="p">),</span>
-    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">distribution</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">),</span>
+    <span class="n">density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">(</span><span class="mf">2.5</span><span class="p">),</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">)</span>
 <span class="p">)</span>
 
 <span class="c1"># Instantiate a Particle with a Number-Based Strategy</span>
@@ -754,9 +761,9 @@ Total Particle Mass: 1.4000000000000001e-05
 <span class="n">radii_based_particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span>
     <span class="n">strategy</span><span class="o">=</span><span class="n">radii_based_strategy</span><span class="p">,</span>
     <span class="c1"># Example size distribution</span>
-    <span class="n">distribution</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-    <span class="n">density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.5</span><span class="p">),</span>
-    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">500</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">distribution</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">),</span>
+    <span class="n">density</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">(</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">500</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float_</span><span class="p">)</span>
 <span class="p">)</span>
 
 <span class="c1"># Demonstrating how Particle class methods provide a consistent interface</span>

@@ -18,55 +18,44 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-# Example demonstrating the usage of particle distribution strategies
+# Example: Creating a mass-based particle strategy
+mass_based_strategy = create_particle_strategy("mass_based_moving_bin")
 
-# Assuming necessary imports
-import numpy as np
-from particula.next.particle import (
-    create_particle_strategy,
-    Particle,
-    MassBasedStrategy,
-    RadiiBasedStrategy,
-    SpeciatedMassStrategy,
+# Now, initialize a Particle instance using the mass-based strategy
+# Example particle sizes in meters
+particle_distribution = np.array([1e-9, 2e-9, 3e-9], dtype=np.float_)
+particle_density = np.float_(1000)  # Example density in kg/m^3
+particle_concentration = np.array(
+    [1000, 2000, 3000], dtype=np.float_)  # Example concentrations
+
+particle = Particle(
+    strategy=mass_based_strategy,
+    distribution=particle_distribution,
+    density=particle_density,
+    concentration=particle_concentration
 )
 
-# Creating particle distribution examples
-mass_distribution = np.array([100, 200, 300], dtype=np.float64)
-density = np.float64(2.5)
-concentration = np.array([10, 20, 30], dtype=np.float64)
-
-# Instantiate a particle strategy
-mass_based_strategy = MassBasedStrategy()
-
-# Create a Particle instance using the MassBasedStrategy
-particle = Particle(strategy=mass_based_strategy,
-                    distribution=mass_distribution,
-                    density=density,
-                    concentration=concentration)
-
-# Accessing calculated properties
-print("Mass of particles:", particle.get_mass())
-print("Radius of particles:", particle.get_radius())
-print("Total mass of the particle distribution:", particle.get_total_mass())
+# Demonstrate the usage of the Particle instance
+print(f"Particle Masses: {particle.get_mass()}")
+print(f"Particle Radii: {particle.get_radius()}")
+print(f"Total Particle Mass: {particle.get_total_mass()}")
 ------------------
 
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mImportError[0m                               Traceback (most recent call last)
-Cell [0;32mIn[1], line 5[0m
-[1;32m      1[0m [38;5;66;03m# Example demonstrating the usage of particle distribution strategies[39;00m
-[1;32m      2[0m 
-[1;32m      3[0m [38;5;66;03m# Assuming necessary imports[39;00m
-[1;32m      4[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
-[0;32m----> 5[0m [38;5;28;01mfrom[39;00m [38;5;21;01mparticula[39;00m[38;5;21;01m.[39;00m[38;5;21;01mnext[39;00m[38;5;21;01m.[39;00m[38;5;21;01mparticle[39;00m [38;5;28;01mimport[39;00m (
-[1;32m      6[0m     create_particle_strategy,
-[1;32m      7[0m     Particle,
-[1;32m      8[0m     MassBasedStrategy,
-[1;32m      9[0m     RadiiBasedStrategy,
-[1;32m     10[0m     SpeciatedMassStrategy,
-[1;32m     11[0m )
-[1;32m     13[0m [38;5;66;03m# Creating particle distribution examples[39;00m
-[1;32m     14[0m mass_distribution [38;5;241m=[39m np[38;5;241m.[39marray([[38;5;241m100[39m, [38;5;241m200[39m, [38;5;241m300[39m], dtype[38;5;241m=[39mnp[38;5;241m.[39mfloat64)
+[0;31mTypeError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[2], line 11[0m
+[1;32m      7[0m particle_density [38;5;241m=[39m np[38;5;241m.[39mfloat_([38;5;241m1000[39m)  [38;5;66;03m# Example density in kg/m^3[39;00m
+[1;32m      8[0m particle_concentration [38;5;241m=[39m np[38;5;241m.[39marray(
+[1;32m      9[0m     [[38;5;241m1000[39m, [38;5;241m2000[39m, [38;5;241m3000[39m], dtype[38;5;241m=[39mnp[38;5;241m.[39mfloat_)  [38;5;66;03m# Example concentrations[39;00m
+[0;32m---> 11[0m particle [38;5;241m=[39m [43mParticle[49m[43m([49m
+[1;32m     12[0m [43m    [49m[43mstrategy[49m[38;5;241;43m=[39;49m[43mmass_based_strategy[49m[43m,[49m
+[1;32m     13[0m [43m    [49m[43mdistribution[49m[38;5;241;43m=[39;49m[43mparticle_distribution[49m[43m,[49m
+[1;32m     14[0m [43m    [49m[43mdensity[49m[38;5;241;43m=[39;49m[43mparticle_density[49m[43m,[49m
+[1;32m     15[0m [43m    [49m[43mconcentration[49m[38;5;241;43m=[39;49m[43mparticle_concentration[49m
+[1;32m     16[0m [43m)[49m
+[1;32m     18[0m [38;5;66;03m# Demonstrate the usage of the Particle instance[39;00m
+[1;32m     19[0m [38;5;28mprint[39m([38;5;124mf[39m[38;5;124m"[39m[38;5;124mParticle Masses: [39m[38;5;132;01m{[39;00mparticle[38;5;241m.[39mget_mass()[38;5;132;01m}[39;00m[38;5;124m"[39m)
 
-[0;31mImportError[0m: cannot import name 'MassBasedStrategy' from 'particula.next.particle' (/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/particle.py)
+[0;31mTypeError[0m: Particle.__init__() missing 2 required positional arguments: 'activity' and 'surface'
 
