@@ -8,8 +8,8 @@
 import pytest
 import numpy as np
 from particula.next.aerosol import Aerosol
-from particula.next.gas import Gas, GasBuilder
-from particula.next.gas_species import GasSpeciesBuilder
+from particula.next.gas import GasBuilder
+from particula.next.gas_species import GasSpeciesBuilder, GasSpecies
 from particula.next.gas_vapor_pressure import ConstantVaporPressureStrategy
 from particula.next.particle import Particle, create_particle_strategy
 from particula.next.particle_activity import MassIdealActivity
@@ -48,7 +48,7 @@ def sample_gas():
 @pytest.fixture
 def sample_particles():
     """Fixture for creating a Particle instance for testing."""
-    strategy = create_particle_strategy('mass_based')
+    strategy = create_particle_strategy('mass_based_moving_bin')
     return Particle(
         strategy,
         activity_strategy,
@@ -61,13 +61,7 @@ def sample_particles():
 @pytest.fixture
 def aerosol_with_fixtures(sample_gas, sample_particles):
     """Fixture for creating an Aerosol instance with fixtures."""
-    return Aerosol(gases=sample_gas, particles=sample_particles)
-
-
-def test_add_gas(aerosol_with_fixtures, sample_gas):
-    """"Test adding a Gas instance."""
-    aerosol_with_fixtures.add_gas(sample_gas)
-    assert len(aerosol_with_fixtures.gases) == 2
+    return Aerosol(gas=sample_gas, particles=sample_particles)
 
 
 def test_add_particle(aerosol_with_fixtures, sample_particles):
@@ -78,8 +72,8 @@ def test_add_particle(aerosol_with_fixtures, sample_particles):
 
 def test_iterate_gases(aerosol_with_fixtures):
     """Test iterating over Gas instances."""
-    for gas in aerosol_with_fixtures.iterate_gas():
-        assert isinstance(gas, Gas)
+    for gas_species in aerosol_with_fixtures.iterate_gas():
+        assert isinstance(gas_species, GasSpecies)
 
 
 def test_iterate_particles(aerosol_with_fixtures):
