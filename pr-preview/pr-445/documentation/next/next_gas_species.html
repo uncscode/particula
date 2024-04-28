@@ -911,6 +911,13 @@ class GasSpecies(builtins.object)
  |  __str__(self)
  |      Return a string representation of the GasSpecies object.
  |  
+ |  add_concentration(self, added_concentration: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]])
+ |      Add concentration to the gas species.
+ |      
+ |      Args:
+ |      - added_concentration (float): The concentration to add to the gas
+ |          species.
+ |  
  |  get_concentration(self) -&gt; Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
  |      Get the concentration of the gas species in the mixture, in kg/m^3.
  |      
