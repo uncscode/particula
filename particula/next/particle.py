@@ -280,8 +280,9 @@ class SpeciatedMassMovingBin(ParticleStrategy):
     ) -> tuple[NDArray[np.float_], NDArray[np.float_]]:
         # Add the mass to the distribution moving the bins
         # limit add to zero, total mass cannot be negative
-        new_mass = np.maximum(distribution+added_mass, 0)
-        return (new_mass, concentration)
+        new_mass = np.maximum(
+            distribution*concentration+added_mass, 0)/concentration
+        return (concentration, new_mass)
 
 
 def particle_strategy_factory(
