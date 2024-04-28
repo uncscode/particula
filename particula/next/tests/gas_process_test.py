@@ -65,7 +65,7 @@ def sample_gas():
 @pytest.fixture
 def sample_particles():
     """Fixture for creating a Particle instance for testing."""
-    strategy = create_particle_strategy('mass_based')
+    strategy = create_particle_strategy('mass_based_moving_bin')
     return Particle(
         strategy,
         activity_strategy,
@@ -78,14 +78,14 @@ def sample_particles():
 @pytest.fixture
 def aerosol_with_fixtures(sample_gas, sample_particles) -> Aerosol:
     """Fixture for creating an Aerosol instance with fixtures."""
-    return Aerosol(gases=sample_gas, particles=sample_particles)
+    return Aerosol(gas=sample_gas, particles=sample_particles)
 
 
 def test_adiabaticpressurechange(aerosol_with_fixtures):
     """Test the AdiabaticPressureChange process."""
     # Process parameters
-    new_pressure = 202650  # Final pressure (2 atm)
-    runnable = AdiabaticPressureChange(aerosol_with_fixtures, new_pressure)
+    new_pressure = 202650.0  # Final pressure (2 atm)
+    runnable = AdiabaticPressureChange(new_pressure)
 
     # Execute the process
     runnable.execute(aerosol_with_fixtures)
@@ -94,5 +94,5 @@ def test_adiabaticpressurechange(aerosol_with_fixtures):
     t_final_expected = 298.15 * (new_pressure / 101325) ** ((1.4 - 1) / 1.4)
 
     # Check the final temperature
-    final_temperature = aerosol_with_fixtures.gases[0].temperature
+    final_temperature = aerosol_with_fixtures.gas.temperature
     assert np.isclose(final_temperature, t_final_expected)

@@ -281,6 +281,17 @@ class GasSpecies:
             temperature=temperature
         )
 
+    def add_concentration(
+        self,
+        added_concentration: Union[float, NDArray[np.float_]]
+    ):
+        """Add concentration to the gas species.
+
+        Args:
+        - added_concentration (float): The concentration to add to the gas
+            species."""
+        self.concentration = self.add_concentration + added_concentration
+
 
 class GasSpeciesBuilder:
     """Builder class for GasSpecies objects, allowing for a more fluent and
