@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Modeling Aerosol Dynamics with Runnable Processes &#8212; Particula Book</title>
+    <title>Condensation &#8212; Particula Book</title>
   
   
   
@@ -57,11 +57,9 @@
     <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'documentation/next/next_runnable_process';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'documentation/next/next_condensation';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Contributor Guidelines" href="../../CONTRIBUTING.html" />
-    <link rel="prev" title="Aerosol" href="next_aerosol.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -122,6 +120,8 @@
     <div class="bd-container__inner bd-page-width">
       
       
+      
+        
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -272,7 +272,7 @@
 
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Next DevOps</span></p>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="next_overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="next_vapor_pressure.html">Vapor Pressure</a></li>
 
@@ -288,7 +288,6 @@
 <li class="toctree-l1"><a class="reference internal" href="next_particle.html">Strategies in Particle Distributions</a></li>
 
 <li class="toctree-l1"><a class="reference internal" href="next_aerosol.html">Aerosol</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Modeling Aerosol Dynamics with Runnable Processes</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
 <ul class="nav bd-sidenav">
@@ -348,7 +347,7 @@
       
       
       
-      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/documentation/next/next_runnable_process.ipynb" target="_blank"
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/documentation/next/next_condensation.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
    title="Launch onBinder"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -366,7 +365,7 @@
       
       
       
-      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/documentation/next/next_runnable_process.ipynb" target="_blank"
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/documentation/next/next_condensation.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
    title="Launch onColab"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -432,7 +431,7 @@
       
       
       
-      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/documentation/next/next_runnable_process.ipynb" target="_blank"
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/documentation/next/next_condensation.ipynb" target="_blank"
    class="btn btn-sm btn-source-edit-button dropdown-item"
    title="Suggest edit"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -449,7 +448,7 @@
       
       
       
-      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fdocumentation/next/next_runnable_process.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fdocumentation/next/next_condensation.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -479,7 +478,7 @@
       
       
       
-      <li><a href="../../_sources/documentation/next/next_runnable_process.ipynb" target="_blank"
+      <li><a href="../../_sources/documentation/next/next_condensation.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -563,7 +562,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Modeling Aerosol Dynamics with Runnable Processes</h1>
+    <h1>Condensation</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -574,8 +573,8 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-concepts">Core Concepts:</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-insights">Practical Insights:</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inputs">Inputs:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#condensation-process">Condensation Process</a></li>
 </ul>
             </nav>
         </div>
@@ -587,91 +586,134 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="modeling-aerosol-dynamics-with-runnable-processes">
-<h1>Modeling Aerosol Dynamics with Runnable Processes<a class="headerlink" href="#modeling-aerosol-dynamics-with-runnable-processes" title="Link to this heading">#</a></h1>
-<p>In aerosol science, understanding and simulating the dynamic processes affecting aerosol particles and gases—such as condensation and coagulation—is crucial for accurate modeling. The <code class="docutils literal notranslate"><span class="pre">RunnableProcess</span></code> framework allows for the encapsulation of these dynamic behaviors, providing a flexible and modular approach to applying transformations to aerosol systems.</p>
-<p>The underlying Processes are currently just mock-ups, we wanted to test the framework of the <code class="docutils literal notranslate"><span class="pre">RunnableProcess</span></code> class and the <code class="docutils literal notranslate"><span class="pre">ProcessSequence</span></code> utility class. How they are called and how they can be chained together to simulate complex aerosol transformations.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="condensation">
+<h1>Condensation<a class="headerlink" href="#condensation" title="Link to this heading">#</a></h1>
+<p>Condensation, is the first process where this framework we have been building up is applied. Here we need to account for the gas phase, and the particle phase. Then ensure that the partial pressures of species at the surface of the particle are equal to the partial pressure in the gas.</p>
 <section id="core-concepts">
 <h2>Core Concepts:<a class="headerlink" href="#core-concepts" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p><strong>RunnableProcess</strong>: An abstract base class defining the interface for aerosol transformation processes.</p></li>
-<li><p><strong>MassCondensation</strong> &amp; <strong>MassCoagulation</strong>: Concrete implementations of <code class="docutils literal notranslate"><span class="pre">RunnableProcess</span></code> that simulate condensation and coagulation effects on an aerosol.</p></li>
-<li><p><strong>ProcessSequence</strong>: A utility class for chaining multiple processes together, enabling complex transformations through a series of simple steps.</p></li>
+<li><p><strong>Runnable</strong>: An abstract base class defining the interface for aerosol transformation processes.</p>
+<ul>
+<li><p>Here and aerosol object is passed to the process, and the process is expected to modify the aerosol object in place, returning the modified object.</p></li>
 </ul>
+</li>
+<li><p><strong>MassCondensation</strong>: A concrete class implementing the RunnableProcess interface for the condensation process. Is an implementation of a <code class="docutils literal notranslate"><span class="pre">Runnable</span></code> process that adds mass to the aerosol object based on the partial pressures of the gas phase and the particle phase. Then removes the mass from the gas phase.</p></li>
+</ul>
+</section>
+<section id="inputs">
+<h2>Inputs:<a class="headerlink" href="#inputs" title="Link to this heading">#</a></h2>
+<p>The inputs get a bit complicated here, but in the future we will build factories to handle the creation of these objects and use builder patterns to change units and verify inputs. For now, we will just create them manually.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">particula.base.gas</span> <span class="kn">import</span> <span class="n">Gas</span>
-<span class="kn">from</span> <span class="nn">particula.base.particle</span> <span class="kn">import</span> <span class="n">Particle</span><span class="p">,</span> <span class="n">particle_strategy_factory</span>
-<span class="kn">from</span> <span class="nn">particula.base.aerosol</span> <span class="kn">import</span> <span class="n">Aerosol</span>
-<span class="kn">from</span> <span class="nn">particula.base.process</span> <span class="kn">import</span> <span class="n">ProcessSequence</span><span class="p">,</span> <span class="n">MassCondensation</span><span class="p">,</span> <span class="n">MassCoagulation</span>
+<span class="kn">from</span> <span class="nn">particula.next.gas_species</span> <span class="kn">import</span> <span class="n">GasSpeciesBuilder</span>
+<span class="kn">from</span> <span class="nn">particula.next.particle</span> <span class="kn">import</span> <span class="n">Particle</span><span class="p">,</span> <span class="n">particle_strategy_factory</span>
+<span class="kn">from</span> <span class="nn">particula.next.aerosol</span> <span class="kn">import</span> <span class="n">Aerosol</span>
+<span class="kn">from</span> <span class="nn">particula.next.gas_vapor_pressure</span> <span class="kn">import</span> <span class="n">vapor_pressure_factory</span>
+<span class="kn">from</span> <span class="nn">particula.next.particle_activity</span> <span class="kn">import</span> <span class="n">particle_activity_strategy_factory</span>
+<span class="kn">from</span> <span class="nn">particula.next.surface</span> <span class="kn">import</span> <span class="n">surface_strategy_factory</span>
+<span class="kn">from</span> <span class="nn">particula.next.particle_process</span> <span class="kn">import</span> <span class="n">MassCondensation</span>
+<span class="kn">from</span> <span class="nn">particula.next.condensation</span> <span class="kn">import</span> <span class="n">CondensationIsothermal</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a Gas instance</span>
+<span class="c1"># Define the coefficients for Butanol using the Antoine equation.</span>
+<span class="n">butanol_coefficients</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;latent_heat&#39;</span><span class="p">:</span> <span class="mf">267.0e3</span><span class="p">,</span>  <span class="c1"># check these values, they seem too high, or what latent heat should be used is wrong.</span>
+    <span class="s1">&#39;temperature_initial&#39;</span><span class="p">:</span> <span class="mf">298.15</span><span class="p">,</span>
+    <span class="s1">&#39;pressure_initial&#39;</span><span class="p">:</span> <span class="mf">0.58</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">}</span>
+<span class="n">butanol_clausius</span> <span class="o">=</span> <span class="n">vapor_pressure_factory</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;clausius_clapeyron&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">butanol_coefficients</span><span class="p">)</span>
+<span class="n">styrene_coefficients</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;latent_heat&#39;</span><span class="p">:</span> <span class="mf">42e3</span><span class="p">,</span>
+    <span class="s1">&#39;temperature_initial&#39;</span><span class="p">:</span> <span class="mf">298.15</span><span class="p">,</span>
+    <span class="s1">&#39;pressure_initial&#39;</span><span class="p">:</span> <span class="mi">667</span><span class="p">}</span>
+<span class="n">styrene_clausius</span> <span class="o">=</span> <span class="n">vapor_pressure_factory</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;clausius_clapeyron&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">styrene_coefficients</span><span class="p">)</span>
+<span class="n">water_buck</span> <span class="o">=</span> <span class="n">vapor_pressure_factory</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;water_buck&#39;</span><span class="p">)</span>
 
-<span class="c1"># Initialize an Aerosol instance</span>
-<span class="n">gas</span> <span class="o">=</span> <span class="n">Gas</span><span class="p">()</span>
-<span class="n">gas</span><span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="s2">&quot;Oxygen&quot;</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">)</span>
-<span class="n">gas</span><span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="s2">&quot;Nitrogen&quot;</span><span class="p">,</span> <span class="mf">28.0</span><span class="p">)</span>
-<span class="n">strategy</span> <span class="o">=</span> <span class="n">particle_strategy_factory</span><span class="p">(</span><span class="s1">&#39;mass_based&#39;</span><span class="p">)</span>
-<span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="n">strategy</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-    <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">gas</span><span class="p">,</span> <span class="n">particle</span><span class="p">)</span>
+<span class="c1"># set RH at 10%</span>
+<span class="n">water_concentration</span> <span class="o">=</span> <span class="n">water_buck</span><span class="o">.</span><span class="n">saturation_concentration</span><span class="p">(</span><span class="mf">0.017</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">)</span><span class="o">*</span><span class="mf">0.1</span>
 
-<span class="c1"># Create process instances</span>
-<span class="n">mass_condensation</span> <span class="o">=</span> <span class="n">MassCondensation</span><span class="p">(</span><span class="n">other_settings</span><span class="o">=</span><span class="s2">&quot;Some settings&quot;</span><span class="p">)</span>
-<span class="n">mass_coagulation</span> <span class="o">=</span> <span class="n">MassCoagulation</span><span class="p">(</span><span class="n">other_setting2</span><span class="o">=</span><span class="s2">&quot;Some other settings&quot;</span><span class="p">)</span>
-
-<span class="c1"># Apply a single process</span>
-<span class="n">condensed_aerosol</span> <span class="o">=</span> <span class="n">mass_condensation</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">)</span>
-<span class="c1"># Examine the changes</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;After condensation, particle distribution:&quot;</span><span class="p">,</span>
-      <span class="n">condensed_aerosol</span><span class="o">.</span><span class="n">particle</span><span class="o">.</span><span class="n">distribution</span><span class="p">)</span>
-
-<span class="c1"># Chain processes using ProcessSequence</span>
-<span class="n">process_sequence</span> <span class="o">=</span> <span class="n">ProcessSequence</span><span class="p">()</span>
-<span class="n">process_sequence</span><span class="o">.</span><span class="n">add_process</span><span class="p">(</span><span class="n">mass_condensation</span><span class="p">)</span>
-<span class="n">process_sequence</span><span class="o">.</span><span class="n">add_process</span><span class="p">(</span><span class="n">mass_coagulation</span><span class="p">)</span>
+<span class="c1"># gas species</span>
+<span class="n">molar_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.018</span><span class="p">,</span> <span class="mf">0.074121</span><span class="p">,</span> <span class="mf">104.15e-3</span><span class="p">])</span>
+<span class="n">vapor_pressure</span> <span class="o">=</span> <span class="p">[</span><span class="n">water_buck</span><span class="p">,</span> <span class="n">butanol_clausius</span><span class="p">,</span> <span class="n">styrene_clausius</span><span class="p">]</span>
+<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">water_concentration</span><span class="p">,</span> <span class="mf">2e-6</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">])</span>
+<span class="n">names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;water&quot;</span><span class="p">,</span> <span class="s2">&quot;butanol&quot;</span><span class="p">,</span> <span class="s2">&quot;styrene&quot;</span><span class="p">])</span>
+<span class="n">gas_species</span> <span class="o">=</span> <span class="n">GasSpeciesBuilder</span><span class="p">()</span> \
+    <span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">molar_mass</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">vapor_pressure_strategy</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">condensable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">concentration</span><span class="p">(</span><span class="n">concentration</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 
 
-<span class="c1"># Or using the | operator for a more intuitive chaining</span>
-<span class="c1"># HUGE FAN OF THIS IDEA</span>
-<span class="n">process_sequence</span> <span class="o">=</span> <span class="n">mass_condensation</span> <span class="o">|</span> <span class="n">mass_coagulation</span>
-
-<span class="c1"># Execute the sequence</span>
-<span class="n">final_aerosol</span> <span class="o">=</span> <span class="n">process_sequence</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">)</span>
-
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;After condensation and coagulation, particle distribution:&quot;</span><span class="p">,</span>
-      <span class="n">final_aerosol</span><span class="o">.</span><span class="n">particle</span><span class="o">.</span><span class="n">distribution</span><span class="p">)</span>
+<span class="c1"># Accessing dynamically attached methods and properties</span>
+<span class="c1"># Example method call, assuming such a method exists</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gas mass: </span><span class="si">{</span><span class="n">gas_species</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">particula.base.gas</span> <span class="kn">import</span> <span class="n">Gas</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">from</span> <span class="nn">particula.base.particle</span> <span class="kn">import</span> <span class="n">Particle</span><span class="p">,</span> <span class="n">particle_strategy_factory</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">from</span> <span class="nn">particula.base.aerosol</span> <span class="kn">import</span> <span class="n">Aerosol</span>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Gas mass: [&#39;water&#39; &#39;butanol&#39; &#39;styrene&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># particle distribution speciated mass, single mode</span>
+<span class="n">particle_masses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">4.1e-20</span><span class="p">,</span> <span class="mf">4.1e-20</span><span class="p">])</span>  <span class="c1"># kg</span>
+<span class="n">particle_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0e3</span><span class="p">,</span> <span class="mf">1.4e3</span><span class="p">,</span> <span class="mf">1.4e3</span><span class="p">])</span>  <span class="c1"># kg/m^3</span>
+<span class="n">particle_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">particle_masses</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e6</span>
 
-<span class="ne">ModuleNotFoundError</span>: No module named &#39;particula.base&#39;
+<span class="c1"># particle activity strategy, or how to treat the mixing of species, kappa, ideal mixing, etc.</span>
+<span class="n">particle_activity_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;kappa&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]),</span>
+    <span class="s1">&#39;molar_mass&#39;</span><span class="p">:</span> <span class="n">molar_mass</span><span class="p">,</span>
+    <span class="s1">&#39;density&#39;</span><span class="p">:</span> <span class="n">particle_density</span><span class="p">}</span>
+<span class="n">particle_activity</span> <span class="o">=</span> <span class="n">particle_activity_strategy_factory</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;kappa&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">particle_activity_kwargs</span><span class="p">)</span>
+
+<span class="c1"># particle surface strategy, or how to treat the surface properties, surface tension mixing rule, and Kelvin effect</span>
+<span class="n">particle_surface_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;surface_tension&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.07</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">]),</span>
+    <span class="s1">&#39;density&#39;</span><span class="p">:</span> <span class="n">particle_density</span><span class="p">}</span>
+<span class="n">particle_surface</span> <span class="o">=</span> <span class="n">surface_strategy_factory</span><span class="p">(</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s1">&#39;volume&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">particle_surface_kwargs</span><span class="p">)</span>
+
+<span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="n">particle_strategy_factory</span><span class="p">(</span><span class="s2">&quot;speciated_mass_moving_bin&quot;</span><span class="p">),</span>
+    <span class="n">activity</span><span class="o">=</span><span class="n">particle_activity</span><span class="p">,</span>
+    <span class="n">surface</span><span class="o">=</span><span class="n">particle_surface</span><span class="p">,</span>
+    <span class="n">distribution</span><span class="o">=</span><span class="n">particle_masses</span><span class="p">,</span>
+    <span class="n">density</span><span class="o">=</span><span class="n">particle_density</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">particle_concentration</span>
+<span class="p">)</span>
+
+<span class="c1"># Particle,</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Particle mass [kg]: </span><span class="si">{</span><span class="n">particle</span><span class="o">.</span><span class="n">get_mass</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Particle radius [m]: </span><span class="si">{</span><span class="n">particle</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Particle mass [kg]: [0.0e+00 4.1e-20 4.1e-20]
+Particle radius [m]: [0.00000000e+00 1.91215196e-08 1.91215196e-08]
 </pre></div>
 </div>
 </div>
 </div>
 </section>
-<section id="practical-insights">
-<h2>Practical Insights:<a class="headerlink" href="#practical-insights" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p><strong>Process Execution</strong>: Applying a process directly modifies the aerosol instance, reflecting the physical transformations occurring within the aerosol system.</p></li>
-<li><p><strong>Sequence Execution</strong>: By chaining processes, complex transformations can be modeled step-by-step, offering a detailed view of the aerosol’s evolution.</p></li>
-</ul>
-<p>Through these examples, we illustrate not just the theoretical underpinnings of aerosol process modeling but also practical methodologies for simulation and analysis.</p>
-</section>
-<section id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">#</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">RunnableProcess</span></code> framework and the <code class="docutils literal notranslate"><span class="pre">ProcessSequence</span></code> utility provide powerful tools for modeling the dynamic nature of aerosols. By abstracting complex transformations into manageable, composable units, this approach greatly enhances the flexibility and depth of aerosol simulations, paving the way for more accurate and comprehensive studies in aerosol science.</p>
-<p>It still, is not clear how/where would be best to integrate the ODE solvers to solve the differential equations that describe the aerosol dynamics. This is a work in progress…</p>
-<p>Current guess would be ODEfactory to create the ODEsolver and inject the ode solver when creating the Process object.</p>
+<section id="condensation-process">
+<h2>Condensation Process<a class="headerlink" href="#condensation-process" title="Link to this heading">#</a></h2>
+<p>With the gas phase and particle phase defined, we can now define the condensation process. This process is defined by the following equation:</p>
 </section>
 </section>
 
@@ -705,24 +747,6 @@ document.write(`
                 <footer class="prev-next-footer">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="next_aerosol.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Aerosol</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="../../CONTRIBUTING.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Contributor Guidelines</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -740,8 +764,8 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-concepts">Core Concepts:</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-insights">Practical Insights:</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inputs">Inputs:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#condensation-process">Condensation Process</a></li>
 </ul>
   </nav></div>
 
