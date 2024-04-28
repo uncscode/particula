@@ -35,6 +35,10 @@ class GasSpecies:
         """Return a string representation of the GasSpecies object."""
         return str(self.name)
 
+    def __len__(self):
+        """Return the number of gas species."""
+        return len(self.molar_mass)
+
     def set_name(self, name: Union[str, NDArray[np.str_]]):
         """Set the name of the gas species.
 
@@ -290,7 +294,7 @@ class GasSpecies:
         Args:
         - added_concentration (float): The concentration to add to the gas
             species."""
-        self.concentration = self.add_concentration + added_concentration
+        self.concentration = self.concentration + added_concentration
 
 
 class GasSpeciesBuilder:

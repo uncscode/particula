@@ -246,10 +246,7 @@ class SpeciatedMassMovingBin(ParticleStrategy):
             bin.
         """
         # Calculate volume from mass and density, then derive radius
-        if distribution.ndim == 1:
-            volumes = distribution / density
-        else:
-            volumes = np.sum(distribution / density, axis=0)
+        volumes = np.sum(distribution / density, axis=0)
         return (3 * volumes / (4 * np.pi)) ** (1 / 3)
 
     def get_total_mass(
@@ -282,7 +279,9 @@ class SpeciatedMassMovingBin(ParticleStrategy):
         added_mass: NDArray[np.float_]
     ) -> tuple[NDArray[np.float_], NDArray[np.float_]]:
         # Add the mass to the distribution moving the bins
-        return (distribution + added_mass, concentration)
+        # limit add to zero, total mass cannot be negative
+        new_mass = np.maximum(distribution+added_mass, 0)
+        return (new_mass, concentration)
 
 
 def particle_strategy_factory(
