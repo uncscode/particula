@@ -4,7 +4,7 @@
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
-from particula.next.runable import Runnable
+from particula.next.runnable import Runnable
 from particula.next.aerosol import Aerosol
 
 
@@ -47,11 +47,9 @@ class AdiabaticPressureChange(Runnable):
 
     def __init__(
         self,
-        aerosol: Aerosol,
         new_pressure: float,
         gamma: float = 1.4
     ):
-        self.aerosol = aerosol
         self.gamma = gamma
         self.new_pressure = new_pressure
 

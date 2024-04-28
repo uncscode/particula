@@ -76,6 +76,31 @@ class ParticleStrategy(ABC):
         - np.float64: The total mass of the particles.
         """
 
+    @abstractmethod
+    def add_mass(
+        self,
+        distribution: NDArray[np.float64],
+        density: NDArray[np.float64],
+        concentration: NDArray[np.float64],
+        added_mass: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        """
+        Adds mass to the distribution of particles based on their distribution,
+        concentration, and density.
+
+        Parameters:
+        - distribution (NDArray[np.float64]): The distribution representation
+        of particles
+        - concentration (NDArray[np.float64]): The concentration of each
+        particle in the distribution.
+        - density (NDArray[np.float64]): The density of the particles.
+        - added_mass (NDArray[np.float64]): The mass to be added per
+        distribution bin.
+
+        Returns:
+        - NDArray[np.float64]: The new concentration array.
+        """
+
 
 class MassBasedStrategy(ParticleStrategy):
     """
@@ -116,9 +141,9 @@ class MassBasedStrategy(ParticleStrategy):
 class RadiiBasedStrategy(ParticleStrategy):
     """
     A strategy for particles represented by their radius (distribution),
-    and particle conentraiton. Implementing the ParticleStrategy interface.
+    and particle concentration. Implementing the ParticleStrategy interface.
     This strategy calculates particle mass, radius, and total mass based on
-    the particle's radius, number concentraiton, and density.
+    the particle's radius, number concentration, and density.
     """
 
     def get_mass(

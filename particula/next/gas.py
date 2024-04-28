@@ -25,6 +25,25 @@ class Gas:
     total_pressure: float
     species: list[GasSpecies] = field(default_factory=list)
 
+    def dynamic_viscosity(self) -> float:
+        """
+        Calculates the dynamic viscosity of the gas mixture using the Sutherland's
+        law.
+
+        Returns:
+        - dynamic_viscosity (float): The dynamic viscosity of the gas mixture in
+        Pa.s.
+        """
+        # Constants for Sutherland's law
+        C1 = 1.458e-6
+        S = 110.4
+        T0 = 273.15
+        mu0 = 1.716e-5
+
+        # Calculate the dynamic viscosity
+        mu = mu0 * ((self.temperature / T0) ** 1.5) * ((T0 + S) / (self.temperature + S))
+        return mu
+
     def add_species(self, gas_species: GasSpecies) -> None:
         """
         Adds a gas species to the mixture.
@@ -51,6 +70,10 @@ class Gas:
     def __iter__(self):
         """Allows iteration over the species in the gas mixture."""
         return iter(self.species)
+
+    def __getitem__(self, index: int) -> GasSpecies:
+        """Returns the gas species at the given index."""
+        return self.species[index]
 
     def __len__(self):
         """Returns the number of species in the gas mixture."""
