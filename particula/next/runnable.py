@@ -7,14 +7,15 @@ from particula.next.aerosol import Aerosol
 
 
 class Runnable(ABC):
-    """Runnable process that can modify an aerosol instance."""
+    """Runnable process that can modify an aerosol instance.
 
-    @abstractmethod
-    def execute(self, aerosol: Aerosol) -> Aerosol:
-        """Execute the process and modify the aerosol instance.
+    Parameters: None
 
-        Parameters:
-        - aerosol (Aerosol): The aerosol instance to modify."""
+    Methods:
+    - rate: Return the rate of the process.
+    - execute: Execute the process and modify the aerosol instance.
+    - __or__: Chain this process with another process using the | operator.
+    """
 
     @abstractmethod
     def rate(self, aerosol: Aerosol) -> Any:
@@ -22,6 +23,14 @@ class Runnable(ABC):
 
         Parameters:
         - aerosol (Aerosol): The aerosol instance to modify."""
+
+    @abstractmethod
+    def execute(self, aerosol: Aerosol, time_step: float) -> Aerosol:
+        """Execute the process and modify the aerosol instance.
+
+        Parameters:
+        - aerosol (Aerosol): The aerosol instance to modify.
+        - time_step (float): The time step for the process in seconds."""
 
     def __or__(self, other: "Runnable"):
         """Chain this process with another process using the | operator."""
@@ -50,11 +59,11 @@ class RunnableSequence:
         """Add a process to the sequence."""
         self.processes.append(process)
 
-    def execute(self, aerosol: Aerosol) -> Aerosol:
+    def execute(self, aerosol: Aerosol, time_step: float) -> Aerosol:
         """Execute the sequence of runnables on an aerosol instance."""
         result = aerosol
         for process in self.processes:
-            result = process.execute(result)
+            result = process.execute(result, time_step)
         return result
 
     def __or__(self, process: Runnable):

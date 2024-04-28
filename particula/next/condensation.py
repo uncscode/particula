@@ -397,7 +397,7 @@ class CondensationStrategy(ABC):
 
 
 # Define a condensation strategy with no latent heat of vaporization effect
-class CondesnationIsothermal(CondensationStrategy):
+class CondensationIsothermal(CondensationStrategy):
     """
     Condensation strategy for isothermal conditions, where the temperature
     remains constant. This class implements the mass transfer rate calculation
@@ -436,7 +436,8 @@ class CondesnationIsothermal(CondensationStrategy):
 
         # Calculate the partial pressure
         partial_pressure_particle = particle.activity.partial_pressure(
-            pure_vapor_pressure=gas_species.get_vapor_pressure(temperature),
+            pure_vapor_pressure=gas_species.get_pure_vapor_pressure(
+                temperature),
             mass_concentration=particle.get_mass()
         )
         partial_pressure_gas = gas_species.get_partial_pressure(temperature)
