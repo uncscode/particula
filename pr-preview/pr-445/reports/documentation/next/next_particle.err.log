@@ -52,16 +52,21 @@ print("Total mass of the particle distribution:", particle.get_total_mass())
 
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mTypeError[0m                                 Traceback (most recent call last)
-Cell [0;32mIn[1], line 19[0m
-[1;32m     16[0m concentration [38;5;241m=[39m np[38;5;241m.[39marray([[38;5;241m10[39m, [38;5;241m20[39m, [38;5;241m30[39m], dtype[38;5;241m=[39mnp[38;5;241m.[39mfloat64)
-[1;32m     18[0m [38;5;66;03m# Instantiate a particle strategy[39;00m
-[0;32m---> 19[0m mass_based_strategy [38;5;241m=[39m [43mMassBasedStrategy[49m[43m([49m[43m)[49m
-[1;32m     21[0m [38;5;66;03m# Create a Particle instance using the MassBasedStrategy[39;00m
-[1;32m     22[0m particle [38;5;241m=[39m Particle(strategy[38;5;241m=[39mmass_based_strategy,
-[1;32m     23[0m                     distribution[38;5;241m=[39mmass_distribution,
-[1;32m     24[0m                     density[38;5;241m=[39mdensity,
-[1;32m     25[0m                     concentration[38;5;241m=[39mconcentration)
+[0;31mImportError[0m                               Traceback (most recent call last)
+Cell [0;32mIn[1], line 5[0m
+[1;32m      1[0m [38;5;66;03m# Example demonstrating the usage of particle distribution strategies[39;00m
+[1;32m      2[0m 
+[1;32m      3[0m [38;5;66;03m# Assuming necessary imports[39;00m
+[1;32m      4[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[0;32m----> 5[0m [38;5;28;01mfrom[39;00m [38;5;21;01mparticula[39;00m[38;5;21;01m.[39;00m[38;5;21;01mnext[39;00m[38;5;21;01m.[39;00m[38;5;21;01mparticle[39;00m [38;5;28;01mimport[39;00m (
+[1;32m      6[0m     create_particle_strategy,
+[1;32m      7[0m     Particle,
+[1;32m      8[0m     MassBasedStrategy,
+[1;32m      9[0m     RadiiBasedStrategy,
+[1;32m     10[0m     SpeciatedMassStrategy,
+[1;32m     11[0m )
+[1;32m     13[0m [38;5;66;03m# Creating particle distribution examples[39;00m
+[1;32m     14[0m mass_distribution [38;5;241m=[39m np[38;5;241m.[39marray([[38;5;241m100[39m, [38;5;241m200[39m, [38;5;241m300[39m], dtype[38;5;241m=[39mnp[38;5;241m.[39mfloat64)
 
-[0;31mTypeError[0m: Can't instantiate abstract class MassBasedStrategy with abstract method add_mass
+[0;31mImportError[0m: cannot import name 'MassBasedStrategy' from 'particula.next.particle' (/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/particle.py)
 

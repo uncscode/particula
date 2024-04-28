@@ -651,18 +651,23 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">19</span>
-<span class="g g-Whitespace">     </span><span class="mi">16</span> <span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">18</span> <span class="c1"># Instantiate a particle strategy</span>
-<span class="ne">---&gt; </span><span class="mi">19</span> <span class="n">mass_based_strategy</span> <span class="o">=</span> <span class="n">MassBasedStrategy</span><span class="p">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">21</span> <span class="c1"># Create a Particle instance using the MassBasedStrategy</span>
-<span class="g g-Whitespace">     </span><span class="mi">22</span> <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">mass_based_strategy</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">23</span>                     <span class="n">distribution</span><span class="o">=</span><span class="n">mass_distribution</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">24</span>                     <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">25</span>                     <span class="n">concentration</span><span class="o">=</span><span class="n">concentration</span><span class="p">)</span>
+<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># Example demonstrating the usage of particle distribution strategies</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> 
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="c1"># Assuming necessary imports</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="ne">----&gt; </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">particula.next.particle</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span>     <span class="n">create_particle_strategy</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="n">Particle</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span>     <span class="n">MassBasedStrategy</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span>     <span class="n">RadiiBasedStrategy</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">10</span>     <span class="n">SpeciatedMassStrategy</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">11</span> <span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">13</span> <span class="c1"># Creating particle distribution examples</span>
+<span class="g g-Whitespace">     </span><span class="mi">14</span> <span class="n">mass_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 
-<span class="ne">TypeError</span>: Can&#39;t instantiate abstract class MassBasedStrategy with abstract method add_mass
+<span class="ne">ImportError</span>: cannot import name &#39;MassBasedStrategy&#39; from &#39;particula.next.particle&#39; (/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/particle.py)
 </pre></div>
 </div>
 </div>
