@@ -222,6 +222,8 @@ class SpeciatedMassMovingBin(ParticleStrategy):
             bin. The sum of each column (species) in the distribution matrix.
         """
         # Broadcasting works natively as each column represents a species
+        if distribution.ndim == 1:
+            return distribution
         return np.sum(distribution, axis=1)
 
     def get_radius(
@@ -244,7 +246,10 @@ class SpeciatedMassMovingBin(ParticleStrategy):
             bin.
         """
         # Calculate volume from mass and density, then derive radius
-        volumes = np.sum(distribution / density, axis=0)
+        if distribution.ndim == 1:
+            volumes = distribution / density
+        else:
+            volumes = np.sum(distribution / density, axis=0)
         return (3 * volumes / (4 * np.pi)) ** (1 / 3)
 
     def get_total_mass(
