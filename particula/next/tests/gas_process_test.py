@@ -6,7 +6,7 @@
 import pytest
 import numpy as np
 
-from particula.next.particle import Particle, create_particle_strategy
+from particula.next.particle import Particle, particle_strategy_factory
 from particula.next.gas_vapor_pressure import ConstantVaporPressureStrategy
 from particula.next.gas_species import GasSpeciesBuilder
 from particula.next.gas import GasBuilder
@@ -65,7 +65,7 @@ def sample_gas():
 @pytest.fixture
 def sample_particles():
     """Fixture for creating a Particle instance for testing."""
-    strategy = create_particle_strategy('mass_based_moving_bin')
+    strategy = particle_strategy_factory('mass_based_moving_bin')
     return Particle(
         strategy,
         activity_strategy,

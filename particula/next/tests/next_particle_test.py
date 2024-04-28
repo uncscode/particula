@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from particula.next.particle import (
     MassBasedMovingBin, RadiiBasedMovingBin, SpeciatedMassMovingBin,
-    create_particle_strategy, Particle)
+    particle_strategy_factory, Particle)
 from particula.next.surface import VolumeSurfaceStrategy
 from particula.next.particle_activity import MassIdealActivity
 from particula.next.surface import surface_strategy_factory
@@ -140,9 +140,9 @@ def test_speciated_mass_strategy_get_total_mass():
     ("radii_based_moving_bin", RadiiBasedMovingBin),
     ("speciated_mass_moving_bin", SpeciatedMassMovingBin),
 ])
-def test_create_particle_strategy(representation, expected_strategy_type):
-    """Parameterized test for create_particle_strategy."""
-    strategy = create_particle_strategy(representation)
+def test_particle_strategy_factory(representation, expected_strategy_type):
+    """Parameterized test for particle_strategy_factory."""
+    strategy = particle_strategy_factory(representation)
     assert isinstance(strategy, expected_strategy_type)
 
 
