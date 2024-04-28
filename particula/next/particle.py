@@ -101,7 +101,7 @@ class ParticleStrategy(ABC):
         - NDArray[np.float64]: The new concentration array.
         """
 
-
+# add moving bins method, later on fixed bins.
 class MassBasedStrategy(ParticleStrategy):
     """
     A strategy for particles represented by their mass distribution, and
