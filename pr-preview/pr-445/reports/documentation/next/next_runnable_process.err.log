@@ -20,7 +20,7 @@ nbclient.exceptions.CellExecutionError: An error occurred while executing the fo
 ------------------
 import numpy as np
 from particula.base.gas import Gas
-from particula.base.particle import Particle, create_particle_strategy
+from particula.base.particle import Particle, particle_strategy_factory
 from particula.base.aerosol import Aerosol
 from particula.base.process import ProcessSequence, MassCondensation, MassCoagulation
 
@@ -28,7 +28,7 @@ from particula.base.process import ProcessSequence, MassCondensation, MassCoagul
 gas = Gas()
 gas.add_species("Oxygen", 32.0)
 gas.add_species("Nitrogen", 28.0)
-strategy = create_particle_strategy('mass_based')
+strategy = particle_strategy_factory('mass_based')
 particle = Particle(strategy, np.array(
     [100, 200, 300], dtype=np.float64), 2.5, np.array([10, 20, 30], dtype=np.float64))
 aerosol = Aerosol(gas, particle)
@@ -67,7 +67,7 @@ print("After condensation and coagulation, particle distribution:",
 Cell [0;32mIn[1], line 2[0m
 [1;32m      1[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
 [0;32m----> 2[0m [38;5;28;01mfrom[39;00m [38;5;21;01mparticula[39;00m[38;5;21;01m.[39;00m[38;5;21;01mbase[39;00m[38;5;21;01m.[39;00m[38;5;21;01mgas[39;00m [38;5;28;01mimport[39;00m Gas
-[1;32m      3[0m [38;5;28;01mfrom[39;00m [38;5;21;01mparticula[39;00m[38;5;21;01m.[39;00m[38;5;21;01mbase[39;00m[38;5;21;01m.[39;00m[38;5;21;01mparticle[39;00m [38;5;28;01mimport[39;00m Particle, create_particle_strategy
+[1;32m      3[0m [38;5;28;01mfrom[39;00m [38;5;21;01mparticula[39;00m[38;5;21;01m.[39;00m[38;5;21;01mbase[39;00m[38;5;21;01m.[39;00m[38;5;21;01mparticle[39;00m [38;5;28;01mimport[39;00m Particle, particle_strategy_factory
 [1;32m      4[0m [38;5;28;01mfrom[39;00m [38;5;21;01mparticula[39;00m[38;5;21;01m.[39;00m[38;5;21;01mbase[39;00m[38;5;21;01m.[39;00m[38;5;21;01maerosol[39;00m [38;5;28;01mimport[39;00m Aerosol
 
 [0;31mModuleNotFoundError[0m: No module named 'particula.base'
