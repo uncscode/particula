@@ -573,7 +573,6 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#facade-pattern-of-aerosol-systems">Facade Pattern of Aerosol Systems</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-overview">Implementation Overview</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
 </ul>
@@ -589,72 +588,73 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="aerosol">
 <h1>Aerosol<a class="headerlink" href="#aerosol" title="Link to this heading">#</a></h1>
-<p>Aerosols are complex systems comprising both gaseous components and particulate matter. To accurately model such systems, we introduce the <code class="docutils literal notranslate"><span class="pre">Aerosol</span></code> class, which serves as a facade for seamlessly interacting with both <code class="docutils literal notranslate"><span class="pre">Gas</span></code> and <code class="docutils literal notranslate"><span class="pre">Particle</span></code> objects. This class not only encapsulates the complexity of aerosol systems but also dynamically integrates the behaviors and properties of its gas and particle constituents.</p>
-<section id="facade-pattern-of-aerosol-systems">
-<h2>Facade Pattern of Aerosol Systems<a class="headerlink" href="#facade-pattern-of-aerosol-systems" title="Link to this heading">#</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">Aerosol</span></code> class employs the <a class="reference external" href="https://en.wikipedia.org/wiki/Facade_pattern">Facade Pattern</a> to provide a simplified interface to the more complex subsystems of gases and particles. This design choice offers several benefits:</p>
-<ul class="simple">
-<li><p><strong>Simplified Interaction</strong>: By abstracting the details of gas and particle interactions, the <code class="docutils literal notranslate"><span class="pre">Aerosol</span></code> class allows users to work with a simplified model of the aerosol system.</p></li>
-<li><p><strong>Dynamic Property and Method Attachment</strong>: The class dynamically attaches the methods and properties of both <code class="docutils literal notranslate"><span class="pre">Gas</span></code> and <code class="docutils literal notranslate"><span class="pre">Particle</span></code> objects, ensuring that all relevant functionalities are directly accessible. (so maybe not a true facade pattern)</p></li>
-<li><p><strong>Enhanced Flexibility</strong>: Replacing gas or particle components within an aerosol system is straightforward, enabling dynamic adjustments to the model as needed.</p></li>
-</ul>
-</section>
+<p>Aerosols are complex systems comprising both gaseous components and particulate matter. To accurately model such systems, we introduce the <code class="docutils literal notranslate"><span class="pre">Aerosol</span></code> class, which serves as a collection of <code class="docutils literal notranslate"><span class="pre">Gas</span></code> and <code class="docutils literal notranslate"><span class="pre">Particle</span></code> objects.</p>
 <section id="implementation-overview">
 <h2>Implementation Overview<a class="headerlink" href="#implementation-overview" title="Link to this heading">#</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">Aerosol</span></code> class initializes with instances of <code class="docutils literal notranslate"><span class="pre">Gas</span></code> and <code class="docutils literal notranslate"><span class="pre">Particle</span></code>, attaching their methods and properties dynamically. This approach allows for a consistent and intuitive interface for interacting with aerosol systems, regardless of the complexity or variability of the constituent gases and particles.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Aerosol</span></code> class initializes with instances of <code class="docutils literal notranslate"><span class="pre">Gas</span></code> and <code class="docutils literal notranslate"><span class="pre">Particle</span></code>. There is a single <code class="docutils literal notranslate"><span class="pre">Gas</span></code> object and a list of <code class="docutils literal notranslate"><span class="pre">Particle</span></code> objects. The each can be iterated on to pull out the underlying <code class="docutils literal notranslate"><span class="pre">GasSpecies</span></code> and <code class="docutils literal notranslate"><span class="pre">Particle</span></code> objects.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">particula.base.gas</span> <span class="kn">import</span> <span class="n">GasSpecies</span><span class="p">,</span> <span class="n">Gas</span>
-<span class="kn">from</span> <span class="nn">particula.base.particle</span> <span class="kn">import</span> <span class="n">Particle</span><span class="p">,</span> <span class="n">particle_strategy_factory</span>
-<span class="kn">from</span> <span class="nn">particula.base.aerosol</span> <span class="kn">import</span> <span class="n">Aerosol</span>
+<span class="kn">from</span> <span class="nn">particula.next.gas_species</span> <span class="kn">import</span> <span class="n">GasSpeciesBuilder</span>
+<span class="kn">from</span> <span class="nn">particula.next.particle</span> <span class="kn">import</span> <span class="n">Particle</span><span class="p">,</span> <span class="n">particle_strategy_factory</span>
+<span class="kn">from</span> <span class="nn">particula.next.aerosol</span> <span class="kn">import</span> <span class="n">Aerosol</span>
+<span class="kn">from</span> <span class="nn">particula.next.gas_vapor_pressure</span> <span class="kn">import</span> <span class="n">vapor_pressure_factory</span>
+<span class="kn">from</span> <span class="nn">particula.next.particle_activity</span> <span class="kn">import</span> <span class="n">particle_activity_strategy_factory</span>
+<span class="kn">from</span> <span class="nn">particula.next.surface</span> <span class="kn">import</span> <span class="n">surface_strategy_factory</span>
 
 <span class="c1"># Create a Gas instance</span>
-<span class="n">air</span> <span class="o">=</span> <span class="n">Gas</span><span class="p">()</span>
-<span class="n">air</span><span class="o">.</span><span class="n">add_species</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Oxygen&quot;</span><span class="p">,</span>
-    <span class="n">mass</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-    <span class="n">vapor_pressure</span><span class="o">=</span><span class="mf">0.21</span><span class="p">,</span>
-    <span class="n">condensable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">air</span><span class="o">.</span><span class="n">add_species</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Water Vapor&quot;</span><span class="p">,</span>
-    <span class="n">mass</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
-    <span class="n">vapor_pressure</span><span class="o">=</span><span class="mf">2.3</span><span class="p">,</span>
-    <span class="n">condensable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># Define the coefficients for Butanol using the Antoine equation.</span>
+<span class="n">butanol_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mf">7.838</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mf">1558.19</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mf">196.881</span><span class="p">}</span>
+<span class="n">butanol_antione</span> <span class="o">=</span> <span class="n">vapor_pressure_factory</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;antoine&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">butanol_coefficients</span><span class="p">)</span>
+<span class="n">styrene_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mf">6.924</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">1420</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mi">226</span><span class="p">}</span>
+<span class="n">styrene_antione</span> <span class="o">=</span> <span class="n">vapor_pressure_factory</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;antoine&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">styrene_coefficients</span><span class="p">)</span>
+<span class="c1"># Water uses a different model for vapor pressure calculation called the</span>
+<span class="c1"># Buck equation.</span>
+<span class="n">water_buck</span> <span class="o">=</span> <span class="n">vapor_pressure_factory</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;water_buck&#39;</span><span class="p">)</span>
 
-<span class="c1"># Example particle sizes in meters</span>
-<span class="n">particle_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">2e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-<span class="n">particle_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>  <span class="c1"># Example density in kg/m^3</span>
-<span class="n">particle_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-    <span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>  <span class="c1"># Example concentrations</span>
+<span class="c1"># gas species</span>
+<span class="n">molar_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.018</span><span class="p">,</span> <span class="mf">0.074121</span><span class="p">,</span> <span class="mf">104.15e-3</span><span class="p">])</span>
+<span class="n">vapor_pressure</span> <span class="o">=</span> <span class="p">[</span><span class="n">butanol_antione</span><span class="p">,</span> <span class="n">styrene_antione</span><span class="p">]</span>
+<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.017</span><span class="p">,</span> <span class="mf">2e-6</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">])</span>
+<span class="n">names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;water&quot;</span><span class="p">,</span> <span class="s2">&quot;butanol&quot;</span><span class="p">,</span> <span class="s2">&quot;styrene&quot;</span><span class="p">])</span>
+<span class="n">gas_species</span> <span class="o">=</span> <span class="n">GasSpeciesBuilder</span><span class="p">()</span> \
+    <span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">molar_mass</span><span class="p">(</span><span class="n">molar_mass</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">vapor_pressure_strategy</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">condensable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">concentration</span><span class="p">(</span><span class="n">concentration</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+
+<span class="c1"># particle distribution</span>
+<span class="n">particle_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1e-6</span>
+<span class="n">particle_density</span> <span class="o">=</span> <span class="mf">1.0e3</span>
+<span class="n">particle_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">particle_distribution</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e6</span>
 
 <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span>
-    <span class="n">strategy</span><span class="o">=</span><span class="n">particle_strategy_factory</span><span class="p">(</span><span class="s2">&quot;radii_based&quot;</span><span class="p">),</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="n">particle_strategy_factory</span><span class="p">(</span><span class="s2">&quot;radii_based_moving_bin&quot;</span><span class="p">),</span>
+    <span class="n">activity</span><span class="o">=</span><span class="n">particle_activity_strategy_factory</span><span class="p">(),</span>
+    <span class="n">surface</span><span class="o">=</span><span class="n">surface_strategy_factory</span><span class="p">(),</span>
     <span class="n">distribution</span><span class="o">=</span><span class="n">particle_distribution</span><span class="p">,</span>
     <span class="n">density</span><span class="o">=</span><span class="n">particle_density</span><span class="p">,</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">particle_concentration</span>
 <span class="p">)</span>
 
 <span class="c1"># Create an Aerosol instance</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">gas</span><span class="o">=</span><span class="n">air</span><span class="p">,</span> <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">)</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">gas</span><span class="o">=</span><span class="n">gas_species</span><span class="p">,</span> <span class="n">particles</span><span class="o">=</span><span class="n">particle</span><span class="p">)</span>
 
 <span class="c1"># Accessing dynamically attached methods and properties</span>
 <span class="c1"># Example method call, assuming such a method exists</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gas mass: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">gas_get_mass</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Particle mass: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particle_get_total_mass</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gas mass: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">gas</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Particle mass: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_total_mass</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">particula.base.gas</span> <span class="kn">import</span> <span class="n">GasSpecies</span><span class="p">,</span> <span class="n">Gas</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">from</span> <span class="nn">particula.base.particle</span> <span class="kn">import</span> <span class="n">Particle</span><span class="p">,</span> <span class="n">particle_strategy_factory</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">from</span> <span class="nn">particula.base.aerosol</span> <span class="kn">import</span> <span class="n">Aerosol</span>
-
-<span class="ne">ModuleNotFoundError</span>: No module named &#39;particula.base&#39;
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Gas mass: [&#39;water&#39; &#39;butanol&#39; &#39;styrene&#39;]
+Particle mass: 9.42477796076938e-10
 </pre></div>
 </div>
 </div>
@@ -662,7 +662,6 @@ document.write(`
 </section>
 <section id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">#</a></h2>
-<p>This section of your Jupyter notebook clarifies the role and functionality of the <code class="docutils literal notranslate"><span class="pre">Aerosol</span></code> class within aerosol modeling frameworks. By demonstrating how gases and particles are combined into a coherent model, you underscore the practical advantages of employing design patterns to abstract complexity and facilitate user interaction with aerosol systems. Through this approach, the notebook not only educates on the theoretical underpinnings of the <code class="docutils literal notranslate"><span class="pre">Aerosol</span></code> class but also provides actionable insights through examples, empowering users to effectively model and analyze aerosol systems in their work.</p>
 <p>This <code class="docutils literal notranslate"><span class="pre">Aerosol</span></code> collection or interface may change in the future, as we figure out this interacts with the aerosol simulation, but for now, this is a good start.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -671,49 +670,48 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class Aerosol in module particula.base.aerosol:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class Aerosol in module particula.next.aerosol:
 
 class Aerosol(builtins.object)
- |  Aerosol(gas: particula.base.gas.Gas, particle: particula.base.particle.Particle)
+ |  Aerosol(gas: particula.next.gas.Gas, particles: Union[particula.next.particle.Particle, List[particula.next.particle.Particle]])
  |  
- |  A class that acts as a facade for interacting with a single Gas and a
- |  single Particle object. It dynamically attaches methods and properties of
- |  Gas and Particle objects to itself.
+ |  A class for interacting with collections of Gas and Particle objects.
+ |  Allows for the representation and manipulation of an aerosol, which
+ |  is composed of various gases and particles.
  |  
  |  Methods defined here:
  |  
- |  __init__(self, gas: particula.base.gas.Gas, particle: particula.base.particle.Particle)
- |      Initializes an Aerosol instance with a single Gas and Particle.
- |      Dynamically attaches methods and properties of these objects to the
- |      Aerosol instance.
+ |  __init__(self, gas: particula.next.gas.Gas, particles: Union[particula.next.particle.Particle, List[particula.next.particle.Particle]])
+ |      Initializes an Aerosol instance with Gas and Particle instances.
  |      
  |      Parameters:
- |      - gas (Gas): A single Gas instance.
- |      - particle (Particle): A single Particle instance.
+ |      - gas (Gas): Gas with many GasSpeices possible.
+ |      - particles (Union[Particle, List[Particle]]): One or more Particle
+ |      instances.
  |  
- |  attach_methods_and_properties(self, obj_to_attach: Union[particula.base.gas.Gas, particula.base.particle.Particle], prefix: str)
- |      Dynamically attaches methods and properties from the given object to
- |      the Aerosol instance, prefixing them to distinguish between Gas and
- |      Particle attributes.
+ |  add_gas(self, gas: particula.next.gas.Gas)
+ |      Replaces the current Gas instance with a new one.
  |      
  |      Parameters:
- |      - obj: The object whose methods and properties are to be attached.
- |      - prefix (str): The prefix to apply to the attached attributes.
+ |      - gas (Gas): The Gas instance to replace the current one.
  |  
- |  replace_gas(self, gas: particula.base.gas.Gas)
- |      Replaces the current Gas instance with a new one and dynamically
- |      attaches its methods and properties.
+ |  add_particle(self, particle: particula.next.particle.Particle)
+ |      Adds a Particle instance to the aerosol.
  |      
  |      Parameters:
- |      - gas (Gas): A new Gas instance to replace the current one.
+ |      - particle (Particle): The Particle instance to add.
  |  
- |  replace_particle(self, particle: particula.base.particle.Particle)
- |      Replaces the current Particle instance with a new one and dynamically
- |      attaches its methods and properties.
+ |  iterate_gas(self) -&gt; Iterator[particula.next.gas_species.GasSpecies]
+ |      Returns an iterator for gas species.
  |      
- |      Parameters:
- |      - particle (Particle): A new Particle instance to replace the current
- |      one.
+ |      Returns:
+ |      Iterator[GasSpecies]: An iterator over the gas species type.
+ |  
+ |  iterate_particle(self) -&gt; Iterator[particula.next.particle.Particle]
+ |      Returns an iterator for particle.
+ |      
+ |      Returns:
+ |      Iterator[Particle]: An iterator over the particle type.
  |  
  |  ----------------------------------------------------------------------
  |  Data descriptors defined here:
@@ -794,7 +792,6 @@ class Aerosol(builtins.object)
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#facade-pattern-of-aerosol-systems">Facade Pattern of Aerosol Systems</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-overview">Implementation Overview</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
 </ul>
