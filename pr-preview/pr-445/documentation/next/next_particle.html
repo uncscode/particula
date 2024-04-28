@@ -652,17 +652,17 @@ document.write(`
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">22</span>
-<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="n">mass_based_strategy</span> <span class="o">=</span> <span class="n">MassBasedStrategy</span><span class="p">()</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">19</span>
+<span class="g g-Whitespace">     </span><span class="mi">16</span> <span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">18</span> <span class="c1"># Instantiate a particle strategy</span>
+<span class="ne">---&gt; </span><span class="mi">19</span> <span class="n">mass_based_strategy</span> <span class="o">=</span> <span class="n">MassBasedStrategy</span><span class="p">()</span>
 <span class="g g-Whitespace">     </span><span class="mi">21</span> <span class="c1"># Create a Particle instance using the MassBasedStrategy</span>
-<span class="ne">---&gt; </span><span class="mi">22</span> <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">mass_based_strategy</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">22</span> <span class="n">particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">mass_based_strategy</span><span class="p">,</span>
 <span class="g g-Whitespace">     </span><span class="mi">23</span>                     <span class="n">distribution</span><span class="o">=</span><span class="n">mass_distribution</span><span class="p">,</span>
 <span class="g g-Whitespace">     </span><span class="mi">24</span>                     <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
 <span class="g g-Whitespace">     </span><span class="mi">25</span>                     <span class="n">concentration</span><span class="o">=</span><span class="n">concentration</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">27</span> <span class="c1"># Accessing calculated properties</span>
-<span class="g g-Whitespace">     </span><span class="mi">28</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mass of particles:&quot;</span><span class="p">,</span> <span class="n">particle</span><span class="o">.</span><span class="n">get_mass</span><span class="p">())</span>
 
-<span class="ne">TypeError</span>: Particle.__init__() missing 2 required positional arguments: &#39;activity&#39; and &#39;surface&#39;
+<span class="ne">TypeError</span>: Can&#39;t instantiate abstract class MassBasedStrategy with abstract method add_mass
 </pre></div>
 </div>
 </div>

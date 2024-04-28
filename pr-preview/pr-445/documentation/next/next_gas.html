@@ -881,6 +881,9 @@ class Gas(builtins.object)
  |  __eq__(self, other)
  |      Return self==value.
  |  
+ |  __getitem__(self, index: int) -&gt; particula.next.gas_species.GasSpecies
+ |      Returns the gas species at the given index.
+ |  
  |  __init__(self, temperature: float, total_pressure: float, species: list[particula.next.gas_species.GasSpecies] = &lt;factory&gt;) -&gt; None
  |      Initialize self.  See help(type(self)) for accurate signature.
  |  
@@ -902,6 +905,14 @@ class Gas(builtins.object)
  |      Parameters:
  |      - gas_species (GasSpecies): The GasSpecies object to be added to the
  |      mixture.
+ |  
+ |  dynamic_viscosity(self) -&gt; float
+ |      Calculates the dynamic viscosity of the gas mixture using the Sutherland&#39;s
+ |      law.
+ |      
+ |      Returns:
+ |      - dynamic_viscosity (float): The dynamic viscosity of the gas mixture in
+ |      Pa.s.
  |  
  |  remove_species(self, index: int) -&gt; None
  |      Removes a gas species from the mixture by index.

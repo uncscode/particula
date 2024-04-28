@@ -53,15 +53,15 @@ print("Total mass of the particle distribution:", particle.get_total_mass())
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mTypeError[0m                                 Traceback (most recent call last)
-Cell [0;32mIn[1], line 22[0m
-[1;32m     19[0m mass_based_strategy [38;5;241m=[39m MassBasedStrategy()
+Cell [0;32mIn[1], line 19[0m
+[1;32m     16[0m concentration [38;5;241m=[39m np[38;5;241m.[39marray([[38;5;241m10[39m, [38;5;241m20[39m, [38;5;241m30[39m], dtype[38;5;241m=[39mnp[38;5;241m.[39mfloat64)
+[1;32m     18[0m [38;5;66;03m# Instantiate a particle strategy[39;00m
+[0;32m---> 19[0m mass_based_strategy [38;5;241m=[39m [43mMassBasedStrategy[49m[43m([49m[43m)[49m
 [1;32m     21[0m [38;5;66;03m# Create a Particle instance using the MassBasedStrategy[39;00m
-[0;32m---> 22[0m particle [38;5;241m=[39m [43mParticle[49m[43m([49m[43mstrategy[49m[38;5;241;43m=[39;49m[43mmass_based_strategy[49m[43m,[49m
-[1;32m     23[0m [43m                    [49m[43mdistribution[49m[38;5;241;43m=[39;49m[43mmass_distribution[49m[43m,[49m
-[1;32m     24[0m [43m                    [49m[43mdensity[49m[38;5;241;43m=[39;49m[43mdensity[49m[43m,[49m
-[1;32m     25[0m [43m                    [49m[43mconcentration[49m[38;5;241;43m=[39;49m[43mconcentration[49m[43m)[49m
-[1;32m     27[0m [38;5;66;03m# Accessing calculated properties[39;00m
-[1;32m     28[0m [38;5;28mprint[39m([38;5;124m"[39m[38;5;124mMass of particles:[39m[38;5;124m"[39m, particle[38;5;241m.[39mget_mass())
+[1;32m     22[0m particle [38;5;241m=[39m Particle(strategy[38;5;241m=[39mmass_based_strategy,
+[1;32m     23[0m                     distribution[38;5;241m=[39mmass_distribution,
+[1;32m     24[0m                     density[38;5;241m=[39mdensity,
+[1;32m     25[0m                     concentration[38;5;241m=[39mconcentration)
 
-[0;31mTypeError[0m: Particle.__init__() missing 2 required positional arguments: 'activity' and 'surface'
+[0;31mTypeError[0m: Can't instantiate abstract class MassBasedStrategy with abstract method add_mass
 
