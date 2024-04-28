@@ -52,6 +52,9 @@ class MassCondensation(Runnable):
                 )
                 # apply the mass change
                 particle.add_mass(added_mass=mass_gain_per_bin)
+                # remove mass from gas phase
+                gas_species.add_concentration(
+                    added_concentration=-1*mass_gain_per_bin)
         return aerosol
 
     def rate(self, aerosol: Aerosol) -> Any:

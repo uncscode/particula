@@ -53,7 +53,7 @@ class AdiabaticPressureChange(Runnable):
         self.gamma = gamma
         self.new_pressure = new_pressure
 
-    def execute(self, aerosol: Aerosol) -> Aerosol:
+    def execute(self, aerosol: Aerosol, time_step = 1) -> Aerosol:
         """
         Execute the adiabatic pressure change process.
 
@@ -63,12 +63,11 @@ class AdiabaticPressureChange(Runnable):
         Returns:
         - aerosol (Aerosol): The modified aerosol instance.
         """
-        for gas in aerosol.iterate_gas():
-            gas.temperature = adiabatic_pressure_change(
-                gas.temperature,
-                gas.total_pressure,
-                self.new_pressure,
-                self.gamma)
+        aerosol.gas.temperature = adiabatic_pressure_change(
+            aerosol.gas.temperature,
+            aerosol.gas.total_pressure,
+            self.new_pressure,
+            self.gamma)
         return aerosol
 
     def rate(self, aerosol: Aerosol) -> Union[float, NDArray[np.float_]]:
@@ -81,8 +80,7 @@ class AdiabaticPressureChange(Runnable):
         Returns:
         - rate (float): The rate of the process.
         """
-        return self.new_pressure - np.array([
-            gas.total_pressure for gas in aerosol.iterate_gas()])
+        return self.new_pressure - aerosol.gas.total_pressure
 
 
 # def adiabatic_volume_change(
