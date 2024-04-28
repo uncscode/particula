@@ -53,12 +53,13 @@ class AdiabaticPressureChange(Runnable):
         self.gamma = gamma
         self.new_pressure = new_pressure
 
-    def execute(self, aerosol: Aerosol, time_step = 1) -> Aerosol:
+    def execute(self, aerosol: Aerosol, time_step: float = 1) -> Aerosol:
         """
         Execute the adiabatic pressure change process.
 
         Parameters:
         - aerosol (Aerosol): The aerosol instance to modify.
+        - time_step (float): The time step for the process in seconds.
 
         Returns:
         - aerosol (Aerosol): The modified aerosol instance.
