@@ -37,12 +37,13 @@ def sample_gas():
                    .concentration(concentrations)
                    .build())
 
-    gas = (GasBuilder()
-           .temperature(298.15)
-           .total_pressure(101325)
-           .add_species(gas_species)
-           .build())
-    return gas
+    return (
+        GasBuilder()
+        .temperature(298.15)
+        .total_pressure(101325)
+        .add_species(gas_species)
+        .build()
+    )
 
 
 @pytest.fixture

@@ -306,11 +306,7 @@ def mass_concentration_to_mole_fraction(
     # Calculate total moles in the mixture
     total_moles = np.sum(moles)
 
-    # Calculate mole fractions by dividing moles of each component by total
-    # moles
-    mole_fractions = moles / total_moles
-
-    return mole_fractions
+    return moles / total_moles
 
 
 def mass_concentration_to_volume_fraction(
@@ -343,9 +339,8 @@ def mass_concentration_to_volume_fraction(
 
     # Calculate volume fractions by dividing the volume of each component by
     # the total volume
-    volume_fractions = volumes / total_volume
 
-    return volume_fractions
+    return volumes / total_volume
 
 
 def mass_fraction_to_volume_fraction(

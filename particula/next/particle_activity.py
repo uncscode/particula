@@ -99,11 +99,10 @@ class MolarIdealActivity(ParticleActivityStrategy):
         if isinstance(mass_concentration, float):
             return 1.0
         # multiple species, calculate mole fractions
-        mole_fraction = mass_concentration_to_mole_fraction(
+        return mass_concentration_to_mole_fraction(
             mass_concentrations=mass_concentration,
             molar_masses=self.molar_mass
         )
-        return mole_fraction
 
 
 class MassIdealActivity(ParticleActivityStrategy):
@@ -135,9 +134,7 @@ class MassIdealActivity(ParticleActivityStrategy):
         # return for single species, activity is always 1
         if isinstance(mass_concentration, float):
             return 1.0
-        # multiple species, calculate mass fractions
-        mass_fraction = mass_concentration / np.sum(mass_concentration)
-        return mass_fraction
+        return mass_concentration / np.sum(mass_concentration)
 
 
 # Non-ideal activity strategies
