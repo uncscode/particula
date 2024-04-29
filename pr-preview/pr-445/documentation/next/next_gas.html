@@ -62,7 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'documentation/next/next_gas';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Strategies in Particle Distributions" href="next_particle.html" />
+    <link rel="next" title="Particle Representation" href="next_particle.html" />
     <link rel="prev" title="Gas Species" href="next_gas_species.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -287,7 +287,7 @@
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Gases</a></li>
 
 
-<li class="toctree-l1"><a class="reference internal" href="next_particle.html">Strategies in Particle Distributions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="next_particle.html">Particle Representation</a></li>
 
 <li class="toctree-l1"><a class="reference internal" href="next_aerosol.html">Aerosol</a></li>
 <li class="toctree-l1"><a class="reference internal" href="next_condensation.html">Condensation Runnables</a></li>
@@ -609,6 +609,7 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="gases">
 <h1>Gases<a class="headerlink" href="#gases" title="Link to this heading">#</a></h1>
+<p><strong>This may get cut, as calling GasSpecies may be enough for all use cases. We’ll see after gas phase processes</strong></p>
 <p>Gases, alongside particles, constitute the essential components of an aerosol system. In their natural state, gases are collections of molecules that move freely, not bound to one another. We introduce the <code class="docutils literal notranslate"><span class="pre">Gas</span></code> class, a composite that aggregates multiple <code class="docutils literal notranslate"><span class="pre">GasSpecies</span></code> objects, each representing type of gas or gases.</p>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">Gas</span></code></strong>: Functions as a composite object capable of encompassing multiple <code class="docutils literal notranslate"><span class="pre">GasSpecies</span></code>, facilitating the management and operation of gas mixtures as coherent wholes.
@@ -987,7 +988,7 @@ class Gas(builtins.object)
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Strategies in Particle Distributions</p>
+        <p class="prev-next-title">Particle Representation</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
