@@ -1,6 +1,9 @@
 """Strategies for curvature effects on particles. This includes
 the Kelvin effect, and surface tension methods.
 
+Unit tests should be added to ensure these strategies are correctly
+implemented and to prevent future regressions.
+the Kelvin effect, and surface tension methods.
 Should add the organic film strategy at some point"""
 
 # pyright: reportArgumentType=false

@@ -95,9 +95,8 @@ class GasBuilder:
         """Build and return the Gas object."""
         if not self._species:
             raise ValueError("At least one gas component must be added.")
-        gas = Gas(
+        return Gas(
             temperature=self._temperature,
             total_pressure=self._total_pressure,
             species=self._species,
         )
-        return gas

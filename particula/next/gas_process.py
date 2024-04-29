@@ -35,9 +35,9 @@ def adiabatic_pressure_change(
     -----------
     - https://en.wikipedia.org/wiki/Adiabatic_process
     """
-    temperature_final = temperature_initial * (
-        pressure_final / pressure_initial) ** ((gamma - 1) / gamma)
-    return temperature_final
+    return temperature_initial * (pressure_final / pressure_initial) ** (
+        (gamma - 1) / gamma
+    )
 
 
 class AdiabaticPressureChange(Runnable):
