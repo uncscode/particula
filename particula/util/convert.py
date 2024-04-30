@@ -2,8 +2,8 @@
 """
 
 from typing import Union, Tuple, Any, List, Dict
-import numpy as np
 from numpy.typing import NDArray
+import numpy as np
 
 
 def coerce_type(data, dtype):
