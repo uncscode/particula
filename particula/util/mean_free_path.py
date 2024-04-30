@@ -7,18 +7,14 @@
     The expeected mean free path of air is approx.
     65 nm at 298 K and 101325 Pa.
 
-    TODO:
-        add size checks for pressure--temperature pairs
-        to ensure that they match; otherwise, an error will occur
-        or use broadcast (though this is likely not a good idea)?
-        perhaps allow for a height--temperature--pressure dependency
-        somewhere? this could be import for @Gorkowski's parcels...
-        (likely through a different utility function...)
 """
 
+from typing import Union, Optional
+from numpy.typing import NDArray
 import numpy as np
 from particula import u
-from particula.constants import GAS_CONSTANT, MOLECULAR_WEIGHT_AIR
+from particula.constants import (
+    GAS_CONSTANT, MOLECULAR_WEIGHT_AIR)
 from particula.util.dynamic_viscosity import dyn_vis
 from particula.util.input_handling import (in_gas_constant,
                                            in_molecular_weight, in_pressure,
@@ -126,3 +122,45 @@ def mfp(
         (2 * dyn_vis_val / pres) /
         (8 * molec_wt / (np.pi * gas_con * temp))**0.5
     ).to_base_units()
+
+
+def molecule_mean_free_path(
+    molar_mass: Union[
+        float, NDArray[np.float_]] = MOLECULAR_WEIGHT_AIR.m,  # type: ignore
+    temperature: float = 298.15,
+    pressure: float = 101325,
+    dynamic_viscosity: Optional[float] = None,
+) -> Union[float, NDArray[np.float_]]:
+    """
+    Calculate the mean free path of a gas molecule in air based on the
+    temperature, pressure, and molar mass of the gas. The mean free path
+    is the average distance traveled by a molecule between collisions with
+    other molecules present in a medium (air).
+
+    Args:
+    -----
+    - molar_mass (Union[float, NDArray[np.float_]]): The molar mass
+    of the gas molecule [kg/mol]. Default is the molecular weight of air.
+    - temperature (float): The temperature of the gas [K]. Default is 298.15 K.
+    - pressure (float): The pressure of the gas [Pa]. Default is 101325 Pa.
+    - dynamic_viscosity (Optional[float]): The dynamic viscosity of the gas
+    [Pa*s]. If not provided, it will be calculated based on the temperature.
+
+    Returns:
+    --------
+    - Union[float, NDArray[np.float_]]: The mean free path of the gas molecule
+    in meters (m).
+
+    References:
+    ----------
+    ask Naser where the 2/8 term came it is the same as root(2)
+    - https://en.wikipedia.org/wiki/Mean_free_path
+    """
+    if dynamic_viscosity is None:
+        dynamic_viscosity = dyn_vis(temperature)  # type: ignore
+
+    return np.array(
+        (dynamic_viscosity.m / pressure)  # type: ignore
+        * ((np.pi * GAS_CONSTANT.m * temperature)
+           / (2 * molar_mass))**0.5,
+        dtype=np.float_)
