@@ -99,4 +99,4 @@ def test_parametrized(mfp, radius, expected):
     if isinstance(expected, np.ndarray):
         np.testing.assert_array_equal(result, expected)
     else:
-        assert result == expected, "Failed on parameterized test"
+        assert result == expected  # Single value comparison

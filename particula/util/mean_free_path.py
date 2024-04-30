@@ -153,7 +153,6 @@ def molecule_mean_free_path(
 
     References:
     ----------
-    ask Naser where the 2/8 term came it is the same as root(2)
     - https://en.wikipedia.org/wiki/Mean_free_path
     """
     # check inputs are positive
