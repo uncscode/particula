@@ -13,8 +13,8 @@ def to_mole_fraction(
     Args:
     -----------
     - mass_concentrations: A list or ndarray of mass concentrations
-    (e.g., kg/m^3).
-    - molar_masses: A list or ndarray of molecular weights (e.g., kg/mol).
+    (SI, kg/m^3).
+    - molar_masses: A list or ndarray of molecular weights (SI, kg/mol).
 
     Returns:
     --------
@@ -47,9 +47,9 @@ def to_volume_fraction(
     Args:
     -----------
     - mass_concentrations: A list or ndarray of mass concentrations
-    (e.g., kg/m^3).
+    (SI, kg/m^3).
     - densities: A list or ndarray of densities of each component
-    (e.g., kg/m^3).
+    (SI, kg/m^3).
 
     Returns:
     --------
