@@ -82,6 +82,7 @@ def test_invalid_pressure(pressure):
     with pytest.raises((TypeError, ValueError)):
         molecule_mean_free_path(pressure=pressure)
 
+
 @pytest.mark.parametrize("molar_mass",
                          [None, -1, 'a', np.array([0.028, -0.044])])
 def test_invalid_molar_mass(molar_mass):
