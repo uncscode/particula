@@ -227,6 +227,8 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
         Pascals.
 
         References:
+        - https://en.wikipedia.org/wiki/Antoine_equation (but in Kelvin)
+        - Kelvin form:
         https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781118135341.app1
         """
         # Antoine equation for Kelvin temperature
