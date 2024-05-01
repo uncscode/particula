@@ -7,7 +7,7 @@
 import pytest
 import numpy as np
 from particula.next.aerosol import Aerosol
-from particula.next.gas import Gas
+from particula.next.gas.species import Gas
 from particula.next.particle import Particle, create_particle_strategy
 
 
