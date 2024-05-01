@@ -1,5 +1,11 @@
+"""Vapor Pressure Module.
 
-"""Strategy pattern for vapor pressure calculations.
+This module calculates the vapor pressure of substances based on different
+strategies. These strategies are interchangeable and can be used to calculate
+the vapor pressure of a substance at a given temperature. The module provides
+a factory method to create a concrete VaporPressureStrategy object based on
+the desired strategy.
+
 All units are in base SI units (kg, m, s).
 """
 
@@ -338,9 +344,8 @@ class WaterBuckStrategy(VaporPressureStrategy):
             100  # Convert from hPa to Pa
 
         # Select the appropriate equation based on temperature
-        vapor_pressure = (vapor_pressure_below_freezing * temp_below_freezing +
-                          vapor_pressure_above_freezing * temp_above_freezing)
-        return vapor_pressure
+        return (vapor_pressure_below_freezing * temp_below_freezing +
+                vapor_pressure_above_freezing * temp_above_freezing)
 
 
 def vapor_pressure_factory(
