@@ -15,8 +15,14 @@
 
 # Import pint here to avoid using a different registry in each module.
 from pint import UnitRegistry
+from particula.logger_setup import setup
 
 # u is the unit registry name.
 u = UnitRegistry(force_ndarray=True)
 
 __version__ = "0.0.16"
+
+# setup the logger
+logger = setup()
+# log the version of particula upon loading
+logger.info("particula version %s loaded.", __version__)

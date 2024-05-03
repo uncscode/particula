@@ -1,7 +1,10 @@
 """Functions to convert mass concentrations to other concentration units."""
 
+import logging
 from numpy.typing import NDArray
 import numpy as np
+
+logger = logging.getLogger("particula")
 
 
 def to_mole_fraction(
@@ -28,8 +31,10 @@ def to_mole_fraction(
     """
     # check for negative values
     if np.any(mass_concentrations < 0):
+        logger.error("Mass concentrations must be positive")
         raise ValueError("Mass concentrations must be positive")
     if np.any(molar_masses <= 0):
+        logger.error("Molar masses must be non-zero, positive")
         raise ValueError("Molar masses must be non-zero, positive")
     # Convert mass concentrations to moles for each component
     moles = mass_concentrations / molar_masses

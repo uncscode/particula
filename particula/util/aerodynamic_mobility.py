@@ -1,5 +1,6 @@
 """ mobility of particle
 """
+from typing import Union
 import numpy as np
 
 from particula.util.input_handling import in_radius, in_scalar, in_viscosity
@@ -25,4 +26,14 @@ def pam(
 
     return (
         scf_val / (3 * np.pi * vis_val * rad * 2)
+    )
+
+
+def particle_aerodynamic_mobility(
+    radius: Union[float, np.ndarray],
+    slip_correction_factor,
+    dynamic_viscosity
+) -> float:
+    return (
+        slip_correction_factor / (3 * np.pi * dynamic_viscosity * radius * 2)
     )
