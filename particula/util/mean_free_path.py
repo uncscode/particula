@@ -153,14 +153,20 @@ def molecule_mean_free_path(
 
     References:
     ----------
-    ask Naser where the 2/8 term came it is the same as root(2)
     - https://en.wikipedia.org/wiki/Mean_free_path
     """
+    # check inputs are positive
+    if temperature <= 0:
+        raise ValueError("Temperature must be positive [Kelvin]")
+    if pressure <= 0:
+        raise ValueError("Pressure must be positive [Pascal]")
+    if np.any(molar_mass <= 0):
+        raise ValueError("Molar mass must be positive [kg/mol]")
     if dynamic_viscosity is None:
         dynamic_viscosity = dyn_vis(temperature)  # type: ignore
+        dynamic_viscosity = float(dynamic_viscosity.m)  # type: ignore
 
     return np.array(
-        (dynamic_viscosity.m / pressure)  # type: ignore
-        * ((np.pi * GAS_CONSTANT.m * temperature)
-           / (2 * molar_mass))**0.5,
+        (2 * dynamic_viscosity / pressure)
+        / (8 * molar_mass / (np.pi * GAS_CONSTANT.m * temperature))**0.5,
         dtype=np.float_)
