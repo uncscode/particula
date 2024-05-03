@@ -633,6 +633,19 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="c1"># Particula imports</span>
+<span class="ne">----&gt; </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">particula.next.gas_vapor_pressure</span> <span class="kn">import</span> <span class="n">vapor_pressure_factory</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="kn">from</span> <span class="nn">particula.next.gas_species</span> <span class="kn">import</span> <span class="n">GasSpecies</span><span class="p">,</span> <span class="n">GasSpeciesBuilder</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;particula.next.gas_vapor_pressure&#39;
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="define-vapor-pressure-strategies">
@@ -778,7 +791,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/027aad64044899be1732131bbe53bfcc99a768e52220e707e3ba7fc7c3a138bc.png" src="../../_images/027aad64044899be1732131bbe53bfcc99a768e52220e707e3ba7fc7c3a138bc.png" />
+<img alt="../../_images/bb52f16987634a49a46fe6325be00c7342c0149fd388c3f80d07424dcda1b805.png" src="../../_images/bb52f16987634a49a46fe6325be00c7342c0149fd388c3f80d07424dcda1b805.png" />
 </div>
 </div>
 </section>
@@ -812,7 +825,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/f6225337bff1f0ab8295764a3ff8a1d14235fd0368b89ab99c6af941d5051614.png" src="../../_images/f6225337bff1f0ab8295764a3ff8a1d14235fd0368b89ab99c6af941d5051614.png" />
+<img alt="../../_images/251887c18256f6589cf02f344c86312d0c675635f7867b18a28b8612d83f508a.png" src="../../_images/251887c18256f6589cf02f344c86312d0c675635f7867b18a28b8612d83f508a.png" />
 </div>
 </div>
 </section>
@@ -910,9 +923,6 @@ class GasSpecies(builtins.object)
  |  
  |  __init__(self)
  |      Initialize self.  See help(type(self)) for accurate signature.
- |  
- |  __len__(self)
- |      Return the number of gas species.
  |  
  |  __str__(self)
  |      Return a string representation of the GasSpecies object.

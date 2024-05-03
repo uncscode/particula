@@ -655,8 +655,15 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Gas mass: [&#39;water&#39; &#39;butanol&#39; &#39;styrene&#39;]
-Particle mass: 9.42477796076938e-10
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">particula.next.gas_species</span> <span class="kn">import</span> <span class="n">GasSpeciesBuilder</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">from</span> <span class="nn">particula.next.particle</span> <span class="kn">import</span> <span class="n">Particle</span><span class="p">,</span> <span class="n">particle_strategy_factory</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">from</span> <span class="nn">particula.next.aerosol</span> <span class="kn">import</span> <span class="n">Aerosol</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;particula.next.gas_species&#39;
 </pre></div>
 </div>
 </div>
