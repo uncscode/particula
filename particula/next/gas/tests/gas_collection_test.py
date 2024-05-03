@@ -4,7 +4,7 @@
 
 import pytest
 import numpy as np
-from particula.next.gas import Gas, GasBuilder
+from particula.next.gas.gas_collection import Gas, GasBuilder
 from particula.next.gas.gas_species import GasSpeciesBuilder
 from particula.next.gas.gas_vapor_pressure import ConstantVaporPressureStrategy
 

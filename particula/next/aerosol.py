@@ -5,7 +5,8 @@ particles and getting it to work correctly. This is will be solved
 with usage as we figure out the best way to do this.
 """
 from typing import List, Union, Iterator
-from particula.next.gas.species import Gas, GasSpecies
+from particula.next.gas.species import GasSpecies
+from particula.next.gas.gas_collection import Gas
 from particula.next.particle import Particle
 
 
