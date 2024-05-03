@@ -6,7 +6,7 @@ with usage as we figure out the best way to do this.
 """
 from typing import List, Union, Iterator
 from particula.next.gas.species import GasSpecies
-from particula.next.gas.gas_collection import Gas
+from particula.next.gas.atmosphere import Atmosphere
 from particula.next.particle import Particle
 
 
@@ -17,7 +17,7 @@ class Aerosol:
     is composed of various gases and particles.
     """
 
-    def __init__(self, gas: Gas,
+    def __init__(self, gas: Atmosphere,
                  particles: Union[Particle, List[Particle]]):
         """
         Initializes an Aerosol instance with Gas and Particle instances.
@@ -49,7 +49,7 @@ class Aerosol:
         """
         return iter(self.particles)
 
-    def add_gas(self, gas: Gas):
+    def add_gas(self, gas: Atmosphere):
         """
         Replaces the current Gas instance with a new one.
 

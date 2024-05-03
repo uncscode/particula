@@ -4,9 +4,9 @@
 
 import pytest
 import numpy as np
-from particula.next.gas.gas_collection import Gas, GasBuilder
-from particula.next.gas.gas_species import GasSpeciesBuilder
-from particula.next.gas.gas_vapor_pressure import ConstantVaporPressureStrategy
+from particula.next.gas.atmosphere import Atmosphere, AtmosphereBuilder
+from particula.next.gas.species import GasSpeciesBuilder
+from particula.next.gas.vapor_pressure import ConstantVaporPressureStrategy
 
 
 def test_gas_initialization():
@@ -29,7 +29,7 @@ def test_gas_initialization():
     temperature = 298.15  # Kelvin
     total_pressure = 101325  # Pascals
 
-    gas = Gas(temperature, total_pressure, [gas_species])
+    gas = Atmosphere(temperature, total_pressure, [gas_species])
 
     assert gas.temperature == temperature
     assert gas.total_pressure == total_pressure
@@ -63,7 +63,7 @@ def test_gas_builder_with_species():
                    .concentration(concentrations)
                    .build())
 
-    gas = (GasBuilder()
+    gas = (AtmosphereBuilder()
            .temperature(298.15)
            .total_pressure(101325)
            .add_species(gas_species)
@@ -76,8 +76,8 @@ def test_gas_builder_with_species():
 
 def test_gas_builder_without_species_raises_error():
     """Test that building a Gas object without any species raises an error."""
-    builder = GasBuilder()
+    builder = AtmosphereBuilder()
     # Omit adding any species to trigger the validation error
     with pytest.raises(ValueError) as e:
         builder.build()
-    assert "At least one gas component must be added." in str(e.value)
+    assert "At least one GasSpecies must be added." in str(e.value)

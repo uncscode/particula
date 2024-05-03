@@ -1,11 +1,11 @@
 """Gas module."""
 
 from dataclasses import dataclass, field
-from particula.next.gas.gas_species import GasSpecies
+from particula.next.gas.species import GasSpecies
 
 
 @dataclass
-class Gas:
+class Atmosphere:
     """
     Represents a mixture of gas species, detailing properties such as
     temperature, total pressure, and the list of gas species in the mixture.
@@ -68,7 +68,7 @@ class Gas:
         )
 
 
-class GasBuilder:
+class AtmosphereBuilder:
     """A builder class for creating Gas objects with a fluent interface."""
 
     def __init__(self):
@@ -87,15 +87,15 @@ class GasBuilder:
         return self
 
     def add_species(self, species: GasSpecies):
-        """Add a gas species component to the gas mixture."""
+        """Add a GasSpecies component to the gas mixture."""
         self._species.append(species)
         return self
 
-    def build(self) -> Gas:
+    def build(self) -> Atmosphere:
         """Build and return the Gas object."""
         if not self._species:
-            raise ValueError("At least one gas component must be added.")
-        return Gas(
+            raise ValueError("At least one GasSpecies must be added.")
+        return Atmosphere(
             temperature=self._temperature,
             total_pressure=self._total_pressure,
             species=self._species,
