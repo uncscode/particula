@@ -1,7 +1,7 @@
 """Gas module."""
 
 from dataclasses import dataclass, field
-from particula.next.gas_species import GasSpecies
+from particula.next.gas.gas_species import GasSpecies
 
 
 @dataclass

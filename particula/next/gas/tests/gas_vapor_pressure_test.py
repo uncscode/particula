@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 from particula.constants import GAS_CONSTANT
-from particula.next.gas_vapor_pressure import (
+from particula.next.gas.gas_vapor_pressure import (
     calculate_partial_pressure,
     calculate_concentration,
     vapor_pressure_factory)
