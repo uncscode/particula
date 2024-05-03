@@ -6,15 +6,15 @@
 import pytest
 import numpy as np
 
-from particula.next.particle import Particle, particle_strategy_factory
+from particula.next.particles.representation import Particle, particle_strategy_factory
 from particula.next.gas.vapor_pressure import ConstantVaporPressureStrategy
 from particula.next.gas.species import GasSpeciesBuilder
 from particula.next.gas.atmosphere import AtmosphereBuilder
 from particula.next.aerosol import Aerosol
 from particula.next.gas.process import adiabatic_pressure_change, \
     AdiabaticPressureChange
-from particula.next.particle_activity import MassIdealActivity
-from particula.next.surface import surface_strategy_factory
+from particula.next.particles.activity import MassIdealActivity
+from particula.next.particles.surface import surface_strategy_factory
 
 activity_strategy = MassIdealActivity()
 surface = surface_strategy_factory()

@@ -11,9 +11,9 @@ from particula.next.aerosol import Aerosol
 from particula.next.gas.atmosphere import AtmosphereBuilder
 from particula.next.gas.species import GasSpeciesBuilder, GasSpecies
 from particula.next.gas.vapor_pressure import ConstantVaporPressureStrategy
-from particula.next.particle import Particle, particle_strategy_factory
-from particula.next.particle_activity import MassIdealActivity
-from particula.next.surface import surface_strategy_factory
+from particula.next.particles.representation import Particle, particle_strategy_factory
+from particula.next.particles.activity import MassIdealActivity
+from particula.next.particles.surface import surface_strategy_factory
 
 activity_strategy = MassIdealActivity()
 surface_strategy = surface_strategy_factory()

@@ -8,7 +8,7 @@ import numpy as np
 # Particula imports
 from particula.next.runnable import Runnable
 from particula.next.aerosol import Aerosol
-from particula.next.condensation import CondensationStrategy
+from particula.next.dynamics.condensation import CondensationStrategy
 
 
 class MassCondensation(Runnable):

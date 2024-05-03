@@ -1,7 +1,7 @@
 """Test the Condensation module."""
 
 import numpy as np
-from particula.next.condensation import (
+from particula.next.dynamics.condensation import (
     vapor_transition_correction,
     partial_pressure_delta,
     thermal_conductivity,

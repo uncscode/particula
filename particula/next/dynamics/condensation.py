@@ -40,7 +40,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 # particula imports
-from particula.next.particle import Particle
+from particula.next.particles.representation import Particle
 from particula.next.gas.species import GasSpecies
 from particula.constants import GAS_CONSTANT
 from particula.util.knudsen_number import calculate_knudsen_number

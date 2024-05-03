@@ -1,7 +1,7 @@
 """Test the surface module."""
 import numpy as np
 import pytest
-from particula.next.surface import (
+from particula.next.particles.surface import (
     MolarSurfaceStrategy,
     MassSurfaceStrategy,
     VolumeSurfaceStrategy,

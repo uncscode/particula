@@ -2,12 +2,12 @@
 
 import numpy as np
 import pytest
-from particula.next.particle import (
+from particula.next.particles.representation import (
     MassBasedMovingBin, RadiiBasedMovingBin, SpeciatedMassMovingBin,
     particle_strategy_factory, Particle)
-from particula.next.surface import VolumeSurfaceStrategy
-from particula.next.particle_activity import MassIdealActivity
-from particula.next.surface import surface_strategy_factory
+from particula.next.particles.surface import VolumeSurfaceStrategy
+from particula.next.particles.activity import MassIdealActivity
+from particula.next.particles.surface import surface_strategy_factory
 
 
 mass_based_strategy = MassBasedMovingBin()

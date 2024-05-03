@@ -5,8 +5,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 # From Particula
-from particula.next.particle_activity import ParticleActivityStrategy
-from particula.next.surface import SurfaceStrategy
+from particula.next.particles.activity import ParticleActivityStrategy
+from particula.next.particles.surface import SurfaceStrategy
 
 
 class ParticleStrategy(ABC):

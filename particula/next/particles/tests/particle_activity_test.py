@@ -4,7 +4,7 @@ Replace with real values in the future."""
 
 import pytest
 import numpy as np
-from particula.next.particle_activity import (
+from particula.next.particles.activity import (
     MolarIdealActivity,
     MassIdealActivity,
     KappaParameterActivity,
