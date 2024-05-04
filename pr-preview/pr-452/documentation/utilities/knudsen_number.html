@@ -574,121 +574,21 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on module particula.util.knudsen_number in particula.util:
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
 
-NAME
-    particula.util.knudsen_number - calculating Knudsen number
+  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">IPython</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">interactiveshell</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">3577</span> <span class="ow">in</span> <span class="n">run_code</span>
+    <span class="n">exec</span><span class="p">(</span><span class="n">code_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_global_ns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_ns</span><span class="p">)</span>
 
-DESCRIPTION
-    TODO:
-        add a sanity check for mixing radius shapes and temperature shapes
-        for example, someone may want to calculate knu for [1e-9, 2e-9, 3e-9]
-        but only at two different temperatures [290, 300].
-        A solution is to broadcast into a new shape, e.g. (3, 2) with the
-        leading dim being the radius; or we could simply ban this entirely.
-    
-        -- implementing tranpose for now.
+  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+    <span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">knudsen_number</span>
 
-FUNCTIONS
-    calculate_knudsen_number(mean_free_path: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], particle_radius: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]) -&gt; Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
-        Calculate the Knudsen number using the mean free path of the gas and the
-        radius of the particle. The Knudsen number is a dimensionless number that
-        indicates the regime of gas flow relative to the size of particles.
-        
-        Args:
-        -----
-        - mean_free_path (Union[float, NDArray[np.float_]]): The mean free path of
-        the gas molecules [meters (m)].
-        - particle_radius (Union[float, NDArray[np.float_]]): The radius of the
-        particle [meters (m)].
-        
-        Returns:
-        --------
-        - Union[float, NDArray[np.float_]]: The Knudsen number, which is the
-        ratio of the mean free path to the particle radius.
-        
-        References:
-        -----------
-        - For more information at https://en.wikipedia.org/wiki/Knudsen_number
-    
-    knu(radius=None, mfp=None, **kwargs)
-        Returns particle&#39;s Knudsen number.
-        
-        The Knudsen number reflects the relative length scales of
-        the particle and the suspending fluid (air, water, etc.).
-        This is calculated by the mean free path of the medium
-        divided by the particle radius.
-        
-        The Knudsen number is a measure of continuum effects and
-        deviation thereof. For larger particles, the Knudsen number
-        goes towards 0. For smaller particles, the Knudsen number
-        goes towards infinity.
-        
-        Examples:
-        ```
-        &gt;&gt;&gt; from particula import u
-        &gt;&gt;&gt; from particula.util.knudsen_number import knu
-        &gt;&gt;&gt; # with radius 1e-9 m
-        &gt;&gt;&gt; knu(radius=1e-9)
-        &lt;Quantity(66.4798498, &#39;dimensionless&#39;)&gt;
-        &gt;&gt;&gt; # with radius 1e-9 m and mfp 60 nm
-        &gt;&gt;&gt; knu(radius=1e-9*u.m, mfp=60*u.nm).m
-        60.00000000000001
-        &gt;&gt;&gt; calculating via mfp(**kwargs)
-        &gt;&gt;&gt; knu(
-        ... radius=1e-9*u.m,
-        ... temperature=300,
-        ... pressure=1e5,
-        ... molecular_weight=0.03,
-        ... )
-        &lt;Quantity(66.7097062, &#39;dimensionless&#39;)&gt;
-        ```
-        
-        Args:
-            radius  (float) [m]
-            mfp     (float) [m] (default: util)
-        
-        Returns:
-                    (float) [dimensionless]
-        
-        Notes:
-            mfp can be calculated using mfp(**kwargs);
-            refer to particula.util.mean_free_path.mfp for more info.
+  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">18</span>
+    <span class="kn">from</span> <span class="nn">particula.logger_setup</span> <span class="kn">import</span> <span class="n">setup</span>
 
-DATA
-    NDArray = numpy.ndarray[typing.Any, numpy.dtype[+_ScalarType_co]]
-    Union = typing.Union
-        Union type; Union[X, Y] means either X or Y.
-        
-        On Python 3.10 and higher, the | operator
-        can also be used to denote unions;
-        X | Y means the same thing to the type checker as Union[X, Y].
-        
-        To define a union, use e.g. Union[int, str]. Details:
-        - The arguments must be types and there must be at least one.
-        - None as an argument is a special case and is replaced by
-          type(None).
-        - Unions of unions are flattened, e.g.::
-        
-            assert Union[Union[int, str], float] == Union[int, str, float]
-        
-        - Unions of a single argument vanish, e.g.::
-        
-            assert Union[int] == int  # The constructor actually returns int
-        
-        - Redundant arguments are skipped, e.g.::
-        
-            assert Union[int, str, int] == Union[int, str]
-        
-        - When comparing unions, the argument order is ignored, e.g.::
-        
-            assert Union[int, str] == Union[str, int]
-        
-        - You cannot subclass or instantiate a union.
-        - You can use Optional[X] as a shorthand for Union[X, None].
-
-FILE
-    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/util/knudsen_number.py
+  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="n">logger_setup</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">62</span>
+    <span class="n">logging_dir</span> <span class="o">=</span> <span class="s2">&quot;logging&quot;</span>
+    <span class="o">^</span>
+<span class="ne">SyntaxError</span>: expected &#39;except&#39; or &#39;finally&#39; block
 </pre></div>
 </div>
 </div>
@@ -697,111 +597,6 @@ FILE
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">inspect</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">knudsen_number</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&quot;&quot;&quot; calculating Knudsen number
-
-    TODO:
-        add a sanity check for mixing radius shapes and temperature shapes
-        for example, someone may want to calculate knu for [1e-9, 2e-9, 3e-9]
-        but only at two different temperatures [290, 300].
-        A solution is to broadcast into a new shape, e.g. (3, 2) with the
-        leading dim being the radius; or we could simply ban this entirely.
-
-        -- implementing tranpose for now.
-&quot;&quot;&quot;
-
-from typing import Union
-from numpy.typing import NDArray
-import numpy as np
-from particula.util.input_handling import in_length, in_radius
-from particula.util.mean_free_path import mfp as mfp_func
-
-
-def knu(
-    radius=None,
-    mfp=None,
-    **kwargs
-):
-    &quot;&quot;&quot; Returns particle&#39;s Knudsen number.
-
-        The Knudsen number reflects the relative length scales of
-        the particle and the suspending fluid (air, water, etc.).
-        This is calculated by the mean free path of the medium
-        divided by the particle radius.
-
-        The Knudsen number is a measure of continuum effects and
-        deviation thereof. For larger particles, the Knudsen number
-        goes towards 0. For smaller particles, the Knudsen number
-        goes towards infinity.
-
-        Examples:
-        ```
-        &gt;&gt;&gt; from particula import u
-        &gt;&gt;&gt; from particula.util.knudsen_number import knu
-        &gt;&gt;&gt; # with radius 1e-9 m
-        &gt;&gt;&gt; knu(radius=1e-9)
-        &lt;Quantity(66.4798498, &#39;dimensionless&#39;)&gt;
-        &gt;&gt;&gt; # with radius 1e-9 m and mfp 60 nm
-        &gt;&gt;&gt; knu(radius=1e-9*u.m, mfp=60*u.nm).m
-        60.00000000000001
-        &gt;&gt;&gt; calculating via mfp(**kwargs)
-        &gt;&gt;&gt; knu(
-        ... radius=1e-9*u.m,
-        ... temperature=300,
-        ... pressure=1e5,
-        ... molecular_weight=0.03,
-        ... )
-        &lt;Quantity(66.7097062, &#39;dimensionless&#39;)&gt;
-        ```
-
-        Args:
-            radius  (float) [m]
-            mfp     (float) [m] (default: util)
-
-        Returns:
-                    (float) [dimensionless]
-
-        Notes:
-            mfp can be calculated using mfp(**kwargs);
-            refer to particula.util.mean_free_path.mfp for more info.
-
-    &quot;&quot;&quot;
-
-    mfp_val = mfp_func(**kwargs) if mfp is None else in_length(mfp)
-    radius = in_radius(radius)
-
-    return np.transpose([mfp_val.m]) * mfp_val.u / radius
-
-
-def calculate_knudsen_number(
-    mean_free_path: Union[float, NDArray[np.float_]],
-    particle_radius: Union[float, NDArray[np.float_]]
-) -&gt; Union[float, NDArray[np.float_]]:
-    &quot;&quot;&quot;
-    Calculate the Knudsen number using the mean free path of the gas and the
-    radius of the particle. The Knudsen number is a dimensionless number that
-    indicates the regime of gas flow relative to the size of particles.
-
-    Args:
-    -----
-    - mean_free_path (Union[float, NDArray[np.float_]]): The mean free path of
-    the gas molecules [meters (m)].
-    - particle_radius (Union[float, NDArray[np.float_]]): The radius of the
-    particle [meters (m)].
-
-    Returns:
-    --------
-    - Union[float, NDArray[np.float_]]: The Knudsen number, which is the
-    ratio of the mean free path to the particle radius.
-
-    References:
-    -----------
-    - For more information at https://en.wikipedia.org/wiki/Knudsen_number
-    &quot;&quot;&quot;
-    return mean_free_path / particle_radius
 </pre></div>
 </div>
 </div>

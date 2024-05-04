@@ -598,6 +598,25 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+
+  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">IPython</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">interactiveshell</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">3577</span> <span class="ow">in</span> <span class="n">run_code</span>
+    <span class="n">exec</span><span class="p">(</span><span class="n">code_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_global_ns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_ns</span><span class="p">)</span>
+
+  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+    <span class="kn">import</span> <span class="nn">particula</span><span class="o">,</span> <span class="nn">matplotlib</span>
+
+  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">18</span>
+    <span class="kn">from</span> <span class="nn">particula.logger_setup</span> <span class="kn">import</span> <span class="n">setup</span>
+
+  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="n">logger_setup</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">62</span>
+    <span class="n">logging_dir</span> <span class="o">=</span> <span class="s2">&quot;logging&quot;</span>
+    <span class="o">^</span>
+<span class="ne">SyntaxError</span>: expected &#39;except&#39; or &#39;finally&#39; block
+</pre></div>
+</div>
+</div>
 </div>
 <section id="particle">
 <h2><code class="docutils literal notranslate"><span class="pre">Particle</span></code><a class="headerlink" href="#particle" title="Link to this heading">#</a></h2>
@@ -612,11 +631,10 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Radii: 
-[4.1972292396604054e-08 4.216876899517281e-08 4.236524559374157e-08 4.256172219231033e-08 4.275819879087909e-08 4.295467538944785e-08 4.315115198801661e-08 4.3347628586585377e-08 4.3544105185154136e-08 4.3740581783722896e-08] meter
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Radii
 </pre></div>
 </div>
-</div>
+<div class="output text_html"><table><tbody><tr><th>Magnitude</th><td style='text-align:left;'><pre>[4.1972292396604054e-08 4.216876899517281e-08 4.236524559374157e-08<br> 4.256172219231033e-08 4.275819879087909e-08 4.295467538944785e-08<br> 4.315115198801661e-08 4.3347628586585377e-08 4.3544105185154136e-08<br> 4.3740581783722896e-08]</pre></td></tr><tr><th>Units</th><td style='text-align:left;'>meter</td></tr></tbody></table></div></div>
 </div>
 <p>At every radius listed in <code class="docutils literal notranslate"><span class="pre">.particle_radius</span></code> is a probability of the particles at that radius. Thus, we have probability distribution function (PDF) of particles.</p>
 <div class="cell docutils container">
@@ -627,11 +645,10 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Particles PDF given radii: 
-[2200235960693703.8 2375247794883328.5 2562153632216260.0 2761608050637125.5 2974291484346663.0 3200910665710347.5 3442199044624819.5 3698917183754246.5 3971853128059254.0 4261822747056273.0] / meter ** 4
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Particles PFD given radii.
 </pre></div>
 </div>
-</div>
+<div class="output text_html"><table><tbody><tr><th>Magnitude</th><td style='text-align:left;'><pre>[2200235960693703.8 2375247794883328.5 2562153632216260.0<br> 2761608050637125.5 2974291484346663.0 3200910665710347.5<br> 3442199044624819.5 3698917183754246.5 3971853128059254.0<br> 4261822747056273.0]</pre></td></tr><tr><th>Units</th><td style='text-align:left;'>1/meter<sup>4</sup></td></tr></tbody></table></div></div>
 </div>
 </section>
 <section id="plot-the-particle-pdf">
@@ -659,7 +676,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/13bec4a1bb76d0721252ee2fee7ecb3c2739816edf1b9b965b06be2af0630aac.png" src="../_images/13bec4a1bb76d0721252ee2fee7ecb3c2739816edf1b9b965b06be2af0630aac.png" />
+<img alt="../_images/eb341bbf67068112ce17637866b4311527d6343788cee61022224d2d3dd25d36.png" src="../_images/eb341bbf67068112ce17637866b4311527d6343788cee61022224d2d3dd25d36.png" />
 </div>
 </div>
 </section>
@@ -793,8 +810,8 @@ Total volume of the PDF, 0.0003653651719983997 dimensionless
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/e68e607335276d619f98528727e6b63d601efa713478fe3e298441aacf5a92e1.png" src="../_images/e68e607335276d619f98528727e6b63d601efa713478fe3e298441aacf5a92e1.png" />
-<img alt="../_images/e094e5726b723e96d858b48e9c966f4ecffed7912074e227051718a4648ee6d2.png" src="../_images/e094e5726b723e96d858b48e9c966f4ecffed7912074e227051718a4648ee6d2.png" />
+<img alt="../_images/a0aa1896e46089fd1549a3b55404ebe7dc5307979a5ce4867d781d95acd5d703.png" src="../_images/a0aa1896e46089fd1549a3b55404ebe7dc5307979a5ce4867d781d95acd5d703.png" />
+<img alt="../_images/0c201138dab0eecbd6f4e1832a2581b55829e9926c87b25542ba5b29ab7fabea.png" src="../_images/0c201138dab0eecbd6f4e1832a2581b55829e9926c87b25542ba5b29ab7fabea.png" />
 </div>
 </div>
 </section>

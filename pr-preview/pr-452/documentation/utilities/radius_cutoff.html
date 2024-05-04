@@ -574,166 +574,21 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on module particula.util.radius_cutoff in particula.util:
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
 
-NAME
-    particula.util.radius_cutoff - determing the radius cutoff for particle distribution
+  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">IPython</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">interactiveshell</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">3577</span> <span class="ow">in</span> <span class="n">run_code</span>
+    <span class="n">exec</span><span class="p">(</span><span class="n">code_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_global_ns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_ns</span><span class="p">)</span>
 
-FUNCTIONS
-    cut_rad(cutoff=array(0.9999), gsigma=array(1.25), mode=&lt;Quantity(1e-07, &#39;meter&#39;)&gt;, force_radius_start=None, force_radius_end=None, **kwargs)
-        This routine determins the radius cutoff for the particle distribution
-        
-        Inputs:
-            cutoff  (float) coverage cutoff (default: .9999)
-            gsigma  (float) geometric standard deviation (default: 1.25)
-            mode    (float) mean radius of the particles (default: 1e-7)
-        
-        Returns:
-            (starting radius, ending radius) float tuple
+  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+    <span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">radius_cutoff</span>
 
-DATA
-    lognorm = &lt;scipy.stats._continuous_distns.lognorm_gen object&gt;
-        A lognormal continuous random variable.
-        
-        As an instance of the `rv_continuous` class, `lognorm` object inherits from it
-        a collection of generic methods (see below for the full list),
-        and completes them with details specific for this particular distribution.
-        
-        Methods
-        -------
-        rvs(s, loc=0, scale=1, size=1, random_state=None)
-            Random variates.
-        pdf(x, s, loc=0, scale=1)
-            Probability density function.
-        logpdf(x, s, loc=0, scale=1)
-            Log of the probability density function.
-        cdf(x, s, loc=0, scale=1)
-            Cumulative distribution function.
-        logcdf(x, s, loc=0, scale=1)
-            Log of the cumulative distribution function.
-        sf(x, s, loc=0, scale=1)
-            Survival function  (also defined as ``1 - cdf``, but `sf` is sometimes more accurate).
-        logsf(x, s, loc=0, scale=1)
-            Log of the survival function.
-        ppf(q, s, loc=0, scale=1)
-            Percent point function (inverse of ``cdf`` --- percentiles).
-        isf(q, s, loc=0, scale=1)
-            Inverse survival function (inverse of ``sf``).
-        moment(order, s, loc=0, scale=1)
-            Non-central moment of the specified order.
-        stats(s, loc=0, scale=1, moments=&#39;mv&#39;)
-            Mean(&#39;m&#39;), variance(&#39;v&#39;), skew(&#39;s&#39;), and/or kurtosis(&#39;k&#39;).
-        entropy(s, loc=0, scale=1)
-            (Differential) entropy of the RV.
-        fit(data)
-            Parameter estimates for generic data.
-            See `scipy.stats.rv_continuous.fit &lt;https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.rv_continuous.fit.html#scipy.stats.rv_continuous.fit&gt;`__ for detailed documentation of the
-            keyword arguments.
-        expect(func, args=(s,), loc=0, scale=1, lb=None, ub=None, conditional=False, **kwds)
-            Expected value of a function (of one argument) with respect to the distribution.
-        median(s, loc=0, scale=1)
-            Median of the distribution.
-        mean(s, loc=0, scale=1)
-            Mean of the distribution.
-        var(s, loc=0, scale=1)
-            Variance of the distribution.
-        std(s, loc=0, scale=1)
-            Standard deviation of the distribution.
-        interval(confidence, s, loc=0, scale=1)
-            Confidence interval with equal areas around the median.
-        
-        Notes
-        -----
-        The probability density function for `lognorm` is:
-        
-        .. math::
-        
-            f(x, s) = \frac{1}{s x \sqrt{2\pi}}
-                      \exp\left(-\frac{\log^2(x)}{2s^2}\right)
-        
-        for :math:`x &gt; 0`, :math:`s &gt; 0`.
-        
-        `lognorm` takes ``s`` as a shape parameter for :math:`s`.
-        
-        The probability density above is defined in the &quot;standardized&quot; form. To shift
-        and/or scale the distribution use the ``loc`` and ``scale`` parameters.
-        Specifically, ``lognorm.pdf(x, s, loc, scale)`` is identically
-        equivalent to ``lognorm.pdf(y, s) / scale`` with
-        ``y = (x - loc) / scale``. Note that shifting the location of a distribution
-        does not make it a &quot;noncentral&quot; distribution; noncentral generalizations of
-        some distributions are available in separate classes.
-        
-        Suppose a normally distributed random variable ``X`` has  mean ``mu`` and
-        standard deviation ``sigma``. Then ``Y = exp(X)`` is lognormally
-        distributed with ``s = sigma`` and ``scale = exp(mu)``.
-        
-        Examples
-        --------
-        &gt;&gt;&gt; import numpy as np
-        &gt;&gt;&gt; from scipy.stats import lognorm
-        &gt;&gt;&gt; import matplotlib.pyplot as plt
-        &gt;&gt;&gt; fig, ax = plt.subplots(1, 1)
-        
-        Calculate the first four moments:
-        
-        &gt;&gt;&gt; s = 0.954
-        &gt;&gt;&gt; mean, var, skew, kurt = lognorm.stats(s, moments=&#39;mvsk&#39;)
-        
-        Display the probability density function (``pdf``):
-        
-        &gt;&gt;&gt; x = np.linspace(lognorm.ppf(0.01, s),
-        ...                 lognorm.ppf(0.99, s), 100)
-        &gt;&gt;&gt; ax.plot(x, lognorm.pdf(x, s),
-        ...        &#39;r-&#39;, lw=5, alpha=0.6, label=&#39;lognorm pdf&#39;)
-        
-        Alternatively, the distribution object can be called (as a function)
-        to fix the shape, location and scale parameters. This returns a &quot;frozen&quot;
-        RV object holding the given parameters fixed.
-        
-        Freeze the distribution and display the frozen ``pdf``:
-        
-        &gt;&gt;&gt; rv = lognorm(s)
-        &gt;&gt;&gt; ax.plot(x, rv.pdf(x), &#39;k-&#39;, lw=2, label=&#39;frozen pdf&#39;)
-        
-        Check accuracy of ``cdf`` and ``ppf``:
-        
-        &gt;&gt;&gt; vals = lognorm.ppf([0.001, 0.5, 0.999], s)
-        &gt;&gt;&gt; np.allclose([0.001, 0.5, 0.999], lognorm.cdf(vals, s))
-        True
-        
-        Generate random numbers:
-        
-        &gt;&gt;&gt; r = lognorm.rvs(s, size=1000)
-        
-        And compare the histogram:
-        
-        &gt;&gt;&gt; ax.hist(r, density=True, bins=&#39;auto&#39;, histtype=&#39;stepfilled&#39;, alpha=0.2)
-        &gt;&gt;&gt; ax.set_xlim([x[0], x[-1]])
-        &gt;&gt;&gt; ax.legend(loc=&#39;best&#39;, frameon=False)
-        &gt;&gt;&gt; plt.show()
-        
-        
-        The logarithm of a log-normally distributed random variable is
-        normally distributed:
-        
-        &gt;&gt;&gt; import numpy as np
-        &gt;&gt;&gt; import matplotlib.pyplot as plt
-        &gt;&gt;&gt; from scipy import stats
-        &gt;&gt;&gt; fig, ax = plt.subplots(1, 1)
-        &gt;&gt;&gt; mu, sigma = 2, 0.5
-        &gt;&gt;&gt; X = stats.norm(loc=mu, scale=sigma)
-        &gt;&gt;&gt; Y = stats.lognorm(s=sigma, scale=np.exp(mu))
-        &gt;&gt;&gt; x = np.linspace(*X.interval(0.999))
-        &gt;&gt;&gt; y = Y.rvs(size=10000)
-        &gt;&gt;&gt; ax.plot(x, X.pdf(x), label=&#39;X (pdf)&#39;)
-        &gt;&gt;&gt; ax.hist(np.log(y), density=True, bins=x, label=&#39;log(Y) (histogram)&#39;)
-        &gt;&gt;&gt; ax.legend()
-        &gt;&gt;&gt; plt.show()
-    
-    u = &lt;pint.registry.UnitRegistry object&gt;
+  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">18</span>
+    <span class="kn">from</span> <span class="nn">particula.logger_setup</span> <span class="kn">import</span> <span class="n">setup</span>
 
-FILE
-    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/util/radius_cutoff.py
+  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="n">logger_setup</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">62</span>
+    <span class="n">logging_dir</span> <span class="o">=</span> <span class="s2">&quot;logging&quot;</span>
+    <span class="o">^</span>
+<span class="ne">SyntaxError</span>: expected &#39;except&#39; or &#39;finally&#39; block
 </pre></div>
 </div>
 </div>
@@ -742,66 +597,6 @@ FILE
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">inspect</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">radius_cutoff</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&quot;&quot;&quot; determing the radius cutoff for particle distribution
-&quot;&quot;&quot;
-
-import numpy as np
-from scipy.stats import lognorm
-
-from particula import u
-from particula.util.input_handling import in_scalar, in_radius
-
-
-def cut_rad(
-    cutoff=in_scalar(0.9999).m,
-    gsigma=in_scalar(1.25).m,
-    mode=in_radius(100e-9),
-    force_radius_start=None,
-    force_radius_end=None,
-    **kwargs
-):
-    &quot;&quot;&quot; This routine determins the radius cutoff for the particle distribution
-
-        Inputs:
-            cutoff  (float) coverage cutoff (default: .9999)
-            gsigma  (float) geometric standard deviation (default: 1.25)
-            mode    (float) mean radius of the particles (default: 1e-7)
-
-        Returns:
-            (starting radius, ending radius) float tuple
-    &quot;&quot;&quot;
-
-    _ = kwargs.get(&quot;something&quot;)
-    if not isinstance(mode, u.Quantity):
-        mode = in_radius(mode)
-
-    if np.array([mode.m]).size == 1:
-        (rad_start, rad_end) = lognorm.interval(
-            cutoff,
-            s=np.log(gsigma),
-            scale=mode.m,
-        )
-    else:
-        (rad_start_pre, rad_end_pre) = lognorm.interval(
-            cutoff,
-            s=np.log(gsigma),
-            scale=mode.m,
-        )
-        rad_start = rad_start_pre.min() or force_radius_start.m
-        rad_end = rad_end_pre.max() or force_radius_end.m
-
-    if force_radius_start is not None:
-        force_radius_start = in_radius(force_radius_start)
-        rad_start = force_radius_start.m
-    if force_radius_end is not None:
-        force_radius_end = in_radius(force_radius_end)
-        rad_end = force_radius_end.m
-
-    return (rad_start, rad_end)
 </pre></div>
 </div>
 </div>

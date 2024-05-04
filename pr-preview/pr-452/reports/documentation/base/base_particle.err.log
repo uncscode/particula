@@ -51,22 +51,20 @@ print("Total mass of the particle distribution:", particle.get_total_mass())
 ------------------
 
 
-[0;31m---------------------------------------------------------------------------[0m
-[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
-Cell [0;32mIn[1], line 5[0m
-[1;32m      1[0m [38;5;66;03m# Example demonstrating the usage of particle distribution strategies[39;00m
-[1;32m      2[0m 
-[1;32m      3[0m [38;5;66;03m# Assuming necessary imports[39;00m
-[1;32m      4[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
-[0;32m----> 5[0m [38;5;28;01mfrom[39;00m [38;5;21;01mparticula[39;00m[38;5;21;01m.[39;00m[38;5;21;01mbase[39;00m[38;5;21;01m.[39;00m[38;5;21;01mparticle[39;00m [38;5;28;01mimport[39;00m (
-[1;32m      6[0m     create_particle_strategy,
-[1;32m      7[0m     Particle,
-[1;32m      8[0m     MassBasedStrategy,
-[1;32m      9[0m     RadiiBasedStrategy,
-[1;32m     10[0m     SpeciatedMassStrategy,
-[1;32m     11[0m )
-[1;32m     13[0m [38;5;66;03m# Creating particle distribution examples[39;00m
-[1;32m     14[0m mass_distribution [38;5;241m=[39m np[38;5;241m.[39marray([[38;5;241m100[39m, [38;5;241m200[39m, [38;5;241m300[39m], dtype[38;5;241m=[39mnp[38;5;241m.[39mfloat64)
+Traceback [0;36m(most recent call last)[0m:
 
-[0;31mModuleNotFoundError[0m: No module named 'particula.base'
+[0m  File [1;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/IPython/core/interactiveshell.py:3577[0m in [1;35mrun_code[0m
+    exec(code_obj, self.user_global_ns, self.user_ns)[0m
+
+[0m  Cell [1;32mIn[1], line 5[0m
+    from particula.base.particle import ([0m
+
+[0;36m  File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/__init__.py:18[0;36m
+[0;31m    from particula.logger_setup import setup[0;36m
+
+[0;36m  File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logger_setup.py:62[0;36m[0m
+[0;31m    logging_dir = "logging"[0m
+[0m    ^[0m
+[0;31mSyntaxError[0m[0;31m:[0m expected 'except' or 'finally' block
+
 

@@ -618,6 +618,25 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+
+  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">IPython</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">interactiveshell</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">3577</span> <span class="ow">in</span> <span class="n">run_code</span>
+    <span class="n">exec</span><span class="p">(</span><span class="n">code_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_global_ns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_ns</span><span class="p">)</span>
+
+  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">6</span>
+    <span class="kn">from</span> <span class="nn">particula.lagrangian</span> <span class="kn">import</span> <span class="n">boundary</span><span class="p">,</span> <span class="n">integration</span><span class="p">,</span> <span class="n">collisions</span><span class="p">,</span> <span class="n">particle_property</span><span class="p">,</span> <span class="n">particle_pairs</span>
+
+  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">18</span>
+    <span class="kn">from</span> <span class="nn">particula.logger_setup</span> <span class="kn">import</span> <span class="n">setup</span>
+
+  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="n">logger_setup</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">62</span>
+    <span class="n">logging_dir</span> <span class="o">=</span> <span class="s2">&quot;logging&quot;</span>
+    <span class="o">^</span>
+<span class="ne">SyntaxError</span>: expected &#39;except&#39; or &#39;finally&#39; block
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="defining-the-system-parameters-and-initial-conditions">
@@ -761,8 +780,8 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 22.469005346298218 seconds
-Ratio of wall time to simulation time: 0.22469005346298218
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 19.743536710739136 seconds
+Ratio of wall time to simulation time: 0.19743536710739135
 </pre></div>
 </div>
 </div>
@@ -824,10 +843,10 @@ Ratio of wall time to simulation time: 0.22469005346298218
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 64
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 56
 </pre></div>
 </div>
-<img alt="../../_images/c92344e84f5f94398240fc291e474a07efd3a2e95ed43bc08b6368c15288155e.png" src="../../_images/c92344e84f5f94398240fc291e474a07efd3a2e95ed43bc08b6368c15288155e.png" />
+<img alt="../../_images/d3447394b9eed654024103bc6f1ae66ff652b69cd7da4856002110f635a36c1a.png" src="../../_images/d3447394b9eed654024103bc6f1ae66ff652b69cd7da4856002110f635a36c1a.png" />
 </div>
 </div>
 </section>
@@ -870,7 +889,7 @@ Ratio of wall time to simulation time: 0.22469005346298218
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/bf157da8ea9889d095f8ae17aa3b7bdec04130a9874d7a396013cac0cfa54f13.png" src="../../_images/bf157da8ea9889d095f8ae17aa3b7bdec04130a9874d7a396013cac0cfa54f13.png" />
+<img alt="../../_images/98e908f23f9e2df5e7528bf2cfbfff8895e9b236ab700b49d53c6ce706242382.png" src="../../_images/98e908f23f9e2df5e7528bf2cfbfff8895e9b236ab700b49d53c6ce706242382.png" />
 </div>
 </div>
 </section>
