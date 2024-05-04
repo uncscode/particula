@@ -1,6 +1,7 @@
 """ mobility of particle
 """
 from typing import Union
+from numpy.typing import NDArray
 import numpy as np
 
 from particula.util.input_handling import in_radius, in_scalar, in_viscosity
@@ -30,10 +31,29 @@ def pam(
 
 
 def particle_aerodynamic_mobility(
-    radius: Union[float, np.ndarray],
-    slip_correction_factor,
-    dynamic_viscosity
-) -> float:
+    radius: Union[float, NDArray[np.float_]],
+    slip_correction_factor: Union[float, NDArray[np.float_]],
+    dynamic_viscosity: float
+) -> Union[float, NDArray[np.float_]]:
+    """
+    Calculate the aerodynamic mobility of a particle, defined as the ratio
+    of the slip correction factor to the product of the dynamic viscosity of
+    the fluid, the particle radius, and a slip correction constant derived.
+
+    This mobility quantifies the ease with which a particle can move through
+    a fluid.
+
+    Args:
+    -----
+    - radius: The radius of the particle (m).
+    - slip_correction_factor: The slip correction factor for the particle
+    in the fluid (dimensionless).
+    - dynamic_viscosity: The dynamic viscosity of the fluid (Pa.s).
+
+    Returns:
+    --------
+    - The particle aerodynamic mobility (m^2/s).
+    """
     return (
-        slip_correction_factor / (3 * np.pi * dynamic_viscosity * radius * 2)
+        slip_correction_factor / (6 * np.pi * dynamic_viscosity * radius)
     )
