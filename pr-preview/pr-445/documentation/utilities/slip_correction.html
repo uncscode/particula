@@ -593,31 +593,6 @@ NAME
     particula.util.slip_correction - calculate slip correction
 
 FUNCTIONS
-    cunningham_slip_correction(knudsen_number: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]) -&gt; Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
-        Calculate the Cunningham slip correction factor. Accounts for
-        non-continuum effects on small particles.
-        
-        Args:
-        -----
-        - knudsen_number: Knudsen number [unitless].
-        
-        Returns:
-        --------
-        - Slip correction factor [unitless].
-        
-        Reference:
-        ----------
-        Dimensionless quantity accounting for non-continuum effects
-        on small particles. It is a deviation from Stokes&#39; Law.
-        Stokes assumes a no-slip condition that is not correct at
-        high Knudsen numbers. The slip correction factor is used to
-        calculate the friction factor.
-        Thus, the slip correction factor is about unity (1) for larger
-        particles (Kn -&gt; 0). Its behavior on the other end of the
-        spectrum (smaller particles; Kn -&gt; inf) is more nuanced, though
-        it tends to scale linearly on a log-log scale, log Cc vs log Kn.
-        - https://en.wikipedia.org/wiki/Cunningham_correction_factor
-    
     scf(radius=None, knu=None, **kwargs)
         Returns particle&#39;s Cunningham slip correction factor.
         
@@ -666,38 +641,6 @@ FUNCTIONS
             knu can be calculated using knu(**kwargs);
             refer to particula.util.knudsen_number.knu for more info.
 
-DATA
-    NDArray = numpy.ndarray[typing.Any, numpy.dtype[+_ScalarType_co]]
-    Union = typing.Union
-        Union type; Union[X, Y] means either X or Y.
-        
-        On Python 3.10 and higher, the | operator
-        can also be used to denote unions;
-        X | Y means the same thing to the type checker as Union[X, Y].
-        
-        To define a union, use e.g. Union[int, str]. Details:
-        - The arguments must be types and there must be at least one.
-        - None as an argument is a special case and is replaced by
-          type(None).
-        - Unions of unions are flattened, e.g.::
-        
-            assert Union[Union[int, str], float] == Union[int, str, float]
-        
-        - Unions of a single argument vanish, e.g.::
-        
-            assert Union[int] == int  # The constructor actually returns int
-        
-        - Redundant arguments are skipped, e.g.::
-        
-            assert Union[int, str, int] == Union[int, str]
-        
-        - When comparing unions, the argument order is ignored, e.g.::
-        
-            assert Union[int, str] == Union[str, int]
-        
-        - You cannot subclass or instantiate a union.
-        - You can use Optional[X] as a shorthand for Union[X, None].
-
 FILE
     /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/util/slip_correction.py
 </pre></div>
@@ -715,8 +658,6 @@ FILE
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&quot;&quot;&quot; calculate slip correction
 &quot;&quot;&quot;
 
-from typing import Union
-from numpy.typing import NDArray
 import numpy as np
 from particula.util.input_handling import in_radius, in_scalar
 from particula.util.knudsen_number import knu as knu_func
@@ -782,39 +723,6 @@ def scf(
 
     return 1 + knu_val * (
         1.257 + 0.4 * np.exp(-1.1 / knu_val)
-    )
-
-
-def cunningham_slip_correction(
-    knudsen_number: Union[float, NDArray[np.float_]]
-) -&gt; Union[float, NDArray[np.float_]]:
-    &quot;&quot;&quot;
-    Calculate the Cunningham slip correction factor. Accounts for
-    non-continuum effects on small particles.
-
-    Args:
-    -----
-    - knudsen_number: Knudsen number [unitless].
-
-    Returns:
-    --------
-    - Slip correction factor [unitless].
-
-    Reference:
-    ----------
-    Dimensionless quantity accounting for non-continuum effects
-    on small particles. It is a deviation from Stokes&#39; Law.
-    Stokes assumes a no-slip condition that is not correct at
-    high Knudsen numbers. The slip correction factor is used to
-    calculate the friction factor.
-    Thus, the slip correction factor is about unity (1) for larger
-    particles (Kn -&gt; 0). Its behavior on the other end of the
-    spectrum (smaller particles; Kn -&gt; inf) is more nuanced, though
-    it tends to scale linearly on a log-log scale, log Cc vs log Kn.
-    - https://en.wikipedia.org/wiki/Cunningham_correction_factor
-    &quot;&quot;&quot;
-    return 1 + knudsen_number * (
-        1.257 + 0.4 * np.exp(-1.1 / knudsen_number)
     )
 </pre></div>
 </div>
