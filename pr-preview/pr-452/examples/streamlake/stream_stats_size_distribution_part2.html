@@ -603,25 +603,6 @@ the mean diameter, median diameter, and total PM2.5 mass.</p>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
-
-  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">IPython</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">interactiveshell</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">3577</span> <span class="ow">in</span> <span class="n">run_code</span>
-    <span class="n">exec</span><span class="p">(</span><span class="n">code_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_global_ns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_ns</span><span class="p">)</span>
-
-  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
-    <span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">loader_interface</span><span class="p">,</span> <span class="n">settings_generator</span>
-
-  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">18</span>
-    <span class="kn">from</span> <span class="nn">particula.logger_setup</span> <span class="kn">import</span> <span class="n">setup</span>
-
-  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="n">logger_setup</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">62</span>
-    <span class="n">logging_dir</span> <span class="o">=</span> <span class="s2">&quot;logging&quot;</span>
-    <span class="o">^</span>
-<span class="ne">SyntaxError</span>: expected &#39;except&#39; or &#39;finally&#39; block
-</pre></div>
-</div>
-</div>
 </div>
 <section id="load-the-data">
 <h2>Load the data<a class="headerlink" href="#load-the-data" title="Link to this heading">#</a></h2>
@@ -697,12 +678,18 @@ show the fix to that soon.</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_1d
-  Loading file: 2022-07-07_095151_SMPS.csv
   Loading file: 2022-07-10_094659_SMPS.csv
-Folder Settings: smps_2d
   Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_2d
   Loading file: 2022-07-10_094659_SMPS.csv
- 
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 
 Lake with streams: [&#39;smps_1d&#39;, &#39;smps_2d&#39;]
 </pre></div>
 </div>
@@ -797,7 +784,7 @@ the header name, which is not a valid index for a np.ndarray.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/1cf13fedb6389f50d41729b8516e28aa3b355dd5ce7fc479bbcc21fd5eb554de.png" src="../../_images/1cf13fedb6389f50d41729b8516e28aa3b355dd5ce7fc479bbcc21fd5eb554de.png" />
+<img alt="../../_images/2d298dee421bc0055f4a0650970455da042e447f938779e0d930550cdae1f406.png" src="../../_images/2d298dee421bc0055f4a0650970455da042e447f938779e0d930550cdae1f406.png" />
 </div>
 </div>
 </section>
@@ -820,7 +807,7 @@ sizer_mean_properties(stream: particula.data.stream.Stream, sizer_limits: Option
     Calculates the mean properties of the size distribution, and returns a
     stream.
     
-    Parameters
+    Args
     ----------
     stream : Stream
         The stream to process.

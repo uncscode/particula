@@ -574,21 +574,62 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on module particula.util.slip_correction in particula.util:
 
-  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">IPython</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">interactiveshell</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">3577</span> <span class="ow">in</span> <span class="n">run_code</span>
-    <span class="n">exec</span><span class="p">(</span><span class="n">code_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_global_ns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_ns</span><span class="p">)</span>
+NAME
+    particula.util.slip_correction - calculate slip correction
 
-  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-    <span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">slip_correction</span>
+FUNCTIONS
+    scf(radius=None, knu=None, **kwargs)
+        Returns particle&#39;s Cunningham slip correction factor.
+        
+        Dimensionless quantity accounting for non-continuum effects
+        on small particles. It is a deviation from Stokes&#39; Law.
+        Stokes assumes a no-slip condition that is not correct at
+        high Knudsen numbers. The slip correction factor is used to
+        calculate the friction factor.
+        
+        Thus, the slip correction factor is about unity (1) for larger
+        particles (Kn -&gt; 0). Its behavior on the other end of the
+        spectrum (smaller particles; Kn -&gt; inf) is more nuanced, though
+        it tends to scale linearly on a log-log scale, log Cc vs log Kn.
+        
+        Examples:
+        ```
+        &gt;&gt;&gt; from particula import u
+        &gt;&gt;&gt; from particula.util.slip_correction import scf
+        &gt;&gt;&gt; # with radius 1e-9 m
+        &gt;&gt;&gt; scf(radius=1e-9)
+        &lt;Quantity(110.720731, &#39;dimensionless&#39;)&gt;
+        &gt;&gt;&gt; # with radius 1e-9 m and knu=1
+        &gt;&gt;&gt; scf(radius=1e-9*u.m, knu=1)
+        &lt;Quantity(2.39014843, &#39;dimensionless&#39;)&gt;
+        &gt;&gt;&gt; # using knu(**kwargs)
+        &gt;&gt;&gt; scf(radius=1e-9*u.m, mfp=60*u.nm)
+        &lt;Quantity(99.9840088, &#39;dimensionless&#39;)&gt;
+        &gt;&gt;&gt; # using mfp(**kwargs)
+        &gt;&gt;&gt; scf(
+        ... radius=1e-9*u.m,
+        ... temperature=300,
+        ... pressure=1e5,
+        ... molecular_weight=0.03
+        ... )
+        &lt;Quantity(111.101591, &#39;dimensionless&#39;)&gt;
+        ```
+        
+        Args:
+            radius  (float) [m]
+            knu     (float) [ ] (default: util)
+        
+        Returns:
+                    (float) [dimensionless]
+        
+        Notes:
+            knu can be calculated using knu(**kwargs);
+            refer to particula.util.knudsen_number.knu for more info.
 
-  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">18</span>
-    <span class="kn">from</span> <span class="nn">particula.logger_setup</span> <span class="kn">import</span> <span class="n">setup</span>
-
-  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="n">logger_setup</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">62</span>
-    <span class="n">logging_dir</span> <span class="o">=</span> <span class="s2">&quot;logging&quot;</span>
-    <span class="o">^</span>
-<span class="ne">SyntaxError</span>: expected &#39;except&#39; or &#39;finally&#39; block
+FILE
+    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/util/slip_correction.py
 </pre></div>
 </div>
 </div>
@@ -597,6 +638,79 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">inspect</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">slip_correction</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&quot;&quot;&quot; calculate slip correction
+&quot;&quot;&quot;
+
+import numpy as np
+from particula.util.input_handling import in_radius, in_scalar
+from particula.util.knudsen_number import knu as knu_func
+
+
+def scf(
+    radius=None,
+    knu=None,
+    **kwargs
+):
+    &quot;&quot;&quot; Returns particle&#39;s Cunningham slip correction factor.
+
+        Dimensionless quantity accounting for non-continuum effects
+        on small particles. It is a deviation from Stokes&#39; Law.
+        Stokes assumes a no-slip condition that is not correct at
+        high Knudsen numbers. The slip correction factor is used to
+        calculate the friction factor.
+
+        Thus, the slip correction factor is about unity (1) for larger
+        particles (Kn -&gt; 0). Its behavior on the other end of the
+        spectrum (smaller particles; Kn -&gt; inf) is more nuanced, though
+        it tends to scale linearly on a log-log scale, log Cc vs log Kn.
+
+        Examples:
+        ```
+        &gt;&gt;&gt; from particula import u
+        &gt;&gt;&gt; from particula.util.slip_correction import scf
+        &gt;&gt;&gt; # with radius 1e-9 m
+        &gt;&gt;&gt; scf(radius=1e-9)
+        &lt;Quantity(110.720731, &#39;dimensionless&#39;)&gt;
+        &gt;&gt;&gt; # with radius 1e-9 m and knu=1
+        &gt;&gt;&gt; scf(radius=1e-9*u.m, knu=1)
+        &lt;Quantity(2.39014843, &#39;dimensionless&#39;)&gt;
+        &gt;&gt;&gt; # using knu(**kwargs)
+        &gt;&gt;&gt; scf(radius=1e-9*u.m, mfp=60*u.nm)
+        &lt;Quantity(99.9840088, &#39;dimensionless&#39;)&gt;
+        &gt;&gt;&gt; # using mfp(**kwargs)
+        &gt;&gt;&gt; scf(
+        ... radius=1e-9*u.m,
+        ... temperature=300,
+        ... pressure=1e5,
+        ... molecular_weight=0.03
+        ... )
+        &lt;Quantity(111.101591, &#39;dimensionless&#39;)&gt;
+        ```
+
+        Args:
+            radius  (float) [m]
+            knu     (float) [ ] (default: util)
+
+        Returns:
+                    (float) [dimensionless]
+
+        Notes:
+            knu can be calculated using knu(**kwargs);
+            refer to particula.util.knudsen_number.knu for more info.
+
+    &quot;&quot;&quot;
+    rad = in_radius(radius)
+
+    knu_val = knu_func(radius=rad, **kwargs) if knu is None \
+        else in_scalar(knu)
+
+    return 1 + knu_val * (
+        1.257 + 0.4 * np.exp(-1.1 / knu_val)
+    )
 </pre></div>
 </div>
 </div>

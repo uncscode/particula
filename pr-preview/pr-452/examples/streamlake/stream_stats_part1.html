@@ -612,21 +612,8 @@ folder called “data” in your home directory, you could set the path to:
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
-
-  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">IPython</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">interactiveshell</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">3577</span> <span class="ow">in</span> <span class="n">run_code</span>
-    <span class="n">exec</span><span class="p">(</span><span class="n">code_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_global_ns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_ns</span><span class="p">)</span>
-
-  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">4</span>
-    <span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">loader_interface</span><span class="p">,</span> <span class="n">settings_generator</span><span class="p">,</span> <span class="n">stream_stats</span>
-
-  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">18</span>
-    <span class="kn">from</span> <span class="nn">particula.logger_setup</span> <span class="kn">import</span> <span class="n">setup</span>
-
-  <span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="n">logger_setup</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">62</span>
-    <span class="n">logging_dir</span> <span class="o">=</span> <span class="s2">&quot;logging&quot;</span>
-    <span class="o">^</span>
-<span class="ne">SyntaxError</span>: expected &#39;except&#39; or &#39;finally&#39; block
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Path to data folder:
+/data/tests/example_data
 </pre></div>
 </div>
 </div>
@@ -669,8 +656,10 @@ load the data.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: CPC_3010_data_20220710_Jul.csv
+</pre></div>
+</div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: CPC_3010_data_20220709_Jul.csv
-  Loading file: CPC_3010_data_20220710_Jul.csv
 </pre></div>
 </div>
 </div>
@@ -692,7 +681,7 @@ Stream(header=[&#39;CPC_count[#/sec]&#39;, &#39;Temperature[degC]&#39;], data=ar
        [1.9403e+04, 1.6900e+01],
        [2.0230e+04, 1.7000e+01],
        [1.9521e+04, 1.6800e+01]]), time=array([1.65734280e+09, 1.65734281e+09, 1.65734281e+09, ...,
-       1.65751559e+09, 1.65751560e+09, 1.65751560e+09]), files=[[&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1044534], [&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1113488]])
+       1.65751559e+09, 1.65751560e+09, 1.65751560e+09]), files=[[&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1078191], [&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1011254]])
 </pre></div>
 </div>
 </div>
@@ -716,7 +705,7 @@ Stream(header=[&#39;CPC_count[#/sec]&#39;, &#39;Temperature[degC]&#39;], data=ar
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/db87bafe76d91107284de99ac0f422522efba9031df874d02423cd62a1171faf.png" src="../../_images/db87bafe76d91107284de99ac0f422522efba9031df874d02423cd62a1171faf.png" />
+<img alt="../../_images/f9ad298c1820118eb08576d04c4335b4fb17f1c0779605cbba7e8773c34666fc.png" src="../../_images/f9ad298c1820118eb08576d04c4335b4fb17f1c0779605cbba7e8773c34666fc.png" />
 </div>
 </div>
 </section>
@@ -761,7 +750,7 @@ object with the averaged data and the standard deviation of the data.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/514eaf885329a58ee969fc87d43ad73c3531152697b90cef4ebc3bca5385ba74.png" src="../../_images/514eaf885329a58ee969fc87d43ad73c3531152697b90cef4ebc3bca5385ba74.png" />
+<img alt="../../_images/bf719363de53635d3c3930df2c2d749d958f5e5a0284359e90d35044aecd7ef4.png" src="../../_images/bf719363de53635d3c3930df2c2d749d958f5e5a0284359e90d35044aecd7ef4.png" />
 </div>
 </div>
 <section id="clean-up-the-data">
@@ -791,7 +780,7 @@ removed.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/a64cef9fd1553997bd306795d27d48bde4eac52b89553f5f283ebc99df0272c0.png" src="../../_images/a64cef9fd1553997bd306795d27d48bde4eac52b89553f5f283ebc99df0272c0.png" />
+<img alt="../../_images/1c0eeb4dc7ef4a943b960f87462a10205bfe2509cfd618f6cc851fc74b520b31.png" src="../../_images/1c0eeb4dc7ef4a943b960f87462a10205bfe2509cfd618f6cc851fc74b520b31.png" />
 </div>
 </div>
 </section>
@@ -802,6 +791,151 @@ and averaging the values over time.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">stream_stats</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on module particula.data.stream_stats in particula.data:
+
+NAME
+    particula.data.stream_stats - Functions to operate on stream objects.
+
+FUNCTIONS
+    average_std(stream: particula.data.stream.Stream, average_interval: Union[float, int] = 60, new_time_array: Optional[numpy.ndarray] = None) -&gt; particula.data.stream.StreamAveraged
+        Calculate the average and standard deviation of data within a given
+        &#39;stream&#39; object over specified intervals.
+        
+        This function takes a &#39;stream&#39; object, which should contain time-series
+        data, and computes the average and standard deviation of the data at
+        intervals specified by &#39;average_interval&#39;. If data.time is in seconds
+        then the units of the interval are seconds (hour in hours etc). The
+        results are returned as a new &#39;StreamAveraged&#39; object containing the
+        processed data.
+        
+        Args:
+        - stream (object): The input stream object containing &#39;time&#39; and &#39;data&#39;
+            arrays along with other associated metadata.
+        - average_interval (float|int, optional): The time interval over which the
+            averaging is to be performed.
+        - new_time_array (np.ndarray, optional): An optional array of time points
+            at which the average and standard deviation are computed.
+            If not provided, a new time array is generated based on the start and
+            end times within the &#39;stream.time&#39; object.
+        
+        Returns:
+        - StreamAveraged (object): An object of type &#39;StreamAveraged&#39; containing
+            the averaged data, time array, start and stop times, the standard
+            deviation of the averaged data, and other metadata from the original
+            &#39;stream&#39; object.
+        
+        The function checks for an existing &#39;new_time_array&#39; and generates one if
+        needed. It then calculates the average and standard deviation for each
+        interval and constructs a &#39;StreamAveraged&#39; object with the results and
+        metadata from the original &#39;stream&#39; object.
+    
+    drop_masked(stream: particula.data.stream.Stream, mask: numpy.ndarray) -&gt; particula.data.stream.Stream
+        Drop rows where mask is false, and return data stream.
+        
+        Args
+        ----------
+        stream : object
+            data stream object
+        mask : np.ndarray
+            mask to apply to data stream
+        
+        Returns
+        -------
+        object
+            stream object
+    
+    filtering(stream: particula.data.stream.Stream, bottom: Optional[float] = None, top: Optional[float] = None, value: Optional[float] = None, invert: Optional[bool] = False, clone: Optional[bool] = True, replace_with: Union[float, int, NoneType] = None, drop: Optional[bool] = False, header: Union[list, int, str, NoneType] = None) -&gt; particula.data.stream.Stream
+        Filters the data of the given &#39;stream&#39; object based on the specified
+        bounds or specific value. The filtered data can be either dropped or
+        replaced with a specified value.  Note, not all parameters need to be
+        specified, but at least one must be provided (top, bottom, value)
+        
+        Args:
+        - stream (Stream): The input stream object containing &#39;data&#39; and &#39;time&#39;
+            attributes.
+        - bottom (float, optional): The lower bound for filtering data. Defaults
+            to None.
+        - top (float, optional): The upper bound for filtering data.
+            Defaults to None.
+        - value (float, optional): Specific value to filter from data.
+            Defaults to None.
+        - invert (bool): If True, inverts the filter criteria.
+            Defaults to False.
+        - clone (bool): If True, returns a copy of the &#39;stream&#39; object, with
+            filtered data. If False, modifies the &#39;stream&#39; object in-place.
+            Defaults to True.
+        - replace_with (float|int, optional): Value to replace filtered-out data.
+            Defaults to None.
+        - drop (bool, optional): If True, filtered-out data points are dropped
+            from the dataset. Defaults to False.
+        - header (list, optional): The header of the data to filter on. This can
+            same as calling Stream[&#39;header&#39;]
+            Defaults to None.
+        
+        Returns:
+        - Stream: The &#39;stream&#39; object with data filtered as specified.
+        
+        If &#39;drop&#39; is True, &#39;replace_with&#39; is ignored and filtered data points are
+        removed from the &#39;stream&#39; object. Otherwise, filtered data points are
+        replaced with &#39;replace_with&#39; value.
+        
+        add specific data row to filter on
+    
+    remove_time_window(stream: particula.data.stream.Stream, epoch_start: Union[float, int], epoch_end: Union[float, int, NoneType] = None) -&gt; particula.data.stream.Stream
+        Remove a time window from a stream object.
+        
+        Args:
+        - stream: The input stream object containing &#39;data&#39; and &#39;time&#39;
+            attributes.
+        - epoch_start: The start time of the time window to be
+            removed.
+        - epoch_end: The end time of the time window to be
+            removed. If not provided, the time window is the closest time point to
+            &#39;epoch_start&#39;.
+        
+        Returns:
+        - Stream: The &#39;stream&#39; object with the specified time window removed.
+
+DATA
+    Optional = typing.Optional
+        Optional[X] is equivalent to Union[X, None].
+    
+    Union = typing.Union
+        Union type; Union[X, Y] means either X or Y.
+        
+        On Python 3.10 and higher, the | operator
+        can also be used to denote unions;
+        X | Y means the same thing to the type checker as Union[X, Y].
+        
+        To define a union, use e.g. Union[int, str]. Details:
+        - The arguments must be types and there must be at least one.
+        - None as an argument is a special case and is replaced by
+          type(None).
+        - Unions of unions are flattened, e.g.::
+        
+            assert Union[Union[int, str], float] == Union[int, str, float]
+        
+        - Unions of a single argument vanish, e.g.::
+        
+            assert Union[int] == int  # The constructor actually returns int
+        
+        - Redundant arguments are skipped, e.g.::
+        
+            assert Union[int, str, int] == Union[int, str]
+        
+        - When comparing unions, the argument order is ignored, e.g.::
+        
+            assert Union[int, str] == Union[str, int]
+        
+        - You cannot subclass or instantiate a union.
+        - You can use Optional[X] as a shorthand for Union[X, None].
+
+FILE
+    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/data/stream_stats.py
 </pre></div>
 </div>
 </div>
