@@ -20,4 +20,3 @@ def test_setup_configures_logger():
     logger.warning("Logger Test: This is a warning message.")
     logger.critical("Logger Test: This is a critical message.")
     logger.exception("Logger Test: This is an exception message.")
-    assert True  # if no exception is raised, all logging levels are working
