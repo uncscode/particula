@@ -59,7 +59,8 @@ def setup():
     logging_dir = "logging"
     try:
         os.mkdir(logging_dir)
-    except FileExistsError:
+    logging_dir = "logging"
+    os.makedirs(logging_dir, exist_ok=True)
         pass
     logging.config.dictConfig(config)
     return logger
