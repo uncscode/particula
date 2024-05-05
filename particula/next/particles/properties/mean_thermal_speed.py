@@ -32,6 +32,5 @@ def mean_thermal_speed(
     """
     return np.sqrt(
         (8 * BOLTZMANN_CONSTANT.m * temperature)
-        / (np.pi * mass),
-        dtype=np.float_
+        / (np.pi * mass)
     )

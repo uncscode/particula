@@ -62,11 +62,10 @@ def g_collection_term(
     physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
     Coefficient K12
     """
-    return (
+    return 2**0.5 * (
         (2 * radius_particle - mean_free_path_particle)**3
         - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3/2)
-        - 2 * radius_particle
-    ) / (6 * radius_particle - mean_free_path_particle)
+    ) / (6 * radius_particle * mean_free_path_particle) - 2 * radius_particle
 
 
 def brownian_diffusivity(
