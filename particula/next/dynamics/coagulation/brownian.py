@@ -64,8 +64,11 @@ def g_collection_term(
     Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
     Coefficient K12
+
+    The np.sqrt(2) term appears to be an error in the text, as the term is
+    not used in the second edition of the book. And when it it is used, the
+    values are too small, by about 2x
     """
-    # maybe have np.sqrt(2) as a constant
     return (
         (2 * radius_particle + mean_free_path_particle)**3
         - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3/2)
