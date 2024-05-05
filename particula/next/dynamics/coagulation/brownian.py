@@ -1,6 +1,6 @@
 """
 The basic Brownian coagulation kernel for aerosol particles, as described by
-Seinfeld and Pandis for Fuchs' theory, Chapter 13 table 13.1.
+Seinfeld and Pandis (2016) from Fuchs' theory, Chapter 13 table 13.1.
 """
 
 from typing import Union
@@ -124,17 +124,27 @@ def brownian_coagulation_kernel(
     physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
     Coefficient K12 (with alpha collision efficiency term 13.56)
     """
-    # pre-compute some terms
-    sum_diffusivity = diffusivity_particle + np.transpose(diffusivity_particle)
-    sum_radius = radius_particle + np.transpose(radius_particle)
+    # Convert 1D arrays to 2D square matrices
+    diffusivity_matrix = np.tile(
+        diffusivity_particle, (len(diffusivity_particle), 1))
+    radius_matrix = np.tile(radius_particle, (len(radius_particle), 1))
+    g_collection_term_matrix = np.tile(
+        g_collection_term_particle, (len(g_collection_term_particle), 1)) ** 2
+    mean_thermal_speed_matrix = np.tile(
+        mean_thermal_speed_particle, (len(mean_thermal_speed_particle), 1)) ** 2
+
+    # Sum of diffusivities and radii across particles
+    sum_diffusivity = diffusivity_matrix + np.transpose(diffusivity_matrix)
+    sum_radius = radius_matrix + np.transpose(radius_matrix)
+
+    # Square root of sums for g-collection terms and mean thermal speeds
     g_term_sqrt = np.sqrt(
-        g_collection_term_particle**2
-        + np.transpose(g_collection_term_particle**2)
-    )
+        g_collection_term_matrix +
+        np.transpose(g_collection_term_matrix))
     thermal_speed_sqrt = np.sqrt(
-        mean_thermal_speed_particle**2
-        + np.transpose(mean_thermal_speed_particle**2)
-    )
+        mean_thermal_speed_matrix +
+        np.transpose(mean_thermal_speed_matrix))
+
     # equation 13.56 from Seinfeld and Pandis
     return (
         4 * np.pi * sum_diffusivity * sum_radius
