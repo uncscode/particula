@@ -136,7 +136,7 @@ def brownian_coagulation_kernel(
     sum_diffusivity = diffusivity_matrix + np.transpose(diffusivity_matrix)
     sum_radius = radius_matrix + np.transpose(radius_matrix)
 
-    # Square root of sums for g-collection terms and mean thermal speeds
+    # Square root of sums for g-collection terms and mean thermal speeds 
     g_term_sqrt = np.sqrt(
         g_collection_term_matrix +
         np.transpose(g_collection_term_matrix))
