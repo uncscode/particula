@@ -34,9 +34,6 @@ from particula.next.particle_process import MassCondensation
 from particula.next.condensation import CondensationIsothermal
 ------------------
 
------ stderr -----
-Matplotlib is building the font cache; this may take a moment.
-------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
