@@ -602,17 +602,12 @@ document.write(`
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Matplotlib is building the font cache; this may take a moment.
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># creat radius</span>
 
-<span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 <span class="n">mass</span> <span class="o">=</span> <span class="mi">4</span><span class="o">/</span><span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mf">1e3</span>
 <span class="n">temperature</span> <span class="o">=</span> <span class="mi">298</span>
 <span class="n">pressure</span> <span class="o">=</span> <span class="mi">101325</span>
@@ -621,7 +616,7 @@ document.write(`
     <span class="n">radius_particle</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
     <span class="n">mass_particle</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-    <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -629,10 +624,32 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.particle</span> <span class="kn">import</span> <span class="n">Particle</span>
+<span class="n">PD_disc</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+    <span class="n">particle_number</span><span class="o">=</span><span class="n">radius</span><span class="o">/</span><span class="n">radius</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">kernel_class</span> <span class="o">=</span> <span class="n">PD_disc</span><span class="o">.</span><span class="n">coagulation</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">kernel</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">kernel_class</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Radius [m]&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Kernel [m^3/s]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">kernel_class</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Radius [m]&#39;</span><span class="p">)</span>
@@ -643,9 +660,15 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(100, 100)
+(100, 100)
 </pre></div>
 </div>
-<img alt="../../_images/2bbbbbfab9e96720cf4b0155835f6237d5b33e928989a69a87eed231de588c23.png" src="../../_images/2bbbbbfab9e96720cf4b0155835f6237d5b33e928989a69a87eed231de588c23.png" />
+<img alt="../../_images/8d8c4d57fb92d434f2aad353ed510e5417a064c124b0140acabb9e2a4488f5c2.png" src="../../_images/8d8c4d57fb92d434f2aad353ed510e5417a064c124b0140acabb9e2a4488f5c2.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/matplotlib/cbook.py:1345: UnitStrippedWarning: The unit of the quantity is stripped when downcasting to ndarray.
+  return np.asarray(x, float)
+</pre></div>
+</div>
+<img alt="../../_images/f0b2eb13a9571850e98b4be2a9fba0ee9346b36de38f75ca6ee08ea9c6bc1b58.png" src="../../_images/f0b2eb13a9571850e98b4be2a9fba0ee9346b36de38f75ca6ee08ea9c6bc1b58.png" />
 </div>
 </div>
 </section>
