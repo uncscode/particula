@@ -11,6 +11,10 @@ import logging.config
 
 logger = logging.getLogger("particula")  # define the parent logger
 
+# get path of the current directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# add the logging directory to the path
+log_dir = os.path.join(current_dir, "logging")
 
 config = {
     "version": 1,
@@ -36,8 +40,8 @@ config = {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "DEBUG",
             "formatter": "detailed",
-            "filename": "logging/particula.log",
-            "maxBytes": 1000000,
+            "filename": os.path.join(log_dir, "particula.log"),
+            "maxBytes": 25_000_000,
             "backupCount": 3
         }
     },
