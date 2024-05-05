@@ -15,26 +15,29 @@ from particula.util.dynamic_viscosity import dyn_vis  # pyright: ignore
 
 def mean_free_path_l(
     diffusivity_particle: Union[float, NDArray[np.float_]],
-    mean_thermal_speed_particle: Union[float, NDArray[np.float_]],
+    mean_thermal_speed_particle: Union[float, NDArray[np.float_]]
 ) -> Union[float, NDArray[np.float_]]:
-    """ Returns the mean free path of the particles. Defined for Brownian
-    coagulation as the ratio of the diffusivity of the particles to the
-    mean thermal speed of the particles.
+    """
+    Calculate the mean free path of particles, defined for Brownian
+    coagulation as the ratio of the diffusivity of the particles to their mean
+    thermal speed. This parameter is crucial for understanding particle
+    dynamics in a fluid.
 
-    Args
+    Args:
     ----
-    diffusivity_particle : The diffusivity of the particles [m^2/s].
-    mean_thermal_speed_particle : The mean thermal speed of the particles [m/s]
+    - diffusivity_particle : The diffusivity of the particles [m^2/s].
+    - mean_thermal_speed_particle : The mean thermal speed of the particles
+    [m/s].
 
-    Returns
+    Returns:
     -------
     The mean free path of the particles [m].
 
-    References
+    References:
     ----------
     Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
-    Coefficient K12
+    Coefficient K12.
     """
     return 8 * diffusivity_particle / (np.pi * mean_thermal_speed_particle)
 
@@ -62,8 +65,9 @@ def g_collection_term(
     physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
     Coefficient K12
     """
-    return 2**0.5 * (
-        (2 * radius_particle - mean_free_path_particle)**3
+    # maybe have np.sqrt(2) as a constant
+    return (
+        (2 * radius_particle + mean_free_path_particle)**3
         - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3/2)
     ) / (6 * radius_particle * mean_free_path_particle) - 2 * radius_particle
 
@@ -125,18 +129,23 @@ def brownian_coagulation_kernel(
     """
     # Convert 1D arrays to 2D square matrices
     diffusivity_matrix = np.tile(
-        diffusivity_particle, (len(diffusivity_particle), 1))
-    radius_matrix = np.tile(radius_particle, (len(radius_particle), 1))
+        diffusivity_particle,
+        (len(diffusivity_particle), 1))
+    radius_matrix = np.tile(
+        radius_particle,
+        (len(radius_particle), 1))
     g_collection_term_matrix = np.tile(
-        g_collection_term_particle, (len(g_collection_term_particle), 1)) ** 2
+        g_collection_term_particle,
+        (len(g_collection_term_particle), 1)) ** 2
     mean_thermal_speed_matrix = np.tile(
-        mean_thermal_speed_particle, (len(mean_thermal_speed_particle), 1)) ** 2
+        mean_thermal_speed_particle,
+        (len(mean_thermal_speed_particle), 1)) ** 2
 
     # Sum of diffusivities and radii across particles
     sum_diffusivity = diffusivity_matrix + np.transpose(diffusivity_matrix)
     sum_radius = radius_matrix + np.transpose(radius_matrix)
 
-    # Square root of sums for g-collection terms and mean thermal speeds 
+    # Square root of sums for g-collection terms and mean thermal speeds
     g_term_sqrt = np.sqrt(
         g_collection_term_matrix +
         np.transpose(g_collection_term_matrix))

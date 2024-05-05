@@ -9,7 +9,7 @@ def test_mean_thermal_speed_single_value():
     """
     Test mean_thermal_speed with single float inputs for mass and temperature.
     """
-    mass = 2.18e-25  # Example mass in kg
+    mass = 4.188790204786391e-12  # Example mass in kg
     temperature = 300  # Temperature in Kelvin
     expected_speed = np.sqrt(
         (8 * BOLTZMANN_CONSTANT.m * temperature) / (np.pi * mass))
