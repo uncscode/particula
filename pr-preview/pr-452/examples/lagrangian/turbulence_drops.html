@@ -616,81 +616,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:573,</span> in <span class="ni">DictConfigurator.configure</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">572</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">573</span>     <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_handler</span><span class="p">(</span><span class="n">handlers</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
-<span class="g g-Whitespace">    </span><span class="mi">574</span>     <span class="n">handler</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:757,</span> in <span class="ni">DictConfigurator.configure_handler</span><span class="nt">(self, config)</span>
-<span class="g g-Whitespace">    </span><span class="mi">756</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">757</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">758</span> <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">te</span><span class="p">:</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/handlers.py:155,</span> in <span class="ni">RotatingFileHandler.__init__</span><span class="nt">(self, filename, mode, maxBytes, backupCount, encoding, delay, errors)</span>
-<span class="g g-Whitespace">    </span><span class="mi">154</span>     <span class="n">encoding</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">text_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">155</span> <span class="n">BaseRotatingHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">156</span>                              <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">157</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxBytes</span> <span class="o">=</span> <span class="n">maxBytes</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/handlers.py:58,</span> in <span class="ni">BaseRotatingHandler.__init__</span><span class="nt">(self, filename, mode, encoding, delay, errors)</span>
-<span class="g g-Whitespace">     </span><span class="mi">55</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">56</span><span class="sd"> Use the specified filename for streamed logging</span>
-<span class="g g-Whitespace">     </span><span class="mi">57</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="ne">---&gt; </span><span class="mi">58</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">59</span>                              <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">60</span>                              <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">61</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/__init__.py:1181,</span> in <span class="ni">FileHandler.__init__</span><span class="nt">(self, filename, mode, encoding, delay, errors)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1180</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">1181</span>     <span class="n">StreamHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">())</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/__init__.py:1213,</span> in <span class="ni">FileHandler._open</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1212</span> <span class="n">open_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_builtin_open</span>
-<span class="ne">-&gt; </span><span class="mi">1213</span> <span class="k">return</span> <span class="n">open_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFilename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1214</span>                  <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
-
-<span class="ne">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logging/particula.log&#39;
-
-<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
-
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">6</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="ne">----&gt; </span><span class="mi">6</span> <span class="kn">from</span> <span class="nn">particula.lagrangian</span> <span class="kn">import</span> <span class="n">boundary</span><span class="p">,</span> <span class="n">integration</span><span class="p">,</span> <span class="n">collisions</span><span class="p">,</span> <span class="n">particle_property</span><span class="p">,</span> <span class="n">particle_pairs</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">machine_limit</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="c1"># or &#39;cuda:0&#39; to specify a particular GPU</span>
-
-<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">26</span>
-<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.0.16&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">25</span> <span class="c1"># setup the logger</span>
-<span class="ne">---&gt; </span><span class="mi">26</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">setup</span><span class="p">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">27</span> <span class="c1"># log the version of particula upon loading</span>
-<span class="g g-Whitespace">     </span><span class="mi">28</span> <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;particula version </span><span class="si">%s</span><span class="s2"> loaded.&quot;</span><span class="p">,</span> <span class="n">__version__</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logger_setup.py:66,</span> in <span class="ni">setup</span><span class="nt">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">64</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">logging_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">65</span> <span class="c1"># configure the logger</span>
-<span class="ne">---&gt; </span><span class="mi">66</span> <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">67</span> <span class="k">return</span> <span class="n">logger</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:823,</span> in <span class="ni">dictConfig</span><span class="nt">(config)</span>
-<span class="g g-Whitespace">    </span><span class="mi">821</span> <span class="k">def</span> <span class="nf">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">822</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Configure logging using a dictionary.&quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">823</span>     <span class="n">dictConfigClass</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:580,</span> in <span class="ni">DictConfigurator.configure</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">578</span>             <span class="n">deferred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">579</span>         <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">580</span>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unable to configure handler &#39;</span>
-<span class="g g-Whitespace">    </span><span class="mi">581</span>                              <span class="s1">&#39;</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-<span class="g g-Whitespace">    </span><span class="mi">583</span> <span class="c1"># Now do any that were deferred</span>
-<span class="g g-Whitespace">    </span><span class="mi">584</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">deferred</span><span class="p">:</span>
-
-<span class="ne">ValueError</span>: Unable to configure handler &#39;file&#39;
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>particula version:  0.0.16
 </pre></div>
 </div>
 </div>
@@ -783,7 +709,7 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">IndexError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="ne">RuntimeError</span><span class="g g-Whitespace">                              </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">25</span>
 <span class="g g-Whitespace">     </span><span class="mi">22</span> <span class="n">tke_interval</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># Interval for updating turbulent kinetic energy</span>
 <span class="g g-Whitespace">     </span><span class="mi">24</span> <span class="c1"># Generating particle masses using a log-normal distribution</span>
@@ -802,16 +728,61 @@ document.write(`
 <span class="g g-Whitespace">     </span><span class="mi">39</span>     <span class="n">random_seed</span><span class="o">=</span><span class="n">seed</span>
 <span class="g g-Whitespace">     </span><span class="mi">40</span> <span class="p">)</span>
 
-<span class="nn">File C:\Code\particula\particula\lagrangian\particle_property.py:167,</span> in <span class="ni">generate_particle_masses</span><span class="nt">(mean_radius, std_dev_radius, density, num_particles, radius_input_units)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/lagrangian/particle_property.py:164,</span> in <span class="ni">generate_particle_masses</span><span class="nt">(mean_radius, std_dev_radius, density, num_particles, radius_input_units)</span>
+<span class="g g-Whitespace">    </span><span class="mi">159</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">160</span>         <span class="s2">&quot;log of Mean radius and standard deviation must be positive for&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">161</span>         <span class="o">+</span> <span class="s2">&quot; torch.distributions.log_normal.LogNormal&quot;</span><span class="p">)</span>
 <span class="g g-Whitespace">    </span><span class="mi">163</span> <span class="c1"># Sample radii from the log-normal distribution</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span> <span class="n">radius_samples</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">log_normal</span><span class="o">.</span><span class="n">LogNormal</span><span class="p">(</span>
+<span class="ne">--&gt; </span><span class="mi">164</span> <span class="n">radius_samples</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">log_normal</span><span class="o">.</span><span class="n">LogNormal</span><span class="p">(</span>
 <span class="g g-Whitespace">    </span><span class="mi">165</span>     <span class="n">mean_log</span><span class="p">,</span> <span class="n">std_dev_log</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">((</span><span class="n">num_particles</span><span class="p">,))</span>
-<span class="g g-Whitespace">    </span><span class="mi">166</span> <span class="n">radius_samples</span> <span class="o">*=</span> <span class="n">torch</span><span class="o">.</span><span class="n">scalar_tensor</span><span class="p">(</span>
-<span class="ne">--&gt; </span><span class="mi">167</span>     <span class="n">convert_units</span><span class="p">(</span><span class="n">radius_input_units</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+<span class="g g-Whitespace">    </span><span class="mi">166</span> <span class="n">radius_samples</span> <span class="o">*=</span> <span class="n">torch</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">167</span>     <span class="n">convert_units</span><span class="p">(</span><span class="n">radius_input_units</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">))</span>
 <span class="g g-Whitespace">    </span><span class="mi">169</span> <span class="c1"># Calculate mass of each particle</span>
-<span class="g g-Whitespace">    </span><span class="mi">170</span> <span class="k">return</span> <span class="n">mass_calculation</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">radius_samples</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
 
-<span class="ne">IndexError</span>: too many indices for array: array is 0-dimensional, but 1 were indexed
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/distributions/log_normal.py:33,</span> in <span class="ni">LogNormal.__init__</span><span class="nt">(self, loc, scale, validate_args)</span>
+<span class="g g-Whitespace">     </span><span class="mi">32</span> <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">validate_args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="ne">---&gt; </span><span class="mi">33</span>     <span class="n">base_dist</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">validate_args</span><span class="o">=</span><span class="n">validate_args</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">34</span>     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">base_dist</span><span class="p">,</span> <span class="n">ExpTransform</span><span class="p">(),</span> <span class="n">validate_args</span><span class="o">=</span><span class="n">validate_args</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/distributions/normal.py:51,</span> in <span class="ni">Normal.__init__</span><span class="nt">(self, loc, scale, validate_args)</span>
+<span class="g g-Whitespace">     </span><span class="mi">50</span> <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">validate_args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="ne">---&gt; </span><span class="mi">51</span>     <span class="bp">self</span><span class="o">.</span><span class="n">loc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">broadcast_all</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">52</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="n">Number</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">53</span>         <span class="n">batch_shape</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Size</span><span class="p">()</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/distributions/utils.py:49,</span> in <span class="ni">broadcast_all</span><span class="nt">(*values)</span>
+<span class="g g-Whitespace">     </span><span class="mi">47</span>             <span class="n">options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">48</span>             <span class="k">break</span>
+<span class="ne">---&gt; </span><span class="mi">49</span>     <span class="n">new_values</span> <span class="o">=</span> <span class="p">[</span>
+<span class="g g-Whitespace">     </span><span class="mi">50</span>         <span class="n">v</span> <span class="k">if</span> <span class="n">is_tensor_like</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span>
+<span class="g g-Whitespace">     </span><span class="mi">51</span>     <span class="p">]</span>
+<span class="g g-Whitespace">     </span><span class="mi">52</span>     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">broadcast_tensors</span><span class="p">(</span><span class="o">*</span><span class="n">new_values</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">53</span> <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">broadcast_tensors</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/distributions/utils.py:50,</span> in <span class="ni">&lt;listcomp&gt;</span><span class="nt">(.0)</span>
+<span class="g g-Whitespace">     </span><span class="mi">47</span>             <span class="n">options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">48</span>             <span class="k">break</span>
+<span class="g g-Whitespace">     </span><span class="mi">49</span>     <span class="n">new_values</span> <span class="o">=</span> <span class="p">[</span>
+<span class="ne">---&gt; </span><span class="mi">50</span>         <span class="n">v</span> <span class="k">if</span> <span class="n">is_tensor_like</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span>
+<span class="g g-Whitespace">     </span><span class="mi">51</span>     <span class="p">]</span>
+<span class="g g-Whitespace">     </span><span class="mi">52</span>     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">broadcast_tensors</span><span class="p">(</span><span class="o">*</span><span class="n">new_values</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">53</span> <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">broadcast_tensors</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/utils/_device.py:78,</span> in <span class="ni">DeviceContext.__torch_function__</span><span class="nt">(self, func, types, args, kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">76</span> <span class="k">if</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">_device_constructors</span><span class="p">()</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">77</span>     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;device&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+<span class="ne">---&gt; </span><span class="mi">78</span> <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/cuda/__init__.py:293,</span> in <span class="ni">_lazy_init</span><span class="nt">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">291</span> <span class="k">if</span> <span class="s2">&quot;CUDA_MODULE_LOADING&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">292</span>     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CUDA_MODULE_LOADING&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;LAZY&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">293</span> <span class="n">torch</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">_cuda_init</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">294</span> <span class="c1"># Some of the queued calls may reentrantly call _lazy_init();</span>
+<span class="g g-Whitespace">    </span><span class="mi">295</span> <span class="c1"># we need to just return without initializing in that case.</span>
+<span class="g g-Whitespace">    </span><span class="mi">296</span> <span class="c1"># However, we must not let any *other* threads in!</span>
+<span class="g g-Whitespace">    </span><span class="mi">297</span> <span class="n">_tls</span><span class="o">.</span><span class="n">is_initializing</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="ne">RuntimeError</span>: Found no NVIDIA driver on your system. Please check that you have an NVIDIA GPU and installed a driver from http://www.nvidia.com/Download/index.aspx
 </pre></div>
 </div>
 </div>

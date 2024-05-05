@@ -582,78 +582,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:573,</span> in <span class="ni">DictConfigurator.configure</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">572</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">573</span>     <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_handler</span><span class="p">(</span><span class="n">handlers</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
-<span class="g g-Whitespace">    </span><span class="mi">574</span>     <span class="n">handler</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:757,</span> in <span class="ni">DictConfigurator.configure_handler</span><span class="nt">(self, config)</span>
-<span class="g g-Whitespace">    </span><span class="mi">756</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">757</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">758</span> <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">te</span><span class="p">:</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/handlers.py:155,</span> in <span class="ni">RotatingFileHandler.__init__</span><span class="nt">(self, filename, mode, maxBytes, backupCount, encoding, delay, errors)</span>
-<span class="g g-Whitespace">    </span><span class="mi">154</span>     <span class="n">encoding</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">text_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">155</span> <span class="n">BaseRotatingHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">156</span>                              <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">157</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxBytes</span> <span class="o">=</span> <span class="n">maxBytes</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/handlers.py:58,</span> in <span class="ni">BaseRotatingHandler.__init__</span><span class="nt">(self, filename, mode, encoding, delay, errors)</span>
-<span class="g g-Whitespace">     </span><span class="mi">55</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">56</span><span class="sd"> Use the specified filename for streamed logging</span>
-<span class="g g-Whitespace">     </span><span class="mi">57</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="ne">---&gt; </span><span class="mi">58</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">59</span>                              <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">60</span>                              <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">61</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/__init__.py:1181,</span> in <span class="ni">FileHandler.__init__</span><span class="nt">(self, filename, mode, encoding, delay, errors)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1180</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">1181</span>     <span class="n">StreamHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">())</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/__init__.py:1213,</span> in <span class="ni">FileHandler._open</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1212</span> <span class="n">open_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_builtin_open</span>
-<span class="ne">-&gt; </span><span class="mi">1213</span> <span class="k">return</span> <span class="n">open_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFilename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1214</span>                  <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
-
-<span class="ne">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logging/particula.log&#39;
-
-<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
-
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">particula.environment</span> <span class="kn">import</span> <span class="n">Environment</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mean free path is &quot;</span><span class="p">,</span> <span class="n">Environment</span><span class="p">()</span><span class="o">.</span><span class="n">mean_free_path</span><span class="p">())</span> <span class="c1"># will produce approx 66.5 nm</span>
-
-<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">26</span>
-<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.0.16&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">25</span> <span class="c1"># setup the logger</span>
-<span class="ne">---&gt; </span><span class="mi">26</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">setup</span><span class="p">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">27</span> <span class="c1"># log the version of particula upon loading</span>
-<span class="g g-Whitespace">     </span><span class="mi">28</span> <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;particula version </span><span class="si">%s</span><span class="s2"> loaded.&quot;</span><span class="p">,</span> <span class="n">__version__</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logger_setup.py:66,</span> in <span class="ni">setup</span><span class="nt">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">64</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">logging_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">65</span> <span class="c1"># configure the logger</span>
-<span class="ne">---&gt; </span><span class="mi">66</span> <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">67</span> <span class="k">return</span> <span class="n">logger</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:823,</span> in <span class="ni">dictConfig</span><span class="nt">(config)</span>
-<span class="g g-Whitespace">    </span><span class="mi">821</span> <span class="k">def</span> <span class="nf">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">822</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Configure logging using a dictionary.&quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">823</span>     <span class="n">dictConfigClass</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:580,</span> in <span class="ni">DictConfigurator.configure</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">578</span>             <span class="n">deferred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">579</span>         <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">580</span>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unable to configure handler &#39;</span>
-<span class="g g-Whitespace">    </span><span class="mi">581</span>                              <span class="s1">&#39;</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-<span class="g g-Whitespace">    </span><span class="mi">583</span> <span class="c1"># Now do any that were deferred</span>
-<span class="g g-Whitespace">    </span><span class="mi">584</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">deferred</span><span class="p">:</span>
-
-<span class="ne">ValueError</span>: Unable to configure handler &#39;file&#39;
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mean free path is  6.647984929145103e-08 meter
 </pre></div>
 </div>
 </div>
@@ -665,11 +594,346 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on module particula.util.mean_free_path in particula.util:
+
+NAME
+    particula.util.mean_free_path - calculating the mean free path of air
+
+DESCRIPTION
+    The mean free path is the average distance
+    traveled by a molecule between collisions
+    with other molecules present in a medium (air).
+    
+    The expeected mean free path of air is approx.
+    65 nm at 298 K and 101325 Pa.
+
+FUNCTIONS
+    mfp(temperature=&lt;Quantity(298.15, &#39;kelvin&#39;)&gt;, pressure=&lt;Quantity(101325, &#39;pascal&#39;)&gt;, molecular_weight=&lt;Quantity(0.0289644, &#39;kilogram / mole&#39;)&gt;, dynamic_viscosity=None, gas_constant=&lt;Quantity(8.31446261815324, &#39;kilogram * meter ** 2 / kelvin / mole / second ** 2&#39;)&gt;, **kwargs)
+        Returns the mean free path of in air.
+        
+        The mean free path is the average distance
+        traveled by a molecule between collisions
+        with other molecules present in a medium (air).
+        
+        The expeected mean free path of air is approx.
+        65 nm at 298 K and 101325 Pa.
+        
+        Examples:
+        ```
+        &gt;&gt;&gt; from particula import u
+        &gt;&gt;&gt; from particula.util.mean_free_path import mfp
+        &gt;&gt;&gt; # with no inputs, it defaults to 298 K and 101325 Pa
+        &gt;&gt;&gt; mfp()
+        &lt;Quantity(6.64373669e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; # specifying a temperature of 300 K
+        &gt;&gt;&gt; mfp(temperature=300*u.K).magnitude
+        6.700400687925813e-08
+        &gt;&gt;&gt; # specifying 300 K and  pressure of 1e5 Pa
+        &gt;&gt;&gt; mfp(temperature=300*u.K, pressure=1e5*u.Pa)
+        &lt;Quantity(6.789181e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; mfp(
+        ... temperature=300,
+        ... pressure=1e5,
+        ... molecular_weight=0.03
+        ... )
+        &lt;Quantity(6.67097062e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; # specifying explicit value for dynamic viscosity
+        &gt;&gt;&gt; mfp(dynamic_viscosity=1e-5)
+        &lt;Quantity(3.61864151e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; # specifying implicit value for dynamic viscosity
+        &gt;&gt;&gt; mfp(
+        ... temperature=300,
+        ... reference_viscosity=1e-5,
+        ... reference_temperature=273.15
+        ... )
+        &lt;Quantity(3.90466241e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; # specifying a list of temperatures
+        &gt;&gt;&gt; mfp(temperature=[200, 250, 300, 400]).m
+        array([3.93734886e-08, 5.29859655e-08, 6.70040069e-08, 9.57800224e-08])
+        &gt;&gt;&gt; # specifying a list of pressures
+        &gt;&gt;&gt; mfp(pressure=[1.0e5, 1.1e5, 1.2e5, 1.3e5]).m
+        array([6.73607078e-08, 6.12370071e-08, 5.61339232e-08, 5.18159291e-08])
+        &gt;&gt;&gt; # specifying a list of pressures and temperatures
+        &gt;&gt;&gt; mfp(temperature=[300,310], pressure=[1e5, 1.1e5])
+        &lt;Quantity([6.78918100e-08 6.43354325e-08], &#39;meter&#39;)&gt;
+        ```
+        
+        Args: (either # or $)
+            temperature           (float) [K]      (default: 298)
+            pressure              (float) [Pa]     (default: 101325)
+            molecular_weight      (float) [kg/mol] (default: constants)
+        
+        #   dynamic_viscosity     (float) [Pa*s]   (default: util)
+        $   reference_viscosity   (float) [Pa*s]   (default: constants)
+        $   reference_temperature (float) [K]      (default: constants)
+        
+        Returns:
+                        (float) [m]
+        
+        Using particula.constants:
+            GAS_CONSTANT            (float) [J/mol/K]
+            MOLECULAR_WEIGHT_AIR    (float) [kg/mol]
+        
+            REF_VISCOSITY_AIR_STP   (float) [Pa*s]
+            REF_TEMPERATURE_STP     (float) [K]
+            SUTHERLAND_CONSTANT     (float) [K]
+        
+        Notes:
+            dynamic_viscosity can be calculated independently via
+            particula.util.dynamic_viscosity.dyn_vis(**kwargs), but
+            if the value of dynamic_viscosity is provided directly,
+            it overrides the calculated value.
+    
+    molecule_mean_free_path(molar_mass: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]] = array(0.0289644), temperature: float = 298.15, pressure: float = 101325, dynamic_viscosity: Optional[float] = None) -&gt; Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
+        Calculate the mean free path of a gas molecule in air based on the
+        temperature, pressure, and molar mass of the gas. The mean free path
+        is the average distance traveled by a molecule between collisions with
+        other molecules present in a medium (air).
+        
+        Args:
+        -----
+        - molar_mass (Union[float, NDArray[np.float_]]): The molar mass
+        of the gas molecule [kg/mol]. Default is the molecular weight of air.
+        - temperature (float): The temperature of the gas [K]. Default is 298.15 K.
+        - pressure (float): The pressure of the gas [Pa]. Default is 101325 Pa.
+        - dynamic_viscosity (Optional[float]): The dynamic viscosity of the gas
+        [Pa*s]. If not provided, it will be calculated based on the temperature.
+        
+        Returns:
+        --------
+        - Union[float, NDArray[np.float_]]: The mean free path of the gas molecule
+        in meters (m).
+        
+        References:
+        ----------
+        - https://en.wikipedia.org/wiki/Mean_free_path
+
+DATA
+    GAS_CONSTANT = &lt;Quantity(8.31446261815324, &#39;kilogram * meter ** 2 / ke...
+    MOLECULAR_WEIGHT_AIR = &lt;Quantity(0.0289644, &#39;kilogram / mole&#39;)&gt;
+    NDArray = numpy.ndarray[typing.Any, numpy.dtype[+_ScalarType_co]]
+    Optional = typing.Optional
+        Optional[X] is equivalent to Union[X, None].
+    
+    Union = typing.Union
+        Union type; Union[X, Y] means either X or Y.
+        
+        On Python 3.10 and higher, the | operator
+        can also be used to denote unions;
+        X | Y means the same thing to the type checker as Union[X, Y].
+        
+        To define a union, use e.g. Union[int, str]. Details:
+        - The arguments must be types and there must be at least one.
+        - None as an argument is a special case and is replaced by
+          type(None).
+        - Unions of unions are flattened, e.g.::
+        
+            assert Union[Union[int, str], float] == Union[int, str, float]
+        
+        - Unions of a single argument vanish, e.g.::
+        
+            assert Union[int] == int  # The constructor actually returns int
+        
+        - Redundant arguments are skipped, e.g.::
+        
+            assert Union[int, str, int] == Union[int, str]
+        
+        - When comparing unions, the argument order is ignored, e.g.::
+        
+            assert Union[int, str] == Union[str, int]
+        
+        - You cannot subclass or instantiate a union.
+        - You can use Optional[X] as a shorthand for Union[X, None].
+    
+    u = &lt;pint.registry.UnitRegistry object&gt;
+
+FILE
+    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/util/mean_free_path.py
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">inspect</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">mean_free_path</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&quot;&quot;&quot; calculating the mean free path of air
+
+    The mean free path is the average distance
+    traveled by a molecule between collisions
+    with other molecules present in a medium (air).
+
+    The expeected mean free path of air is approx.
+    65 nm at 298 K and 101325 Pa.
+
+&quot;&quot;&quot;
+
+from typing import Union, Optional
+from numpy.typing import NDArray
+import numpy as np
+from particula import u
+from particula.constants import (
+    GAS_CONSTANT, MOLECULAR_WEIGHT_AIR)
+from particula.util.dynamic_viscosity import dyn_vis
+from particula.util.input_handling import (in_gas_constant,
+                                           in_molecular_weight, in_pressure,
+                                           in_temperature, in_viscosity)
+
+
+def mfp(
+    temperature=298.15 * u.K,
+    pressure=101325 * u.Pa,
+    molecular_weight=MOLECULAR_WEIGHT_AIR,
+    dynamic_viscosity=None,
+    gas_constant=GAS_CONSTANT,
+    **kwargs,
+):
+    &quot;&quot;&quot; Returns the mean free path of in air.
+
+        The mean free path is the average distance
+        traveled by a molecule between collisions
+        with other molecules present in a medium (air).
+
+        The expeected mean free path of air is approx.
+        65 nm at 298 K and 101325 Pa.
+
+        Examples:
+        ```
+        &gt;&gt;&gt; from particula import u
+        &gt;&gt;&gt; from particula.util.mean_free_path import mfp
+        &gt;&gt;&gt; # with no inputs, it defaults to 298 K and 101325 Pa
+        &gt;&gt;&gt; mfp()
+        &lt;Quantity(6.64373669e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; # specifying a temperature of 300 K
+        &gt;&gt;&gt; mfp(temperature=300*u.K).magnitude
+        6.700400687925813e-08
+        &gt;&gt;&gt; # specifying 300 K and  pressure of 1e5 Pa
+        &gt;&gt;&gt; mfp(temperature=300*u.K, pressure=1e5*u.Pa)
+        &lt;Quantity(6.789181e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; mfp(
+        ... temperature=300,
+        ... pressure=1e5,
+        ... molecular_weight=0.03
+        ... )
+        &lt;Quantity(6.67097062e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; # specifying explicit value for dynamic viscosity
+        &gt;&gt;&gt; mfp(dynamic_viscosity=1e-5)
+        &lt;Quantity(3.61864151e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; # specifying implicit value for dynamic viscosity
+        &gt;&gt;&gt; mfp(
+        ... temperature=300,
+        ... reference_viscosity=1e-5,
+        ... reference_temperature=273.15
+        ... )
+        &lt;Quantity(3.90466241e-08, &#39;meter&#39;)&gt;
+        &gt;&gt;&gt; # specifying a list of temperatures
+        &gt;&gt;&gt; mfp(temperature=[200, 250, 300, 400]).m
+        array([3.93734886e-08, 5.29859655e-08, 6.70040069e-08, 9.57800224e-08])
+        &gt;&gt;&gt; # specifying a list of pressures
+        &gt;&gt;&gt; mfp(pressure=[1.0e5, 1.1e5, 1.2e5, 1.3e5]).m
+        array([6.73607078e-08, 6.12370071e-08, 5.61339232e-08, 5.18159291e-08])
+        &gt;&gt;&gt; # specifying a list of pressures and temperatures
+        &gt;&gt;&gt; mfp(temperature=[300,310], pressure=[1e5, 1.1e5])
+        &lt;Quantity([6.78918100e-08 6.43354325e-08], &#39;meter&#39;)&gt;
+        ```
+
+        Args: (either # or $)
+            temperature           (float) [K]      (default: 298)
+            pressure              (float) [Pa]     (default: 101325)
+            molecular_weight      (float) [kg/mol] (default: constants)
+
+        #   dynamic_viscosity     (float) [Pa*s]   (default: util)
+        $   reference_viscosity   (float) [Pa*s]   (default: constants)
+        $   reference_temperature (float) [K]      (default: constants)
+
+        Returns:
+                        (float) [m]
+
+        Using particula.constants:
+            GAS_CONSTANT            (float) [J/mol/K]
+            MOLECULAR_WEIGHT_AIR    (float) [kg/mol]
+
+            REF_VISCOSITY_AIR_STP   (float) [Pa*s]
+            REF_TEMPERATURE_STP     (float) [K]
+            SUTHERLAND_CONSTANT     (float) [K]
+
+        Notes:
+            dynamic_viscosity can be calculated independently via
+            particula.util.dynamic_viscosity.dyn_vis(**kwargs), but
+            if the value of dynamic_viscosity is provided directly,
+            it overrides the calculated value.
+    &quot;&quot;&quot;
+
+    temp = in_temperature(temperature)
+    pres = in_pressure(pressure)
+    molec_wt = in_molecular_weight(molecular_weight)
+
+    if dynamic_viscosity is None:
+        dyn_vis_val = in_viscosity(
+            dyn_vis(temperature=temp, **kwargs)
+        )
+    else:
+        dyn_vis_val = in_viscosity(dynamic_viscosity)
+
+    gas_con = in_gas_constant(gas_constant)
+
+    return (
+        (2 * dyn_vis_val / pres) /
+        (8 * molec_wt / (np.pi * gas_con * temp))**0.5
+    ).to_base_units()
+
+
+def molecule_mean_free_path(
+    molar_mass: Union[
+        float, NDArray[np.float_]] = MOLECULAR_WEIGHT_AIR.m,  # type: ignore
+    temperature: float = 298.15,
+    pressure: float = 101325,
+    dynamic_viscosity: Optional[float] = None,
+) -&gt; Union[float, NDArray[np.float_]]:
+    &quot;&quot;&quot;
+    Calculate the mean free path of a gas molecule in air based on the
+    temperature, pressure, and molar mass of the gas. The mean free path
+    is the average distance traveled by a molecule between collisions with
+    other molecules present in a medium (air).
+
+    Args:
+    -----
+    - molar_mass (Union[float, NDArray[np.float_]]): The molar mass
+    of the gas molecule [kg/mol]. Default is the molecular weight of air.
+    - temperature (float): The temperature of the gas [K]. Default is 298.15 K.
+    - pressure (float): The pressure of the gas [Pa]. Default is 101325 Pa.
+    - dynamic_viscosity (Optional[float]): The dynamic viscosity of the gas
+    [Pa*s]. If not provided, it will be calculated based on the temperature.
+
+    Returns:
+    --------
+    - Union[float, NDArray[np.float_]]: The mean free path of the gas molecule
+    in meters (m).
+
+    References:
+    ----------
+    - https://en.wikipedia.org/wiki/Mean_free_path
+    &quot;&quot;&quot;
+    # check inputs are positive
+    if temperature &lt;= 0:
+        raise ValueError(&quot;Temperature must be positive [Kelvin]&quot;)
+    if pressure &lt;= 0:
+        raise ValueError(&quot;Pressure must be positive [Pascal]&quot;)
+    if np.any(molar_mass &lt;= 0):
+        raise ValueError(&quot;Molar mass must be positive [kg/mol]&quot;)
+    if dynamic_viscosity is None:
+        dynamic_viscosity = dyn_vis(temperature)  # type: ignore
+        dynamic_viscosity = float(dynamic_viscosity.m)  # type: ignore
+
+    return np.array(
+        (2 * dynamic_viscosity / pressure)
+        / (8 * molar_mass / (np.pi * GAS_CONSTANT.m * temperature))**0.5,
+        dtype=np.float_)
 </pre></div>
 </div>
 </div>

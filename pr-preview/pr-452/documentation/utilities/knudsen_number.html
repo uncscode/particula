@@ -574,78 +574,121 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:573,</span> in <span class="ni">DictConfigurator.configure</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">572</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">573</span>     <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_handler</span><span class="p">(</span><span class="n">handlers</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
-<span class="g g-Whitespace">    </span><span class="mi">574</span>     <span class="n">handler</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on module particula.util.knudsen_number in particula.util:
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:757,</span> in <span class="ni">DictConfigurator.configure_handler</span><span class="nt">(self, config)</span>
-<span class="g g-Whitespace">    </span><span class="mi">756</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">757</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">758</span> <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">te</span><span class="p">:</span>
+NAME
+    particula.util.knudsen_number - calculating Knudsen number
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/handlers.py:155,</span> in <span class="ni">RotatingFileHandler.__init__</span><span class="nt">(self, filename, mode, maxBytes, backupCount, encoding, delay, errors)</span>
-<span class="g g-Whitespace">    </span><span class="mi">154</span>     <span class="n">encoding</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">text_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">155</span> <span class="n">BaseRotatingHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">156</span>                              <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">157</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxBytes</span> <span class="o">=</span> <span class="n">maxBytes</span>
+DESCRIPTION
+    TODO:
+        add a sanity check for mixing radius shapes and temperature shapes
+        for example, someone may want to calculate knu for [1e-9, 2e-9, 3e-9]
+        but only at two different temperatures [290, 300].
+        A solution is to broadcast into a new shape, e.g. (3, 2) with the
+        leading dim being the radius; or we could simply ban this entirely.
+    
+        -- implementing tranpose for now.
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/handlers.py:58,</span> in <span class="ni">BaseRotatingHandler.__init__</span><span class="nt">(self, filename, mode, encoding, delay, errors)</span>
-<span class="g g-Whitespace">     </span><span class="mi">55</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">56</span><span class="sd"> Use the specified filename for streamed logging</span>
-<span class="g g-Whitespace">     </span><span class="mi">57</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="ne">---&gt; </span><span class="mi">58</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">59</span>                              <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">60</span>                              <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">61</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+FUNCTIONS
+    calculate_knudsen_number(mean_free_path: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], particle_radius: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]) -&gt; Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
+        Calculate the Knudsen number using the mean free path of the gas and the
+        radius of the particle. The Knudsen number is a dimensionless number that
+        indicates the regime of gas flow relative to the size of particles.
+        
+        Args:
+        -----
+        - mean_free_path (Union[float, NDArray[np.float_]]): The mean free path of
+        the gas molecules [meters (m)].
+        - particle_radius (Union[float, NDArray[np.float_]]): The radius of the
+        particle [meters (m)].
+        
+        Returns:
+        --------
+        - Union[float, NDArray[np.float_]]: The Knudsen number, which is the
+        ratio of the mean free path to the particle radius.
+        
+        References:
+        -----------
+        - For more information at https://en.wikipedia.org/wiki/Knudsen_number
+    
+    knu(radius=None, mfp=None, **kwargs)
+        Returns particle&#39;s Knudsen number.
+        
+        The Knudsen number reflects the relative length scales of
+        the particle and the suspending fluid (air, water, etc.).
+        This is calculated by the mean free path of the medium
+        divided by the particle radius.
+        
+        The Knudsen number is a measure of continuum effects and
+        deviation thereof. For larger particles, the Knudsen number
+        goes towards 0. For smaller particles, the Knudsen number
+        goes towards infinity.
+        
+        Examples:
+        ```
+        &gt;&gt;&gt; from particula import u
+        &gt;&gt;&gt; from particula.util.knudsen_number import knu
+        &gt;&gt;&gt; # with radius 1e-9 m
+        &gt;&gt;&gt; knu(radius=1e-9)
+        &lt;Quantity(66.4798498, &#39;dimensionless&#39;)&gt;
+        &gt;&gt;&gt; # with radius 1e-9 m and mfp 60 nm
+        &gt;&gt;&gt; knu(radius=1e-9*u.m, mfp=60*u.nm).m
+        60.00000000000001
+        &gt;&gt;&gt; calculating via mfp(**kwargs)
+        &gt;&gt;&gt; knu(
+        ... radius=1e-9*u.m,
+        ... temperature=300,
+        ... pressure=1e5,
+        ... molecular_weight=0.03,
+        ... )
+        &lt;Quantity(66.7097062, &#39;dimensionless&#39;)&gt;
+        ```
+        
+        Args:
+            radius  (float) [m]
+            mfp     (float) [m] (default: util)
+        
+        Returns:
+                    (float) [dimensionless]
+        
+        Notes:
+            mfp can be calculated using mfp(**kwargs);
+            refer to particula.util.mean_free_path.mfp for more info.
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/__init__.py:1181,</span> in <span class="ni">FileHandler.__init__</span><span class="nt">(self, filename, mode, encoding, delay, errors)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1180</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">1181</span>     <span class="n">StreamHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">())</span>
+DATA
+    NDArray = numpy.ndarray[typing.Any, numpy.dtype[+_ScalarType_co]]
+    Union = typing.Union
+        Union type; Union[X, Y] means either X or Y.
+        
+        On Python 3.10 and higher, the | operator
+        can also be used to denote unions;
+        X | Y means the same thing to the type checker as Union[X, Y].
+        
+        To define a union, use e.g. Union[int, str]. Details:
+        - The arguments must be types and there must be at least one.
+        - None as an argument is a special case and is replaced by
+          type(None).
+        - Unions of unions are flattened, e.g.::
+        
+            assert Union[Union[int, str], float] == Union[int, str, float]
+        
+        - Unions of a single argument vanish, e.g.::
+        
+            assert Union[int] == int  # The constructor actually returns int
+        
+        - Redundant arguments are skipped, e.g.::
+        
+            assert Union[int, str, int] == Union[int, str]
+        
+        - When comparing unions, the argument order is ignored, e.g.::
+        
+            assert Union[int, str] == Union[str, int]
+        
+        - You cannot subclass or instantiate a union.
+        - You can use Optional[X] as a shorthand for Union[X, None].
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/__init__.py:1213,</span> in <span class="ni">FileHandler._open</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1212</span> <span class="n">open_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_builtin_open</span>
-<span class="ne">-&gt; </span><span class="mi">1213</span> <span class="k">return</span> <span class="n">open_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFilename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1214</span>                  <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
-
-<span class="ne">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logging/particula.log&#39;
-
-<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
-
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">knudsen_number</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">help</span><span class="p">(</span><span class="n">knudsen_number</span><span class="p">)</span>
-
-<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">26</span>
-<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.0.16&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">25</span> <span class="c1"># setup the logger</span>
-<span class="ne">---&gt; </span><span class="mi">26</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">setup</span><span class="p">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">27</span> <span class="c1"># log the version of particula upon loading</span>
-<span class="g g-Whitespace">     </span><span class="mi">28</span> <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;particula version </span><span class="si">%s</span><span class="s2"> loaded.&quot;</span><span class="p">,</span> <span class="n">__version__</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logger_setup.py:66,</span> in <span class="ni">setup</span><span class="nt">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">64</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">logging_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">65</span> <span class="c1"># configure the logger</span>
-<span class="ne">---&gt; </span><span class="mi">66</span> <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">67</span> <span class="k">return</span> <span class="n">logger</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:823,</span> in <span class="ni">dictConfig</span><span class="nt">(config)</span>
-<span class="g g-Whitespace">    </span><span class="mi">821</span> <span class="k">def</span> <span class="nf">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">822</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Configure logging using a dictionary.&quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">823</span>     <span class="n">dictConfigClass</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:580,</span> in <span class="ni">DictConfigurator.configure</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">578</span>             <span class="n">deferred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">579</span>         <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">580</span>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unable to configure handler &#39;</span>
-<span class="g g-Whitespace">    </span><span class="mi">581</span>                              <span class="s1">&#39;</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-<span class="g g-Whitespace">    </span><span class="mi">583</span> <span class="c1"># Now do any that were deferred</span>
-<span class="g g-Whitespace">    </span><span class="mi">584</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">deferred</span><span class="p">:</span>
-
-<span class="ne">ValueError</span>: Unable to configure handler &#39;file&#39;
+FILE
+    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/util/knudsen_number.py
 </pre></div>
 </div>
 </div>
@@ -654,6 +697,111 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">inspect</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">knudsen_number</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&quot;&quot;&quot; calculating Knudsen number
+
+    TODO:
+        add a sanity check for mixing radius shapes and temperature shapes
+        for example, someone may want to calculate knu for [1e-9, 2e-9, 3e-9]
+        but only at two different temperatures [290, 300].
+        A solution is to broadcast into a new shape, e.g. (3, 2) with the
+        leading dim being the radius; or we could simply ban this entirely.
+
+        -- implementing tranpose for now.
+&quot;&quot;&quot;
+
+from typing import Union
+from numpy.typing import NDArray
+import numpy as np
+from particula.util.input_handling import in_length, in_radius
+from particula.util.mean_free_path import mfp as mfp_func
+
+
+def knu(
+    radius=None,
+    mfp=None,
+    **kwargs
+):
+    &quot;&quot;&quot; Returns particle&#39;s Knudsen number.
+
+        The Knudsen number reflects the relative length scales of
+        the particle and the suspending fluid (air, water, etc.).
+        This is calculated by the mean free path of the medium
+        divided by the particle radius.
+
+        The Knudsen number is a measure of continuum effects and
+        deviation thereof. For larger particles, the Knudsen number
+        goes towards 0. For smaller particles, the Knudsen number
+        goes towards infinity.
+
+        Examples:
+        ```
+        &gt;&gt;&gt; from particula import u
+        &gt;&gt;&gt; from particula.util.knudsen_number import knu
+        &gt;&gt;&gt; # with radius 1e-9 m
+        &gt;&gt;&gt; knu(radius=1e-9)
+        &lt;Quantity(66.4798498, &#39;dimensionless&#39;)&gt;
+        &gt;&gt;&gt; # with radius 1e-9 m and mfp 60 nm
+        &gt;&gt;&gt; knu(radius=1e-9*u.m, mfp=60*u.nm).m
+        60.00000000000001
+        &gt;&gt;&gt; calculating via mfp(**kwargs)
+        &gt;&gt;&gt; knu(
+        ... radius=1e-9*u.m,
+        ... temperature=300,
+        ... pressure=1e5,
+        ... molecular_weight=0.03,
+        ... )
+        &lt;Quantity(66.7097062, &#39;dimensionless&#39;)&gt;
+        ```
+
+        Args:
+            radius  (float) [m]
+            mfp     (float) [m] (default: util)
+
+        Returns:
+                    (float) [dimensionless]
+
+        Notes:
+            mfp can be calculated using mfp(**kwargs);
+            refer to particula.util.mean_free_path.mfp for more info.
+
+    &quot;&quot;&quot;
+
+    mfp_val = mfp_func(**kwargs) if mfp is None else in_length(mfp)
+    radius = in_radius(radius)
+
+    return np.transpose([mfp_val.m]) * mfp_val.u / radius
+
+
+def calculate_knudsen_number(
+    mean_free_path: Union[float, NDArray[np.float_]],
+    particle_radius: Union[float, NDArray[np.float_]]
+) -&gt; Union[float, NDArray[np.float_]]:
+    &quot;&quot;&quot;
+    Calculate the Knudsen number using the mean free path of the gas and the
+    radius of the particle. The Knudsen number is a dimensionless number that
+    indicates the regime of gas flow relative to the size of particles.
+
+    Args:
+    -----
+    - mean_free_path (Union[float, NDArray[np.float_]]): The mean free path of
+    the gas molecules [meters (m)].
+    - particle_radius (Union[float, NDArray[np.float_]]): The radius of the
+    particle [meters (m)].
+
+    Returns:
+    --------
+    - Union[float, NDArray[np.float_]]: The Knudsen number, which is the
+    ratio of the mean free path to the particle radius.
+
+    References:
+    -----------
+    - For more information at https://en.wikipedia.org/wiki/Knudsen_number
+    &quot;&quot;&quot;
+    return mean_free_path / particle_radius
 </pre></div>
 </div>
 </div>

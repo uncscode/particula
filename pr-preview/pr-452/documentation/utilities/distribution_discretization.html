@@ -574,78 +574,164 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:573,</span> in <span class="ni">DictConfigurator.configure</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">572</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">573</span>     <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_handler</span><span class="p">(</span><span class="n">handlers</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
-<span class="g g-Whitespace">    </span><span class="mi">574</span>     <span class="n">handler</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on module particula.util.distribution_discretization in particula.util:
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:757,</span> in <span class="ni">DictConfigurator.configure_handler</span><span class="nt">(self, config)</span>
-<span class="g g-Whitespace">    </span><span class="mi">756</span> <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">757</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">758</span> <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">te</span><span class="p">:</span>
+NAME
+    particula.util.distribution_discretization - discretization of the distribution of the particles
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/handlers.py:155,</span> in <span class="ni">RotatingFileHandler.__init__</span><span class="nt">(self, filename, mode, maxBytes, backupCount, encoding, delay, errors)</span>
-<span class="g g-Whitespace">    </span><span class="mi">154</span>     <span class="n">encoding</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">text_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">155</span> <span class="n">BaseRotatingHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">156</span>                              <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">157</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxBytes</span> <span class="o">=</span> <span class="n">maxBytes</span>
+FUNCTIONS
+    discretize(interval=None, disttype=&#39;lognormal&#39;, gsigma=array(1.25), mode=&lt;Quantity(1e-07, &#39;meter&#39;)&gt;, nparticles=array(100000.), **kwargs)
+        discretize the distribution of the particles
+        
+        Args:
+            interval    (float) the size interval of the distribution
+            distype     (str)   the type of distribution, &quot;lognormal&quot; for now
+            gsigma      (float) geometric standard deviation of distribution
+            mode        (float) pdf scale (corresponds to mode in lognormal)
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/handlers.py:58,</span> in <span class="ni">BaseRotatingHandler.__init__</span><span class="nt">(self, filename, mode, encoding, delay, errors)</span>
-<span class="g g-Whitespace">     </span><span class="mi">55</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">56</span><span class="sd"> Use the specified filename for streamed logging</span>
-<span class="g g-Whitespace">     </span><span class="mi">57</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="ne">---&gt; </span><span class="mi">58</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">59</span>                              <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">60</span>                              <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">61</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+DATA
+    lognorm = &lt;scipy.stats._continuous_distns.lognorm_gen object&gt;
+        A lognormal continuous random variable.
+        
+        As an instance of the `rv_continuous` class, `lognorm` object inherits from it
+        a collection of generic methods (see below for the full list),
+        and completes them with details specific for this particular distribution.
+        
+        Methods
+        -------
+        rvs(s, loc=0, scale=1, size=1, random_state=None)
+            Random variates.
+        pdf(x, s, loc=0, scale=1)
+            Probability density function.
+        logpdf(x, s, loc=0, scale=1)
+            Log of the probability density function.
+        cdf(x, s, loc=0, scale=1)
+            Cumulative distribution function.
+        logcdf(x, s, loc=0, scale=1)
+            Log of the cumulative distribution function.
+        sf(x, s, loc=0, scale=1)
+            Survival function  (also defined as ``1 - cdf``, but `sf` is sometimes more accurate).
+        logsf(x, s, loc=0, scale=1)
+            Log of the survival function.
+        ppf(q, s, loc=0, scale=1)
+            Percent point function (inverse of ``cdf`` --- percentiles).
+        isf(q, s, loc=0, scale=1)
+            Inverse survival function (inverse of ``sf``).
+        moment(order, s, loc=0, scale=1)
+            Non-central moment of the specified order.
+        stats(s, loc=0, scale=1, moments=&#39;mv&#39;)
+            Mean(&#39;m&#39;), variance(&#39;v&#39;), skew(&#39;s&#39;), and/or kurtosis(&#39;k&#39;).
+        entropy(s, loc=0, scale=1)
+            (Differential) entropy of the RV.
+        fit(data)
+            Parameter estimates for generic data.
+            See `scipy.stats.rv_continuous.fit &lt;https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.rv_continuous.fit.html#scipy.stats.rv_continuous.fit&gt;`__ for detailed documentation of the
+            keyword arguments.
+        expect(func, args=(s,), loc=0, scale=1, lb=None, ub=None, conditional=False, **kwds)
+            Expected value of a function (of one argument) with respect to the distribution.
+        median(s, loc=0, scale=1)
+            Median of the distribution.
+        mean(s, loc=0, scale=1)
+            Mean of the distribution.
+        var(s, loc=0, scale=1)
+            Variance of the distribution.
+        std(s, loc=0, scale=1)
+            Standard deviation of the distribution.
+        interval(confidence, s, loc=0, scale=1)
+            Confidence interval with equal areas around the median.
+        
+        Notes
+        -----
+        The probability density function for `lognorm` is:
+        
+        .. math::
+        
+            f(x, s) = \frac{1}{s x \sqrt{2\pi}}
+                      \exp\left(-\frac{\log^2(x)}{2s^2}\right)
+        
+        for :math:`x &gt; 0`, :math:`s &gt; 0`.
+        
+        `lognorm` takes ``s`` as a shape parameter for :math:`s`.
+        
+        The probability density above is defined in the &quot;standardized&quot; form. To shift
+        and/or scale the distribution use the ``loc`` and ``scale`` parameters.
+        Specifically, ``lognorm.pdf(x, s, loc, scale)`` is identically
+        equivalent to ``lognorm.pdf(y, s) / scale`` with
+        ``y = (x - loc) / scale``. Note that shifting the location of a distribution
+        does not make it a &quot;noncentral&quot; distribution; noncentral generalizations of
+        some distributions are available in separate classes.
+        
+        Suppose a normally distributed random variable ``X`` has  mean ``mu`` and
+        standard deviation ``sigma``. Then ``Y = exp(X)`` is lognormally
+        distributed with ``s = sigma`` and ``scale = exp(mu)``.
+        
+        Examples
+        --------
+        &gt;&gt;&gt; import numpy as np
+        &gt;&gt;&gt; from scipy.stats import lognorm
+        &gt;&gt;&gt; import matplotlib.pyplot as plt
+        &gt;&gt;&gt; fig, ax = plt.subplots(1, 1)
+        
+        Calculate the first four moments:
+        
+        &gt;&gt;&gt; s = 0.954
+        &gt;&gt;&gt; mean, var, skew, kurt = lognorm.stats(s, moments=&#39;mvsk&#39;)
+        
+        Display the probability density function (``pdf``):
+        
+        &gt;&gt;&gt; x = np.linspace(lognorm.ppf(0.01, s),
+        ...                 lognorm.ppf(0.99, s), 100)
+        &gt;&gt;&gt; ax.plot(x, lognorm.pdf(x, s),
+        ...        &#39;r-&#39;, lw=5, alpha=0.6, label=&#39;lognorm pdf&#39;)
+        
+        Alternatively, the distribution object can be called (as a function)
+        to fix the shape, location and scale parameters. This returns a &quot;frozen&quot;
+        RV object holding the given parameters fixed.
+        
+        Freeze the distribution and display the frozen ``pdf``:
+        
+        &gt;&gt;&gt; rv = lognorm(s)
+        &gt;&gt;&gt; ax.plot(x, rv.pdf(x), &#39;k-&#39;, lw=2, label=&#39;frozen pdf&#39;)
+        
+        Check accuracy of ``cdf`` and ``ppf``:
+        
+        &gt;&gt;&gt; vals = lognorm.ppf([0.001, 0.5, 0.999], s)
+        &gt;&gt;&gt; np.allclose([0.001, 0.5, 0.999], lognorm.cdf(vals, s))
+        True
+        
+        Generate random numbers:
+        
+        &gt;&gt;&gt; r = lognorm.rvs(s, size=1000)
+        
+        And compare the histogram:
+        
+        &gt;&gt;&gt; ax.hist(r, density=True, bins=&#39;auto&#39;, histtype=&#39;stepfilled&#39;, alpha=0.2)
+        &gt;&gt;&gt; ax.set_xlim([x[0], x[-1]])
+        &gt;&gt;&gt; ax.legend(loc=&#39;best&#39;, frameon=False)
+        &gt;&gt;&gt; plt.show()
+        
+        
+        The logarithm of a log-normally distributed random variable is
+        normally distributed:
+        
+        &gt;&gt;&gt; import numpy as np
+        &gt;&gt;&gt; import matplotlib.pyplot as plt
+        &gt;&gt;&gt; from scipy import stats
+        &gt;&gt;&gt; fig, ax = plt.subplots(1, 1)
+        &gt;&gt;&gt; mu, sigma = 2, 0.5
+        &gt;&gt;&gt; X = stats.norm(loc=mu, scale=sigma)
+        &gt;&gt;&gt; Y = stats.lognorm(s=sigma, scale=np.exp(mu))
+        &gt;&gt;&gt; x = np.linspace(*X.interval(0.999))
+        &gt;&gt;&gt; y = Y.rvs(size=10000)
+        &gt;&gt;&gt; ax.plot(x, X.pdf(x), label=&#39;X (pdf)&#39;)
+        &gt;&gt;&gt; ax.hist(np.log(y), density=True, bins=x, label=&#39;log(Y) (histogram)&#39;)
+        &gt;&gt;&gt; ax.legend()
+        &gt;&gt;&gt; plt.show()
+    
+    u = &lt;pint.registry.UnitRegistry object&gt;
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/__init__.py:1181,</span> in <span class="ni">FileHandler.__init__</span><span class="nt">(self, filename, mode, encoding, delay, errors)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1180</span> <span class="k">else</span><span class="p">:</span>
-<span class="ne">-&gt; </span><span class="mi">1181</span>     <span class="n">StreamHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">())</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/__init__.py:1213,</span> in <span class="ni">FileHandler._open</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1212</span> <span class="n">open_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_builtin_open</span>
-<span class="ne">-&gt; </span><span class="mi">1213</span> <span class="k">return</span> <span class="n">open_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFilename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
-<span class="g g-Whitespace">   </span><span class="mi">1214</span>                  <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
-
-<span class="ne">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logging/particula.log&#39;
-
-<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
-
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">distribution_discretization</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">help</span><span class="p">(</span><span class="n">distribution_discretization</span><span class="p">)</span>
-
-<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">26</span>
-<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.0.16&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">25</span> <span class="c1"># setup the logger</span>
-<span class="ne">---&gt; </span><span class="mi">26</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">setup</span><span class="p">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">27</span> <span class="c1"># log the version of particula upon loading</span>
-<span class="g g-Whitespace">     </span><span class="mi">28</span> <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;particula version </span><span class="si">%s</span><span class="s2"> loaded.&quot;</span><span class="p">,</span> <span class="n">__version__</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logger_setup.py:66,</span> in <span class="ni">setup</span><span class="nt">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">64</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">logging_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">65</span> <span class="c1"># configure the logger</span>
-<span class="ne">---&gt; </span><span class="mi">66</span> <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">67</span> <span class="k">return</span> <span class="n">logger</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:823,</span> in <span class="ni">dictConfig</span><span class="nt">(config)</span>
-<span class="g g-Whitespace">    </span><span class="mi">821</span> <span class="k">def</span> <span class="nf">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">822</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Configure logging using a dictionary.&quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">823</span>     <span class="n">dictConfigClass</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:580,</span> in <span class="ni">DictConfigurator.configure</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">578</span>             <span class="n">deferred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">579</span>         <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">580</span>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unable to configure handler &#39;</span>
-<span class="g g-Whitespace">    </span><span class="mi">581</span>                              <span class="s1">&#39;</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-<span class="g g-Whitespace">    </span><span class="mi">583</span> <span class="c1"># Now do any that were deferred</span>
-<span class="g g-Whitespace">    </span><span class="mi">584</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">deferred</span><span class="p">:</span>
-
-<span class="ne">ValueError</span>: Unable to configure handler &#39;file&#39;
+FILE
+    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/util/distribution_discretization.py
 </pre></div>
 </div>
 </div>
@@ -654,6 +740,59 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">inspect</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">distribution_discretization</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&quot;&quot;&quot; discretization of the distribution of the particles
+&quot;&quot;&quot;
+import numpy as np
+from scipy.stats import lognorm
+from particula import u
+from particula.util.input_handling import in_scalar, in_radius
+
+
+def discretize(
+    interval=None,
+    disttype=&quot;lognormal&quot;,
+    gsigma=in_scalar(1.25).m,
+    mode=in_radius(100e-9),
+    nparticles=in_scalar(1e5).m,
+    **kwargs
+):
+    &quot;&quot;&quot; discretize the distribution of the particles
+
+        Args:
+            interval    (float) the size interval of the distribution
+            distype     (str)   the type of distribution, &quot;lognormal&quot; for now
+            gsigma      (float) geometric standard deviation of distribution
+            mode        (float) pdf scale (corresponds to mode in lognormal)
+    &quot;&quot;&quot;
+
+    _ = kwargs.get(&quot;something&quot;)
+    if not isinstance(mode, u.Quantity):
+        mode = in_radius(mode)
+
+    if interval is None:
+        raise ValueError(&quot;the &#39;interval&#39; must be specified!&quot;)
+
+    if not isinstance(interval, u.Quantity):
+        interval = u.Quantity(interval, &quot; &quot;)
+
+    if disttype != &quot;lognormal&quot;:
+        raise ValueError(&quot;the &#39;disttype&#39; must be &#39;lognormal&#39; for now!&quot;)
+
+    return ((
+        lognorm.pdf(
+            x=interval.m,
+            s=np.reshape(np.log(gsigma), (np.array([gsigma]).size, 1)),
+            scale=np.reshape([mode.m], (np.array([mode.m]).size, 1)),
+        ) / interval.u
+        * np.reshape([nparticles], (np.array([nparticles]).size, 1))
+    ).sum(axis=0) /
+        np.array([nparticles]).sum() /
+        np.max([np.array([mode.m]).size, np.array([gsigma]).size])
+    )
 </pre></div>
 </div>
 </div>
