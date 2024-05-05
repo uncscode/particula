@@ -50,7 +50,7 @@ def test_g_collection_term_single_value():
     radius of particles.
     """
     mean_free_path_particle = 6.085302617379366e-08  # mean free path in meters
-    radius_particle = 1e-5 # radius in meters
+    radius_particle = 1e-5  # radius in meters
     expected_value = (
         (2 * radius_particle + mean_free_path_particle)**3
         - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3 / 2)
@@ -182,13 +182,13 @@ def test_brownian_coagulation_kernel_input_validation():
             "not a number")
 
 
-def test_system_state_brownian_coagulation_kernel_basic():
+def test_brownian_coagulation_kernel_via_system_state_basic():
     """
     Test the complete system function with basic input values.
     """
     # diameters, 2 nm, 1 um, 20 um
     radius_particle = np.array([1e-9, 5e-7, 10e-6])  # radii in meters
-    mass_particle = 4/3 * np.pi * radius_particle**3 * 1000  # mass in kg
+    mass_particle = 4 / 3 * np.pi * radius_particle**3 * 1000  # mass in kg
     temperature = 298  # temperature in Kelvin
     pressure = 101325  # pressure in Pascal
     alpha_collision_efficiency = np.array([1.0, 1.0, 1.0])  # dimensionless
@@ -205,7 +205,7 @@ def test_system_state_brownian_coagulation_kernel_basic():
     ])
 
     # Call the system function
-    result = brownian.system_state_brownian_coagulation_kernel(
+    result = brownian.brownian_coagulation_kernel_via_system_state(
         radius_particle,
         mass_particle,
         temperature,
@@ -217,13 +217,13 @@ def test_system_state_brownian_coagulation_kernel_basic():
     np.testing.assert_allclose(result, expected_output, rtol=1e-6)
 
 
-def test_system_state_brownian_coagulation_kernel_input_validation():
+def test_brownian_coagulation_kernel_via_system_state_input_validation():
     """
     Ensure that providing incorrect input types or sizes raises appropriate
     errors.
     """
     with pytest.raises(TypeError):
-        brownian.system_state_brownian_coagulation_kernel(
+        brownian.brownian_coagulation_kernel_via_system_state(
             radius_particle="not a number",
             mass_particle="not a number",
             temperature="not a number",

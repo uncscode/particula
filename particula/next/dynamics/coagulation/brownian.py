@@ -67,11 +67,11 @@ def g_collection_term(
 
     The np.sqrt(2) term appears to be an error in the text, as the term is
     not used in the second edition of the book. And when it it is used, the
-    values are too small, by about 2x
+    values are too small, by about 2x.
     """
     return (
         (2 * radius_particle + mean_free_path_particle)**3
-        - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3/2)
+        - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3 / 2)
     ) / (6 * radius_particle * mean_free_path_particle) - 2 * radius_particle
 
 
@@ -163,10 +163,10 @@ def brownian_coagulation_kernel(
         sum_radius / (sum_radius + g_term_sqrt)
         + 4 * sum_diffusivity
         / (sum_radius * thermal_speed_sqrt * alpha_collision_efficiency)
-        )
+    )
 
 
-def system_state_brownian_coagulation_kernel(
+def brownian_coagulation_kernel_via_system_state(
     radius_particle: Union[float, NDArray[np.float_]],
     mass_particle: Union[float, NDArray[np.float_]],
     temperature: float,
@@ -174,6 +174,7 @@ def system_state_brownian_coagulation_kernel(
     alpha_collision_efficiency: Union[float, NDArray[np.float_]] = 1.0
 ) -> Union[float, NDArray[np.float_]]:
     """ Returns the Brownian coagulation kernel for aerosol particles.
+    Calculating the intermediate properties needed.
 
     Args
     ----
