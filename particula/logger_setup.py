@@ -60,8 +60,7 @@ config = {
 def setup():
     """Setup for logging in the particula package."""
     # check for logging directory
-    logging_dir = "logging"
-    os.makedirs(logging_dir, exist_ok=True)
+    os.makedirs(log_dir, exist_ok=True)
     # configure the logger
     logging.config.dictConfig(config)
     return logger
