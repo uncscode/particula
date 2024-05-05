@@ -628,6 +628,85 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:573,</span> in <span class="ni">DictConfigurator.configure</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">    </span><span class="mi">572</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">573</span>     <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_handler</span><span class="p">(</span><span class="n">handlers</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+<span class="g g-Whitespace">    </span><span class="mi">574</span>     <span class="n">handler</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:757,</span> in <span class="ni">DictConfigurator.configure_handler</span><span class="nt">(self, config)</span>
+<span class="g g-Whitespace">    </span><span class="mi">756</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">757</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">758</span> <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">te</span><span class="p">:</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/handlers.py:155,</span> in <span class="ni">RotatingFileHandler.__init__</span><span class="nt">(self, filename, mode, maxBytes, backupCount, encoding, delay, errors)</span>
+<span class="g g-Whitespace">    </span><span class="mi">154</span>     <span class="n">encoding</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">text_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">155</span> <span class="n">BaseRotatingHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">156</span>                              <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">157</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxBytes</span> <span class="o">=</span> <span class="n">maxBytes</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/handlers.py:58,</span> in <span class="ni">BaseRotatingHandler.__init__</span><span class="nt">(self, filename, mode, encoding, delay, errors)</span>
+<span class="g g-Whitespace">     </span><span class="mi">55</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">56</span><span class="sd"> Use the specified filename for streamed logging</span>
+<span class="g g-Whitespace">     </span><span class="mi">57</span><span class="sd"> &quot;&quot;&quot;</span>
+<span class="ne">---&gt; </span><span class="mi">58</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">59</span>                              <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">60</span>                              <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">61</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/__init__.py:1181,</span> in <span class="ni">FileHandler.__init__</span><span class="nt">(self, filename, mode, encoding, delay, errors)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1180</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1181</span>     <span class="n">StreamHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">())</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/__init__.py:1213,</span> in <span class="ni">FileHandler._open</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1212</span> <span class="n">open_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_builtin_open</span>
+<span class="ne">-&gt; </span><span class="mi">1213</span> <span class="k">return</span> <span class="n">open_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFilename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1214</span>                  <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+
+<span class="ne">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logging/particula.log&#39;
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">6</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="ne">----&gt; </span><span class="mi">6</span> <span class="kn">from</span> <span class="nn">particula.lagrangian</span> <span class="kn">import</span> <span class="n">boundary</span><span class="p">,</span> <span class="n">integration</span><span class="p">,</span> <span class="n">collisions</span><span class="p">,</span> <span class="n">particle_property</span><span class="p">,</span> <span class="n">particle_pairs</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">machine_limit</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="c1"># Initializing the Torch Generator and setting the data type</span>
+
+<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">26</span>
+<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.0.16&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">25</span> <span class="c1"># setup the logger</span>
+<span class="ne">---&gt; </span><span class="mi">26</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">setup</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">27</span> <span class="c1"># log the version of particula upon loading</span>
+<span class="g g-Whitespace">     </span><span class="mi">28</span> <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;particula version </span><span class="si">%s</span><span class="s2"> loaded.&quot;</span><span class="p">,</span> <span class="n">__version__</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logger_setup.py:66,</span> in <span class="ni">setup</span><span class="nt">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">64</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">logging_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">65</span> <span class="c1"># configure the logger</span>
+<span class="ne">---&gt; </span><span class="mi">66</span> <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">67</span> <span class="k">return</span> <span class="n">logger</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:823,</span> in <span class="ni">dictConfig</span><span class="nt">(config)</span>
+<span class="g g-Whitespace">    </span><span class="mi">821</span> <span class="k">def</span> <span class="nf">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">822</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Configure logging using a dictionary.&quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">823</span>     <span class="n">dictConfigClass</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:580,</span> in <span class="ni">DictConfigurator.configure</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">    </span><span class="mi">578</span>             <span class="n">deferred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">579</span>         <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">580</span>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unable to configure handler &#39;</span>
+<span class="g g-Whitespace">    </span><span class="mi">581</span>                              <span class="s1">&#39;</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+<span class="g g-Whitespace">    </span><span class="mi">583</span> <span class="c1"># Now do any that were deferred</span>
+<span class="g g-Whitespace">    </span><span class="mi">584</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">deferred</span><span class="p">:</span>
+
+<span class="ne">ValueError</span>: Unable to configure handler &#39;file&#39;
+</pre></div>
+</div>
+</div>
 </div>
 <section id="initialization-of-particles">
 <h2>Initialization of Particles<a class="headerlink" href="#initialization-of-particles" title="Link to this heading">#</a></h2>
@@ -756,8 +835,8 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/b7da67a7d7a3e14eb4d2037101214d112f4dffdf8e4970926088a4cd4706c2d7.png" src="../../_images/b7da67a7d7a3e14eb4d2037101214d112f4dffdf8e4970926088a4cd4706c2d7.png" />
-<img alt="../../_images/c7417950fe1c8d0572f2c7ab9ae7e8d2dfcb7f9949b68beffecd4d797c11f144.png" src="../../_images/c7417950fe1c8d0572f2c7ab9ae7e8d2dfcb7f9949b68beffecd4d797c11f144.png" />
+<img alt="../../_images/95c0e57d1efb52ce781068e59752e777806ea13294670574e0e382b97bc1ed80.png" src="../../_images/95c0e57d1efb52ce781068e59752e777806ea13294670574e0e382b97bc1ed80.png" />
+<img alt="../../_images/3dbf6c0f3b7b2a66ad155afe60dad33d250592de02d2a27a5fd70843b36f16a2.png" src="../../_images/3dbf6c0f3b7b2a66ad155afe60dad33d250592de02d2a27a5fd70843b36f16a2.png" />
 </div>
 </div>
 </section>
@@ -830,10 +909,10 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Max Radius [m]:  tensor(0.0006)
-Min Radius [m]:  tensor(2.9795e-06)
+Min Radius [m]:  tensor(6.2121e-06)
 </pre></div>
 </div>
-<img alt="../../_images/263f545578e25131da9af0a1742ac96bcfb7e6f1701d388aeb600a1b0dac18dc.png" src="../../_images/263f545578e25131da9af0a1742ac96bcfb7e6f1701d388aeb600a1b0dac18dc.png" />
+<img alt="../../_images/5bae33957c2ccef657b97508b407508ede19e656a126c41196b37b5c14e00ec6.png" src="../../_images/5bae33957c2ccef657b97508b407508ede19e656a126c41196b37b5c14e00ec6.png" />
 </div>
 </div>
 </section>
@@ -922,8 +1001,8 @@ Min Radius [m]:  tensor(2.9795e-06)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 8.609729290008545 seconds
-Ratio of wall time to simulation time: 0.08609729290008544
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total wall time: 22.354511499404907 seconds
+Ratio of wall time to simulation time: 0.22354511499404908
 </pre></div>
 </div>
 </div>
@@ -987,10 +1066,10 @@ Ratio of wall time to simulation time: 0.08609729290008544
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 1510
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of particles at the end: 1260
 </pre></div>
 </div>
-<img alt="../../_images/e18b5ed2161e231502e715eccaf1a10626098c50eee6e87a82150d27fa456116.png" src="../../_images/e18b5ed2161e231502e715eccaf1a10626098c50eee6e87a82150d27fa456116.png" />
+<img alt="../../_images/71778c18cfdb5818ea4094fc2040e7dd3fa68f0eafa89458948552275535ae68.png" src="../../_images/71778c18cfdb5818ea4094fc2040e7dd3fa68f0eafa89458948552275535ae68.png" />
 </div>
 </div>
 </section>
@@ -1018,9 +1097,9 @@ Ratio of wall time to simulation time: 0.08609729290008544
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/70dba8340cbaf6374b4074b4a4b623a868eee36ad40a988cdae7d756afe20b88.png" src="../../_images/70dba8340cbaf6374b4074b4a4b623a868eee36ad40a988cdae7d756afe20b88.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial Max Radius [m]:  0.0006300950772128999
-Final Max Radius [m]:  0.0007361950668992882
+<img alt="../../_images/7d74a9c775811386553f2dd398e7b94a7636898a8cd9f9eb86435f8a09dac781.png" src="../../_images/7d74a9c775811386553f2dd398e7b94a7636898a8cd9f9eb86435f8a09dac781.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Initial Max Radius [m]:  0.0005869632004760206
+Final Max Radius [m]:  0.0007475933229391738
 </pre></div>
 </div>
 </div>

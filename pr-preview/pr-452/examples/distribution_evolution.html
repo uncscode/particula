@@ -598,6 +598,84 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:573,</span> in <span class="ni">DictConfigurator.configure</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">    </span><span class="mi">572</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">573</span>     <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_handler</span><span class="p">(</span><span class="n">handlers</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+<span class="g g-Whitespace">    </span><span class="mi">574</span>     <span class="n">handler</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:757,</span> in <span class="ni">DictConfigurator.configure_handler</span><span class="nt">(self, config)</span>
+<span class="g g-Whitespace">    </span><span class="mi">756</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">757</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">758</span> <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">te</span><span class="p">:</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/handlers.py:155,</span> in <span class="ni">RotatingFileHandler.__init__</span><span class="nt">(self, filename, mode, maxBytes, backupCount, encoding, delay, errors)</span>
+<span class="g g-Whitespace">    </span><span class="mi">154</span>     <span class="n">encoding</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">text_encoding</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">155</span> <span class="n">BaseRotatingHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">156</span>                              <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">157</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxBytes</span> <span class="o">=</span> <span class="n">maxBytes</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/handlers.py:58,</span> in <span class="ni">BaseRotatingHandler.__init__</span><span class="nt">(self, filename, mode, encoding, delay, errors)</span>
+<span class="g g-Whitespace">     </span><span class="mi">55</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">56</span><span class="sd"> Use the specified filename for streamed logging</span>
+<span class="g g-Whitespace">     </span><span class="mi">57</span><span class="sd"> &quot;&quot;&quot;</span>
+<span class="ne">---&gt; </span><span class="mi">58</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">59</span>                              <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">60</span>                              <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">61</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/__init__.py:1181,</span> in <span class="ni">FileHandler.__init__</span><span class="nt">(self, filename, mode, encoding, delay, errors)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1180</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1181</span>     <span class="n">StreamHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">())</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/__init__.py:1213,</span> in <span class="ni">FileHandler._open</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1212</span> <span class="n">open_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_builtin_open</span>
+<span class="ne">-&gt; </span><span class="mi">1213</span> <span class="k">return</span> <span class="n">open_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFilename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1214</span>                  <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+
+<span class="ne">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logging/particula.log&#39;
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">----&gt; </span><span class="mi">2</span>     <span class="kn">import</span> <span class="nn">particula</span><span class="o">,</span> <span class="nn">matplotlib</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting up computational environment...&quot;</span><span class="p">)</span>
+
+<span class="n">File</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.11.9</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">particula</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">26</span>
+<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.0.16&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">25</span> <span class="c1"># setup the logger</span>
+<span class="ne">---&gt; </span><span class="mi">26</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">setup</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">27</span> <span class="c1"># log the version of particula upon loading</span>
+<span class="g g-Whitespace">     </span><span class="mi">28</span> <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;particula version </span><span class="si">%s</span><span class="s2"> loaded.&quot;</span><span class="p">,</span> <span class="n">__version__</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/logger_setup.py:66,</span> in <span class="ni">setup</span><span class="nt">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">64</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">logging_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">65</span> <span class="c1"># configure the logger</span>
+<span class="ne">---&gt; </span><span class="mi">66</span> <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">67</span> <span class="k">return</span> <span class="n">logger</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:823,</span> in <span class="ni">dictConfig</span><span class="nt">(config)</span>
+<span class="g g-Whitespace">    </span><span class="mi">821</span> <span class="k">def</span> <span class="nf">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">822</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Configure logging using a dictionary.&quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">823</span>     <span class="n">dictConfigClass</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">configure</span><span class="p">()</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/logging/config.py:580,</span> in <span class="ni">DictConfigurator.configure</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">    </span><span class="mi">578</span>             <span class="n">deferred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">579</span>         <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">580</span>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unable to configure handler &#39;</span>
+<span class="g g-Whitespace">    </span><span class="mi">581</span>                              <span class="s1">&#39;</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+<span class="g g-Whitespace">    </span><span class="mi">583</span> <span class="c1"># Now do any that were deferred</span>
+<span class="g g-Whitespace">    </span><span class="mi">584</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">deferred</span><span class="p">:</span>
+
+<span class="ne">ValueError</span>: Unable to configure handler &#39;file&#39;
+</pre></div>
+</div>
+</div>
 </div>
 <p>We can do this in a simple way by using a for loop to march through the time steps.</p>
 <div class="cell docutils container">
@@ -659,7 +737,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/69538e06e64c96d54809deada797f1e6fd4b3159a0c006e9ca0622c34226bb17.png" src="../_images/69538e06e64c96d54809deada797f1e6fd4b3159a0c006e9ca0622c34226bb17.png" />
+<img alt="../_images/80427abdf6960b7d55b4f6053b87ca30809cec173794895c1a68c4a3f5df8817.png" src="../_images/80427abdf6960b7d55b4f6053b87ca30809cec173794895c1a68c4a3f5df8817.png" />
 </div>
 </div>
 </section>
@@ -717,7 +795,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/3511f05e36b730b892c9f2b01226630f0fa0d379b860e7fa804b75dc1e4ba09c.png" src="../_images/3511f05e36b730b892c9f2b01226630f0fa0d379b860e7fa804b75dc1e4ba09c.png" />
+<img alt="../_images/44af99009e6da89d32bfd32a45361dda8a1a60ab7761aa2d5b67f6bebc4e6cf7.png" src="../_images/44af99009e6da89d32bfd32a45361dda8a1a60ab7761aa2d5b67f6bebc4e6cf7.png" />
 </div>
 </div>
 </section>
