@@ -9,15 +9,23 @@ import numpy as np
 from particula.next.runnable import Runnable
 from particula.next.aerosol import Aerosol
 from particula.next.dynamics.condensation import CondensationStrategy
+from particula.next.dynamics.coagulation.strategy import CoagulationStrategy
 
 
 class MassCondensation(Runnable):
     """
     A class for running a mass condensation process.
 
-    Parameters:
+    Args:
+    -----
     - condensation_strategy (CondensationStrategy): The condensation strategy
     to use.
+
+    Methods:
+    --------
+    - execute: Execute the mass condensation process.
+    - rate: Calculate the rate of mass condensation for each particle due to
+    each condensable gas species.
     """
 
     def __init__(self, condensation_strategy: CondensationStrategy):
@@ -27,7 +35,8 @@ class MassCondensation(Runnable):
         """
         Execute the mass condensation process.
 
-        Parameters:
+        Args:
+        -----
         - aerosol (Aerosol): The aerosol instance to modify.
         """
         # loop over gas species
@@ -62,10 +71,12 @@ class MassCondensation(Runnable):
         Calculate the rate of mass condensation for each particle due to
         each condensable gas species.
 
-        Parameters:
+        Args:
+        -----
         - aerosol (Aerosol): The aerosol instance to modify.
 
         Returns:
+        --------
         - np.ndarray: An array of condensation rates for each particle.
         """
         rates = np.array([], dtype=np.float_)
@@ -85,4 +96,67 @@ class MassCondensation(Runnable):
                 )
                 # Multiply mass rate by particle concentration
                 rates = np.append(rates, mass_rate * particle.concentration)
+        return rates
+
+
+class Coagulation(Runnable):
+    """
+    A class for running a coagulation strategy.
+
+    Args:
+    -----
+    - coagulation_strategy (CoagulationStrategy): The coagulation strategy to
+    use.
+
+    Methods:
+    --------
+    - execute: Execute the coagulation process.
+    - rate: Calculate the rate of coagulation for each particle.
+    """
+
+    def __init__(self, coagulation_strategy: CoagulationStrategy):
+        self.coagulation_strategy = coagulation_strategy
+
+    def execute(self, aerosol: Aerosol, time_step: float) -> Aerosol:
+        """
+        Execute the coagulation process.
+
+        Args:
+        -----
+        - aerosol (Aerosol): The aerosol instance to modify.
+        """
+        # Loop over particles
+        for particle in aerosol.iterate_particle():
+            # Calculate the net coagulation rate for the particle
+            net_rate = self.coagulation_strategy.net_rate(
+                particle=particle,
+                temperature=aerosol.gas.temperature,
+                pressure=aerosol.gas.total_pressure
+            )
+            # Apply the change in distribution
+            particle.add_concentration(net_rate * time_step)  # type: ignore
+        return aerosol
+
+    def rate(self, aerosol: Aerosol) -> Any:
+        """
+        Calculate the rate of coagulation for each particle.
+
+        Args:
+        -----
+        - aerosol (Aerosol): The aerosol instance to modify.
+
+        Returns:
+        --------
+        - np.ndarray: An array of coagulation rates for each particle.
+        """
+        rates = np.array([], dtype=np.float_)
+        # Loop over particles
+        for particle in aerosol.iterate_particle():
+            # Calculate the net coagulation rate for the particle
+            net_rate = self.coagulation_strategy.net_rate(
+                particle=particle,
+                temperature=aerosol.gas.temperature,
+                pressure=aerosol.gas.total_pressure
+            )
+            rates = np.append(rates, net_rate)
         return rates

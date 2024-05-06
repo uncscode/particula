@@ -13,7 +13,7 @@ from scipy.interpolate import RectBivariateSpline  # type: ignore
 
 def loss_rate(
     radius: Union[float, NDArray[np.float_]],
-    distribution: Union[float, NDArray[np.float_]],
+    concentration: Union[float, NDArray[np.float_]],
     kernel: NDArray[np.float_]
 ) -> Union[float, NDArray[np.float_]]:
     """
@@ -22,7 +22,7 @@ def loss_rate(
     Args:
     -----
     - radius: The radius of the particles.
-    - dist: The distribution of particles.
+    - concentraiton: The distribution of particles.
     - kernel: The coagulation kernel.
 
     Returns:
@@ -34,12 +34,12 @@ def loss_rate(
     Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Chapter 13 Equations 13.61
     """
-    return distribution * np.trapz(kernel * distribution, radius)
+    return concentration * np.trapz(kernel * concentration, radius)
 
 
 def gain_rate(
     radius: Union[float, NDArray[np.float_]],
-    distribution: Union[float, NDArray[np.float_]],
+    concentration: Union[float, NDArray[np.float_]],
     kernel: NDArray[np.float_]
 ) -> Union[float, NDArray[np.float_]]:
     """
@@ -48,7 +48,7 @@ def gain_rate(
     Args:
     -----
     - radius: The radius of the particles.
-    - dist: The distribution of particles.
+    - concentration: The distribution of particles.
     - kernel: The coagulation kernel.
 
     Returns:
@@ -70,18 +70,18 @@ def gain_rate(
     interp = RectBivariateSpline(
         x=radius,
         y=radius,
-        z=kernel * distribution * np.transpose(distribution)
+        z=kernel * concentration * np.transpose(concentration)
     )
 
     dpd = np.linspace(0, radius / 2**(1 / 3), radius.size)
     dpi = ((np.transpose(radius))**3 - dpd**3)**(1 / 3)
 
-    return radius**2 * np.trapz(interp.ev(dpd.m, dpi.m) / dpi**2, dpd, axis=0)
+    return radius**2 * np.trapz(interp.ev(dpd, dpi) / dpi**2, dpd, axis=0)
 
 
 def net_rate(
     radius: Union[float, NDArray[np.float_]],
-    distribution: Union[float, NDArray[np.float_]],
+    concentration: Union[float, NDArray[np.float_]],
     kernel: NDArray[np.float_]
 ) -> Union[float, NDArray[np.float_]]:
     """
@@ -102,5 +102,5 @@ def net_rate(
     Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Chapter 13 Equations 13.61
     """
-    return gain_rate(radius, distribution, kernel) - loss_rate(
-        radius, distribution, kernel)
+    return gain_rate(radius, concentration, kernel) - loss_rate(
+        radius, concentration, kernel)

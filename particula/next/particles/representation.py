@@ -421,4 +421,4 @@ class Particle:
         - added_concentration (NDArray[np.float_]): The concentration to be
             added per distribution bin.
         """
-        self.concentration += added_concentration
+        self.concentration = added_concentration + self.concentration

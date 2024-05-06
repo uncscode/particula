@@ -2,7 +2,7 @@
 """
 
 from abc import ABC, abstractmethod
-from typing import Union, Optional
+from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
@@ -76,7 +76,7 @@ class CoagulationStrategy(ABC):
         """
         return rate.loss_rate(
             radius=particle.get_radius(),
-            distribution=particle.distribution,
+            concentration=particle.concentration,
             kernel=kernel,
         )
 
@@ -107,7 +107,7 @@ class CoagulationStrategy(ABC):
         """
         return rate.gain_rate(
             radius=particle.get_radius(),
-            distribution=particle.distribution,
+            concentration=particle.concentration,
             kernel=kernel,
         )
 
