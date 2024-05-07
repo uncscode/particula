@@ -42,7 +42,7 @@
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -271,13 +271,13 @@
 
 
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Prototype</span></p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Next Development</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../base/base_overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../base/gas.html">Gases</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../base/base_particle.html">Strategies in Particle Distributions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../base/base_aerosol.html">Aerosol</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../base/base_runnable_process.html">Modeling Aerosol Dynamics with Runnable Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../next/next_vapor_pressure.html">Vapor Pressure</a></li>
+
+
+
+
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
 <ul class="nav bd-sidenav">
@@ -590,6 +590,27 @@ DESCRIPTION
         -- implementing tranpose for now.
 
 FUNCTIONS
+    calculate_knudsen_number(mean_free_path: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], particle_radius: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]) -&gt; Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
+        Calculate the Knudsen number using the mean free path of the gas and the
+        radius of the particle. The Knudsen number is a dimensionless number that
+        indicates the regime of gas flow relative to the size of particles.
+        
+        Args:
+        -----
+        - mean_free_path (Union[float, NDArray[np.float_]]): The mean free path of
+        the gas molecules [meters (m)].
+        - particle_radius (Union[float, NDArray[np.float_]]): The radius of the
+        particle [meters (m)].
+        
+        Returns:
+        --------
+        - Union[float, NDArray[np.float_]]: The Knudsen number, which is the
+        ratio of the mean free path to the particle radius.
+        
+        References:
+        -----------
+        - For more information at https://en.wikipedia.org/wiki/Knudsen_number
+    
     knu(radius=None, mfp=None, **kwargs)
         Returns particle&#39;s Knudsen number.
         
@@ -634,8 +655,40 @@ FUNCTIONS
             mfp can be calculated using mfp(**kwargs);
             refer to particula.util.mean_free_path.mfp for more info.
 
+DATA
+    NDArray = numpy.ndarray[typing.Any, numpy.dtype[+_ScalarType_co]]
+    Union = typing.Union
+        Union type; Union[X, Y] means either X or Y.
+        
+        On Python 3.10 and higher, the | operator
+        can also be used to denote unions;
+        X | Y means the same thing to the type checker as Union[X, Y].
+        
+        To define a union, use e.g. Union[int, str]. Details:
+        - The arguments must be types and there must be at least one.
+        - None as an argument is a special case and is replaced by
+          type(None).
+        - Unions of unions are flattened, e.g.::
+        
+            assert Union[Union[int, str], float] == Union[int, str, float]
+        
+        - Unions of a single argument vanish, e.g.::
+        
+            assert Union[int] == int  # The constructor actually returns int
+        
+        - Redundant arguments are skipped, e.g.::
+        
+            assert Union[int, str, int] == Union[int, str]
+        
+        - When comparing unions, the argument order is ignored, e.g.::
+        
+            assert Union[int, str] == Union[str, int]
+        
+        - You cannot subclass or instantiate a union.
+        - You can use Optional[X] as a shorthand for Union[X, None].
+
 FILE
-    /opt/hostedtoolcache/Python/3.11.8/x64/lib/python3.11/site-packages/particula/util/knudsen_number.py
+    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/util/knudsen_number.py
 </pre></div>
 </div>
 </div>
@@ -660,6 +713,8 @@ FILE
         -- implementing tranpose for now.
 &quot;&quot;&quot;
 
+from typing import Union
+from numpy.typing import NDArray
 import numpy as np
 from particula.util.input_handling import in_length, in_radius
 from particula.util.mean_free_path import mfp as mfp_func
@@ -719,6 +774,34 @@ def knu(
     radius = in_radius(radius)
 
     return np.transpose([mfp_val.m]) * mfp_val.u / radius
+
+
+def calculate_knudsen_number(
+    mean_free_path: Union[float, NDArray[np.float_]],
+    particle_radius: Union[float, NDArray[np.float_]]
+) -&gt; Union[float, NDArray[np.float_]]:
+    &quot;&quot;&quot;
+    Calculate the Knudsen number using the mean free path of the gas and the
+    radius of the particle. The Knudsen number is a dimensionless number that
+    indicates the regime of gas flow relative to the size of particles.
+
+    Args:
+    -----
+    - mean_free_path (Union[float, NDArray[np.float_]]): The mean free path of
+    the gas molecules [meters (m)].
+    - particle_radius (Union[float, NDArray[np.float_]]): The radius of the
+    particle [meters (m)].
+
+    Returns:
+    --------
+    - Union[float, NDArray[np.float_]]: The Knudsen number, which is the
+    ratio of the mean free path to the particle radius.
+
+    References:
+    -----------
+    - For more information at https://en.wikipedia.org/wiki/Knudsen_number
+    &quot;&quot;&quot;
+    return mean_free_path / particle_radius
 </pre></div>
 </div>
 </div>
