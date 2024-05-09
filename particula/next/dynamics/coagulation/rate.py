@@ -34,7 +34,7 @@ def loss_rate(
     Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Chapter 13 Equations 13.61
     """
-    return concentration * np.trapz(kernel * concentration, radius)
+    return np.sum(concentration * kernel * np.transpose(concentration), axis=0)
 
 
 def gain_rate(
@@ -67,16 +67,22 @@ def gain_rate(
     - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Chapter 13 Equations 13.61
     """
-    interp = RectBivariateSpline(
-        x=radius,
-        y=radius,
-        z=kernel * concentration * np.transpose(concentration)
-    )
+    # gain
+    # 0.5* C_i * C_j * K_ij
+    gain_matrix = 0.5 * kernel * concentration * np.transpose(concentration)
 
-    dpd = np.linspace(0, radius / 2**(1 / 3), radius.size)
-    dpi = ((np.transpose(radius))**3 - dpd**3)**(1 / 3)
+    # select the diagonal to sum over, skip the first one.
+    # rotate matrix
+    flipped_matrix = np.fliplr(gain_matrix)
 
-    return radius**2 * np.trapz(interp.ev(dpd, dpi) / dpi**2, dpd, axis=0)
+    # Generate offsets
+    offsets = len(flipped_matrix) - 1 - np.arange(len(flipped_matrix))
+
+    # Calculate traces of each diagonal
+    gain = np.array([np.trace(flipped_matrix, offset=off)
+                     for off in offsets[:-1]])
+    # prepend the first element
+    return np.insert(gain, 0, 0)
 
 
 def net_rate(

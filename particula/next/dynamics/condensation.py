@@ -43,8 +43,8 @@ import numpy as np
 from particula.next.particles.representation import Particle
 from particula.next.gas.species import GasSpecies
 from particula.constants import GAS_CONSTANT
-from particula.util.knudsen_number import calculate_knudsen_number
-from particula.util.mean_free_path import molecule_mean_free_path
+from particula.next.particles.properties import calculate_knudsen_number
+from particula.next.gas.properties import molecule_mean_free_path
 
 
 # define Suchs and Futugin transition function
