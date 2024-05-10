@@ -3,7 +3,8 @@
 
 import pytest
 import numpy as np
-from particula.next.gas.properties.mean_free_path import molecule_mean_free_path
+from particula.next.gas.properties.mean_free_path import (
+    molecule_mean_free_path)
 
 
 def test_molecule_mean_free_path():

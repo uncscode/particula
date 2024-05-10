@@ -8,7 +8,7 @@ import numpy as np
 
 from particula.next.particles.representation import Particle
 from particula.next.dynamics.coagulation import rate
-from particula.next.dynamics.coagulation.brownian import (
+from particula.next.dynamics.coagulation.brownian_kernel import (
     brownian_coagulation_kernel_via_system_state
 )
 

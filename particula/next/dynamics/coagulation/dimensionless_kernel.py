@@ -1,12 +1,50 @@
-""" A class with methods for dimensionless coagulation
+""" A dimensionless coagulation strategies and builders
 """
 
-from particula.util.input_handling import in_scalar
+from abc import ABC, abstractmethod
+
 from particula.util.diffusive_knudsen import DiffusiveKnudsen as DKn
 from particula.util.diffusive_knudsen import celimits
 # from particula.util.diffusive_knudsen import diff_knu as dknu
 from particula.util.diffusive_knudsen import red_frifac, red_mass, rxr
 from particula.util.approx_coagulation import approx_coag_less
+
+
+class DimensionlessStrategy(ABC):
+    """
+    Abstract class for dimensionless coagulation strategies. This class defines
+    the methods that must be implemented by any dimensionless coagulation
+    strategy.
+    """
+
+    @abstractmethod
+    def dimensionless(self):
+        """ Return the dimensionless coagulation kernel (H)
+        """
+
+    def kernel(self):
+        """ Retrun the dimensioned coagulation kernel
+        """
+
+        dimensionless_h = self.coag_less()
+        reduced_friction_factor = red_frifac(**self.kwargs)
+        reduced_mass = red_mass(**self.kwargs)
+        columb_kenetic_limit = celimits(**self.kwargs)
+        columb_continum_limit = celimits(**self.kwargs)
+        cekl, cecl = celimits(**self.kwargs)
+        xrxr = rxr(**self.kwargs)
+
+        return (
+            coag * redff * xrxr**3 * cekl**2 / (redm * cecl)
+        )
+
+
+
+
+
+
+
+
 
 
 class DimensionlessCoagulation(DKn):

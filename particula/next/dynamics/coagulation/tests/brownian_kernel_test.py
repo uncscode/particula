@@ -3,7 +3,7 @@
 
 import pytest
 import numpy as np
-from particula.next.dynamics.coagulation import brownian
+from particula.next.dynamics.coagulation import brownian_kernel
 from particula.constants import BOLTZMANN_CONSTANT
 
 
@@ -16,7 +16,7 @@ def test_mean_free_path_l_single_value():
     mean_thermal_speed_particle = 100  # example speed [m/s]
     expected_path = 8 * diffusivity_particle / \
         (np.pi * mean_thermal_speed_particle)
-    value = brownian.mean_free_path_l(
+    value = brownian_kernel.mean_free_path_l(
         diffusivity_particle, mean_thermal_speed_particle)
     assert np.isclose(value, expected_path)
 
@@ -30,7 +30,7 @@ def test_mean_free_path_l_array_input():
     mean_thermal_speed_particle = np.array([100, 200])
     expected_path = 8 * diffusivity_particle / \
         (np.pi * mean_thermal_speed_particle)
-    value = brownian.mean_free_path_l(
+    value = brownian_kernel.mean_free_path_l(
         diffusivity_particle, mean_thermal_speed_particle)
     np.testing.assert_allclose(value, expected_path, rtol=1e-6)
 
@@ -41,7 +41,7 @@ def test_mean_free_path_l_input_validation():
     TypeError.
     """
     with pytest.raises(TypeError):
-        brownian.mean_free_path_l("not a number", "also not a number")
+        brownian_kernel.mean_free_path_l("not a number", "also not a number")
 
 
 def test_g_collection_term_single_value():
@@ -55,7 +55,7 @@ def test_g_collection_term_single_value():
         (2 * radius_particle + mean_free_path_particle)**3
         - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3 / 2)
     ) / (6 * radius_particle * mean_free_path_particle) - 2 * radius_particle
-    value = brownian.g_collection_term(
+    value = brownian_kernel.g_collection_term(
         mean_free_path_particle, radius_particle)
     assert np.isclose(value, expected_value)
 
@@ -71,7 +71,7 @@ def test_g_collection_term_array_input():
         (2 * radius_particle + mean_free_path_particle)**3
         - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3 / 2)
     ) / (6 * radius_particle * mean_free_path_particle) - 2 * radius_particle
-    value = brownian.g_collection_term(
+    value = brownian_kernel.g_collection_term(
         mean_free_path_particle, radius_particle)
     np.testing.assert_allclose(value, expected_value, rtol=1e-6)
 
@@ -82,7 +82,7 @@ def test_g_collection_term_input_validation():
     a TypeError.
     """
     with pytest.raises(TypeError):
-        brownian.g_collection_term("not a number", "also not a number")
+        brownian_kernel.g_collection_term("not a number", "also not a number")
 
 
 def test_g_collection_term_zero_radius():
@@ -93,7 +93,7 @@ def test_g_collection_term_zero_radius():
     mean_free_path_particle = 0.0005
     radius_particle = 0.0
     with pytest.raises(ZeroDivisionError):
-        brownian.g_collection_term(mean_free_path_particle, radius_particle)
+        brownian_kernel.g_collection_term(mean_free_path_particle, radius_particle)
 
 
 def test_brownian_diffusivity_single_value():
@@ -105,7 +105,7 @@ def test_brownian_diffusivity_single_value():
     aerodynamic_mobility = 1.5e-9  # example mobility in m^2/s
     expected_diffusivity = float(
         BOLTZMANN_CONSTANT.m) * temperature * aerodynamic_mobility
-    value = brownian.brownian_diffusivity(temperature, aerodynamic_mobility)
+    value = brownian_kernel.brownian_diffusivity(temperature, aerodynamic_mobility)
     assert np.isclose(value, expected_diffusivity)
 
 
@@ -118,7 +118,7 @@ def test_brownian_diffusivity_array_input():
     aerodynamic_mobility = np.array([1.5e-9, 2.0e-9])
     expected_diffusivity = float(
         BOLTZMANN_CONSTANT.m) * temperature * aerodynamic_mobility
-    value = brownian.brownian_diffusivity(temperature, aerodynamic_mobility)
+    value = brownian_kernel.brownian_diffusivity(temperature, aerodynamic_mobility)
     np.testing.assert_allclose(value, expected_diffusivity, rtol=1e-6)
 
 
@@ -138,7 +138,7 @@ def test_brownian_coagulation_kernel_basic():
         [3.99769516e-15, 7.10577039e-15]
     ])
 
-    result_kernel = brownian.brownian_coagulation_kernel(
+    result_kernel = brownian_kernel.brownian_coagulation_kernel(
         radius_particle,
         diffusivity_particle,
         g_collection_term_particle,
@@ -161,7 +161,7 @@ def test_brownian_coagulation_kernel_with_defaults():
     # expected result for a single input with default alpha
     expected_kernel = np.array([1.77697548e-15])
 
-    result_kernel = brownian.brownian_coagulation_kernel(
+    result_kernel = brownian_kernel.brownian_coagulation_kernel(
         radius_particle,
         diffusivity_particle,
         g_collection_term_particle,
@@ -175,7 +175,7 @@ def test_brownian_coagulation_kernel_input_validation():
     Ensure that providing incorrect input types raises a TypeError.
     """
     with pytest.raises(TypeError):
-        brownian.brownian_coagulation_kernel(
+        brownian_kernel.brownian_coagulation_kernel(
             "not a number",
             "not a number",
             "not a number",
@@ -205,7 +205,7 @@ def test_brownian_coagulation_kernel_via_system_state_basic():
     ])
 
     # Call the system function
-    result = brownian.brownian_coagulation_kernel_via_system_state(
+    result = brownian_kernel.brownian_coagulation_kernel_via_system_state(
         radius_particle,
         mass_particle,
         temperature,
@@ -223,7 +223,7 @@ def test_brownian_coagulation_kernel_via_system_state_input_validation():
     errors.
     """
     with pytest.raises(TypeError):
-        brownian.brownian_coagulation_kernel_via_system_state(
+        brownian_kernel.brownian_coagulation_kernel_via_system_state(
             radius_particle="not a number",
             mass_particle="not a number",
             temperature="not a number",
