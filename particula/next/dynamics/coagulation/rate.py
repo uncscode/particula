@@ -3,7 +3,12 @@ The coagulation gain, loss, net rate calculations.
 
 These are separate from the strategies to isolate behavior, calculation
 definitions from the usages. Which allows for easier testing and
-charry-picking of code snips."""
+charry-picking of code snips.
+
+The are discrete and continuous versions of the gain and loss rates.
+The discrete versions are calculated via summation, while the continuous
+versions are calculated via integration.
+"""
 
 from typing import Union
 from numpy.typing import NDArray
@@ -32,7 +37,7 @@ def discrete_loss(
     Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Chapter 13 Equations 13.61
     """
-    return np.sum(concentration * kernel * np.transpose(concentration), axis=0)
+    return np.sum(concentration * kernel * np.transpose([concentration]), axis=0)
 
 
 def discrete_gain(
@@ -58,7 +63,8 @@ def discrete_gain(
     """
     # gain
     # 0.5* C_i * C_j * K_ij
-    gain_matrix = 0.5 * kernel * concentration * np.transpose(concentration)
+    # typing check doesn't like the [concentration] part, to broadcast.
+    gain_matrix = 0.5 * kernel * concentration * np.transpose([concentration])
 
     # select the diagonal to sum over, skip the first one, size as no particles
     # will coagulate into it.
@@ -131,13 +137,15 @@ def continuous_gain(
     - Seinfeld, J. H., & Pandis, S. (2016). Atmospheric chemistry and
     physics, Chapter 13 Equations 13.61
     """
+
+    # typing check doesn't like the [concentration] part, to broadcast.
     interp = RectBivariateSpline(
         x=radius,
         y=radius,
-        z=kernel * concentration * np.transpose(concentration)
+        z=kernel * concentration * np.transpose([concentration])
     )
 
-    dpd = np.linspace(0, radius / 2**(1 / 3), radius.size)
+    dpd = np.linspace(0, radius / 2**(1 / 3), radius.size)  # type: ignore
     dpi = (np.transpose(radius)**3 - dpd**3)**(1 / 3)
 
     return radius**2 * np.trapz(
@@ -145,3 +153,16 @@ def continuous_gain(
         dpd,
         axis=0
     )
+
+    #    interp = RectBivariateSpline(
+    #        rads.m, rads.m, kern.m * nums.m * np.transpose([nums.m])
+    #    )
+
+    #    dpd = np.linspace(0, rads.m / 2**(1 / 3), rads.m.size) * rads.u
+    #    dpi = ((np.transpose(rads.m) * rads.u)**3 - dpd**3)**(1 / 3)
+
+    #    return rads**2 * np.trapz(
+    #        interp.ev(dpd.m, dpi.m) * kern.u * nums.u * nums.u / dpi**2,
+    #        dpd,
+    #        axis=0
+    #    )

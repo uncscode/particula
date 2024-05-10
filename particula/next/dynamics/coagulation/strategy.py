@@ -14,6 +14,7 @@ from particula.next.dynamics.coagulation.brownian_kernel import (
 from particula.next.dynamics.coagulation.kernel import KernelStrategy
 from particula.next.particles import properties
 from particula.next.gas import properties as gas_properties
+from particula.util.reduced_quantity import reduced_value
 
 
 class CoagulationStrategy(ABC):
@@ -30,6 +31,30 @@ class CoagulationStrategy(ABC):
     - diffusive_knudsen: Calculate the diffusive Knudsen number.
     - coulomb_potential_ratio: Calculate the Coulomb potential ratio.
     """
+
+    @abstractmethod
+    def dimensionless_kernel(
+        self,
+        diffusive_knudsen: NDArray[np.float_],
+        coulomb_potential_ratio: NDArray[np.float_]
+    ) -> NDArray[np.float_]:
+        """
+        Calculate the dimensionless coagulation kernel based on the particle
+        properties interactions,
+        diffusive Knudsen number and Coulomb potential
+
+        Args:
+        -----
+        - diffusive_knudsen (NDArray[np.float_]): The diffusive Knudsen number
+        for the particle [dimensionless].
+        - coulomb_potential_ratio (NDArray[np.float_]): The Coulomb potential
+        ratio for the particle [dimensionless].
+
+        Returns:
+        --------
+        - NDArray[np.float_]: The dimensionless coagulation kernel for the
+        particle [dimensionless].
+        """
 
     @abstractmethod
     def kernel(
@@ -136,13 +161,13 @@ class CoagulationStrategy(ABC):
         pressure: float
     ) -> NDArray[np.float_]:
         """
-        Calculate the diffusive Knudsen number based on the particle properties,
-        temperature, and pressure.
+        Calculate the diffusive Knudsen number based on the particle
+        properties, temperature, and pressure.
 
         Args:
         -----
-        - particle (Particle class): The particle for which the diffusive Knudsen
-        number is to be calculated.
+        - particle (Particle class): The particle for which the diffusive
+        Knudsen number is to be calculated.
         - temperature (float): The temperature of the gas phase [K].
         - pressure (float): The pressure of the gas phase [Pa].
 
@@ -152,24 +177,10 @@ class CoagulationStrategy(ABC):
         [dimensionless].
         """
         # properties calculation for friction factor
-        dynamic_viscosity = gas_properties.dynamic_viscosity(
-            temperature=temperature  # assume standard atmospheric composition
-        )
-        mean_free_path = gas_properties.molecule_mean_free_path(
+        friction_factor = self.friction_factor(
+            particle=particle,
             temperature=temperature,
-            pressure=pressure,
-            dynamic_viscosity=dynamic_viscosity
-        )
-        knudsen_number = properties.calculate_knudsen_number(
-            mean_free_path=mean_free_path,
-            particle_radius=particle.get_radius()
-        )
-        slip_correction = properties.cunningham_slip_correction(
-            knudsen_number=knudsen_number)
-        friction_factor = properties.friction_factor(
-            radius=particle.get_radius(),
-            dynamic_viscosity=dynamic_viscosity,
-            slip_correction=slip_correction
+            pressure=pressure
         )
 
         # coulomb potential ratio
@@ -211,6 +222,48 @@ class CoagulationStrategy(ABC):
             temperature=temperature
         )  # type: ignore
 
+    def friction_factor(
+        self,
+        particle: Particle,
+        temperature: float,
+        pressure: float
+    ) -> NDArray[np.float_]:
+        """
+        Calculate the friction factor based on the particle properties,
+        temperature, and pressure.
+
+        Args:
+        -----
+        - particle (Particle class): The particle for which the friction factor
+        is to be calculated.
+        - temperature (float): The temperature of the gas phase [K].
+        - pressure (float): The pressure of the gas phase [Pa].
+
+        Returns:
+        --------
+        - NDArray[np.float_]: The friction factor for the particle
+        [dimensionless].
+        """
+        dynamic_viscosity = gas_properties.dynamic_viscosity(
+            temperature=temperature  # assume standard atmospheric composition
+        )
+        mean_free_path = gas_properties.molecule_mean_free_path(
+            temperature=temperature,
+            pressure=pressure,
+            dynamic_viscosity=dynamic_viscosity
+        )
+        knudsen_number = properties.calculate_knudsen_number(
+            mean_free_path=mean_free_path,
+            particle_radius=particle.get_radius()
+        )
+        slip_correction = properties.cunningham_slip_correction(
+            knudsen_number=knudsen_number)
+        return properties.friction_factor(
+            radius=particle.get_radius(),
+            dynamic_viscosity=dynamic_viscosity,
+            slip_correction=slip_correction
+        )  # type: ignore
+
 
 # Define a coagulation strategy
 class DiscreteSimple(CoagulationStrategy):
@@ -225,6 +278,16 @@ class DiscreteSimple(CoagulationStrategy):
     - gain_rate: Calculate the coagulation gain rate.
     - net_rate: Calculate the net coagulation rate.
     """
+
+    def dimensionless_kernel(
+        self,
+        diffusive_knudsen: NDArray[np.float_],
+        coulomb_potential_ratio: NDArray[np.float_]
+    ) -> NDArray[np.float_]:
+
+        raise NotImplementedError(
+            'Dimensionless kernel not implemented in \
+            simple coagulation strategy. Use a general strategy.')
 
     def kernel(
         self,
@@ -286,23 +349,62 @@ class DiscreteGeneral(CoagulationStrategy):
     def __init__(self, kernel_strategy: KernelStrategy):
         self.kernel_strategy = kernel_strategy
 
+    def dimensionless_kernel(
+        self,
+        diffusive_knudsen: NDArray[np.float_],
+        coulomb_potential_ratio: NDArray[np.float_]
+    ) -> NDArray[np.float_]:
+        return self.kernel_strategy.dimensionless(
+            diffusive_knudsen=diffusive_knudsen,
+            coulomb_potential_ratio=coulomb_potential_ratio
+        )
+
     def kernel(
         self,
         particle: Particle,
         temperature: float,
         pressure: float
     ) -> Union[float, NDArray[np.float_]]:
+        diffusive_knudsen = self.diffusive_knudsen(
+            particle=particle,
+            temperature=temperature,
+            pressure=pressure
+        )
+        coulomb_potential_ratio = self.coulomb_potential_ratio(
+            particle=particle,
+            temperature=temperature
+        )
+        dimensionless_kernel = self.dimensionless_kernel(
+            diffusive_knudsen=diffusive_knudsen,
+            coulomb_potential_ratio=coulomb_potential_ratio
+        )
+        friction_factor = self.friction_factor(
+            particle=particle,
+            temperature=temperature,
+            pressure=pressure
+        )
+        # square matrix of radius
+        radius = particle.get_radius()
+        radius = np.tile(radius, (len(radius), 1))
+        # square matrix of mass
+        mass_particle = particle.get_mass()
+        mass_particle = np.tile(mass_particle, (len(mass_particle), 1))
+        # square matrix of friction factor
+        friction_factor = np.tile(friction_factor, (len(friction_factor), 1))
+        # reduced values
+        reduced_mass = reduced_value(
+            mass_particle, np.transpose(mass_particle))
+        reduced_friction_factor = reduced_value(
+            friction_factor, np.transpose(friction_factor))
+        # radius sum
+        sum_of_radii = radius + np.transpose(radius)
 
-        return self.kernel_strategy.dimensionless(
-            diffusive_knudsen=self.diffusive_knudsen(
-                particle=particle,
-                temperature=temperature,
-                pressure=pressure
-            ),
-            coulomb_potential_ratio=self.coulomb_potential_ratio(
-                particle=particle,
-                temperature=temperature
-            )
+        return self.kernel_strategy.kernel(
+            dimensionless_kernel=dimensionless_kernel,
+            coulomb_potential_ratio=coulomb_potential_ratio,
+            sum_of_radii=sum_of_radii,
+            reduced_mass=reduced_mass,
+            reduced_friction_factor=reduced_friction_factor
         )
 
     def loss_rate(
@@ -346,23 +448,62 @@ class ContinuousGeneralPDF(CoagulationStrategy):
     def __init__(self, kernel_strategy: KernelStrategy):
         self.kernel_strategy = kernel_strategy
 
+    def dimensionless_kernel(
+        self,
+        diffusive_knudsen: NDArray[np.float_],
+        coulomb_potential_ratio: NDArray[np.float_]
+    ) -> NDArray[np.float_]:
+        return self.kernel_strategy.dimensionless(
+            diffusive_knudsen=diffusive_knudsen,
+            coulomb_potential_ratio=coulomb_potential_ratio
+        )
+
     def kernel(
         self,
         particle: Particle,
         temperature: float,
         pressure: float
     ) -> Union[float, NDArray[np.float_]]:
+        diffusive_knudsen = self.diffusive_knudsen(
+            particle=particle,
+            temperature=temperature,
+            pressure=pressure
+        )
+        coulomb_potential_ratio = self.coulomb_potential_ratio(
+            particle=particle,
+            temperature=temperature
+        )
+        dimensionless_kernel = self.dimensionless_kernel(
+            diffusive_knudsen=diffusive_knudsen,
+            coulomb_potential_ratio=coulomb_potential_ratio
+        )
+        friction_factor = self.friction_factor(
+            particle=particle,
+            temperature=temperature,
+            pressure=pressure
+        )
+        # square matrix of radius
+        radius = particle.get_radius()
+        radius = np.tile(radius, (len(radius), 1))
+        # square matrix of mass
+        mass_particle = particle.get_mass()
+        mass_particle = np.tile(mass_particle, (len(mass_particle), 1))
+        # square matrix of friction factor
+        friction_factor = np.tile(friction_factor, (len(friction_factor), 1))
+        # reduced values
+        reduced_mass = reduced_value(
+            mass_particle, np.transpose(mass_particle))
+        reduced_friction_factor = reduced_value(
+            friction_factor, np.transpose(friction_factor))
+        # radius sum
+        sum_of_radii = radius + np.transpose(radius)
 
-        return self.kernel_strategy.dimensionless(
-            diffusive_knudsen=self.diffusive_knudsen(
-                particle=particle,
-                temperature=temperature,
-                pressure=pressure
-            ),
-            coulomb_potential_ratio=self.coulomb_potential_ratio(
-                particle=particle,
-                temperature=temperature
-            )
+        return self.kernel_strategy.kernel(
+            dimensionless_kernel=dimensionless_kernel,
+            coulomb_potential_ratio=coulomb_potential_ratio,
+            sum_of_radii=sum_of_radii,
+            reduced_mass=reduced_mass,
+            reduced_friction_factor=reduced_friction_factor
         )
 
     def loss_rate(
