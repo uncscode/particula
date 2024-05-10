@@ -7,4 +7,4 @@ particula.next.gas.properties.
 # pyright: basic
 
 from particula.next.gas.properties.mean_free_path import molecule_mean_free_path
-
+from particula.next.gas.properties.dynamic_viscosity import dynamic_viscosity

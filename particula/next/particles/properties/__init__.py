@@ -12,3 +12,4 @@ from particula.next.particles.properties.slip_correction import cunningham_slip_
 from particula.next.particles.properties.knudsen_number import calculate_knudsen_number
 from particula.next.particles.properties.friction_factor import friction_factor
 from particula.next.particles.properties import coulomb_enhancement
+from particula.next.particles.properties.diffusive_knudsen import diffusive_knudsen_number

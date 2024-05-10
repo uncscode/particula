@@ -346,7 +346,8 @@ class Particle:
         surface: SurfaceStrategy,
         distribution: NDArray[np.float_],
         density: NDArray[np.float_],
-        concentration: NDArray[np.float_]
+        concentration: NDArray[np.float_],
+        charge: NDArray[np.float_],
     ):  # pylint: disable=too-many-arguments
         """
         Initializes a Particle instance with a strategy, distribution,
@@ -367,6 +368,7 @@ class Particle:
         self.distribution = distribution
         self.density = density
         self.concentration = concentration
+        self.charge = charge
 
     def get_mass(self) -> NDArray[np.float_]:
         """
@@ -385,6 +387,15 @@ class Particle:
         - NDArray[np.float_]: The radius of the particles.
         """
         return self.strategy.get_radius(self.distribution, self.density)
+
+    def get_charge(self) -> NDArray[np.float_]:
+        """
+        Returns the charge per particle.
+
+        Returns:
+        - NDArray[np.float_]: The charge of the particles.
+        """
+        return self.charge
 
     def get_total_mass(self) -> np.float_:
         """

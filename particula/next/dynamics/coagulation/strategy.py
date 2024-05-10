@@ -11,6 +11,9 @@ from particula.next.dynamics.coagulation import rate
 from particula.next.dynamics.coagulation.brownian_kernel import (
     brownian_coagulation_kernel_via_system_state
 )
+from particula.next.dynamics.coagulation.kernel import KernelStrategy
+from particula.next.particles import properties
+from particula.next.gas import properties as gas_properties
 
 
 class CoagulationStrategy(ABC):
@@ -24,6 +27,8 @@ class CoagulationStrategy(ABC):
     - loss_rate: Calculate the coagulation loss rate.
     - gain_rate: Calculate the coagulation gain rate.
     - net_rate: Calculate the net coagulation rate.
+    - diffusive_knudsen: Calculate the diffusive Knudsen number.
+    - coulomb_potential_ratio: Calculate the Coulomb potential ratio.
     """
 
     @abstractmethod
@@ -49,6 +54,7 @@ class CoagulationStrategy(ABC):
         - NDArray[np.float_]: The coagulation kernel for the particle [m^3/s].
         """
 
+    @abstractmethod
     def loss_rate(
         self,
         particle: Particle,
@@ -68,18 +74,9 @@ class CoagulationStrategy(ABC):
         --------
         - Union[float, NDArray[np.float_]]: The coagulation loss rate for the
         particle [kg/s].
-
-        Notes:
-        ------
-        May be abstracted to a separate module when different coagulation
-        strategies are implemented (super droplet).
         """
-        return rate.loss_rate(
-            radius=particle.get_radius(),
-            concentration=particle.concentration,
-            kernel=kernel,
-        )
 
+    @abstractmethod
     def gain_rate(
         self,
         particle: Particle,
@@ -105,11 +102,6 @@ class CoagulationStrategy(ABC):
         May be abstracted to a separate module when different coagulation
         strategies are implemented (super droplet).
         """
-        return rate.gain_rate(
-            radius=particle.get_radius(),
-            concentration=particle.concentration,
-            kernel=kernel,
-        )
 
     def net_rate(
         self,
@@ -137,12 +129,94 @@ class CoagulationStrategy(ABC):
         return self.gain_rate(particle, kernel) - self.loss_rate(
             particle, kernel)
 
+    def diffusive_knudsen(
+        self,
+        particle: Particle,
+        temperature: float,
+        pressure: float
+    ) -> NDArray[np.float_]:
+        """
+        Calculate the diffusive Knudsen number based on the particle properties,
+        temperature, and pressure.
+
+        Args:
+        -----
+        - particle (Particle class): The particle for which the diffusive Knudsen
+        number is to be calculated.
+        - temperature (float): The temperature of the gas phase [K].
+        - pressure (float): The pressure of the gas phase [Pa].
+
+        Returns:
+        --------
+        - NDArray[np.float_]: The diffusive Knudsen number for the particle
+        [dimensionless].
+        """
+        # properties calculation for friction factor
+        dynamic_viscosity = gas_properties.dynamic_viscosity(
+            temperature=temperature  # assume standard atmospheric composition
+        )
+        mean_free_path = gas_properties.molecule_mean_free_path(
+            temperature=temperature,
+            pressure=pressure,
+            dynamic_viscosity=dynamic_viscosity
+        )
+        knudsen_number = properties.calculate_knudsen_number(
+            mean_free_path=mean_free_path,
+            particle_radius=particle.get_radius()
+        )
+        slip_correction = properties.cunningham_slip_correction(
+            knudsen_number=knudsen_number)
+        friction_factor = properties.friction_factor(
+            radius=particle.get_radius(),
+            dynamic_viscosity=dynamic_viscosity,
+            slip_correction=slip_correction
+        )
+
+        # coulomb potential ratio
+        coulomb_potential_ratio = self.coulomb_potential_ratio(
+            particle=particle,
+            temperature=temperature
+        )
+        return properties.diffusive_knudsen_number(
+            radius=particle.get_radius(),
+            mass_particle=particle.get_mass(),
+            friction_factor=friction_factor,
+            coulomb_potential_ratio=coulomb_potential_ratio,
+            temperature=temperature
+        )  # type: ignore
+
+    def coulomb_potential_ratio(
+        self,
+        particle: Particle,
+        temperature: float
+    ) -> NDArray[np.float_]:
+        """
+        Calculate the Coulomb potential ratio based on the particle properties
+        and temperature.
+
+        Args:
+        -----
+        - particle (Particle class): The particles for which the Coulomb
+        potential ratio is to be calculated.
+        - temperature (float): The temperature of the gas phase [K].
+
+        Returns:
+        --------
+        - NDArray[np.float_]: The Coulomb potential ratio for the particle
+        [dimensionless].
+        """
+        return properties.coulomb_enhancement.ratio(
+            radius=particle.get_radius(),
+            charge=particle.get_charge(),
+            temperature=temperature
+        )  # type: ignore
+
 
 # Define a coagulation strategy
-class BrownianCoagulation(CoagulationStrategy):
+class DiscreteSimple(CoagulationStrategy):
     """
-    Brownian coagulation strategy class. This class implements the methods
-    defined in the CoagulationStrategy abstract class.
+    Discrete Brownian coagulation strategy class. This class implements the
+    methods defined in the CoagulationStrategy abstract class.
 
     Methods:
     --------
@@ -164,4 +238,153 @@ class BrownianCoagulation(CoagulationStrategy):
             mass_particle=particle.get_mass(),
             temperature=temperature,
             pressure=pressure
+        )
+
+    def loss_rate(
+        self,
+        particle: Particle,
+        kernel: NDArray[np.float_],
+    ) -> Union[float, NDArray[np.float_]]:
+
+        return rate.discrete_loss(
+            concentration=particle.concentration,
+            kernel=kernel,
+        )
+
+    def gain_rate(
+        self,
+        particle: Particle,
+        kernel: NDArray[np.float_],
+    ) -> Union[float, NDArray[np.float_]]:
+
+        return rate.discrete_gain(
+            concentration=particle.concentration,
+            kernel=kernel,
+        )
+
+
+class DiscreteGeneral(CoagulationStrategy):
+    """
+    Discrete general coagulation strategy class. This class implements the
+    methods defined in the CoagulationStrategy abstract class. The kernel
+    strategy is passed as an argument to the class, to use a dimensionless
+    kernel representation.
+
+    Attributes:
+    -----------
+    - kernel_strategy: The kernel strategy to be used for the coagulation, from
+    the KernelStrategy class.
+
+    Methods:
+    --------
+    - kernel: Calculate the coagulation kernel.
+    - loss_rate: Calculate the coagulation loss rate.
+    - gain_rate: Calculate the coagulation gain rate.
+    - net_rate: Calculate the net coagulation rate.
+    """
+
+    def __init__(self, kernel_strategy: KernelStrategy):
+        self.kernel_strategy = kernel_strategy
+
+    def kernel(
+        self,
+        particle: Particle,
+        temperature: float,
+        pressure: float
+    ) -> Union[float, NDArray[np.float_]]:
+
+        return self.kernel_strategy.dimensionless(
+            diffusive_knudsen=self.diffusive_knudsen(
+                particle=particle,
+                temperature=temperature,
+                pressure=pressure
+            ),
+            coulomb_potential_ratio=self.coulomb_potential_ratio(
+                particle=particle,
+                temperature=temperature
+            )
+        )
+
+    def loss_rate(
+        self,
+        particle: Particle,
+        kernel: NDArray[np.float_],
+    ) -> Union[float, NDArray[np.float_]]:
+
+        return rate.discrete_loss(
+            concentration=particle.concentration,
+            kernel=kernel,
+        )
+
+    def gain_rate(
+        self,
+        particle: Particle,
+        kernel: NDArray[np.float_],
+    ) -> Union[float, NDArray[np.float_]]:
+
+        return rate.discrete_gain(
+            concentration=particle.concentration,
+            kernel=kernel,
+        )
+
+
+class ContinuousGeneralPDF(CoagulationStrategy):
+    """
+    Continuous PDF coagulation strategy class. This class implements the
+    methods defined in the CoagulationStrategy abstract class. The kernel
+    strategy is passed as an argument to the class, to use a dimensionless
+    kernel representation.
+
+    Methods:
+    --------
+    - kernel: Calculate the coagulation kernel.
+    - loss_rate: Calculate the coagulation loss rate.
+    - gain_rate: Calculate the coagulation gain rate.
+    - net_rate: Calculate the net coagulation rate.
+    """
+
+    def __init__(self, kernel_strategy: KernelStrategy):
+        self.kernel_strategy = kernel_strategy
+
+    def kernel(
+        self,
+        particle: Particle,
+        temperature: float,
+        pressure: float
+    ) -> Union[float, NDArray[np.float_]]:
+
+        return self.kernel_strategy.dimensionless(
+            diffusive_knudsen=self.diffusive_knudsen(
+                particle=particle,
+                temperature=temperature,
+                pressure=pressure
+            ),
+            coulomb_potential_ratio=self.coulomb_potential_ratio(
+                particle=particle,
+                temperature=temperature
+            )
+        )
+
+    def loss_rate(
+        self,
+        particle: Particle,
+        kernel: NDArray[np.float_],
+    ) -> Union[float, NDArray[np.float_]]:
+
+        return rate.continuous_loss(
+            radius=particle.get_radius(),
+            concentration=particle.concentration,
+            kernel=kernel,
+        )
+
+    def gain_rate(
+        self,
+        particle: Particle,
+        kernel: NDArray[np.float_],
+    ) -> Union[float, NDArray[np.float_]]:
+
+        return rate.continuous_gain(
+            radius=particle.get_radius(),
+            concentration=particle.concentration,
+            kernel=kernel,
         )
