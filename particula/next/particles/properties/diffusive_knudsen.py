@@ -1,174 +1,77 @@
 """ Calculate the diffusive knudsen number
 """
-
+from typing import Union
+from numpy.typing import NDArray
 import numpy as np
 from particula.constants import BOLTZMANN_CONSTANT
-from particula.util.coulomb_enhancement import (CoulombEnhancement,
-                                                coulomb_enhancement_all)
-from particula.util.friction_factor import frifac
-from particula.util.input_handling import in_density
-from particula.util.particle_mass import mass
-from particula.util.reduced_quantity import reduced_quantity
+
+from particula.next.particles.properties import coulomb_enhancement
+from particula.util.reduced_quantity import reduced_value
 
 
-class DiffusiveKnudsen(CoulombEnhancement):
-    """ A class for Diff..Knu
+def diffusive_knudsen_number(
+    radius: Union[float, NDArray[np.float_]],
+    mass_particle: Union[float, NDArray[np.float_]],
+    friction_factor: Union[float, NDArray[np.float_]],
+    coulomb_potential_ratio: Union[float, NDArray[np.float_]] = 0.0,
+    temperature: float = 298.15
+) -> Union[float, NDArray[np.float_]]:
     """
+    Diffusive Knudsen number. The *diffusive* Knudsen number is different
+    from Knudsen number. Ratio of: mean persistence of one particle to the
+    effective length scale of particle--particle Coulombic interaction
 
-    def __init__(
-        self,
-        density=1000,
-        other_density=None,
-        **kwargs
-    ):
-        """ define properties """
+    Args:
+    -----
+    - radius: The radius of the particle [m].
+    - mass_particle: The mass of the particle [kg].
+    - friction_factor: The friction factor of the particle [dimensionless].
+    - coulomb_potential_ratio: The Coulomb potential ratio, zero if
+     no charges [dimensionless].
+    - temperature: The temperature of the system [K].
 
-        super().__init__(**kwargs)
+    Returns:
+    --------
+    The diffusive Knudsen number [dimensionless], as a square matrix, of all
+    particle-particle interactions.
 
-        self.density = in_density(density)
-        self.other_density = self.density if other_density is None \
-            else in_density(other_density)
-
-        self.kwargs = kwargs
-
-    def get_red_mass(self):
-        """ get the reduced mass
-        """
-
-        mass_dummy = mass(radius=self.radius, density=self.density)
-
-        return reduced_quantity(
-            np.transpose([mass_dummy.m]) * mass_dummy.u,
-            mass(radius=self.other_radius, density=self.other_density)
-        )
-
-    def get_rxr(self):
-        """ add two radii
-        """
-        return np.transpose([self.radius.m]) * \
-            self.radius.u + self.other_radius
-
-    def get_red_frifac(self):
-        """ get the reduced friction factor
-        """
-
-        frifac_kwargs = self.kwargs.copy()
-        other_frifac_kwargs = self.kwargs.copy()
-
-        frifac_kwargs.pop("radius", None)
-        other_frifac_kwargs.pop("radius", None)
-
-        dummy_frifac = frifac(radius=self.radius, **frifac_kwargs)
-        return reduced_quantity(
-            np.transpose([dummy_frifac.m]) * dummy_frifac.u,
-            frifac(radius=self.other_radius, **other_frifac_kwargs)
-        )
-
-    def get_ces(self):
-        """ get coulomb enhancement parameters
-        """
-        lkwargs = self.kwargs.copy()
-        return coulomb_enhancement_all(**lkwargs)
-
-    def get_celimits(self):
-        """ get coag enh limits
-        """
-
-        lkwargs = self.kwargs.copy()
-        return coulomb_enhancement_all(**lkwargs)[1:]
-
-    def get_diff_knu(self):
-        """ calculate it
-        """
-        boltz_const = BOLTZMANN_CONSTANT
-        rmass = self.get_red_mass()
-        rfrifac = self.get_red_frifac()
-        (cekl_val, cecl_val) = self.get_celimits()
-        temp = self.temperature
-        return (
-            ((temp * boltz_const * rmass)**0.5 / rfrifac) /
-            (self.get_rxr() * cecl_val / cekl_val)
-        )
-
-
-def diff_knu(**kwargs):
-    """ Diffusive Knudsen number.
-
-        The *diffusive* Knudsen number is different from Knudsen number.
-        Ratio of:
-            - numerator: mean persistence of one particle
-            - denominator: effective length scale of
-                particle--particle Coulombic interaction
-
-        Examples:
-        ```
-        >>> from particula import u
-        >>> from particula.util.diffusive_knudsen import diff_knu
-        >>> # with only one radius
-        >>> diff_knu(radius=1e-9)
-        <Quantity(29.6799, 'dimensionless')>
-        >>> # with two radii
-        >>> diff_knu(radius=1e-9, other_radius=1e-8)
-        <Quantity(3.85387845, 'dimensionless')>
-        >>> # with radii and charges
-        >>> diff_knu(radius=1e-9, other_radius=1e-8, charge=-1, other_charge=1)
-        <Quantity(4.58204028, 'dimensionless')>
-        ```
-        Args:
-            radius          (float) [m]
-            other_radius    (float) [m]             (default: radius)
-            density         (float) [kg/m^3]        (default: 1000)
-            other_density   (float) [kg/m^3]        (default: density)
-            charge          (int)   [dimensionless] (default: 0)
-            other_charge    (int)   [dimensionless] (default: 0)
-            temperature     (float) [K]             (default: 298)
-
-        Returns:
-                            (float) [dimensionless]
-
-        Notes:
-            this function uses the friction factor and
-            the coulomb enhancement calculations; for more information,
-            please see the documentation of the respective functions:
-                - particula.util.friction_factor.frifac(**kwargs)
-                - particula.util.coulomb_enhancement.cekl(**kwargs)
-                - particula.util.coulomb_enhancement.cecl(**kwargs)
-
+    References:
+    -----------
+    - Equation 5 in, with charges:
+    Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
+    molecular regime Coulombic collisions in aerosols and dusty plasmas.
+    Aerosol Science and Technology, 53(8), 933-957.
+    https://doi.org/10.1080/02786826.2019.1614522
+    - Equation 3b in, no charges:
+    Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
+    in aerosols and dusty plasmas. Physical Review E - Statistical,
+    Nonlinear, and Soft Matter Physics, 85(2).
+    https://doi.org/10.1103/PhysRevE.85.026410
     """
+    if isinstance(radius, np.ndarray):
+        # square matrix of radius
+        radius = np.array(radius)
+        radius = np.tile(radius, (len(radius), 1))
+    if isinstance(mass_particle, np.ndarray):
+        # square matrix of mass
+        mass_particle = np.array(mass_particle)
+        mass_particle = np.tile(mass_particle, (len(mass_particle), 1))
+    if isinstance(friction_factor, np.ndarray):
+        # square matrix of charge
+        friction_factor = np.array(friction_factor)
+        friction_factor = np.tile(friction_factor, (len(friction_factor), 1))
 
-    return DiffusiveKnudsen(**kwargs).get_diff_knu()
-
-
-def red_mass(**kwargs):
-    """ get the reduced mass
-    """
-
-    return DiffusiveKnudsen(**kwargs).get_red_mass()
-
-
-def red_frifac(**kwargs):
-    """ get the reduced friction factor
-    """
-
-    return DiffusiveKnudsen(**kwargs).get_red_frifac()
-
-
-def ces(**kwargs):
-    """ get the coulomb enhancement limits
-    """
-
-    return DiffusiveKnudsen(**kwargs).get_ces()
-
-
-def celimits(**kwargs):
-    """ get coag enh limits
-    """
-
-    return DiffusiveKnudsen(**kwargs).get_celimits()
-
-
-def rxr(**kwargs):
-    """ add two radii
-    """
-
-    return DiffusiveKnudsen(**kwargs).get_rxr()
+    # reduced values
+    reduced_mass = reduced_value(
+        mass_particle, np.transpose(mass_particle))
+    reduced_friction_factor = reduced_value(
+        friction_factor, np.transpose(friction_factor))
+    # radius sum
+    sum_radius = radius + np.transpose(radius)
+    return (
+        ((temperature * BOLTZMANN_CONSTANT.m * reduced_mass)**0.5
+         / reduced_friction_factor)
+        /
+        (sum_radius * coulomb_enhancement.continuum(coulomb_potential_ratio)
+         / coulomb_enhancement.kinetic(coulomb_potential_ratio))
+    )
