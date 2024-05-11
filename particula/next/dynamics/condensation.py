@@ -43,105 +43,11 @@ import numpy as np
 from particula.next.particles.representation import Particle
 from particula.next.gas.species import GasSpecies
 from particula.constants import GAS_CONSTANT
-from particula.next.particles.properties import calculate_knudsen_number
-from particula.next.gas.properties import molecule_mean_free_path
-
-
-# define Suchs and Futugin transition function
-def vapor_transition_correction(
-    knudsen_number: Union[float, NDArray[np.float_]],
-    mass_accommodation: Union[float, NDArray[np.float_]]
-) -> Union[float, NDArray[np.float_]]:
-    """
-    Calculate the transition correction factor, f(Kn, alpha), for a given
-    Knudsen number and mass accommodation coefficient. This function is used to
-    account for the intermediate regime between continuum and free molecular
-    flow. This is the Suchs and Futugin transition function.
-
-    Args:
-    -----
-    - knudsen_number (Union[float, NDArray[np.float_]]): The Knudsen number,
-    which quantifies the relative importance of the mean free path of gas
-    molecules to the size of the particle.
-    - mass_accommodation (Union[float, NDArray[np.float_]]): The mass
-    accommodation coefficient, representing the probability of a gas molecule
-    sticking to the particle upon collision.
-
-    Returns:
-    --------
-    - Union[float, NDArray[np.float_]]: The transition correction value
-    calculated based on the specified inputs.
-
-    References:
-    ----------
-    - Seinfeld and Pandis, "Atmospheric Chemistry and Physics", Chapter 12,
-    equation 12.43.
-    Note: There are various formulations for this correction, so further
-    extensions of this function might be necessary depending on specific
-    requirements.
-
-    Original reference:
-    - FUCHS, N. A., & SUTUGIN, A. G. (1971). HIGH-DISPERSED AEROSOLS.
-    In Topics in Current Aerosol Research (p. 1). Elsevier.
-    https://doi.org/10.1016/B978-0-08-016674-2.50006-6
-    """
-    return (
-        (0.75 * mass_accommodation * (1 + knudsen_number))
-        /
-        ((knudsen_number**2 + knudsen_number)
-         + 0.283 * mass_accommodation * knudsen_number
-         + 0.75 * mass_accommodation)
-    )
-
-
-def partial_pressure_delta(
-    partial_pressure_gas: Union[float, NDArray[np.float_]],
-    partial_pressure_particle: Union[float, NDArray[np.float_]],
-    kelvin_term: Union[float, NDArray[np.float_]],
-) -> Union[float, NDArray[np.float_]]:
-    """
-    Calculate the difference in partial pressure of a species between the gas
-    phase and the particle phase, which is used in the calculation of the rate
-    of change of mass of an aerosol particle.
-
-    Args:
-    -----
-    - partial_pressure_gas (Union[float, NDArray[np.float_]]): The partial
-    pressure of the species in the gas phase.
-    - partial_pressure_particle (Union[float, NDArray[np.float_]]): The partial
-    pressure of the species in the particle phase.
-    - kelvin_term (Union[float, NDArray[np.float_]]): Kelvin effect to account
-    for the curvature of the particle.
-
-    Returns:
-    --------
-    - Union[float, NDArray[np.float_]]: The difference in partial pressure
-    between the gas phase and the particle phase.
-    """
-    return partial_pressure_gas - partial_pressure_particle * kelvin_term
-
-
-def thermal_conductivity(
-    temperature: Union[float, NDArray[np.float_]]
-) -> Union[float, NDArray[np.float_]]:
-    """
-    Calculate the thermal conductivity of air as a function of temperature.
-
-    Args:
-    -----
-    - temperature (Union[float, NDArray[np.float_]]): The temperature at which
-    the thermal conductivity of air is to be calculated.
-
-    Returns:
-    --------
-    - Union[float, NDArray[np.float_]]: The thermal conductivity of air at the
-    specified temperature. Units of J/(m s K).
-
-    References:
-    ----------
-    - Seinfeld and Pandis, "Atmospheric Chemistry and Physics", Equation 17.54.
-    """
-    return 1e-3 * (4.39 + 0.071 * temperature)
+from particula.next.particles.properties import (
+    calculate_knudsen_number, vapor_transition_correction,
+    partial_pressure_delta)
+from particula.next.gas.properties import (
+    molecule_mean_free_path)
 
 
 def first_order_mass_transport_k(

@@ -13,3 +13,5 @@ from particula.next.particles.properties.knudsen_number import calculate_knudsen
 from particula.next.particles.properties.friction_factor import friction_factor
 from particula.next.particles.properties import coulomb_enhancement
 from particula.next.particles.properties.diffusive_knudsen import diffusive_knudsen_number
+from particula.next.particles.properties.vapor_correction import vapor_transition_correction
+from particula.next.particles.properties.partial_pressure import partial_pressure_delta

@@ -73,7 +73,8 @@ def sample_particles():
         surface,
         np.array([100, 200, 350], dtype=np.float64),
         np.float64([2.5]),
-        np.array([10, 20, 50], dtype=np.float64))
+        np.array([10, 20, 50], dtype=np.float64),
+        np.float64([0, 0, 0]))
 
 
 @pytest.fixture

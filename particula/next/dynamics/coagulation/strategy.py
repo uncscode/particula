@@ -14,7 +14,7 @@ from particula.next.dynamics.coagulation.brownian_kernel import (
 from particula.next.dynamics.coagulation.kernel import KernelStrategy
 from particula.next.particles import properties
 from particula.next.gas import properties as gas_properties
-from particula.util.reduced_quantity import reduced_value
+from particula.util.reduced_quantity import reduced_value, reduced_self_broadcast
 
 
 class CoagulationStrategy(ABC):
@@ -382,21 +382,12 @@ class DiscreteGeneral(CoagulationStrategy):
             temperature=temperature,
             pressure=pressure
         )
-        # square matrix of radius
-        radius = particle.get_radius()
-        radius = np.tile(radius, (len(radius), 1))
+        # square matrix sum of radii pairs
+        sum_of_radii = np.outer(particle.get_radius(), particle.get_radius())
         # square matrix of mass
-        mass_particle = particle.get_mass()
-        mass_particle = np.tile(mass_particle, (len(mass_particle), 1))
+        reduced_mass = reduced_self_broadcast(particle.get_mass())
         # square matrix of friction factor
-        friction_factor = np.tile(friction_factor, (len(friction_factor), 1))
-        # reduced values
-        reduced_mass = reduced_value(
-            mass_particle, np.transpose(mass_particle))
-        reduced_friction_factor = reduced_value(
-            friction_factor, np.transpose(friction_factor))
-        # radius sum
-        sum_of_radii = radius + np.transpose(radius)
+        reduced_friction_factor = reduced_self_broadcast(friction_factor)
 
         return self.kernel_strategy.kernel(
             dimensionless_kernel=dimensionless_kernel,
@@ -481,21 +472,12 @@ class ContinuousGeneralPDF(CoagulationStrategy):
             temperature=temperature,
             pressure=pressure
         )
-        # square matrix of radius
-        radius = particle.get_radius()
-        radius = np.tile(radius, (len(radius), 1))
+        # square matrix sum of radii pairs
+        sum_of_radii = np.outer(particle.get_radius(), particle.get_radius())
         # square matrix of mass
-        mass_particle = particle.get_mass()
-        mass_particle = np.tile(mass_particle, (len(mass_particle), 1))
+        reduced_mass = reduced_self_broadcast(particle.get_mass())
         # square matrix of friction factor
-        friction_factor = np.tile(friction_factor, (len(friction_factor), 1))
-        # reduced values
-        reduced_mass = reduced_value(
-            mass_particle, np.transpose(mass_particle))
-        reduced_friction_factor = reduced_value(
-            friction_factor, np.transpose(friction_factor))
-        # radius sum
-        sum_of_radii = radius + np.transpose(radius)
+        reduced_friction_factor = reduced_self_broadcast(friction_factor)
 
         return self.kernel_strategy.kernel(
             dimensionless_kernel=dimensionless_kernel,

@@ -8,3 +8,4 @@ particula.next.gas.properties.
 
 from particula.next.gas.properties.mean_free_path import molecule_mean_free_path
 from particula.next.gas.properties.dynamic_viscosity import dynamic_viscosity
+from particula.next.gas.properties.thermal_conductivity import thermal_conductivity
