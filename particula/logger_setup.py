@@ -40,14 +40,19 @@ config = {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "DEBUG",
             "formatter": "detailed",
-            "filename": os.path.join(log_dir, "particula.log"),
+            "filename": log_dir + "/particula.log",
             "maxBytes": 25_000_000,
             "backupCount": 3
         }
     },
     "loggers": {
-        "root": {
+        "particula": {
             "level": "DEBUG",
+            "handlers": ["file", "stderr"],
+            "propagate": False
+        },
+        "root": {
+            "level": "ERROR",
             "handlers": [
                 "stderr",
                 "file"
@@ -61,6 +66,5 @@ def setup():
     """Setup for logging in the particula package."""
     # check for logging directory
     os.makedirs(log_dir, exist_ok=True)
-    # configure the logger
     logging.config.dictConfig(config)
     return logger
