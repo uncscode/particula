@@ -7,8 +7,8 @@ from particula.next.particles.properties import particle_aerodynamic_mobility
 
 def test_particle_aerodynamic_mobility_single_value():
     """
-    Verify that the particle_aerodynamic_mobility function calculates the correct
-    aerodynamic mobility value for a single particle.
+    Verify that the particle_aerodynamic_mobility function calculates the
+    correct aerodynamic mobility value for a single particle.
     """
     radius = 0.00005  # 50 micrometers
     slip_correction_factor = 1.1
@@ -23,7 +23,8 @@ def test_particle_aerodynamic_mobility_single_value():
 
 def test_particle_aerodynamic_mobility_array_input():
     """
-    Test that the particle_aerodynamic_mobility function handles numpy array inputs correctly.
+    Test that the particle_aerodynamic_mobility function handles numpy array
+    inputs correctly.
     """
     radius = np.array([0.00005, 0.00007])  # Array of radii
     slip_correction_factor = np.array([1.1, 1.2])
@@ -33,7 +34,7 @@ def test_particle_aerodynamic_mobility_array_input():
     actual_mobility = particle_aerodynamic_mobility(
         radius, slip_correction_factor, dynamic_viscosity)
     assert np.allclose(
-        actual_mobility, expected_mobility), "The calculated mobilities for array inputs do not match expected values."
+        actual_mobility, expected_mobility)
 
 
 def test_particle_aerodynamic_mobility_type_error():

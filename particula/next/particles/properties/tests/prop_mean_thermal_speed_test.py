@@ -14,7 +14,7 @@ def test_mean_thermal_speed_single_value():
     expected_speed = np.sqrt(
         (8 * BOLTZMANN_CONSTANT.m * temperature) / (np.pi * mass))
     assert np.isclose(mean_thermal_speed(mass, temperature),
-                      expected_speed), "Calculated speed does not match expected value."
+                      expected_speed)
 
 
 def test_mean_thermal_speed_array_input():
@@ -25,9 +25,9 @@ def test_mean_thermal_speed_array_input():
     temperature = np.array([300, 350])
     expected_speed = np.sqrt(
         (8 * BOLTZMANN_CONSTANT.m * temperature) / (np.pi * mass))
-    np.testing.assert_allclose(
-        mean_thermal_speed(
-            mass, temperature), expected_speed, rtol=1e-6), "Calculated speeds do not match expected values."
+    assert np.allclose(
+        mean_thermal_speed(mass, temperature),
+        expected_speed, rtol=1e-6)
 
 
 def test_mean_thermal_speed_input_validation():
