@@ -634,38 +634,6 @@ FUNCTIONS
             mfp can be calculated using mfp(**kwargs);
             refer to particula.util.mean_free_path.mfp for more info.
 
-DATA
-    NDArray = numpy.ndarray[typing.Any, numpy.dtype[+_ScalarType_co]]
-    Union = typing.Union
-        Union type; Union[X, Y] means either X or Y.
-        
-        On Python 3.10 and higher, the | operator
-        can also be used to denote unions;
-        X | Y means the same thing to the type checker as Union[X, Y].
-        
-        To define a union, use e.g. Union[int, str]. Details:
-        - The arguments must be types and there must be at least one.
-        - None as an argument is a special case and is replaced by
-          type(None).
-        - Unions of unions are flattened, e.g.::
-        
-            assert Union[Union[int, str], float] == Union[int, str, float]
-        
-        - Unions of a single argument vanish, e.g.::
-        
-            assert Union[int] == int  # The constructor actually returns int
-        
-        - Redundant arguments are skipped, e.g.::
-        
-            assert Union[int, str, int] == Union[int, str]
-        
-        - When comparing unions, the argument order is ignored, e.g.::
-        
-            assert Union[int, str] == Union[str, int]
-        
-        - You cannot subclass or instantiate a union.
-        - You can use Optional[X] as a shorthand for Union[X, None].
-
 FILE
     /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/util/knudsen_number.py
 </pre></div>
@@ -692,8 +660,6 @@ FILE
         -- implementing tranpose for now.
 &quot;&quot;&quot;
 
-from typing import Union
-from numpy.typing import NDArray
 import numpy as np
 from particula.util.input_handling import in_length, in_radius
 from particula.util.mean_free_path import mfp as mfp_func
