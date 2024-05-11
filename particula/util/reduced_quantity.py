@@ -4,11 +4,14 @@
         quantity_1 * quantity_2 / (quantity_1 + quantity_2)
 """
 
+import logging
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
 from particula import u
+
+logger = logging.getLogger("particula")  # get instance of logger
 
 
 def reduced_quantity(a_quantity, b_quantity):
@@ -111,6 +114,7 @@ def reduced_value(
     # Ensure input compatibility, especially when both are arrays
     if isinstance(alpha, np.ndarray) and isinstance(beta, np.ndarray):
         if alpha.shape != beta.shape:
+            logger.error("The shapes of alpha and beta must be identical.")
             raise ValueError("The shapes of alpha and beta must be identical.")
 
     # Calculation of the reduced value, with safety against division by zero

@@ -17,11 +17,33 @@ class GasSpecies:
     properties like name, molar mass, vapor pressure, and condensability.
 
     Attributes:
+    ------------
     - name (str): The name of the gas species.
     - molar_mass (float): The molar mass of the gas species.
     - pure_vapor_pressure_strategy (VaporPressureStrategy): The strategy for
         calculating the pure vapor pressure of the gas species.
     - condensable (bool): Indicates whether the gas species is condensable.
+
+    Methods:
+    --------
+    - set_name: Set the name of the gas species.
+    - set_molar_mass: Set the molar mass of the gas species.
+    - set_vapor_pressure_strategy: Set the vapor pressure strategy for the gas
+        species.
+    - set_condensable: Set the condensable property of the gas species.
+    - set_concentration: Set the concentration of the gas species in the
+        mixture.
+    - get_molar_mass: Get the molar mass of the gas species.
+    - get_condensable: Check if the gas species is condensable.
+    - get_concentration: Get the concentration of the gas species in the
+        mixture.
+    - get_pure_vapor_pressure: Calculate the pure vapor pressure of the gas
+        species at a given temperature.
+    - get_partial_pressure: Calculate the partial pressure of the gas species.
+    - get_saturation_ratio: Calculate the saturation ratio of the gas species.
+    - get_saturation_concentration: Calculate the saturation concentration of
+        the gas species.
+    - add_concentration: Add concentration to the gas species.
     """
 
     def __init__(self):
