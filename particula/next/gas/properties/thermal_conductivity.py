@@ -1,8 +1,11 @@
 """Thermal Conductivity of air."""
 
+import logging
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
+
+logger = logging.getLogger("particula")  # get instance of logger
 
 
 def get_thermal_conductivity(
@@ -33,6 +36,7 @@ def get_thermal_conductivity(
     - Seinfeld and Pandis, "Atmospheric Chemistry and Physics", Equation 17.54.
     """
     if np.any(temperature < 0):
+        logger.error("Temperature must be greater than or equal to 0 Kelvin.")
         raise ValueError(
             "Temperature must be greater than or equal to 0 Kelvin.")
     return 1e-3 * (4.39 + 0.071 * temperature)
