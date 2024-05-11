@@ -7,5 +7,5 @@ particula.next.gas.properties.
 # pyright: basic
 
 from particula.next.gas.properties.mean_free_path import molecule_mean_free_path
-from particula.next.gas.properties.dynamic_viscosity import dynamic_viscosity
-from particula.next.gas.properties.thermal_conductivity import thermal_conductivity
+from particula.next.gas.properties.dynamic_viscosity import get_dynamic_viscosity
+from particula.next.gas.properties.thermal_conductivity import get_thermal_conductivity

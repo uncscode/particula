@@ -9,12 +9,16 @@
 
 """
 
+import logging
 from typing import Union, Optional
 from numpy.typing import NDArray
 import numpy as np
 from particula.constants import (
-    GAS_CONSTANT, MOLECULAR_WEIGHT_AIR)
-from particula.util.dynamic_viscosity import dyn_vis
+    GAS_CONSTANT, MOLECULAR_WEIGHT_AIR)  # type: ignore
+from particula.next.gas.properties.dynamic_viscosity import (
+    get_dynamic_viscosity)
+
+logger = logging.getLogger("particula")  # get instance of logger
 
 
 def molecule_mean_free_path(
@@ -50,14 +54,16 @@ def molecule_mean_free_path(
     """
     # check inputs are positive
     if temperature <= 0:
+        logger.error("Temperature must be positive [Kelvin]")
         raise ValueError("Temperature must be positive [Kelvin]")
     if pressure <= 0:
+        logger.error("Pressure must be positive [Pascal]")
         raise ValueError("Pressure must be positive [Pascal]")
     if np.any(molar_mass <= 0):
+        logger.error("Molar mass must be positive [kg/mol]")
         raise ValueError("Molar mass must be positive [kg/mol]")
     if dynamic_viscosity is None:
-        dynamic_viscosity = dyn_vis(temperature)  # type: ignore
-        dynamic_viscosity = float(dynamic_viscosity.m)  # type: ignore
+        dynamic_viscosity = get_dynamic_viscosity(temperature)
 
     return np.array(
         (2 * dynamic_viscosity / pressure)

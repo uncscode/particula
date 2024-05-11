@@ -9,8 +9,8 @@ import numpy as np
 
 from particula.constants import BOLTZMANN_CONSTANT
 from particula.next.particles import properties
-from particula.util.mean_free_path import molecule_mean_free_path
-from particula.util.dynamic_viscosity import dyn_vis  # pyright: ignore
+from particula.next.gas.properties import (
+    get_dynamic_viscosity, molecule_mean_free_path)
 
 
 def mean_free_path_l(
@@ -196,7 +196,7 @@ def brownian_coagulation_kernel_via_system_state(
     Coefficient K12
     """
     # calculations to get particle diffusivity
-    dynamic_viscosity = float(dyn_vis(temperature).m)  # pyright: ignore
+    dynamic_viscosity = get_dynamic_viscosity(temperature)
     air_mean_free_path = molecule_mean_free_path(
         temperature=temperature,
         pressure=pressure,

@@ -12,11 +12,14 @@
     https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
 """
 
+import logging
 from particula.constants import (REF_TEMPERATURE_STP, REF_VISCOSITY_AIR_STP,
                                  SUTHERLAND_CONSTANT)
 
+logger = logging.getLogger("particula")  # get instance of logger
 
-def dynamic_viscosity(
+
+def get_dynamic_viscosity(
     temperature: float,
     reference_viscosity: float = REF_VISCOSITY_AIR_STP.m,
     reference_temperature: float = REF_TEMPERATURE_STP.m
@@ -47,6 +50,7 @@ def dynamic_viscosity(
     https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
     """
     if temperature <= 0:
+        logger.error("Temperature must be greater than 0 Kelvin.")
         raise ValueError("Temperature must be greater than 0 Kelvin.")
     return (
         reference_viscosity * (temperature / reference_temperature)**1.5 *

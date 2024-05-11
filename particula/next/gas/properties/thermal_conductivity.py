@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 
-def thermal_conductivity(
+def get_thermal_conductivity(
     temperature: Union[float, NDArray[np.float_]]
 ) -> Union[float, NDArray[np.float_]]:
     """
