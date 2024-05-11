@@ -34,7 +34,7 @@ def get_dynamic_viscosity(
     - temperature: Desired air temperature [K]. Must be greater than 0.
     - reference_viscosity: Gas viscosity [Pa*s] at the reference temperature
     (default is STP).
-    - reference_temperature: Gas temperature [K] for the reference viscosity 
+    - reference_temperature: Gas temperature [K] for the reference viscosity
     (default is STP).
 
     Returns:
