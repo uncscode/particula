@@ -40,7 +40,7 @@ config = {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "DEBUG",
             "formatter": "detailed",
-            "filename": log_dir + "/particula.log",
+            "filename": os.path.join(log_dir, "particula.log"),
             "maxBytes": 25_000_000,
             "backupCount": 3
         }
