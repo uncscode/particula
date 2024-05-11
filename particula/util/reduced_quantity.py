@@ -112,7 +112,9 @@ def reduced_value(
     - ValueError: If alpha and beta are arrays and their shapes do not match.
     """
     # Ensure input compatibility, especially when both are arrays
-    if isinstance(alpha, np.ndarray) and isinstance(beta, np.ndarray) and alpha.shape != beta.shape:
+    if isinstance(alpha, np.ndarray) and isinstance(beta, np.ndarray) and (
+        alpha.shape != beta.shape
+    ):
         logger.error("The shapes of alpha and beta must be identical.")
         raise ValueError("The shapes of alpha and beta must be identical.")
 
