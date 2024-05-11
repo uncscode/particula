@@ -6,10 +6,8 @@
 """
 
 import pytest
-import numpy as np
 from particula import u
 from particula.util.knudsen_number import knu
-from particula.util.knudsen_number import calculate_knudsen_number
 
 
 def test_kn():

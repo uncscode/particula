@@ -10,8 +10,6 @@
         -- implementing tranpose for now.
 """
 
-from typing import Union
-from numpy.typing import NDArray
 import numpy as np
 from particula.util.input_handling import in_length, in_radius
 from particula.util.mean_free_path import mfp as mfp_func
