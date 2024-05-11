@@ -118,7 +118,6 @@ def reduced_value(
         logger.error("The shapes of alpha and beta must be identical.")
         raise ValueError("The shapes of alpha and beta must be identical.")
 
-
     # Calculation of the reduced value, with safety against division by zero
     denominator = alpha + beta
     # Using np.where to avoid division by zero
