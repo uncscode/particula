@@ -37,7 +37,7 @@ def discrete_loss(
     Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Chapter 13 Equations 13.61
     """
-    return np.sum(concentration * kernel * np.transpose([concentration]), axis=0)
+    return np.sum(kernel * np.outer(concentration, concentration), axis=0)
 
 
 def discrete_gain(
@@ -63,8 +63,8 @@ def discrete_gain(
     """
     # gain
     # 0.5* C_i * C_j * K_ij
-    # typing check doesn't like the [concentration] part, to broadcast.
-    gain_matrix = 0.5 * kernel * concentration * np.transpose([concentration])
+    # outer replaces, concentration * np.transpose([concentration])
+    gain_matrix = 0.5 * kernel * np.outer(concentration, concentration)
 
     # select the diagonal to sum over, skip the first one, size as no particles
     # will coagulate into it.
@@ -138,11 +138,11 @@ def continuous_gain(
     physics, Chapter 13 Equations 13.61
     """
 
-    # typing check doesn't like the [concentration] part, to broadcast.
+    # outer replaces, concentration * np.transpose([concentration])
     interp = RectBivariateSpline(
         x=radius,
         y=radius,
-        z=kernel * concentration * np.transpose([concentration])
+        z=kernel * np.outer(concentration, concentration)
     )
 
     dpd = np.linspace(0, radius / 2**(1 / 3), radius.size)  # type: ignore

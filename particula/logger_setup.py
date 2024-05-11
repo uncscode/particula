@@ -46,8 +46,13 @@ config = {
         }
     },
     "loggers": {
-        "root": {
+        "particula": {
             "level": "DEBUG",
+            "handlers": ["file", "stderr"],
+            "propagate": False
+        },
+        "root": {
+            "level": "ERROR",
             "handlers": [
                 "stderr",
                 "file"

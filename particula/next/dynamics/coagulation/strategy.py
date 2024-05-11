@@ -182,7 +182,6 @@ class CoagulationStrategy(ABC):
             temperature=temperature,
             pressure=pressure
         )
-
         # coulomb potential ratio
         coulomb_potential_ratio = self.coulomb_potential_ratio(
             particle=particle,
