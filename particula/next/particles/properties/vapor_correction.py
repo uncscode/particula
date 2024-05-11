@@ -1,4 +1,4 @@
-"""The vapor transition correction function, which accounts for the
+"""Module for the vapor transition correction function, which accounts for the
 intermediate regime between continuum and free molecular flow. This is the
 Suchs and Futugin transition function.
 """

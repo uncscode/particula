@@ -1,4 +1,4 @@
-""" Calculate the diffusive knudsen number
+""" Module for the diffusive knudsen number
 """
 from typing import Union
 from numpy.typing import NDArray
@@ -6,7 +6,7 @@ import numpy as np
 from particula.constants import BOLTZMANN_CONSTANT
 
 from particula.next.particles.properties import coulomb_enhancement
-from particula.util.reduced_quantity import reduced_value
+from particula.util.reduced_quantity import reduced_self_broadcast
 
 
 def diffusive_knudsen_number(
@@ -48,30 +48,31 @@ def diffusive_knudsen_number(
     Nonlinear, and Soft Matter Physics, 85(2).
     https://doi.org/10.1103/PhysRevE.85.026410
     """
+    # Calculate the pairwise sum of radii
     if isinstance(radius, np.ndarray):
-        # square matrix of radius
-        radius = np.array(radius)
-        radius = np.tile(radius, (len(radius), 1))
-    if isinstance(mass_particle, np.ndarray):
-        # square matrix of mass
-        mass_particle = np.array(mass_particle)
-        mass_particle = np.tile(mass_particle, (len(mass_particle), 1))
-    if isinstance(friction_factor, np.ndarray):
-        # square matrix of charge
-        friction_factor = np.array(friction_factor)
-        friction_factor = np.tile(friction_factor, (len(friction_factor), 1))
+        sum_of_radii = radius[:, np.newaxis] + radius
+    else:
+        sum_of_radii = 2 * radius
 
-    # reduced values
-    reduced_mass = reduced_value(
-        mass_particle, np.transpose(mass_particle))
-    reduced_friction_factor = reduced_value(
-        friction_factor, np.transpose(friction_factor))
-    # radius sum
-    sum_radius = radius + np.transpose(radius)
-    return (
-        ((temperature * BOLTZMANN_CONSTANT.m * reduced_mass)**0.5
-         / reduced_friction_factor)
-        /
-        (sum_radius * coulomb_enhancement.continuum(coulomb_potential_ratio)
-         / coulomb_enhancement.kinetic(coulomb_potential_ratio))
-    )
+    # Calculate reduced mass
+    if isinstance(mass_particle, np.ndarray):
+        reduced_mass = reduced_self_broadcast(mass_particle)
+    else:
+        reduced_mass = mass_particle
+
+    # Calculate reduced friction factor
+    if isinstance(friction_factor, np.ndarray):
+        reduced_friction_factor = reduced_self_broadcast(friction_factor)
+    else:
+        reduced_friction_factor = friction_factor
+
+    # Calculate the kinetic and continuum enhancements
+    kinetic_enhance = coulomb_enhancement.kinetic(coulomb_potential_ratio)
+    continuum_enhance = coulomb_enhancement.continuum(coulomb_potential_ratio)
+
+    # Final calculation of diffusive Knudsen number
+    numerator = np.sqrt(temperature * BOLTZMANN_CONSTANT.m *
+                        reduced_mass) / reduced_friction_factor
+    denominator = sum_of_radii * continuum_enhance / kinetic_enhance
+
+    return numerator / denominator

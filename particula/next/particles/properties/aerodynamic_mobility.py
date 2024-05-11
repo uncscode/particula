@@ -1,4 +1,4 @@
-""" Aerodynamic mobility of a particle in a fluid.
+"""Module for aerodynamic mobility of a particle in a fluid.
 """
 from typing import Union
 from numpy.typing import NDArray

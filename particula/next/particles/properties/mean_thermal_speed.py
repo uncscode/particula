@@ -1,4 +1,4 @@
-""" This module contains the function for calculating the mean thermal speed
+""" Module contains the function for calculating the mean thermal speed
 of particles in a fluid."""
 
 from typing import Union

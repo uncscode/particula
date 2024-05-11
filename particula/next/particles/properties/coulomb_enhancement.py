@@ -1,4 +1,4 @@
-""" Calculate coulomb-related enhancements
+"""Module for coulomb-related enhancements
 
 References:
 ----------

@@ -1,4 +1,4 @@
-""" Friction factor of a particle in a fluid.
+"""Module for friction factor of a particle in a fluid.
 
 Zhang, C., Thajudeen, T., Larriba, C., Schwartzentruber, T. E., &
 Hogan, C. J. (2012). Determination of the Scalar Friction Factor for

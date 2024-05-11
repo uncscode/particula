@@ -382,8 +382,9 @@ class DiscreteGeneral(CoagulationStrategy):
             temperature=temperature,
             pressure=pressure
         )
-        # square matrix sum of radii pairs
-        sum_of_radii = np.outer(particle.get_radius(), particle.get_radius())
+        # Calculate the pairwise sum of radii
+        radius = particle.get_radius()
+        sum_of_radii = radius[:, np.newaxis] + radius
         # square matrix of mass
         reduced_mass = reduced_self_broadcast(particle.get_mass())
         # square matrix of friction factor
@@ -472,8 +473,9 @@ class ContinuousGeneralPDF(CoagulationStrategy):
             temperature=temperature,
             pressure=pressure
         )
-        # square matrix sum of radii pairs
-        sum_of_radii = np.outer(particle.get_radius(), particle.get_radius())
+        # Calculate the pairwise sum of radii
+        radius = particle.get_radius()
+        sum_of_radii = radius[:, np.newaxis] + radius
         # square matrix of mass
         reduced_mass = reduced_self_broadcast(particle.get_mass())
         # square matrix of friction factor
