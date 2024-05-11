@@ -2,7 +2,7 @@
 particula.next.particles.properties.
 """
 
-# pylint: disable=unused-import
+# pylint: disable=unused-import, disable=line-too-long
 # flake8: noqa
 # pyright: basic
 
