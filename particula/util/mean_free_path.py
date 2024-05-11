@@ -9,8 +9,6 @@
 
 """
 
-from typing import Union, Optional
-from numpy.typing import NDArray
 import numpy as np
 from particula import u
 from particula.constants import (
