@@ -99,7 +99,6 @@ def test_reduced_self_broadcast_typical():
 def test_reduced_self_broadcast_empty():
     """ Test with empty input"""
     alpha_array = np.array([])
-    expected_result = np.array([])
     result = reduced_self_broadcast(alpha_array)
     assert result.shape == (0, 0), "Test failed for empty input"
 

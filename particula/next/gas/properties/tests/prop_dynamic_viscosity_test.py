@@ -38,4 +38,3 @@ def test_dynamic_viscosity_negative_temperature():
     """Test for error handling with negative temperature."""
     with pytest.raises(ValueError):
         get_dynamic_viscosity(-10)
-
