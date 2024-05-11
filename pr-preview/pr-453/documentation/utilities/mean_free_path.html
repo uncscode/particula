@@ -688,40 +688,6 @@ FUNCTIONS
 DATA
     GAS_CONSTANT = &lt;Quantity(8.31446261815324, &#39;kilogram * meter ** 2 / ke...
     MOLECULAR_WEIGHT_AIR = &lt;Quantity(0.0289644, &#39;kilogram / mole&#39;)&gt;
-    NDArray = numpy.ndarray[typing.Any, numpy.dtype[+_ScalarType_co]]
-    Optional = typing.Optional
-        Optional[X] is equivalent to Union[X, None].
-    
-    Union = typing.Union
-        Union type; Union[X, Y] means either X or Y.
-        
-        On Python 3.10 and higher, the | operator
-        can also be used to denote unions;
-        X | Y means the same thing to the type checker as Union[X, Y].
-        
-        To define a union, use e.g. Union[int, str]. Details:
-        - The arguments must be types and there must be at least one.
-        - None as an argument is a special case and is replaced by
-          type(None).
-        - Unions of unions are flattened, e.g.::
-        
-            assert Union[Union[int, str], float] == Union[int, str, float]
-        
-        - Unions of a single argument vanish, e.g.::
-        
-            assert Union[int] == int  # The constructor actually returns int
-        
-        - Redundant arguments are skipped, e.g.::
-        
-            assert Union[int, str, int] == Union[int, str]
-        
-        - When comparing unions, the argument order is ignored, e.g.::
-        
-            assert Union[int, str] == Union[str, int]
-        
-        - You cannot subclass or instantiate a union.
-        - You can use Optional[X] as a shorthand for Union[X, None].
-    
     u = &lt;pint.registry.UnitRegistry object&gt;
 
 FILE
@@ -749,8 +715,6 @@ FILE
 
 &quot;&quot;&quot;
 
-from typing import Union, Optional
-from numpy.typing import NDArray
 import numpy as np
 from particula import u
 from particula.constants import (
