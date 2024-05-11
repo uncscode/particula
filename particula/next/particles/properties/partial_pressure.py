@@ -31,4 +31,3 @@ def partial_pressure_delta(
     between the gas phase and the particle phase.
     """
     return partial_pressure_gas - partial_pressure_particle * kelvin_term
-
