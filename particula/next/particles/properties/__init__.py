@@ -5,6 +5,7 @@ particula.next.particles.properties.
 # pylint: disable=unused-import, disable=line-too-long
 # flake8: noqa
 # pyright: basic
+# pytype: skip-file
 
 from particula.next.particles.properties.aerodynamic_mobility_module import particle_aerodynamic_mobility
 from particula.next.particles.properties.mean_thermal_speed_module import mean_thermal_speed
