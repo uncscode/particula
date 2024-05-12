@@ -167,4 +167,3 @@ def test_build_water_buck():
     """Test building the WaterBuck strategy."""
     builder = WaterBuckBuilder()
     builder.build()
-    assert True, "No exception raised"
