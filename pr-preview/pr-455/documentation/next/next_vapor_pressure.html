@@ -574,7 +574,8 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#example-antoine-equation-vapor-pressure-strategy">Example: Antoine Equation Vapor Pressure Strategy</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-builder-and-factory-patterns">Direct, Builder, and Factory Patterns</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-strategy-builder-and-factory-patterns">Direct Strategy, Builder, and Factory Patterns</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#builder-validation">Builder Validation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#temperature-variation">Temperature Variation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#saturation-concentration">Saturation Concentration</a></li>
 </ul>
@@ -680,11 +681,11 @@ document.write(`
 <li><p>Styrene: “Formula”: “C8H8”, “A”: 6.92409, “B”: 1420, “C”: 226</p></li>
 <li><p>Water: “Formula”: “H2O”, “A”: 7.94917, “B”: 1657.462, “C”: 227.02</p></li>
 </ul>
-<section id="direct-builder-and-factory-patterns">
-<h2>Direct, Builder, and Factory Patterns<a class="headerlink" href="#direct-builder-and-factory-patterns" title="Link to this heading">#</a></h2>
+<section id="direct-strategy-builder-and-factory-patterns">
+<h2>Direct Strategy, Builder, and Factory Patterns<a class="headerlink" href="#direct-strategy-builder-and-factory-patterns" title="Link to this heading">#</a></h2>
 <p>We will demonstrate the use of the direct, builder, and factory patterns to create instances of the <code class="docutils literal notranslate"><span class="pre">AntoineVaporPressure</span></code> strategy. These patterns provide different levels of abstraction and flexibility in object creation, catering to various use cases and design requirements.</p>
 <ul class="simple">
-<li><p><strong>Direct Pattern</strong>: This pattern involves directly creating instances of the <code class="docutils literal notranslate"><span class="pre">AntoineVaporPressure</span></code> class with the required parameters. It is straightforward but may be less flexible when dealing with complex object creation or configuration.</p></li>
+<li><p><strong>Direct Strategy</strong>: This involves directly creating instances of the <code class="docutils literal notranslate"><span class="pre">AntoineVaporPressure</span></code> class with the required parameters. It is straightforward but may be less flexible when dealing with complex object creation or configuration.</p></li>
 <li><p><strong>Builder Pattern</strong>: The builder pattern separates the construction of a complex object from its representation, allowing for more flexible and readable object creation. We will use a <code class="docutils literal notranslate"><span class="pre">VaporPressureBuilder</span></code> class to construct instances of the <code class="docutils literal notranslate"><span class="pre">AntoineVaporPressure</span></code> strategy with different parameters. The parameters can be set in any order, and the builder provides a clear and intuitive way to create objects.</p></li>
 <li><p><strong>Factory Pattern</strong>: The factory pattern provides an interface for creating objects without specifying the exact class of the object to be created. We will use a <code class="docutils literal notranslate"><span class="pre">VaporPressureFactory</span></code> class to create instances of the <code class="docutils literal notranslate"><span class="pre">AntoineVaporPressure</span></code> strategy based on the substance name. This pattern allows for dynamic object creation based on input parameters, enhancing flexibility and extensibility.</p></li>
 </ul>
@@ -739,6 +740,10 @@ Water Antoine vapor pressure at 300 K: 2.305354272293551e-13 Pa
 </div>
 </div>
 </div>
+</section>
+<section id="builder-validation">
+<h2>Builder Validation<a class="headerlink" href="#builder-validation" title="Link to this heading">#</a></h2>
+<p>Here we call the <code class="docutils literal notranslate"><span class="pre">AntoineBuilder</span></code> pattern, with incomplete parameters, to demonstrate the error handling mechanism.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># failed build due to missing parameters</span>
@@ -1819,7 +1824,8 @@ class WaterBuckStrategy(VaporPressureStrategy)
 </ul>
 </li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#example-antoine-equation-vapor-pressure-strategy">Example: Antoine Equation Vapor Pressure Strategy</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-builder-and-factory-patterns">Direct, Builder, and Factory Patterns</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-strategy-builder-and-factory-patterns">Direct Strategy, Builder, and Factory Patterns</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#builder-validation">Builder Validation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#temperature-variation">Temperature Variation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#saturation-concentration">Saturation Concentration</a></li>
 </ul>
