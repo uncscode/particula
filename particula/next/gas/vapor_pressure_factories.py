@@ -8,9 +8,10 @@ from particula.next.gas.vapor_pressure_strategies import VaporPressureStrategy
 
 def vapor_pressure_factory(
     strategy: str,
-    parameters: Optional[dict] = None
+    parameters: Optional[dict] = None  # type: ignore
 ) -> VaporPressureStrategy:
-    """Factory method to create a concrete VaporPressureStrategy object using builders.
+    """Factory method to create a concrete VaporPressureStrategy object using
+    builders.
 
     Args:
     ----
@@ -21,21 +22,22 @@ def vapor_pressure_factory(
     Returns:
     -------
     - vapor_pressure_strategy (VaporPressureStrategy): A concrete
-      implementation of the VaporPressureStrategy built using the appropriate builder.
+      implementation of the VaporPressureStrategy built using the appropriate
+      builder.
     """
     # Assumes all necessary parameters are passed, builder will raise error
     # if parameters are missing.
     if strategy.lower() == "constant":
         builder = vapor_pressure_builders.ConstantBuilder()
-        builder.set_parameters(parameters=parameters)
+        builder.set_parameters(parameters=parameters)  # type: ignore
         return builder.build()
     if strategy.lower() == "antoine":
         builder = vapor_pressure_builders.AntoineBuilder()
-        builder.set_parameters(parameters=parameters)
+        builder.set_parameters(parameters=parameters)  # type: ignore
         return builder.build()
     if strategy.lower() == "clausius_clapeyron":
         builder = vapor_pressure_builders.ClausiusClapeyronBuilder()
-        builder.set_parameters(parameters=parameters)
+        builder.set_parameters(parameters=parameters)  # type: ignore
         return builder.build()
     if strategy.lower() == "water_buck":
         builder = vapor_pressure_builders.WaterBuckBuilder()
