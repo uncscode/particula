@@ -110,7 +110,6 @@ def test_clausius_build_success():
         .set_pressure_initial(101325, 'Pa')
     )
     builder.build()
-    assert True, "No exception raised"
 
 
 def test_clausius_build_failure():
