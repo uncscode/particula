@@ -152,7 +152,6 @@ def test_constant_build_success():
     builder = ConstantBuilder()
     builder.set_vapor_pressure(101325, 'Pa')
     builder.build()
-    assert True, "No exception raised"
 
 
 def test_constant_build_failure():
