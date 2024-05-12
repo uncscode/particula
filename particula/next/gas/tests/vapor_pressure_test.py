@@ -3,10 +3,14 @@
 import numpy as np
 import pytest
 from particula.constants import GAS_CONSTANT
-from particula.next.gas.vapor_pressure import (
+from particula.next.gas.vapor_pressure_strategies import (
     calculate_partial_pressure,
     calculate_concentration,
-    vapor_pressure_factory)
+    ConstantVaporPressureStrategy,
+    AntoineVaporPressureStrategy,
+    ClausiusClapeyronStrategy,
+    WaterBuckStrategy,
+)
 
 
 def test_calculate_partial_pressure_scalar():
@@ -68,8 +72,8 @@ def test_calculate_concentration_array():
 def test_constant_vapor_pressure_strategy():
     """Test the constant vapor pressure strategy."""
     constant_pressure = 101325  # Pa, standard atmospheric pressure
-    strategy = vapor_pressure_factory(
-        "constant", vapor_pressure=constant_pressure)
+    strategy = ConstantVaporPressureStrategy(
+        vapor_pressure=constant_pressure)
     assert strategy.pure_vapor_pressure(298) == constant_pressure
 
 
@@ -77,7 +81,7 @@ def test_antoine_vapor_pressure_strategy():
     """Test the Antoine vapor pressure strategy."""
     # Example coefficients for water
     a, b, c = 8.07131, 1730.63, 233.426
-    strategy = vapor_pressure_factory("antoine", a=a, b=b, c=c)
+    strategy = AntoineVaporPressureStrategy(a=a, b=b, c=c)
     temperature = 100 + 273.15  # Convert 100°C to Kelvin
     expected_pressure = 10**(a - (b / (temperature - c))) * 133.322
     assert strategy.pure_vapor_pressure(
@@ -89,8 +93,7 @@ def test_clausius_clapeyron_strategy():
     latent_heat = 2260000  # J/kg for water
     temp_initial = 373.15  # K, boiling point of water
     pressure_initial = 101325  # Pa, standard atmospheric pressure
-    strategy = vapor_pressure_factory(
-        "clausius_clapeyron",
+    strategy = ClausiusClapeyronStrategy(
         latent_heat=latent_heat,
         temperature_initial=temp_initial,
         pressure_initial=pressure_initial)
@@ -105,7 +108,7 @@ def test_clausius_clapeyron_strategy():
 
 def test_water_buck_strategy():
     """Test the Buck equation for water vapor pressure."""
-    strategy = vapor_pressure_factory("water_buck")
+    strategy = WaterBuckStrategy()
     temperature = 25+273.15  # 25°C to Kelvin
     # Use Buck equation directly for expected value calculation or reference a
     # known value
