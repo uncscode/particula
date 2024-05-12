@@ -1,4 +1,4 @@
-"""Builders and factory to create vapor pressure models for gas species."""
+"""Builders to create vapor pressure models for gas species."""
 
 from typing import Optional
 import logging
