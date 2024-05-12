@@ -2,9 +2,7 @@
 
 This module calculates the vapor pressure of substances based on different
 strategies. These strategies are interchangeable and can be used to calculate
-the vapor pressure of a substance at a given temperature. The module provides
-a factory method to create a concrete VaporPressureStrategy object based on
-the desired strategy.
+the vapor pressure of a substance at a given temperature.
 
 All units are in base SI units (kg, m, s).
 """
@@ -233,6 +231,8 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
         Pascals.
 
         References:
+        ----------
+        - Equation: log10(P) = a - b / (T - c)
         - https://en.wikipedia.org/wiki/Antoine_equation (but in Kelvin)
         - Kelvin form:
         https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781118135341.app1
@@ -346,30 +346,3 @@ class WaterBuckStrategy(VaporPressureStrategy):
         # Select the appropriate equation based on temperature
         return (vapor_pressure_below_freezing * temp_below_freezing +
                 vapor_pressure_above_freezing * temp_above_freezing)
-
-
-def vapor_pressure_factory(
-            strategy: str, **kwargs  # pyright: ignore
-        ) -> VaporPressureStrategy:
-    """Factory method to create a concrete VaporPressureStrategy object.
-
-    Args:
-    ----
-    - strategy (str): The strategy to use for vapor pressure calculations.
-    options: "constant", "antoine", "clausius_clapeyron", "water_buck".
-    - **kwargs: Additional keyword arguments required for the strategy.
-
-    Returns:
-    -------
-    - vapor_pressure_strategy (VaporPressureStrategy): A concrete
-    implementation of the VaporPressureStrategy.
-    """
-    if strategy.lower() == "constant":
-        return ConstantVaporPressureStrategy(**kwargs)  # pyright: ignore
-    if strategy.lower() == "antoine":
-        return AntoineVaporPressureStrategy(**kwargs)  # pyright: ignore
-    if strategy.lower() == "clausius_clapeyron":
-        return ClausiusClapeyronStrategy(**kwargs)  # pyright: ignore
-    if strategy.lower() == "water_buck":
-        return WaterBuckStrategy()
-    raise ValueError(f"Unknown vapor pressure strategy: {strategy}")
