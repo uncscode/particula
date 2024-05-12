@@ -56,7 +56,7 @@ def test_clausius_set_temperature_initial_positive():
     """Test setting a positive value for the initial temperature."""
     builder = ClausiusClapeyronBuilder()
     builder.set_temperature_initial(300, 'K')
-    assert builder.temperature_initial == 300, "Temperature should be set correctly"
+    assert builder.temperature_initial == 300
 
 
 def test_clausius_set_temperature_initial_negative():
@@ -72,7 +72,7 @@ def test_clausius_set_pressure_initial_positive():
     """Test setting a positive value for the initial pressure."""
     builder = ClausiusClapeyronBuilder()
     builder.set_pressure_initial(101325, 'Pa')
-    assert builder.pressure_initial == 101325, "Pressure should be set correctly"
+    assert builder.pressure_initial == 101325
 
 
 def test_clausius_set_pressure_initial_negative():
@@ -106,7 +106,7 @@ def test_clausius_build_success():
     builder = (
         ClausiusClapeyronBuilder()
         .set_latent_heat(2260, 'J/kg')
-        .set_temperature_initial(373,'K')
+        .set_temperature_initial(373, 'K')
         .set_pressure_initial(101325, 'Pa')
     )
     builder.build()
@@ -165,6 +165,7 @@ def test_constant_build_failure():
 
 
 def test_build_water_buck():
+    """Test building the WaterBuck strategy."""
     builder = WaterBuckBuilder()
     builder.build()
     assert True, "No exception raised"

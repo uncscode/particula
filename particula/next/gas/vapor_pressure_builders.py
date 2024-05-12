@@ -3,8 +3,10 @@
 from typing import Optional
 import logging
 from particula.next.gas.vapor_pressure_strategies import (
-    VaporPressureStrategy, AntoineVaporPressureStrategy,
-    ClausiusClapeyronStrategy, WaterBuckStrategy, ConstantVaporPressureStrategy
+    AntoineVaporPressureStrategy,
+    ClausiusClapeyronStrategy,
+    WaterBuckStrategy,
+    ConstantVaporPressureStrategy
 )
 from particula.util.input_handling import convert_units  # type: ignore
 
