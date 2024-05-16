@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+title: Particula
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Kyle
+    family-names: Gorkowski
+    affiliation: Los Alamos National Laboratory
+    orcid: 'https://orcid.org/0000-0002-3750-1189'
+  - given-names: Naser
+    family-names: Mahfouz
+    orcid: 'https://orcid.org/0000-0002-7097-1430'
+    affiliation: Pacific Northwest National Laboratory
+  - given-names: Wayne
+    family-names: Chuang
+  - given-names: aktwo
+doi: 10.5281/zenodo.10775643
+repository-code: 'https://github.com/uncscode/particula'
+url: 'https://uncscode.github.io/particula/intro.html'
+abstract: >-
+  Particula is a simple aerosol particle simulator. It is
+  designed to be easy to use and easy to extend. The goal is
+  to have a robust aerosol (gas phase and particle phase)
+  simulation system that can be used to answer scientific
+  questions that arise in experiments and research
+  endeavors.
+license: MIT
+version: v0.0.16
+date-released: '2024-03-03'
