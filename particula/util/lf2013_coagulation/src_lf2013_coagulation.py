@@ -8,7 +8,7 @@ import numpy as np
 
 # flake8: noqa: C901
 # pylint: disable=too-many-arguments, too-many-locals, too-many-branches
-# pylint: disable=used-before-assignment
+# pylint: disable=possibly-used-before-assignment
 
 def lf2013_coag_full(
     ion_type="air",
