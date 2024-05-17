@@ -108,11 +108,13 @@ def wet_mixing(
             # water
             sigma = surface_tension_solute * surface_coverage + \
                 water(temperature) * (1 - surface_coverage)
-    elif method == 'volume':
+        return sigma
+    if method == 'volume':
         # Volume method
         sigma = (
             volume_solute * surface_tension_solute +
             volume_water * water(temperature)
         ) / (volume_solute + volume_water)
+        return sigma
 
-    return sigma
+    raise ValueError("Invalid method")
