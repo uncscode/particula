@@ -104,6 +104,7 @@ def continuous_loss(
     Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Chapter 13 Equations 13.61
     """
+    # concentration (n,) and kernel (n,n)
     return concentration * np.trapz(y=kernel*concentration, x=radius)
 
 
