@@ -48,7 +48,7 @@ def test_coulomb_dyachkov2007():
     np.testing.assert_almost_equal(result, expected, decimal=4)
 
 
-def test_coulomb_gatti200():
+def test_coulomb_gatti2008():
     """
     Test the coulomb_gatti2008 function with a single value and
     array of diffusive_knudsen and coulomb_potential_ratio values.
@@ -96,7 +96,7 @@ def test_coulomb_chahl2019():
     np.testing.assert_almost_equal(result_single, expected_single, decimal=4)
     # array
     expected = np.array(
-        [0.10960427, 1.65863442, 4.37444613, 28.05501739, 59.74082667])
+        [ 0.10960427,  1.65863442,  4.37444613, 28.05501739, 59.74082667])
     result = transition_regime.coulomb_chahl2019(
         diffusive_knudsen_array, coulomb_potential_ratio_array)
     np.testing.assert_almost_equal(result, expected, decimal=4)
