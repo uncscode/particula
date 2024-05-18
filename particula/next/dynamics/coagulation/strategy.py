@@ -14,7 +14,7 @@ from particula.next.dynamics.coagulation.brownian_kernel import (
 from particula.next.dynamics.coagulation.kernel import KernelStrategy
 from particula.next.particles import properties
 from particula.next.gas import properties as gas_properties
-from particula.util.reduced_quantity import reduced_value, reduced_self_broadcast
+from particula.util.reduced_quantity import reduced_self_broadcast
 
 
 class CoagulationStrategy(ABC):
