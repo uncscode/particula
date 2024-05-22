@@ -2,6 +2,7 @@
 
 from typing import Union, List
 from typing import List, Union, Tuple, Dict, Any, Optional
+from datetime import datetime, timezone
 import warnings
 import glob
 import os
@@ -643,6 +644,10 @@ def save_stream_to_csv(
         Subfolder within path to save the CSV file. The default is 'output'.
     include_time : bool, optional
         Whether to include time data in the first column. The default is True.
+    include_iso_datatime : bool, optional
+        Whether to include ISO formatted datetime in the second column.
+        The default is True. The format is ISO 8601,
+        '2021-01-01T00:00:00Z'.
     """
     # Validate path
     if not os.path.isdir(path):
@@ -664,7 +669,7 @@ def save_stream_to_csv(
             # Prepare header
             header = stream.header
             if include_time:
-                header = ['Epoch_UTC'] + header
+                header = ['DateTime[ISO8601]'] + ['Epoch_UTC'] + header
             csv_writer.writerow(header)
             
             # Write data rows
@@ -672,7 +677,10 @@ def save_stream_to_csv(
                 row = stream.data[i, :].tolist()
                 if include_time and len(stream.time) == len(stream.data):
                     time_val = stream.time[i]
-                    row = [time_val] + row
+                    # Convert epoch time to a readable string (ISO 8601 format)
+                    readable_time = datetime.fromtimestamp(
+                        time_val, timezone.utc).isoformat() + 'Z'
+                    row = [readable_time] + [time_val] + row
                 csv_writer.writerow(row)
         print(f"Stream saved to CSV: {file_name}")
     except (FileNotFoundError, PermissionError, IOError, OSError) as e:
