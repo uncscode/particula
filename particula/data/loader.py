@@ -146,6 +146,9 @@ def data_format_checks(data: List[str], data_checks: dict) -> List[str]:
                 < data_checks['characters'][1]
             )
         ]
+    if 'filter' in data_checks:
+        filter_chars = data_checks['filter']
+        data = [x for x in data if not any(char in x for char in filter_chars)]
     if len(data) / length_initial < FILTER_WARNING_FRACTION:
         warnings.warn(
             f"More than {FILTER_WARNING_FRACTION} rows are filtered based on "
