@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=87e54e7c" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -52,7 +52,7 @@
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../../_static/design-tabs.js?v=36754332"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
@@ -574,6 +574,8 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#example-antoine-equation-vapor-pressure-strategy">Example: Antoine Equation Vapor Pressure Strategy</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-strategy-builder-and-factory-patterns">Direct Strategy, Builder, and Factory Patterns</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#builder-validation">Builder Validation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#temperature-variation">Temperature Variation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#saturation-concentration">Saturation Concentration</a></li>
 </ul>
@@ -621,7 +623,9 @@ document.write(`
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="c1"># Import the functions from the particula package</span>
-<span class="kn">from</span> <span class="nn">particula.next.gas</span> <span class="kn">import</span> <span class="n">vapor_pressure</span>
+<span class="kn">from</span> <span class="nn">particula.next.gas</span> <span class="kn">import</span> <span class="n">vapor_pressure_strategies</span>
+<span class="kn">from</span> <span class="nn">particula.next.gas</span> <span class="kn">import</span> <span class="n">vapor_pressure_builders</span>
+<span class="kn">from</span> <span class="nn">particula.next.gas.vapor_pressure_factories</span> <span class="kn">import</span> <span class="n">vapor_pressure_factory</span>
 </pre></div>
 </div>
 </div>
@@ -677,29 +681,51 @@ document.write(`
 <li><p>Styrene: “Formula”: “C8H8”, “A”: 6.92409, “B”: 1420, “C”: 226</p></li>
 <li><p>Water: “Formula”: “H2O”, “A”: 7.94917, “B”: 1657.462, “C”: 227.02</p></li>
 </ul>
+<section id="direct-strategy-builder-and-factory-patterns">
+<h2>Direct Strategy, Builder, and Factory Patterns<a class="headerlink" href="#direct-strategy-builder-and-factory-patterns" title="Link to this heading">#</a></h2>
+<p>We will demonstrate the use of the direct, builder, and factory patterns to create instances of the <code class="docutils literal notranslate"><span class="pre">AntoineVaporPressure</span></code> strategy. These patterns provide different levels of abstraction and flexibility in object creation, catering to various use cases and design requirements.</p>
+<ul class="simple">
+<li><p><strong>Direct Strategy</strong>: This involves directly creating instances of the <code class="docutils literal notranslate"><span class="pre">AntoineVaporPressure</span></code> class with the required parameters. It is straightforward but may be less flexible when dealing with complex object creation or configuration.</p></li>
+<li><p><strong>Builder Pattern</strong>: The builder pattern separates the construction of a complex object from its representation, allowing for more flexible and readable object creation. We will use a <code class="docutils literal notranslate"><span class="pre">VaporPressureBuilder</span></code> class to construct instances of the <code class="docutils literal notranslate"><span class="pre">AntoineVaporPressure</span></code> strategy with different parameters. The parameters can be set in any order, and the builder provides a clear and intuitive way to create objects.</p></li>
+<li><p><strong>Factory Pattern</strong>: The factory pattern provides an interface for creating objects without specifying the exact class of the object to be created. We will use a <code class="docutils literal notranslate"><span class="pre">VaporPressureFactory</span></code> class to create instances of the <code class="docutils literal notranslate"><span class="pre">AntoineVaporPressure</span></code> strategy based on the substance name. This pattern allows for dynamic object creation based on input parameters, enhancing flexibility and extensibility.</p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize a specific strategy for calculating butanol&#39;s vapor pressure using Antoine&#39;s equation.</span>
-<span class="c1"># We set the coefficients &#39;a&#39;, &#39;b&#39;, and &#39;c&#39; which are specific to butanol.</span>
-<span class="n">butanol_antione</span> <span class="o">=</span> <span class="n">vapor_pressure</span><span class="o">.</span><span class="n">AntoineVaporPressureStrategy</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Direct instantiation of an AntoineVaporPressureStrategy for butanol.</span>
+<span class="c1"># This approach directly sets the coefficients &#39;a&#39;, &#39;b&#39;, and &#39;c&#39; specific</span>
+<span class="c1"># to butanol for calculating its vapor pressure.</span>
+<span class="n">butanol_antione</span> <span class="o">=</span> <span class="n">vapor_pressure_strategies</span><span class="o">.</span><span class="n">AntoineVaporPressureStrategy</span><span class="p">(</span>
     <span class="n">a</span><span class="o">=</span><span class="mf">7.838</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mf">1558.19</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">196.881</span><span class="p">)</span>
 
-<span class="c1"># Initialize a strategy for styrene using a factory method.</span>
-<span class="c1"># A factory method is a way to create objects without specifying the exact class of object that will be created.</span>
-<span class="c1"># We pass &#39;antoine&#39; as the strategy name and the coefficients as a dictionary.</span>
+<span class="c1"># Use the Builder pattern to create a vapor pressure strategy for styrene.</span>
+<span class="c1"># The Builder pattern allows for more flexible object creation by setting properties step-by-step.</span>
+<span class="c1"># This approach, also validates the input parameters and ensures the object is fully defined.</span>
+<span class="c1"># Here, coefficients are set individually using setter methods provided by</span>
+<span class="c1"># the AntoineBuilder.</span>
 <span class="n">styrene_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mf">6.924</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">1420</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mi">226</span><span class="p">}</span>
-<span class="n">styrene_antione</span> <span class="o">=</span> <span class="n">vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
-    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;antoine&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">styrene_coefficients</span><span class="p">)</span>
+<span class="n">styrene_antione</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">vapor_pressure_builders</span><span class="o">.</span><span class="n">AntoineBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_a</span><span class="p">(</span><span class="n">styrene_coefficients</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_b</span><span class="p">(</span><span class="n">styrene_coefficients</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_c</span><span class="p">(</span><span class="n">styrene_coefficients</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="p">)</span>
 
-<span class="c1"># Similar to styrene, initialize a strategy for water using the factory method.</span>
-<span class="c1"># note the strategy name is case-insensitive.</span>
+<span class="c1"># Initialize a vapor pressure strategy for water using the factory method.</span>
+<span class="c1"># The factory method abstracts the creation logic of the builder and can instantiate different builder strategies based on the input strategy.</span>
+<span class="c1"># This approach ensures that object creation is centralized and consistent across the application.</span>
+<span class="c1"># Note: The strategy name provided to the factory method is case-insensitive.</span>
 <span class="n">water_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mf">7.949017</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mf">1657.462</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mf">227.02</span><span class="p">}</span>
-<span class="n">water_antione</span> <span class="o">=</span> <span class="n">vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
-    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;Antoine&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">water_coefficients</span><span class="p">)</span>
+<span class="n">water_antione</span> <span class="o">=</span> <span class="n">vapor_pressure_factory</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;Antoine&#39;</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="o">=</span><span class="n">water_coefficients</span>
+<span class="p">)</span>
+
 
 <span class="c1"># Calculate and print the vapor pressures at 300 Kelvin for each substance using the initialized strategies.</span>
 <span class="c1"># The function &#39;pure_vapor_pressure&#39; is used here, which calculates the</span>
 <span class="c1"># vapor pressure based on the provided temperature.</span>
+
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Butanol Antoine vapor pressure at 300 K: </span><span class="si">{</span><span class="n">butanol_antione</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span><span class="si">}</span><span class="s1"> Pa&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Styrene Antoine vapor pressure at 300 K: </span><span class="si">{</span><span class="n">styrene_antione</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span><span class="si">}</span><span class="s1"> Pa&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Water Antoine vapor pressure at 300 K: </span><span class="si">{</span><span class="n">water_antione</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span><span class="si">}</span><span class="s1"> Pa&#39;</span><span class="p">)</span>
@@ -714,6 +740,47 @@ Water Antoine vapor pressure at 300 K: 2.305354272293551e-13 Pa
 </div>
 </div>
 </div>
+</section>
+<section id="builder-validation">
+<h2>Builder Validation<a class="headerlink" href="#builder-validation" title="Link to this heading">#</a></h2>
+<p>Here we call the <code class="docutils literal notranslate"><span class="pre">AntoineBuilder</span></code> pattern, with incomplete parameters, to demonstrate the error handling mechanism.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># failed build due to missing parameters</span>
+<span class="n">styrene_fail</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">vapor_pressure_builders</span><span class="o">.</span><span class="n">AntoineBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_a</span><span class="p">(</span><span class="n">styrene_coefficients</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_b</span><span class="p">(</span><span class="n">styrene_coefficients</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">6</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># failed build due to missing parameters</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">styrene_fail</span> <span class="o">=</span> <span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">vapor_pressure_builders</span><span class="o">.</span><span class="n">AntoineBuilder</span><span class="p">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="o">.</span><span class="n">set_a</span><span class="p">(</span><span class="n">styrene_coefficients</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">])</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="o">.</span><span class="n">set_b</span><span class="p">(</span><span class="n">styrene_coefficients</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span>
+<span class="ne">----&gt; </span><span class="mi">6</span>     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/gas/vapor_pressure_builders.py:91,</span> in <span class="ni">AntoineBuilder.build</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">     </span><span class="mi">89</span> <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">]:</span>
+<span class="g g-Whitespace">     </span><span class="mi">90</span>     <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">]</span>
+<span class="ne">---&gt; </span><span class="mi">91</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing coefficients: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">92</span> <span class="k">return</span> <span class="n">AntoineVaporPressureStrategy</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">93</span>     <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
+
+<span class="ne">ValueError</span>: Missing coefficients: c
+</pre></div>
+</div>
+</div>
+</div>
+</section>
 <section id="temperature-variation">
 <h2>Temperature Variation<a class="headerlink" href="#temperature-variation" title="Link to this heading">#</a></h2>
 <p>With the vapor pressure strategy implemented, we can now explore how the vapor pressure of these substances varies with temperature. We will plot the vapor pressure curves for n-Butanol, Styrene, and Water over a range of temperatures to observe their behavior.</p>
@@ -742,7 +809,7 @@ Water Antoine vapor pressure at 300 K: 2.305354272293551e-13 Pa
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/2b0cce757fd132d1fc705342e3cf47ec5e4846dabe135a99e9648319472be94a.png" src="../../_images/2b0cce757fd132d1fc705342e3cf47ec5e4846dabe135a99e9648319472be94a.png" />
+<img alt="../../_images/8d380b1e3db2158438b6c62595898375a6df634c7eac170ad251a608e1cc5329.png" src="../../_images/8d380b1e3db2158438b6c62595898375a6df634c7eac170ad251a608e1cc5329.png" />
 </div>
 </div>
 </section>
@@ -796,7 +863,7 @@ C = \frac{P_{pure}M}{RT}
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/e2fbfff3282188726d1ff66055802e0e58e95a8925249d4002f292fcc1e4092e.png" src="../../_images/e2fbfff3282188726d1ff66055802e0e58e95a8925249d4002f292fcc1e4092e.png" />
+<img alt="../../_images/84ff5cc01b00a173b599be72880d76c010b043ca97007b39b82ccc737beee225.png" src="../../_images/84ff5cc01b00a173b599be72880d76c010b043ca97007b39b82ccc737beee225.png" />
 </div>
 </div>
 </section>
@@ -854,7 +921,7 @@ P_{partial} = \frac{C R T}{M}
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/f9a45893bc9fe74af81c0b296b7fbde9a9a8de68e71a725f6a1bc582119dc428.png" src="../../_images/f9a45893bc9fe74af81c0b296b7fbde9a9a8de68e71a725f6a1bc582119dc428.png" />
+<img alt="../../_images/5d8f95caaefa8c461662dc377d791fd217e7f77f50061b4f012df23f17e1392d.png" src="../../_images/5d8f95caaefa8c461662dc377d791fd217e7f77f50061b4f012df23f17e1392d.png" />
 </div>
 </div>
 <section id="saturation-ratio">
@@ -903,7 +970,7 @@ SR = \frac{P}{P_{sat}}
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/e2e4a4f94aae546f8802526c32e17e22b75f459ebe640c97205958ae178e8f91.png" src="../../_images/e2e4a4f94aae546f8802526c32e17e22b75f459ebe640c97205958ae178e8f91.png" />
+<img alt="../../_images/05d69bda285f847383160f00f278fe52c54652337d05f29f5fa632e425bdf910.png" src="../../_images/05d69bda285f847383160f00f278fe52c54652337d05f29f5fa632e425bdf910.png" />
 </div>
 </div>
 </section>
@@ -923,21 +990,21 @@ SR = \frac{P}{P_{sat}}
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setting a constant vapor pressure at 300 K for water</span>
-<span class="n">water_pure_at_300K</span> <span class="o">=</span> <span class="mf">1234.56</span>  <span class="c1"># in Pascals (Pa)</span>
-<span class="n">water_constant_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
-    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">vapor_pressure</span><span class="o">=</span><span class="n">water_pure_at_300K</span><span class="p">)</span>
+<span class="n">water_pure_at_300K</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vapor_pressure&#39;</span><span class="p">:</span> <span class="mf">1234.56</span><span class="p">}</span>  <span class="c1"># in Pascals (Pa)</span>
+<span class="n">water_constant_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure_factory</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">water_pure_at_300K</span><span class="p">)</span>
 
 <span class="c1"># Setting parameters for the Clausius-Clapeyron equation for water</span>
 <span class="n">water_clausius_clapeyron_parameters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;latent_heat&#39;</span><span class="p">:</span> <span class="mf">40.7e3</span><span class="p">,</span>  <span class="c1"># specific latent heat J/mol</span>
     <span class="s1">&#39;temperature_initial&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>  <span class="c1"># Initial temperature in Kelvin</span>
-    <span class="s1">&#39;pressure_initial&#39;</span><span class="p">:</span> <span class="n">water_pure_at_300K</span>  <span class="c1"># Initial pressure in Pascals</span>
+    <span class="s1">&#39;pressure_initial&#39;</span><span class="p">:</span> <span class="mf">1234.56</span>  <span class="c1"># Initial pressure in Pascals</span>
 <span class="p">}</span>
-<span class="n">water_clausius_clapeyron_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
-    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;clausius_clapeyron&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">water_clausius_clapeyron_parameters</span><span class="p">)</span>
+<span class="n">water_clausius_clapeyron_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure_factory</span><span class="p">(</span>
+    <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;clausius_clapeyron&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">water_clausius_clapeyron_parameters</span><span class="p">)</span>
 
 <span class="c1"># Using the Water Buck strategy, no additional parameters needed</span>
-<span class="n">water_buck_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">(</span>
+<span class="n">water_buck_strategy</span> <span class="o">=</span> <span class="n">vapor_pressure_factory</span><span class="p">(</span>
     <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;water_buck&#39;</span><span class="p">)</span>
 
 <span class="c1"># Define a range of temperatures for which to calculate vapor pressures</span>
@@ -972,7 +1039,7 @@ SR = \frac{P}{P_{sat}}
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/f4301d7dc2ee46c11b7c309037ab4b8d1b3a8629e7bc43ee38ea35ea17fa2ae8.png" src="../../_images/f4301d7dc2ee46c11b7c309037ab4b8d1b3a8629e7bc43ee38ea35ea17fa2ae8.png" />
+<img alt="../../_images/6fe5037950a6c71cb6fe8a9b24711cd0c02f79e3636b99c73f653e269afdedd8.png" src="../../_images/6fe5037950a6c71cb6fe8a9b24711cd0c02f79e3636b99c73f653e269afdedd8.png" />
 </div>
 </div>
 </section>
@@ -988,12 +1055,12 @@ SR = \frac{P}{P_{sat}}
 <p>Below is the help for each of the classes and methods used in this notebook.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">calculate_concentration</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure_strategies</span><span class="o">.</span><span class="n">calculate_concentration</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function calculate_concentration in module particula.next.gas.vapor_pressure:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function calculate_concentration in module particula.next.gas.vapor_pressure_strategies:
 
 calculate_concentration(partial_pressure: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], molar_mass: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], temperature: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]) -&gt; Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
     Calculate the concentration of a gas from its partial pressure, molar mass,
@@ -1014,7 +1081,7 @@ calculate_concentration(partial_pressure: Union[float, numpy.ndarray[Any, numpy.
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">calculate_partial_pressure</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure_strategies</span><span class="o">.</span><span class="n">calculate_partial_pressure</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1038,7 +1105,7 @@ calculate_partial_pressure(concentration: Union[float, numpy.ndarray[Any, numpy.
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">VaporPressureStrategy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure_strategies</span><span class="o">.</span><span class="n">VaporPressureStrategy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1144,7 +1211,7 @@ class VaporPressureStrategy(abc.ABC)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure_strategies</span><span class="o">.</span><span class="n">vapor_pressure_factory</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1170,7 +1237,7 @@ vapor_pressure_factory(strategy: str, **kwargs) -&gt; particula.next.gas.vapor_p
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure_strategies</span><span class="o">.</span><span class="n">ConstantVaporPressureStrategy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1290,7 +1357,7 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">AntoineVaporPressureStrategy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure_strategies</span><span class="o">.</span><span class="n">AntoineVaporPressureStrategy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1418,7 +1485,7 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">ClausiusClapeyronStrategy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure_strategies</span><span class="o">.</span><span class="n">ClausiusClapeyronStrategy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1559,7 +1626,7 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure</span><span class="o">.</span><span class="n">WaterBuckStrategy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">vapor_pressure_strategies</span><span class="o">.</span><span class="n">WaterBuckStrategy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1757,6 +1824,8 @@ class WaterBuckStrategy(VaporPressureStrategy)
 </ul>
 </li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#example-antoine-equation-vapor-pressure-strategy">Example: Antoine Equation Vapor Pressure Strategy</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-strategy-builder-and-factory-patterns">Direct Strategy, Builder, and Factory Patterns</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#builder-validation">Builder Validation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#temperature-variation">Temperature Variation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#saturation-concentration">Saturation Concentration</a></li>
 </ul>

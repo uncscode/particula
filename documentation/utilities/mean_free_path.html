@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=87e54e7c" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
@@ -52,7 +52,7 @@
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    <script src="../../_static/design-tabs.js?v=36754332"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
@@ -684,68 +684,10 @@ FUNCTIONS
             particula.util.dynamic_viscosity.dyn_vis(**kwargs), but
             if the value of dynamic_viscosity is provided directly,
             it overrides the calculated value.
-    
-    molecule_mean_free_path(molar_mass: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]] = array(0.0289644), temperature: float = 298.15, pressure: float = 101325, dynamic_viscosity: Optional[float] = None) -&gt; Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
-        Calculate the mean free path of a gas molecule in air based on the
-        temperature, pressure, and molar mass of the gas. The mean free path
-        is the average distance traveled by a molecule between collisions with
-        other molecules present in a medium (air).
-        
-        Args:
-        -----
-        - molar_mass (Union[float, NDArray[np.float_]]): The molar mass
-        of the gas molecule [kg/mol]. Default is the molecular weight of air.
-        - temperature (float): The temperature of the gas [K]. Default is 298.15 K.
-        - pressure (float): The pressure of the gas [Pa]. Default is 101325 Pa.
-        - dynamic_viscosity (Optional[float]): The dynamic viscosity of the gas
-        [Pa*s]. If not provided, it will be calculated based on the temperature.
-        
-        Returns:
-        --------
-        - Union[float, NDArray[np.float_]]: The mean free path of the gas molecule
-        in meters (m).
-        
-        References:
-        ----------
-        - https://en.wikipedia.org/wiki/Mean_free_path
 
 DATA
     GAS_CONSTANT = &lt;Quantity(8.31446261815324, &#39;kilogram * meter ** 2 / ke...
     MOLECULAR_WEIGHT_AIR = &lt;Quantity(0.0289644, &#39;kilogram / mole&#39;)&gt;
-    NDArray = numpy.ndarray[typing.Any, numpy.dtype[+_ScalarType_co]]
-    Optional = typing.Optional
-        Optional[X] is equivalent to Union[X, None].
-    
-    Union = typing.Union
-        Union type; Union[X, Y] means either X or Y.
-        
-        On Python 3.10 and higher, the | operator
-        can also be used to denote unions;
-        X | Y means the same thing to the type checker as Union[X, Y].
-        
-        To define a union, use e.g. Union[int, str]. Details:
-        - The arguments must be types and there must be at least one.
-        - None as an argument is a special case and is replaced by
-          type(None).
-        - Unions of unions are flattened, e.g.::
-        
-            assert Union[Union[int, str], float] == Union[int, str, float]
-        
-        - Unions of a single argument vanish, e.g.::
-        
-            assert Union[int] == int  # The constructor actually returns int
-        
-        - Redundant arguments are skipped, e.g.::
-        
-            assert Union[int, str, int] == Union[int, str]
-        
-        - When comparing unions, the argument order is ignored, e.g.::
-        
-            assert Union[int, str] == Union[str, int]
-        
-        - You cannot subclass or instantiate a union.
-        - You can use Optional[X] as a shorthand for Union[X, None].
-    
     u = &lt;pint.registry.UnitRegistry object&gt;
 
 FILE
@@ -773,8 +715,6 @@ FILE
 
 &quot;&quot;&quot;
 
-from typing import Union, Optional
-from numpy.typing import NDArray
 import numpy as np
 from particula import u
 from particula.constants import (
@@ -886,54 +826,6 @@ def mfp(
         (2 * dyn_vis_val / pres) /
         (8 * molec_wt / (np.pi * gas_con * temp))**0.5
     ).to_base_units()
-
-
-def molecule_mean_free_path(
-    molar_mass: Union[
-        float, NDArray[np.float_]] = MOLECULAR_WEIGHT_AIR.m,  # type: ignore
-    temperature: float = 298.15,
-    pressure: float = 101325,
-    dynamic_viscosity: Optional[float] = None,
-) -&gt; Union[float, NDArray[np.float_]]:
-    &quot;&quot;&quot;
-    Calculate the mean free path of a gas molecule in air based on the
-    temperature, pressure, and molar mass of the gas. The mean free path
-    is the average distance traveled by a molecule between collisions with
-    other molecules present in a medium (air).
-
-    Args:
-    -----
-    - molar_mass (Union[float, NDArray[np.float_]]): The molar mass
-    of the gas molecule [kg/mol]. Default is the molecular weight of air.
-    - temperature (float): The temperature of the gas [K]. Default is 298.15 K.
-    - pressure (float): The pressure of the gas [Pa]. Default is 101325 Pa.
-    - dynamic_viscosity (Optional[float]): The dynamic viscosity of the gas
-    [Pa*s]. If not provided, it will be calculated based on the temperature.
-
-    Returns:
-    --------
-    - Union[float, NDArray[np.float_]]: The mean free path of the gas molecule
-    in meters (m).
-
-    References:
-    ----------
-    - https://en.wikipedia.org/wiki/Mean_free_path
-    &quot;&quot;&quot;
-    # check inputs are positive
-    if temperature &lt;= 0:
-        raise ValueError(&quot;Temperature must be positive [Kelvin]&quot;)
-    if pressure &lt;= 0:
-        raise ValueError(&quot;Pressure must be positive [Pascal]&quot;)
-    if np.any(molar_mass &lt;= 0):
-        raise ValueError(&quot;Molar mass must be positive [kg/mol]&quot;)
-    if dynamic_viscosity is None:
-        dynamic_viscosity = dyn_vis(temperature)  # type: ignore
-        dynamic_viscosity = float(dynamic_viscosity.m)  # type: ignore
-
-    return np.array(
-        (2 * dynamic_viscosity / pressure)
-        / (8 * molar_mass / (np.pi * GAS_CONSTANT.m * temperature))**0.5,
-        dtype=np.float_)
 </pre></div>
 </div>
 </div>
