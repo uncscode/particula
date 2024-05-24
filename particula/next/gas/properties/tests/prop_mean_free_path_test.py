@@ -32,7 +32,6 @@ def test_array_input():
     assert np.all(results > 0)
 
 
-
 @pytest.mark.parametrize("temperature", [None, -1, 'a'])
 def test_invalid_temperature(temperature):
     """Test when invalid temperature values are provided to the function"""
