@@ -1,0 +1,50 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/nbclient/client.py", line 1314, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# failed build due to missing parameters
+styrene_fail = (
+    vapor_pressure_builders.AntoineBuilder()
+    .set_a(styrene_coefficients['a'])
+    .set_b(styrene_coefficients['b'])
+    .build()
+)
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mValueError[0m                                Traceback (most recent call last)
+Cell [0;32mIn[3], line 6[0m
+[1;32m      1[0m [38;5;66;03m# failed build due to missing parameters[39;00m
+[1;32m      2[0m styrene_fail [38;5;241m=[39m (
+[1;32m      3[0m     [43mvapor_pressure_builders[49m[38;5;241;43m.[39;49m[43mAntoineBuilder[49m[43m([49m[43m)[49m
+[1;32m      4[0m [43m    [49m[38;5;241;43m.[39;49m[43mset_a[49m[43m([49m[43mstyrene_coefficients[49m[43m[[49m[38;5;124;43m'[39;49m[38;5;124;43ma[39;49m[38;5;124;43m'[39;49m[43m][49m[43m)[49m
+[1;32m      5[0m [43m    [49m[38;5;241;43m.[39;49m[43mset_b[49m[43m([49m[43mstyrene_coefficients[49m[43m[[49m[38;5;124;43m'[39;49m[38;5;124;43mb[39;49m[38;5;124;43m'[39;49m[43m][49m[43m)[49m
+[0;32m----> 6[0m [43m    [49m[38;5;241;43m.[39;49m[43mbuild[49m[43m([49m[43m)[49m
+[1;32m      7[0m )
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/gas/vapor_pressure_builders.py:91[0m, in [0;36mAntoineBuilder.build[0;34m(self)[0m
+[1;32m     89[0m [38;5;28;01mif[39;00m [38;5;28;01mNone[39;00m [38;5;129;01min[39;00m [[38;5;28mself[39m[38;5;241m.[39ma, [38;5;28mself[39m[38;5;241m.[39mb, [38;5;28mself[39m[38;5;241m.[39mc]:
+[1;32m     90[0m     missing [38;5;241m=[39m [p [38;5;28;01mfor[39;00m p [38;5;129;01min[39;00m [[38;5;124m'[39m[38;5;124ma[39m[38;5;124m'[39m, [38;5;124m'[39m[38;5;124mb[39m[38;5;124m'[39m, [38;5;124m'[39m[38;5;124mc[39m[38;5;124m'[39m] [38;5;28;01mif[39;00m [38;5;28mgetattr[39m([38;5;28mself[39m, p) [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m]
+[0;32m---> 91[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m([38;5;124mf[39m[38;5;124m"[39m[38;5;124mMissing coefficients: [39m[38;5;132;01m{[39;00m[38;5;124m'[39m[38;5;124m, [39m[38;5;124m'[39m[38;5;241m.[39mjoin(missing)[38;5;132;01m}[39;00m[38;5;124m"[39m)
+[1;32m     92[0m [38;5;28;01mreturn[39;00m AntoineVaporPressureStrategy(
+[1;32m     93[0m     [38;5;28mself[39m[38;5;241m.[39ma, [38;5;28mself[39m[38;5;241m.[39mb, [38;5;28mself[39m[38;5;241m.[39mc)
+
+[0;31mValueError[0m: Missing coefficients: c
+
