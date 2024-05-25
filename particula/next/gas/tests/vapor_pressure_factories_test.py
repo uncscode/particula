@@ -72,4 +72,4 @@ def test_factory_with_incomplete_parameters():
     with pytest.raises(ValueError) as excinfo:
         vapor_pressure_factory(strategy="antoine", parameters=parameters)
     # Assuming builders check and raise for missing params
-    assert "Missing coefficient 'c'." in str(excinfo.value)
+    assert "Missing required parameter(s): c" in str(excinfo.value)
