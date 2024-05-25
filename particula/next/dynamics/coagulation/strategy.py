@@ -425,7 +425,7 @@ class ContinuousGeneralPDF(CoagulationStrategy):
     """
     Continuous PDF coagulation strategy class. This class implements the
     methods defined in the CoagulationStrategy abstract class. The kernel
-    strategy is passed as an argument to the class, to use a dimensionless
+    strategy is passed as an argument to the class, should use a dimensionless
     kernel representation.
 
     Methods:
