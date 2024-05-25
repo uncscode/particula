@@ -1,6 +1,8 @@
 """ dimensionless coagulation according to several approx.
 """
 
+# pylint: disable=possibly-used-before-assignment
+
 import numpy as np
 from particula.util.input_handling import in_scalar
 

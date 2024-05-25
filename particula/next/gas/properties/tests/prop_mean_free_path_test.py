@@ -29,7 +29,7 @@ def test_array_input():
     molar_masses = np.array([0.028, 0.044])
     results = molecule_mean_free_path(molar_mass=molar_masses)
     # All calculated mean free paths should be positive
-    assert all(results > 0)
+    assert np.all(results > 0)
 
 
 @pytest.mark.parametrize("temperature", [None, -1, 'a'])
