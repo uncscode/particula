@@ -2,6 +2,7 @@
 and checking/validation of the parameters.
 """
 
+import pytest
 from particula.next.gas.species import GasSpecies
 from particula.next.gas.species_builder import GasSpeciesBuilder
 from particula.next.gas.vapor_pressure_strategies import (
@@ -59,18 +60,18 @@ def test_set_concentration():
 def test_set_parameters():
     """Test setting all parameters at once."""
     builder = GasSpeciesBuilder()
+    vapor_obj = ConstantVaporPressureStrategy(0.0)
     parameters = {
         "name": "Oxygen",
         "molar_mass": 0.032,
-        "vapor_pressure_strategy": ConstantVaporPressureStrategy(0.0),
+        "vapor_pressure_strategy": vapor_obj,
         "condensable": True,
         "concentration": 1.0
     }
     builder.set_parameters(parameters)
     assert builder.name == "Oxygen"
     assert builder.molar_mass == 0.032
-    assert builder.vapor_pressure_strategy == ConstantVaporPressureStrategy(
-        0.0)
+    assert builder.vapor_pressure_strategy == vapor_obj
     assert builder.condensable is True
     assert builder.concentration == 1.0
 
