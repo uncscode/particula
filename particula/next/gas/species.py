@@ -47,6 +47,7 @@ class GasSpecies:
     """
 
     def __init__(self):
+        # We could use an empty list instead of None, might be better for types
         self.name = None
         self.molar_mass = None
         self.pure_vapor_pressure_strategy = None

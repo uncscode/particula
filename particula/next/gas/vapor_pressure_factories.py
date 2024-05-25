@@ -17,7 +17,8 @@ def vapor_pressure_factory(
     ----
     - strategy (str): The strategy to use for vapor pressure calculations.
       Options: "constant", "antoine", "clausius_clapeyron", "water_buck".
-    - **kwargs: Additional keyword arguments required for the strategy.
+    - parameters (dict): A dictionary containing the necessary parameters for
+        the strategy. If no parameters are needed, this can be left as None.
 
     Returns:
     -------
