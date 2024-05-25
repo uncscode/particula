@@ -7,7 +7,7 @@ with usage as we figure out the best way to do this.
 from typing import List, Union, Iterator
 from particula.next.gas.species import GasSpecies
 from particula.next.gas.atmosphere import Atmosphere
-from particula.next.particles.representation import Particle
+from particula.next.particle import Particle
 
 
 class Aerosol:
