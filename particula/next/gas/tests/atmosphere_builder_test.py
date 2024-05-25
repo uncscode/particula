@@ -45,3 +45,31 @@ def test_gas_builder_without_species_raises_error():
     with pytest.raises(ValueError) as e:
         builder.build()
     assert "Atmosphere must contain at least one species." in str(e.value)
+
+
+def test_set_temperature():
+    """Test setting the temperature of the atmosphere."""
+    builder = AtmosphereBuilder()
+    builder.set_temperature(300.0)
+    assert builder.temperature == 300.0
+
+    # test with unit conversion
+    builder.set_temperature(300.0, temperature_units='C')
+    assert builder.temperature == 573.15
+
+    with pytest.raises(ValueError):
+        builder.set_temperature(-10.0)
+
+
+def test_set_total_pressure():
+    """Test setting the total pressure of the atmosphere."""
+    builder = AtmosphereBuilder()
+    builder.set_total_pressure(102000.0)
+    assert builder.total_pressure == 102000.0
+
+    # test with unit conversion
+    builder.set_total_pressure(102000.0, pressure_units='kPa')
+    assert builder.total_pressure == 102000.0 * 1000.0
+
+    with pytest.raises(ValueError):
+        builder.set_total_pressure(-1000.0)
