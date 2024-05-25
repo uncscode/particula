@@ -9,7 +9,7 @@ pressure, and kg/m^3 for concentration.
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
-from particula.next.gas.vapor_pressure import VaporPressureStrategy
+from particula.next.gas.vapor_pressure_strategies import VaporPressureStrategy
 
 
 class GasSpecies:
