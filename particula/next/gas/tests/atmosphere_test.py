@@ -2,9 +2,8 @@
 
 # pylint: disable=R0801
 
-import pytest
 import numpy as np
-from particula.next.gas.atmosphere import Atmosphere, AtmosphereBuilder
+from particula.next.gas.atmosphere import Atmosphere
 from particula.next.gas.species import GasSpecies
 from particula.next.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy)
@@ -44,40 +43,3 @@ def test_gas_initialization():
     # Remove a species
     gas.remove_species(1)
     assert len(gas.species) == 1
-
-
-def test_gas_builder_with_species():
-    """Test building a Gas object with the GasBuilder."""
-    vapor_pressure_strategy = ConstantVaporPressureStrategy(
-        vapor_pressure=np.array([101325, 101325]))
-    names = np.array(["Oxygen", "Nitrogen"])
-    molar_masses = np.array([0.032, 0.028])  # kg/mol
-    condensables = np.array([False, False])
-    concentrations = np.array([1.2, 0.8])  # kg/m^3
-
-    gas_species = GasSpecies(
-        name=names,
-        molar_mass=molar_masses,
-        vapor_pressure_strategy=vapor_pressure_strategy,
-        condensable=condensables,
-        concentration=concentrations
-    )
-
-    gas = (AtmosphereBuilder()
-           .temperature(298.15)
-           .total_pressure(101325)
-           .add_species(gas_species)
-           .build())
-
-    assert gas.temperature == 298.15
-    assert gas.total_pressure == 101325
-    assert len(gas.species) == 1
-
-
-def test_gas_builder_without_species_raises_error():
-    """Test that building a Gas object without any species raises an error."""
-    builder = AtmosphereBuilder()
-    # Omit adding any species to trigger the validation error
-    with pytest.raises(ValueError) as e:
-        builder.build()
-    assert "At least one GasSpecies must be added." in str(e.value)

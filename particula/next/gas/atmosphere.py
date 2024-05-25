@@ -66,37 +66,3 @@ class Atmosphere:
             f"Gas mixture at {self.temperature} K and {self.total_pressure} Pa"
             f" consisting of {[str(species) for species in self.species]}"
         )
-
-
-class AtmosphereBuilder:
-    """A builder class for creating Gas objects with a fluent interface."""
-
-    def __init__(self):
-        self._temperature: float = 298.15
-        self._total_pressure: float = 101325
-        self._species: list[GasSpecies] = []
-
-    def temperature(self, temperature: float):
-        """Set the temperature of the gas mixture, in Kelvin."""
-        self._temperature = temperature
-        return self
-
-    def total_pressure(self, total_pressure: float):
-        """Set the total pressure of the gas mixture, in Pascals."""
-        self._total_pressure = total_pressure
-        return self
-
-    def add_species(self, species: GasSpecies):
-        """Add a GasSpecies component to the gas mixture."""
-        self._species.append(species)
-        return self
-
-    def build(self) -> Atmosphere:
-        """Build and return the Gas object."""
-        if not self._species:
-            raise ValueError("At least one GasSpecies must be added.")
-        return Atmosphere(
-            temperature=self._temperature,
-            total_pressure=self._total_pressure,
-            species=self._species,
-        )
