@@ -54,11 +54,14 @@ def test_set_temperature():
     assert builder.temperature == 300.0
 
     # test with unit conversion
-    builder.set_temperature(300.0, temperature_units='C')
-    assert builder.temperature == 573.15
+    builder.set_temperature(20.0, temperature_units='degC')
+    assert builder.temperature == 20.0 + 273.15
 
     with pytest.raises(ValueError):
         builder.set_temperature(-10.0)
+
+    builder.set_temperature(-10, temperature_units='degC')
+    assert builder.temperature == 263.15
 
 
 def test_set_total_pressure():

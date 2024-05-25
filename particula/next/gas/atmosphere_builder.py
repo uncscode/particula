@@ -5,7 +5,7 @@ import logging
 from particula.next.abc_builder import BuilderABC
 from particula.next.gas.species import GasSpecies
 from particula.next.gas.atmosphere import Atmosphere
-from particula.util.input_handling import convert_units
+from particula.util.input_handling import convert_units, in_temperature
 
 logger = logging.getLogger("particula")
 
@@ -42,10 +42,15 @@ class AtmosphereBuilder(BuilderABC):
         temperature_units: str = "K"
     ):
         """Set the temperature of the gas mixture, in Kelvin."""
-        if temperature < 0:
-            logger.error("Temperature must be a positive value.")
-            raise ValueError("Temperature must be a positive value.")
-        self.temperature = temperature * convert_units(temperature_units, "K")
+        self.temperature = convert_units(
+            temperature_units,
+            "kelvin",
+            value=temperature
+        )  # temperature is a non-mupltiplicative conversion
+        # raise an error if the temperature is below absolute zero
+        if self.temperature < 0:
+            logger.error("Temperature must be above zero Kelvin.")
+            raise ValueError("Temperature must be above zero Kelvin.")
         return self
 
     def set_total_pressure(
