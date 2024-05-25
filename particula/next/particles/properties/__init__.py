@@ -2,6 +2,10 @@
 particula.next.particles.properties.
 """
 
+# FIXME: pytype does not like these imports. These also need to be moved
+# up in the import directory to make the particula package more flat. We can
+# fix this later, when we have a better understanding of the package structure.
+
 # pylint: disable=unused-import, disable=line-too-long
 # flake8: noqa
 # pyright: basic
