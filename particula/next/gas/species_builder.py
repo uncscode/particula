@@ -1,6 +1,7 @@
 """This module contains the GasSpeciesBuilder class, which is a builder class
 for GasSpecies objects. The GasSpeciesBuilder class allows for a more fluent
-and readable creation of GasSpecies instances with optional parameters.
+and readable creation of GasSpecies as this class provides validation and
+unit conversion for the parameters of the GasSpecies object.
 """
 from typing import Union
 import logging

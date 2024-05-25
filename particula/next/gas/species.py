@@ -71,6 +71,13 @@ class GasSpecies:
             return len(self.molar_mass)
         return 1.0
 
+    def get_name(self) -> Union[str, NDArray[np.str_]]:
+        """Get the name of the gas species.
+
+        Returns:
+        - name (str or NDArray[np.str_]): The name of the gas species."""
+        return self.name
+
     def get_molar_mass(self) -> Union[float, NDArray[np.float_]]:
         """Get the molar mass of the gas species in kg/mol.
 
