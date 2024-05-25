@@ -750,32 +750,41 @@ Water Antoine vapor pressure at 300 K: 2.305354272293551e-13 Pa
 <span class="n">styrene_fail</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">vapor_pressure_builders</span><span class="o">.</span><span class="n">AntoineBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_a</span><span class="p">(</span><span class="n">styrene_coefficients</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">])</span>
-    <span class="o">.</span><span class="n">set_b</span><span class="p">(</span><span class="n">styrene_coefficients</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[ERROR|vapor_pressure_builders|L119]: Required parameter(s) not set: b, c
+</pre></div>
+</div>
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">6</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
 <span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># failed build due to missing parameters</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">styrene_fail</span> <span class="o">=</span> <span class="p">(</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">vapor_pressure_builders</span><span class="o">.</span><span class="n">AntoineBuilder</span><span class="p">()</span>
 <span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="o">.</span><span class="n">set_a</span><span class="p">(</span><span class="n">styrene_coefficients</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">])</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="o">.</span><span class="n">set_b</span><span class="p">(</span><span class="n">styrene_coefficients</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span>
-<span class="ne">----&gt; </span><span class="mi">6</span>     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">5</span>     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/gas/vapor_pressure_builders.py:91,</span> in <span class="ni">AntoineBuilder.build</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">     </span><span class="mi">89</span> <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">]:</span>
-<span class="g g-Whitespace">     </span><span class="mi">90</span>     <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">]</span>
-<span class="ne">---&gt; </span><span class="mi">91</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing coefficients: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">92</span> <span class="k">return</span> <span class="n">AntoineVaporPressureStrategy</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">93</span>     <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/gas/vapor_pressure_builders.py:190,</span> in <span class="ni">AntoineBuilder.build</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">    </span><span class="mi">187</span> <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">188</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Build the AntoineVaporPressureStrategy object with the set</span>
+<span class="g g-Whitespace">    </span><span class="mi">189</span><span class="sd">     coefficients.&quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">190</span>     <span class="bp">self</span><span class="o">.</span><span class="n">pre_build_check</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">191</span>     <span class="k">return</span> <span class="n">AntoineVaporPressureStrategy</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">192</span>         <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
 
-<span class="ne">ValueError</span>: Missing coefficients: c
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/gas/vapor_pressure_builders.py:121,</span> in <span class="ni">BuilderBase.pre_build_check</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">    </span><span class="mi">118</span> <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">119</span>     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">120</span>         <span class="s2">&quot;Required parameter(s) not set: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
+<span class="ne">--&gt; </span><span class="mi">121</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">122</span>         <span class="sa">f</span><span class="s2">&quot;Required parameter(s) not set: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="ne">ValueError</span>: Required parameter(s) not set: b, c
 </pre></div>
 </div>
 </div>
