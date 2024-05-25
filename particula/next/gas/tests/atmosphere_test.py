@@ -5,7 +5,7 @@
 import pytest
 import numpy as np
 from particula.next.gas.atmosphere import Atmosphere, AtmosphereBuilder
-from particula.next.gas.species import GasSpeciesBuilder
+from particula.next.gas.species import GasSpecies
 from particula.next.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy)
 
@@ -19,14 +19,13 @@ def test_gas_initialization():
     condensables = np.array([False, False])
     concentrations = np.array([1.2, 0.8])  # kg/m^3
 
-    gas_species = (GasSpeciesBuilder()
-                   .name(names)
-                   .molar_mass(molar_masses)
-                   .vapor_pressure_strategy(vapor_pressure_strategy)
-                   .condensable(condensables)
-                   .concentration(concentrations)
-                   .build())
-
+    gas_species = GasSpecies(
+        name=names,
+        molar_mass=molar_masses,
+        vapor_pressure_strategy=vapor_pressure_strategy,
+        condensable=condensables,
+        concentration=concentrations
+    )
     temperature = 298.15  # Kelvin
     total_pressure = 101325  # Pascals
 
@@ -56,13 +55,13 @@ def test_gas_builder_with_species():
     condensables = np.array([False, False])
     concentrations = np.array([1.2, 0.8])  # kg/m^3
 
-    gas_species = (GasSpeciesBuilder()
-                   .name(names)
-                   .molar_mass(molar_masses)
-                   .vapor_pressure_strategy(vapor_pressure_strategy)
-                   .condensable(condensables)
-                   .concentration(concentrations)
-                   .build())
+    gas_species = GasSpecies(
+        name=names,
+        molar_mass=molar_masses,
+        vapor_pressure_strategy=vapor_pressure_strategy,
+        condensable=condensables,
+        concentration=concentrations
+    )
 
     gas = (AtmosphereBuilder()
            .temperature(298.15)

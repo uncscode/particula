@@ -9,7 +9,8 @@ pressure, and kg/m^3 for concentration.
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
-from particula.next.gas.vapor_pressure_strategies import VaporPressureStrategy
+from particula.next.gas.vapor_pressure_strategies import (
+    VaporPressureStrategy, ConstantVaporPressureStrategy)
 
 
 class GasSpecies:
@@ -21,18 +22,16 @@ class GasSpecies:
     - name (str): The name of the gas species.
     - molar_mass (float): The molar mass of the gas species.
     - pure_vapor_pressure_strategy (VaporPressureStrategy): The strategy for
-        calculating the pure vapor pressure of the gas species.
+        calculating the pure vapor pressure of the gas species. Can be a single
+        strategy or a list of strategies. Default is a constant vapor pressure
+        strategy with a vapor pressure of 0.0 Pa.
     - condensable (bool): Indicates whether the gas species is condensable.
+        Default is True.
+    - concentration (float): The concentration of the gas species in the
+        mixture. Default is 0.0 kg/m^3.
 
     Methods:
     --------
-    - set_name: Set the name of the gas species.
-    - set_molar_mass: Set the molar mass of the gas species.
-    - set_vapor_pressure_strategy: Set the vapor pressure strategy for the gas
-        species.
-    - set_condensable: Set the condensable property of the gas species.
-    - set_concentration: Set the concentration of the gas species in the
-        mixture.
     - get_molar_mass: Get the molar mass of the gas species.
     - get_condensable: Check if the gas species is condensable.
     - get_concentration: Get the concentration of the gas species in the
@@ -46,13 +45,21 @@ class GasSpecies:
     - add_concentration: Add concentration to the gas species.
     """
 
-    def __init__(self):
-        # We could use an empty list instead of None, might be better for types
-        self.name = None
-        self.molar_mass = None
-        self.pure_vapor_pressure_strategy = None
-        self.condensable = None
-        self.concentration = None
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        name: Union[str, NDArray[np.str_]],
+        molar_mass: Union[float, NDArray[np.float_]],
+        vapor_pressure_strategy: Union[
+            VaporPressureStrategy, list[VaporPressureStrategy]
+            ] = ConstantVaporPressureStrategy(0.0),
+        condensable: Union[bool, NDArray[np.bool_]] = True,
+        concentration: Union[float, NDArray[np.float_]] = 0.0
+    ) -> None:
+        self.name = name
+        self.molar_mass = molar_mass
+        self.pure_vapor_pressure_strategy = vapor_pressure_strategy
+        self.condensable = condensable
+        self.concentration = concentration
 
     def __str__(self):
         """Return a string representation of the GasSpecies object."""
@@ -60,52 +67,9 @@ class GasSpecies:
 
     def __len__(self):
         """Return the number of gas species."""
-        return len(self.molar_mass)
-
-    def set_name(self, name: Union[str, NDArray[np.str_]]):
-        """Set the name of the gas species.
-
-        Args:
-        - name (str or NDArray[np.str_]): The name of the gas species."""
-        self.name = name
-        return self
-
-    def set_molar_mass(self, molar_mass: Union[float, NDArray[np.float_]]):
-        """Set the molar mass of the gas species in kg/mol.
-
-        Args:
-        - molar_mass (float or NDArray[np.float_]): The molar mass of the gas
-            species in kg/mol."""
-        self.molar_mass = molar_mass
-        return self
-
-    def set_vapor_pressure_strategy(
-            self,
-            strategy: Union[VaporPressureStrategy, list[VaporPressureStrategy]]
-            ):
-        """Set the vapor pressure strategies for the gas species.
-
-        Args:
-        - strategy (VaporPressureStrategy): The strategy for calculating the
-            pure vapor pressure of the gas species. either a single strategy or
-            a list of strategies."""
-        self.pure_vapor_pressure_strategy = strategy
-        return self
-
-    def set_condensable(self, condensable: Union[bool, NDArray[np.bool_]]):
-        """Set the condensable bool of the gas species."""
-        self.condensable = condensable
-        return self
-
-    def set_concentration(
-            self, concentration: Union[float, NDArray[np.float_]]):
-        """Set the concentration of the gas species in the mixture, in kg/m^3.
-
-        Args:
-        - concentration (float or NDArray[np.float_]): The concentration of the
-            gas species in the mixture."""
-        self.concentration = concentration
-        return self
+        if isinstance(self.molar_mass, np.ndarray):
+            return len(self.molar_mass)
+        return 1.0
 
     def get_molar_mass(self) -> Union[float, NDArray[np.float_]]:
         """Get the molar mass of the gas species in kg/mol.
@@ -113,8 +77,6 @@ class GasSpecies:
         Returns:
         - molar_mass (float or NDArray[np.float_]): The molar mass of the gas
             species, in kg/mol."""
-        if self.molar_mass is None:
-            raise ValueError("Molar mass property is not set.")
         return self.molar_mass
 
     def get_condensable(self) -> Union[bool, NDArray[np.bool_]]:
@@ -123,8 +85,6 @@ class GasSpecies:
         Returns:
         - condensable (bool): True if the gas species is condensable, False
             otherwise."""
-        if self.condensable is None:
-            raise ValueError("Condensable property is not set.")
         return self.condensable
 
     def get_concentration(self) -> Union[float, NDArray[np.float_]]:
@@ -133,8 +93,6 @@ class GasSpecies:
         Returns:
         - concentration (float or NDArray[np.float_]): The concentration of the
             gas species in the mixture."""
-        if self.concentration is None:
-            raise ValueError("Concentration property is not set.")
         return self.concentration
 
     def get_pure_vapor_pressure(
@@ -158,9 +116,6 @@ class GasSpecies:
         Raises:
             ValueError: If no vapor pressure strategy is set.
         """
-        if self.pure_vapor_pressure_strategy is None:
-            raise ValueError("Vapor pressure strategy is not set.")
-
         if isinstance(self.pure_vapor_pressure_strategy, list):
             # Handle a list of strategies: calculate and return a list of vapor
             # pressures
@@ -194,10 +149,6 @@ class GasSpecies:
         Raises:
         - ValueError: If the vapor pressure strategy is not set.
         """
-        # Check if the vapor pressure strategy is set
-        if self.pure_vapor_pressure_strategy is None:
-            raise ValueError("Vapor pressure strategy is not set.")
-
         # Handle multiple vapor pressure strategies
         if isinstance(self.pure_vapor_pressure_strategy, list):
             # Calculate partial pressure for each strategy
@@ -240,10 +191,6 @@ class GasSpecies:
         Raises:
         - ValueError: If the vapor pressure strategy is not set.
         """
-        # Check if the vapor pressure strategy is set
-        if self.pure_vapor_pressure_strategy is None:
-            raise ValueError("Vapor pressure strategy is not set.")
-
         # Handle multiple vapor pressure strategies
         if isinstance(self.pure_vapor_pressure_strategy, list):
             # Calculate saturation ratio for each strategy
@@ -286,10 +233,6 @@ class GasSpecies:
         Raises:
         - ValueError: If the vapor pressure strategy is not set.
         """
-        # Check if the vapor pressure strategy is set
-        if self.pure_vapor_pressure_strategy is None:
-            raise ValueError("Vapor pressure strategy is not set.")
-
         # Handle multiple vapor pressure strategies
         if isinstance(self.pure_vapor_pressure_strategy, list):
             # Calculate saturation concentraiton for each strategy
@@ -318,66 +261,3 @@ class GasSpecies:
         - added_concentration (float): The concentration to add to the gas
             species."""
         self.concentration = self.concentration + added_concentration
-
-
-class GasSpeciesBuilder:
-    """Builder class for GasSpecies objects, allowing for a more fluent and
-    readable creation of GasSpecies instances with optional parameters.
-
-    Methods:
-    - name: Set the name of the gas species.
-    - molar_mass: Set the molar mass of the gas species.
-    - vapor_pressure_strategy: Set the vapor pressure strategy for the gas
-        species.
-    - condensable: Set the condensable property of the gas species.
-    - build: Validate and return the GasSpecies object.
-
-    Returns:
-    - GasSpecies: The built GasSpecies object.
-    """
-
-    def __init__(self):
-        self.gas_species = GasSpecies()
-
-    def name(self, name: Union[str, NDArray[np.str_]]):
-        """Set the name of the gas species."""
-        self.gas_species.set_name(name)
-        return self
-
-    def molar_mass(self, molar_mass: Union[float, NDArray[np.float_]]):
-        """Set the molar mass of the gas species. Units in kg/mol."""
-        self.gas_species.set_molar_mass(molar_mass)
-        return self
-
-    def vapor_pressure_strategy(
-            self,
-            strategy: Union[VaporPressureStrategy, list[VaporPressureStrategy]]
-            ):
-        """Set the vapor pressure strategy for the gas species."""
-        self.gas_species.set_vapor_pressure_strategy(strategy)
-        return self
-
-    def condensable(self, condensable: Union[bool, NDArray[np.bool_]]):
-        """Set the condensable bool of the gas species."""
-        self.gas_species.set_condensable(condensable)
-        return self
-
-    def concentration(self, concentration: Union[float, NDArray[np.float_]]):
-        """Set the concentration of the gas species in the mixture,
-        in kg/m^3."""
-        self.gas_species.set_concentration(concentration)
-        return self
-
-    def build(self) -> GasSpecies:
-        """Validate and return the GasSpecies object."""
-        if self.gas_species.name is None:
-            raise ValueError("Gas species name is required.")
-        if self.gas_species.molar_mass is None:
-            raise ValueError("Gas species molar mass is required")
-        if self.gas_species.pure_vapor_pressure_strategy is None:
-            raise ValueError("Vapor pressure strategy is required")
-        if self.gas_species.condensable is None:
-            raise ValueError("Condensable property is required")
-        if self.gas_species.concentration is None:
-            raise ValueError("Concentration property is required")
-        return self.gas_species
