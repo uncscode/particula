@@ -6,7 +6,8 @@ import pytest
 import numpy as np
 from particula.next.gas.atmosphere import Atmosphere, AtmosphereBuilder
 from particula.next.gas.species import GasSpeciesBuilder
-from particula.next.gas.vapor_pressure import ConstantVaporPressureStrategy
+from particula.next.gas.vapor_pressure_strategies import (
+    ConstantVaporPressureStrategy)
 
 
 def test_gas_initialization():
