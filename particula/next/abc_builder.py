@@ -66,8 +66,10 @@ class BuilderABC(ABC):
             raise ValueError(error_message)
 
         # Generate a set of all valid keys
-        valid_keys = set(self.required_parameters +
-                        [f"{key}_units" for key in self.required_parameters])
+        valid_keys = set(
+            self.required_parameters +
+            [f"{key}_units" for key in self.required_parameters]
+        )
         # Check for any invalid keys and handle them within the if condition
         if invalid_keys := [key for key in parameters
                             if key not in valid_keys]:
