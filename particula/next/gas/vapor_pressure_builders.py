@@ -56,7 +56,7 @@ class AntoineBuilder(BuilderABC):
         if b < 0:
             logger.error("Coefficient 'b' must be a positive value.")
             raise ValueError("Coefficient 'b' must be a positive value.")
-        self.b = b * convert_units(b_units, 'K')
+        self.b = convert_units(b_units, 'K', b)
         return self
 
     def set_c(self, c: float, c_units: str = 'K'):
@@ -64,7 +64,7 @@ class AntoineBuilder(BuilderABC):
         if c < 0:
             logger.error("Coefficient 'c' must be a positive value.")
             raise ValueError("Coefficient 'c' must be a positive value.")
-        self.c = c * convert_units(c_units, 'K')
+        self.c = convert_units(c_units, 'K', c)
         return self
 
     def build(self):
@@ -129,8 +129,8 @@ class ClausiusClapeyronBuilder(BuilderABC):
         if temperature_initial < 0:
             raise ValueError(
                 "Initial temperature must be a positive numeric value.")
-        self.temperature_initial = temperature_initial * convert_units(
-            temperature_initial_units, 'K')
+        self.temperature_initial = convert_units(
+            temperature_initial_units, 'K', temperature_initial)
         return self
 
     def set_pressure_initial(

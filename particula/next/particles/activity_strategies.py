@@ -16,10 +16,9 @@ from particula.util.convert import (
     )
 
 
-# Abstract class for vapor pressure strategies
-class ParticleActivityStrategy(ABC):
+class ActivityStrategy(ABC):
     """
-    Abstract class for implementing vapor pressure strategies based on
+    Abstract base class for implementing vapor pressure strategies based on
     particle activity calculations.
     """
 
@@ -60,7 +59,7 @@ class ParticleActivityStrategy(ABC):
 
 
 # Ideal activity strategies
-class MolarIdealActivity(ParticleActivityStrategy):
+class IdealActivityMolar(ActivityStrategy):
     """Ideal activity strategy, based on mole fractions.
 
     Keyword arguments:
@@ -103,7 +102,7 @@ class MolarIdealActivity(ParticleActivityStrategy):
         )
 
 
-class MassIdealActivity(ParticleActivityStrategy):
+class IdealActivityMass(ActivityStrategy):
     """Ideal activity strategy, based on mass fractions.
 
     Keyword arguments:
@@ -136,7 +135,7 @@ class MassIdealActivity(ParticleActivityStrategy):
 
 
 # Non-ideal activity strategies
-class KappaParameterActivity(ParticleActivityStrategy):
+class KappaParameterActivity(ActivityStrategy):
     """Non-ideal activity strategy, based on kappa hygroscopic parameter for
     non-ideal water, and mole fraction for other species.
 

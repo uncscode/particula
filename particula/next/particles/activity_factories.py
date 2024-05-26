@@ -2,8 +2,8 @@
 of species in a mixture of liquids."""
 
 from particula.next.particles.activity_strategies import (
-    MolarIdealActivity,
-    MassIdealActivity,
+    IdealActivityMass,
+    IdealActivityMolar,
     KappaParameterActivity
 )
 
@@ -24,9 +24,9 @@ def particle_activity_strategy_factory(
         - kappa: Non-ideal activity based on kappa hygroscopic parameter.
     - kwargs: Arguments for the activity strategy."""
     if strategy_type.lower() == "molar_ideal":
-        return MolarIdealActivity(**kwargs)
+        return IdealActivityMolar(**kwargs)
     if strategy_type.lower() == "mass_ideal":
-        return MassIdealActivity()
+        return IdealActivityMass()
     if strategy_type.lower() == "kappa":
         return KappaParameterActivity(**kwargs)
     raise ValueError(f"Unknown strategy type call: {strategy_type}")
