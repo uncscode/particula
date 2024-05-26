@@ -2,7 +2,6 @@
 Replace with real values in the future."""
 
 
-import pytest
 import numpy as np
 from particula.next.particles.activity_strategies import (
     MolarIdealActivity,
@@ -68,4 +67,3 @@ def test_kappa_parameter_activity_multiple_species():
         activity_strategy.activity(mass_concentration),
         expected_activity
     )
-

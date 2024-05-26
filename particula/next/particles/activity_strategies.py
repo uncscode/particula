@@ -10,8 +10,6 @@ from abc import ABC, abstractmethod
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
-
-# particula imports
 from particula.util.convert import (
     mass_concentration_to_mole_fraction,
     mass_concentration_to_volume_fraction
@@ -208,4 +206,3 @@ class KappaParameterActivity(ParticleActivityStrategy):
         # replace water activity with kappa activity
         activity[self.water_index] = water_activity
         return activity
-
