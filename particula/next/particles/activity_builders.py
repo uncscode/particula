@@ -38,7 +38,7 @@ class IdealActivityMassBuilder(BuilderABC):
 
 
 class IdealActivityMolarBuilder(BuilderABC):
-    """Builder class for IdealActivityMolar objects. 
+    """Builder class for IdealActivityMolar objects.
 
     Methods:
     --------
@@ -184,8 +184,8 @@ class KappaParameterActivityBuilder(BuilderABC):
         """
         self.pre_build_check()
         return KappaParameterActivity(
-            kappa=self.kappa,
-            density=self.density,
-            molar_mass=self.molar_mass,
-            water_index=self.water_index
+            kappa=self.kappa,  # type: ignore
+            density=self.density,  # type: ignore
+            molar_mass=self.molar_mass,  # type: ignore
+            water_index=self.water_index  # type: ignore
         )
