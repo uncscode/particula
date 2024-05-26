@@ -756,7 +756,7 @@ Water Antoine vapor pressure at 300 K: 2.305354272293551e-13 Pa
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[ERROR|abc_builder|L129]: Required parameter(s) not set: b, c
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[ERROR|abc_builder|L131]: Required parameter(s) not set: b, c
 </pre></div>
 </div>
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
@@ -777,11 +777,11 @@ Water Antoine vapor pressure at 300 K: 2.305354272293551e-13 Pa
 <span class="g g-Whitespace">     </span><span class="mi">74</span>     <span class="k">return</span> <span class="n">AntoineVaporPressureStrategy</span><span class="p">(</span>
 <span class="g g-Whitespace">     </span><span class="mi">75</span>         <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
 
-<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/abc_builder.py:130,</span> in <span class="ni">BuilderABC.pre_build_check</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">127</span> <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">128</span>     <span class="sa">f</span><span class="s2">&quot;Required parameter(s) not set: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">129</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">130</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/abc_builder.py:132,</span> in <span class="ni">BuilderABC.pre_build_check</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">    </span><span class="mi">129</span> <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">130</span>     <span class="sa">f</span><span class="s2">&quot;Required parameter(s) not set: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">131</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">132</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
 
 <span class="ne">ValueError</span>: Required parameter(s) not set: b, c
 </pre></div>
