@@ -27,7 +27,7 @@ styrene_fail = (
 ------------------
 
 ----- stderr -----
-[ERROR|abc_builder|L130]: Required parameter(s) not set: b, c
+[ERROR|abc_builder|L129]: Required parameter(s) not set: b, c
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
@@ -48,13 +48,11 @@ File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/
 [1;32m     74[0m     [38;5;28;01mreturn[39;00m AntoineVaporPressureStrategy(
 [1;32m     75[0m         [38;5;28mself[39m[38;5;241m.[39ma, [38;5;28mself[39m[38;5;241m.[39mb, [38;5;28mself[39m[38;5;241m.[39mc)
 
-File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/abc_builder.py:133[0m, in [0;36mBuilderABC.pre_build_check[0;34m(self)[0m
-[1;32m    129[0m [38;5;28;01mif[39;00m missing:
-[1;32m    130[0m     logger[38;5;241m.[39merror(
-[1;32m    131[0m         [38;5;124m"[39m[38;5;124mRequired parameter(s) not set: [39m[38;5;132;01m%s[39;00m[38;5;124m"[39m,
-[1;32m    132[0m         [38;5;124m'[39m[38;5;124m, [39m[38;5;124m'[39m[38;5;241m.[39mjoin(missing))
-[0;32m--> 133[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(
-[1;32m    134[0m         [38;5;124mf[39m[38;5;124m"[39m[38;5;124mRequired parameter(s) not set: [39m[38;5;132;01m{[39;00m[38;5;124m'[39m[38;5;124m, [39m[38;5;124m'[39m[38;5;241m.[39mjoin(missing)[38;5;132;01m}[39;00m[38;5;124m"[39m)
+File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/next/abc_builder.py:130[0m, in [0;36mBuilderABC.pre_build_check[0;34m(self)[0m
+[1;32m    127[0m error_message [38;5;241m=[39m (
+[1;32m    128[0m     [38;5;124mf[39m[38;5;124m"[39m[38;5;124mRequired parameter(s) not set: [39m[38;5;132;01m{[39;00m[38;5;124m'[39m[38;5;124m, [39m[38;5;124m'[39m[38;5;241m.[39mjoin(missing)[38;5;132;01m}[39;00m[38;5;124m"[39m)
+[1;32m    129[0m logger[38;5;241m.[39merror(error_message)
+[0;32m--> 130[0m [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(error_message)
 
 [0;31mValueError[0m: Required parameter(s) not set: b, c
 
