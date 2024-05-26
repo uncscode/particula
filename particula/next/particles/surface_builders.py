@@ -3,6 +3,10 @@ surface tension in the calculation of the Kelvin effect.
 
 This builds the strategy and checks that the required parameters are set,
 and converts the units of the parameters if necessary.
+
+We could add another layer for common methods between the three strategies,
+but lets wait, as now it is very clear for the user to see what is required
+for each strategy. And there is no coupling between the strategies.
 """
 
 import logging
