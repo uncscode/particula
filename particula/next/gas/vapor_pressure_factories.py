@@ -28,6 +28,7 @@ def vapor_pressure_factory(
     """
     # Assumes all necessary parameters are passed, builder will raise error
     # if parameters are missing.
+    # update to a map, like in activity_factories.py
     if strategy.lower() == "constant":
         builder = vapor_pressure_builders.ConstantBuilder()
         builder.set_parameters(parameters=parameters)  # type: ignore
