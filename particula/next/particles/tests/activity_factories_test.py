@@ -7,8 +7,8 @@ from particula.next.particles.activity_factories import (
     particle_activity_strategy_factory,
 )
 from particula.next.particles.activity_strategies import (
-    MolarIdealActivity,
-    MassIdealActivity,
+    IdealActivityMass,
+    IdealActivityMolar,
     KappaParameterActivity,
 )
 
@@ -20,7 +20,7 @@ def test_particle_activity_strategy_factory_molar_ideal():
     kwargs = {"molar_mass": np.array([1.0, 2.0, 3.0])}
     activity_strategy = particle_activity_strategy_factory(
         strategy_type, **kwargs)  # type: ignore
-    assert isinstance(activity_strategy, MolarIdealActivity)
+    assert isinstance(activity_strategy, IdealActivityMolar)
 
 
 def test_particle_activity_strategy_factory_mass_ideal():
@@ -29,7 +29,7 @@ def test_particle_activity_strategy_factory_mass_ideal():
     kwargs = {}
     activity_strategy = particle_activity_strategy_factory(
         strategy_type, **kwargs)  # type: ignore
-    assert isinstance(activity_strategy, MassIdealActivity)
+    assert isinstance(activity_strategy, IdealActivityMass)
 
 
 def test_particle_activity_strategy_factory_kappa():

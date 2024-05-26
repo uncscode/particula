@@ -67,7 +67,7 @@ class IdealActivityMolarBuilder(BuilderABC):
         - molar_mass_units (str): The units of the molar mass input.
         Default is 'kg/mol'.
         """
-        if molar_mass < 0:
+        if np.any(molar_mass < 0):
             error_message = "Molar mass must be a positive value."
             logger.error(error_message)
             raise ValueError(error_message)
@@ -111,17 +111,24 @@ class KappaParameterActivityBuilder(BuilderABC):
         self.molar_mass = None
         self.water_index = None
 
-    def set_kappa(self, kappa: Union[float, NDArray[np.float_]]):
+    def set_kappa(
+        self,
+        kappa: Union[float, NDArray[np.float_]],
+        kappa_units: Optional[str] = None
+    ):
         """Set the kappa parameter for the activity calculation.
 
         Args:
         ----
         - kappa: The kappa parameter for the activity calculation.
+        - kappa_units: Not used. (for interface consistency)
         """
-        if kappa < 0:
+        if np.any(kappa < 0):
             error_message = "Kappa parameter must be a positive value."
             logger.error(error_message)
             raise ValueError(error_message)
+        if kappa_units is not None:
+            logger.warning("Ignoring units for kappa parameter.")
         self.kappa = kappa
         return self
 
@@ -138,7 +145,7 @@ class KappaParameterActivityBuilder(BuilderABC):
         - density_units (str): The units of the density input. Default is
             'kg/m^3'.
         """
-        if density < 0:
+        if np.any(density < 0):
             error_message = "Density must be a positive value."
             logger.error(error_message)
             raise ValueError(error_message)
@@ -158,7 +165,7 @@ class KappaParameterActivityBuilder(BuilderABC):
         - molar_mass_units (str): The units of the molar mass input. Default is
             'kg/mol'.
         """
-        if molar_mass < 0:
+        if np.any(molar_mass < 0):
             error_message = "Molar mass must be a positive value."
             logger.error(error_message)
             raise ValueError(error_message)
@@ -166,12 +173,24 @@ class KappaParameterActivityBuilder(BuilderABC):
             * convert_units(molar_mass_units, 'kg/mol')
         return self
 
-    def set_water_index(self, water_index: int):
+    def set_water_index(
+        self,
+        water_index: int,
+        water_index_units: Optional[str] = None
+    ):
         """Set the array index of the species.
 
         Args:
         ----
-        - water_index (int): The array index of the species."""
+        - water_index (int): The array index of the species.
+        - water_index_units (str): Not used. (for interface consistency)
+        """
+        if not isinstance(water_index, int):  # type: ignore
+            error_message = "Water index must be an integer."
+            logger.error(error_message)
+            raise TypeError(error_message)
+        if water_index_units is not None:
+            logger.warning("Ignoring units for water index.")
         self.water_index = water_index
         return self
 
