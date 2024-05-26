@@ -16,7 +16,7 @@ def test_gas_builder_with_species():
     molar_masses = np.array([0.032, 0.028, 0.044])
     condensables = np.array([False, False, True])
     concentrations = np.array([0.21, 0.79, 0.0])
-    gas_species = GasSpecies(
+    gas_species_builder_test = GasSpecies(
         name=names,
         molar_mass=molar_masses,
         vapor_pressure_strategy=vapor_pressure_strategy,
@@ -27,7 +27,7 @@ def test_gas_builder_with_species():
         AtmosphereBuilder()
         .set_temperature(298.15)
         .set_total_pressure(101325)
-        .add_species(gas_species)
+        .add_species(gas_species_builder_test)
         .build()
     )
 
