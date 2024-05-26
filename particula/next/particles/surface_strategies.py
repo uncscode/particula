@@ -1,13 +1,6 @@
-"""Strategies for curvature effects on particles. This includes
-the Kelvin effect, and surface tension methods.
+"""Strategies for surface effects on particles.
 
-Unit tests should be added to ensure these strategies are correctly
-implemented and to prevent future regressions.
-the Kelvin effect, and surface tension methods.
-Should add the organic film strategy at some point"""
-
-# pyright: reportArgumentType=false
-
+Should add the organic film strategy in the future."""
 from abc import ABC, abstractmethod
 from typing import Union
 from numpy.typing import NDArray
@@ -20,7 +13,6 @@ from particula.util.convert import (
 from particula.next.particles.properties import kelvin_radius, kelvin_term
 
 
-# Surface tension strategies and Kelvin effect
 class SurfaceStrategy(ABC):
     """
     Abstract class for implementing strategies to calculate surface tension and
@@ -139,7 +131,7 @@ class SurfaceStrategy(ABC):
 
 
 # Surface mixing strategies
-class MolarSurfaceStrategy(SurfaceStrategy):
+class SurfaceStrategyMolar(SurfaceStrategy):
     """Surface tension and density, based on mole fraction weighted values.
 
     Keyword arguments:
@@ -192,7 +184,7 @@ class MolarSurfaceStrategy(SurfaceStrategy):
             )
 
 
-class MassSurfaceStrategy(SurfaceStrategy):
+class SurfaceStrategyMass(SurfaceStrategy):
     """Surface tension and density, based on mass fraction weighted values.
 
     Keyword arguments:
@@ -242,7 +234,7 @@ class MassSurfaceStrategy(SurfaceStrategy):
             )
 
 
-class VolumeSurfaceStrategy(SurfaceStrategy):
+class SurfaceStrategyVolume(SurfaceStrategy):
     """Surface tension and density, based on volume fraction weighted values.
 
     Keyword arguments:
@@ -290,35 +282,3 @@ class VolumeSurfaceStrategy(SurfaceStrategy):
                 mass_concentration, self.density),  # type: ignore
             dtype=np.float_
             )
-
-
-# Surface strategies factory
-def surface_strategy_factory(
-    strategy_type: str = "default",
-    **kwargs: dict  # type: ignore
-) -> SurfaceStrategy:
-    """
-    Factory function to create surface tension strategies.
-
-    Args:
-    -----
-    - strategy_type (str): Type of strategy to create, options are:
-        - "molar": Surface tension and density based on mole fractions.
-        - "mass": Surface tension and density based on mass fractions.
-        - "volume": Surface tension and density based on volume fractions.
-    - **kwargs (dict): Keyword arguments for the strategy.
-
-    Returns:
-    --------
-    - SurfaceStrategy: Instance of the surface tension strategy.
-    """
-    if strategy_type.lower() == "molar":
-        return MolarSurfaceStrategy(**kwargs)
-    if strategy_type.lower() == "mass":
-        return MassSurfaceStrategy(**kwargs)
-    if strategy_type.lower() == "volume":
-        return VolumeSurfaceStrategy(**kwargs)
-    if strategy_type.lower() == "default":
-        return VolumeSurfaceStrategy()
-    raise ValueError(
-        f"Surface strategy type '{strategy_type}' not recognized.")

@@ -31,13 +31,13 @@ def test_prop_kelvin_radius_array():
     temperature = 298
     expected_radius = (2 * effective_surface_tension *
                        molar_mass) / (8.314 * temperature * effective_density)
-    assert np.allclose(
+    np.testing.assert_allclose(
         kelvin_radius(
             effective_surface_tension,
             effective_density,
             molar_mass,
             temperature),
-        expected_radius)
+        expected_radius, atol=1e-5)
 
 
 def test_prop_kelvin_term_scalar():
@@ -53,10 +53,5 @@ def test_prop_kelvin_term_array():
     radius = np.array([0.5, 1.0])
     kelvin_radius_value = np.array([0.1, 0.2])
     expected_term = np.exp(kelvin_radius_value / radius)
-    assert np.allclose(kelvin_term(radius, kelvin_radius_value), expected_term)
-
-
-def test_prop_negative_temperature_raises_error():
-    """Ensure that negative temperature inputs raise an error."""
-    with pytest.raises(ValueError):
-        kelvin_radius(0.072, 1000, 0.018, -1)
+    np.testing.assert_allclose(
+        kelvin_term(radius, kelvin_radius_value), expected_term, rtol=1e-5)

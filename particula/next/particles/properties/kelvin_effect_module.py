@@ -7,7 +7,6 @@ import numpy as np
 from particula.constants import GAS_CONSTANT
 
 
-# Kelvin effect
 def kelvin_radius(
     effective_surface_tension: Union[float, NDArray[np.float_]],
     effective_density: Union[float, NDArray[np.float_]],

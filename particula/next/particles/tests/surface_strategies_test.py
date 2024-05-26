@@ -2,9 +2,9 @@
 import numpy as np
 import pytest
 from particula.next.particles.surface_strategies import (
-    MolarSurfaceStrategy,
-    MassSurfaceStrategy,
-    VolumeSurfaceStrategy,
+    SurfaceStrategyMass,
+    SurfaceStrategyMolar,
+    SurfaceStrategyVolume
 )
 
 
@@ -15,7 +15,7 @@ def test_molar_surface_strategy():
     density = np.array([1000, 800])  # water, oil
     molar_mass = np.array([0.01815, 0.03])  # water, oil
 
-    strategy = MolarSurfaceStrategy(surface_tension, density, molar_mass)
+    strategy = SurfaceStrategyMolar(surface_tension, density, molar_mass)
 
     # Test effective surface tension
     mass_concentration = np.array([100, 200])  # water, oil
@@ -55,7 +55,7 @@ def test_mass_surface_strategy():
     surface_tension = np.array([0.072, 0.05])  # water, oil
     density = np.array([1000, 800])  # water, oil
 
-    strategy = MassSurfaceStrategy(surface_tension, density)
+    strategy = SurfaceStrategyMass(surface_tension, density)
 
     # Test effective surface tension
     mass_concentration = np.array([100, 200])  # water, oil
@@ -97,7 +97,7 @@ def test_volume_surface_strategy():
     surface_tension = np.array([0.072, 0.05])  # water, oil
     density = np.array([1000, 800])  # water, oil
 
-    strategy = VolumeSurfaceStrategy(surface_tension, density)
+    strategy = SurfaceStrategyVolume(surface_tension, density)
 
     # Test effective surface tension
     mass_concentration = np.array([100, 200])  # water, oil
@@ -125,5 +125,3 @@ def test_volume_surface_strategy():
     assert strategy.kelvin_term(
         radius, 0.01815, mass_concentration, 298
     ) == pytest.approx(expected_kelvin_term)
-
-
