@@ -5,7 +5,7 @@ import logging
 from particula.next.abc_builder import BuilderABC
 from particula.next.gas.species import GasSpecies
 from particula.next.gas.atmosphere import Atmosphere
-from particula.util.input_handling import convert_units, in_temperature
+from particula.util.input_handling import convert_units  # type: ignore
 
 logger = logging.getLogger("particula")
 
