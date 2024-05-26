@@ -55,29 +55,28 @@ class BuilderABC(ABC):
         - ValueError: If any required key is missing or if trying to set an
         invalid parameter.
         """
-        # Check if all required keys are present
-        missing = [p for p in self.required_parameters if p not in parameters]
-        if missing:
-            logger.error(
-                "Missing required parameter(s): %s",
-                ', '.join(missing))
-            raise ValueError(
-                f"Missing required parameter(s): {', '.join(missing)}")
 
-        # Check if all keys in parameters are valid, accounting for _units
-        # suffix
+        # Check if all required keys are present
+        if missing := [p for p in self.required_parameters
+                       if p not in parameters]:
+            error_message = (
+                f"Missing required parameter(s): {', '.join(missing)}"
+            )
+            logger.error(error_message)
+            raise ValueError(error_message)
+
+        # Generate a set of all valid keys
         valid_keys = set(self.required_parameters +
-                         [f"{key}_units" for key in self.required_parameters])
-        invalid_keys = [key for key in parameters if key not in valid_keys]
-        if invalid_keys:
-            logger.error(
-                "Trying to set an invalid parameter(s) '%s'. "
-                "The valid parameter(s) '%s'.",
-                invalid_keys,
-                valid_keys)
-            raise ValueError(
+                        [f"{key}_units" for key in self.required_parameters])
+        # Check for any invalid keys and handle them within the if condition
+        if invalid_keys := [key for key in parameters
+                            if key not in valid_keys]:
+            error_message = (
                 f"Trying to set an invalid parameter(s) '{invalid_keys}'. "
-                f"The valid parameter(s) '{valid_keys}'.")
+                f"The valid parameter(s) '{valid_keys}'."
+            )
+            logger.error(error_message)
+            raise ValueError(error_message)
 
     def set_parameters(self, parameters: dict[str, Any]):
         """Set parameters from a dictionary including optional suffix for
@@ -123,15 +122,12 @@ class BuilderABC(ABC):
         ------
         - ValueError: If any required parameter is missing.
         """
-        missing = [
-            p for p in self.required_parameters if getattr(
-                self, p) is None]
-        if missing:
-            logger.error(
-                "Required parameter(s) not set: %s",
-                ', '.join(missing))
-            raise ValueError(
+        if missing := [p for p in self.required_parameters
+                       if getattr(self, p) is None]:
+            error_message = (
                 f"Required parameter(s) not set: {', '.join(missing)}")
+            logger.error(error_message)
+            raise ValueError(error_message)
 
     @abstractmethod
     def build(self) -> Any:
