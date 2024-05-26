@@ -13,11 +13,10 @@ def test_gas_initialization():
     """Test the initialization of a Gas object."""
     vapor_pressure_strategy = ConstantVaporPressureStrategy(
         vapor_pressure=np.array([101325, 101325]))
-    names = np.array(["Oxygen1", "Nitrogen2"])
-    molar_masses = np.array([0.032, 0.028])  # kg/mol
-    condensables = np.array([False, False])
-    concentrations = np.array([1.2, 0.8])  # kg/m^3
-
+    names = np.array(["Oxygen1", "Hydrogen1", "Nitrogen1"])
+    molar_masses = np.array([0.032, 0.002, 0.028])
+    condensables = np.array([False, False, False])
+    concentrations = np.array([0.21, 0.79, 0.0])
     gas_species = GasSpecies(
         name=names,
         molar_mass=molar_masses,
@@ -25,9 +24,9 @@ def test_gas_initialization():
         condensable=condensables,
         concentration=concentrations
     )
+    #create a gas object
     temperature = 298.15  # Kelvin
     total_pressure = 101325  # Pascals
-
     gas = Atmosphere(temperature, total_pressure, [gas_species])
 
     assert gas.temperature == temperature
