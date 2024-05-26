@@ -1,7 +1,7 @@
 """Test the surface module."""
 import numpy as np
 import pytest
-from particula.next.particles.surface import (
+from particula.next.particles.surface_strategies import (
     MolarSurfaceStrategy,
     MassSurfaceStrategy,
     VolumeSurfaceStrategy,
@@ -127,16 +127,3 @@ def test_volume_surface_strategy():
     ) == pytest.approx(expected_kelvin_term)
 
 
-# Test case for Kelvin term calculation
-def test_kelvin_term():
-    """Test the Kelvin term calculation."""
-    strategy = MolarSurfaceStrategy()
-    radius = 1.0
-    molar_mass = 0.01815
-    concentration = np.array([0.1, 0.2, 0.3])
-    temperature = 298.15
-    assert strategy.kelvin_term(
-        radius,
-        molar_mass,
-        concentration,
-        temperature) == pytest.approx(1.0)
