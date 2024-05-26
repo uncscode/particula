@@ -12,7 +12,7 @@ from particula.next.gas.vapor_pressure_strategies import (
 def test_gas_initialization():
     """Test the initialization of a Gas object."""
     vapor_pressure_strategy = ConstantVaporPressureStrategy(
-        vapor_pressure=np.array([101325, 101325]))
+        vapor_pressure=np.array([101325, 101325, 101325]))
     names = np.array(["Oxygen1", "Hydrogen1", "Nitrogen1"])
     molar_masses = np.array([0.032, 0.002, 0.028])
     condensables = np.array([False, False, False])

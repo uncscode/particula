@@ -11,12 +11,11 @@ from particula.next.gas.vapor_pressure_strategies import (
 def test_gas_builder_with_species():
     """Test building a Gas object with the GasBuilder."""
     vapor_pressure_strategy = ConstantVaporPressureStrategy(
-        vapor_pressure=np.array([101325, 101325]))
-    names = np.array(["Oxygen", "Nitrogen"])
-    molar_masses = np.array([0.032, 0.028])  # kg/mol
-    condensables = np.array([False, False])
-    concentrations = np.array([1.2, 0.8])  # kg/m^3
-
+        vapor_pressure=np.array([101325, 101325, 101325]))
+    names = np.array(["Oxygen", "Nitrogen", "Carbon Dioxide"])
+    molar_masses = np.array([0.032, 0.028, 0.044])
+    condensables = np.array([False, False, True])
+    concentrations = np.array([0.21, 0.79, 0.0])
     gas_species = GasSpecies(
         name=names,
         molar_mass=molar_masses,
@@ -24,7 +23,6 @@ def test_gas_builder_with_species():
         condensable=condensables,
         concentration=concentrations
     )
-
     atmo = (
         AtmosphereBuilder()
         .set_temperature(298.15)
