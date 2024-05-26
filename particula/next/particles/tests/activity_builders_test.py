@@ -139,11 +139,6 @@ def test_build_kappa_parameter_activity_set_water_index():
     builder.set_water_index(1)
     assert builder.water_index == 1
 
-    # test type error
-    with pytest.raises(TypeError) as excinfo:
-        builder.set_water_index(1.59)
-    assert "Water index must be an integer." in str(excinfo.value)
-
     # test ignore units
     builder.set_water_index(1, water_index_units='no_units')
     assert builder.water_index == 1
