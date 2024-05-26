@@ -41,7 +41,22 @@ class AtmosphereBuilder(BuilderABC):
         temperature: float,
         temperature_units: str = "K"
     ):
-        """Set the temperature of the gas mixture, in Kelvin."""
+        """Set the temperature of the gas mixture, in Kelvin.
+
+        Args:
+        ----
+        - temperature (float): The temperature of the gas mixture.
+        - temperature_units (str): The units of the temperature.
+        options are 'degC', 'degF', 'degR', 'K'. Default is 'K'.
+
+        Returns:
+        -------
+        - self: The AtmosphereBuilder object.
+
+        Raises:
+        ------
+        - ValueError: If the temperature is below absolute zero.
+        """
         self.temperature = convert_units(
             temperature_units,
             "kelvin",
@@ -58,7 +73,22 @@ class AtmosphereBuilder(BuilderABC):
         total_pressure: float,
         pressure_units: str = "Pa"
     ):
-        """Set the total pressure of the gas mixture, in Pascals."""
+        """Set the total pressure of the gas mixture, in Pascals.
+
+        Args:
+        ----
+        - total_pressure (float): The total pressure of the gas mixture.
+        - pressure_units (str): The units of the pressure. Options are 'Pa',
+        'kPa', 'MPa', 'psi', 'bar', 'atm'. Default is 'Pa'.
+
+        Returns:
+        -------
+        - self: The AtmosphereBuilder object.
+
+        Raises:
+        ------
+        - ValueError: If the total pressure is below zero.
+        """
         if total_pressure < 0:
             logger.error("Total pressure must be a positive value.")
             raise ValueError("Total pressure must be a positive value.")
@@ -67,12 +97,27 @@ class AtmosphereBuilder(BuilderABC):
         return self
 
     def add_species(self, species: GasSpecies):
-        """Add a GasSpecies component to the gas mixture."""
+        """Add a GasSpecies component to the gas mixture.
+
+        Args:
+        ----
+        - species (GasSpecies): The GasSpecies object to be added to the
+        mixture.
+
+        Returns:
+        -------
+        - self: The AtmosphereBuilder object.
+        """
         self.species.append(species)
         return self
 
     def build(self) -> Atmosphere:
-        """Validate and return the Atmosphere object."""
+        """Validate and return the Atmosphere object.
+
+        Returns:
+        -------
+        - Atmosphere: The Atmosphere object.
+        """
         if not self.species:
             raise ValueError("Atmosphere must contain at least one species.")
         self.pre_build_check()
