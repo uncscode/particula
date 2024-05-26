@@ -67,9 +67,11 @@ class GasSpecies:
 
     def __len__(self):
         """Return the number of gas species."""
-        if isinstance(self.molar_mass, np.ndarray):
-            return len(self.molar_mass)
-        return 1.0
+        return (
+            len(self.molar_mass)
+            if isinstance(self.molar_mass, np.ndarray)
+            else 1.0
+        )
 
     def get_name(self) -> Union[str, NDArray[np.str_]]:
         """Get the name of the gas species.

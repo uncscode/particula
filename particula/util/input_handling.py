@@ -94,8 +94,8 @@ def convert_units(
             * Throws ValueError if unit is wrong
             * Assigning default base units to scalar input
     """
-    addative_units = ['degC', 'degF', 'degR', 'degK']
     if isinstance(old, str):
+        addative_units = ['degC', 'degF', 'degR', 'degK']
         if old in addative_units or value is not None:
             value = value if value is not None else 0
             old = u.Quantity(value, old)
