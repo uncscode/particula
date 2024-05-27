@@ -1,0 +1,172 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/nbclient/client.py", line 1314, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# Setting up the Simulation Parameters and Initial Conditions
+
+# Define fixed parameters
+TOTAL_NUMBER_OF_PARTICLES = 100
+TIME_STEP = 0.005
+SIMULATION_TIME = 10
+CUBE_SIDE = 0.010  # Size of the simulation cube in meters
+save_points = 120  # Number of points to save the simulation data
+tke_sigma = 0.5  # Standard deviation of turbulent kinetic energy, m^2/s^2
+
+# Defining new parameters for more realistic simulation
+density_uniform = 1.5e3  # Uniform density of particles in kg/m^3
+mean_radius_nm = 25000  # Mean radius of particles in nanometers
+std_dev_nm = 1.1  # Standard deviation of particle radius in nanometers
+system_temperature_kelvin = 300  # System temperature in Kelvin
+system_pressure_pascal = 1e5  # System pressure in Pascal
+
+# Define intervals for updating interaction factors
+interval_friction_factor = 1000  # Interval for updating friction factor
+interval_coagulation = 100  # Interval for updating coagulation
+regnerate_interval = 10000  # Interval for regenerating particles
+tke_interval = 100  # Interval for updating turbulent kinetic energy
+
+# Generating particle masses using a log-normal distribution
+mass = particle_property.generate_particle_masses(
+    mean_radius=mean_radius_nm,
+    std_dev_radius=std_dev_nm,
+    density=density_uniform,
+    num_particles=TOTAL_NUMBER_OF_PARTICLES,
+    radius_input_units="nm",
+)
+
+# Initializing particle velocities using thermal velocity
+velocity = particle_property.random_thermal_velocity(
+    temperature_kelvin=system_temperature_kelvin,
+    mass_kg=mass,
+    number_of_particles=TOTAL_NUMBER_OF_PARTICLES,
+    t_type=t_type,
+    random_seed=seed
+)
+
+# Setting constant density for all particles
+density = torch.ones(TOTAL_NUMBER_OF_PARTICLES, dtype=t_type) * density_uniform
+
+# Initialize particle positions randomly within the cube
+position = torch.rand(
+    3,
+    TOTAL_NUMBER_OF_PARTICLES,
+    dtype=t_type) * CUBE_SIDE - CUBE_SIDE / 2
+
+# Initialize force as zero for all particles
+force = torch.zeros(3, TOTAL_NUMBER_OF_PARTICLES, dtype=t_type)
+
+# Generating indices for particles
+indices = torch.arange(TOTAL_NUMBER_OF_PARTICLES, dtype=t_type)  # Integer type
+
+# Calculating the total number of iterations for the simulation
+total_iterations = int(SIMULATION_TIME / TIME_STEP)
+
+# Initializing tensor to track total mass over iterations
+total_mass = torch.zeros(total_iterations, dtype=t_type)
+
+# Defining gravity acting on all particles
+gravity = torch.tensor(
+    [0, 0, -9.81]).repeat(TOTAL_NUMBER_OF_PARTICLES, 1).transpose(0, 1)
+
+# Initializing Arrays for Saving Position and Mass Data
+save_position = np.zeros((3, TOTAL_NUMBER_OF_PARTICLES, save_points))
+save_mass = np.zeros((TOTAL_NUMBER_OF_PARTICLES, save_points))
+save_iterations = np.linspace(0, total_iterations, save_points, dtype=int)
+
+# Calculating particle radius from mass and density
+radius = particle_property.radius_calculation(mass=mass, density=density)
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mRuntimeError[0m                              Traceback (most recent call last)
+Cell [0;32mIn[2], line 25[0m
+[1;32m     22[0m tke_interval [38;5;241m=[39m [38;5;241m100[39m  [38;5;66;03m# Interval for updating turbulent kinetic energy[39;00m
+[1;32m     24[0m [38;5;66;03m# Generating particle masses using a log-normal distribution[39;00m
+[0;32m---> 25[0m mass [38;5;241m=[39m [43mparticle_property[49m[38;5;241;43m.[39;49m[43mgenerate_particle_masses[49m[43m([49m
+[1;32m     26[0m [43m    [49m[43mmean_radius[49m[38;5;241;43m=[39;49m[43mmean_radius_nm[49m[43m,[49m
+[1;32m     27[0m [43m    [49m[43mstd_dev_radius[49m[38;5;241;43m=[39;49m[43mstd_dev_nm[49m[43m,[49m
+[1;32m     28[0m [43m    [49m[43mdensity[49m[38;5;241;43m=[39;49m[43mdensity_uniform[49m[43m,[49m
+[1;32m     29[0m [43m    [49m[43mnum_particles[49m[38;5;241;43m=[39;49m[43mTOTAL_NUMBER_OF_PARTICLES[49m[43m,[49m
+[1;32m     30[0m [43m    [49m[43mradius_input_units[49m[38;5;241;43m=[39;49m[38;5;124;43m"[39;49m[38;5;124;43mnm[39;49m[38;5;124;43m"[39;49m[43m,[49m
+[1;32m     31[0m [43m)[49m
+[1;32m     33[0m [38;5;66;03m# Initializing particle velocities using thermal velocity[39;00m
+[1;32m     34[0m velocity [38;5;241m=[39m particle_property[38;5;241m.[39mrandom_thermal_velocity(
+[1;32m     35[0m     temperature_kelvin[38;5;241m=[39msystem_temperature_kelvin,
+[1;32m     36[0m     mass_kg[38;5;241m=[39mmass,
+[0;32m   (...)[0m
+[1;32m     39[0m     random_seed[38;5;241m=[39mseed
+[1;32m     40[0m )
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/lagrangian/particle_property.py:164[0m, in [0;36mgenerate_particle_masses[0;34m(mean_radius, std_dev_radius, density, num_particles, radius_input_units)[0m
+[1;32m    159[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(
+[1;32m    160[0m         [38;5;124m"[39m[38;5;124mlog of Mean radius and standard deviation must be positive for[39m[38;5;124m"[39m
+[1;32m    161[0m         [38;5;241m+[39m [38;5;124m"[39m[38;5;124m torch.distributions.log_normal.LogNormal[39m[38;5;124m"[39m)
+[1;32m    163[0m [38;5;66;03m# Sample radii from the log-normal distribution[39;00m
+[0;32m--> 164[0m radius_samples [38;5;241m=[39m [43mtorch[49m[38;5;241;43m.[39;49m[43mdistributions[49m[38;5;241;43m.[39;49m[43mlog_normal[49m[38;5;241;43m.[39;49m[43mLogNormal[49m[43m([49m
+[1;32m    165[0m [43m    [49m[43mmean_log[49m[43m,[49m[43m [49m[43mstd_dev_log[49m[43m)[49m[38;5;241m.[39msample((num_particles,))
+[1;32m    166[0m radius_samples [38;5;241m*[39m[38;5;241m=[39m torch[38;5;241m.[39masarray(
+[1;32m    167[0m     convert_units(radius_input_units, [38;5;124m"[39m[38;5;124mm[39m[38;5;124m"[39m))
+[1;32m    169[0m [38;5;66;03m# Calculate mass of each particle[39;00m
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/distributions/log_normal.py:33[0m, in [0;36mLogNormal.__init__[0;34m(self, loc, scale, validate_args)[0m
+[1;32m     32[0m [38;5;28;01mdef[39;00m [38;5;21m__init__[39m([38;5;28mself[39m, loc, scale, validate_args[38;5;241m=[39m[38;5;28;01mNone[39;00m):
+[0;32m---> 33[0m     base_dist [38;5;241m=[39m [43mNormal[49m[43m([49m[43mloc[49m[43m,[49m[43m [49m[43mscale[49m[43m,[49m[43m [49m[43mvalidate_args[49m[38;5;241;43m=[39;49m[43mvalidate_args[49m[43m)[49m
+[1;32m     34[0m     [38;5;28msuper[39m()[38;5;241m.[39m[38;5;21m__init__[39m(base_dist, ExpTransform(), validate_args[38;5;241m=[39mvalidate_args)
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/distributions/normal.py:51[0m, in [0;36mNormal.__init__[0;34m(self, loc, scale, validate_args)[0m
+[1;32m     50[0m [38;5;28;01mdef[39;00m [38;5;21m__init__[39m([38;5;28mself[39m, loc, scale, validate_args[38;5;241m=[39m[38;5;28;01mNone[39;00m):
+[0;32m---> 51[0m     [38;5;28mself[39m[38;5;241m.[39mloc, [38;5;28mself[39m[38;5;241m.[39mscale [38;5;241m=[39m [43mbroadcast_all[49m[43m([49m[43mloc[49m[43m,[49m[43m [49m[43mscale[49m[43m)[49m
+[1;32m     52[0m     [38;5;28;01mif[39;00m [38;5;28misinstance[39m(loc, Number) [38;5;129;01mand[39;00m [38;5;28misinstance[39m(scale, Number):
+[1;32m     53[0m         batch_shape [38;5;241m=[39m torch[38;5;241m.[39mSize()
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/distributions/utils.py:49[0m, in [0;36mbroadcast_all[0;34m(*values)[0m
+[1;32m     47[0m             options [38;5;241m=[39m [38;5;28mdict[39m(dtype[38;5;241m=[39mvalue[38;5;241m.[39mdtype, device[38;5;241m=[39mvalue[38;5;241m.[39mdevice)
+[1;32m     48[0m             [38;5;28;01mbreak[39;00m
+[0;32m---> 49[0m     new_values [38;5;241m=[39m [43m[[49m
+[1;32m     50[0m [43m        [49m[43mv[49m[43m [49m[38;5;28;43;01mif[39;49;00m[43m [49m[43mis_tensor_like[49m[43m([49m[43mv[49m[43m)[49m[43m [49m[38;5;28;43;01melse[39;49;00m[43m [49m[43mtorch[49m[38;5;241;43m.[39;49m[43mtensor[49m[43m([49m[43mv[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43moptions[49m[43m)[49m[43m [49m[38;5;28;43;01mfor[39;49;00m[43m [49m[43mv[49m[43m [49m[38;5;129;43;01min[39;49;00m[43m [49m[43mvalues[49m
+[1;32m     51[0m [43m    [49m[43m][49m
+[1;32m     52[0m     [38;5;28;01mreturn[39;00m torch[38;5;241m.[39mbroadcast_tensors([38;5;241m*[39mnew_values)
+[1;32m     53[0m [38;5;28;01mreturn[39;00m torch[38;5;241m.[39mbroadcast_tensors([38;5;241m*[39mvalues)
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/distributions/utils.py:50[0m, in [0;36m<listcomp>[0;34m(.0)[0m
+[1;32m     47[0m             options [38;5;241m=[39m [38;5;28mdict[39m(dtype[38;5;241m=[39mvalue[38;5;241m.[39mdtype, device[38;5;241m=[39mvalue[38;5;241m.[39mdevice)
+[1;32m     48[0m             [38;5;28;01mbreak[39;00m
+[1;32m     49[0m     new_values [38;5;241m=[39m [
+[0;32m---> 50[0m         v [38;5;28;01mif[39;00m is_tensor_like(v) [38;5;28;01melse[39;00m [43mtorch[49m[38;5;241;43m.[39;49m[43mtensor[49m[43m([49m[43mv[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43moptions[49m[43m)[49m [38;5;28;01mfor[39;00m v [38;5;129;01min[39;00m values
+[1;32m     51[0m     ]
+[1;32m     52[0m     [38;5;28;01mreturn[39;00m torch[38;5;241m.[39mbroadcast_tensors([38;5;241m*[39mnew_values)
+[1;32m     53[0m [38;5;28;01mreturn[39;00m torch[38;5;241m.[39mbroadcast_tensors([38;5;241m*[39mvalues)
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/utils/_device.py:78[0m, in [0;36mDeviceContext.__torch_function__[0;34m(self, func, types, args, kwargs)[0m
+[1;32m     76[0m [38;5;28;01mif[39;00m func [38;5;129;01min[39;00m _device_constructors() [38;5;129;01mand[39;00m kwargs[38;5;241m.[39mget([38;5;124m'[39m[38;5;124mdevice[39m[38;5;124m'[39m) [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m:
+[1;32m     77[0m     kwargs[[38;5;124m'[39m[38;5;124mdevice[39m[38;5;124m'[39m] [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39mdevice
+[0;32m---> 78[0m [38;5;28;01mreturn[39;00m [43mfunc[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m/opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/torch/cuda/__init__.py:293[0m, in [0;36m_lazy_init[0;34m()[0m
+[1;32m    291[0m [38;5;28;01mif[39;00m [38;5;124m"[39m[38;5;124mCUDA_MODULE_LOADING[39m[38;5;124m"[39m [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m os[38;5;241m.[39menviron:
+[1;32m    292[0m     os[38;5;241m.[39menviron[[38;5;124m"[39m[38;5;124mCUDA_MODULE_LOADING[39m[38;5;124m"[39m] [38;5;241m=[39m [38;5;124m"[39m[38;5;124mLAZY[39m[38;5;124m"[39m
+[0;32m--> 293[0m [43mtorch[49m[38;5;241;43m.[39;49m[43m_C[49m[38;5;241;43m.[39;49m[43m_cuda_init[49m[43m([49m[43m)[49m
+[1;32m    294[0m [38;5;66;03m# Some of the queued calls may reentrantly call _lazy_init();[39;00m
+[1;32m    295[0m [38;5;66;03m# we need to just return without initializing in that case.[39;00m
+[1;32m    296[0m [38;5;66;03m# However, we must not let any *other* threads in![39;00m
+[1;32m    297[0m _tls[38;5;241m.[39mis_initializing [38;5;241m=[39m [38;5;28;01mTrue[39;00m
+
+[0;31mRuntimeError[0m: Found no NVIDIA driver on your system. Please check that you have an NVIDIA GPU and installed a driver from http://www.nvidia.com/Download/index.aspx
+
