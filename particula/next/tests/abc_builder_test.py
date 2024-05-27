@@ -12,6 +12,7 @@ from particula.next.abc_builder import (
 
 # Example of a concrete class extending BuilderABC for testing
 class ConcreteBuilder(BuilderABC):
+    """Concrete class extending BuilderABC for testing purposes."""
     def build(self):
         return "Build successful!"
 
@@ -19,6 +20,7 @@ class ConcreteBuilder(BuilderABC):
 # Setup the fixture for the testing
 @pytest.fixture
 def builder_fix():
+    """Fixture for the BuilderABC class."""
     return ConcreteBuilder(required_parameters=['param1', 'param2'])
 
 
