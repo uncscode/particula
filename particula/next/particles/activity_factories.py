@@ -2,12 +2,15 @@
 of species in a mixture of liquids."""
 
 from typing import Optional, Any, Dict
+import logging
 from particula.next.particles.activity_strategies import (
     ActivityStrategy)
 from particula.next.particles.activity_builders import (
     IdealActivityMassBuilder, IdealActivityMolarBuilder,
     KappaParameterActivityBuilder
 )
+
+logger = logging.getLogger("particula")
 
 
 def activity_factory(
@@ -43,7 +46,9 @@ def activity_factory(
     }
     builder = builder_map.get(strategy_type.lower())
     if builder is None:
-        raise ValueError(f"Unknown strategy type: {strategy_type}")
+        message = f"Unknown strategy type: {strategy_type}"
+        logger.error(message)
+        raise ValueError(message)
 
     # Set the parameters for the builder
     if parameters and hasattr(builder, 'set_parameters'):
