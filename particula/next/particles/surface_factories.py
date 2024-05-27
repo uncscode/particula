@@ -1,8 +1,4 @@
 """"Surface tension strategies factory.
-
-If this factory patterns holds, we can make and ABC factory class
-or function that will consolidate the code and test. We can revisit this
-idea in the future.
 """
 
 from typing import Union

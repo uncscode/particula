@@ -8,7 +8,7 @@ The Builder is tested independently."""
 import pytest
 import numpy as np
 from particula.next.particles.surface_factories import (
-    surface_strategy_factory,
+    SurfaceFactory,
 )
 from particula.next.particles.surface_strategies import (
     SurfaceStrategyMolar,
@@ -24,7 +24,7 @@ def test_surface_molar_with_parameters():
         'density': np.array([1000.0, 2000.0, 3000.0]),
         'surface_tension': np.array([0.1, 0.2, 0.3])
     }
-    strategy = surface_strategy_factory("molar", parameters)
+    strategy = SurfaceFactory().get_strategy("molar", parameters)
     assert isinstance(
         strategy, SurfaceStrategyMolar)
     np.testing.assert_allclose(
@@ -41,7 +41,7 @@ def test_surface_mass_with_parameters():
         'density': np.array([1000.0, 2000.0, 3000.0]),
         'surface_tension': np.array([0.1, 0.2, 0.3])
     }
-    strategy = surface_strategy_factory("mass", parameters)
+    strategy = SurfaceFactory().get_strategy("mass", parameters)
     assert isinstance(
         strategy, SurfaceStrategyMass)
     np.testing.assert_allclose(
@@ -56,7 +56,7 @@ def test_surface_volume_with_parameters():
         'density': np.array([1000.0, 2000.0, 3000.0]),
         'surface_tension': np.array([0.1, 0.2, 0.3])
     }
-    strategy = surface_strategy_factory("volume", parameters)
+    strategy = SurfaceFactory().get_strategy("volume", parameters)
     assert isinstance(
         strategy, SurfaceStrategyVolume)
     np.testing.assert_allclose(
@@ -68,6 +68,6 @@ def test_surface_volume_with_parameters():
 def test_invalid_strategy_type():
     """Test factory function with an invalid strategy type."""
     with pytest.raises(ValueError) as excinfo:
-        surface_strategy_factory("invalid_type")
+        SurfaceFactory().get_strategy("invalid_type")
     assert "Unknown strategy type: invalid_type" in str(
         excinfo.value)

@@ -5,7 +5,7 @@ Note: Not sure on this approach, we'll see how it grows and if it is useful.
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Optional, Generic, TypeVar
+from typing import Dict, Optional, Generic, TypeVar, Any
 import logging
 
 logger = logging.getLogger("particula")
@@ -28,7 +28,7 @@ class StrategyFactory(ABC, Generic[BuilderT, StrategyT]):
 
     def get_strategy(
         self, strategy_type: str,
-        parameters: Optional[Dict[str, StrategyT]] = None
+        parameters: Optional[Dict[str, Any]] = None
     ) -> StrategyT:
         """
         Generic factory method to create strategies.
