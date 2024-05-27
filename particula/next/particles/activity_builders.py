@@ -1,4 +1,6 @@
 """Builder class for Activity objects with validation and error handling.
+
+Change to MixinMolar classes, after PR integration.
 """
 
 import logging

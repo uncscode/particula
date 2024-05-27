@@ -4,25 +4,30 @@ surface tension in the calculation of the Kelvin effect.
 This builds the strategy and checks that the required parameters are set,
 and converts the units of the parameters if necessary.
 
-We could add another layer for common methods between the three strategies,
-but lets wait, as now it is very clear for the user to see what is required
-for each strategy. And there is no coupling between the strategies.
+Mixins are used to set the common parameters of the Surface strategies.
+
+We use explicit initialization of the mixins in the __init__ method, for
+clarity and traceability steps. Using super() would be more concise, but
+it would be harder to trace the inheritance chain.
 """
 
 import logging
-from typing import Optional, Union
-from numpy.typing import NDArray
-import numpy as np
-from particula.next.abc_builder import BuilderABC
+from particula.next.abc_builder import (
+    BuilderABC, BuilderDensityMixin, BuilderSurfaceTensionMixin,
+    BuilderMolarMassMixin)
 from particula.next.particles.surface_strategies import (
     SurfaceStrategyMass, SurfaceStrategyMolar, SurfaceStrategyVolume
 )
-from particula.util.input_handling import convert_units  # type: ignore
 
 logger = logging.getLogger("particula")
 
 
-class SurfaceStrategyMolarBuilder(BuilderABC):
+class SurfaceStrategyMolarBuilder(
+    BuilderABC,
+    BuilderDensityMixin,
+    BuilderSurfaceTensionMixin,
+    BuilderMolarMassMixin
+):
     """Builder class for SurfaceStrategyMolar objects.
 
     Methods:
@@ -40,71 +45,10 @@ class SurfaceStrategyMolarBuilder(BuilderABC):
 
     def __init__(self):
         required_parameters = ['surface_tension', 'density', 'molar_mass']
-        super().__init__(required_parameters)
-        self.surface_tension = None
-        self.density = None
-        self.molar_mass = None
-
-    def set_surface_tension(
-        self,
-        surface_tension: Union[float, NDArray[np.float_]],
-        surface_tension_units: Optional[str] = 'N/m'
-    ):
-        """Set the surface tension of the particle in N/m.
-
-        Args:
-        -----
-        - surface_tension (float or NDArray[float]): Surface tension of the
-            particle [N/m].
-        - surface_tension_units (str, optional): Units of the surface tension.
-            Default is 'N/m'.
-        """
-        if np.any(surface_tension < 0):
-            error_message = "Surface tension must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
-        self.surface_tension = surface_tension \
-            * convert_units(surface_tension_units, 'N/m')
-
-    def set_density(
-        self,
-        density: Union[float, NDArray[np.float_]],
-        density_units: Optional[str] = 'kg/m^3'
-    ):
-        """Set the density of the particle in kg/m^3.
-
-        Args:
-        -----
-        - density (float or NDArray[float]): Density of the particle [kg/m^3].
-        - density_units (str, optional): Units of the density. Default is
-            'kg/m^3'.
-        """
-        if np.any(density < 0):
-            error_message = "Density must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
-        self.density = density * convert_units(density_units, 'kg/m^3')
-
-    def set_molar_mass(
-        self,
-        molar_mass: Union[float, NDArray[np.float_]],
-        molar_mass_units: Optional[str] = 'kg/mol'
-    ):
-        """Set the molar mass of the particle in kg/mol.
-
-        Args:
-        -----
-        - molar_mass (float or NDArray[float]): Molar mass of the particle
-            [kg/mol].
-        - molar_mass_units (str, optional): Units of the molar mass. Default is
-            'kg/mol'.
-        """
-        if np.any(molar_mass < 0):
-            error_message = "Molar mass must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
-        self.molar_mass = molar_mass \
-            * convert_units(molar_mass_units, 'kg/mol')
+        BuilderABC.__init__(self, required_parameters)
+        BuilderSurfaceTensionMixin.__init__(self)
+        BuilderDensityMixin.__init__(self)
+        BuilderMolarMassMixin.__init__(self)
 
     def build(self) -> SurfaceStrategyMolar:
         """Validate and return the SurfaceStrategyMass object.
@@ -121,7 +65,11 @@ class SurfaceStrategyMolarBuilder(BuilderABC):
         )
 
 
-class SurfaceStrategyMassBuilder(BuilderABC):
+class SurfaceStrategyMassBuilder(
+    BuilderABC,
+    BuilderSurfaceTensionMixin,
+    BuilderDensityMixin
+):
     """Builder class for SurfaceStrategyMass objects.
 
     Methods:
@@ -137,49 +85,9 @@ class SurfaceStrategyMassBuilder(BuilderABC):
 
     def __init__(self):
         required_parameters = ['surface_tension', 'density']
-        super().__init__(required_parameters)
-        self.surface_tension = None
-        self.density = None
-
-    def set_surface_tension(
-        self,
-        surface_tension: Union[float, NDArray[np.float_]],
-        surface_tension_units: Optional[str] = 'N/m'
-    ):
-        """Set the surface tension of the particle in N/m.
-
-        Args:
-        -----
-        - surface_tension (float or NDArray[float]): Surface tension of the
-            particle [N/m].
-        - surface_tension_units (str, optional): Units of the surface tension.
-            Default is 'N/m'.
-        """
-        if np.any(surface_tension < 0):
-            error_message = "Surface tension must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
-        self.surface_tension = surface_tension \
-            * convert_units(surface_tension_units, 'N/m')
-
-    def set_density(
-        self,
-        density: Union[float, NDArray[np.float_]],
-        density_units: Optional[str] = 'kg/m^3'
-    ):
-        """Set the density of the particle in kg/m^3.
-
-        Args:
-        -----
-        - density (float or NDArray[float]): Density of the particle [kg/m^3].
-        - density_units (str, optional): Units of the density. Default is
-            'kg/m^3'.
-        """
-        if np.any(density < 0):
-            error_message = "Density must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
-        self.density = density * convert_units(density_units, 'kg/m^3')
+        BuilderABC.__init__(self, required_parameters)
+        BuilderSurfaceTensionMixin.__init__(self)
+        BuilderDensityMixin.__init__(self)
 
     def build(self) -> SurfaceStrategyMass:
         """Validate and return the SurfaceStrategyMass object.
@@ -195,7 +103,11 @@ class SurfaceStrategyMassBuilder(BuilderABC):
         )
 
 
-class SurfaceStrategyVolumeBuilder(BuilderABC):
+class SurfaceStrategyVolumeBuilder(
+    BuilderABC,
+    BuilderSurfaceTensionMixin,
+    BuilderDensityMixin
+):
     """Builder class for SurfaceStrategyVolume objects.
 
     Methods:
@@ -211,49 +123,9 @@ class SurfaceStrategyVolumeBuilder(BuilderABC):
 
     def __init__(self):
         required_parameters = ['surface_tension', 'density']
-        super().__init__(required_parameters)
-        self.surface_tension = None
-        self.density = None
-
-    def set_surface_tension(
-        self,
-        surface_tension: Union[float, NDArray[np.float_]],
-        surface_tension_units: Optional[str] = 'N/m'
-    ):
-        """Set the surface tension of the particle in N/m.
-
-        Args:
-        -----
-        - surface_tension (float or NDArray[float]): Surface tension of the
-            particle [N/m].
-        - surface_tension_units (str, optional): Units of the surface tension.
-            Default is 'N/m'.
-        """
-        if np.any(surface_tension < 0):
-            error_message = "Surface tension must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
-        self.surface_tension = surface_tension \
-            * convert_units(surface_tension_units, 'N/m')
-
-    def set_density(
-        self,
-        density: Union[float, NDArray[np.float_]],
-        density_units: Optional[str] = 'kg/m^3'
-    ):
-        """Set the density of the particle in kg/m^3.
-
-        Args:
-        -----
-        - density (float or NDArray[float]): Density of the particle [kg/m^3].
-        - density_units (str, optional): Units of the density. Default is
-            'kg/m^3'.
-        """
-        if np.any(density < 0):
-            error_message = "Density must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
-        self.density = density * convert_units(density_units, 'kg/m^3')
+        BuilderABC.__init__(self, required_parameters)
+        BuilderSurfaceTensionMixin.__init__(self)
+        BuilderDensityMixin.__init__(self)
 
     def build(self) -> SurfaceStrategyVolume:
         """Validate and return the SurfaceStrategyVolume object.
