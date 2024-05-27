@@ -37,7 +37,7 @@ def test_speciated_mass_moving_bin():
 
 def test_invalid_strategy():
     """Test factory function for invalid type."""
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as excinfo:
         DistributionFactory().get_strategy("invalid_type")
     assert "Unknown strategy type: invalid_type" in str(
         excinfo.value)
