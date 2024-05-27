@@ -1,6 +1,6 @@
 """Abstract Base Class for Builder classes.
 
-This module also defines mixin classes for the Builder classes to set 
+This module also defines mixin classes for the Builder classes to set
 some optional method to be used in the Builder classes.
 https://en.wikipedia.org/wiki/Mixin
 """
