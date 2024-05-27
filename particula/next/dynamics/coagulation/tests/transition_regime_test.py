@@ -1,6 +1,5 @@
 """Test for transition_regime calculation functions."""
 
-import pytest
 import numpy as np
 
 from particula.next.dynamics.coagulation import transition_regime
@@ -96,7 +95,7 @@ def test_coulomb_chahl2019():
     np.testing.assert_almost_equal(result_single, expected_single, decimal=4)
     # array
     expected = np.array(
-        [ 0.10960427,  1.65863442,  4.37444613, 28.05501739, 59.74082667])
+        [0.10960427,  1.65863442,  4.37444613, 28.05501739, 59.74082667])
     result = transition_regime.coulomb_chahl2019(
         diffusive_knudsen_array, coulomb_potential_ratio_array)
     np.testing.assert_almost_equal(result, expected, decimal=4)

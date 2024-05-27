@@ -16,7 +16,6 @@
 # activity_strategy = IdealActivityMass()
 
 
-
 # @pytest.mark.parametrize("strategy, distribution, density, concentration", [
 #     (MassBasedMovingBin(),
 #      np.array([100, 200, 300], dtype=np.float64),
