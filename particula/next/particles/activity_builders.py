@@ -10,7 +10,8 @@ import numpy as np
 from particula.next.abc_builder import (
     BuilderABC, BuilderMolarMassMixin, BuilderDensityMixin)
 from particula.next.particles.activity_strategies import (
-    IdealActivityMass, IdealActivityMolar, KappaParameterActivity
+    IdealActivityMass, IdealActivityMolar, KappaParameterActivity,
+    ActivityStrategy
 )
 
 logger = logging.getLogger("particula")
@@ -29,7 +30,7 @@ class IdealActivityMassBuilder(BuilderABC):
         required_parameters = None
         BuilderABC.__init__(self, required_parameters)
 
-    def build(self) -> IdealActivityMass:
+    def build(self) -> ActivityStrategy:
         """Validate and return the IdealActivityMass object.
 
         Returns:
@@ -59,7 +60,7 @@ class IdealActivityMolarBuilder(
         BuilderABC.__init__(self, required_parameters)
         BuilderMolarMassMixin.__init__(self)
 
-    def build(self) -> IdealActivityMolar:
+    def build(self) -> ActivityStrategy:
         """Validate and return the IdealActivityMolar object.
 
         Returns:
@@ -141,7 +142,7 @@ class KappaParameterActivityBuilder(
         self.water_index = water_index
         return self
 
-    def build(self) -> KappaParameterActivity:
+    def build(self) -> ActivityStrategy:
         """Validate and return the KappaParameterActivity object.
 
         Returns:
