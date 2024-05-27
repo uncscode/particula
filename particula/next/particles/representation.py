@@ -11,15 +11,12 @@ from particula.next.particles.distribution_strategies import (
 )
 
 
-# note there is no inheritance from ParticleStrategy, this is a design choice
-# for injection dependency over inheritance
 class ParticleRepresentation():
     """
     Represents a particle or a collection of particles, encapsulating the
     strategy for calculating mass, radius, and total mass based on a
     specified particle distribution, density, and concentration. This class
-    allows for flexibility in representing particles by delegating computation
-    to a strategy pattern.
+    allows for flexibility in representing particles.
 
     Attributes:
     - strategy (ParticleStrategy): The computation strategy for particle
