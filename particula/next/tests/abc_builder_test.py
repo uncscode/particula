@@ -1,11 +1,11 @@
 """Test the BuilderABC and BuilderDensityMixin classes."""
 
 import pytest
+import numpy as np
 from particula.next.abc_builder import (
     BuilderABC, BuilderDensityMixin, BuilderSurfaceTensionMixin,
     BuilderMolarMassMixin, BuilderConcentrationMixin
 )
-import numpy as np
 
 
 # Example of a concrete class extending BuilderABC for testing
