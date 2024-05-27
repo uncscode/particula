@@ -7,7 +7,8 @@ import logging
 from typing import Optional, Union
 from numpy.typing import NDArray
 import numpy as np
-from particula.next.abc_builder import BuilderABC
+from particula.next.abc_builder import (
+    BuilderABC, BuilderMolarMassMixin, BuilderDensityMixin)
 from particula.next.particles.activity_strategies import (
     IdealActivityMass, IdealActivityMolar, KappaParameterActivity
 )
@@ -27,7 +28,7 @@ class IdealActivityMassBuilder(BuilderABC):
 
     def __init__(self):
         required_parameters = None
-        super().__init__(required_parameters)
+        BuilderABC.__init__(self, required_parameters)
 
     def build(self) -> IdealActivityMass:
         """Validate and return the IdealActivityMass object.
@@ -39,7 +40,10 @@ class IdealActivityMassBuilder(BuilderABC):
         return IdealActivityMass()
 
 
-class IdealActivityMolarBuilder(BuilderABC):
+class IdealActivityMolarBuilder(
+    BuilderABC,
+    BuilderMolarMassMixin
+):
     """Builder class for IdealActivityMolar objects.
 
     Methods:
@@ -53,29 +57,8 @@ class IdealActivityMolarBuilder(BuilderABC):
 
     def __init__(self):
         required_parameters = ['molar_mass']
-        super().__init__(required_parameters)
-        self.molar_mass = None
-
-    def set_molar_mass(
-        self,
-        molar_mass: Union[float, NDArray[np.float_]],
-        molar_mass_units: Optional[str] = 'kg/mol'
-    ):
-        """Set the molar mass of the particle in kg/mol.
-
-        Args:
-        ----
-        - molar_mass (float): The molar mass of the chemical species.
-        - molar_mass_units (str): The units of the molar mass input.
-        Default is 'kg/mol'.
-        """
-        if np.any(molar_mass < 0):
-            error_message = "Molar mass must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
-        self.molar_mass = molar_mass \
-            * convert_units(molar_mass_units, 'kg/mol')
-        return self
+        BuilderABC.__init__(self, required_parameters)
+        BuilderMolarMassMixin.__init__(self)
 
     def build(self) -> IdealActivityMolar:
         """Validate and return the IdealActivityMolar object.
@@ -88,7 +71,11 @@ class IdealActivityMolarBuilder(BuilderABC):
         return IdealActivityMolar(molar_mass=self.molar_mass)  # type: ignore
 
 
-class KappaParameterActivityBuilder(BuilderABC):
+class KappaParameterActivityBuilder(
+    BuilderABC,
+    BuilderDensityMixin,
+    BuilderMolarMassMixin
+):
     """Builder class for KappaParameterActivity objects.
 
     Methods:
@@ -107,10 +94,10 @@ class KappaParameterActivityBuilder(BuilderABC):
     def __init__(self):
         required_parameters = [
             'kappa', 'density', 'molar_mass', 'water_index']
-        super().__init__(required_parameters)
+        BuilderABC.__init__(self, required_parameters)
+        BuilderDensityMixin.__init__(self)
+        BuilderMolarMassMixin.__init__(self)
         self.kappa = None
-        self.density = None
-        self.molar_mass = None
         self.water_index = None
 
     def set_kappa(
@@ -132,47 +119,6 @@ class KappaParameterActivityBuilder(BuilderABC):
         if kappa_units is not None:
             logger.warning("Ignoring units for kappa parameter.")
         self.kappa = kappa
-        return self
-
-    def set_density(
-        self,
-        density: Union[float, NDArray[np.float_]],
-        density_units: str = 'kg/m^3'
-    ):
-        """Set the density of the species in kg/m^3.
-
-        Args:
-        ----
-        - density (float): The density of the species.
-        - density_units (str): The units of the density input. Default is
-            'kg/m^3'.
-        """
-        if np.any(density < 0):
-            error_message = "Density must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
-        self.density = density * convert_units(density_units, 'kg/m^3')
-        return self
-
-    def set_molar_mass(
-        self,
-        molar_mass: Union[float, NDArray[np.float_]],
-        molar_mass_units: str = 'kg/mol'
-    ):
-        """Set the molar mass of the species in kg/mol.
-
-        Args:
-        ----
-        - molar_mass (float): The molar mass of the species.
-        - molar_mass_units (str): The units of the molar mass input. Default is
-            'kg/mol'.
-        """
-        if np.any(molar_mass < 0):
-            error_message = "Molar mass must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
-        self.molar_mass = molar_mass \
-            * convert_units(molar_mass_units, 'kg/mol')
         return self
 
     def set_water_index(
