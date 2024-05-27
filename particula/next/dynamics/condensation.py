@@ -40,7 +40,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 # particula imports
-from particula.next.particles.representation import Particle
+from particula.next.particles.representation import ParticleRepresentation
 from particula.next.gas.species import GasSpecies
 from particula.constants import GAS_CONSTANT
 from particula.next.particles.properties import (
@@ -272,7 +272,7 @@ class CondensationStrategy(ABC):
     @abstractmethod
     def mass_transfer_rate(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         gas_species: GasSpecies,
         temperature: float,
         pressure: float,
@@ -324,7 +324,7 @@ class CondensationIsothermal(CondensationStrategy):
 
     def mass_transfer_rate(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         gas_species: GasSpecies,
         temperature: float,
         pressure: float,
