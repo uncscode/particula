@@ -12,7 +12,6 @@ from particula.next.abc_builder import (
 from particula.next.particles.activity_strategies import (
     IdealActivityMass, IdealActivityMolar, KappaParameterActivity
 )
-from particula.util.input_handling import convert_units  # type: ignore
 
 logger = logging.getLogger("particula")
 
