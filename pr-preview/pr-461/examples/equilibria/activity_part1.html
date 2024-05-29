@@ -1,0 +1,1147 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Activity Example &#8212; Particula Book</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/equilibria/activity_part1';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Liquid Vapor Equilibrium" href="equilibria_part1.html" />
+    <link rel="prev" title="Equilibria of Aerosols" href="equilibria_intro.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/placeholder.png" class="logo__image only-light" alt="Particula Book - Home"/>
+    <script>document.write(`<img src="../../_static/placeholder.png" class="logo__image only-dark" alt="Particula Book - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    Getting started
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tour</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../tour/part-tour.html">Particula tour</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../distribution_statistics.html">Distribution statistics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_coagulation.html">Distribution coagulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_evolution.html">Distribution evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_ambient.html">Distributions</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../ionparticle_coagulation.html">Ion–particle coagulation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../streamlake/particula_data.html">Data in Particula</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part1.html">Loading Part 1: Into &amp; 1D Data</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part2.html">Loading Part 2: Sizer Data</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part3.html">Loading Part 3: Lake</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part4.html">Loading Part 4: Settings Files</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/stream_stats_part1.html">Stream: Averaging and Outliers</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/stream_stats_size_distribution_part2.html">Size Distribution Stats</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../wall_loss_section.html">Chamber Wall Loss Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/chamber_smps_data.html">Chamber Analysis</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/wall_loss_forward_simulation.html">Chamber Forward Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/forward_fit_simple.html">Simple Wall Loss Fit</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../lagrangian/lagrangian_intro.html">Lagrangian Particle Model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/basic_lagrangian_box.html">Introduction to the Lagrangian Box Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/sweep_and_prune.html">Sweep and Prune Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/friction_force.html">Realistic Drag, Mass, and Velocity</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="equilibria_intro.html">Equilibria of Aerosols</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Activity Example</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../light_scattering/aerosol_optics_intro.html">Introduction to Aerosol Optics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/mie_basics.html">Mie Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/humid_scattering.html">Scattering for Humidified Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/scattering_truncation.html">Scattering Truncation Corrections</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/knudsen_number.html"><code class="docutils literal notranslate"><span class="pre">knudsen_number</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/slip_correction.html"><code class="docutils literal notranslate"><span class="pre">slip_correction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/friction_factor.html"><code class="docutils literal notranslate"><span class="pre">friction_factor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/utilities/utilities_overview.html">Utilities Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/convert_size_dist_scales.html">Converting Distributions</a></li>
+
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Strategic Plan</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/strategic_planning_FY24.html">FY24 Plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/Aerosol_patterns.html">Program Outline Revision Draft</a></li>
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Next Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/next/next_vapor_pressure.html">Vapor Pressure</a></li>
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributor Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/equilibria/activity_part1.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/equilibria/activity_part1.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/equilibria/activity_part1.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/equilibria/activity_part1.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/examples/equilibria/activity_part1.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Activity Example</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Activity Example</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#activity-calculation">Activity Calculation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-the-activity-and-phase-separation">Plotting the Activity and Phase Separation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#q-alpha"><span class="math notranslate nohighlight">\( q^\alpha \)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#water-activity-focus">Water Activity Focus</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#higher-oxygen-to-carbon-ratios">Higher Oxygen to Carbon Ratios</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-documentation">Further Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="activity-example">
+<h1>Activity Example<a class="headerlink" href="#activity-example" title="Link to this heading">#</a></h1>
+<p>This notebook demonstrates the Binary Activity Theory (BAT) model application, crucial for calculating the activity of water and organic compounds in mixtures and understanding phase separation. This model, as detailed in Gorkowski, K., Preston, T. C., &amp; Zuend, A. (2019), provides critical insights into aerosol particle behavior, essential in environmental and climate change research.</p>
+<p>Reference: Gorkowski, K., Preston, T. C., &amp; Zuend, A. (2019).
+Relative-humidity-dependent organic aerosol thermodynamics Via an efficient
+reduced-complexity model. Atmospheric Chemistry and Physics
+<a class="reference external" href="https://doi.org/10.5194/acp-19-13383-2019">https://doi.org/10.5194/acp-19-13383-2019</a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>  <span class="c1"># For numerical operations</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>  <span class="c1"># For plotting graphs</span>
+<span class="c1"># Specific functions from the particula package for activity calculations</span>
+<span class="kn">from</span> <span class="nn">particula.activity</span> <span class="kn">import</span> <span class="n">binary_activity</span><span class="p">,</span> <span class="n">phase_separation</span><span class="p">,</span> <span class="n">species_density</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="activity-calculation">
+<h2>Activity Calculation<a class="headerlink" href="#activity-calculation" title="Link to this heading">#</a></h2>
+<p>Define the parameters required by the activity module to calculate the activity of water and organic compounds in a mixture, as well as phase separation. These parameters include organic mole fraction, density, molecular weight ratio [water/organic], and the density of the organic compound. Using these parameters helps in accurately modeling the behavior of aerosol particles in various environmental conditions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define a range of organic mole fractions for the calculation</span>
+<span class="n">organic_mole_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="c1"># Define other necessary parameters</span>
+<span class="n">oxygen2carbon</span> <span class="o">=</span> <span class="mf">0.225</span>  <span class="c1"># Oxygen to carbon ratio</span>
+<span class="n">molar_mass_ratio</span> <span class="o">=</span> <span class="mf">18.016</span> <span class="o">/</span> <span class="mi">100</span>  <span class="c1"># Water to organic molecular weight ratio</span>
+<span class="n">density</span> <span class="o">=</span> <span class="n">species_density</span><span class="o">.</span><span class="n">organic_density_estimate</span><span class="p">(</span>
+    <span class="mf">18.016</span> <span class="o">/</span> <span class="n">molar_mass_ratio</span><span class="p">,</span>
+    <span class="n">oxygen2carbon</span><span class="p">)</span>  <span class="c1"># Estimate of organic compound density</span>
+
+<span class="c1"># Calculate activity coefficients using the binary_activity function</span>
+<span class="n">activity_water</span><span class="p">,</span> <span class="n">activity_organic</span><span class="p">,</span> <span class="n">mass_water</span><span class="p">,</span> <span class="n">mass_organic</span><span class="p">,</span> <span class="n">gamma_water</span><span class="p">,</span> <span class="n">gamma_organic</span> <span class="o">=</span> \
+    <span class="n">binary_activity</span><span class="o">.</span><span class="n">activity_coefficients</span><span class="p">(</span>
+        <span class="n">molar_mass_ratio</span><span class="p">,</span>
+        <span class="n">organic_mole_fraction</span><span class="p">,</span>
+        <span class="n">oxygen2carbon</span><span class="p">,</span>
+        <span class="n">density</span><span class="p">,</span>
+        <span class="n">functional_group</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="plotting-the-activity-and-phase-separation">
+<h2>Plotting the Activity and Phase Separation<a class="headerlink" href="#plotting-the-activity-and-phase-separation" title="Link to this heading">#</a></h2>
+<p>Here we plot the activity of water and the organic compound as a function of the organic mole fraction. Visualizing these activities helps in identifying phase separation or miscibility gaps, crucial for understanding the behavior of aerosols under different environmental conditions. Phase separation is indicated by activities greater than 1.0 or non-monotonic behavior in the activity curve, as shown below.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span><span class="p">,</span>
+    <span class="n">activity_water</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;water&quot;</span><span class="p">,</span>
+    <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span><span class="p">,</span>
+    <span class="n">activity_organic</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;organic&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;water mole fraction&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;activity&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span><span class="p">,</span>
+    <span class="n">gamma_water</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;water&quot;</span><span class="p">,</span>
+    <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span><span class="p">,</span>
+    <span class="n">gamma_organic</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;organic&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;water mole fraction&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;activity coefficient&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/21a10181e9d94ce0ad6bbae86805cb3136bfe3ffbe26e2b7490f4e1b19c1be83.png" src="../../_images/21a10181e9d94ce0ad6bbae86805cb3136bfe3ffbe26e2b7490f4e1b19c1be83.png" />
+<img alt="../../_images/d3839ad6ef28f5a962c37fdec895aba66231826613499a0cfac81e76ba43c73f.png" src="../../_images/d3839ad6ef28f5a962c37fdec895aba66231826613499a0cfac81e76ba43c73f.png" />
+</div>
+</div>
+</section>
+<section id="q-alpha">
+<h2><span class="math notranslate nohighlight">\( q^\alpha \)</span><a class="headerlink" href="#q-alpha" title="Link to this heading">#</a></h2>
+<p>The <span class="math notranslate nohighlight">\(q^\alpha\)</span> parameter signifies the transition from an organic-rich phase to a water-rich phase. This transition is crucial for understanding the phase behavior of aerosol particles. It can be calculated using the <code class="docutils literal notranslate"><span class="pre">particula.activity.phase_separation</span></code> function. The plot below illustrates <span class="math notranslate nohighlight">\(q^\alpha\)</span> based on the activity calculations performed earlier.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Finding phase separation points and calculating q_alpha</span>
+<span class="n">phase_sep_aw</span> <span class="o">=</span> <span class="n">phase_separation</span><span class="o">.</span><span class="n">find_phase_separation</span><span class="p">(</span>
+    <span class="n">activity_water</span><span class="p">,</span> <span class="n">activity_organic</span><span class="p">)</span>
+<span class="n">q_alpha</span> <span class="o">=</span> <span class="n">phase_separation</span><span class="o">.</span><span class="n">q_alpha</span><span class="p">(</span>
+    <span class="n">seperation_activity</span><span class="o">=</span><span class="n">phase_sep_aw</span><span class="p">[</span><span class="s1">&#39;upper_seperation&#39;</span><span class="p">],</span>
+    <span class="n">activities</span><span class="o">=</span><span class="n">activity_water</span><span class="p">)</span>
+
+<span class="c1"># Plotting q_alpha</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">activity_water</span><span class="p">,</span> <span class="n">q_alpha</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Water Activity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$q^{</span><span class="se">\\</span><span class="s1">alpha}$ [Organic Rich to Water Rich]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/8cc90c9055987a3e662daf6855570a2e69e23dbbd9e41f0b6798f3bf9015d4c7.png" src="../../_images/8cc90c9055987a3e662daf6855570a2e69e23dbbd9e41f0b6798f3bf9015d4c7.png" />
+</div>
+</div>
+</section>
+<section id="water-activity-focus">
+<h2>Water Activity Focus<a class="headerlink" href="#water-activity-focus" title="Link to this heading">#</a></h2>
+<p>In atmospheric aerosol modeling, water activity is often a more critical parameter than mole fraction. This is because water activity is typically a controllable or known variable in atmospheric conditions, unlike the exact mole fractions in a solution. To correlate water activity with the mole fraction required to achieve it, we utilize functions from the <code class="docutils literal notranslate"><span class="pre">particula.activity</span></code> module.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># select the water activity desired</span>
+<span class="n">water_activity_desired</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">oxygen2carbon</span> <span class="o">=</span> <span class="mf">0.25</span>
+
+<span class="c1"># calculate the mass fraction of water in the alpha and beta phases</span>
+<span class="c1"># for each water activity</span>
+<span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">q_alpha</span> <span class="o">=</span> <span class="n">binary_activity</span><span class="o">.</span><span class="n">fixed_water_activity</span><span class="p">(</span>
+        <span class="n">water_activity</span><span class="o">=</span><span class="n">water_activity_desired</span><span class="p">,</span>
+        <span class="n">molar_mass_ratio</span><span class="o">=</span><span class="n">molar_mass_ratio</span><span class="p">,</span>
+        <span class="n">oxygen2carbon</span><span class="o">=</span><span class="n">oxygen2carbon</span><span class="p">,</span>
+        <span class="n">density</span><span class="o">=</span><span class="n">density</span>
+        <span class="p">)</span>
+
+<span class="c1"># plot the results vs water activity</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">water_activity_desired</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;alpha phase mass fraction water&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">water_activity_desired</span><span class="p">,</span>
+        <span class="n">q_alpha</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;q_alpha&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+<span class="k">if</span> <span class="n">beta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">water_activity_desired</span><span class="p">,</span>
+        <span class="n">beta</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;beta phase mass fraction water&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;water activity (Relative Humidity/100)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;mass fraction of water&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/741635009c5a25c8764e54a022ac10c5eea76af066fc38abc759e066a28856f5.png" src="../../_images/741635009c5a25c8764e54a022ac10c5eea76af066fc38abc759e066a28856f5.png" />
+</div>
+</div>
+</section>
+<section id="higher-oxygen-to-carbon-ratios">
+<h2>Higher Oxygen to Carbon Ratios<a class="headerlink" href="#higher-oxygen-to-carbon-ratios" title="Link to this heading">#</a></h2>
+<p>Higher oxygen to carbon ratios in the mixture tend to inhibit phase separation. The following analysis demonstrates this effect. This observation is crucial in predicting the behavior of aerosol particles under varying chemical compositions (more or less ‘aged’).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># select the water activity desired</span>
+<span class="n">water_activity_desired</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="c1"># select the oxygen to carbon ratio</span>
+<span class="n">oxygen2carbon</span> <span class="o">=</span> <span class="mf">0.6</span>
+
+<span class="c1"># calculate the mass fraction of water in the alpha and beta phases</span>
+<span class="c1"># for each water activity</span>
+<span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">q_alpha</span> <span class="o">=</span> <span class="n">binary_activity</span><span class="o">.</span><span class="n">fixed_water_activity</span><span class="p">(</span>
+    <span class="n">water_activity</span><span class="o">=</span><span class="n">water_activity_desired</span><span class="p">,</span>
+    <span class="n">molar_mass_ratio</span><span class="o">=</span><span class="n">molar_mass_ratio</span><span class="p">,</span>
+    <span class="n">oxygen2carbon</span><span class="o">=</span><span class="n">oxygen2carbon</span><span class="p">,</span>
+    <span class="n">density</span><span class="o">=</span><span class="n">density</span>
+<span class="p">)</span>
+
+<span class="c1"># plot the results vs water activity</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">water_activity_desired</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;alpha phase mass fraction water&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">water_activity_desired</span><span class="p">,</span>
+    <span class="n">q_alpha</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;q_alpha&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">if</span> <span class="n">beta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">water_activity_desired</span><span class="p">,</span>
+        <span class="n">beta</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;beta phase mass fraction water&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;water activity (Relative Humidity/100)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;mass fraction of water&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/d1dd1e1685853bffd2cbf026d7dae03fbf651220d45951625b2d5289241122ce.png" src="../../_images/d1dd1e1685853bffd2cbf026d7dae03fbf651220d45951625b2d5289241122ce.png" />
+</div>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="summary">
+<h1>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h1>
+<p>This notebook demonstrates how to use the activity module for calculating the activity of water and organic compounds in a mixture and assessing phase separation. The insights gained are vital for applications in aerosol thermodynamics, cloud condensation nuclei, and cloud microphysics.</p>
+<p>This is an implementation of the Binary Activity Theory (BAT) model
+developed in Gorkowski, K., Preston, T. C., &amp; Zuend, A. (2019).</p>
+<section id="further-documentation">
+<h2>Further Documentation<a class="headerlink" href="#further-documentation" title="Link to this heading">#</a></h2>
+<p>For more in-depth understanding and additional functionalities, refer to the documentation, or call the <code class="docutils literal notranslate"><span class="pre">help</span></code> function on any of the functions in the <code class="docutils literal notranslate"><span class="pre">particula.activity</span></code> module.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">binary_activity</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on module particula.activity.binary_activity in particula.activity:
+
+NAME
+    particula.activity.binary_activity - Binary activity coefficient model for organic-water mixtures.
+
+DESCRIPTION
+    Gorkowski, K., Preston, T. C., &amp;#38; Zuend, A. (2019).
+    Relative-humidity-dependent organic aerosol thermodynamics
+    Via an efficient reduced-complexity model.
+    Atmospheric Chemistry and Physics
+    https://doi.org/10.5194/acp-19-13383-2019
+
+FUNCTIONS
+    activity_coefficients(molar_mass_ratio: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], organic_mole_fraction: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], oxygen2carbon: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], density: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], functional_group=None) -&gt; Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]
+        Calculate the activity coefficients for water and organic matter in
+        organic-water mixtures.
+        
+        Args:
+            - molar_mass_ratio: Ratio of the molecular weight of water to the
+                molecular weight of organic matter.
+            - organic_mole_fraction: Molar fraction of organic matter in the
+                mixture.
+            - oxygen2carbon: Oxygen to carbon ratio in the organic compound.
+            - density: Density of the mixture.
+            - functional_group: Optional functional group(s) of the organic
+                compound, if applicable.
+        
+        Returns:
+            A tuple containing the activity of water, activity
+            of organic matter, mass fraction of water, and mass
+            fraction of organic matter, gamma_water (activity coefficient),
+            and gamma_organic (activity coefficient).
+    
+    bat_blending_weights(molar_mass_ratio: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], oxygen2carbon: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]]) -&gt; numpy.ndarray
+        Function to estimate the blending weights for the BAT model.
+        
+        Args:
+            - molar_mass_ratio: The molar mass ratio of water to organic
+                matter.
+            - oxygen2carbon: The oxygen to carbon ratio.
+        
+        Returns:
+            - blending_weights : List of blending weights for the BAT model
+            in the low, mid, and high oxygen2carbon regions.
+    
+    biphasic_water_activity_point(oxygen2carbon: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], hydrogen2carbon: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], molar_mass_ratio: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], functional_group: Union[list[str], str, NoneType] = None) -&gt; numpy.ndarray
+        This function computes the biphasic to single phase
+        water activity (RH*100).
+        
+        Args:
+            - oxygen2carbon: The oxygen to carbon ratio.
+            - hydrogen2carbon: The hydrogen to carbon ratio.
+            - molar_mass_ratio: The molar mass ratio of water to organic
+                matter.
+            - functional_group: Optional functional group(s) of the organic
+                compound, if applicable.
+        
+        Returns:
+            - np.array: The RH cross point array.
+    
+    coefficients_c(molar_mass_ratio: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], oxygen2carbon: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], fit_values: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]]) -&gt; numpy.ndarray
+        Coefficients for activity model, see Gorkowski (2019). equation S1 S2.
+        
+        Args:
+            - molar_mass_ratio: The molar mass ratio of water to organic
+                matter.
+            - oxygen2carbon: The oxygen to carbon ratio.
+            - fit_values: The fit values for the activity model.
+        
+        Returns:
+            - np.ndarray: The coefficients for the activity model.
+    
+    convert_to_oh_equivalent(oxygen2carbon: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], molar_mass_ratio: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], functional_group: Union[list[str], str, NoneType] = None) -&gt; Tuple[numpy.ndarray, numpy.ndarray]
+        just a pass through now, but will
+        add the oh equivalent conversion
+    
+    fixed_water_activity(water_activity: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], molar_mass_ratio: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], oxygen2carbon: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], density: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]]) -&gt; Tuple
+        Calculate the activity coefficients of water and organic matter in
+        organic-water mixtures.
+        
+        This function assumes a fixed water activity value (e.g., RH = 75%
+        corresponds to 0.75 water activity in equilibrium).
+        It calculates the activity coefficients for different phases and
+        determines phase separations if they occur.
+        
+        Parameters:
+        water_activity (ArrayLike): An array of water activity values.
+        molar_mass_ratio (ArrayLike): Array of molar mass ratios of the components.
+        oxygen2carbon (ArrayLike): Array of oxygen-to-carbon ratios.
+        density (ArrayLike): Array of densities of the mixture.
+        
+        Returns:
+        Tuple: A tuple containing the activity coefficients for alpha and beta
+                phases, and the alpha phase mole fraction.
+               If no phase separation occurs, the beta phase values are None.
+    
+    gibbs_mix_weight(molar_mass_ratio: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], organic_mole_fraction: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], oxygen2carbon: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], density: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], functional_group: Optional[str] = None) -&gt; Tuple[numpy.ndarray, numpy.ndarray]
+        Gibbs free energy of mixing, see Gorkowski (2019), with weighted
+        oxygen2carbon regions. Only can run one compound at a time.
+        
+        Args:
+            - molar_mass_ratio: The molar mass ratio of water to organic
+                matter.
+            - organic_mole_fraction: The fraction of organic matter.
+            - oxygen2carbon: The oxygen to carbon ratio.
+            - density: The density of the mixture.
+            - functional_group: Optional functional group(s) of the organic
+                compound, if applicable.
+        
+        Returns:
+            - gibbs_mix : Gibbs energy of mixing (including 1/RT)
+            - derivative_gibbs : derivative of Gibbs energy with respect to
+            - mole fraction of organics (includes 1/RT)
+    
+    gibbs_of_mixing(molar_mass_ratio: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], organic_mole_fraction: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], oxygen2carbon: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], density: Union[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]], numpy._typing._nested_sequence._NestedSequence[numpy._typing._array_like._SupportsArray[numpy.dtype[Any]]], bool, int, float, complex, str, bytes, numpy._typing._nested_sequence._NestedSequence[Union[bool, int, float, complex, str, bytes]]], fit_dict: dict) -&gt; Tuple[numpy.ndarray, numpy.ndarray]
+        Calculate the Gibbs free energy of mixing for a binary mixture.
+        
+        Args:
+            - molar_mass_ratio: The molar mass ratio of water to organic
+                matter.
+            - organic_mole_fraction: The fraction of organic matter.
+            - oxygen2carbon: The oxygen to carbon ratio.
+            - density: The density of the mixture.
+            - fit_dict: A dictionary of fit values for the low oxygen2carbon region
+        
+        Returns:
+            Tuple[np.ndarray, np.ndarray]: A tuple containing the Gibbs free
+            energy of mixing and its derivative.
+
+DATA
+    ArrayLike = typing.Union[numpy._typing._array_like._Supports...ng.Unio...
+    FIT_HIGH = {&#39;a1&#39;: [5.92155, -2.528295, -3.883017, -7.898128], &#39;a2&#39;: [-...
+    FIT_LOW = {&#39;a1&#39;: [7.089476, -7.71186, -38.85941, -100.0], &#39;a2&#39;: [-0.62...
+    FIT_MID = {&#39;a1&#39;: [5.872214, -4.535007, -5.129327, -28.09232], &#39;a2&#39;: [-...
+    INTERPOLATE_WATER_FIT = 500
+    LOWEST_ORGANIC_MOLE_FRACTION = 1e-12
+    Optional = typing.Optional
+        Optional[X] is equivalent to Union[X, None].
+    
+    Tuple = typing.Tuple
+        Deprecated alias to builtins.tuple.
+        
+        Tuple[X, Y] is the cross-product type of X and Y.
+        
+        Example: Tuple[T1, T2] is a tuple of two elements corresponding
+        to type variables T1 and T2.  Tuple[int, float, str] is a tuple
+        of an int, a float and a string.
+        
+        To specify a variable-length tuple of homogeneous type, use Tuple[T, ...].
+    
+    Union = typing.Union
+        Union type; Union[X, Y] means either X or Y.
+        
+        On Python 3.10 and higher, the | operator
+        can also be used to denote unions;
+        X | Y means the same thing to the type checker as Union[X, Y].
+        
+        To define a union, use e.g. Union[int, str]. Details:
+        - The arguments must be types and there must be at least one.
+        - None as an argument is a special case and is replaced by
+          type(None).
+        - Unions of unions are flattened, e.g.::
+        
+            assert Union[Union[int, str], float] == Union[int, str, float]
+        
+        - Unions of a single argument vanish, e.g.::
+        
+            assert Union[int] == int  # The constructor actually returns int
+        
+        - Redundant arguments are skipped, e.g.::
+        
+            assert Union[int, str, int] == Union[int, str]
+        
+        - When comparing unions, the argument order is ignored, e.g.::
+        
+            assert Union[int, str] == Union[str, int]
+        
+        - You cannot subclass or instantiate a union.
+        - You can use Optional[X] as a shorthand for Union[X, None].
+
+FILE
+    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/particula/activity/binary_activity.py
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "uncscode/particula",
+            ref: "v0.0.10",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./examples/equilibria"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="equilibria_intro.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Equilibria of Aerosols</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="equilibria_part1.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Liquid Vapor Equilibrium</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Activity Example</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#activity-calculation">Activity Calculation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-the-activity-and-phase-separation">Plotting the Activity and Phase Separation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#q-alpha"><span class="math notranslate nohighlight">\( q^\alpha \)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#water-activity-focus">Water Activity Focus</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#higher-oxygen-to-carbon-ratios">Higher Oxygen to Carbon Ratios</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-documentation">Further Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By particula contributors
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

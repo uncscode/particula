@@ -1,0 +1,1017 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Mie Scattering &#8212; Particula Book</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/light_scattering/mie_basics';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Scattering for Humidified Particles" href="humid_scattering.html" />
+    <link rel="prev" title="Introduction to Aerosol Optics" href="aerosol_optics_intro.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/placeholder.png" class="logo__image only-light" alt="Particula Book - Home"/>
+    <script>document.write(`<img src="../../_static/placeholder.png" class="logo__image only-dark" alt="Particula Book - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    Getting started
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tour</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../tour/part-tour.html">Particula tour</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../distribution_statistics.html">Distribution statistics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_coagulation.html">Distribution coagulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_evolution.html">Distribution evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_ambient.html">Distributions</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../ionparticle_coagulation.html">Ion–particle coagulation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../streamlake/particula_data.html">Data in Particula</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part1.html">Loading Part 1: Into &amp; 1D Data</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part2.html">Loading Part 2: Sizer Data</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part3.html">Loading Part 3: Lake</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part4.html">Loading Part 4: Settings Files</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/stream_stats_part1.html">Stream: Averaging and Outliers</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/stream_stats_size_distribution_part2.html">Size Distribution Stats</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../wall_loss_section.html">Chamber Wall Loss Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/chamber_smps_data.html">Chamber Analysis</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/wall_loss_forward_simulation.html">Chamber Forward Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/forward_fit_simple.html">Simple Wall Loss Fit</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../lagrangian/lagrangian_intro.html">Lagrangian Particle Model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/basic_lagrangian_box.html">Introduction to the Lagrangian Box Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/sweep_and_prune.html">Sweep and Prune Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/friction_force.html">Realistic Drag, Mass, and Velocity</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../equilibria/equilibria_intro.html">Equilibria of Aerosols</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../equilibria/activity_part1.html">Activity Example</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="aerosol_optics_intro.html">Introduction to Aerosol Optics</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Mie Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="humid_scattering.html">Scattering for Humidified Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scattering_truncation.html">Scattering Truncation Corrections</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/knudsen_number.html"><code class="docutils literal notranslate"><span class="pre">knudsen_number</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/slip_correction.html"><code class="docutils literal notranslate"><span class="pre">slip_correction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/friction_factor.html"><code class="docutils literal notranslate"><span class="pre">friction_factor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/utilities/utilities_overview.html">Utilities Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/convert_size_dist_scales.html">Converting Distributions</a></li>
+
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Strategic Plan</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/strategic_planning_FY24.html">FY24 Plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/Aerosol_patterns.html">Program Outline Revision Draft</a></li>
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Next Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/next/next_vapor_pressure.html">Vapor Pressure</a></li>
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributor Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/light_scattering/mie_basics.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/light_scattering/mie_basics.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/light_scattering/mie_basics.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/light_scattering/mie_basics.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/examples/light_scattering/mie_basics.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Mie Scattering</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mie-coefficients-discretize-auto-mieq">Mie Coefficients: <code class="docutils literal notranslate"><span class="pre">discretize_auto_mieq</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#function-overview">Function Overview</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#returns">Returns</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-mie-size-distribution-function">The <code class="docutils literal notranslate"><span class="pre">mie_size_distribution</span></code> Function</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-variables-explained">New Variables Explained</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-implications">Practical Implications</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#note">Note</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-blocks-for-advanced-analysis">Building Blocks for Advanced Analysis</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="mie-scattering">
+<h1>Mie Scattering<a class="headerlink" href="#mie-scattering" title="Link to this heading">#</a></h1>
+<p>Mie scattering is the scattering of light by spherical particles. It is named after the German physicist Gustav Mie. The Mie solution to Maxwell’s equations is an exact solution that describes the scattering of electromagnetic radiation by a sphere. Here we will discuss our integration (wrapper) of the pyMieScatt package, which is a Python implementation of the Mie solution.</p>
+<p>We have built this wrapper for two main reasons:</p>
+<ol class="arabic simple">
+<li><p>Reduce the complexity of calling the original package so integrations with data analysis is easier.</p></li>
+<li><p>The codification of data types in the interface. This also allows for Least Recently Used cache (<code class="docutils literal notranslate"><span class="pre">lru_cache</span></code>) to be used, which is a Python decorator that caches the results of a function, so if the function is called with the same arguments, the result is returned from the cache instead of calling the function again. This only works if the arguments types are hashable, so immutable.</p></li>
+</ol>
+<p><strong>The following imports are needed</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># particula imports</span>
+<span class="kn">from</span> <span class="nn">particula.data.process</span> <span class="kn">import</span> <span class="n">mie_bulk</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="mie-coefficients-discretize-auto-mieq">
+<h2>Mie Coefficients: <code class="docutils literal notranslate"><span class="pre">discretize_auto_mieq</span></code><a class="headerlink" href="#mie-coefficients-discretize-auto-mieq" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">discretize_auto_mieq</span></code> function plays a critical role our interface with pyMieScatt, by computing Mie coefficients for a spherical particle. These coefficients are pivotal in understanding how light interacts with particles in the atmosphere, influencing phenomena such as visibility, climate change, and radiative forcing.</p>
+<section id="function-overview">
+<h3>Function Overview<a class="headerlink" href="#function-overview" title="Link to this heading">#</a></h3>
+<p>This function utilizes the PyMieScatt library to derive several key efficiencies and factors for a single sphere, given its material properties, size, and the surrounding medium’s properties. By leveraging an LRU (Least Recently Used) cache, <code class="docutils literal notranslate"><span class="pre">discretize_auto_mieq</span></code> significantly enhances performance for repetitive calculations, storing up to 100,000 recent calls to avoid recalculating identical inputs.</p>
+</section>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">m_sphere</span></code></strong>: Complex or real refractive index of the sphere. Real numbers can be used for non-absorbing materials, while complex numbers account for both the real and imaginary parts of the refractive index, representing absorption characteristics.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">wavelength</span></code></strong>: Wavelength of the incident light, specified in nanometers (nm). This parameter is crucial as Mie scattering varies with wavelength, affecting how light is scattered or absorbed by particles.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">diameter</span></code></strong>: Diameter of the spherical particle in nanometers (nm). Particle size relative to the wavelength influences scattering behavior, making this a key parameter in Mie theory.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">m_medium</span></code></strong> (optional): Refractive index of the medium surrounding the particle, defaulting to 1.0 to represent a vacuum. This context is important for accurately modeling light-particle interactions in various environments.</p></li>
+</ul>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading">#</a></h3>
+<p>A tuple containing the calculated Mie efficiencies and parameters:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">q_ext</span></code></strong>: Extinction efficiency, representing the fraction of light extinguished (either absorbed or scattered) by the particle.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">q_sca</span></code></strong>: Scattering efficiency, indicating the fraction of light scattered by the particle.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">q_abs</span></code></strong>: Absorption efficiency, showing the fraction of light absorbed by the particle.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">g</span></code></strong>: Asymmetry factor, describing the average cosine of the scattering angle, which influences the directionality of scattering.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">q_pr</span></code></strong>: Radiation pressure efficiency, quantifying the momentum transfer from the light to the particle, affecting particle movement.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">q_back</span></code></strong>: Backscatter efficiency, indicating the fraction of light scattered in directions reverse to the incident light.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">q_ratio</span></code></strong>: The ratio of backscatter to extinction efficiency, useful for understanding reflective properties.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate Mie coefficients for a non absorbing sphere</span>
+<span class="n">mie_coefficients</span> <span class="o">=</span> <span class="n">mie_bulk</span><span class="o">.</span><span class="n">discretize_auto_mieq</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="mf">550.0</span><span class="p">,</span>
+    <span class="n">diameter</span><span class="o">=</span><span class="mf">200.0</span>
+<span class="p">)</span>
+<span class="c1"># Calculate Mie coefficients for a absorbing sphere</span>
+<span class="n">mie_coefficients_abs</span> <span class="o">=</span> <span class="n">mie_bulk</span><span class="o">.</span><span class="n">discretize_auto_mieq</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="mf">1.5</span> <span class="o">+</span> <span class="mf">0.5</span><span class="n">j</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="mf">550.0</span><span class="p">,</span>
+    <span class="n">diameter</span><span class="o">=</span><span class="mf">200.0</span>
+<span class="p">)</span>
+
+<span class="c1"># Print the table header, with padding spaces</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Property&#39;</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Non-absorbing Sphere&#39;</span><span class="si">:</span><span class="s2">&lt;25</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Absorbing Sphere&#39;</span><span class="si">:</span><span class="s2">&lt;25</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Print each row of Q efficiencies</span>
+<span class="n">properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Qext&#39;</span><span class="p">,</span> <span class="s1">&#39;Qsca&#39;</span><span class="p">,</span> <span class="s1">&#39;Qabs&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;Qpr&#39;</span><span class="p">,</span> <span class="s1">&#39;Qback&#39;</span><span class="p">,</span> <span class="s1">&#39;Qratio&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prop</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">mie_coefficients</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;25</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">mie_coefficients_abs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;25</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Property   Non-absorbing Sphere      Absorbing Sphere         
+Qext       0.33811822921216034       1.638639216334929        
+Qsca       0.33811822921216034       0.44129028057104036      
+Qabs       0.0                       1.1973489357638887       
+g          0.267185706667637         0.2920132136174058       
+Qpr        0.2477778712028992        1.509776623367253        
+Qback      0.23099105902557251       0.26574242780352036      
+Qratio     0.6831665348650329        0.6021941554199726       
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="the-mie-size-distribution-function">
+<h2>The <code class="docutils literal notranslate"><span class="pre">mie_size_distribution</span></code> Function<a class="headerlink" href="#the-mie-size-distribution-function" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">mie_size_distribution</span></code> function extends the capabilities of single-particle Mie scattering calculations to entire particle size distributions, providing a comprehensive view of aerosol optical properties. This section focuses on the new variables introduced in this function, which enable it to handle distributions and offer various modes of computation.</p>
+<section id="new-variables-explained">
+<h3>New Variables Explained<a class="headerlink" href="#new-variables-explained" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">number_per_cm3</span></code></strong>: This array represents the number distribution of particles per cubic centimeter for each diameter in the size distribution. It’s crucial for calculating the collective optical properties of the particle ensemble, allowing for a more accurate representation of aerosol behavior in the atmosphere.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">n_medium</span></code></strong>: The refractive index of the medium surrounding the particles, with a default value of 1.0, representing air or vacuum. This parameter is essential for adjusting the Mie scattering calculations based on the medium’s optical properties.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">pms</span></code></strong> (Probability Mass Function): A boolean flag indicating whether the size distribution is provided in the form of a probability mass function. When <code class="docutils literal notranslate"><span class="pre">True</span></code>, it signifies that the <code class="docutils literal notranslate"><span class="pre">number_per_cm3</span></code> array represents a binned distribution (sum of bins is total number), affecting how the bulk optical properties are computed. When <code class="docutils literal notranslate"><span class="pre">False</span></code>, the function assumes the array represents a continuous probability density function, where the area under the curve is equal to total particle number.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">as_dict</span></code></strong>: This boolean flag determines the format of the function’s output. If set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, the function returns a dictionary containing the calculated optical properties, providing a convenient structure for accessing specific values.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">extinction_only</span></code></strong>: When set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, this flag limits the calculations to only the extinction coefficient, simplifying the output for applications focused solely on particle extinction properties.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">discretize</span></code></strong>: This flag enables the discretization of input parameters (<code class="docutils literal notranslate"><span class="pre">m_sphere</span></code>, <code class="docutils literal notranslate"><span class="pre">wavelength</span></code>, <code class="docutils literal notranslate"><span class="pre">diameter</span></code>) for potentially improved calculation stability and performance. Discretization can introduce computational errors by truncating the significant digits.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">truncation_calculation</span></code></strong>: A boolean flag that, when <code class="docutils literal notranslate"><span class="pre">True</span></code>, activates the truncation of the scattering efficiency calculation. This adjustment is based on a multiple of the backscattering coefficient, addressing truncation errors inherent in certain measurement instruments.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">truncation_b_sca_multiple</span></code></strong>: An optional float specifying the multiple of the scattering coefficient used for truncating the scattering efficiency. This parameter is required if <code class="docutils literal notranslate"><span class="pre">truncation_calculation</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code> and is key to accurately correcting for instrument truncation effects.</p></li>
+</ul>
+</section>
+<section id="practical-implications">
+<h3>Practical Implications<a class="headerlink" href="#practical-implications" title="Link to this heading">#</a></h3>
+<p>These variables introduce flexibility and precision into aerosol optics modeling, allowing for detailed analysis of particle distributions under varying environmental conditions and measurement setups. By adjusting these parameters, we can simulate a wide range of atmospheric particles, enhancing our understanding of aerosol impacts on climate and air quality.</p>
+</section>
+</section>
+<section id="note">
+<h2>Note<a class="headerlink" href="#note" title="Link to this heading">#</a></h2>
+<p>This is also where we deviate from <code class="docutils literal notranslate"><span class="pre">pyMieScatt</span></code>, as this is now not a wrapper of the same functions in the original package, but a new function that calls the underlining <code class="docutils literal notranslate"><span class="pre">discretize_auto_mieq</span></code>. We then calculate the results with more flexibility.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the refractive index of the particles (complex for absorbing,</span>
+<span class="c1"># real for non-absorbing)</span>
+<span class="n">m_sphere</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">+</span> <span class="mf">0.01</span><span class="n">j</span>  <span class="c1"># Example for slightly absorbing particles</span>
+
+<span class="c1"># Define the wavelength of the incident light in nanometers</span>
+<span class="n">wavelength</span> <span class="o">=</span> <span class="mf">550.0</span>
+
+<span class="c1"># Create a linearly spaced array of particle diameters in nanometers</span>
+<span class="c1"># From 100 nm to 300 nm, 50 sizes</span>
+<span class="n">diameter_sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="c1"># Simulate a number concentration for each particle size in #/cm³</span>
+<span class="c1"># Decreasing concentration from 1000 to 500 #/cm³</span>
+<span class="n">number_per_cm3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="c1"># Refractive index of the surrounding medium (e.g., air)</span>
+<span class="n">n_medium</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+
+<span class="c1"># Calculate the Mie scattering parameters for the given size distribution</span>
+<span class="n">mie_results</span> <span class="o">=</span> <span class="n">mie_bulk</span><span class="o">.</span><span class="n">mie_size_distribution</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">diameter</span><span class="o">=</span><span class="n">diameter_sizes</span><span class="p">,</span>
+    <span class="n">number_per_cm3</span><span class="o">=</span><span class="n">number_per_cm3</span><span class="p">,</span>
+    <span class="n">n_medium</span><span class="o">=</span><span class="n">n_medium</span><span class="p">,</span>
+    <span class="n">as_dict</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Print or process the Mie scattering results</span>
+
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">mie_results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>b_ext   : 5024.182718003773
+b_sca   : 4784.810191293376
+b_abs   : 239.37252671039641
+G       : 0.6715751320242712
+b_pr    : 1810.8231820748451
+b_back  : 657.8815183489642
+b_ratio : 584.281702454577
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<p>The provided code segments form a foundational framework for analyzing aerosol optics, specifically through the calculation of Mie scattering parameters. This framework includes:</p>
+<ol class="arabic simple">
+<li><p><strong>Discretization of Mie Coefficients (<code class="docutils literal notranslate"><span class="pre">discretize_auto_mieq</span></code>)</strong>: This function computes essential Mie scattering parameters such as extinction, scattering, absorption efficiencies, the asymmetry factor, radiation pressure efficiency, backscatter efficiency, and the ratio of backscatter to extinction efficiency for spherical particles. It leverages the PyMieScatt library for calculations and optimizes performance with an LRU cache, effectively reducing computational overhead for repeated calculations.</p></li>
+<li><p><strong>Mie Scattering for Size Distributions (<code class="docutils literal notranslate"><span class="pre">mie_size_distribution</span></code>)</strong>: Extending the application to aerosol size distributions, this function calculates optical properties across a range of particle sizes. It supports various modes of operation, including discretization of input parameters for improved computational performance and optional truncation of scattering efficiencies. The function can output results as either a dictionary or a tuple, accommodating different analytical needs.</p></li>
+<li><p><strong>Example Usage with Linearly Spaced Size Distribution</strong>: Demonstrated how to apply the <code class="docutils literal notranslate"><span class="pre">mie_size_distribution</span></code> function to a linearly spaced array of particle diameters, simulating a realistic aerosol size distribution. This example showcases how to generate a size distribution, calculate Mie scattering parameters for it, and then access these parameters for further analysis.</p></li>
+</ol>
+<section id="building-blocks-for-advanced-analysis">
+<h3>Building Blocks for Advanced Analysis<a class="headerlink" href="#building-blocks-for-advanced-analysis" title="Link to this heading">#</a></h3>
+<p>These components serve as critical building blocks for more advanced analyses, particularly in studying the next section: <a class="reference internal" href="humid_scattering.html"><span class="std std-doc">Humidified Particle Scattering</span></a>. In real atmospheric conditions, aerosol particles often undergo hygroscopic growth, absorbing water from the air and increasing in size. This water uptake significantly affects the optical properties of aerosols, influencing their scattering and absorption behaviors and, consequently, their impact on climate and visibility.</p>
+<p>The code and methodologies discussed provide a starting point for such advanced analyses, enabling the exploration of how aerosol optical properties change with humidity. This understanding is crucial for accurately assessing aerosols’ environmental and climatic impacts, highlighting the importance of these computational tools in atmospheric sciences.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">mie_bulk</span><span class="o">.</span><span class="n">discretize_auto_mieq</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on _lru_cache_wrapper in module particula.data.process.mie_bulk:
+
+discretize_auto_mieq(m_sphere: Union[complex, float], wavelength: float, diameter: float, m_medium: float = 1.0) -&gt; Tuple[float, ...]
+    Computes Mie coefficients for a spherical particle based on its material
+    properties, size, and the properties of the surrounding medium.
+    
+    This function leverages the PyMieScatt library to calculate the extinction
+    (q_ext), scattering (q_sca), absorption (q_abs) efficiencies, the
+    asymmetry factor (g), radiation pressure efficiency (q_pr), backscatter
+    efficiency (q_back), and the ratio of backscatter to extinction efficiency
+    (q_ratio) for a single sphere under specified conditions.
+    
+    This function is optimized with an LRU (Least Recently Used) cache to
+    enhance performance by storing up to 100,000 recent calls. The cache
+    memorizes the results of expensive function calls and returns the cached
+    result when the same inputs occur again, reducing the need to recompute
+    these values.
+    
+    Args
+    ----------
+    m_sphere : The complex refractive index of the sphere. For non-absorbing
+        material a real number can be provided.
+    wavelength : The wavelength of the incident light in nanometers (nm).
+    diameter : The diameter of the sphere in nanometers (nm).
+    mMedium : The refractive index of the surrounding medium.
+        Defaults to 1.0, corresponding to vacuum.
+    
+    Returns
+    -------
+    Tuple[float, float, float, float, float, float, float]
+        A tuple containing the calculated Mie efficiencies and parameters:
+        q_ext (extinction efficiency), q_sca (scattering efficiency),
+        q_abs (absorption efficiency), g (asymmetry factor),
+        q_pr (radiation pressure efficiency), q_back (backscatter efficiency),
+        and q_ratio (the ratio of backscatter to extinction efficiency).
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">mie_bulk</span><span class="o">.</span><span class="n">mie_size_distribution</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function mie_size_distribution in module particula.data.process.mie_bulk:
+
+mie_size_distribution(m_sphere: Union[complex, float], wavelength: float, diameter: numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]], number_per_cm3: numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]], n_medium: float = 1.0, pms: bool = True, as_dict: bool = False, extinction_only: bool = False, discretize: bool = False, truncation_calculation: bool = False, truncation_b_sca_multiple: Optional[float] = None) -&gt; Union[numpy.ndarray[Any, numpy.dtype[numpy.float64]], dict[str, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], Tuple[numpy.ndarray[Any, numpy.dtype[numpy.float64]], ...]]
+    Calculates Mie scattering parameters for a size distribution of spherical
+    particles.
+    
+    This function computes optical properties such as extinction, scattering,
+    absorption coefficients, asymmetry factor, backscatter efficiency, and
+    their ratios for a given size distribution of spherical particles. It
+    supports various modes of calculation, including discretization of input
+    parameters and optional truncation of the scattering efficiency.
+    
+    Parameters
+    ----------
+    m_sphere : Union[complex, float]
+        The complex refractive index of the particles. Real values can be used
+        for non-absorbing materials.
+    wavelength : float
+        The wavelength of the incident light in nanometers (nm).
+    diameter : NDArray[np.float64]
+        An array of particle diameters in nanometers (nm).
+    number_per_cm3 : NDArray[np.float64]
+        The number distribution of particles per cubic centimeter (#/cm^3).
+    n_medium : float, optional
+        The refractive index of the medium. Defaults to 1.0 (air or vacuum).
+    pms : bool, optional
+        Specifies if the size distribution is in probability mass form.
+    as_dict : bool, optional
+        If True, results are returned as a dictionary. Otherwise, as a tuple.
+    extinction_only : bool, optional
+        If True, only the extinction coefficient is calculated and returned.
+    discretize : bool, optional
+        If True, input parameters (m, wavelength, dp) are discretized for
+        computation. Defaults to False.
+    truncation_calculation : bool, optional
+        Enables truncation of the scattering efficiency based on a multiple
+        of the backscattering coefficient. Defaults to False.
+    truncation_b_sca_multiple : Optional[float], optional
+        The multiple of the backscattering coefficient used for truncating the
+        scattering efficiency. Required if `truncation_calculation` is True.
+    
+    Returns
+    -------
+    Union[float, Dict[str, float], Tuple[float, ...]]
+        Depending on the parameters `asDict` and `extinction_only`, the
+        function can return:
+        - A single float (extinction coefficient) if `extinction_only` is True.
+        - A dictionary of computed optical properties if `asDict` is True.
+        - A tuple of computed optical properties.
+    
+    Raises
+    ------
+    ValueError
+        If `truncation_calculation` is True but `truncation_b_sca_multiple`
+        is not specified.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "uncscode/particula",
+            ref: "v0.0.10",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./examples/light_scattering"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="aerosol_optics_intro.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Introduction to Aerosol Optics</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="humid_scattering.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Scattering for Humidified Particles</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mie-coefficients-discretize-auto-mieq">Mie Coefficients: <code class="docutils literal notranslate"><span class="pre">discretize_auto_mieq</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#function-overview">Function Overview</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#returns">Returns</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-mie-size-distribution-function">The <code class="docutils literal notranslate"><span class="pre">mie_size_distribution</span></code> Function</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-variables-explained">New Variables Explained</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-implications">Practical Implications</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#note">Note</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-blocks-for-advanced-analysis">Building Blocks for Advanced Analysis</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By particula contributors
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
