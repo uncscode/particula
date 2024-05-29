@@ -1,0 +1,1076 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The Particle Classes &#8212; Particula Book</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'documentation/particle';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="distribution_discretization" href="utilities/distribution_discretization.html" />
+    <link rel="prev" title="The Vapor Class" href="vapor.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/placeholder.png" class="logo__image only-light" alt="Particula Book - Home"/>
+    <script>document.write(`<img src="../_static/placeholder.png" class="logo__image only-dark" alt="Particula Book - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Getting started
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tour</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tour/part-tour.html">Particula tour</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../examples/distribution_statistics.html">Distribution statistics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/distribution_coagulation.html">Distribution coagulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/distribution_evolution.html">Distribution evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/distribution_ambient.html">Distributions</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../examples/ionparticle_coagulation.html">Ion–particle coagulation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples/streamlake/particula_data.html">Data in Particula</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/streamlake/loading_data_part1.html">Loading Part 1: Into &amp; 1D Data</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../examples/streamlake/loading_data_part2.html">Loading Part 2: Sizer Data</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../examples/streamlake/loading_data_part3.html">Loading Part 3: Lake</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../examples/streamlake/loading_data_part4.html">Loading Part 4: Settings Files</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../examples/streamlake/stream_stats_part1.html">Stream: Averaging and Outliers</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../examples/streamlake/stream_stats_size_distribution_part2.html">Size Distribution Stats</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples/wall_loss_section.html">Chamber Wall Loss Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/wall_loss/chamber_smps_data.html">Chamber Analysis</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../examples/wall_loss/wall_loss_forward_simulation.html">Chamber Forward Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/wall_loss/forward_fit_simple.html">Simple Wall Loss Fit</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples/lagrangian/lagrangian_intro.html">Lagrangian Particle Model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/lagrangian/basic_lagrangian_box.html">Introduction to the Lagrangian Box Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/lagrangian/sweep_and_prune.html">Sweep and Prune Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/lagrangian/friction_force.html">Realistic Drag, Mass, and Velocity</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples/equilibria/equilibria_intro.html">Equilibria of Aerosols</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/equilibria/activity_part1.html">Activity Example</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../examples/equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples/light_scattering/aerosol_optics_intro.html">Introduction to Aerosol Optics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/light_scattering/mie_basics.html">Mie Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/light_scattering/humid_scattering.html">Scattering for Humidified Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/light_scattering/kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/light_scattering/scattering_truncation.html">Scattering Truncation Corrections</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/knudsen_number.html"><code class="docutils literal notranslate"><span class="pre">knudsen_number</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/slip_correction.html"><code class="docutils literal notranslate"><span class="pre">slip_correction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/friction_factor.html"><code class="docutils literal notranslate"><span class="pre">friction_factor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="utilities/utilities_overview.html">Utilities Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="utilities/convert_size_dist_scales.html">Converting Distributions</a></li>
+
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Strategic Plan</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../strategic_plan/strategic_planning_FY24.html">FY24 Plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../strategic_plan/Aerosol_patterns.html">Program Outline Revision Draft</a></li>
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Next Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="next/next_vapor_pressure.html">Vapor Pressure</a></li>
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributor Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/documentation/particle.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/documentation/particle.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/documentation/particle.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fdocumentation/particle.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/documentation/particle.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>The Particle Classes</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particledistribution-attributes"><code class="docutils literal notranslate"><span class="pre">ParticleDistribution</span></code> attributes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particledistribution-methods"><code class="docutils literal notranslate"><span class="pre">ParticleDistribution</span></code> methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particledistribution-pre-radius"><code class="docutils literal notranslate"><span class="pre">ParticleDistribution.pre_radius()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particledistribution-pre-discretize"><code class="docutils literal notranslate"><span class="pre">ParticleDistribution.pre_discretize()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particledistribution-pre-distribution"><code class="docutils literal notranslate"><span class="pre">ParticleDistribution.pre_distribution()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-attributes"><code class="docutils literal notranslate"><span class="pre">ParticleInstances</span></code> attributes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-methods"><code class="docutils literal notranslate"><span class="pre">ParticleInstances</span></code> methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-particle-distribution"><code class="docutils literal notranslate"><span class="pre">ParticleInstances.particle_distribution()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-particle-mass"><code class="docutils literal notranslate"><span class="pre">ParticleInstances.particle_mass()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-knudsen-number"><code class="docutils literal notranslate"><span class="pre">ParticleInstances.knudsen_number()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-slip-correction-factor"><code class="docutils literal notranslate"><span class="pre">ParticleInstances.slip_correction_factor()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-friction-factor"><code class="docutils literal notranslate"><span class="pre">ParticleInstances.friction_factor()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-particle-attributes">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> attributes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-particle-methods">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> methods</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="the-particle-classes">
+<h1>The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes<a class="headerlink" href="#the-particle-classes" title="Link to this heading">#</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> class is the base class for all particles, whether introduced discretely one by one or as a distribution. In reality, the <code class="docutils literal notranslate"><span class="pre">Particle</span></code> class is based on two intermediate classes: <code class="docutils literal notranslate"><span class="pre">ParticleDistribution</span></code> and <code class="docutils literal notranslate"><span class="pre">ParticleInstances</span></code> to instantiate particle distributions and particles directly, respectively.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ParticleDistribution</span></code> inherits from the <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> class, with the following added attributes and methods:</p>
+<section id="particledistribution-attributes">
+<h2><code class="docutils literal notranslate"><span class="pre">ParticleDistribution</span></code> attributes<a class="headerlink" href="#particledistribution-attributes" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>attribute</p></th>
+<th class="head"><p>unit</p></th>
+<th class="head"><p>default value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">spacing</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;linspace&quot;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nbins</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1e3</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nparticles</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1e5</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">volume</span></code></p></td>
+<td><p>/ m^3</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1e-6</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cutoff</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.9999</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">gsigma</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.25</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mode</span></code></p></td>
+<td><p>m</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1e-7</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">disttype</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;lognormal&quot;</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="particledistribution-methods">
+<h2><code class="docutils literal notranslate"><span class="pre">ParticleDistribution</span></code> methods<a class="headerlink" href="#particledistribution-methods" title="Link to this heading">#</a></h2>
+<section id="particledistribution-pre-radius">
+<h3><code class="docutils literal notranslate"><span class="pre">ParticleDistribution.pre_radius()</span></code><a class="headerlink" href="#particledistribution-pre-radius" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">pre_radius</span></code> method uses the attributes <code class="docutils literal notranslate"><span class="pre">cutoff</span></code>, <code class="docutils literal notranslate"><span class="pre">gsigma</span></code>, and <code class="docutils literal notranslate"><span class="pre">mode</span></code> to determine the starting and ending radii according to the utility <code class="docutils literal notranslate"><span class="pre">cutoff_radius.cut_rad</span></code>. Here, <code class="docutils literal notranslate"><span class="pre">cutoff</span></code> refers to the fraction cutoff of the distribution (e.g. <code class="docutils literal notranslate"><span class="pre">cutoff=0.9999</span></code> means taking only 99.99% of the lognormal distribution). Moreover, <code class="docutils literal notranslate"><span class="pre">gsigma</span></code> and <code class="docutils literal notranslate"><span class="pre">mode</span></code> are the lognormal parameters of the distribution, referring to the geometric standard deviation and mode (geometric mean) respectively. We use the <code class="docutils literal notranslate"><span class="pre">scipy.stats.lognorm</span></code> to construct the distribution in the <code class="docutils literal notranslate"><span class="pre">pre_discretize</span></code> method below.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="utilities/radius_cutoff.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">particula.util.cutoff_radius</span></code></span></a></p></li>
+</ul>
+<p>Then, the <code class="docutils literal notranslate"><span class="pre">spacing</span></code> is used to create a vector of radii with <code class="docutils literal notranslate"><span class="pre">nbins</span></code> entries. The <code class="docutils literal notranslate"><span class="pre">spacing</span></code> attribute is a <code class="docutils literal notranslate"><span class="pre">string</span></code> type and for now, it can only be <code class="docutils literal notranslate"><span class="pre">&quot;linspace&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;logspace&quot;</span></code>: using the <code class="docutils literal notranslate"><span class="pre">numpy.linspace</span></code> or <code class="docutils literal notranslate"><span class="pre">numpy.logspace</span></code> functions, respectively, to construct the vector.</p>
+<p>Finally, the <code class="docutils literal notranslate"><span class="pre">pre_radius</span></code> method returns a radius vector with units of meter.</p>
+</section>
+<section id="particledistribution-pre-discretize">
+<h3><code class="docutils literal notranslate"><span class="pre">ParticleDistribution.pre_discretize()</span></code><a class="headerlink" href="#particledistribution-pre-discretize" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">pre_discretize</span></code> method uses the result of the <code class="docutils literal notranslate"><span class="pre">pre_radius()</span></code> method above, <code class="docutils literal notranslate"><span class="pre">disttype</span></code>, <code class="docutils literal notranslate"><span class="pre">gsigma</span></code>, and <code class="docutils literal notranslate"><span class="pre">mode</span></code> attributes to produce a probability density function distribution based on the <code class="docutils literal notranslate"><span class="pre">scipy.stats.lognorm</span></code> (lognormal) function. This is done via the <code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code> utility.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="utilities/distribution_discretization.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">particula.util.distribution_discretization</span></code></span></a></p></li>
+</ul>
+</section>
+<section id="particledistribution-pre-distribution">
+<h3><code class="docutils literal notranslate"><span class="pre">ParticleDistribution.pre_distribution()</span></code><a class="headerlink" href="#particledistribution-pre-distribution" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">pre_distribution</span></code> method simply constructs the distribution multiplying the product of <code class="docutils literal notranslate"><span class="pre">pre_discretize()</span></code> by <code class="docutils literal notranslate"><span class="pre">nparticles</span></code> and dividing by <code class="docutils literal notranslate"><span class="pre">volume</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.particle</span> <span class="kn">import</span> <span class="n">ParticleDistribution</span>
+<span class="n">PDcutoff1</span> <span class="o">=</span> <span class="n">ParticleDistribution</span><span class="p">()</span>
+<span class="n">PDcutoff2</span> <span class="o">=</span> <span class="n">ParticleDistribution</span><span class="p">(</span>
+    <span class="n">cutoff</span><span class="o">=</span><span class="mf">.99</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting radius from 99.99</span><span class="si">% c</span><span class="s2">utoff is &quot;</span><span class="p">,</span> <span class="n">PDcutoff1</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting radius from 99</span><span class="si">% c</span><span class="s2">utoff is &quot;</span><span class="p">,</span> <span class="n">PDcutoff2</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Starting radius from 99.99% cutoff is  4.1972292396604054e-08 meter
+Starting radius from 99% cutoff is  5.628288472608393e-08 meter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.particle</span> <span class="kn">import</span> <span class="n">ParticleDistribution</span>
+<span class="n">PDspacing1</span> <span class="o">=</span> <span class="n">ParticleDistribution</span><span class="p">()</span>
+<span class="n">PDspacing2</span> <span class="o">=</span> <span class="n">ParticleDistribution</span><span class="p">(</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="s2">&quot;logspace&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First few radii from linspace spacing are &quot;</span><span class="p">,</span> <span class="n">PDspacing1</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()[:</span><span class="mi">6</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First few radii from logspace spacing are &quot;</span><span class="p">,</span> <span class="n">PDspacing2</span><span class="o">.</span><span class="n">pre_radius</span><span class="p">()[:</span><span class="mi">6</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>First few radii from linspace spacing are  [4.1972292396604054e-08 4.216876899517281e-08 4.236524559374157e-08 4.256172219231033e-08 4.275819879087909e-08 4.295467538944785e-08] meter
+First few radii from logspace spacing are  [4.1972292396604034e-08 4.204530615154216e-08 4.211844691904267e-08 4.2191714920053024e-08 4.2265110375904696e-08 4.2338633508314515e-08] meter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The units of the distribution (density units): &quot;</span><span class="p">,</span> <span class="n">PDspacing1</span><span class="o">.</span><span class="n">pre_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The units of the distribution (density units):  1 / meter ** 4
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">ParticleInstances</span></code> inherits from the <code class="docutils literal notranslate"><span class="pre">ParticleDistribution</span></code> class, with the following added attributes and methods:</p>
+</section>
+</section>
+<section id="particleinstances-attributes">
+<h2><code class="docutils literal notranslate"><span class="pre">ParticleInstances</span></code> attributes<a class="headerlink" href="#particleinstances-attributes" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>attribute</p></th>
+<th class="head"><p>unit</p></th>
+<th class="head"><p>default value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">particle_radius</span></code></p></td>
+<td><p>m</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">ParticleDistribution.pre_radius()</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">particle_number</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code> or <code class="docutils literal notranslate"><span class="pre">ParticleDistribution.nparticles</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">particle_density</span></code></p></td>
+<td><p>kg / m^3</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1e3</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">shape_factor</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">volume_void</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">particle_charge</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>We note that the <code class="docutils literal notranslate"><span class="pre">particle_radius</span></code> attribute defaults to <code class="docutils literal notranslate"><span class="pre">ParticleDistribution.pre_radius()</span></code> if it is not given explicitly. Therefore, one could either provide a one or more radii via <code class="docutils literal notranslate"><span class="pre">particle_radius</span></code> or provide the parameters for a distribution as described above. The <code class="docutils literal notranslate"><span class="pre">particle_number</span></code> attribute defaults to <code class="docutils literal notranslate"><span class="pre">ParticleDistribution.nparticles</span></code> if the <code class="docutils literal notranslate"><span class="pre">particle_radius</span></code> attribute is not given explicitly; otherwise, it is set to <code class="docutils literal notranslate"><span class="pre">1</span></code> by default, but the user could provide a different value, for example, <code class="docutils literal notranslate"><span class="pre">particle_radius=[1e-9,</span> <span class="pre">2e-9]</span></code> coupled with <code class="docutils literal notranslate"><span class="pre">particle_number=[1,</span> <span class="pre">2]</span></code> would mean one particle of radius 1e-9 and two particles of radius 2e-9.</p>
+<p>In any event, the attributes here have higher precedence than the attributes in <code class="docutils literal notranslate"><span class="pre">ParticleDistribution</span></code>. Below, we reaffirm the <code class="docutils literal notranslate"><span class="pre">particle_distribution</span></code> as well.</p>
+</section>
+<section id="particleinstances-methods">
+<h2><code class="docutils literal notranslate"><span class="pre">ParticleInstances</span></code> methods<a class="headerlink" href="#particleinstances-methods" title="Link to this heading">#</a></h2>
+<section id="particleinstances-particle-distribution">
+<h3><code class="docutils literal notranslate"><span class="pre">ParticleInstances.particle_distribution()</span></code><a class="headerlink" href="#particleinstances-particle-distribution" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">particle_distribution</span></code> method either returns the <code class="docutils literal notranslate"><span class="pre">ParticleDistribution.pre_distribution()</span></code> if the <code class="docutils literal notranslate"><span class="pre">particle_radius</span></code> attribute is not given explicitly, or it constructs the distribution dividing <code class="docutils literal notranslate"><span class="pre">particle_number</span></code> by <code class="docutils literal notranslate"><span class="pre">particle_radius</span></code> and dividing by <code class="docutils literal notranslate"><span class="pre">volume</span></code>.</p>
+<p>Note: the idea of distribution density necessitates normalizing by the variable (in our case, it is the radius) and here we divide by radius to get the unit of 1 / m^3 / m (i.e. number concentration density).</p>
+</section>
+<section id="particleinstances-particle-mass">
+<h3><code class="docutils literal notranslate"><span class="pre">ParticleInstances.particle_mass()</span></code><a class="headerlink" href="#particleinstances-particle-mass" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">particle_mass</span></code> method returns the mass of the particle by using the <code class="docutils literal notranslate"><span class="pre">particle_radius</span></code>, <code class="docutils literal notranslate"><span class="pre">particle_density</span></code>, <code class="docutils literal notranslate"><span class="pre">shape_factor</span></code>, and <code class="docutils literal notranslate"><span class="pre">volume_void</span></code> attributes.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="utilities/particle_mass.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">particula.util.particle_mass</span></code></span></a></p></li>
+</ul>
+</section>
+<section id="particleinstances-knudsen-number">
+<h3><code class="docutils literal notranslate"><span class="pre">ParticleInstances.knudsen_number()</span></code><a class="headerlink" href="#particleinstances-knudsen-number" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">knudsen_number</span></code> method returns the knudsen number of the particle by using the <code class="docutils literal notranslate"><span class="pre">particle_radius</span></code> attribute as well as the <code class="docutils literal notranslate"><span class="pre">mean_free_path()</span></code> method.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="utilities/knudsen_number.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">knudsen_number</span></code></span></a></p></li>
+</ul>
+</section>
+<section id="particleinstances-slip-correction-factor">
+<h3><code class="docutils literal notranslate"><span class="pre">ParticleInstances.slip_correction_factor()</span></code><a class="headerlink" href="#particleinstances-slip-correction-factor" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">slip_correction_factor</span></code> method returns the slip correction factor of the particle by using the <code class="docutils literal notranslate"><span class="pre">particle_radius</span></code> attribute as well as the <code class="docutils literal notranslate"><span class="pre">knudsen_number()</span></code> method.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="utilities/slip_correction.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">particula.util.slip_correction</span></code></span></a></p></li>
+</ul>
+</section>
+<section id="particleinstances-friction-factor">
+<h3><code class="docutils literal notranslate"><span class="pre">ParticleInstances.friction_factor()</span></code><a class="headerlink" href="#particleinstances-friction-factor" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">friction_factor</span></code> method returns the friction factor of the particle by using the <code class="docutils literal notranslate"><span class="pre">particle_radius</span></code> attribute as well as the <code class="docutils literal notranslate"><span class="pre">dynamic_viscosity()</span></code> and <code class="docutils literal notranslate"><span class="pre">slip_correction_factor()</span></code> methods.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="utilities/friction_factor.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">particula.util.friction_factor</span></code></span></a></p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.particle</span> <span class="kn">import</span> <span class="n">ParticleInstances</span>
+<span class="n">PD_dist</span> <span class="o">=</span> <span class="n">ParticleInstances</span><span class="p">()</span>
+<span class="n">PD_disc</span> <span class="o">=</span> <span class="n">ParticleInstances</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">2e-9</span><span class="p">],</span>
+    <span class="n">particle_number</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The units of the &#39;continuous&#39; distribution (density units): &quot;</span><span class="p">,</span> <span class="n">PD_dist</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The units of the &#39;discrete&#39; distribution (density units): &quot;</span><span class="p">,</span> <span class="n">PD_disc</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">()</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First few points of continuous: &quot;</span><span class="p">,</span> <span class="n">PD_dist</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">()[:</span><span class="mi">2</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First few points of discrete: &quot;</span><span class="p">,</span> <span class="n">PD_disc</span><span class="o">.</span><span class="n">particle_distribution</span><span class="p">()[:</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The units of the &#39;continuous&#39; distribution (density units):  1 / meter ** 4
+The units of the &#39;discrete&#39; distribution (density units):  1 / meter ** 4
+First few points of continuous:  [2200235960693703.8 2375247794883328.5] / meter ** 4
+First few points of discrete:  [999999999999999.9 999999999999999.9] / meter ** 4
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Particle mass: &quot;</span><span class="p">,</span> <span class="n">PD_disc</span><span class="o">.</span><span class="n">particle_mass</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Friction factor: &quot;</span><span class="p">,</span> <span class="n">PD_disc</span><span class="o">.</span><span class="n">friction_factor</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Particle mass:  [4.188790204786392e-24 3.3510321638291136e-23] kilogram
+Friction factor:  [3.1276392144839314e-15 1.244639390633872e-14] kilogram / second
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> inherits from the <code class="docutils literal notranslate"><span class="pre">ParticleInstances</span></code> class, with the following added attributes and methods:</p>
+</section>
+</section>
+<section id="the-particle-attributes">
+<h2>The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> attributes<a class="headerlink" href="#the-particle-attributes" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>attribute</p></th>
+<th class="head"><p>unit</p></th>
+<th class="head"><p>default value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">elementary_charge_value</span></code></p></td>
+<td><p>C</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">constants.ELEMENTARY_CHARGE_VALUE</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">electric_permittivity</span></code></p></td>
+<td><p>F / m</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">constants.ELECTRIC_PERMITTIVITY</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">boltzmann_constant</span></code></p></td>
+<td><p>kg * m^2 / K / s^2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">constants.BOLTZMANN_CONSTANT</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">coagulation_approximation</span></code></p></td>
+<td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;hardsphere&quot;</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="the-particle-methods">
+<h2>The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> methods<a class="headerlink" href="#the-particle-methods" title="Link to this heading">#</a></h2>
+<p>The following methods are available for the <code class="docutils literal notranslate"><span class="pre">Particle</span></code> class:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Particle._coag_prep()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Particle.reduced_mass()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Particle.reduced_friction_factor()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Particle.coulomb_potential_ratio()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Particle.coulomb_enhancement_kinetic_limit()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Particle.coulomb_enhancement_continuum_limit()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Particle.diffusive_knudsen_number()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Particle.dimensionless_coagulation()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Particle.coagulation()</span></code></p></li>
+</ul>
+<p>They all rely on one underlying utility: the class <code class="docutils literal notranslate"><span class="pre">DimensionlessCoagulation</span></code> from <code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code>, which is documented in the <a class="reference internal" href="utilities/dimensionless_coagulation.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">particula.util.dimensionless_coagulation</span></code></span></a> notebook.</p>
+<p>All these added methods rely on previously defined attributes and methods to construct particle–particle interaction (e.g. coagulation). Thus, each method takes an input argument <code class="docutils literal notranslate"><span class="pre">particle</span></code> which is an instance of the <code class="docutils literal notranslate"><span class="pre">Particle</span></code> class. If not explicitly provided, the <code class="docutils literal notranslate"><span class="pre">particle</span></code> argument defaults to <code class="docutils literal notranslate"><span class="pre">self</span></code> (itself).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">particula.particle</span> <span class="kn">import</span> <span class="n">Particle</span>
+
+<span class="n">two_particles</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">2e-9</span><span class="p">],</span>
+    <span class="n">particle_number</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">another_particle</span> <span class="o">=</span> <span class="n">Particle</span><span class="p">(</span><span class="n">particle_radius</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">two_particles</span><span class="o">.</span><span class="n">coagulation</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><table><tbody><tr><th>Magnitude</th><td style='text-align:left;'><pre>[[8.835482747955866e-16 1.4836836107072172e-15]<br> [1.4836836107072172e-15 1.2356686651065113e-15]]</pre></td></tr><tr><th>Units</th><td style='text-align:left;'>meter<sup>3</sup>/second</td></tr></tbody></table></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">another_particle</span><span class="o">.</span><span class="n">coagulation</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><table><tbody><tr><th>Magnitude</th><td style='text-align:left;'><pre>[[2.306525014899979e-15]]</pre></td></tr><tr><th>Units</th><td style='text-align:left;'>meter<sup>3</sup>/second</td></tr></tbody></table></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">another_particle</span><span class="o">.</span><span class="n">coagulation</span><span class="p">(</span><span class="n">another_particle</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><table><tbody><tr><th>Magnitude</th><td style='text-align:left;'><pre>[[2.306525014899979e-15]]</pre></td></tr><tr><th>Units</th><td style='text-align:left;'>meter<sup>3</sup>/second</td></tr></tbody></table></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">two_particles</span><span class="o">.</span><span class="n">coagulation</span><span class="p">(</span><span class="n">another_particle</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><table><tbody><tr><th>Magnitude</th><td style='text-align:left;'><pre>[[1.8143554037039256e-14]<br> [7.479664412223585e-15]]</pre></td></tr><tr><th>Units</th><td style='text-align:left;'>meter<sup>3</sup>/second</td></tr></tbody></table></div></div>
+</div>
+</section>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "uncscode/particula",
+            ref: "v0.0.10",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./documentation"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="vapor.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="utilities/distribution_discretization.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particledistribution-attributes"><code class="docutils literal notranslate"><span class="pre">ParticleDistribution</span></code> attributes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particledistribution-methods"><code class="docutils literal notranslate"><span class="pre">ParticleDistribution</span></code> methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particledistribution-pre-radius"><code class="docutils literal notranslate"><span class="pre">ParticleDistribution.pre_radius()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particledistribution-pre-discretize"><code class="docutils literal notranslate"><span class="pre">ParticleDistribution.pre_discretize()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particledistribution-pre-distribution"><code class="docutils literal notranslate"><span class="pre">ParticleDistribution.pre_distribution()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-attributes"><code class="docutils literal notranslate"><span class="pre">ParticleInstances</span></code> attributes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-methods"><code class="docutils literal notranslate"><span class="pre">ParticleInstances</span></code> methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-particle-distribution"><code class="docutils literal notranslate"><span class="pre">ParticleInstances.particle_distribution()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-particle-mass"><code class="docutils literal notranslate"><span class="pre">ParticleInstances.particle_mass()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-knudsen-number"><code class="docutils literal notranslate"><span class="pre">ParticleInstances.knudsen_number()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-slip-correction-factor"><code class="docutils literal notranslate"><span class="pre">ParticleInstances.slip_correction_factor()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#particleinstances-friction-factor"><code class="docutils literal notranslate"><span class="pre">ParticleInstances.friction_factor()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-particle-attributes">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> attributes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-particle-methods">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> methods</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By particula contributors
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

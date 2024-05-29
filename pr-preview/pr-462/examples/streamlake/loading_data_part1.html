@@ -1,0 +1,1448 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Loading Part 1: Into &amp; 1D Data &#8212; Particula Book</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/streamlake/loading_data_part1';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Loading Part 2: Sizer Data" href="loading_data_part2.html" />
+    <link rel="prev" title="Data in Particula" href="particula_data.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/placeholder.png" class="logo__image only-light" alt="Particula Book - Home"/>
+    <script>document.write(`<img src="../../_static/placeholder.png" class="logo__image only-dark" alt="Particula Book - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    Getting started
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tour</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../tour/part-tour.html">Particula tour</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../distribution_statistics.html">Distribution statistics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_coagulation.html">Distribution coagulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_evolution.html">Distribution evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_ambient.html">Distributions</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../ionparticle_coagulation.html">Ion–particle coagulation</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="particula_data.html">Data in Particula</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Loading Part 1: Into &amp; 1D Data</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part2.html">Loading Part 2: Sizer Data</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part3.html">Loading Part 3: Lake</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part4.html">Loading Part 4: Settings Files</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="stream_stats_part1.html">Stream: Averaging and Outliers</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="stream_stats_size_distribution_part2.html">Size Distribution Stats</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../wall_loss_section.html">Chamber Wall Loss Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/chamber_smps_data.html">Chamber Analysis</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/wall_loss_forward_simulation.html">Chamber Forward Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/forward_fit_simple.html">Simple Wall Loss Fit</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../lagrangian/lagrangian_intro.html">Lagrangian Particle Model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/basic_lagrangian_box.html">Introduction to the Lagrangian Box Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/sweep_and_prune.html">Sweep and Prune Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/friction_force.html">Realistic Drag, Mass, and Velocity</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../equilibria/equilibria_intro.html">Equilibria of Aerosols</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../equilibria/activity_part1.html">Activity Example</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../light_scattering/aerosol_optics_intro.html">Introduction to Aerosol Optics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/mie_basics.html">Mie Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/humid_scattering.html">Scattering for Humidified Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/scattering_truncation.html">Scattering Truncation Corrections</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/knudsen_number.html"><code class="docutils literal notranslate"><span class="pre">knudsen_number</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/slip_correction.html"><code class="docutils literal notranslate"><span class="pre">slip_correction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/friction_factor.html"><code class="docutils literal notranslate"><span class="pre">friction_factor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/utilities/utilities_overview.html">Utilities Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/convert_size_dist_scales.html">Converting Distributions</a></li>
+
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Strategic Plan</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/strategic_planning_FY24.html">FY24 Plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/Aerosol_patterns.html">Program Outline Revision Draft</a></li>
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Next Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/next/next_vapor_pressure.html">Vapor Pressure</a></li>
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributor Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/streamlake/loading_data_part1.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/streamlake/loading_data_part1.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/streamlake/loading_data_part1.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/streamlake/loading_data_part1.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/examples/streamlake/loading_data_part1.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Loading Part 1: Into & 1D Data</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Part 1: Into &amp; 1D Data</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-the-working-path">Setting the Working Path</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#importing-packages">Importing Packages</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-the-data">Loading the Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clean-up-data">Clean Up Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-and-time">Data and Time</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pause-to-plot-verifying-data-integrity">Pause to Plot: Verifying Data Integrity</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stream-object-streamlining-your-analysis">Stream Object: Streamlining Your Analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#settings-dictionary-centralizing-data-loading-parameters">Settings Dictionary: Centralizing Data Loading Parameters</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data-with-the-interface">Load the Data with the Interface</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#exploring-the-stream-class-in-particula">Exploring the Stream Class in Particula</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-features-of-the-stream-class">Key Features of the Stream Class</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functionalities-and-tools">Functionalities and Tools</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-application">Practical Application</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-data-using-the-stream-object">Plotting Data Using the Stream Object</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bonus-utilizing-python-s-help-function">Bonus: Utilizing Python’s Help Function</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-use-the-help-function">How to Use the Help Function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-help-to-explore-functionality">Applying Help to Explore Functionality</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="loading-part-1-into-1d-data">
+<h1>Loading Part 1: Into &amp; 1D Data<a class="headerlink" href="#loading-part-1-into-1d-data" title="Link to this heading">#</a></h1>
+<p>This notebook is designed to guide you through the process of loading, cleaning, formatting, and processing data, a common task in aerosol research. You’ll learn how to automate these repetitive tasks using Python scripts, specifically leveraging the functionalities of the <code class="docutils literal notranslate"><span class="pre">particula.data</span></code> package. This will streamline your data handling process, making your research more efficient.</p>
+<section id="setting-the-working-path">
+<h2>Setting the Working Path<a class="headerlink" href="#setting-the-working-path" title="Link to this heading">#</a></h2>
+<p>The first step in data processing is to set the working path where your data files are located. In this example, we’ll use example data from the data/examples directory. However, you can easily adapt this to point to any directory on your computer.</p>
+<p>For instance, if you have a data folder in your home directory, you might set the path like this:
+<code class="docutils literal notranslate"><span class="pre">path</span> <span class="pre">=</span> <span class="pre">&quot;U:\\data\\processing\\Campaign2023_of_awesome\\data&quot;</span></code></p>
+<p>This flexibility allows you to work with data stored in different locations on your computer.</p>
+<section id="importing-packages">
+<h3>Importing Packages<a class="headerlink" href="#importing-packages" title="Link to this heading">#</a></h3>
+<p>Before we get started, we need to import the packages we’ll be using.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Importing necessary libraries</span>
+<span class="kn">import</span> <span class="nn">os</span>  <span class="c1"># For handling file paths and directories</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>  <span class="c1"># For plotting data</span>
+
+<span class="c1"># Importing specific functions from the particula package for data loading</span>
+<span class="c1"># and handling</span>
+<span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">loader</span><span class="p">,</span> <span class="n">loader_interface</span><span class="p">,</span> <span class="n">settings_generator</span>
+<span class="kn">from</span> <span class="nn">particula.data.tests.example_data.get_example_data</span> <span class="kn">import</span> <span class="n">get_data_folder</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setting up the path for data files</span>
+<span class="kn">import</span> <span class="nn">os</span>  <span class="c1"># Re-importing os for clarity</span>
+<span class="kn">from</span> <span class="nn">particula.data.tests.example_data.get_example_data</span> <span class="kn">import</span> <span class="n">get_data_folder</span>
+
+<span class="n">current_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>  <span class="c1"># Getting the current working directory</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Current path for this script:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">current_path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;particula&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># Displaying the current path</span>
+
+<span class="n">path</span> <span class="o">=</span> <span class="n">get_data_folder</span><span class="p">()</span>  <span class="c1"># Getting the example data folder path</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path to data folder:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;particula&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># Displaying the data folder path</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Current path for this script:
+/docs/examples/streamlake
+Path to data folder:
+/data/tests/example_data
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="loading-the-data">
+<h2>Loading the Data<a class="headerlink" href="#loading-the-data" title="Link to this heading">#</a></h2>
+<p>With the working directory set, we’re ready to load the data. For this task, we’ll use the <code class="docutils literal notranslate"><span class="pre">loader</span></code> module from the <code class="docutils literal notranslate"><span class="pre">particula</span></code> package. The <code class="docutils literal notranslate"><span class="pre">loader.data_raw_loader()</span></code> function allows us to easily load data files by providing the file path. This simplifies the initial step of any data analysis process, especially for those new to Python.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">,</span>
+    <span class="s1">&#39;CPC_3010_data&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CPC_3010_data_20220709_Jul.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># load the data</span>
+<span class="n">raw_data</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">data_raw_loader</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+
+<span class="c1"># print the first 2 rows</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">raw_data</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;1657342801,32660,17.1,&#39;, &#39;1,0.017&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="clean-up-data">
+<h2>Clean Up Data<a class="headerlink" href="#clean-up-data" title="Link to this heading">#</a></h2>
+<p>To facilitate data cleaning, we utilize <code class="docutils literal notranslate"><span class="pre">loader.data_format_checks</span></code>. This function performs a series of checks on the data, ensuring it meets specified criteria. The checks include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">characters</span></code>: Validates the minimum and maximum number of characters in each data line, ensuring data integrity and uniformity.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">char_counts</span></code>: Counts the occurrences of specific characters in each line. This is defined in a dictionary, with characters as keys and their expected counts as values.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">skip_rows</span></code>: Specifies the number of rows to skip at the beginning of the file, useful for bypassing headers or non-data lines.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">skip_end</span></code>: Determines the number of rows to omit at the end of the file, often used to avoid reading summary or footer information.</p></li>
+</ul>
+<p>After performing these checks, the function returns a list of data that has passed all the criteria. This cleaned data is then ready for further analysis or processing.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Printing the length of raw_data before cleaning</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;raw_data length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Cleaning the data using loader.data_format_checks</span>
+<span class="c1"># This function checks for:</span>
+<span class="c1"># - characters: Ensures each line has between 10 and 100 characters</span>
+<span class="c1"># - char_counts: Checks that each line contains 4 commas (this is customizable)</span>
+<span class="c1"># - skip_rows: Number of rows to skip at the start (none in this case)</span>
+<span class="c1"># - skip_end: Number of rows to skip at the end (none in this case)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">data_format_checks</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">raw_data</span><span class="p">,</span>
+    <span class="n">data_checks</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+        <span class="s2">&quot;char_counts&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;,&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>  <span class="c1"># this can be anything, e.g., &quot;adsf&quot;: 10</span>
+        <span class="s2">&quot;skip_rows&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;skip_end&quot;</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># Printing the length of data after cleaning</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Calculating and printing the number of lines removed during the cleaning</span>
+<span class="c1"># process</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;There was </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2"> lines removed from the data&quot;</span><span class="p">)</span>
+
+<span class="c1"># Note: The data cleaning is performed by the general_data_formatter function for timeseries data.</span>
+<span class="c1"># If dealing with 2D data, a separate function is used for cleaning.</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>raw_data length: 33280
+data length: 33254
+There was 26 lines removed from the data
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="data-and-time">
+<h2>Data and Time<a class="headerlink" href="#data-and-time" title="Link to this heading">#</a></h2>
+<p>Once the data is cleaned, the next crucial step is extracting and standardizing the time and data columns. This process is particularly important because time data can come in many formats, and standardizing it to a single format, like epoch time, facilitates analysis and comparison. Epoch time, also known as Unix time, is a system for describing points in time as the number of seconds elapsed since January 1, 1970. It’s a widely used standard in computing and data processing.</p>
+<p>To handle the conversion and extraction of time and data, we use the <code class="docutils literal notranslate"><span class="pre">loader.sample_data()</span></code> function. This function is designed to:</p>
+<ol class="arabic simple">
+<li><p><strong>Identify and Extract Time Data</strong>: It locates the time information within the dataset, which can be in various formats such as ISO 8601, DD/MM/YYYY, MM/DD/YYYY, etc.</p></li>
+<li><p><strong>Convert to Epoch Time</strong>: It standardizes the extracted time data to epoch time. This conversion is crucial because epoch time provides a consistent reference for time data, making it easier to perform time-based calculations and comparisons.</p></li>
+<li><p><strong>Separate Data Columns</strong>: Along with time data, it also segregates other data columns for further analysis.</p></li>
+</ol>
+<p>By using <code class="docutils literal notranslate"><span class="pre">loader.sample_data()</span></code> to convert various time formats to epoch time and separate the data columns, we effectively prepare our dataset for robust and error-free analysis. This approach is essential in research and data science, where dealing with multiple time formats is a common challenge.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sample the data to get the epoch times and the data</span>
+<span class="n">epoch_time</span><span class="p">,</span> <span class="n">data_array</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">sample_data</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+    <span class="n">time_column</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="c1"># Indicate the column(s) that contain time data.</span>
+                      <span class="c1"># For instance, if time data spans multiple columns,</span>
+                      <span class="c1"># list them here, like [0, 2] for columns 0 and 2.</span>
+    <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;epoch&quot;</span><span class="p">,</span>  <span class="c1"># Define the format of the time data.</span>
+                          <span class="c1"># Use &quot;epoch&quot; for epoch time, or specify another format</span>
+                          <span class="c1"># compatible with datetime.strptime(), such as</span>
+                          <span class="c1"># &quot;%m/%d/%Y %I:%M:%S %p&quot;.</span>
+    <span class="c1"># Specify columns that contain the actual data for analysis.</span>
+    <span class="n">data_columns</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="c1"># Indicate the delimiter used in the data (e.g., comma for CSV files).</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Printing the shape and first few entries of the epoch time array</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;epoch_time shape: </span><span class="si">{</span><span class="n">epoch_time</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 5 epoch times:&quot;</span><span class="p">,</span> <span class="n">epoch_time</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+
+<span class="c1"># Printing the shape and first few entries of the data array</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data_array shape: </span><span class="si">{</span><span class="n">data_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First 5 data entries:&quot;</span><span class="p">,</span> <span class="n">data_array</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>epoch_time shape: (33254,)
+First 5 epoch times: [1.65734280e+09 1.65734281e+09 1.65734281e+09 1.65734281e+09
+ 1.65734282e+09]
+data_array shape: (33254, 2)
+First 5 data entries: [[3.3510e+04 1.7000e+01]
+ [3.3465e+04 1.7100e+01]
+ [3.2171e+04 1.7000e+01]
+ [3.2889e+04 1.6800e+01]
+ [3.2706e+04 1.7000e+01]]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="pause-to-plot-verifying-data-integrity">
+<h2>Pause to Plot: Verifying Data Integrity<a class="headerlink" href="#pause-to-plot-verifying-data-integrity" title="Link to this heading">#</a></h2>
+<p>After successfully importing the data and converting time information, it’s crucial to pause and visually inspect our dataset. Plotting the data serves as an essential checkpoint to verify that the import process has been executed correctly. This step is vital for several reasons:</p>
+<ol class="arabic simple">
+<li><p><strong>Data Integrity Check</strong>: Visualizing the data helps in quickly identifying any anomalies or irregularities that might indicate issues in the data import or cleaning processes.</p></li>
+<li><p><strong>Understanding Data Structure</strong>: A plot can provide immediate insights into the nature and structure of the dataset, such as trends, patterns, and outliers.</p></li>
+<li><p><strong>Ensuring Accuracy</strong>: Before proceeding to more complex analyses or modeling, confirming the accuracy of the data through visualization is a fundamental best practice.</p></li>
+</ol>
+<p>In this section, we will create a simple plot to examine our time series data, ensuring that the time conversion and data import have been performed correctly.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Creating a figure and axis for the plot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="c1"># Plotting the data</span>
+<span class="c1"># `epoch_time` on the x-axis and the first column of `data_array` on the y-axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epoch_time</span><span class="p">,</span>
+        <span class="n">data_array</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># Selecting the first column of data_array</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;data column 1&quot;</span><span class="p">,</span>  <span class="c1"># Label for this data series</span>
+        <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>  <span class="c1"># No line connecting the data points</span>
+        <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>  <span class="c1"># Style of the data points; here, it&#39;s a dot</span>
+
+<span class="c1"># Setting the x-axis label to &quot;Time (epoch)&quot;</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (epoch)&quot;</span><span class="p">)</span>
+
+<span class="c1"># Setting the y-axis label to &quot;Data&quot;</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Data&quot;</span><span class="p">)</span>
+
+<span class="c1"># Adding a legend to the plot, which helps identify the data series</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="c1"># Displaying the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Adjusting the layout to make sure everything fits well within the figure</span>
+<span class="c1"># This is particularly useful for ensuring labels and titles are not cut off</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/f5098565ce09040520d7274fc4a926d8562560ec35c2def31793799ed889a917.png" src="../../_images/f5098565ce09040520d7274fc4a926d8562560ec35c2def31793799ed889a917.png" />
+</div>
+</div>
+</section>
+<section id="stream-object-streamlining-your-analysis">
+<h2>Stream Object: Streamlining Your Analysis<a class="headerlink" href="#stream-object-streamlining-your-analysis" title="Link to this heading">#</a></h2>
+<p>Once you have the cleaned and formatted data, you might find yourself repeatedly using the same code to analyze different datasets. To avoid the tedium of copying and pasting the same code, we can utilize the <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object provided by the <code class="docutils literal notranslate"><span class="pre">loader</span></code> module. The <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object allows for more automated and efficient analysis, significantly simplifying repetitive tasks.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object requires a settings dictionary that encapsulates all necessary parameters for data loading. Below, we’ll explore how to create this settings dictionary and use it to initialize a <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object.</p>
+<section id="settings-dictionary-centralizing-data-loading-parameters">
+<h3>Settings Dictionary: Centralizing Data Loading Parameters<a class="headerlink" href="#settings-dictionary-centralizing-data-loading-parameters" title="Link to this heading">#</a></h3>
+<p>The settings dictionary is a crucial component in the data loading process. It consolidates all the necessary settings for loading your data into a single, easily manageable structure. This includes parameters for data checks, specification of time and data columns, as well as the time format.</p>
+<p>There are two primary methods to generate this settings dictionary:</p>
+<ol class="arabic simple">
+<li><p><strong>Using <code class="docutils literal notranslate"><span class="pre">settings_generator</span></code> Module</strong>: This approach involves calling the <code class="docutils literal notranslate"><span class="pre">for_1d_general_file()</span></code> function from the <code class="docutils literal notranslate"><span class="pre">settings_generator</span></code> module. You can specify your desired settings as arguments to this function, which then returns a ready-to-use settings dictionary.</p></li>
+<li><p><strong>Manual Creation</strong>: Alternatively, you can manually construct the settings dictionary. This might involve writing the dictionary from scratch or modifying one generated by the <code class="docutils literal notranslate"><span class="pre">settings_generator</span></code> module. Manual creation offers more flexibility and is particularly useful if your data loading requirements are unique or complex.</p></li>
+</ol>
+<p>In the next steps, we will demonstrate how to use the settings dictionary for loading data into a <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using the settings_generator module to generate the settings dictionary</span>
+<span class="c1"># for data loading</span>
+
+<span class="c1"># Importing the necessary modules (repeating the import from above for clarity)</span>
+<span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">settings_generator</span>
+
+<span class="c1"># Generating the settings dictionary with specified parameters</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">settings_generator</span><span class="o">.</span><span class="n">for_general_1d_load</span><span class="p">(</span>
+    <span class="c1"># The folder where the data files are located</span>
+    <span class="n">relative_data_folder</span><span class="o">=</span><span class="s1">&#39;CPC_3010_data&#39;</span><span class="p">,</span>
+    <span class="c1"># Pattern to match the filenames (e.g., all CSV files)</span>
+    <span class="n">filename_regex</span><span class="o">=</span><span class="s1">&#39;*.csv&#39;</span><span class="p">,</span>
+    <span class="n">file_min_size_bytes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>  <span class="c1"># Minimum file size in bytes to be considered for loading</span>
+    <span class="n">data_checks</span><span class="o">=</span><span class="p">{</span>
+        <span class="c1"># Range of characters count per line (min, max)</span>
+        <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+        <span class="c1"># Number of times a character (e.g., comma) should appear in each line</span>
+        <span class="s2">&quot;char_counts&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;,&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+        <span class="s2">&quot;skip_rows&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Number of rows to skip at the beginning of the file</span>
+        <span class="s2">&quot;skip_end&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Number of rows to skip at the end of the file</span>
+    <span class="p">},</span>
+    <span class="n">data_column</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>  <span class="c1"># Columns in the file that contain the data</span>
+    <span class="n">data_header</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;data 1&#39;</span><span class="p">,</span> <span class="s1">&#39;data 2&#39;</span><span class="p">],</span>  <span class="c1"># Headers for the data columns</span>
+    <span class="n">time_column</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="c1"># Column in the file that contains the time data</span>
+    <span class="c1"># Format of the time data (epoch, &quot;%m/%d/%Y %H:%M:%S&quot; etc.)</span>
+    <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;epoch&#39;</span><span class="p">,</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span>  <span class="c1"># Delimiter used in the data file (e.g., comma for CSV)</span>
+    <span class="n">time_shift_seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># Shift in time data if needed, in seconds</span>
+    <span class="n">timezone_identifier</span><span class="o">=</span><span class="s1">&#39;UTC&#39;</span><span class="p">,</span>  <span class="c1"># Timezone identifier for the time data</span>
+<span class="p">)</span>
+
+<span class="c1"># Printing the generated settings dictionary to verify its contents</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Settings dictionary:&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Settings dictionary:
+relative_data_folder: CPC_3010_data
+filename_regex: *.csv
+MIN_SIZE_BYTES: 10
+data_loading_function: general_1d_load
+header_row: 0
+data_checks: {&#39;characters&#39;: [10, 100], &#39;char_counts&#39;: {&#39;,&#39;: 4}, &#39;skip_rows&#39;: 0, &#39;skip_end&#39;: 0}
+data_column: [1, 2]
+data_header: [&#39;data 1&#39;, &#39;data 2&#39;]
+time_column: [0]
+time_format: epoch
+delimiter: ,
+time_shift_seconds: 0
+timezone_identifier: UTC
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="load-the-data-with-the-interface">
+<h2>Load the Data with the Interface<a class="headerlink" href="#load-the-data-with-the-interface" title="Link to this heading">#</a></h2>
+<p>With our settings dictionary in hand, we can now streamline the data loading process using a specialized interface. This interface acts as a bridge between our predefined settings and the actual data loading steps. It essentially automates the sequence of actions we performed manually earlier, like data cleaning and formatting, based on the parameters specified in the settings dictionary.</p>
+<p>By utilizing this interface, we can efficiently load our data with a few lines of code, ensuring consistency and accuracy. This approach is particularly beneficial when dealing with multiple datasets or when needing to replicate the same data processing steps in different projects.</p>
+<p>The interface function we’ll use is designed to accept the settings dictionary and the location of the data. It then internally calls the necessary functions to execute the data loading process. This includes:</p>
+<ul class="simple">
+<li><p>Reading the data files based on the specified filename patterns and folder locations.</p></li>
+<li><p>Performing data checks and cleaning as defined in the settings.</p></li>
+<li><p>Extracting and formatting time and data columns according to our requirements.</p></li>
+</ul>
+<p>This method significantly simplifies the data loading process, reducing the potential for errors and increasing efficiency.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Importing the loader interface from the particula package</span>
+<span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">loader_interface</span>
+<span class="kn">from</span> <span class="nn">particula.data.tests.example_data.get_example_data</span> <span class="kn">import</span> <span class="n">get_data_folder</span>
+
+<span class="c1"># Getting the working path where the data files are located</span>
+<span class="n">working_path</span> <span class="o">=</span> <span class="n">get_data_folder</span><span class="p">()</span>
+
+<span class="c1"># Defining the settings for loading CPC 3010 data</span>
+<span class="c1"># These settings were previously generated or can be created manually</span>
+<span class="n">cpc_settings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># Folder name containing the data files</span>
+    <span class="s1">&#39;relative_data_folder&#39;</span><span class="p">:</span> <span class="s1">&#39;CPC_3010_data&#39;</span><span class="p">,</span>
+    <span class="c1"># Pattern to match filenames (e.g., all CSV files)</span>
+    <span class="s1">&#39;filename_regex&#39;</span><span class="p">:</span> <span class="s1">&#39;*.csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MIN_SIZE_BYTES&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>  <span class="c1"># Minimum file size in bytes for a file to be considered</span>
+    <span class="c1"># Function to be used for loading the data</span>
+    <span class="s1">&#39;data_loading_function&#39;</span><span class="p">:</span> <span class="s1">&#39;general_1d_load&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;header_row&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Row number of the header in the data file</span>
+    <span class="s1">&#39;data_checks&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1"># Range of character count per line (min, max)</span>
+        <span class="s1">&#39;characters&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+        <span class="c1"># Number of times a character (comma) should appear in each line</span>
+        <span class="s1">&#39;char_counts&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;,&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+        <span class="s1">&#39;skip_rows&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Number of rows to skip at the beginning of the file</span>
+        <span class="s1">&#39;skip_end&#39;</span><span class="p">:</span> <span class="mi">0</span>  <span class="c1"># Number of rows to skip at the end of the file</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;data_column&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>  <span class="c1"># Columns in the file that contain the data</span>
+    <span class="s1">&#39;data_header&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;data 1&#39;</span><span class="p">,</span> <span class="s1">&#39;data 2&#39;</span><span class="p">],</span>  <span class="c1"># Headers for the data columns</span>
+    <span class="s1">&#39;time_column&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="c1"># Column in the file that contains the time data</span>
+    <span class="s1">&#39;time_format&#39;</span><span class="p">:</span> <span class="s1">&#39;epoch&#39;</span><span class="p">,</span>  <span class="c1"># Format of the time data (epoch, ISO 8601, etc.)</span>
+    <span class="s1">&#39;delimiter&#39;</span><span class="p">:</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span>  <span class="c1"># Delimiter used in the data file (e.g., comma for CSV)</span>
+    <span class="s1">&#39;time_shift_seconds&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># Shift in time data if needed, in seconds</span>
+    <span class="s1">&#39;timezone_identifier&#39;</span><span class="p">:</span> <span class="s1">&#39;UTC&#39;</span>  <span class="c1"># Timezone identifier for the time data</span>
+<span class="p">}</span>
+
+<span class="c1"># Now call the loader interface to load the data using the specified settings</span>
+<span class="n">data_stream</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">working_path</span><span class="p">,</span>  <span class="c1"># Path to the data folder</span>
+    <span class="n">settings</span><span class="o">=</span><span class="n">cpc_settings</span><span class="p">,</span>  <span class="c1"># Settings defined above</span>
+<span class="p">)</span>
+
+<span class="c1"># The data_stream object now contains the loaded and formatted data ready</span>
+<span class="c1"># for analysis</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: CPC_3010_data_20220710_Jul.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: CPC_3010_data_20220709_Jul.csv
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="exploring-the-stream-class-in-particula">
+<h1>Exploring the Stream Class in Particula<a class="headerlink" href="#exploring-the-stream-class-in-particula" title="Link to this heading">#</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">Stream</span></code> class in the Particula package is a sophisticated tool for data management, akin to a well-organized filing cabinet for your data. Let’s dive into its features and functionalities to understand how it can streamline your data analysis tasks.</p>
+<section id="key-features-of-the-stream-class">
+<h2>Key Features of the Stream Class<a class="headerlink" href="#key-features-of-the-stream-class" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Header</strong>: Just as labels on filing cabinet drawers help you identify contents, the <code class="docutils literal notranslate"><span class="pre">header</span></code> in <code class="docutils literal notranslate"><span class="pre">Stream</span></code> serves a similar purpose. It’s a list of strings that represent the column names of your data, guiding you to understand what each column in your dataset signifies.</p></li>
+<li><p><strong>Data</strong>: Imagine each drawer in a filing cabinet filled with files; <code class="docutils literal notranslate"><span class="pre">data</span></code> in <code class="docutils literal notranslate"><span class="pre">Stream</span></code> is akin to this. It’s a numpy array containing your dataset, neatly organized where each row represents a point in time and each column corresponds to one of the headers.</p></li>
+<li><p><strong>Time</strong>: Like time tags on files that show when they were recorded, the <code class="docutils literal notranslate"><span class="pre">time</span></code> attribute in <code class="docutils literal notranslate"><span class="pre">Stream</span></code> keeps a chronological record of each data entry. It’s a numpy array that represents the time dimension of your data, correlating each row in the <code class="docutils literal notranslate"><span class="pre">data</span></code> array with a specific moment.</p></li>
+<li><p><strong>Files</strong>: Similar to having a list that tells you about all the folders inside a filing cabinet, <code class="docutils literal notranslate"><span class="pre">files</span></code> in <code class="docutils literal notranslate"><span class="pre">Stream</span></code> reveals the names of all the data files that comprise your data stream. This list of strings provides a clear trace back to the original data sources.</p></li>
+</ul>
+</section>
+<section id="functionalities-and-tools">
+<h2>Functionalities and Tools<a class="headerlink" href="#functionalities-and-tools" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>validate_inputs</strong>: This function acts like a checklist ensuring all your files are correctly formatted before being placed in the cabinet. In <code class="docutils literal notranslate"><span class="pre">Stream</span></code>, it checks the validity of header, data, and time inputs, ensuring everything is in order for smooth data handling.</p></li>
+<li><p><strong>datetime64</strong>: Think of it as a tool that standardizes the dates and times on your documents into a uniform format (datetime64), making them easier to understand and use, particularly for plotting and time-based operations.</p></li>
+<li><p><strong>return_header_dict</strong>: It’s like having a quick reference guide in your filing cabinet, telling you exactly where to find data corresponding to each label (header). In <code class="docutils literal notranslate"><span class="pre">Stream</span></code>, it offers a dictionary mapping header elements to their indices in the data array, simplifying data access.</p></li>
+</ul>
+</section>
+<section id="practical-application">
+<h2>Practical Application<a class="headerlink" href="#practical-application" title="Link to this heading">#</a></h2>
+<p>For beginners and experienced users alike, the Stream class in Particula package is your organized, efficient data manager. It takes the complexity out of data handling, allowing you to focus more on insightful analysis and less on the intricacies of data organization.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example 1: Print the Headers of the Data Stream</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Headers of the Data Stream:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_stream</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+
+<span class="c1"># Example 2: Display the First Few Rows of Data</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">First 5 Rows of Data:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_stream</span><span class="o">.</span><span class="n">data</span><span class="p">[:</span><span class="mi">5</span><span class="p">,</span> <span class="p">:])</span>
+
+<span class="c1"># Example 3: Print the Time Stamps Associated with the First Few Data Entries</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Time Stamps for the First 5 Data Entries:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_stream</span><span class="o">.</span><span class="n">time</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+
+<span class="c1"># Example 4: Retrieve and Print Data from a Specific Column using Header Name</span>
+<span class="n">column_name</span> <span class="o">=</span> <span class="s1">&#39;data 1&#39;</span>  <span class="c1"># Replace with an actual column name from your header</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">5 Entries from data Column &#39;</span><span class="si">{</span><span class="n">column_name</span><span class="si">}</span><span class="s2">&#39;:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_stream</span><span class="p">[</span><span class="n">column_name</span><span class="p">][:</span><span class="mi">5</span><span class="p">])</span>
+
+<span class="c1"># Example 5: Print the Length of the Time Stream (Number of Data Entries)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Number of Data Entries in the Time Stream:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_stream</span><span class="p">))</span>
+
+<span class="c1"># Example 6: Convert Time to datetime64 and Print the First Few Entries</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">First 5 Time Entries in datetime64 Format:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_stream</span><span class="o">.</span><span class="n">datetime64</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+
+<span class="c1"># Example 7: Print the Names of the Source Files</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Names of the Source Files for the Data Stream:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data_stream</span><span class="o">.</span><span class="n">files</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Headers of the Data Stream:
+[&#39;data 1&#39;, &#39;data 2&#39;]
+
+First 5 Rows of Data:
+[[3.3510e+04 1.7000e+01]
+ [3.3465e+04 1.7100e+01]
+ [3.2171e+04 1.7000e+01]
+ [3.2889e+04 1.6800e+01]
+ [3.2706e+04 1.7000e+01]]
+
+Time Stamps for the First 5 Data Entries:
+[1.65734280e+09 1.65734281e+09 1.65734281e+09 1.65734281e+09
+ 1.65734282e+09]
+
+5 Entries from data Column &#39;data 1&#39;:
+[33510. 33465. 32171. 32889. 32706.]
+
+Number of Data Entries in the Time Stream:
+68551
+
+First 5 Time Entries in datetime64 Format:
+[&#39;2022-07-09T05:00:04&#39; &#39;2022-07-09T05:00:07&#39; &#39;2022-07-09T05:00:10&#39;
+ &#39;2022-07-09T05:00:13&#39; &#39;2022-07-09T05:00:16&#39;]
+
+Names of the Source Files for the Data Stream:
+[[&#39;CPC_3010_data_20220710_Jul.csv&#39;, 1078191], [&#39;CPC_3010_data_20220709_Jul.csv&#39;, 1011254]]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="plotting-data-using-the-stream-object">
+<h1>Plotting Data Using the Stream Object<a class="headerlink" href="#plotting-data-using-the-stream-object" title="Link to this heading">#</a></h1>
+<p>Visualizing your data is a crucial step in understanding its patterns and behavior. With the <code class="docutils literal notranslate"><span class="pre">data_stream</span></code> object from the Particula package, plotting time-series data becomes straightforward and efficient. Here’s how you can use <code class="docutils literal notranslate"><span class="pre">data_stream</span></code> for plotting:</p>
+<ol class="arabic simple">
+<li><p><strong>Preparing the Plot</strong>: Start by creating a figure and an axis using <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>’s <code class="docutils literal notranslate"><span class="pre">plt.subplots()</span></code>. This sets up the canvas on which you’ll draw your plot.</p></li>
+<li><p><strong>Plotting Time-Series Data</strong>:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">data_stream.datetime64</span></code> provides time data in a format that is ideal for plotting on the x-axis.</p></li>
+<li><p>Since <code class="docutils literal notranslate"><span class="pre">data_stream.data</span></code> is a 2D array (where rows correspond to time and columns to different data types), you need to specify which column you want to plot. For example, <code class="docutils literal notranslate"><span class="pre">data_stream.data[:,</span> <span class="pre">0]</span></code> plots the first column of data.</p></li>
+</ul>
+</li>
+<li><p><strong>Customizing the Plot</strong>:</p>
+<ul class="simple">
+<li><p>Add labels to your plot for clarity. The <code class="docutils literal notranslate"><span class="pre">label</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">ax.plot</span></code> function can be used to name the data series being plotted.</p></li>
+<li><p>Customize the appearance of your plot. In this example, we use <code class="docutils literal notranslate"><span class="pre">linestyle=&quot;none&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">marker=&quot;.&quot;</span></code> to plot individual data points without connecting lines.</p></li>
+</ul>
+</li>
+<li><p><strong>Adjusting Axes and Display</strong>:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">plt.tick_params</span></code> function allows you to rotate the x-axis labels, making them easier to read, especially for densely plotted data.</p></li>
+<li><p>Set the x-axis and y-axis labels using <code class="docutils literal notranslate"><span class="pre">ax.set_xlabel</span></code> and <code class="docutils literal notranslate"><span class="pre">ax.set_ylabel</span></code> to provide context to your plot.</p></li>
+</ul>
+</li>
+<li><p><strong>Final Touches</strong>:</p>
+<ul class="simple">
+<li><p>Include a legend by calling <code class="docutils literal notranslate"><span class="pre">ax.legend()</span></code>. This is particularly useful when plotting multiple data series.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">plt.show()</span></code> to display the plot.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">fig.tight_layout()</span></code> ensures that the layout of the plot is adjusted so that all elements (like labels and titles) are clearly visible.</p></li>
+</ul>
+</li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Importing the matplotlib library for plotting</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Creating a new figure and axis for the plot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="c1"># Plotting data from the data_stream object</span>
+<span class="c1"># data_stream.datetime64 is used for the x-axis (time data)</span>
+<span class="c1"># data_stream.data[:, 0] selects the first column of data for the y-axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_stream</span><span class="o">.</span><span class="n">datetime64</span><span class="p">,</span>
+        <span class="n">data_stream</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># Selecting the first column of data</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;data column 1&quot;</span><span class="p">,</span>  <span class="c1"># Label for the plotted data series</span>
+        <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>  <span class="c1"># No line connecting the data points</span>
+        <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>  <span class="c1"># Style of the data points; here, it&#39;s a dot</span>
+
+<span class="c1"># Adjusting the x-axis labels for better readability</span>
+<span class="c1"># Rotating the labels by -35 degrees</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">rotation</span><span class="o">=-</span><span class="mi">35</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+
+<span class="c1"># Setting the labels for the x-axis and y-axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (UTC)&quot;</span><span class="p">)</span>  <span class="c1"># Label for the x-axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Data&quot;</span><span class="p">)</span>  <span class="c1"># Label for the y-axis</span>
+
+<span class="c1"># Adding a legend to the plot</span>
+<span class="c1"># This helps in identifying the data series</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="c1"># Displaying the plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Adjusting the layout of the plot</span>
+<span class="c1"># Ensures that all elements of the plot are nicely fitted within the figure</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/e32c75a0f35c7a5cf974033328841ee04f5b94b231c83fe4023666e19f3dcf0d.png" src="../../_images/e32c75a0f35c7a5cf974033328841ee04f5b94b231c83fe4023666e19f3dcf0d.png" />
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="summary">
+<h1>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h1>
+<p>In this section, we explored a comprehensive approach to handling data using the functionalities provided by the Particula package. Key takeaways include:</p>
+<ol class="arabic simple">
+<li><p><strong>Data Loading and Cleaning</strong>: We began by loading data from files, emphasizing the importance of automating the cleaning process. This step involved removing errors, handling missing values, and ensuring the data is in a consistent format, which is crucial for accurate analysis.</p></li>
+<li><p><strong>Using the Settings Dictionary</strong>: A significant part of the process was the creation of a settings dictionary. This dictionary serves as a blueprint for the data loading process, specifying parameters like data checks, column information, and time formatting. This approach is particularly effective when working with large datasets or needing to replicate data processing steps across various projects.</p></li>
+<li><p><strong>Streamlining with the Stream Object</strong>: We introduced the <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object, a powerful tool for organizing and processing data streams. The <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object allows for efficient data manipulation, storage, and retrieval, making it an invaluable resource for handling complex or voluminous datasets.</p></li>
+<li><p><strong>Simplifying Repetitive Tasks</strong>: By automating data loading and cleaning through the <code class="docutils literal notranslate"><span class="pre">Stream</span></code> object and settings dictionary, we significantly reduced the redundancy of repetitive tasks. This method proves beneficial in projects where data from multiple files needs to be loaded and combined into a single, manageable unit.</p></li>
+<li><p><strong>Visualization and Analysis</strong>: Finally, we demonstrated how to plot the data using <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>, a crucial step for visually inspecting the data and ensuring its integrity post-import. This visual check is vital for confirming that the import process has been executed correctly and the data is ready for further analysis.</p></li>
+</ol>
+<p>In conclusion, this section provided a solid foundation for efficiently managing and processing data in Python, setting the stage for more advanced analysis and applications in future sections.</p>
+<section id="bonus-utilizing-python-s-help-function">
+<h2>Bonus: Utilizing Python’s Help Function<a class="headerlink" href="#bonus-utilizing-python-s-help-function" title="Link to this heading">#</a></h2>
+<p>One of Python’s most useful built-in functions for learners and developers alike is the <code class="docutils literal notranslate"><span class="pre">help</span></code> function. It provides detailed information about objects, functions, modules, and more, directly within your Python environment. This can be particularly helpful when exploring new libraries or understanding the functionalities of different components in your code.</p>
+<section id="how-to-use-the-help-function">
+<h3>How to Use the Help Function<a class="headerlink" href="#how-to-use-the-help-function" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">help</span></code> function can be invoked directly in your Python code or interactive session. Simply pass the object or function you’re curious about as an argument to <code class="docutils literal notranslate"><span class="pre">help()</span></code>, and it will display documentation including descriptions, available methods, attributes, and other relevant details.</p>
+<p>For example, to learn more about the <code class="docutils literal notranslate"><span class="pre">data_stream</span></code> object we’ve been working with, you can use:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">data_stream</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This command will display information about the Stream class, including its methods, attributes, and how to use them.</p>
+</section>
+<section id="applying-help-to-explore-functionality">
+<h3>Applying Help to Explore Functionality<a class="headerlink" href="#applying-help-to-explore-functionality" title="Link to this heading">#</a></h3>
+<p>You can use help with any object or function in Python. For instance, if you want to understand more about a function from the Particula package or even a built-in Python function, simply pass it to help(). Here’s how you can use it:</p>
+<p>To explore a module: help(particula)
+To learn about a specific function: help(particula.some_function)
+To understand an object you created: help(my_object)
+Enhancing Learning and Troubleshooting
+Using the help function is an excellent habit to develop. It enhances your learning process by providing immediate access to documentation. It’s also a valuable tool for troubleshooting and understanding the functionalities of different components in your code.</p>
+<p>Remember, the help function is always there to assist you, making it a bit easier to navigate the extensive world of Python programming.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># call help on data_stream to see the available methods</span>
+<span class="n">help</span><span class="p">(</span><span class="n">data_stream</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on Stream in module particula.data.stream object:
+
+class Stream(builtins.object)
+ |  Stream(header: List[str] = &lt;factory&gt;, data: numpy.ndarray = &lt;factory&gt;, time: numpy.ndarray = &lt;factory&gt;, files: List[str] = &lt;factory&gt;) -&gt; None
+ |  
+ |  A class for consistent data storage and format.
+ |  
+ |  Attributes:
+ |  ---------
+ |  header : List[str]
+ |      A list of strings representing the header of the data stream.
+ |  data : np.ndarray
+ |      A numpy array representing the data stream. The first dimension
+ |      represents time and the second dimension represents the header.
+ |  time : np.ndarray
+ |      A numpy array representing the time stream.
+ |  files : List[str]
+ |      A list of strings representing the files containing the data stream.
+ |  
+ |  Methods:
+ |  -------
+ |  validate_inputs
+ |      Validates the inputs to the Stream class.
+ |  datetime64 -&gt; np.ndarray
+ |      Returns an array of datetime64 objects representing the time stream.
+ |      Useful for plotting, with matplotlib.dates.
+ |  return_header_dict -&gt; dict
+ |      Returns the header as a dictionary with keys as header elements and
+ |      values as their indices.
+ |  
+ |  Methods defined here:
+ |  
+ |  __eq__(self, other)
+ |      Return self==value.
+ |  
+ |  __getitem__(self, index: Union[int, str])
+ |      Allows for indexing of the data stream.
+ |      Args:
+ |      ----------
+ |      index : int or str
+ |          The index of the data stream to return.
+ |      Returns:
+ |      -------
+ |      np.ndarray
+ |          The data stream at the specified index.
+ |  
+ |  __init__(self, header: List[str] = &lt;factory&gt;, data: numpy.ndarray = &lt;factory&gt;, time: numpy.ndarray = &lt;factory&gt;, files: List[str] = &lt;factory&gt;) -&gt; None
+ |      Initialize self.  See help(type(self)) for accurate signature.
+ |  
+ |  __len__(self)
+ |      Returns the length of the time stream.
+ |  
+ |  __post_init__(self)
+ |  
+ |  __repr__(self)
+ |      Return repr(self).
+ |  
+ |  __setitem__(self, index: Union[int, str], value)
+ |      Allows for setting or adding of a row of data in the stream.
+ |      Args:
+ |      index : The index of the data stream to set.
+ |      value : The data to set at the specified index.
+ |      
+ |      future work maybe add a list option and iterate through the list
+ |  
+ |  validate_inputs(self)
+ |      Validates the inputs for the DataStream object.
+ |      Raises:
+ |          TypeError: If header is not a list.
+ |      # this might be why I can&#39;t call Stream without inputs
+ |  
+ |  ----------------------------------------------------------------------
+ |  Readonly properties defined here:
+ |  
+ |  datetime64
+ |      Returns an array of datetime64 objects representing the time stream.
+ |      Useful for plotting, with matplotlib.dates.
+ |  
+ |  header_dict
+ |      Returns the header as a dictionary with index (0, 1) as the keys
+ |      and the names as values.
+ |  
+ |  header_float
+ |      Returns the header as a numpy array of floats.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |  
+ |  __dict__
+ |      dictionary for instance variables
+ |  
+ |  __weakref__
+ |      list of weak references to the object
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes defined here:
+ |  
+ |  __annotations__ = {&#39;data&#39;: &lt;class &#39;numpy.ndarray&#39;&gt;, &#39;files&#39;: typing.Li...
+ |  
+ |  __dataclass_fields__ = {&#39;data&#39;: Field(name=&#39;data&#39;,type=&lt;class &#39;numpy.n...
+ |  
+ |  __dataclass_params__ = _DataclassParams(init=True,repr=True,eq=True,or...
+ |  
+ |  __hash__ = None
+ |  
+ |  __match_args__ = (&#39;header&#39;, &#39;data&#39;, &#39;time&#39;, &#39;files&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "uncscode/particula",
+            ref: "v0.0.10",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./examples/streamlake"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="particula_data.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Data in Particula</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="loading_data_part2.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Loading Part 2: Sizer Data</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Part 1: Into &amp; 1D Data</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-the-working-path">Setting the Working Path</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#importing-packages">Importing Packages</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-the-data">Loading the Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clean-up-data">Clean Up Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-and-time">Data and Time</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pause-to-plot-verifying-data-integrity">Pause to Plot: Verifying Data Integrity</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stream-object-streamlining-your-analysis">Stream Object: Streamlining Your Analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#settings-dictionary-centralizing-data-loading-parameters">Settings Dictionary: Centralizing Data Loading Parameters</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-data-with-the-interface">Load the Data with the Interface</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#exploring-the-stream-class-in-particula">Exploring the Stream Class in Particula</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-features-of-the-stream-class">Key Features of the Stream Class</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functionalities-and-tools">Functionalities and Tools</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-application">Practical Application</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-data-using-the-stream-object">Plotting Data Using the Stream Object</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bonus-utilizing-python-s-help-function">Bonus: Utilizing Python’s Help Function</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-use-the-help-function">How to Use the Help Function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-help-to-explore-functionality">Applying Help to Explore Functionality</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By particula contributors
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

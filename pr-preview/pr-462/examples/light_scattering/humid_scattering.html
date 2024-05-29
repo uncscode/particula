@@ -1,0 +1,1092 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Scattering for Humidified Particles &#8212; Particula Book</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/light_scattering/humid_scattering';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Fitting Kappa-HGF from Light Extinction" href="kappa_vs_extinction.html" />
+    <link rel="prev" title="Mie Scattering" href="mie_basics.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/placeholder.png" class="logo__image only-light" alt="Particula Book - Home"/>
+    <script>document.write(`<img src="../../_static/placeholder.png" class="logo__image only-dark" alt="Particula Book - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    Getting started
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tour</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../tour/part-tour.html">Particula tour</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../distribution_statistics.html">Distribution statistics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_coagulation.html">Distribution coagulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_evolution.html">Distribution evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_ambient.html">Distributions</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../ionparticle_coagulation.html">Ion–particle coagulation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../streamlake/particula_data.html">Data in Particula</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part1.html">Loading Part 1: Into &amp; 1D Data</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part2.html">Loading Part 2: Sizer Data</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part3.html">Loading Part 3: Lake</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part4.html">Loading Part 4: Settings Files</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/stream_stats_part1.html">Stream: Averaging and Outliers</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/stream_stats_size_distribution_part2.html">Size Distribution Stats</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../wall_loss_section.html">Chamber Wall Loss Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/chamber_smps_data.html">Chamber Analysis</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/wall_loss_forward_simulation.html">Chamber Forward Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/forward_fit_simple.html">Simple Wall Loss Fit</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../lagrangian/lagrangian_intro.html">Lagrangian Particle Model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/basic_lagrangian_box.html">Introduction to the Lagrangian Box Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/sweep_and_prune.html">Sweep and Prune Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/friction_force.html">Realistic Drag, Mass, and Velocity</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../equilibria/equilibria_intro.html">Equilibria of Aerosols</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../equilibria/activity_part1.html">Activity Example</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="aerosol_optics_intro.html">Introduction to Aerosol Optics</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mie_basics.html">Mie Scattering</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Scattering for Humidified Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scattering_truncation.html">Scattering Truncation Corrections</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/knudsen_number.html"><code class="docutils literal notranslate"><span class="pre">knudsen_number</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/slip_correction.html"><code class="docutils literal notranslate"><span class="pre">slip_correction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/friction_factor.html"><code class="docutils literal notranslate"><span class="pre">friction_factor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/utilities/utilities_overview.html">Utilities Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/convert_size_dist_scales.html">Converting Distributions</a></li>
+
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Strategic Plan</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/strategic_planning_FY24.html">FY24 Plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/Aerosol_patterns.html">Program Outline Revision Draft</a></li>
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Next Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/next/next_vapor_pressure.html">Vapor Pressure</a></li>
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributor Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/light_scattering/humid_scattering.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/light_scattering/humid_scattering.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/light_scattering/humid_scattering.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/light_scattering/humid_scattering.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/examples/light_scattering/humid_scattering.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Scattering for Humidified Particles</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#base-distribution">Base Distribution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hygroscopic-growth-in-aerosol-particles">Hygroscopic Growth in Aerosol Particles</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-parameters-for-hygroscopic-growth">Key Parameters for Hygroscopic Growth:</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calculating-and-visualizing-hygroscopic-growth">Calculating and Visualizing Hygroscopic Growth</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#refractive-index-mixing-rule">Refractive Index Mixing Rule</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#effective-refractive-index-calculation">Effective Refractive Index Calculation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculating-optical-properties-of-humidified-particles">Calculating Optical Properties of Humidified Particles</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-details">Implementation Details</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="scattering-for-humidified-particles">
+<h1>Scattering for Humidified Particles<a class="headerlink" href="#scattering-for-humidified-particles" title="Link to this heading">#</a></h1>
+<p>In atmospheric conditions, aerosol particles frequently undergo hygroscopic growth, absorbing moisture from the air which leads to an increase in their size. This process of water uptake markedly influences the optical properties of aerosols, affecting how they scatter and absorb light. These changes are crucial, as they directly impact climate and visibility, playing a significant role in atmospheric processes such as radiation balance and cloud formation.</p>
+<p>A thorough understanding of Mie scattering parameters for both dry and humidified (or growing) particles provides essential insights into aerosol behavior under varied humidity conditions. By accurately modeling these changes in light scattering and absorption as particles absorb water, we can enhance our predictions regarding aerosols’ effects on the atmosphere.</p>
+<section id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Link to this heading">#</a></h2>
+<p>To proceed with our analysis, we’ll start by importing necessary libraries and modules.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># particula imports</span>
+<span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">distribution_discretization</span>
+<span class="kn">from</span> <span class="nn">particula.data.process</span> <span class="kn">import</span> <span class="n">mie_bulk</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="base-distribution">
+<h2>Base Distribution<a class="headerlink" href="#base-distribution" title="Link to this heading">#</a></h2>
+<p>This section demonstrates how to create a bimodal log-normal distribution and visualize the number concentration of particles across different diameters.</p>
+<p>This code snippet generates a bimodal log-normal distribution characterized by specific modes and a standard deviation. The distribution is then scaled to represent the total number of particles, and the resulting number concentration across diameters is visualized using a logarithmic scale. This approach is particularly useful for simulating aerosol size distributions in atmospheric science, enabling researchers to study particle dynamics and interactions based on their size distribution.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the range and resolution of particle diameters (in nanometers)</span>
+<span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>  <span class="c1"># From 20 nm to 1000 nm with 500 points</span>
+
+<span class="c1"># Standard deviation of the log-normal distribution (dimensionless)</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.25</span>
+
+<span class="c1"># Define the modes (peak diameters) for a bimodal distribution</span>
+<span class="n">modes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
+
+<span class="c1"># Total number of particles in the distribution</span>
+<span class="n">number_total</span> <span class="o">=</span> <span class="mf">1e3</span>
+
+<span class="c1"># Generate a log-normal probability density function (pdf) with an area equal to 1</span>
+<span class="n">pdf_dist</span> <span class="o">=</span> <span class="n">distribution_discretization</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span>
+    <span class="n">interval</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>  <span class="c1"># Array of diameters over which to compute the distribution</span>
+    <span class="n">disttype</span><span class="o">=</span><span class="s2">&quot;lognormal&quot;</span><span class="p">,</span>  <span class="c1"># Type of distribution</span>
+    <span class="n">gsigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>  <span class="c1"># Geometric standard deviation</span>
+    <span class="n">mode</span><span class="o">=</span><span class="n">modes</span><span class="p">,</span>  <span class="c1"># Modes of the distribution</span>
+    <span class="n">nparticles</span><span class="o">=</span><span class="n">number_total</span>  <span class="c1"># Total number of particles</span>
+<span class="p">)</span><span class="o">.</span><span class="n">m</span>
+
+<span class="c1"># Convert the distribution from pdf to probability mass function (pmf)</span>
+<span class="n">number_conc_pms</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">distribution_convert_pdf_pms</span><span class="p">(</span>
+    <span class="n">x_array</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>  <span class="c1"># Array of diameters</span>
+    <span class="n">distribution</span><span class="o">=</span><span class="n">pdf_dist</span><span class="p">,</span>  <span class="c1"># The generated pdf</span>
+    <span class="n">to_pdf</span><span class="o">=</span><span class="kc">False</span>  <span class="c1"># Specifies the conversion to pmf</span>
+<span class="p">)</span> <span class="o">*</span> <span class="n">number_total</span>  <span class="c1"># Scale to the total number of particles</span>
+
+<span class="c1"># Check the total number of particles are equal to the specified number</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total number of particles: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">number_conc_pms</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Visualization</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">diameters</span><span class="p">,</span> <span class="n">number_conc_pms</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Base Distribution&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>  <span class="c1"># Logarithmic scale for diameters</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Diameter (nm)&quot;</span><span class="p">)</span>  <span class="c1"># X-axis label</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number concentration (#/cm^3)&quot;</span><span class="p">)</span>  <span class="c1"># Y-axis label</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>  <span class="c1"># Show legend</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># Display the plot</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total number of particles: 999.533377633679
+</pre></div>
+</div>
+<img alt="../../_images/2921be483c76f34b7776a76a80a07ca13cc872130c7b7caab12bcfe91d03025e.png" src="../../_images/2921be483c76f34b7776a76a80a07ca13cc872130c7b7caab12bcfe91d03025e.png" />
+</div>
+</div>
+</section>
+<section id="hygroscopic-growth-in-aerosol-particles">
+<h2>Hygroscopic Growth in Aerosol Particles<a class="headerlink" href="#hygroscopic-growth-in-aerosol-particles" title="Link to this heading">#</a></h2>
+<p>Aerosol particles in the atmosphere can absorb water, leading to an increase in their size—a process known as hygroscopic growth. This phenomenon is crucial for studying the optical properties and scattering behavior of aerosols because the particle size directly influences how light interacts with these particles.</p>
+<section id="key-parameters-for-hygroscopic-growth">
+<h3>Key Parameters for Hygroscopic Growth:<a class="headerlink" href="#key-parameters-for-hygroscopic-growth" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Dry Diameter</strong>: The original size of the particles before absorbing water.</p></li>
+<li><p><strong>Water Activity</strong>: Defined as the relative humidity divided by 100. It is a measure of the moisture content in the air surrounding the particles.</p></li>
+<li><p><strong>Kappa Parameter</strong>: A value that represents the hygroscopicity of the particles, influencing how much water they can absorb under different humidity conditions. The kappa parameter (κ) is used in the kappa-Hygroscopic Growth Factor (HGF) parameterization to model particle growth.</p></li>
+</ul>
+<p>For our analysis, we’ll assume a kappa value of 0.61, indicative of ammonium sulfate, a common compound found in atmospheric aerosols. We will explore particle growth at three different water activities (relative humidity levels): 30%, 60%, and 90%.</p>
+</section>
+<section id="calculating-and-visualizing-hygroscopic-growth">
+<h3>Calculating and Visualizing Hygroscopic Growth<a class="headerlink" href="#calculating-and-visualizing-hygroscopic-growth" title="Link to this heading">#</a></h3>
+<p>The following Python code calculates the change in particle diameters due to hygroscopic growth at low, mid, and high water activity levels and visualizes the base size distribution alongside the grown distributions.</p>
+<p>This code section demonstrates how aerosol particles grow in size with increasing humidity, visualized through the changes in their size distribution. Understanding these dynamics is vital for accurately assessing aerosols’ environmental and climatic effects.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Hygroscopic growth parameters</span>
+<span class="n">kappa</span> <span class="o">=</span> <span class="mf">0.61</span>  <span class="c1"># Kappa value for ammonium sulfate</span>
+<span class="n">water_activity_low</span> <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1"># Low water activity (30% RH)</span>
+<span class="n">water_activity_mid</span> <span class="o">=</span> <span class="mf">0.6</span>  <span class="c1"># Mid water activity (60% RH)</span>
+<span class="n">water_activity_high</span> <span class="o">=</span> <span class="mf">0.9</span>  <span class="c1"># High water activity (90% RH)</span>
+
+<span class="c1"># Convert particle diameters from the base distribution to volumes</span>
+<span class="n">volume_sizer</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">length_to_volume</span><span class="p">(</span><span class="n">diameters</span><span class="p">,</span> <span class="n">length_type</span><span class="o">=</span><span class="s1">&#39;diameter&#39;</span><span class="p">)</span>
+
+<span class="c1"># Calculate water volume absorbed by particles at different RH</span>
+<span class="n">volume_water_low</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">kappa_volume_water</span><span class="p">(</span>
+    <span class="n">volume_solute</span><span class="o">=</span><span class="n">volume_sizer</span><span class="p">,</span>
+    <span class="n">kappa</span><span class="o">=</span><span class="n">kappa</span><span class="p">,</span>
+    <span class="n">water_activity</span><span class="o">=</span><span class="n">water_activity_low</span><span class="p">)</span>  <span class="c1"># showing the input parameters</span>
+<span class="n">volume_water_mid</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">kappa_volume_water</span><span class="p">(</span>
+    <span class="n">volume_sizer</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">water_activity_mid</span><span class="p">)</span>
+<span class="n">volume_water_high</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">kappa_volume_water</span><span class="p">(</span>
+    <span class="n">volume_sizer</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">water_activity_high</span><span class="p">)</span>
+
+<span class="c1"># Calculate new particle diameters after hygroscopic growth</span>
+<span class="n">diameters_low</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">volume_to_length</span><span class="p">(</span>
+    <span class="n">volume</span><span class="o">=</span><span class="n">volume_sizer</span> <span class="o">+</span> <span class="n">volume_water_low</span><span class="p">,</span>
+    <span class="n">length_type</span><span class="o">=</span><span class="s1">&#39;diameter&#39;</span><span class="p">)</span>  <span class="c1"># showing the input parameters</span>
+<span class="n">diameters_mid</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">volume_to_length</span><span class="p">(</span>
+    <span class="n">volume_sizer</span> <span class="o">+</span> <span class="n">volume_water_mid</span><span class="p">,</span> <span class="s1">&#39;diameter&#39;</span><span class="p">)</span>
+<span class="n">diameters_high</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">volume_to_length</span><span class="p">(</span>
+    <span class="n">volume_sizer</span> <span class="o">+</span> <span class="n">volume_water_high</span><span class="p">,</span> <span class="s1">&#39;diameter&#39;</span><span class="p">)</span>
+
+<span class="c1"># Plotting the base and grown size distributions</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">diameters</span><span class="p">,</span> <span class="n">number_conc_pms</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Base Distribution&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">diameters_low</span><span class="p">,</span>
+    <span class="n">number_conc_pms</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Low Water Activity: </span><span class="si">{</span><span class="n">water_activity_low</span><span class="o">*</span><span class="mi">100</span><span class="si">}</span><span class="s2">% RH&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">diameters_mid</span><span class="p">,</span>
+    <span class="n">number_conc_pms</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Mid Water Activity: </span><span class="si">{</span><span class="n">water_activity_mid</span><span class="o">*</span><span class="mi">100</span><span class="si">}</span><span class="s2">% RH&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">diameters_high</span><span class="p">,</span>
+    <span class="n">number_conc_pms</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;High Water Activity: </span><span class="si">{</span><span class="n">water_activity_high</span><span class="o">*</span><span class="mi">100</span><span class="si">}</span><span class="s2">% RH&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Diameter (nm)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number concentration (#/cm^3)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/a455358333411f750fd3ca165d53945262d0e32a2a1d1fd787a708d39a7d9b75.png" src="../../_images/a455358333411f750fd3ca165d53945262d0e32a2a1d1fd787a708d39a7d9b75.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="refractive-index-mixing-rule">
+<h2>Refractive Index Mixing Rule<a class="headerlink" href="#refractive-index-mixing-rule" title="Link to this heading">#</a></h2>
+<p>Upon determining the sizes of both wet and dry particles, we proceed to calculate the refractive index for these humidified particles. This calculation employs the Lorentz-Lorenz mixing rule, a straightforward approximation for the refractive index of a mixture comprising two substances. The mixing rule, as detailed by Liu &amp; Daum (2008), underpins the implementation in the <code class="docutils literal notranslate"><span class="pre">convert.effective_refractive_index</span></code> module, facilitating the computation of the humidified particle’s refractive index.</p>
+<section id="effective-refractive-index-calculation">
+<h3>Effective Refractive Index Calculation<a class="headerlink" href="#effective-refractive-index-calculation" title="Link to this heading">#</a></h3>
+<p>The effective refractive index <span class="math notranslate nohighlight">\(n_{\text{effective}}\)</span> for a binary mixture can be derived using molar refraction mixing, as described in the referenced study. The formula is based on the volumes and refractive indices of the individual components:</p>
+<div class="math notranslate nohighlight">
+\[
+r_{\text{effective}} = \frac{V_0}{V_{\text{total}}} \cdot \frac{m_0 - 1}{m_0 + 2} + \frac{V_1}{V_{\text{total}}} \cdot \frac{m_1 - 1}{m_1 + 2}
+\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(V_0\)</span> and <span class="math notranslate nohighlight">\(V_1\)</span> are the volumes of components 0 and 1, respectively.</p></li>
+<li><p><span class="math notranslate nohighlight">\(V_{\text{total}} = V_0 + V_1\)</span> is the total volume.</p></li>
+<li><p><span class="math notranslate nohighlight">\(m_0\)</span> and <span class="math notranslate nohighlight">\(m_1\)</span> are the refractive indices of components 0 and 1, respectively.</p></li>
+<li><p><span class="math notranslate nohighlight">\(r_{\text{effective}}\)</span> is the effective specific refraction.</p></li>
+</ul>
+<p>The effective refractive index is then calculated from <span class="math notranslate nohighlight">\(r_{\text{effective}}\)</span> as follows:</p>
+<div class="math notranslate nohighlight">
+\[
+n_{\text{effective}} = \frac{2R_{\text{effective}} + 1}{1 - R_{\text{effective}}}
+\]</div>
+<p>This equation allows for the calculation of the effective refractive index of the mixture, accounting for the volumetric contributions and specific refraction of each component.</p>
+<p><strong>Reference</strong>
+Liu, Y., &amp; Daum, P. H. (2008). Relationship of refractive index to mass density and self-consistency mixing rules for multicomponent mixtures like ambient aerosols. <em>Journal of Aerosol Science, 39(11)</em>, 974-986. <a class="reference external" href="https://doi.org/10.1016/j.jaerosci.2008.06.006">https://doi.org/10.1016/j.jaerosci.2008.06.006</a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the refractive index of dry particle material and water</span>
+<span class="n">refractive_index_dry</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">+</span> <span class="mf">0.5</span><span class="n">j</span>  <span class="c1"># Dimensionless</span>
+<span class="n">refractive_index_water</span> <span class="o">=</span> <span class="mf">1.33</span>  <span class="c1"># Dimensionless</span>
+
+<span class="c1"># Calculate effective refractive indices for each water activity level,</span>
+<span class="c1"># utilizing the volumes of each component</span>
+<span class="n">n_effective_low</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">effective_refractive_index</span><span class="p">(</span>
+    <span class="n">m_zero</span><span class="o">=</span><span class="n">refractive_index_dry</span><span class="p">,</span>
+    <span class="n">m_one</span><span class="o">=</span><span class="n">refractive_index_water</span><span class="p">,</span>
+    <span class="n">volume_zero</span><span class="o">=</span><span class="n">volume_sizer</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">volume_one</span><span class="o">=</span><span class="n">volume_water_low</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">n_effective_mid</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">effective_refractive_index</span><span class="p">(</span>
+    <span class="n">m_zero</span><span class="o">=</span><span class="n">refractive_index_dry</span><span class="p">,</span>
+    <span class="n">m_one</span><span class="o">=</span><span class="n">refractive_index_water</span><span class="p">,</span>
+    <span class="n">volume_zero</span><span class="o">=</span><span class="n">volume_sizer</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">volume_one</span><span class="o">=</span><span class="n">volume_water_mid</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">n_effective_high</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">effective_refractive_index</span><span class="p">(</span>
+    <span class="n">m_zero</span><span class="o">=</span><span class="n">refractive_index_dry</span><span class="p">,</span>
+    <span class="n">m_one</span><span class="o">=</span><span class="n">refractive_index_water</span><span class="p">,</span>
+    <span class="n">volume_zero</span><span class="o">=</span><span class="n">volume_sizer</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">volume_one</span><span class="o">=</span><span class="n">volume_water_high</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="c1"># Output the effective refractive indices</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Effective Refractive Index at Low Water Activity: </span><span class="si">{</span><span class="n">n_effective_low</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Effective Refractive Index at Mid Water Activity: </span><span class="si">{</span><span class="n">n_effective_mid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Effective Refractive Index at High Water Activity: </span><span class="si">{</span><span class="n">n_effective_high</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Effective Refractive Index at Low Water Activity: (1.475296758061568+0.3877520937699365j)
+Effective Refractive Index at Mid Water Activity: (1.4339992549471252+0.24759591899911076j)
+Effective Refractive Index at High Water Activity: (1.363603614921365+0.06976083730498348j)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="calculating-optical-properties-of-humidified-particles">
+<h2>Calculating Optical Properties of Humidified Particles<a class="headerlink" href="#calculating-optical-properties-of-humidified-particles" title="Link to this heading">#</a></h2>
+<p>With the sizes and refractive indices of both dry and humidified particles determined, we now turn our attention to calculating their optical properties, including scattering and absorption. These properties are crucial for understanding the particles’ behavior in the atmosphere and their potential climate impacts. We leverage the <code class="docutils literal notranslate"><span class="pre">mie_bulk.mie_size_distribution</span></code> function to compute these properties across different humidity conditions.</p>
+<section id="implementation-details">
+<h3>Implementation Details<a class="headerlink" href="#implementation-details" title="Link to this heading">#</a></h3>
+<p>The Python code below demonstrates how to calculate the optical properties for particles at varying levels of humidity using Mie scattering theory. These calculations provide insights into how hygroscopic growth affects the particles’ ability to scatter and absorb light.</p>
+<p>This segment calculates and then plots the extinction, scattering, and absorption coefficients for particles at different levels of hygroscopic growth. The <code class="docutils literal notranslate"><span class="pre">water_activity_series</span></code> corresponds to the range of humidity conditions under consideration, providing a clear visual representation of how water uptake influences the optical properties of aerosol particles.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the wavelength of incident light in nanometers</span>
+<span class="n">wavelength</span> <span class="o">=</span> <span class="mi">550</span>
+
+<span class="c1"># Calculate optical properties for dry and humidified particles</span>
+<span class="n">optics_dry</span> <span class="o">=</span> <span class="n">mie_bulk</span><span class="o">.</span><span class="n">mie_size_distribution</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">refractive_index_dry</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">diameter</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">number_per_cm3</span><span class="o">=</span><span class="n">number_conc_pms</span><span class="p">,</span>
+    <span class="n">pms</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">discretize</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="n">optics_low</span> <span class="o">=</span> <span class="n">mie_bulk</span><span class="o">.</span><span class="n">mie_size_distribution</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">n_effective_low</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">diameter</span><span class="o">=</span><span class="n">diameters_low</span><span class="p">,</span>
+    <span class="n">number_per_cm3</span><span class="o">=</span><span class="n">number_conc_pms</span><span class="p">,</span>
+    <span class="n">pms</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">discretize</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="n">optics_mid</span> <span class="o">=</span> <span class="n">mie_bulk</span><span class="o">.</span><span class="n">mie_size_distribution</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">n_effective_mid</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">diameter</span><span class="o">=</span><span class="n">diameters_mid</span><span class="p">,</span>
+    <span class="n">number_per_cm3</span><span class="o">=</span><span class="n">number_conc_pms</span><span class="p">,</span>
+    <span class="n">pms</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">discretize</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="n">optics_high</span> <span class="o">=</span> <span class="n">mie_bulk</span><span class="o">.</span><span class="n">mie_size_distribution</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">n_effective_high</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">diameter</span><span class="o">=</span><span class="n">diameters_high</span><span class="p">,</span>
+    <span class="n">number_per_cm3</span><span class="o">=</span><span class="n">number_conc_pms</span><span class="p">,</span>
+    <span class="n">pms</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">discretize</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="c1"># Combine the results for visualization</span>
+<span class="n">combined_optics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">optics_dry</span><span class="p">,</span> <span class="n">optics_low</span><span class="p">,</span> <span class="n">optics_mid</span><span class="p">,</span> <span class="n">optics_high</span><span class="p">))</span>
+<span class="n">water_activity_series</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">water_activity_low</span><span class="p">,</span> <span class="n">water_activity_mid</span><span class="p">,</span> <span class="n">water_activity_high</span><span class="p">]</span>
+
+<span class="c1"># Visualization of optical properties across different humidity levels</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">water_activity_series</span><span class="p">,</span> <span class="n">combined_optics</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Extinction&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">water_activity_series</span><span class="p">,</span> <span class="n">combined_optics</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Scattering&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">water_activity_series</span><span class="p">,</span> <span class="n">combined_optics</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Absorption&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Water Activity&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Coefficient (1/Mm)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/c5e8565946075e0266e22654f2fcd850e85e5b9c554abcf7afcec790f7677334.png" src="../../_images/c5e8565946075e0266e22654f2fcd850e85e5b9c554abcf7afcec790f7677334.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<p>In this notebook, we delved into the phenomenon of hygroscopic growth of aerosol particles and investigated its consequential effects on their optical characteristics. We started with the construction of a bimodal log-normal distribution, aimed at depicting the number concentration of aerosol particles across a spectrum of diameters. This foundational step allowed us to simulate the real-world complexity of aerosol size distributions.</p>
+<p>Moving forward, we calculated the hygroscopic growth of these particles under different humidity conditions, employing varying water activities to simulate environmental changes. Through visualization, we effectively illustrated the shifts in particle size distribution resulting from this growth, providing a clear depiction of how particles expand as they absorb moisture.</p>
+<p>In our subsequent analysis, we determined the refractive index of the humidified particles. This was achieved by applying the Lorentz-Lorenz mixing rule, a theoretical framework that facilitated the computation of the effective refractive index of the particles post-hydration.</p>
+<p>Our exploration ended in the calculation of the optical properties of aerosol particles across different levels of humidity. By doing so, we unveiled the ways in which hygroscopic growth influences the scattering and absorption behaviors of particles. The insights garnered from this analysis are instrumental in comprehending the broader implications of particle growth on atmospheric optics and climate dynamics.</p>
+<p>As we proceed, our focus will shift towards finding the kappa parameter based on empirical measurements of particle sizes and extinction coefficients. This reverse engineering process is a common challenge in atmospheric science, offering a deeper understanding of aerosol properties through observational data. Our exploration into this inverse problem marks the next step in bridging theoretical models with practical atmospheric measurements, enhancing our ability to interpret and predict aerosol behavior in the Earth’s atmosphere.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">convert</span><span class="o">.</span><span class="n">kappa_volume_water</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function kappa_volume_water in module particula.util.convert:
+
+kappa_volume_water(volume_solute: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], kappa: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]], water_activity: Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]) -&gt; Union[float, numpy.ndarray[Any, numpy.dtype[numpy.float64]]]
+    Calculate the volume of water given volume of solute, kappa parameter,
+    and water activity.
+    
+    Args:
+    -----------
+        volume_solute: The volume of solute.
+        kappa: The kappa parameter.
+        water_activity: The water activity.
+    
+    Returns:
+    --------
+        The volume of water as a float.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">convert</span><span class="o">.</span><span class="n">effective_refractive_index</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function effective_refractive_index in module particula.util.convert:
+
+effective_refractive_index(m_zero: Union[float, complex], m_one: Union[float, complex], volume_zero: float, volume_one: float) -&gt; Union[float, complex]
+    Calculate the effective refractive index of a mixture of two solutes, given
+    the refractive index of each solute and the volume of each solute. The
+    mixing is based on volume-weighted molar refraction.
+    
+    Args:
+    -----------
+        m_zero (float or complex): The refractive index of solute 0.
+        m_one (float or complex): The refractive index of solute 1.
+        volume_zero (float): The volume of solute 0.
+        volume_one (float): The volume of solute 1.
+    
+    Returns:
+    -----------
+        The effective refractive index of the mixture.
+    
+    Reference:
+    -----------
+        Liu, Y., &amp;#38; Daum, P. H. (2008).
+        Relationship of refractive index to mass density and self-consistency
+        mixing rules for multicomponent mixtures like ambient aerosols.
+        Journal of Aerosol Science, 39(11), 974-986.
+        https://doi.org/10.1016/j.jaerosci.2008.06.006
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "uncscode/particula",
+            ref: "v0.0.10",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./examples/light_scattering"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="mie_basics.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Mie Scattering</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="kappa_vs_extinction.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Fitting Kappa-HGF from Light Extinction</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#base-distribution">Base Distribution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hygroscopic-growth-in-aerosol-particles">Hygroscopic Growth in Aerosol Particles</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-parameters-for-hygroscopic-growth">Key Parameters for Hygroscopic Growth:</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calculating-and-visualizing-hygroscopic-growth">Calculating and Visualizing Hygroscopic Growth</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#refractive-index-mixing-rule">Refractive Index Mixing Rule</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#effective-refractive-index-calculation">Effective Refractive Index Calculation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculating-optical-properties-of-humidified-particles">Calculating Optical Properties of Humidified Particles</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-details">Implementation Details</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By particula contributors
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
