@@ -7,7 +7,7 @@ with usage as we figure out the best way to do this.
 from typing import List, Union, Iterator
 from particula.next.gas.species import GasSpecies
 from particula.next.gas.atmosphere import Atmosphere
-from particula.next.particles.representation import Particle
+from particula.next.particles.representation import ParticleRepresentation
 
 
 class Aerosol:
@@ -18,7 +18,8 @@ class Aerosol:
     """
 
     def __init__(self, gas: Atmosphere,
-                 particles: Union[Particle, List[Particle]]):
+                 particles: Union[ParticleRepresentation,
+                                  List[ParticleRepresentation]]):
         """
         Initializes an Aerosol instance with Gas and Particle instances.
 
@@ -28,8 +29,10 @@ class Aerosol:
         instances.
         """
         self.gas = gas
-        self.particles: List[Particle] = [particles] if isinstance(
-            particles, Particle) else particles
+        self.particles: List[ParticleRepresentation] = \
+            [particles] \
+            if isinstance(particles, ParticleRepresentation) \
+            else particles
 
     def iterate_gas(self) -> Iterator[GasSpecies]:
         """
@@ -40,7 +43,7 @@ class Aerosol:
         """
         return iter(self.gas)
 
-    def iterate_particle(self) -> Iterator[Particle]:
+    def iterate_particle(self) -> Iterator[ParticleRepresentation]:
         """
         Returns an iterator for particle.
 
@@ -58,7 +61,7 @@ class Aerosol:
         """
         self.gas = gas
 
-    def add_particle(self, particle: Particle):
+    def add_particle(self, particle: ParticleRepresentation):
         """
         Adds a Particle instance to the aerosol.
 

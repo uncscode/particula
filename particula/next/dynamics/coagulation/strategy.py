@@ -6,7 +6,7 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.next.particles.representation import Particle
+from particula.next.particles.representation import ParticleRepresentation
 from particula.next.dynamics.coagulation import rate
 from particula.next.dynamics.coagulation.brownian_kernel import (
     brownian_coagulation_kernel_via_system_state
@@ -59,7 +59,7 @@ class CoagulationStrategy(ABC):
     @abstractmethod
     def kernel(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         temperature: float,
         pressure: float
     ) -> Union[float, NDArray[np.float_]]:
@@ -82,7 +82,7 @@ class CoagulationStrategy(ABC):
     @abstractmethod
     def loss_rate(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         kernel: NDArray[np.float_],
     ) -> Union[float, NDArray[np.float_]]:
         """
@@ -104,7 +104,7 @@ class CoagulationStrategy(ABC):
     @abstractmethod
     def gain_rate(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         kernel: NDArray[np.float_],
     ) -> Union[float, NDArray[np.float_]]:
         """
@@ -130,7 +130,7 @@ class CoagulationStrategy(ABC):
 
     def net_rate(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         temperature: float,
         pressure: float
     ) -> Union[float, NDArray[np.float_]]:
@@ -151,12 +151,14 @@ class CoagulationStrategy(ABC):
         particle [kg/s].
         """
         kernel = self.kernel(particle, temperature, pressure)
-        return self.gain_rate(particle, kernel) - self.loss_rate(
-            particle, kernel)
+        return (
+            self.gain_rate(particle, kernel)  # type: ignore
+            - self.loss_rate(particle, kernel)  # type: ignore
+            )
 
     def diffusive_knudsen(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         temperature: float,
         pressure: float
     ) -> NDArray[np.float_]:
@@ -197,7 +199,7 @@ class CoagulationStrategy(ABC):
 
     def coulomb_potential_ratio(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         temperature: float
     ) -> NDArray[np.float_]:
         """
@@ -223,7 +225,7 @@ class CoagulationStrategy(ABC):
 
     def friction_factor(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         temperature: float,
         pressure: float
     ) -> NDArray[np.float_]:
@@ -243,7 +245,7 @@ class CoagulationStrategy(ABC):
         - NDArray[np.float_]: The friction factor for the particle
         [dimensionless].
         """
-        dynamic_viscosity = gas_properties.dynamic_viscosity(
+        dynamic_viscosity = gas_properties.get_dynamic_viscosity(
             temperature=temperature  # assume standard atmospheric composition
         )
         mean_free_path = gas_properties.molecule_mean_free_path(
@@ -290,7 +292,7 @@ class DiscreteSimple(CoagulationStrategy):
 
     def kernel(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         temperature: float,
         pressure: float
     ) -> Union[float, NDArray[np.float_]]:
@@ -304,7 +306,7 @@ class DiscreteSimple(CoagulationStrategy):
 
     def loss_rate(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         kernel: NDArray[np.float_],
     ) -> Union[float, NDArray[np.float_]]:
 
@@ -315,7 +317,7 @@ class DiscreteSimple(CoagulationStrategy):
 
     def gain_rate(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         kernel: NDArray[np.float_],
     ) -> Union[float, NDArray[np.float_]]:
 
@@ -360,7 +362,7 @@ class DiscreteGeneral(CoagulationStrategy):
 
     def kernel(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         temperature: float,
         pressure: float
     ) -> Union[float, NDArray[np.float_]]:
@@ -400,7 +402,7 @@ class DiscreteGeneral(CoagulationStrategy):
 
     def loss_rate(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         kernel: NDArray[np.float_],
     ) -> Union[float, NDArray[np.float_]]:
 
@@ -411,7 +413,7 @@ class DiscreteGeneral(CoagulationStrategy):
 
     def gain_rate(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         kernel: NDArray[np.float_],
     ) -> Union[float, NDArray[np.float_]]:
 
@@ -451,7 +453,7 @@ class ContinuousGeneralPDF(CoagulationStrategy):
 
     def kernel(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         temperature: float,
         pressure: float
     ) -> Union[float, NDArray[np.float_]]:
@@ -491,7 +493,7 @@ class ContinuousGeneralPDF(CoagulationStrategy):
 
     def loss_rate(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         kernel: NDArray[np.float_],
     ) -> Union[float, NDArray[np.float_]]:
 
@@ -503,7 +505,7 @@ class ContinuousGeneralPDF(CoagulationStrategy):
 
     def gain_rate(
         self,
-        particle: Particle,
+        particle: ParticleRepresentation,
         kernel: NDArray[np.float_],
     ) -> Union[float, NDArray[np.float_]]:
 

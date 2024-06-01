@@ -11,19 +11,19 @@ COULOMB_POTENTIAL_RATIO_ARRAY = np.array([0.0, 0.7, 0.9, 1.0, 1.1])
 
 def test_kernel_call():
     """Test calling the kernel method, common for all kernel strategies."""
-    DIMENSIONLESS_KERNEL = np.array([[1.0, 2.0], [3.0, 4.0]])
-    COULOMB_POTENTIAL_RATIO = np.array([[0.5, 0.6], [0.7, 0.8]])
-    SUM_OF_RADII = np.array([[1e-9, 2e-9], [3e-9, 4e-9]])
-    REDUCED_MASS = np.array([[1e-18, 2e-18], [3e-18, 4e-18]])
-    REDUCED_FRICTION_FACTOR = np.array([[1.0, 1.5], [2.0, 2.5]])
+    dimensionless_kernel_in = np.array([[1.0, 2.0], [3.0, 4.0]])
+    coulomb_potential_ratio_in = np.array([[0.5, 0.6], [0.7, 0.8]])
+    sum_of_radii_in = np.array([[1e-9, 2e-9], [3e-9, 4e-9]])
+    reduced_mass_in = np.array([[1e-18, 2e-18], [3e-18, 4e-18]])
+    reduced_friction_factor_in = np.array([[1.0, 1.5], [2.0, 2.5]])
     # test kernel dimensioned
     kernel_concrete = kernel.HardSphere()
     dimension_result = kernel_concrete.kernel(
-        dimensionless_kernel=DIMENSIONLESS_KERNEL,
-        coulomb_potential_ratio=COULOMB_POTENTIAL_RATIO,
-        sum_of_radii=SUM_OF_RADII,
-        reduced_mass=REDUCED_MASS,
-        reduced_friction_factor=REDUCED_FRICTION_FACTOR
+        dimensionless_kernel=dimensionless_kernel_in,
+        coulomb_potential_ratio=coulomb_potential_ratio_in,
+        sum_of_radii=sum_of_radii_in,
+        reduced_mass=reduced_mass_in,
+        reduced_friction_factor=reduced_friction_factor_in
     )
     expected_result = np.array([[1.77061203e-09, 2.31008442e-08],
                                 [1.12232711e-07, 3.56834831e-07]])
