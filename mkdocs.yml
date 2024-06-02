@@ -35,16 +35,16 @@ theme:
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
-      primary: sky
-      accent: cyan
+      primary: custom
+      accent: custom
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
-      primary: sky
-      accent: cyan
+      primary: custom
+      accent: custom
 
 # nav:
 #   - Home: index.md
@@ -90,9 +90,11 @@ plugins:
   # - social
   - mkdocs-jupyter:
       include_source: True
-      execute: False
-      allow_errors: true
+      execute: False  # takes too long, should build separately
+      allow_errors: True
 
+extra_css:
+  - stylesheets/extra.css
 
 copyright: |
   &copy; 2024 By particula contributors

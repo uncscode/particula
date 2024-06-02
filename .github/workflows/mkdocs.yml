@@ -26,12 +26,13 @@ jobs:
 
         - name: Install dependencies
           run: |
+            pip install jupyter-book ghp-import
             pip install mkdocs mkdocs-material handsdown mkdocs-jupyter
 
-        - name: Generate Documentation with Handsdown
+        - name: Generate Source Code Documentation with Handsdown
           run: python mk_generator.py
 
-        - name: Build MkDocs site
+        - name: Build MkDocs site and Run Jupyter Books
           run: mkdocs build
 
         - name: Deploy to GitHub Pages (on push)

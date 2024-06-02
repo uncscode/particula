@@ -1,13 +1,13 @@
 """
 Handsdown to generate documentation for the project.
 """
+
 import os
+from pathlib import Path
 from handsdown.generators.material import MaterialGenerator
 from handsdown.utils.path_finder import PathFinder
-from pathlib import Path
 
 # pytype: skip-file
-
 
 repo_path = Path.cwd()
 
@@ -19,14 +19,14 @@ path_finder = PathFinder(repo_path)
 path_finder.exclude("tests/*", "build/*")
 
 # generate folder structure, if needed
-os.makedirs(repo_path / 'docs/Source-Code/', exist_ok=True)
+os.makedirs(repo_path / "docs/Source-Code/", exist_ok=True)
 
 # initialize generator
 handsdown = MaterialGenerator(
     input_path=repo_path,
-    output_path=repo_path / 'docs/Source-Code',
+    output_path=repo_path / "docs/Source-Code",
     source_paths=path_finder.glob("**/*.py"),
-    source_code_url='https://github.com/Gorkowski/particula/blob/main/'
+    source_code_url="https://github.com/Gorkowski/particula/blob/main/",
 )
 
 # generate all docs at once
