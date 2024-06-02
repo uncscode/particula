@@ -1,0 +1,36 @@
+"""
+Handsdown to generate documentation for the project.
+"""
+import os
+from handsdown.generators.material import MaterialGenerator
+from handsdown.utils.path_finder import PathFinder
+from pathlib import Path
+
+# pytype: skip-file
+
+
+repo_path = Path.cwd()
+
+# this little tool works like `pathlib.Path.glob` with some extra magic
+# but in this case `repo_path.glob("**/*.py")` would do as well
+path_finder = PathFinder(repo_path)
+
+# no docs for tests and build
+path_finder.exclude("tests/*", "build/*")
+
+# generate folder structure, if needed
+os.makedirs(repo_path / 'docs/Source-Code/', exist_ok=True)
+
+# initialize generator
+handsdown = MaterialGenerator(
+    input_path=repo_path,
+    output_path=repo_path / 'docs/Source-Code',
+    source_paths=path_finder.glob("**/*.py"),
+    source_code_url='https://github.com/Gorkowski/particula/blob/main/'
+)
+
+# generate all docs at once
+handsdown.generate_docs()
+
+# generate index.md file
+handsdown.generate_index()

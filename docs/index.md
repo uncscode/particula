@@ -1,9 +1,17 @@
-# Getting started
+# Home
 
 The documentation for `particula` is organized into Jupyter notebooks that can be executed in the browser.
 To learn more about Jupyter notebooks, visit [jupyter.org](https://jupyter.org/) and [jupyterbook.org](https://jupyterbook.org/).
 
-## Installing `particula`
+## Gorkowski/PARTICULA
+
+This repository is a development fork of `Particula`. Since this is an active development environment, the codebase may undergo frequent changes, and instability can occur. To install this version directly, use the following `pip` command:
+
+```bash
+pip install git+https://github.com/Gorkowski/particula.git
+```
+
+<!-- ## Installing `particula`
 
 You can install `particula` from PyPI using the following command:
 
@@ -23,12 +31,10 @@ Alternative, you could fork the repository (or copy it locally) and install it u
 git clone https://github.com/uncscode/particula.git
 cd particula
 python -m pip install particula
-```
+``` -->
 
 ## Contributing to `particula`
 
 We are open to and we welcome contributions from anyone who wants to contribute to this project.
-We have a short contributing document in the root of the repository, which you can read [here](https://uncscode.github.io/particula/CONTRIBUTING.html).
+We have a short [contributing document](contribute) in the root of the repository, which you can read.
 However, feel free to reach out with any questions or comments!
-
-## Quick links

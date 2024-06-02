@@ -26,10 +26,10 @@ class BuilderABC(ABC):
     - required_parameters (list): List of required parameters for the builder.
 
     Methods:
-    -------
-    - check_keys(parameters): Check if the keys you want to set are
-    present in the parameters dictionary.
-    - set_parameters(parameters): Set parameters from a dictionary including
+    --------
+    - check_keys (parameters): Check if the keys you want to set are
+        present in the parameters dictionary.
+    - set_parameters (parameters): Set parameters from a dictionary including
         optional suffix for units as '_units'.
     - pre_build_check(): Check if all required attribute parameters are set
         before building.

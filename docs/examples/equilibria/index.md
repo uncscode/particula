@@ -1,5 +1,10 @@
 # Equilibria of Aerosols
 
+## Notebooks
+
+- [Activity Coefficients](activity_part1.ipynb)
+- [Liquid-Liquid Equilibrium](equilibria_part1.ipynb)
+
 ## What is Equilibria?
 
 Equilibria, a fundamental concept in physical chemistry, refers to the state where the concentrations of reactants and products in a chemical reaction remain constant over time. In the context of aerosol science, equilibria are essential in understanding how aerosol particles interact with their environment, particularly with respect to liquid and vapor phases. This balance is crucial in predicting how aerosols behave under different atmospheric conditions.
