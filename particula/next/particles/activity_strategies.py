@@ -20,6 +20,11 @@ class ActivityStrategy(ABC):
     """
     Abstract base class for implementing vapor pressure strategies based on
     particle activity calculations.
+
+    Methods:
+        activity: Calculate the activity of a species.
+        partial_pressure: Calculate the partial pressure of a species in the
+        mixture.
     """
 
     @abstractmethod

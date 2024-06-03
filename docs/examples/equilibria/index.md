@@ -2,8 +2,8 @@
 
 ## Notebooks
 
-- [Activity Coefficients](activity_part1.ipynb)
-- [Liquid-Liquid Equilibrium](equilibria_part1.ipynb)
+- [Activity Coefficients](notebooks/activity_part1.ipynb)
+- [Liquid-Liquid Equilibrium](notebooks/equilibria_part1.ipynb)
 
 ## What is Equilibria?
 

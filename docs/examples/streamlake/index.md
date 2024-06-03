@@ -9,9 +9,9 @@ the data.
 
 ## Notebooks
 
-- [Data Loading Part 1](data_loading_part1.ipynb)
-- [Data Loading Part 2](data_loading_part2.ipynb)
-- [Data Loading Part 3](data_loading_part3.ipynb)
-- [Data Loading Part 4](data_loading_part4.ipynb)
-- [Stream Statistics](stream_stats_part1.ipynb)
-- [Stream Statistics Sizer Data](stream_stats_size_distribution_part2.ipynb)
+- [Data Loading Part 1](notebooks/loading_data_part1.ipynb)
+- [Data Loading Part 2](notebooks/loading_data_part2.ipynb)
+- [Data Loading Part 3](notebooks/loading_data_part3.ipynb)
+- [Data Loading Part 4](notebooks/loading_data_part4.ipynb)
+- [Stream Statistics](notebooks/stream_stats_part1.ipynb)
+- [Stream Statistics Sizer Data](notebook/sstream_stats_size_distribution_part2.ipynb)

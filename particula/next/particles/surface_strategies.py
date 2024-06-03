@@ -14,9 +14,18 @@ from particula.next.particles.properties import kelvin_radius, kelvin_term
 
 
 class SurfaceStrategy(ABC):
-    """
-    Abstract class for implementing strategies to calculate surface tension and
-    the Kelvin effect for species in particulate phases.
+    """Abstract class for implementing strategies to calculate surface tension
+    and the Kelvin effect for species in particulate phases.
+
+    Methods:
+        effective_surface_tension: Calculate the effective surface tension of
+        species based on their concentration.
+        effective_density: Calculate the effective density of species based on
+        their concentration.
+        kelvin_radius: Calculate the Kelvin radius which determines the
+        curvature effect on vapor pressure.
+        kelvin_term: Calculate the Kelvin term, which quantifies the effect of
+        particle curvature on vapor pressure.
     """
 
     @abstractmethod

@@ -13,6 +13,12 @@ class DistributionStrategy(ABC):
     Abstract base class for particle strategy, defining the common
     interface for mass, radius, and total mass calculations for different
     particle representations.
+
+    Methods:
+        get_mass: Calculates the mass of particles.
+        get_radius: Calculates the radius of particles.
+        get_total_mass: Calculates the total mass of particles.
+        add_mass: Adds mass to the distribution of particles.
     """
 
     @abstractmethod

@@ -5,6 +5,7 @@ Handsdown to generate documentation for the project.
 import os
 from pathlib import Path
 from handsdown.generators.material import MaterialGenerator
+from handsdown.processors.pep257 import PEP257DocstringProcessor
 from handsdown.utils.path_finder import PathFinder
 
 # pytype: skip-file
@@ -27,6 +28,7 @@ handsdown = MaterialGenerator(
     output_path=repo_path / "docs/Source-Code",
     source_paths=path_finder.glob("**/*.py"),
     source_code_url="https://github.com/Gorkowski/particula/blob/main/",
+    docstring_processor=PEP257DocstringProcessor(),
 )
 
 # generate all docs at once

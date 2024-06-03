@@ -3,10 +3,10 @@
 Aerosol optics examines the interaction between light and aerosol particles suspended in the atmosphere. These interactions, encompassing absorption, scattering, and the emission of light, are pivotal in deciphering the physical properties of aerosols and their environmental ramifications.
 
 ## Notebooks
-- [Mie Scattering Basics](mie_basics.ipynb)
-- [Humidified Particle Scattering](humid_scattering.ipynb)
-- [Kappa-HGF Estimation from Light Extinction](kappa_vs_extinction.ipynb)
-- [Correcting for Scattering Truncation](scattering_truncation.ipynb)
+- [Mie Scattering Basics](notebooks/mie_basics.ipynb)
+- [Humidified Particle Scattering](notebooks/humid_scattering.ipynb)
+- [Kappa-HGF Estimation from Light Extinction](notebooks/kappa_vs_extinction.ipynb)
+- [Correcting for Scattering Truncation](notebooks/scattering_truncation.ipynb)
 
 
 ### Mie Scattering Theory
