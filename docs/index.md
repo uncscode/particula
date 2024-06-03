@@ -31,12 +31,23 @@ Install Miniconda, which includes Conda, a powerful package and environment mana
 - Download Miniconda for Windows from [Miniconda's website](https://docs.conda.io/en/latest/miniconda.html).
 - Follow the installation instructions to install Miniconda on your system.
 
-**Step 3: Setup Proxy**
+**Step 3: Install Git**
 
-If you are behind a proxy, you may need to configure your proxy settings to allow Conda, Pip, and VScode to access the internet.
+Install Git to manage your code repositories effectively. Git is a version control system that lets you track changes, revert to previous stages, and collaborate on projects with others.
+
+- Download Git for Windows from [Git's official website](https://git-scm.com/download/win).
+- Run the downloaded file to start the installation.
+- During the installation, choose your preferred editor for Git, and make sure to select "Git from the command line and also from 3rd-party software" to ensure it integrates well with your system's command prompt.
+- Complete the installation by following the on-screen instructions.
+
+Once installed, you can verify the installation by opening a command prompt or terminal and typing `git --version`, which should display the installed version of Git.
+
+**Step 4: Setup Proxy**
+
+If you are behind a proxy, you may need to configure your proxy settings to allow Conda, Pip, git, and VScode to access the internet.
 
 
-**Step 4: Create a New Python Environment**  
+**Step 5: Create a New Python Environment**  
 
 Avoid conflicts with other development projects by creating an isolated Python environment. Here’s how:
 
@@ -48,7 +59,7 @@ Avoid conflicts with other development projects by creating an isolated Python e
   conda create --name analysisV1 python=3.11
   ```
 
-**Step 5: Activate the Environment**  
+**Step 6: Activate the Environment**  
 
 Ensure you’re working within the context of your new environment:
 - In the VSCode terminal, activate your environment by running:
