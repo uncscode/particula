@@ -1,0 +1,1177 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Scattering Truncation Corrections &#8212; Particula Book</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/light_scattering/scattering_truncation';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The Environment Class" href="../../documentation/environment.html" />
+    <link rel="prev" title="Fitting Kappa-HGF from Light Extinction" href="kappa_vs_extinction.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/placeholder.png" class="logo__image only-light" alt="Particula Book - Home"/>
+    <script>document.write(`<img src="../../_static/placeholder.png" class="logo__image only-dark" alt="Particula Book - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    Getting started
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tour</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../tour/part-tour.html">Particula tour</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../distribution_statistics.html">Distribution statistics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_coagulation.html">Distribution coagulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_evolution.html">Distribution evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_ambient.html">Distributions</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../ionparticle_coagulation.html">Ion–particle coagulation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../streamlake/particula_data.html">Data in Particula</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part1.html">Loading Part 1: Into &amp; 1D Data</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part2.html">Loading Part 2: Sizer Data</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part3.html">Loading Part 3: Lake</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/loading_data_part4.html">Loading Part 4: Settings Files</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/stream_stats_part1.html">Stream: Averaging and Outliers</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../streamlake/stream_stats_size_distribution_part2.html">Size Distribution Stats</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../wall_loss_section.html">Chamber Wall Loss Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/chamber_smps_data.html">Chamber Analysis</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/wall_loss_forward_simulation.html">Chamber Forward Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/forward_fit_simple.html">Simple Wall Loss Fit</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../lagrangian/lagrangian_intro.html">Lagrangian Particle Model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/basic_lagrangian_box.html">Introduction to the Lagrangian Box Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/sweep_and_prune.html">Sweep and Prune Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/friction_force.html">Realistic Drag, Mass, and Velocity</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../equilibria/equilibria_intro.html">Equilibria of Aerosols</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../equilibria/activity_part1.html">Activity Example</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="aerosol_optics_intro.html">Introduction to Aerosol Optics</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mie_basics.html">Mie Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="humid_scattering.html">Scattering for Humidified Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Scattering Truncation Corrections</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/knudsen_number.html"><code class="docutils literal notranslate"><span class="pre">knudsen_number</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/slip_correction.html"><code class="docutils literal notranslate"><span class="pre">slip_correction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/friction_factor.html"><code class="docutils literal notranslate"><span class="pre">friction_factor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/utilities/utilities_overview.html">Utilities Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/convert_size_dist_scales.html">Converting Distributions</a></li>
+
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Strategic Plan</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/strategic_planning_FY24.html">FY24 Plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/Aerosol_patterns.html">Program Outline Revision Draft</a></li>
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Next Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/next/next_vapor_pressure.html">Vapor Pressure</a></li>
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributor Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/light_scattering/scattering_truncation.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/light_scattering/scattering_truncation.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/light_scattering/scattering_truncation.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/light_scattering/scattering_truncation.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/examples/light_scattering/scattering_truncation.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Scattering Truncation Corrections</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-importance-of-correcting-for-scattering-truncation">The Importance of Correcting for Scattering Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#size-dependent-nature-of-scattering-truncation">Size-Dependent Nature of Scattering Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-the-challenge">Addressing the Challenge</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-scattering-truncation-for-single-particle-measurements">Addressing Scattering Truncation for Single Particle Measurements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-truncation-correction-with-python">Implementing Truncation Correction with Python</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#insights-from-truncation-correction">Insights from Truncation Correction</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-size-dependence-of-truncation">Full Size Dependence of Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#correcting-scattering-truncation-250-nm-distribution">Correcting Scattering Truncation 250 nm Distribution</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generating-a-representative-aerosol-distribution">Generating a Representative Aerosol Distribution</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#correcting-scattering-truncation-1000-nm-distribution">Correcting Scattering Truncation 1000 nm Distribution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-humidified-aerosol-measurements">Addressing Humidified Aerosol Measurements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#leveraging-truncation-corrections-for-broader-applications">Leveraging Truncation Corrections for Broader Applications</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="scattering-truncation-corrections">
+<h1>Scattering Truncation Corrections<a class="headerlink" href="#scattering-truncation-corrections" title="Link to this heading">#</a></h1>
+<p>The study of aerosol optical properties, such as Single Scattering Albedo (SSA), plays a crucial role in understanding the effects of aerosols on climate and air quality. SSA, a measure of the fraction of light scattered by particles relative to the total light extinction (scattering plus absorption), is essential for assessing aerosol radiative forcing. Instruments like the Cavity Attenuated Phase Shift (CAPS) SSA instrument are pivotal in making these measurements with high accuracy and reliability. However, one of the critical challenges in accurately determining SSA, especially with the CAPS instrument, is the phenomenon of scattering truncation.</p>
+<section id="the-importance-of-correcting-for-scattering-truncation">
+<h2>The Importance of Correcting for Scattering Truncation<a class="headerlink" href="#the-importance-of-correcting-for-scattering-truncation" title="Link to this heading">#</a></h2>
+<p>Scattering truncation occurs due to the limited angular range over which scattering measurements can be made, leading to an underestimation of the total scattering by aerosol particles. This limitation is particularly pronounced in instruments like the CAPS, where the design inherently restricts the detection of scattered light to a finite angular range (missing some back scatter and forward scattering light). The consequence of this truncation is a potential bias (low) in the measured SSA values, which can significantly affect the interpretation of aerosol optical properties and, by extension, their climatic and environmental impacts.</p>
+</section>
+<section id="size-dependent-nature-of-scattering-truncation">
+<h2>Size-Dependent Nature of Scattering Truncation<a class="headerlink" href="#size-dependent-nature-of-scattering-truncation" title="Link to this heading">#</a></h2>
+<p>The extent of scattering truncation is not uniform across all particle sizes; rather, it exhibits a pronounced size dependency. This variation arises because the scattering efficiency and the angular distribution of scattered light are functions of particle size relative to the wavelength of the incident light. Smaller particles tend to scatter light more isotropically, while larger particles preferentially scatter light in the forward direction. As a result, instruments with limited angular detection ranges may miss a substantial portion of the forward-scattered light from larger particles, leading to more significant truncation effects for these particle sizes.</p>
+</section>
+<section id="addressing-the-challenge">
+<h2>Addressing the Challenge<a class="headerlink" href="#addressing-the-challenge" title="Link to this heading">#</a></h2>
+<p>Correcting for scattering truncation is thus vital for ensuring the accuracy of SSA measurements and, by extension, our understanding of aerosol optical properties. This notebook focuses on methodologies for correcting scattering truncation effects in SSA measurements made using the CAPS instrument. By implementing these corrections, we aim to achieve more accurate and representative SSA values, enhancing our ability to model and predict aerosol impacts on atmospheric processes.</p>
+<p>The following sections will delve into scattering truncation, explore its size-dependent characteristics, and introduce correction techniques tailored to the CAPS SSA instrument.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># particula imports</span>
+<span class="kn">from</span> <span class="nn">particula.util</span> <span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">distribution_discretization</span>
+<span class="kn">from</span> <span class="nn">particula.data.process</span> <span class="kn">import</span> <span class="n">scattering_truncation</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="addressing-scattering-truncation-for-single-particle-measurements">
+<h2>Addressing Scattering Truncation for Single Particle Measurements<a class="headerlink" href="#addressing-scattering-truncation-for-single-particle-measurements" title="Link to this heading">#</a></h2>
+<p>In the quest to accurately assess aerosol optical properties using the Cavity Attenuated Phase Shift (CAPS) SSA instrument, accounting for scattering truncation is paramount. Scattering truncation arises due to the instrument’s limited angular range in capturing scattered light, necessitating corrections to obtain true scattering coefficients. This section introduces the methodology to correct for scattering truncation for a single aerosol particle using the <code class="docutils literal notranslate"><span class="pre">scattering_truncation.trunc_mono</span></code> function.</p>
+<section id="implementing-truncation-correction-with-python">
+<h3>Implementing Truncation Correction with Python<a class="headerlink" href="#implementing-truncation-correction-with-python" title="Link to this heading">#</a></h3>
+<p>The process begins by defining the optical properties of the particle (refractive index and wavelength) and calculating both the ideal (untruncated) and the actual (truncated) scattering efficiencies. We then determine the correction factor needed to adjust for the truncation effect observed with the CAPS instrument.</p>
+<section id="insights-from-truncation-correction">
+<h4>Insights from Truncation Correction<a class="headerlink" href="#insights-from-truncation-correction" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p><strong>Ideal vs. Truncated Scattering Efficiency</strong>: The <code class="docutils literal notranslate"><span class="pre">qsca_ideal</span></code> output represents the scattering efficiency as if measured by a perfect instrument with no angular limitations. In contrast, <code class="docutils literal notranslate"><span class="pre">qsca_trunc</span></code> reflects the efficiency as captured by the CAPS instrument, which is inherently limited by scattering truncation.</p></li>
+<li><p><strong>Correction Factor</strong>: The <code class="docutils literal notranslate"><span class="pre">trunc_corr</span></code> value indicates the factor by which the measured (truncated) scattering efficiency needs to be adjusted to align with the ideal, untruncated scenario. This correction is crucial for accurately interpreting SSA measurements and understanding aerosol scattering behaviors.</p></li>
+</ul>
+<p>This correction approach for a single particle lays the groundwork for more comprehensive analyses.</p>
+<p><strong>Note</strong>: The <code class="docutils literal notranslate"><span class="pre">calibrated_trunc</span></code> boolean applies an additional correction factor of 1.0224, so at a 150 nm diameter the truncation correction is 1. This factor is numerically determined and it is not clear where this error is introduced in the angular truncation calculation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the refractive index of the aerosol particle and the light wavelength</span>
+<span class="n">m_sphere</span> <span class="o">=</span> <span class="mf">1.5</span>  <span class="c1"># Refractive index of the particle</span>
+<span class="n">wavelength</span> <span class="o">=</span> <span class="mf">450.0</span>  <span class="c1"># Wavelength of incident light in nanometers (nm)</span>
+
+<span class="c1"># Perform the truncation correction for a single particle of a given diameter</span>
+<span class="n">trunc_corr</span><span class="p">,</span> <span class="n">z_axis</span><span class="p">,</span> <span class="n">qsca_trunc</span><span class="p">,</span> <span class="n">qsca_ideal</span><span class="p">,</span> <span class="n">theta1</span><span class="p">,</span> <span class="n">theta2</span> <span class="o">=</span> <span class="n">scattering_truncation</span><span class="o">.</span><span class="n">trunc_mono</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>  <span class="c1"># Refractive index of the particle</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>  <span class="c1"># Wavelength of incident light</span>
+    <span class="n">diameter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>  <span class="c1"># Diameter of the particle in nanometers</span>
+    <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Request full output for detailed analysis</span>
+    <span class="n">calibrated_trunc</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Output the calculated scattering efficiencies and truncation correction</span>
+<span class="c1"># factor</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ideal Q_sca: </span><span class="si">{</span><span class="n">qsca_ideal</span><span class="si">}</span><span class="s2"> for a perfect instrument&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Truncated Q_sca: </span><span class="si">{</span><span class="n">qsca_trunc</span><span class="si">}</span><span class="s2"> for a truncated CAPS instrument&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Truncation correction factor: </span><span class="si">{</span><span class="n">trunc_corr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Ideal Q_sca: 0.5478174528225518 for a perfect instrument
+Truncated Q_sca: 0.5363833503036401 for a truncated CAPS instrument
+Truncation correction factor: 0.9988859309373502
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="full-size-dependence-of-truncation">
+<h2>Full Size Dependence of Truncation<a class="headerlink" href="#full-size-dependence-of-truncation" title="Link to this heading">#</a></h2>
+<p>The size-dependent nature of scattering truncation necessitates a thorough understanding of how the phenomenon varies across different particle sizes. This section explores the full size dependence of scattering truncation and introduces the <code class="docutils literal notranslate"><span class="pre">scattering_truncation.truncation_for_diameters</span></code> function to correct for truncation effects across a range of particle sizes.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generating diameters in lin space from 50 nm to 1000 nm with 200 points</span>
+<span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="n">truncation_array</span> <span class="o">=</span> <span class="n">scattering_truncation</span><span class="o">.</span><span class="n">truncation_for_diameters</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">diameter_sizes</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">discretize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">calibrated_trunc</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Plot the truncation correction factor as a function of particle diameter</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">diameters</span><span class="p">,</span> <span class="n">truncation_array</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Particle diameter (nm)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Truncation correction factor&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Truncation correction factor as a function of particle diameter&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/bf3e543fa09289ebfec3d72e9001d92e924601c42fd11e89e3b1b208016caaaa.png" src="../../_images/bf3e543fa09289ebfec3d72e9001d92e924601c42fd11e89e3b1b208016caaaa.png" />
+</div>
+</div>
+</section>
+<section id="correcting-scattering-truncation-250-nm-distribution">
+<h2>Correcting Scattering Truncation 250 nm Distribution<a class="headerlink" href="#correcting-scattering-truncation-250-nm-distribution" title="Link to this heading">#</a></h2>
+<p>Aerosol populations in the atmosphere exhibit a broad range of particle sizes, each contributing distinctively to the overall optical scattering properties. This section demonstrates the application of the <code class="docutils literal notranslate"><span class="pre">scattering_truncation.correction_for_distribution</span></code> function, which facilitates the adjustment for scattering truncation across an aerosol size distributions measurement.</p>
+<section id="generating-a-representative-aerosol-distribution">
+<h3>Generating a Representative Aerosol Distribution<a class="headerlink" href="#generating-a-representative-aerosol-distribution" title="Link to this heading">#</a></h3>
+<p>For this analysis, we focus on a distribution centered around 250 nm, a size range significant for many atmospheric aerosol studies. We simulate this aerosol population using a log-normal distribution, a common representation for atmospheric aerosol size distributions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the refractive index and wavelength for the aerosols</span>
+<span class="n">m_sphere</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="n">wavelength</span> <span class="o">=</span> <span class="mf">450.0</span>  <span class="c1"># in nanometers</span>
+
+<span class="c1"># Generate diameters using a log-spaced array for better representation</span>
+<span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">800</span><span class="p">),</span> <span class="mi">100</span><span class="p">)</span>  <span class="c1"># From 50 nm to 800 nm</span>
+
+<span class="c1"># Parameters for the log-normal size distribution</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.4</span>  <span class="c1"># Geometric standard deviation</span>
+<span class="n">modes</span> <span class="o">=</span> <span class="mi">250</span>  <span class="c1"># Peak diameter for monomodal distribution</span>
+<span class="n">number_total</span> <span class="o">=</span> <span class="mf">1e3</span>  <span class="c1"># Total number of particles</span>
+
+<span class="c1"># Create a log-normal size distribution</span>
+<span class="n">pdf_dist</span> <span class="o">=</span> <span class="n">distribution_discretization</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span>
+    <span class="n">interval</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">disttype</span><span class="o">=</span><span class="s2">&quot;lognormal&quot;</span><span class="p">,</span>
+    <span class="n">gsigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="n">modes</span><span class="p">,</span>
+    <span class="n">nparticles</span><span class="o">=</span><span class="n">number_total</span>
+<span class="p">)</span><span class="o">.</span><span class="n">m</span>
+
+<span class="c1"># Convert the size distribution to a probability mass function (PMF)</span>
+<span class="n">number_conc_pms</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">distribution_convert_pdf_pms</span><span class="p">(</span>
+    <span class="n">x_array</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">distribution</span><span class="o">=</span><span class="n">pdf_dist</span><span class="p">,</span>
+    <span class="n">to_pdf</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span> <span class="o">*</span> <span class="n">number_total</span>
+
+<span class="c1"># Calculate the truncation correction for the entire size distribution</span>
+<span class="n">trunc_correction</span> <span class="o">=</span> <span class="n">scattering_truncation</span><span class="o">.</span><span class="n">correction_for_distribution</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">diameter_sizes</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">number_per_cm3</span><span class="o">=</span><span class="n">number_conc_pms</span><span class="p">,</span>
+    <span class="n">discretize</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Visualize the size distribution and truncation correction</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">diameters</span><span class="p">,</span> <span class="n">number_conc_pms</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Size Distribution&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Particle Diameter (nm)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Number Concentration (#/cm³)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Truncation Correction: </span><span class="si">{</span><span class="n">trunc_correction</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> for the entire distribution&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Overall truncation correction for the distribution: </span><span class="si">{</span><span class="n">trunc_correction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/9274e51c197129ccb73955ff96e7daeab0d485d0d0113a4480d5f14a68707674.png" src="../../_images/9274e51c197129ccb73955ff96e7daeab0d485d0d0113a4480d5f14a68707674.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Overall truncation correction for the distribution: 1.041606234228776
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="correcting-scattering-truncation-1000-nm-distribution">
+<h2>Correcting Scattering Truncation 1000 nm Distribution<a class="headerlink" href="#correcting-scattering-truncation-1000-nm-distribution" title="Link to this heading">#</a></h2>
+<p>In addition to the 250 nm distribution, we also explore the correction of scattering truncation for a larger aerosol population centered around 1000 nm. This size range is particularly relevant for understanding the scattering properties of coarse-mode aerosols, which play a crucial role in atmospheric processes.</p>
+<p>The truncation factor is much larger for the 1000 nm distribution, indicating the more significant impact of truncation for larger particles. This underscores the importance of accounting for scattering truncation across the full range of aerosol sizes to obtain accurate SSA measurements.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the refractive index and wavelength for the aerosols</span>
+<span class="n">m_sphere</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="n">wavelength</span> <span class="o">=</span> <span class="mf">450.0</span>  <span class="c1"># in nanometers</span>
+
+<span class="c1"># Generate diameters using a log-spaced array for better representation</span>
+<span class="n">diameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">2500</span><span class="p">),</span>
+    <span class="mi">100</span><span class="p">)</span>  <span class="c1"># From 50 nm to 800 nm</span>
+
+<span class="c1"># Parameters for the log-normal size distribution</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.4</span>  <span class="c1"># Geometric standard deviation</span>
+<span class="n">modes</span> <span class="o">=</span> <span class="mi">1000</span>  <span class="c1"># Peak diameter for monomodal distribution</span>
+<span class="n">number_total</span> <span class="o">=</span> <span class="mf">1e3</span>  <span class="c1"># Total number of particles</span>
+
+<span class="c1"># Create a log-normal size distribution</span>
+<span class="n">pdf_dist</span> <span class="o">=</span> <span class="n">distribution_discretization</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span>
+    <span class="n">interval</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">disttype</span><span class="o">=</span><span class="s2">&quot;lognormal&quot;</span><span class="p">,</span>
+    <span class="n">gsigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="n">modes</span><span class="p">,</span>
+    <span class="n">nparticles</span><span class="o">=</span><span class="n">number_total</span>
+<span class="p">)</span><span class="o">.</span><span class="n">m</span>
+
+<span class="c1"># Convert the size distribution to a probability mass function (PMF)</span>
+<span class="n">number_conc_pms</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">distribution_convert_pdf_pms</span><span class="p">(</span>
+    <span class="n">x_array</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">distribution</span><span class="o">=</span><span class="n">pdf_dist</span><span class="p">,</span>
+    <span class="n">to_pdf</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span> <span class="o">*</span> <span class="n">number_total</span>
+
+<span class="c1"># Calculate the truncation correction for the entire size distribution</span>
+<span class="n">trunc_correction</span> <span class="o">=</span> <span class="n">scattering_truncation</span><span class="o">.</span><span class="n">correction_for_distribution</span><span class="p">(</span>
+    <span class="n">m_sphere</span><span class="o">=</span><span class="n">m_sphere</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">diameter_sizes</span><span class="o">=</span><span class="n">diameters</span><span class="p">,</span>
+    <span class="n">number_per_cm3</span><span class="o">=</span><span class="n">number_conc_pms</span><span class="p">,</span>
+    <span class="n">discretize</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Visualize the size distribution and truncation correction</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">diameters</span><span class="p">,</span> <span class="n">number_conc_pms</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Size Distribution&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Particle Diameter (nm)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Number Concentration (#/cm³)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Truncation Correction: </span><span class="si">{</span><span class="n">trunc_correction</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> for the entire distribution&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Overall truncation correction for the distribution: </span><span class="si">{</span><span class="n">trunc_correction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/e7748f469acfac727b417084cb2b6be98be45b627d296bf345ebc583cb1e2be2.png" src="../../_images/e7748f469acfac727b417084cb2b6be98be45b627d296bf345ebc583cb1e2be2.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Overall truncation correction for the distribution: 1.1821845913839404
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<p>Understanding the climatic and environmental impacts of aerosols necessitates accurate determinations of their optical properties, especially Single Scattering Albedo (SSA). The challenge of scattering truncation, however, complicates the precise measurement of SSA, a dilemma particularly pronounced with the use of the Cavity Attenuated Phase Shift (CAPS) SSA instrument. Throughout this notebook, we have explored and applied methodologies to correct for the effects of scattering truncation, delving into its size-dependent characteristics and the broader implications for accurately assessing SSA.</p>
+<section id="addressing-humidified-aerosol-measurements">
+<h3>Addressing Humidified Aerosol Measurements<a class="headerlink" href="#addressing-humidified-aerosol-measurements" title="Link to this heading">#</a></h3>
+<p>Our exploration does extend to humidified aerosol measurements, where changes in particle refractive index and diameter under varying humidity levels introduce additional complexity. The <code class="docutils literal notranslate"><span class="pre">scattering_truncation</span></code> module, through its <code class="docutils literal notranslate"><span class="pre">correction_for_humidified</span></code> and <code class="docutils literal notranslate"><span class="pre">correction_for_humidified_looped</span></code> functions, offers robust solutions for incorporating these dynamic factors into SSA calculations, ensuring that measurements remain reflective of actual atmospheric conditions.</p>
+</section>
+<section id="leveraging-truncation-corrections-for-broader-applications">
+<h3>Leveraging Truncation Corrections for Broader Applications<a class="headerlink" href="#leveraging-truncation-corrections-for-broader-applications" title="Link to this heading">#</a></h3>
+<p>The adaptability of these correction techniques to a wide range of real-world aerosol distributions highlights their significance. Aerosols in the atmosphere exhibit a vast diversity in size, composition, and behavior, necessitating flexible and accurate measurement and analysis methods. By enhancing the precision of SSA and other optical property measurements, we lay a stronger foundation for atmospheric modeling, contributing to more reliable predictions of aerosol impacts on climate and environmental health.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">scattering_truncation</span><span class="o">.</span><span class="n">trunc_mono</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on _lru_cache_wrapper in module particula.data.process.scattering_truncation:
+
+trunc_mono(m_sphere: Union[complex, float], wavelength: float, diameter: float, full_output: bool = False, calibrated_trunc: bool = True, discretize: bool = True) -&gt; Union[float, Tuple[float, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]]
+    Calculates the single scattering albedo (SSA) correction due to truncation
+    for monodisperse aerosol measurements using the CAPS-PM-SSA instrument. The
+    correction accounts for the incomplete angular range of scattering
+    measurements due to the instrument&#39;s geometry.
+    
+    Parameters
+    ----------
+    m_sphere : Union[complex, float]
+        Complex or real refractive index of the aerosol.
+    wavelength : float
+        Wavelength of light in nanometers used in the CAPS instrument.
+    diameter : Union[float, np.float64]
+        Diameter of the monodisperse aerosol in nanometers.
+    full_output : bool, optional
+        If True, additional details about the calculation are returned,
+        including z-axis values, angles of integration, and both truncated and
+        ideal scattering efficiencies.
+    calibrated_trunc : bool, optional
+        If True, applies a numberical calibration factor to the truncation
+        correction, so 150 is 1. Default is True.
+    discretize : bool, optional
+        If True, discretizes the input parameters for potentially improved
+        stability/performance in scattering function calculations. Can not be
+        done for full_output=True
+    
+    Returns
+    -------
+    Union[float, Tuple[float, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
+    np.ndarray]]
+    If fullOutput is False, returns only the truncation correction factor.
+    If fullOutput is True, returns a tuple containing the truncation correction
+    factor, z-axis positions, truncated scattering efficiency, ideal scattering
+    efficiency, forward scattering angle, and backward scattering angle.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">scattering_truncation</span><span class="o">.</span><span class="n">truncation_for_diameters</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function truncation_for_diameters in module particula.data.process.scattering_truncation:
+
+truncation_for_diameters(m_sphere: Union[complex, float], wavelength: float, diameter_sizes: numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]], discretize: bool = True, calibrated_trunc: bool = True) -&gt; numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]]
+    Calculates the truncation correction for an array of particle diameters
+    given a specific refractive index and wavelength. This function is
+    particularly useful for aerosol optical property measurements where
+    truncation effects due to instrument geometry need to be accounted for.
+    
+    Parameters
+    ----------
+    m_sphere : Union[complex, float]
+        The complex or real refractive index of the particles.
+    wavelength : float
+        The wavelength of the incident light in nanometers (nm).
+    diameter_sizes : NDArray[np.float64]
+        An array of particle diameters in nanometers (nm) for which the
+        truncation correction will be calculated.
+    discretize : bool, optional
+        A flag indicating whether to discretize the input parameters for
+        potentially improved calculation performance. Default is True.
+    calibrated_trunc : bool, optional
+        If True, applies a numberical calibration factor to the truncation
+        correction, so 150 is 1. Default is True.
+    
+    Returns
+    -------
+    NDArray[np.float64]
+        An array of truncation corrections corresponding to the input array of
+        particle diameters.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">scattering_truncation</span><span class="o">.</span><span class="n">correction_for_distribution</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function correction_for_distribution in module particula.data.process.scattering_truncation:
+
+correction_for_distribution(m_sphere: Union[complex, float], wavelength: float, diameter_sizes: numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]], number_per_cm3: numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]], discretize: bool = True) -&gt; Union[float, numpy.float64]
+    Calculates the correction factor for scattering measurements due to
+    truncation effects in aerosol size distribution measurements. This
+    correction factor is used to adjust the measured scattering
+    coefficient, accounting for the limited angular range of the instrument.
+    
+    Parameters
+    ----------
+    m_sphere : Union[complex, float]
+        The complex or real refractive index of the particles.
+    wavelength : float
+        The wavelength of the incident light in nanometers (nm).
+    diameter_sizes : NDArray[np.float64]
+        An array of particle diameters in nanometers (nm) corresponding to the
+        size distribution.
+    number_per_cm3 : NDArray[np.float64]
+        An array of particle number concentrations (#/cm^3) for each diameter
+        in the size distribution.
+    discretize : bool, optional
+        If True, the calculation will use discretized values for the
+        refractive index, wavelength, and diameters to potentially improve
+        computation performance. Default is True.
+    
+    Returns
+    -------
+    float
+        The correction factor for scattering measurements. This factor is
+        dimensionless and is used to correct the measured scattering
+        coefficient for truncation effects, calculated as the ratio of
+        the ideal (full angular range) to truncated scattering coefficient.
+    
+    Example
+    -------
+    b_sca_corrected = b_sca_measured * bsca_correction
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">scattering_truncation</span><span class="o">.</span><span class="n">correction_for_humidified</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function correction_for_humidified in module particula.data.process.scattering_truncation:
+
+correction_for_humidified(kappa: Union[float, numpy.float64], number_per_cm3: numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]], diameter: numpy.ndarray[typing.Any, numpy.dtype[numpy.float64]], water_activity_sizer: numpy.float64, water_activity_sample: numpy.float64, refractive_index_dry: Union[complex, float] = 1.45, water_refractive_index: Union[complex, float] = 1.33, wavelength: float = 450, discretize: bool = True) -&gt; numpy.float64
+    Calculates the scattering correction for humidified aerosol measurements,
+    accounting for water uptake by adjusting the aerosol&#39;s refractive index.
+    This function requires the kappa values for the particles, which describe
+    their hygroscopic growth.
+    
+    Parameters
+    ----------
+    kappa : Union[float, NDArray[np.float64]]
+        Hygroscopicity parameter kappa, indicating the water uptake capability
+        of the particles.
+    number_per_cm3 : NDArray[np.float64]
+        Number concentration of particles per cubic centimeter (#/cm³) for
+        each size bin.
+    diameter : NDArray[np.float64]
+        Array of particle diameters in nanometers (nm).
+    water_activity_sizer : NDArray[np.float64]
+        Water activity (relative humidity/100) of the air sample used for
+        sizing.
+    water_activity_sample : NDArray[np.float64]
+        Water activity (relative humidity/100) of the air sample in optical
+        measurements.
+    refractive_index_dry : Union[complex, float], optional
+        Refractive index of the dry particles. Default is 1.45.
+    water_refractive_index : Union[complex, float], optional
+        Refractive index of water. Default is 1.33.
+    wavelength : float, optional
+        Wavelength of the incident light in nanometers (nm). Default is 450.
+    discretize : bool, optional
+        If True, calculation uses discretized values for refractive index,
+        wavelength, and diameters to improve performance. Default is True.
+    
+    Returns
+    -------
+    np.float64
+        A numpy array of scattering correction factors for each particle size
+        in the distribution, to be applied to measured backscatter
+        coefficients to account for truncation effects due to humidity.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "uncscode/particula",
+            ref: "v0.0.10",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./examples/light_scattering"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="kappa_vs_extinction.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Fitting Kappa-HGF from Light Extinction</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../documentation/environment.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-importance-of-correcting-for-scattering-truncation">The Importance of Correcting for Scattering Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#size-dependent-nature-of-scattering-truncation">Size-Dependent Nature of Scattering Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-the-challenge">Addressing the Challenge</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-scattering-truncation-for-single-particle-measurements">Addressing Scattering Truncation for Single Particle Measurements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-truncation-correction-with-python">Implementing Truncation Correction with Python</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#insights-from-truncation-correction">Insights from Truncation Correction</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-size-dependence-of-truncation">Full Size Dependence of Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#correcting-scattering-truncation-250-nm-distribution">Correcting Scattering Truncation 250 nm Distribution</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generating-a-representative-aerosol-distribution">Generating a Representative Aerosol Distribution</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#correcting-scattering-truncation-1000-nm-distribution">Correcting Scattering Truncation 1000 nm Distribution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#addressing-humidified-aerosol-measurements">Addressing Humidified Aerosol Measurements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#leveraging-truncation-corrections-for-broader-applications">Leveraging Truncation Corrections for Broader Applications</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By particula contributors
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
