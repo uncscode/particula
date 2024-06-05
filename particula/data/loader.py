@@ -37,7 +37,7 @@ def data_raw_loader(file_path: str) -> list:
         ['line 1', 'line 2', 'line 3']
     """
     try:
-        with open(file_path, 'r', encoding='utf8', errors='replace') as file:
+        with open(file_path, "r", encoding="utf8", errors="replace") as file:
             data = [line.rstrip() for line in file]
     except FileNotFoundError:
         print(f"File not found: {file_path}")
@@ -84,11 +84,13 @@ def filter_list(data: List[str], char_counts: dict) -> List[str]:
     for char, count in char_counts.items():
         if count > -1:
             filtered_data = [
-                row for row in filtered_data if row.count(char) == count]
+                row for row in filtered_data if row.count(char) == count
+            ]
         if len(filtered_data) / len(data) < FILTER_WARNING_FRACTION:
             warnings.warn(
-                f"More than {FILTER_WARNING_FRACTION} of the rows have " +
-                f"been filtered out based on the character: {char}.")
+                f"More than {FILTER_WARNING_FRACTION} of the rows have "
+                + f"been filtered out based on the character: {char}."
+            )
     return filtered_data
 
 
@@ -121,29 +123,24 @@ def data_format_checks(data: List[str], data_checks: dict) -> List[str]:
     if not isinstance(data, list):
         raise TypeError("data must be a list")
     length_initial = len(data)
-    if data_checks.get('skip_rows', 0) > 0:
-        data = data[data_checks['skip_rows']:]
-    if data_checks.get('skip_end', 0) > 0:
-        data = data[:-data_checks['skip_end']]
-    if len(data_checks.get('characters', [])) == 1:
+    if data_checks.get("skip_rows", 0) > 0:
+        data = data[data_checks["skip_rows"] :]
+    if data_checks.get("skip_end", 0) > 0:
+        data = data[: -data_checks["skip_end"]]
+    if len(data_checks.get("characters", [])) == 1:
         # Filter out any rows with fewer than the specified number of
         # characters.
-        data = [
-            x for x in data
-            if (
-                len(x)
-                > data_checks['characters'][0]
-            )
-        ]
-    elif len(data_checks.get('characters', [])) == 2:
+        data = [x for x in data if (len(x) > data_checks["characters"][0])]
+    elif len(data_checks.get("characters", [])) == 2:
         # Filter out any rows with fewer than the minimum or more than the
         # maximum number of characters.
         data = [
-            x for x in data
+            x
+            for x in data
             if (
-                data_checks['characters'][0]
+                data_checks["characters"][0]
                 < len(x)
-                < data_checks['characters'][1]
+                < data_checks["characters"][1]
             )
         ]
     if len(data) / length_initial < FILTER_WARNING_FRACTION:
@@ -151,13 +148,13 @@ def data_format_checks(data: List[str], data_checks: dict) -> List[str]:
             f"More than {FILTER_WARNING_FRACTION} rows are filtered based on "
             + f"{data_checks['characters']} or skip rows."
         )
-    if 'char_counts' in data_checks:
-        char_counts = data_checks.get('char_counts', {})
+    if "char_counts" in data_checks:
+        char_counts = data_checks.get("char_counts", {})
         data = filter_list(data, char_counts)
     if data := [x.strip() for x in data]:
         return data
     else:
-        raise ValueError('No data left in file')
+        raise ValueError("No data left in file")
 
 
 def parse_time_column(
@@ -166,7 +163,7 @@ def parse_time_column(
     line: np.ndarray,
     date_offset: Optional[str] = None,
     seconds_shift: int = 0,
-    timezone_identifier: str = 'UTC'
+    timezone_identifier: str = "UTC",
 ) -> float:
     """
     Parses the time column of a data line and returns it as a timestamp.
@@ -195,7 +192,7 @@ def parse_time_column(
     ValueError
         If an invalid time column or format is specified.
     """
-    if time_format == 'epoch':
+    if time_format == "epoch":
         return float(line[time_column]) + seconds_shift
     if date_offset:
         # if the time is in one column, and the date is fixed
@@ -219,7 +216,8 @@ def parse_time_column(
             + seconds_shift
         )
     raise ValueError(
-        f"Invalid time column or format: {time_column}, {time_format}")
+        f"Invalid time column or format: {time_column}, {time_format}"
+    )
 
 
 def sample_data(
@@ -230,7 +228,7 @@ def sample_data(
     delimiter: str,
     date_offset: Optional[str] = None,
     seconds_shift: int = 0,
-    timezone_identifier: str = 'UTC'
+    timezone_identifier: str = "UTC",
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Samples the data to get the time and data streams.
@@ -288,48 +286,94 @@ def sample_data(
             line=line_array,
             date_offset=date_offset,
             seconds_shift=seconds_shift,
-            timezone_identifier=timezone_identifier
+            timezone_identifier=timezone_identifier,
         )
 
         for j, col in enumerate(data_columns):
-            value = line_array[col].strip() if col < len(line_array) else ''
-            if value in ['', '.']:  # no data
+            value = line_array[col].strip() if col < len(line_array) else ""
+            if value in ["", "."]:  # no data
                 data_array[i, j] = np.nan
-            elif value.count('�') > 0:
+            elif value.count("�") > 0:
                 data_array[i, j] = np.nan
             elif value[0].isnumeric():  # if the first character is a number
                 data_array[i, j] = float(value)
             elif value[-1].isnumeric():
                 data_array[i, j] = float(value)
-            elif value[0] == '-':
+            elif value[0] == "-":
                 data_array[i, j] = float(value)
-            elif value[0] == '+':
+            elif value[0] == "+":
                 data_array[i, j] = float(value)
-            elif value[0] == '.':
+            elif value[0] == ".":
                 try:
                     data_array[i, j] = float(value)
                 except ValueError as exc:
                     print(line_array)
                     raise ValueError(
-                        f'Data is not a float: row {i}, col {j}, value {value}'
+                        f"Data is not a float: row {i}, col {j}, value {value}"
                     ) from exc
 
             elif value.isalpha():
                 true_match = [
-                    'ON', 'on', 'On', 'oN', '1', 'True', 'true',
-                    'TRUE', 'tRUE', 't', 'T', 'Yes', 'yes', 'YES',
-                    'yES', 'y', 'Y'
+                    "ON",
+                    "on",
+                    "On",
+                    "oN",
+                    "1",
+                    "True",
+                    "true",
+                    "TRUE",
+                    "tRUE",
+                    "t",
+                    "T",
+                    "Yes",
+                    "yes",
+                    "YES",
+                    "yES",
+                    "y",
+                    "Y",
                 ]
                 false_match = [
-                    'OFF', 'off', 'Off', 'oFF', '0',
-                    'False', 'false', 'FALSE', 'fALSE', 'f',
-                    'F', 'No', 'no', 'NO', 'nO', 'n', 'N'
+                    "OFF",
+                    "off",
+                    "Off",
+                    "oFF",
+                    "0",
+                    "False",
+                    "false",
+                    "FALSE",
+                    "fALSE",
+                    "f",
+                    "F",
+                    "No",
+                    "no",
+                    "NO",
+                    "nO",
+                    "n",
+                    "N",
                 ]
                 nan_match = [
-                    'NaN', 'nan', 'Nan', 'nAN', 'NAN', 'NaN',
-                    'nAn', 'naN', 'NA', 'Na', 'nA', 'na',
-                    'N', 'n', '', 'aN', 'null', 'NULL', 'Null',
-                    '-99999', '-9999', '.'
+                    "NaN",
+                    "nan",
+                    "Nan",
+                    "nAN",
+                    "NAN",
+                    "NaN",
+                    "nAn",
+                    "naN",
+                    "NA",
+                    "Na",
+                    "nA",
+                    "na",
+                    "N",
+                    "n",
+                    "",
+                    "aN",
+                    "null",
+                    "NULL",
+                    "Null",
+                    "-99999",
+                    "-9999",
+                    ".",
                 ]
                 if value in true_match:
                     data_array[i, j] = 1
@@ -339,8 +383,8 @@ def sample_data(
                     data_array[i, j] = np.nan
                 else:
                     raise ValueError(
-                        f'No match for data value: row {i}, \
-                             col {j}, value {value}'
+                        f"No match for data value: row {i}, \
+                             col {j}, value {value}"
                     )
 
     return epoch_time, data_array
@@ -352,11 +396,11 @@ def general_data_formatter(
     data_column: list,
     time_column: Union[int, List[int]],
     time_format: str,
-    delimiter: str = ',',
+    delimiter: str = ",",
     header_row: int = 0,
     date_offset: Optional[str] = None,
     seconds_shift: int = 0,
-    timezone_identifier: str = 'UTC'
+    timezone_identifier: str = "UTC",
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Formats and samples the data to get the time and data streams.
@@ -391,8 +435,7 @@ def general_data_formatter(
     if isinstance(data_column[0], str):
         data_header = data[header_row].split(delimiter)
         # Get data column indices
-        data_column = [data_header.index(x)
-                       for x in data_column]
+        data_column = [data_header.index(x) for x in data_column]
 
     # Check the data format
     data = data_format_checks(data, data_checks)
@@ -406,7 +449,7 @@ def general_data_formatter(
         delimiter,
         date_offset,
         seconds_shift,
-        timezone_identifier
+        timezone_identifier,
     )
 
     return epoch_time, data_array
@@ -438,7 +481,8 @@ def keyword_to_index(keyword: Union[str, int], header: List[str]) -> int:
     if isinstance(keyword, int):
         if keyword < 0 or keyword >= len(header):
             raise ValueError(
-                f"Index {keyword} is out of range for the header.")
+                f"Index {keyword} is out of range for the header."
+            )
         return keyword
     elif keyword in header:
         return header.index(keyword)
@@ -452,11 +496,11 @@ def sizer_data_formatter(
     data_sizer_reader: Dict[str, str],
     time_column: Union[int, List[int]],
     time_format: str,
-    delimiter: str = ',',
+    delimiter: str = ",",
     header_row: int = 0,
     date_offset: Optional[str] = None,
     seconds_shift: int = 0,
-    timezone_identifier: str = 'UTC'
+    timezone_identifier: str = "UTC",
 ) -> Tuple[np.ndarray, np.ndarray, list]:
     """
     Formats data from a particle sizer.
@@ -491,18 +535,21 @@ def sizer_data_formatter(
     data_header = data[header_row].split(delimiter)
     # Convert start and end keywords to indices
     dp_start_index = keyword_to_index(
-        data_sizer_reader["Dp_start_keyword"], data_header)
+        data_sizer_reader["Dp_start_keyword"], data_header
+    )
     dp_end_index = keyword_to_index(
-        data_sizer_reader["Dp_end_keyword"], data_header)
+        data_sizer_reader["Dp_end_keyword"], data_header
+    )
 
     # Ensure dp_start_index and dp_end_index are within valid range
     if dp_start_index > dp_end_index:
         raise ValueError(
-            "Dp_start_keyword must come before Dp_end_keyword in the header")
+            "Dp_start_keyword must come before Dp_end_keyword in the header"
+        )
     # Generate the range of column indices to include
     dp_columns = list(
         range(dp_start_index, dp_end_index + 1)
-        )  # +1 to include the end index
+    )  # +1 to include the end index
     # Extract headers for the specified range
     header = [data_header[i] for i in dp_columns]
 
@@ -518,7 +565,7 @@ def sizer_data_formatter(
         delimiter,
         date_offset,
         seconds_shift=seconds_shift,
-        timezone_identifier=timezone_identifier
+        timezone_identifier=timezone_identifier,
     )
 
     if "convert_scale_from" in data_sizer_reader:
@@ -527,16 +574,13 @@ def sizer_data_formatter(
                 data_2d[i, :] = convert.convert_sizer_dn(
                     diameter=np.array(header).astype(float),
                     dn_dlogdp=data_2d[i, :],
-                    inverse=True
+                    inverse=True,
                 )
 
     return epoch_time, data_2d, header
 
 
-def non_standard_date_location(
-    data: list,
-    date_location: dict
-) -> str:
+def non_standard_date_location(data: list, date_location: dict) -> str:
     """
     Extracts the date from a non-standard location in the data.
 
@@ -562,12 +606,12 @@ def non_standard_date_location(
     ValueError
         If an unsupported or invalid method is specified in date_location.
     """
-    if date_location['method'] != 'file_header_block':
-        raise ValueError('Invalid date location method specified')
+    if date_location["method"] != "file_header_block":
+        raise ValueError("Invalid date location method specified")
 
-    row_index = date_location['row']
-    delimiter = date_location['delimiter']
-    index = date_location['index']
+    row_index = date_location["row"]
+    delimiter = date_location["delimiter"]
+    index = date_location["index"]
     return data[row_index].split(delimiter)[index].strip()
 
 
@@ -610,13 +654,13 @@ def get_files_in_folder_with_size(
 
     # filter the files by size
     full_path = [
-        file for file in file_list
+        file
+        for file in file_list
         if os.path.getsize(os.path.join(search_path, file)) > min_size
     ]
 
     # get the file names only
-    file_list = [os.path.split(path)[-1]
-                 for path in full_path]
+    file_list = [os.path.split(path)[-1] for path in full_path]
     file_size_in_bytes = [os.path.getsize(path) for path in full_path]
 
     return file_list, full_path, file_size_in_bytes
@@ -626,12 +670,12 @@ def save_stream_to_csv(
     stream: Stream,
     path: str,
     suffix_name: Optional[str] = None,
-    folder: Optional[str] = 'output',
+    folder: Optional[str] = "output",
     include_time: bool = True,
 ) -> None:
     """
     Save stream object as a CSV file, with an option to include formatted time.
-    
+
     Args:
     ----------
     stream : Stream
@@ -657,29 +701,34 @@ def save_stream_to_csv(
     os.makedirs(output_folder, exist_ok=True)
 
     # Add suffix to file name if present
-    file_name = f'data{suffix_name}.csv' \
-        if suffix_name is not None else 'data.csv'
+    file_name = (
+        f"data{suffix_name}.csv" if suffix_name is not None else "data.csv"
+    )
     file_path = os.path.join(output_folder, file_name)
 
     try:
         # Save stream data to CSV
-        with open(file_path, mode='w', newline='') as csv_file:
+        with open(file_path, mode="w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
-            
+
             # Prepare header
             header = stream.header
             if include_time:
-                header = ['DateTime[ISO8601]'] + ['Epoch_UTC'] + header
+                header = ["DateTime[ISO8601]"] + ["Epoch_UTC"] + header
             csv_writer.writerow(header)
-            
+
             # Write data rows
             for i in range(len(stream.data)):
                 row = stream.data[i, :].tolist()
                 if include_time and len(stream.time) == len(stream.data):
                     time_val = stream.time[i]
                     # Convert epoch time to a readable string (ISO 8601 format)
-                    readable_time = datetime.fromtimestamp(
-                        time_val, timezone.utc).isoformat() + 'Z'
+                    readable_time = (
+                        datetime.fromtimestamp(
+                            time_val, timezone.utc
+                        ).isoformat()
+                        + "Z"
+                    )
                     row = [readable_time] + [time_val] + row
                 csv_writer.writerow(row)
         print(f"Stream saved to CSV: {file_name}")
@@ -697,11 +746,11 @@ def save_stream(
     path: str,
     stream: Stream,
     sufix_name: Optional[str] = None,
-    folder: Optional[str] = 'output'
+    folder: Optional[str] = "output",
 ) -> None:
     """
     Save stream object as a pickle file.
-    
+
     Args
     ----------
     stream : Stream
@@ -720,14 +769,15 @@ def save_stream(
     os.makedirs(output_folder, exist_ok=True)
 
     # add suffix to file name if present
-    file_name = f'stream{sufix_name}.pk' \
-        if sufix_name is not None else 'stream.pk'
+    file_name = (
+        f"stream{sufix_name}.pk" if sufix_name is not None else "stream.pk"
+    )
     # path to save pickle file
     file_path = os.path.join(output_folder, file_name)
 
     try:
         # Attempt to save the stream
-        with open(file_path, 'wb') as file:
+        with open(file_path, "wb") as file:
             pickle.dump(stream, file)
         print(f"Stream saved: {file_name}")
     except IOError as e:
@@ -744,11 +794,11 @@ def save_stream(
 def load_stream(
     path: str,
     sufix_name: Optional[str] = None,
-    folder: Optional[str] = 'output'
+    folder: Optional[str] = "output",
 ) -> Stream:
     """
     Load stream object from a pickle file.
-    
+
     Args
     ----------
     path : str
@@ -757,7 +807,7 @@ def load_stream(
         Suffix to add to pickle file name. The default is None.
     folder : str, optional
         Folder to load pickle file from. The default is 'output'.
-    
+
     Returns
     -------
     Stream
@@ -767,13 +817,14 @@ def load_stream(
     if not os.path.isdir(path):
         raise ValueError(f"Provided path '{path}' is not a directory.")
     # add suffix to file name if present
-    file_name = f'stream{sufix_name}.pk' \
-        if sufix_name is not None else 'stream.pk'
+    file_name = (
+        f"stream{sufix_name}.pk" if sufix_name is not None else "stream.pk"
+    )
     # path to load pickle file
     file_path = os.path.join(path, folder, file_name)
 
     # load stream
-    with open(file_path, 'rb') as file:
+    with open(file_path, "rb") as file:
         stream = pickle.load(file)
 
     return stream
@@ -783,7 +834,7 @@ def save_lake(
     path: str,
     lake: Lake,
     sufix_name: Optional[str] = None,
-    folder: Optional[str] = 'output'
+    folder: Optional[str] = "output",
 ) -> None:
     """
     Save lake object as a pickle file.
@@ -797,7 +848,7 @@ def save_lake(
     sufix_name : str, optional
         Suffix to add to pickle file name. The default is None.
     """
-    print('Saving lake...')
+    print("Saving lake...")
     # Validate path
     if not os.path.isdir(path):
         raise ValueError(f"Provided path '{path}' is not a directory.")
@@ -806,14 +857,13 @@ def save_lake(
     os.makedirs(output_folder, exist_ok=True)
 
     # add suffix to file name if present
-    file_name = f'lake{sufix_name}.pk' \
-        if sufix_name is not None else 'lake.pk'
+    file_name = f"lake{sufix_name}.pk" if sufix_name is not None else "lake.pk"
     # path to save pickle file
     file_path = os.path.join(output_folder, file_name)
 
     try:
         # Attempt to save the datalake
-        with open(file_path, 'wb') as file:
+        with open(file_path, "wb") as file:
             pickle.dump(lake, file)
         print(f"Lake saved: {file_name}")
     except IOError as e:
@@ -829,7 +879,8 @@ def save_lake(
 
 def load_lake(
     path: str,
-    sufix_name: Optional[str] = None
+    sufix_name: Optional[str] = None,
+    folder: str = "output",
 ) -> Lake:
     """
     Load datalake object from a pickle file.
@@ -843,23 +894,23 @@ def load_lake(
     -------
     data_lake : DataLake
         Loaded DataLake object.
+
+    Notes:
+        spell correction sufix -> suffix
     """
-    file_name = f'lake{sufix_name}.pk' \
-        if sufix_name is not None else 'lake.pk'
+    file_name = f"lake{sufix_name}.pk" if sufix_name is not None else "lake.pk"
     # path to load pickle file
-    file_path = os.path.join(path, 'output', file_name)
+    load_folder = os.path.join(path, folder)
+    file_path = os.path.join(load_folder, file_name)
 
     # load datalake
-    with open(file_path, 'rb') as file:
+    with open(file_path, "rb") as file:
         lake = pickle.load(file)
 
     return lake
 
 
-def netcdf_get_epoch_time(
-        file_path: str,
-        settings: dict
-) -> np.ndarray:
+def netcdf_get_epoch_time(file_path: str, settings: dict) -> np.ndarray:
     """
     Given a netCDF file path and settings, returns an array of epoch times in
     seconds as a float.
@@ -877,9 +928,9 @@ def netcdf_get_epoch_time(
     """
     nc_file = nc.Dataset(file_path)  # type: ignore
 
-    epoch_time = np.zeros(nc_file.dimensions['time'].size)
+    epoch_time = np.zeros(nc_file.dimensions["time"].size)
 
-    for time_col in settings['time_column']:
+    for time_col in settings["time_column"]:
         epoch_time += nc_file.variables.get(time_col)[:]
     epoch_time = np.array(epoch_time.astype(float))
     nc_file.close()
@@ -888,8 +939,7 @@ def netcdf_get_epoch_time(
 
 
 def netcdf_data_1d_load(
-        file_path: str,
-        settings: dict
+    file_path: str, settings: dict
 ) -> Tuple[np.ndarray, list, np.ndarray]:
     """
     Given a netCDF file path and settings, returns a tuple containing the
@@ -911,11 +961,11 @@ def netcdf_data_1d_load(
         KeyError: If the settings dictionary does not contain 'data_1d'.
     """
     # check if data_1d is in the settings dic
-    if 'data_1d' not in settings['netcdf_reader']:
+    if "data_1d" not in settings["netcdf_reader"]:
         raise KeyError("data_1d not in settings['netcdf_reader']")
 
     # get header
-    header_1d = settings['netcdf_reader']['header_1d']
+    header_1d = settings["netcdf_reader"]["header_1d"]
 
     nc_file = nc.Dataset(file_path)  # type: ignore
     # get epoch time
@@ -923,11 +973,13 @@ def netcdf_data_1d_load(
 
     # empty array to store data
     data_1d = np.zeros(
-        (len(settings['netcdf_reader']['data_1d']),
-         nc_file.dimensions['time'].size)
+        (
+            len(settings["netcdf_reader"]["data_1d"]),
+            nc_file.dimensions["time"].size,
+        )
     )
     # select and fill masked array with nan
-    for i, data_col in enumerate(settings['netcdf_reader']['data_1d']):
+    for i, data_col in enumerate(settings["netcdf_reader"]["data_1d"]):
         try:
             data = nc_file.variables.get(data_col)[:]
             data_1d[i, :] = np.ma.filled(data.astype(float), np.nan)
@@ -938,17 +990,15 @@ def netcdf_data_1d_load(
 
     # check data shape, transpose if necessary so that time is last dimension
     data_1d = convert.data_shape_check(
-        time=epoch_time,
-        data=data_1d,
-        header=header_1d)
+        time=epoch_time, data=data_1d, header=header_1d
+    )
 
     return epoch_time, header_1d, data_1d
 
 
 # pylint: disable-all
 def netcdf_data_2d_load(
-        file_path: str,
-        settings: dict
+    file_path: str, settings: dict
 ) -> Tuple[np.ndarray, list, np.ndarray]:
     """
     Given a netCDF file path and settings, returns a tuple containing the
@@ -970,7 +1020,7 @@ def netcdf_data_2d_load(
         KeyError: If the settings dictionary does not contain 'data_2d'.
     """
     # check if data_1d is in the settings dic
-    if 'data_2d' not in settings['netcdf_reader']:
+    if "data_2d" not in settings["netcdf_reader"]:
         raise KeyError("data_2d not in settings['netcdf_reader']")
 
     # get epoch time
@@ -979,13 +1029,13 @@ def netcdf_data_2d_load(
     nc_file = nc.Dataset(file_path)  # type: ignore
 
     # select data_2d
-    data_2d = nc_file.variables.get(settings['netcdf_reader']['data_2d'])[:]
+    data_2d = nc_file.variables.get(settings["netcdf_reader"]["data_2d"])[:]
     # convert masked array to numpy array
     data_2d = np.ma.filled(data_2d.astype(float), np.nan)
     # get header
-    header_2d = nc_file.variables.get(
-        settings['netcdf_reader']['header_2d']
-    )[:]
+    header_2d = nc_file.variables.get(settings["netcdf_reader"]["header_2d"])[
+        :
+    ]
     nc_file.close()
 
     # convert header to list of strings
@@ -993,9 +1043,8 @@ def netcdf_data_2d_load(
 
     # check data shape, transpose if necessary so that time is last dimension
     data_2d = convert.data_shape_check(
-        time=epoch_time,
-        data=data_2d,
-        header=header_2d)
+        time=epoch_time, data=data_2d, header=header_2d
+    )
 
     return epoch_time, header_2d, data_2d
 
@@ -1022,9 +1071,7 @@ def netcdf_info_print(file_path, file_return=False):
         print(dim, len(nc_file.dimensions[dim]))
     print("\nVariables:")
     for var in nc_file.variables:
-        print(var,
-              nc_file.variables[var].shape,
-              nc_file.variables[var].dtype)
+        print(var, nc_file.variables[var].shape, nc_file.variables[var].dtype)
     print("\nHeaders:")
     for attr in nc_file.ncattrs():
         print(attr, "=", getattr(nc_file, attr))
