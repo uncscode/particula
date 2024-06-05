@@ -78,7 +78,10 @@ class Stream:
         if isinstance(index, str):
             if index not in self.header:
                 self.header.append(index)  # add new header element
-                self.data = np.hstack((self.data, value))
+                if value.ndim == 1:
+                    zeros_array = np.zeros_like(value) * np.nan
+                    zeros_array = zeros_array[:, np.newaxis]  # add dimension
+                self.data = np.hstack((self.data, zeros_array))
             index = self.header.index(index)
         # if index is an int, set the data at that index
         self.data[:, index] = value
