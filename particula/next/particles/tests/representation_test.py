@@ -1,47 +1,40 @@
-"""Test Particles and Strategies."""
+"""Test Building ParticleRepresentation properties."""
 
-# import numpy as np
-# import pytest
-# from particula.next.particles.distribution_strategies import (
-#     MassBasedMovingBin, RadiiBasedMovingBin, SpeciatedMassMovingBin,
-# )
-# from particula.next.particles.surface_strategies import SurfaceStrategyVolume
-# from particula.next.particles.activity_strategies import IdealActivityMass
-
-
-# mass_based_strategy = MassBasedMovingBin()
-# radii_based_strategy = RadiiBasedMovingBin()
-# speciated_mass_strategy = SpeciatedMassMovingBin()
-# surface_strategy = SurfaceStrategyVolume()
-# activity_strategy = IdealActivityMass()
+import numpy as np
+from particula.next.particles.representation import ParticleRepresentation
+from particula.next.particles.distribution_strategies import (
+    RadiiBasedMovingBin,
+)
+from particula.next.particles.surface_strategies import SurfaceStrategyVolume
+from particula.next.particles.activity_strategies import IdealActivityMass
 
 
-# @pytest.mark.parametrize("strategy, distribution, density, concentration", [
-#     (MassBasedMovingBin(),
-#      np.array([100, 200, 300], dtype=np.float64),
-#      np.float64(2.5),
-#      np.array([10, 20, 30], dtype=np.float64)),
-#     (RadiiBasedMovingBin(),
-#      np.array([1, 2, 3], dtype=np.float64),
-#      np.float64(5), np.array([10, 20, 30], dtype=np.float64)),
-#     # For SpeciatedMassStrategy, ensure distribution aligns with expected 2D
-#     # shape and densities are properly set
-#     (SpeciatedMassMovingBin(),
-#      np.array([[100, 200], [300, 400]], dtype=np.float64),
-#      np.array([2.5, 3.5], dtype=np.float64),
-#      np.array([10, 20], dtype=np.float64)),
-# ])
-# def test_particle_properties(strategy, distribution, density, concentration):
-#     """Parameterized test for Particle properties."""
-#     particle = Particle(strategy, activity_strategy, surface,
-#                         distribution, density, concentration)
-#     mass = particle.get_mass()
-#     radius = particle.get_radius()
-#     total_mass = particle.get_total_mass()
+def test_particle_properties():
+    """Building ParticleRepresentation properties."""
 
-#     # Validate the types of the returned values
-#     assert isinstance(mass, np.ndarray)
-#     assert isinstance(radius, np.ndarray)
-#     assert isinstance(total_mass, np.float_)
-#     # The value of the returned mass, radius, and total_mass should be correct
-#     # they are already tested in the strategy tests
+    set_strategy = RadiiBasedMovingBin()
+    set_activity = IdealActivityMass()
+    set_surface = SurfaceStrategyVolume()
+    set_distribution = np.array([1.0, 2.0, 3.0])
+    set_density = 1.0
+    set_concentration = np.array([10, 20, 30])
+    set_charge = 1.0
+
+    particle = ParticleRepresentation(
+        strategy=set_strategy,
+        activity=set_activity,
+        surface=set_surface,
+        distribution=set_distribution,
+        density=set_density,
+        concentration=set_concentration,
+        charge=set_charge,
+    )
+    # call inputs
+    mass = particle.get_mass()
+    radius = particle.get_radius()
+    total_mass = particle.get_total_mass()
+
+    # Validate the types of the returned values
+    assert isinstance(mass, np.ndarray)
+    assert isinstance(radius, np.ndarray)
+    assert isinstance(total_mass, np.float_)

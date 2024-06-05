@@ -18,12 +18,10 @@ logger = logging.getLogger("particula")
 
 
 class IdealActivityMassBuilder(BuilderABC):
-    """Builder class for IdealActivityMass objects. No parameters are required
-    to be set.
+    """Builder class for IdealActivityMass objects. No additional parameters.
 
     Methods:
-    --------
-    - build(): Validate and return the IdealActivityMass object.
+        build(): Validate and return the IdealActivityMass object.
     """
 
     def __init__(self):
@@ -34,8 +32,7 @@ class IdealActivityMassBuilder(BuilderABC):
         """Validate and return the IdealActivityMass object.
 
         Returns:
-        -------
-        - IdealActivityMass: The validated IdealActivityMass object.
+            IdealActivityMass: The validated IdealActivityMass object.
         """
         return IdealActivityMass()
 
@@ -47,12 +44,11 @@ class IdealActivityMolarBuilder(
     """Builder class for IdealActivityMolar objects.
 
     Methods:
-    --------
-    - set_molar_mass(molar_mass, molar_mass_units): Set the molar mass of the
-        particle in kg/mol. Default units are 'kg/mol'.
-    - set_parameters(params): Set the parameters of the IdealActivityMolar
-        object from a dictionary including optional units.
-    - build(): Validate and return the IdealActivityMolar object.
+        set_molar_mass(molar_mass, molar_mass_units): Set the molar mass of the
+            particle in kg/mol. Default units are 'kg/mol'.
+        set_parameters(params): Set the parameters of the IdealActivityMolar
+            object from a dictionary including optional units.
+        build(): Validate and return the IdealActivityMolar object.
     """
 
     def __init__(self):
@@ -64,8 +60,7 @@ class IdealActivityMolarBuilder(
         """Validate and return the IdealActivityMolar object.
 
         Returns:
-        -------
-        - IdealActivityMolar: The validated IdealActivityMolar object.
+            IdealActivityMolar: The validated IdealActivityMolar object.
         """
         self.pre_build_check()
         return IdealActivityMolar(molar_mass=self.molar_mass)  # type: ignore
@@ -79,16 +74,15 @@ class KappaParameterActivityBuilder(
     """Builder class for KappaParameterActivity objects.
 
     Methods:
-    --------
-    - set_kappa(kappa): Set the kappa parameter for the activity calculation.
-    - set_density(density, density_units): Set the density of the species in
-        kg/m^3. Default units are 'kg/m^3'.
-    - set_molar_mass(molar_mass, molar_mass_units): Set the molar mass of the
-        species in kg/mol. Default units are 'kg/mol'.
-    - set_water_index(water_index): Set the array index of the species.
-    - set_parameters(dict): Set the parameters of the KappaParameterActivity
-        object from a dictionary including optional units.
-    - build(): Validate and return the KappaParameterActivity object.
+        set_kappa(kappa): Set the kappa parameter for the activity calculation.
+        set_density(density,density_units): Set the density of the species in
+            kg/m^3. Default units are 'kg/m^3'.
+        set_molar_mass(molar_mass,molar_mass_units): Set the molar mass of the
+            species in kg/mol. Default units are 'kg/mol'.
+        set_water_index(water_index): Set the array index of the species.
+        set_parameters(dict): Set the parameters of the KappaParameterActivity
+            object from a dictionary including optional units.
+        build(): Validate and return the KappaParameterActivity object.
     """
 
     def __init__(self):
@@ -108,9 +102,8 @@ class KappaParameterActivityBuilder(
         """Set the kappa parameter for the activity calculation.
 
         Args:
-        ----
-        - kappa: The kappa parameter for the activity calculation.
-        - kappa_units: Not used. (for interface consistency)
+            kappa: The kappa parameter for the activity calculation.
+            kappa_units: Not used. (for interface consistency)
         """
         if np.any(kappa < 0):
             error_message = "Kappa parameter must be a positive value."
@@ -129,9 +122,8 @@ class KappaParameterActivityBuilder(
         """Set the array index of the species.
 
         Args:
-        ----
-        - water_index (int): The array index of the species.
-        - water_index_units (str): Not used. (for interface consistency)
+            water_index: The array index of the species.
+            water_index_units: Not used. (for interface consistency)
         """
         if not isinstance(water_index, int):  # type: ignore
             error_message = "Water index must be an integer."
@@ -146,8 +138,7 @@ class KappaParameterActivityBuilder(
         """Validate and return the KappaParameterActivity object.
 
         Returns:
-        -------
-        - KappaParameterActivity: The validated KappaParameterActivity object.
+            KappaParameterActivity: The validated KappaParameterActivity object.
         """
         self.pre_build_check()
         return KappaParameterActivity(
