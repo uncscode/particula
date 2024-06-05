@@ -880,7 +880,7 @@ def save_lake(
 def load_lake(
     path: str,
     sufix_name: Optional[str] = None,
-    folder: str = "output",
+    folder: Optional[str] = None,
 ) -> Lake:
     """
     Load datalake object from a pickle file.
@@ -900,7 +900,10 @@ def load_lake(
     """
     file_name = f"lake{sufix_name}.pk" if sufix_name is not None else "lake.pk"
     # path to load pickle file
-    load_folder = os.path.join(path, folder)
+    if folder is not None:
+        load_folder = os.path.join(path, folder)
+    else:
+        load_folder = path
     file_path = os.path.join(load_folder, file_name)
 
     # load datalake
