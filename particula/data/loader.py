@@ -901,10 +901,7 @@ def load_lake(
     """
     file_name = f"lake{sufix_name}.pk" if sufix_name is not None else "lake.pk"
     # path to load pickle file
-    if folder is not None:
-        load_folder = os.path.join(path, folder)
-    else:
-        load_folder = path
+    load_folder = os.path.join(path, folder) if folder is not None else path
     file_path = os.path.join(load_folder, file_name)
 
     # load datalake
