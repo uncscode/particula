@@ -1,4 +1,4 @@
-"""File readers and loaders for datacula."""
+"""File readers and loaders."""
 
 from typing import Union, List
 from typing import List, Union, Tuple, Dict, Any, Optional
@@ -20,7 +20,8 @@ FILTER_WARNING_FRACTION = 0.5
 
 
 def data_raw_loader(file_path: str) -> list:
-    """
+    """Loads raw data from file.
+
     Load raw data from a file at the specified file path and return it as a
     list of strings.
 
