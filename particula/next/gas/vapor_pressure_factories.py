@@ -1,47 +1,84 @@
 """Factory module to create a concrete VaporPressureStrategy object using
 builders."""
 
-from typing import Optional
-from particula.next.gas import vapor_pressure_builders
-from particula.next.gas.vapor_pressure_strategies import VaporPressureStrategy
+from typing import Union
+from particula.next.abc_factory import StrategyFactory
+from particula.next.gas.vapor_pressure_builders import (
+    ConstantBuilder,
+    AntoineBuilder,
+    ClausiusClapeyronBuilder,
+    WaterBuckBuilder,
+)
+from particula.next.gas.vapor_pressure_strategies import (
+    ConstantVaporPressureStrategy,
+    AntoineVaporPressureStrategy,
+    ClausiusClapeyronStrategy,
+    WaterBuckStrategy,
+)
 
 
-def vapor_pressure_factory(
-    strategy: str,
-    parameters: Optional[dict] = None  # type: ignore
-) -> VaporPressureStrategy:
-    """Factory method to create a concrete VaporPressureStrategy object using
-    builders.
+class VaporPressureFactory(
+    StrategyFactory[
+        Union[
+            ConstantBuilder,
+            AntoineBuilder,
+            ClausiusClapeyronBuilder,
+            WaterBuckBuilder,
+        ],
+        Union[
+            ConstantVaporPressureStrategy,
+            AntoineVaporPressureStrategy,
+            ClausiusClapeyronStrategy,
+            WaterBuckStrategy,
+        ],
+    ]
+):
+    """Factory class to create vapor pressure strategy builders
 
-    Args:
-    ----
-    - strategy (str): The strategy to use for vapor pressure calculations.
-      Options: "constant", "antoine", "clausius_clapeyron", "water_buck".
-    - parameters (dict): A dictionary containing the necessary parameters for
-        the strategy. If no parameters are needed, this can be left as None.
+    Factory class to create vapor pressure strategy builders for calculating
+    vapor pressure of gas species.
+
+    Methods:
+        get_builders(): Returns the mapping of strategy types to builder
+        instances.
+        get_strategy(strategy_type, parameters): Gets the strategy instance
+        for the specified strategy type.
+            strategy_type: Type of vapor pressure strategy to use, can be
+            'constant', 'antoine', 'clausius_clapeyron', or 'water_buck'.
+            parameters(Dict[str, Any], optional): Parameters required for the
+            builder, dependent on the chosen strategy type.
+                - constant: constant_vapor_pressure
+                - antoine: A, B, C
+                - clausius_clapeyron: A, B, C
+                - water_buck: No parameters are required.
 
     Returns:
-    -------
-    - vapor_pressure_strategy (VaporPressureStrategy): A concrete
-      implementation of the VaporPressureStrategy built using the appropriate
-      builder.
+        VaporPressureStrategy: An instance of the specified
+            VaporPressureStrategy.
+
+    Raises:
+        ValueError: If an unknown strategy type is provided.
+        ValueError: If any required key is missing during check_keys or
+            pre_build_check, or if trying to set an invalid parameter.
+
+    Example:
+    >>> strategy_is = VaporPressureFactory().get_strategy("constant")
     """
-    # Assumes all necessary parameters are passed, builder will raise error
-    # if parameters are missing.
-    # update to a map, like in activity_factories.py
-    if strategy.lower() == "constant":
-        builder = vapor_pressure_builders.ConstantBuilder()
-        builder.set_parameters(parameters=parameters)  # type: ignore
-        return builder.build()
-    if strategy.lower() == "antoine":
-        builder = vapor_pressure_builders.AntoineBuilder()
-        builder.set_parameters(parameters=parameters)  # type: ignore
-        return builder.build()
-    if strategy.lower() == "clausius_clapeyron":
-        builder = vapor_pressure_builders.ClausiusClapeyronBuilder()
-        builder.set_parameters(parameters=parameters)  # type: ignore
-        return builder.build()
-    if strategy.lower() == "water_buck":
-        builder = vapor_pressure_builders.WaterBuckBuilder()
-        return builder.build()  # Assumes no parameters are needed
-    raise ValueError(f"Unknown vapor pressure strategy: {strategy}")
+
+    def get_builders(self):
+        """Returns the mapping of strategy types to builder instances.
+
+        Returns:
+            Dict[str, Any]: A dictionary mapping strategy types to builder
+                instances.
+                constant: ConstantBuilder
+                antoine: AntoineBuilder
+                clausius_clapeyron: ClausiusClapeyronBuilder
+                water_buck: WaterBuckBuilder
+        """
+        return {
+            "constant": ConstantBuilder(),
+            "antoine": AntoineBuilder(),
+            "clausius_clapeyron": ClausiusClapeyronBuilder(),
+            "water_buck": WaterBuckBuilder(),
+        }

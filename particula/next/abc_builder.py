@@ -168,6 +168,7 @@ class BuilderDensityMixin:
             logger.error(error_message)
             raise ValueError(error_message)
         self.density = density * convert_units(density_units, "kg/m^3")
+        return self
 
 
 class BuilderSurfaceTensionMixin:
@@ -199,6 +200,7 @@ class BuilderSurfaceTensionMixin:
         self.surface_tension = surface_tension * convert_units(
             surface_tension_units, "N/m"
         )
+        return self
 
 
 class BuilderMolarMassMixin:
@@ -230,6 +232,7 @@ class BuilderMolarMassMixin:
         self.molar_mass = molar_mass * convert_units(
             molar_mass_units, "kg/mol"
         )
+        return self
 
 
 class BuilderConcentrationMixin:
@@ -268,6 +271,7 @@ class BuilderConcentrationMixin:
         self.concentration = concentration * convert_units(
             concentration_units, self.default_units
         )
+        return self
 
 
 class BuilderChargeMixin:
@@ -326,6 +330,7 @@ class BuilderMassMixin:
             logger.error(error_message)
             raise ValueError(error_message)
         self.mass = mass * convert_units(mass_units, "kg")
+        return self
 
 
 class BuilderRadiusMixin:
@@ -357,6 +362,7 @@ class BuilderRadiusMixin:
             logger.error(error_message)
             raise ValueError(error_message)
         self.radius = radius * convert_units(radius_units, "m")
+        return self
 
 
 # mixins for strategy builders
