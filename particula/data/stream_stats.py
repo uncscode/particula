@@ -74,8 +74,8 @@ def average_std(
             step=average_interval
         )
     # generate empty arrays for averaged data and std to be filled in
-    average = np.zeros([len(new_time_array), len(stream.header)])
-    std = np.zeros_like(average)
+    average = np.zeros([len(new_time_array), len(stream.header)]) * np.nan
+    std = np.zeros_like(average) * np.nan
 
     # average data
     average, std = stats.average_to_interval(
