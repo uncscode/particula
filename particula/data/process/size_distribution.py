@@ -496,6 +496,6 @@ def resample_distribution(
 
     # assemble the stream
     stream.data = new_concentration
-    stream.header = new_diameters.astype(str).tolist()
+    stream.header = new_diameters.astype(str)
 
     return stream
