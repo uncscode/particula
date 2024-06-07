@@ -20,7 +20,6 @@ class Lake:
         """Add a stream to the lake.
 
         Args:
-        -----------
             stream (Stream): The stream object to be added.
             name (str): The name of the stream.
 

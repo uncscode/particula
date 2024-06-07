@@ -2,6 +2,7 @@
 
 from typing import Optional
 import logging
+from particula.next.abc_builder import BuilderABC
 from particula.next.gas.vapor_pressure_strategies import (
     AntoineVaporPressureStrategy,
     ClausiusClapeyronStrategy,
@@ -13,7 +14,7 @@ from particula.util.input_handling import convert_units  # type: ignore
 logger = logging.getLogger("particula")
 
 
-class AntoineBuilder():
+class AntoineBuilder(BuilderABC):
     """Builder class for AntoineVaporPressureStrategy. It allows setting the
     coefficients 'a', 'b', and 'c' separately and then building the strategy
     object.
@@ -33,6 +34,9 @@ class AntoineBuilder():
     """
 
     def __init__(self):
+        required_parameters = ['a', 'b', 'c']
+        # Call the base class's __init__ method
+        super().__init__(required_parameters)
         self.a = None
         self.b = None
         self.c = None
@@ -52,7 +56,7 @@ class AntoineBuilder():
         if b < 0:
             logger.error("Coefficient 'b' must be a positive value.")
             raise ValueError("Coefficient 'b' must be a positive value.")
-        self.b = b * convert_units(b_units, 'K')
+        self.b = convert_units(b_units, 'K', b)
         return self
 
     def set_c(self, c: float, c_units: str = 'K'):
@@ -60,40 +64,18 @@ class AntoineBuilder():
         if c < 0:
             logger.error("Coefficient 'c' must be a positive value.")
             raise ValueError("Coefficient 'c' must be a positive value.")
-        self.c = c * convert_units(c_units, 'K')
-        return self
-
-    def set_parameters(self, parameters: dict):  # type: ignore
-        """Set coefficients from a dictionary including optional units."""
-        required_keys = ['a', 'b', 'c']
-        for key in required_keys:
-            if key not in parameters:
-                raise ValueError(f"Missing coefficient '{key}'.")
-            unit_key = f'{key}_units'
-            if unit_key in parameters:
-                # build the call set call
-                # e.g. self.set_a(params['a'], params['a_units'])
-                getattr(self, f'set_{key}')(
-                    parameters[key], parameters[unit_key]
-                )
-            else:
-                logger.warning(
-                    "Using default units for coefficient '%s'.", key)
-                # call, e.g. self.set_a(params['a'])
-                getattr(self, f'set_{key}')(parameters[key])
+        self.c = convert_units(c_units, 'K', c)
         return self
 
     def build(self):
         """Build the AntoineVaporPressureStrategy object with the set
         coefficients."""
-        if None in [self.a, self.b, self.c]:
-            missing = [p for p in ['a', 'b', 'c'] if getattr(self, p) is None]
-            raise ValueError(f"Missing coefficients: {', '.join(missing)}")
+        self.pre_build_check()
         return AntoineVaporPressureStrategy(
             self.a, self.b, self.c)  # type: ignore
 
 
-class ClausiusClapeyronBuilder():
+class ClausiusClapeyronBuilder(BuilderABC):
     """Builder class for ClausiusClapeyronStrategy. This class facilitates
     setting the latent heat of vaporization, initial temperature, and initial
     pressure with unit handling and then builds the strategy object.
@@ -117,6 +99,11 @@ class ClausiusClapeyronBuilder():
     """
 
     def __init__(self):
+        required_keys = [
+            'latent_heat',
+            'temperature_initial',
+            'pressure_initial']
+        super().__init__(required_keys)
         self.latent_heat = None
         self.temperature_initial = None
         self.pressure_initial = None
@@ -142,8 +129,8 @@ class ClausiusClapeyronBuilder():
         if temperature_initial < 0:
             raise ValueError(
                 "Initial temperature must be a positive numeric value.")
-        self.temperature_initial = temperature_initial * convert_units(
-            temperature_initial_units, 'K')
+        self.temperature_initial = convert_units(
+            temperature_initial_units, 'K', temperature_initial)
         return self
 
     def set_pressure_initial(
@@ -159,41 +146,10 @@ class ClausiusClapeyronBuilder():
             pressure_initial_units, 'Pa')
         return self
 
-    def set_parameters(self, parameters: dict):  # type: ignore
-        """Set parameters from a dictionary including optional units."""
-        required_keys = [
-            'latent_heat',
-            'temperature_initial',
-            'pressure_initial']
-        for key in required_keys:
-            if key not in parameters:
-                raise ValueError(f"Missing coefficient '{key}'.")
-            unit_key = f'{key}_units'
-            if unit_key in parameters:
-                # units provided
-                getattr(self, f'set_{key}')(
-                    parameters[key], parameters[unit_key]
-                )
-            else:
-                # no units provided
-                logger.warning(
-                    "Using default units for coefficient '%s'.", key)
-                getattr(self, f'set_{key}')(parameters[key])
-        return self
-
     def build(self):
         """Build and return a ClausiusClapeyronStrategy object with the set
         parameters."""
-        if None in [self.latent_heat, self.temperature_initial,
-                    self.pressure_initial]:
-            missing = [
-                p for p in [
-                    'latent_heat',
-                    'temperature_initial',
-                    'pressure_initial'] if getattr(
-                    self,
-                    p) is None]
-            raise ValueError(f"Missing parameters: {', '.join(missing)}")
+        self.pre_build_check()
         return ClausiusClapeyronStrategy(
             self.latent_heat,  # type: ignore
             self.temperature_initial,  # type: ignore
@@ -201,7 +157,7 @@ class ClausiusClapeyronBuilder():
         )
 
 
-class ConstantBuilder():
+class ConstantBuilder(BuilderABC):
     """Builder class for ConstantVaporPressureStrategy. This class facilitates
     setting the constant vapor pressure and then building the strategy object.
 
@@ -219,6 +175,8 @@ class ConstantBuilder():
     """
 
     def __init__(self):
+        required_keys = ['vapor_pressure']
+        super().__init__(required_keys)
         self.vapor_pressure = None
 
     def set_vapor_pressure(
@@ -233,34 +191,14 @@ class ConstantBuilder():
             vapor_pressure_units, 'Pa')
         return self
 
-    def set_parameters(self, parameters: dict):  # type: ignore
-        """Set parameters from a dictionary including optional units."""
-        required_keys = ['vapor_pressure']
-        for key in required_keys:
-            if key not in parameters:
-                raise ValueError(f"Missing coefficient '{key}'.")
-            unit_key = f'{key}_units'
-            if unit_key in parameters:
-                # units provided
-                getattr(self, f'set_{key}')(
-                    parameters[key], parameters[unit_key]
-                )
-            else:
-                # no units provided
-                logger.warning(
-                    "Using default units for coefficient '%s'.", key)
-                getattr(self, f'set_{key}')(parameters[key])
-        return self
-
     def build(self):
         """Build and return a ConstantVaporPressureStrategy object with the set
         parameters."""
-        if self.vapor_pressure is None:
-            raise ValueError("Missing parameter: vapor_pressure")
+        self.pre_build_check()
         return ConstantVaporPressureStrategy(self.vapor_pressure)
 
 
-class WaterBuckBuilder():  # pylint: disable=too-few-public-methods
+class WaterBuckBuilder(BuilderABC):  # pylint: disable=too-few-public-methods
     """Builder class for WaterBuckStrategy. This class facilitates
     the building of the WaterBuckStrategy object. Which as of now has no
     additional parameters to set. But could be extended in the future for
@@ -270,6 +208,10 @@ class WaterBuckBuilder():  # pylint: disable=too-few-public-methods
     --------
     - build(): Build the WaterBuckStrategy object.
     """
+
+    def __init__(self):
+        super().__init__()
+
     def build(self):
         """Build and return a WaterBuckStrategy object."""
         return WaterBuckStrategy()
