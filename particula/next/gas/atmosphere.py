@@ -1,4 +1,4 @@
-"""Gas module."""
+"""Atmosphere module for modeling gas mixtures in a given environment."""
 
 from dataclasses import dataclass, field
 from particula.next.gas.species import GasSpecies
@@ -6,19 +6,23 @@ from particula.next.gas.species import GasSpecies
 
 @dataclass
 class Atmosphere:
-    """
-    Represents a mixture of gas species, detailing properties such as
-    temperature, total pressure, and the list of gas species in the mixture.
+    """Represents a mixture of gas species under specific conditions.
+
+    This class represents the atmospheric environment by detailing properties
+    such as temperature and pressure, alongside a dynamic list of gas species
+    present.
 
     Attributes:
-    - temperature (float): The temperature of the gas mixture in Kelvin.
-    - total_pressure (float): The total pressure of the gas mixture in Pascals.
-    - species (List[GasSpecies]): A list of GasSpecies objects representing the
-        species in the gas mixture.
+        temperature: Temperature of the gas mixture in Kelvin.
+        total_pressure: Total atmospheric pressure of the mixture inPascals.
+        species: List of GasSpecies objects representing the
+            various species within the gas mixture.
 
     Methods:
-    - add_species: Adds a gas species to the mixture.
-    - remove_species: Removes a gas species from the mixture by index.
+        add_species(self, species: GasSpecies) -> None:
+            Adds a GasSpecies object to the mixture.
+        remove_species(self, index: int) -> None:
+            Removes a GasSpecies object from the mixture based on its index.
     """
 
     temperature: float
@@ -26,22 +30,22 @@ class Atmosphere:
     species: list[GasSpecies] = field(default_factory=list)
 
     def add_species(self, gas_species: GasSpecies) -> None:
-        """
-        Adds a gas species to the mixture.
+        """Adds a GasSpecies object to the mixture.
 
-        Parameters:
-        - gas_species (GasSpecies): The GasSpecies object to be added to the
-        mixture.
+        Args:
+            gas_species: The gas species to be added.
         """
         self.species.append(gas_species)
 
     def remove_species(self, index: int) -> None:
-        """
-        Removes a gas species from the mixture by index.
+        """Removes a gas species from the mixture by its index.
 
-        Parameters:
-        - index (int): The index of the gas species to be removed from the
-        list.
+        Args:
+            index: Index of the gas species to remove. Must be within
+                        the current range of the list.
+
+        Raises:
+            IndexError: If the provided index is out of bounds.
         """
         if 0 <= index < len(self.species):
             self.species.pop(index)
@@ -49,19 +53,40 @@ class Atmosphere:
             raise IndexError("No gas species at the provided index.")
 
     def __iter__(self):
-        """Allows iteration over the species in the gas mixture."""
+        """
+        Allows iteration over the species in the gas mixture.
+
+        Returns:
+            Iterator[GasSpecies]: An iterator over the gas species objects.
+        """
         return iter(self.species)
 
     def __getitem__(self, index: int) -> GasSpecies:
-        """Returns the gas species at the given index."""
+        """Retrieves a gas species by index.
+
+        Args:
+            index: The index of the gas species to retrieve.
+
+        Returns:
+            GasSpecies: The gas species at the specified index.
+        """
         return self.species[index]
 
-    def __len__(self):
-        """Returns the number of species in the gas mixture."""
+    def __len__(self) -> int:
+        """Returns the number of species in the gas mixture.
+
+        Returns:
+            int: The number of gas species in the mixture.
+        """
         return len(self.species)
 
-    def __str__(self):
-        """Returns a string representation of the Gas object."""
+    def __str__(self) -> str:
+        """Provides a string representation of the Atmosphere object.
+
+        Returns:
+            str: A string that includes the temperature, pressure, and a
+                list of species in the mixture.
+        """
         return (
             f"Gas mixture at {self.temperature} K and {self.total_pressure} Pa"
             f" consisting of {[str(species) for species in self.species]}"

@@ -365,6 +365,77 @@ class BuilderRadiusMixin:
         return self
 
 
+class BuilderTemperatureMixin:
+    """Mixin class for AtmosphereBuilder to set temperature.
+
+    Methods:
+        set_temperature: Set the temperature attribute and units.
+    """
+
+    def __init__(self):
+        self.temperature = None
+
+    def set_temperature(
+        self, temperature: float, temperature_units: str = "K"
+    ):
+        """Set the temperature of the atmosphere.
+
+        Args:
+            temperature (float): Temperature of the gas mixture.
+            temperature_units (str): Units of the temperature.
+                Options include 'degC', 'degF', 'degR', 'K'. Default is 'K'.
+
+        Returns:
+            AtmosphereBuilderMixin: This object instance with updated
+                temperature.
+
+        Raises:
+            ValueError: If the converted temperature is below absolute zero.
+        """
+        self.temperature = convert_units(
+            temperature_units, "K", value=temperature
+        )  # temperature is a non-multiplicative conversion
+        if self.temperature < 0:
+            logger.error("Temperature must be above zero Kelvin.")
+            raise ValueError("Temperature must be above zero Kelvin.")
+        return self
+
+
+class BuilderPressureMixin:
+    """Mixin class for AtmosphereBuilder to set total pressure.
+
+    Methods:
+        set_pressure: Set the total pressure attribute and units.
+    """
+
+    def __init__(self):
+        self.pressure = None
+
+    def set_pressure(
+        self,
+        pressure: Union[float, NDArray[np.float_]],
+        pressure_units: str = "Pa",
+    ):
+        """Set the total pressure of the atmosphere.
+
+        Args:
+            total_pressure: Total pressure of the gas mixture.
+            pressure_units: Units of the pressure. Options include
+                'Pa', 'kPa', 'MPa', 'psi', 'bar', 'atm'. Default is 'Pa'.
+
+        Returns:
+            AtmosphereBuilderMixin: This object instance with updated pressure.
+
+        Raises:
+            ValueError: If the total pressure is below zero.
+        """
+        if np.any(pressure < 0):
+            logger.error("Pressure must be a positive value.")
+            raise ValueError("Pressure must be a positive value.")
+        self.pressure = pressure * convert_units(pressure_units, "Pa")
+        return self
+
+
 # mixins for strategy builders
 
 
