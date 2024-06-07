@@ -16,7 +16,6 @@ Next is the next iteration of the particula simulation model. It is a complete r
 
 ## Diagrams
 
-To make your documentation clearer and more digestible, you can split the Mermaid diagram into multiple parts, each focusing on a specific component of your aerosol code structure. Below, each diagram is followed by a placeholder for your text descriptions:
 
 ### Activity Component
 
@@ -82,5 +81,3 @@ graph TD
 ```
 
 *Description of Surface Component here...*
-
-This approach not only visually segments the different components of your code but also provides spaces between diagrams for detailed descriptions, making it easier for readers to understand each part's functionality and role within the larger system.
