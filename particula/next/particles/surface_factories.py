@@ -62,9 +62,9 @@ class SurfaceFactory(
         Returns:
             Dict[str, BuilderT]: A dictionary mapping strategy types to
                 builder instances.
-                    volume: SurfaceStrategyVolumeBuilder
-                    mass: SurfaceStrategyMassBuilder
-                    molar: SurfaceStrategyMolarBuilder
+                    - volume: SurfaceStrategyVolumeBuilder
+                    - mass: SurfaceStrategyMassBuilder
+                    - molar: SurfaceStrategyMolarBuilder
         """
         return {
             "volume": SurfaceStrategyVolumeBuilder(),
