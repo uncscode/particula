@@ -240,6 +240,7 @@ class LimitedRadiusParticleBuilder(
             logger.error(message)
             raise ValueError(message)
         self.mode = mode * convert_units(mode_units, "m")
+        return self
 
     def set_geometric_standard_deviation(
         self,
@@ -259,6 +260,7 @@ class LimitedRadiusParticleBuilder(
         if geometric_standard_deviation_units is not None:
             logger.warning("Ignoring units for surface strategy parameter.")
         self.geometric_standard_deviation = geometric_standard_deviation
+        return self
 
     def set_number_concentration(
         self,
@@ -278,6 +280,7 @@ class LimitedRadiusParticleBuilder(
             number_concentration
             * convert_units(number_concentration_units, "1/m^3")
         )
+        return self
 
     def set_radius_bins(
         self,
@@ -296,6 +299,7 @@ class LimitedRadiusParticleBuilder(
         self.radius_bins = radius_bins * convert_units(
             radius_bins_units, "m"
         )
+        return self
 
     def build(self) -> ParticleRepresentation:
         """Validate and return the ParticleRepresentation object.
