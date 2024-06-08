@@ -1,4 +1,4 @@
-"""A module for the Stream and StreamAveraged(Stream) classes."""
+"""A module for the Stream and StreamAveraged(Stream) classes. """
 
 
 from typing import List, Union
