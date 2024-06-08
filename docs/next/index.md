@@ -12,7 +12,7 @@ Next is the next iteration of the particula simulation model. It is a complete r
 
 ### Particle Phase
 
-- [Aerosol Surface Tutorial](Tutorials/Aerosol_Surface_Tutorial.ipynb)
+- [Aerosol Surface Tutorial](Tutorials/Particle_Surface_Tutorial.ipynb)
 - [Aerosol Distribution Tutorial](Tutorials/Aerosol_Distributions.ipynb)
 
 ## Guides for Developers
