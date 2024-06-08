@@ -1,0 +1,21 @@
+title: "Particula Book"
+author: "particula contributors"
+logo: images/placeholder.png
+execute:
+  execute_notebooks: "force"
+
+launch_buttons:
+  notebook_interface: jupyterlab
+  binderhub_url: https://mybinder.org
+  colab_url: https://colab.research.google.com
+  thebe: true
+
+repository:
+  url: https://github.com/uncscode/particula
+  path_to_book: docs
+  branch: v0.0.10
+
+html:
+  use_repository_button: true
+  use_issues_button: true
+  use_edit_page_button: true

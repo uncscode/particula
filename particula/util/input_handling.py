@@ -1,7 +1,7 @@
 """ handling inputs
 """
 
-from typing import Union, Optional
+from typing import Union
 from particula import u
 
 
@@ -76,15 +76,13 @@ def in_handling(value, units: u.Quantity):
 
 def convert_units(
     old: Union[str, u.Quantity],
-    new: Union[str, u.Quantity],
-    value: Optional[float] = None
+    new: Union[str, u.Quantity]
 ) -> float:
     """ generic pint function to convert units
 
         Args:
             old     [str | u.Quantity]
             new     [str | u.Quantity]
-            value   (float) [optional]
 
         Returns:
             multiplier     (float)
@@ -95,17 +93,12 @@ def convert_units(
             * Assigning default base units to scalar input
     """
     if isinstance(old, str):
-        addative_units = ['degC', 'degF', 'degR', 'degK']
-        if old in addative_units or value is not None:
-            value = value if value is not None else 0
-            old = u.Quantity(value, old)
-        else:
-            old = 1 * u.Quantity(old)
+        old = 1 * u.Quantity(old)
     if isinstance(new, str):
         new = u.Quantity(new)
 
     if isinstance(old, u.Quantity) and isinstance(new, u.Quantity):
-        new_value = old.to(new)
+        new = old.to(new)
     else:
         raise ValueError(
             f"\n\t"
@@ -114,7 +107,7 @@ def convert_units(
             f"otherwise, if dimensionless, it will\n\t"
             f"be assigned {new}.\n"
         )
-    return float(new_value.m)
+    return float(new.m)
 
 
 # pylint: disable=missing-docstring, multiple-statements
