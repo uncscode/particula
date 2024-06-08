@@ -1,5 +1,4 @@
-"""Builds distributions strategies based on the specified representation
-type.
+"""Builds distributions strategies based on the specified representation.
 
 Currently, there are no parameters to set, but this is used for consistency
 with other builder patterns in the codebase.
