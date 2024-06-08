@@ -106,9 +106,8 @@ class SurfaceStrategy(ABC):
 
         Args:
             radius: Radius of the particle [m].
-            molar_mass: Molar mass of the species a
-        [kg/mol].
-        - mass_concentration (float or NDArray[float]): Concentration of the
+            molar_mass: Molar mass of the species a [kg/mol].
+            mass_concentration (float or NDArray[float]): Concentration of the
         species [kg/m^3].
         - temperature (float): Temperature of the system [K].
 
