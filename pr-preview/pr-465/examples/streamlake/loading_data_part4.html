@@ -1,0 +1,1105 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Loading Part 4: Settings Files &#8212; Particula Book</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/streamlake/loading_data_part4';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Stream: Averaging and Outliers" href="stream_stats_part1.html" />
+    <link rel="prev" title="Loading Part 3: Lake" href="loading_data_part3.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/placeholder.png" class="logo__image only-light" alt="Particula Book - Home"/>
+    <script>document.write(`<img src="../../_static/placeholder.png" class="logo__image only-dark" alt="Particula Book - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    Getting started
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tour</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../tour/part-tour.html">Particula tour</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../distribution_statistics.html">Distribution statistics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_coagulation.html">Distribution coagulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_evolution.html">Distribution evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../distribution_ambient.html">Distributions</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../ionparticle_coagulation.html">Ion–particle coagulation</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="particula_data.html">Data in Particula</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part1.html">Loading Part 1: Into &amp; 1D Data</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part2.html">Loading Part 2: Sizer Data</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="loading_data_part3.html">Loading Part 3: Lake</a></li>
+
+
+
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Loading Part 4: Settings Files</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="stream_stats_part1.html">Stream: Averaging and Outliers</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="stream_stats_size_distribution_part2.html">Size Distribution Stats</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../wall_loss_section.html">Chamber Wall Loss Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/chamber_smps_data.html">Chamber Analysis</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/wall_loss_forward_simulation.html">Chamber Forward Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../wall_loss/forward_fit_simple.html">Simple Wall Loss Fit</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../lagrangian/lagrangian_intro.html">Lagrangian Particle Model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/basic_lagrangian_box.html">Introduction to the Lagrangian Box Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/sweep_and_prune.html">Sweep and Prune Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lagrangian/friction_force.html">Realistic Drag, Mass, and Velocity</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../equilibria/equilibria_intro.html">Equilibria of Aerosols</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../equilibria/activity_part1.html">Activity Example</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../equilibria/equilibria_part1.html">Liquid Vapor Equilibrium</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../light_scattering/aerosol_optics_intro.html">Introduction to Aerosol Optics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/mie_basics.html">Mie Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/humid_scattering.html">Scattering for Humidified Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/kappa_vs_extinction.html">Fitting Kappa-HGF from Light Extinction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_scattering/scattering_truncation.html">Scattering Truncation Corrections</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/environment.html">The <code class="docutils literal notranslate"><span class="pre">Environment</span></code> Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dilution_loss.html"><code class="docutils literal notranslate"><span class="pre">dilution_loss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dynamic_viscosity.html"><code class="docutils literal notranslate"><span class="pre">dynamic_viscosity</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/mean_free_path.html"><code class="docutils literal notranslate"><span class="pre">mean_free_path</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/vapor.html">The <code class="docutils literal notranslate"><span class="pre">Vapor</span></code> Class</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/particle.html">The <code class="docutils literal notranslate"><span class="pre">Particle</span></code> Classes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/distribution_discretization.html"><code class="docutils literal notranslate"><span class="pre">distribution_discretization</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/radius_cutoff.html"><code class="docutils literal notranslate"><span class="pre">radius_cutoff</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/particle_mass.html"><code class="docutils literal notranslate"><span class="pre">particle_mass</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/knudsen_number.html"><code class="docutils literal notranslate"><span class="pre">knudsen_number</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/slip_correction.html"><code class="docutils literal notranslate"><span class="pre">slip_correction</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/friction_factor.html"><code class="docutils literal notranslate"><span class="pre">friction_factor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/dimensionless_coagulation.html"><code class="docutils literal notranslate"><span class="pre">dimensionless_coagulation</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../documentation/utilities/utilities_overview.html">Utilities Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation/utilities/convert_size_dist_scales.html">Converting Distributions</a></li>
+
+
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Strategic Plan</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/strategic_planning_FY24.html">FY24 Plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../strategic_plan/Aerosol_patterns.html">Program Outline Revision Draft</a></li>
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Next Development</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../documentation/next/next_vapor_pressure.html">Vapor Pressure</a></li>
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Community</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributor Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CODE_OF_CONDUCT.html">Code of Conduct</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/uncscode/particula/v0.0.10?urlpath=lab/tree/docs/examples/streamlake/loading_data_part4.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onBinder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/uncscode/particula/blob/v0.0.10/docs/examples/streamlake/loading_data_part4.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/edit/v0.0.10/docs/examples/streamlake/loading_data_part4.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/uncscode/particula/issues/new?title=Issue%20on%20page%20%2Fexamples/streamlake/loading_data_part4.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/examples/streamlake/loading_data_part4.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Loading Part 4: Settings Files</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Part 4: Settings Files</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-path">Working Path</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-and-save-settings">Generate and Save Settings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#next-save-the-smps-settings">Next save the SMPS settings</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-stream-settings">Loading Stream Settings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lake-settings">Lake settings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-lake">Load the Lake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="loading-part-4-settings-files">
+<h1>Loading Part 4: Settings Files<a class="headerlink" href="#loading-part-4-settings-files" title="Link to this heading">#</a></h1>
+<p>In this part of the tutorial, we will explore how to save and load stream and lake settings dictionaries. This can be incredibly useful for preserving your settings, sharing them with others, or simply avoiding the need to retype everything.</p>
+<section id="working-path">
+<h2>Working Path<a class="headerlink" href="#working-path" title="Link to this heading">#</a></h2>
+<p>In your working path, you will find a couple of <code class="docutils literal notranslate"><span class="pre">.json</span></code> files. These files are the settings files. The <code class="docutils literal notranslate"><span class="pre">lake_settings.json</span></code> file stores the settings for the lake, while the <code class="docutils literal notranslate"><span class="pre">stream_settings.json</span></code> file stores the settings for the stream. These settings are the same ones you created in the previous example, but now they are saved to files for easy access and sharing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>data
+├── CPC_3010_data
+│   ├── CPC_3010_data_20220709_Jul.csv
+│   ├── CPC_3010_data_20220709_Jul.csv
+    ├── stream_settings_cpc.json
+├── SMPS_data
+│   ├── 2022-07-07_095151_SMPS.csv
+│   ├── 2022-07-10_094659_SMPS.csv
+│   ├── stream_settings_smps_1d.json
+│   ├── stream_settings_smps_2d.json
+├── lake_settings.json
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import the necessary libraries and modules</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">particula.data</span> <span class="kn">import</span> <span class="n">loader_interface</span><span class="p">,</span> <span class="n">settings_generator</span>
+<span class="kn">from</span> <span class="nn">particula.data.tests.example_data.get_example_data</span> <span class="kn">import</span> <span class="n">get_data_folder</span>
+<span class="kn">from</span> <span class="nn">particula.data.lake</span> <span class="kn">import</span> <span class="n">Lake</span>
+
+<span class="c1"># Set the parent directory where the data folders are located</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">get_data_folder</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path to data folder:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;particula&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Path to data folder:
+/data/tests/example_data
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="generate-and-save-settings">
+<h2>Generate and Save Settings<a class="headerlink" href="#generate-and-save-settings" title="Link to this heading">#</a></h2>
+<p>First, we generate the settings for the CPC data using the <code class="docutils literal notranslate"><span class="pre">settings_generator.for_general_1d_load</span></code> function. These settings include details such as the data file location, file format, column names, and more.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># settings for the CPC data</span>
+<span class="n">cpc_settings</span> <span class="o">=</span> <span class="n">settings_generator</span><span class="o">.</span><span class="n">for_general_1d_load</span><span class="p">(</span>
+    <span class="n">relative_data_folder</span><span class="o">=</span><span class="s1">&#39;CPC_3010_data&#39;</span><span class="p">,</span>
+    <span class="n">filename_regex</span><span class="o">=</span><span class="s1">&#39;*.csv&#39;</span><span class="p">,</span>
+    <span class="n">file_min_size_bytes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">data_checks</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+        <span class="s2">&quot;char_counts&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;,&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+        <span class="s2">&quot;skip_rows&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;skip_end&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">data_column</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="n">data_header</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;CPC_count[#/sec]&#39;</span><span class="p">,</span> <span class="s1">&#39;Temperature[degC]&#39;</span><span class="p">],</span>
+    <span class="n">time_column</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;epoch&#39;</span><span class="p">,</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span>
+    <span class="n">time_shift_seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">timezone_identifier</span><span class="o">=</span><span class="s1">&#39;UTC&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># save the settings to a file</span>
+<span class="n">settings_generator</span><span class="o">.</span><span class="n">save_settings_for_stream</span><span class="p">(</span>
+    <span class="n">settings</span><span class="o">=</span><span class="n">cpc_settings</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+    <span class="n">subfolder</span><span class="o">=</span><span class="s1">&#39;CPC_3010_data&#39;</span><span class="p">,</span>
+    <span class="n">settings_suffix</span><span class="o">=</span><span class="s1">&#39;_cpc&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="next-save-the-smps-settings">
+<h3>Next save the SMPS settings<a class="headerlink" href="#next-save-the-smps-settings" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># settings for the SMPS data</span>
+<span class="n">smps_1d_settings</span><span class="p">,</span> <span class="n">smps_2d_settings</span> <span class="o">=</span> <span class="n">settings_generator</span><span class="o">.</span><span class="n">for_general_sizer_1d_2d_load</span><span class="p">(</span>
+    <span class="n">relative_data_folder</span><span class="o">=</span><span class="s1">&#39;SMPS_data&#39;</span><span class="p">,</span>
+    <span class="n">filename_regex</span><span class="o">=</span><span class="s1">&#39;*.csv&#39;</span><span class="p">,</span>
+    <span class="n">file_min_size_bytes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">header_row</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+    <span class="n">data_checks</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">250</span><span class="p">],</span>
+        <span class="s2">&quot;skip_rows&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+        <span class="s2">&quot;skip_end&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;char_counts&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;/&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="n">data_1d_column</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">&quot;Lower Size (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Upper Size (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Sample Temp (C)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Sample Pressure (kPa)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Relative Humidity (%)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Median (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mean (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Geo. Mean (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mode (nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Geo. Std. Dev.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Total Conc. (#/cm³)&quot;</span><span class="p">],</span>
+    <span class="n">data_1d_header</span><span class="o">=</span><span class="p">[</span>
+        <span class="s2">&quot;Lower_Size_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Upper_Size_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Sample_Temp_(C)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Sample_Pressure_(kPa)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Relative_Humidity_(%)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Median_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mean_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Geo_Mean_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mode_(nm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Geo_Std_Dev.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Total_Conc_(#/cc)&quot;</span><span class="p">],</span>
+    <span class="n">data_2d_dp_start_keyword</span><span class="o">=</span><span class="s2">&quot;20.72&quot;</span><span class="p">,</span>
+    <span class="n">data_2d_dp_end_keyword</span><span class="o">=</span><span class="s2">&quot;784.39&quot;</span><span class="p">,</span>
+    <span class="n">data_2d_convert_concentration_from</span><span class="o">=</span><span class="s2">&quot;dw/dlogdp&quot;</span><span class="p">,</span>
+    <span class="n">time_column</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;%m/</span><span class="si">%d</span><span class="s2">/%Y %H:%M:%S&quot;</span><span class="p">,</span>
+    <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
+    <span class="n">time_shift_seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">timezone_identifier</span><span class="o">=</span><span class="s2">&quot;UTC&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># save the settings to a file</span>
+<span class="n">settings_generator</span><span class="o">.</span><span class="n">save_settings_for_stream</span><span class="p">(</span>
+    <span class="n">settings</span><span class="o">=</span><span class="n">smps_1d_settings</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+    <span class="n">subfolder</span><span class="o">=</span><span class="s1">&#39;SMPS_data&#39;</span><span class="p">,</span>
+    <span class="n">settings_suffix</span><span class="o">=</span><span class="s1">&#39;_smps_1d&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">settings_generator</span><span class="o">.</span><span class="n">save_settings_for_stream</span><span class="p">(</span>
+    <span class="n">settings</span><span class="o">=</span><span class="n">smps_2d_settings</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+    <span class="n">subfolder</span><span class="o">=</span><span class="s1">&#39;SMPS_data&#39;</span><span class="p">,</span>
+    <span class="n">settings_suffix</span><span class="o">=</span><span class="s1">&#39;_smps_2d&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="loading-stream-settings">
+<h2>Loading Stream Settings<a class="headerlink" href="#loading-stream-settings" title="Link to this heading">#</a></h2>
+<p>If you are still exploring your analysis pipeline, you may want to load settings for individual streams. To do so, you can use the generate_settings.load_settings_for_stream function. This function takes the path to the settings file as an argument and returns a dictionary containing the stream settings.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">smps_1d_stream_settings</span> <span class="o">=</span> <span class="n">settings_generator</span><span class="o">.</span><span class="n">load_settings_for_stream</span><span class="p">(</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+    <span class="n">subfolder</span><span class="o">=</span><span class="s1">&#39;SMPS_data&#39;</span><span class="p">,</span>
+    <span class="n">settings_suffix</span><span class="o">=</span><span class="s1">&#39;_smps_1d&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">stream_smps_1d</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_files_interface</span><span class="p">(</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+    <span class="n">settings</span><span class="o">=</span><span class="n">smps_1d_stream_settings</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">stream_smps_1d</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: 2022-07-10_094659_SMPS.csv
+  Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;Lower_Size_(nm)&#39;, &#39;Upper_Size_(nm)&#39;, &#39;Sample_Temp_(C)&#39;, &#39;Sample_Pressure_(kPa)&#39;, &#39;Relative_Humidity_(%)&#39;, &#39;Median_(nm)&#39;, &#39;Mean_(nm)&#39;, &#39;Geo_Mean_(nm)&#39;, &#39;Mode_(nm)&#39;, &#39;Geo_Std_Dev.&#39;, &#39;Total_Conc_(#/cc)&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="lake-settings">
+<h2>Lake settings<a class="headerlink" href="#lake-settings" title="Link to this heading">#</a></h2>
+<p>If you wanted to load everything for a reanalysis, instead of calling each individual stream, you can first save a lake settings file.  This is done with <code class="docutils literal notranslate"><span class="pre">generate_settings.save_settings_for_lake</span></code>.  This function takes the path to the lake settings file as an argument.  It returns a dictionary with the settings.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># collect settings into a dictionary</span>
+<span class="n">combined_settings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;cpc&#39;</span><span class="p">:</span> <span class="n">cpc_settings</span><span class="p">,</span>
+    <span class="s1">&#39;smps_1d&#39;</span><span class="p">:</span> <span class="n">smps_1d_settings</span><span class="p">,</span>
+    <span class="s1">&#39;smps_2d&#39;</span><span class="p">:</span> <span class="n">smps_2d_settings</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># save the lake settings to a file</span>
+<span class="n">settings_generator</span><span class="o">.</span><span class="n">save_settings_for_lake</span><span class="p">(</span>
+    <span class="n">settings</span><span class="o">=</span><span class="n">combined_settings</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+    <span class="n">subfolder</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">settings_suffix</span><span class="o">=</span><span class="s1">&#39;_cpc_smps&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="load-the-lake">
+<h3>Load the Lake<a class="headerlink" href="#load-the-lake" title="Link to this heading">#</a></h3>
+<p>To load the lake settings use <code class="docutils literal notranslate"><span class="pre">generate_settings.load_settings_for_lake</span></code>.  This function takes the path to the lake settings file as an argument.  It returns a dictionary with the settings.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lake_settings</span> <span class="o">=</span> <span class="n">settings_generator</span><span class="o">.</span><span class="n">load_settings_for_lake</span><span class="p">(</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+    <span class="n">subfolder</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">settings_suffix</span><span class="o">=</span><span class="s1">&#39;_cpc_smps&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># now call the loader interface for files</span>
+<span class="n">lake</span> <span class="o">=</span> <span class="n">loader_interface</span><span class="o">.</span><span class="n">load_folders_interface</span><span class="p">(</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+    <span class="n">folder_settings</span><span class="o">=</span><span class="n">combined_settings</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lake</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: cpc
+  Loading file: CPC_3010_data_20220710_Jul.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Loading file: CPC_3010_data_20220709_Jul.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_1d
+  Loading file: 2022-07-10_094659_SMPS.csv
+  Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Folder Settings: smps_2d
+  Loading file: 2022-07-10_094659_SMPS.csv
+  Loading file: 2022-07-07_095151_SMPS.csv
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 
+Lake with streams: [&#39;cpc&#39;, &#39;smps_1d&#39;, &#39;smps_2d&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="summary">
+<h1>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h1>
+<p>This example showed how to save and load the settings for a stream and a lake.  This is useful if you want to save your settings and then load them later.  This is also useful if you want to share your settings with someone else.  Or just stop from having to retype everything.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">settings_generator</span><span class="o">.</span><span class="n">save_settings_for_stream</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function save_settings_for_stream in module particula.data.settings_generator:
+
+save_settings_for_stream(settings: dict, path: str, subfolder: str, settings_suffix: str = &#39;&#39;) -&gt; None
+    Save settings for lake data to a JSON file.
+    
+    Given a dictionary of settings, this function saves it to a JSON file
+    named &#39;stream_settings&#39; with an optional suffix in the specified filename.
+    The JSON file is formatted with a 4-space indentation.
+    
+    Args:
+    - settings: The settings dictionary to be saved.
+    - path: The path where the subfolder is located.
+    - subfolder: The subfolder where the settings file will be saved.
+    - settings_suffix: An optional suffix for the settings
+        file name. Default is an empty string.
+    
+    Returns:
+    - None
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">settings_generator</span><span class="o">.</span><span class="n">load_settings_for_stream</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function load_settings_for_stream in module particula.data.settings_generator:
+
+load_settings_for_stream(path: str, subfolder: str, settings_suffix: str = &#39;&#39;) -&gt; dict
+    Load settings for Stream data from a JSON file.
+    
+    Given a path and subfolder, this function searches for a JSON file
+    named &#39;stream_settings&#39; with an optional suffix. It returns the settings
+    as a dictionary. If no file is found, or multiple files are found,
+    appropriate errors or warnings are raised.
+    
+    Args:
+    - path: The path where the subfolder is located.
+    - subfolder: The subfolder where the settings file is expected.
+    - settings_suffix: An optional suffix for the settings
+        file name. Default is an empty string.
+    
+    Returns:
+    - dict: A dictionary of settings loaded from the file.
+    
+    Raises:
+    - FileNotFoundError: If no settings file is found.
+    - Warning: If more than one settings file is found.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">settings_generator</span><span class="o">.</span><span class="n">save_settings_for_lake</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function save_settings_for_lake in module particula.data.settings_generator:
+
+save_settings_for_lake(settings: dict, path: str, subfolder: str = &#39;&#39;, settings_suffix: str = &#39;&#39;) -&gt; None
+    Save settings for lake data to a JSON file.
+    
+    Given a dictionary of settings, this function saves it to a JSON file
+    named &#39;lake_settings&#39; with an optional suffix in the specified filename.
+    The JSON file is formatted with a 4-space indentation.
+    
+    Args:
+    - settings: The settings dictionary to be saved.
+    - path: The path where the subfolder is located.
+    - subfolder: The subfolder where the settings file will be saved.
+    - settings_suffix: An optional suffix for the settings
+        file name. Default is an empty string.
+    
+    Returns:
+    - None
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">settings_generator</span><span class="o">.</span><span class="n">load_settings_for_lake</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on function load_settings_for_lake in module particula.data.settings_generator:
+
+load_settings_for_lake(path: str, subfolder: str = &#39;&#39;, settings_suffix: str = &#39;&#39;) -&gt; dict
+    Load settings for Lake data from a JSON file. The settings file is
+    a dictionary of stream settings dictionaries.
+    
+    Given a path and subfolder, this function searches for a JSON file
+    named &#39;lake_settings&#39; with an optional suffix. It returns the settings
+    as a dictionary. If no file is found, or multiple files are found,
+    appropriate errors or warnings are raised.
+    
+    Args:
+    - path: The path where the subfolder is located.
+    - subfolder: The subfolder where the settings file is expected.
+    - settings_suffix: An optional suffix for the settings
+        file name. Default is an empty string.
+    
+    Returns:
+    - dict: A dictionary of settings loaded from the file.
+    
+    Raises:
+    - FileNotFoundError: If no settings file is found.
+    - Warning: If more than one settings file is found.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "uncscode/particula",
+            ref: "v0.0.10",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./examples/streamlake"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="loading_data_part3.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Loading Part 3: Lake</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="stream_stats_part1.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Stream: Averaging and Outliers</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Loading Part 4: Settings Files</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-path">Working Path</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-and-save-settings">Generate and Save Settings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#next-save-the-smps-settings">Next save the SMPS settings</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-stream-settings">Loading Stream Settings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lake-settings">Lake settings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-the-lake">Load the Lake</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By particula contributors
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
