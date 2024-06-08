@@ -30,7 +30,7 @@ class DistributionFactory(
     Used for calculating particle distributions based on the specified
     representation type.
 
-    Methods
+    Methods:
         get_builders(): Returns the mapping of strategy types to builder
         instances.
         get_strategy(strategy_type, parameters): Gets the strategy instance
