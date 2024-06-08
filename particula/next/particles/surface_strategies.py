@@ -106,21 +106,18 @@ class SurfaceStrategy(ABC):
 
         Args:
             radius: Radius of the particle [m].
-            molar_mass: Molar mass of the species a
-        [kg/mol].
-        - mass_concentration (float or NDArray[float]): Concentration of the
-        species [kg/m^3].
-        - temperature (float): Temperature of the system [K].
+            molar_mass: Molar mass of the species a [kg/mol].
+            mass_concentration: Concentration of the species [kg/m^3].
+            temperature: Temperature of the system [K].
 
         Returns:
-        --------
-        - float or NDArray[float]: The exponential factor adjusting vapor
-        pressure due to curvature.
+            float or NDArray[float]: The exponential factor adjusting vapor
+                pressure due to curvature.
 
         References:
-            Based on Neil Donahue's approach to the Kelvin equation:
-            exp(kelvin_radius / particle_radius)
-            See more: https://en.wikipedia.org/wiki/Kelvin_equation
+        Based on Neil Donahue's approach to the Kelvin equation:
+        exp(kelvin_radius / particle_radius)
+        [Kelvin Eq Wikipedia](https://en.wikipedia.org/wiki/Kelvin_equation)
         """
         return kelvin_term(
             radius,
@@ -132,19 +129,16 @@ class SurfaceStrategy(ABC):
 class SurfaceStrategyMolar(SurfaceStrategy):
     """Surface tension and density, based on mole fraction weighted values.
 
-    Keyword arguments:
-    ------------------
-    - surface_tension (Union[float, NDArray[np.float_]]): Surface tension of
-    the species [N/m]. If a single value is provided, it will be used for all
-    species.
-    - density (Union[float, NDArray[np.float_]]): Density of the species
-    [kg/m^3]. If a single value is provided, it will be used for all species.
-    - molar_mass (Union[float, NDArray[np.float_]]): Molar mass of the species
-    [kg/mol]. If a single value is provided, it will be used for all species.
+    Arguments:
+        surface_tension: Surface tension of the species [N/m]. If a single
+            value is provided, it will be used for all species.
+        density: Density of the species [kg/m^3]. If a single value is
+            provided, it will be used for all species.
+        molar_mass: Molar mass of the species [kg/mol]. If a single value is
+            provided, it will be used for all species.
 
     References:
-    -----------
-    - Mole Fractions https://en.wikipedia.org/wiki/Mole_fraction
+        [Mole Fractions](https://en.wikipedia.org/wiki/Mole_fraction)
     """
 
     def __init__(
@@ -165,8 +159,8 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         return np.sum(
             self.surface_tension
             * mass_concentration_to_mole_fraction(
-                mass_concentration, self.molar_mass
-            ),  # type: ignore
+                mass_concentration, self.molar_mass  # type: ignore
+            ),
             dtype=np.float_,
         )
 
@@ -178,8 +172,8 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         return np.sum(
             self.density
             * mass_concentration_to_mole_fraction(
-                mass_concentration, self.molar_mass
-            ),  # type: ignore
+                mass_concentration, self.molar_mass  # type: ignore
+            ),
             dtype=np.float_,
         )
 
@@ -187,17 +181,14 @@ class SurfaceStrategyMolar(SurfaceStrategy):
 class SurfaceStrategyMass(SurfaceStrategy):
     """Surface tension and density, based on mass fraction weighted values.
 
-    Keyword arguments:
-    ------------------
-    - surface_tension (Union[float, NDArray[np.float_]]): Surface tension of
-    the species [N/m]. If a single value is provided, it will be used for all
-    species.
-    - density (Union[float, NDArray[np.float_]]): Density of the species
-    [kg/m^3]. If a single value is provided, it will be used for all species.
+    Args:
+        surface_tension: Surface tension of the species [N/m]. If a single
+            value is provided, it will be used for all species.
+        density: Density of the species [kg/m^3]. If a single value is
+            provided, it will be used for all species.
 
     References:
-    -----------
-    - Mass Fractions https://en.wikipedia.org/wiki/Mass_fraction_(chemistry)
+    [Mass Fractions](https://en.wikipedia.org/wiki/Mass_fraction_(chemistry))
     """
 
     def __init__(
@@ -234,17 +225,14 @@ class SurfaceStrategyMass(SurfaceStrategy):
 class SurfaceStrategyVolume(SurfaceStrategy):
     """Surface tension and density, based on volume fraction weighted values.
 
-    Keyword arguments:
-    ------------------
-    - surface_tension (Union[float, NDArray[np.float_]]): Surface tension of
-    the species [N/m]. If a single value is provided, it will be used for all
-    species.
-    - density (Union[float, NDArray[np.float_]]): Density of the species
-    [kg/m^3]. If a single value is provided, it will be used for all species.
+    Args:
+        surface_tension: Surface tension of the species [N/m]. If a single
+            value is provided, it will be used for all species.
+        density: Density of the species [kg/m^3]. If a single value is
+            provided, it will be used for all species.
 
     References:
-    -----------
-    - Volume Fractions https://en.wikipedia.org/wiki/Volume_fraction
+    [Volume Fractions](https://en.wikipedia.org/wiki/Volume_fraction)
     """
 
     def __init__(
@@ -263,8 +251,8 @@ class SurfaceStrategyVolume(SurfaceStrategy):
         return np.sum(
             self.surface_tension
             * mass_concentration_to_volume_fraction(
-                mass_concentration, self.density
-            ),  # type: ignore
+                mass_concentration, self.density  # type: ignore
+            ),
             dtype=np.float_,
         )
 
@@ -276,7 +264,7 @@ class SurfaceStrategyVolume(SurfaceStrategy):
         return np.sum(
             self.density
             * mass_concentration_to_volume_fraction(
-                mass_concentration, self.density
-            ),  # type: ignore
+                mass_concentration, self.density  # type: ignore
+            ),
             dtype=np.float_,
         )

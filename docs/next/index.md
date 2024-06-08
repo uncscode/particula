@@ -4,10 +4,16 @@ Next is the next iteration of the particula simulation model. It is a complete r
 
 ## Tutorials
 
-- [Aerosol Distribution Tutorial](Tutorials/Aerosol_Distributions.ipynb)
+### Gas Phase
+
 - [Vapor Pressure Tutorial](Tutorials/Vapor_Pressure.ipynb)
 - [Gas Species Tutorial](Tutorials/Gas_Species.ipynb)
 - [Atmosphere Tutorial](Tutorials/AtmosphereTutorial.ipynb)
+
+### Particle Phase
+
+- [Aerosol Surface Tutorial](Tutorials/Particle_Surface_Tutorial.ipynb)
+- [Aerosol Distribution Tutorial](Tutorials/Aerosol_Distributions.ipynb)
 
 ## Guides for Developers
 
