@@ -88,8 +88,8 @@ class ParticleRepresentation:
     def add_mass(self, added_mass: NDArray[np.float_]) -> None:
         """Adds mass to the particle distribution, and updates parameters.
 
-        Parameters:
-        - added_mass: The mass to be added per
+        Args:
+            added_mass: The mass to be added per
             distribution bin.
         """
         self.concentration, self.distribution = self.strategy.add_mass(
@@ -101,8 +101,8 @@ class ParticleRepresentation:
     ) -> None:
         """Adds concentration to the particle distribution.
 
-        Parameters:
-        - added_concentration: The concentration to be
+        Args:
+            added_concentration: The concentration to be
             added per distribution bin.
         """
         self.concentration += added_concentration
