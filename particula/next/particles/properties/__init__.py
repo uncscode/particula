@@ -20,4 +20,3 @@ from particula.next.particles.properties import coulomb_enhancement
 from particula.next.particles.properties.diffusive_knudsen_module import diffusive_knudsen_number
 from particula.next.particles.properties.vapor_correction_module import vapor_transition_correction
 from particula.next.particles.properties.partial_pressure_module import partial_pressure_delta
-from particula.next.particles.properties.kelvin_effect_module import kelvin_radius, kelvin_term

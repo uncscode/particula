@@ -25,7 +25,7 @@ def test_antoine_set_parameters_with_missing_key():
     builder = AntoineBuilder()
     with pytest.raises(ValueError) as excinfo:
         builder.set_parameters({'a': 10, 'b': 2000})
-    assert "Missing required parameter(s): c" in str(excinfo.value)
+    assert "Missing coefficient 'c'." in str(excinfo.value)
 
 
 def test_antoine_build_without_all_coefficients():
@@ -33,7 +33,7 @@ def test_antoine_build_without_all_coefficients():
     builder = AntoineBuilder().set_a(10).set_b(2000)
     with pytest.raises(ValueError) as excinfo:
         builder.build()
-    assert "Required parameter(s) not set: c" in str(excinfo.value)
+    assert "Missing coefficients: c" in str(excinfo.value)
 
 
 def test_clausius_set_latent_heat_positive():
@@ -118,8 +118,7 @@ def test_clausius_build_failure():
     builder.set_latent_heat(2260, 'J/kg').set_temperature_initial(373, 'K')
     with pytest.raises(ValueError) as excinfo:
         builder.build()
-    assert "Required parameter(s) not set: pressure_initial" in str(
-        excinfo.value)
+    assert "Missing parameters: pressure_initial" in str(excinfo.value)
 
 
 def test_constant_set_vapor_pressure_positive():
@@ -160,8 +159,7 @@ def test_constant_build_failure():
     builder = ConstantBuilder()
     with pytest.raises(ValueError) as excinfo:
         builder.build()
-    assert "Required parameter(s) not set: vapor_pressure" in str(
-        excinfo.value)
+    assert "Missing parameter: vapor_pressure" in str(excinfo.value)
 
 
 def test_build_water_buck():

@@ -1,0 +1,44 @@
+name: book
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+    paths:
+    - docs/**
+
+jobs:
+  booking:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with: 
+        persist-credentials: false
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5.1.0
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: |
+        pip install ".[dev]"
+        pip install jupyter-book ghp-import
+
+    - name: Build the book
+      run: |
+        jupyter-book build docs
+
+    - if: ${{ github.event_name == 'push' }}
+      name: GitHub Pages action
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        clean-exclude: pull-request-previews
+        folder: docs/_build/html
+
+    - if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+      name: Preview docs
+      uses: rossjrw/pr-preview-action@v1
+      with:
+        source-dir: docs/_build/html
