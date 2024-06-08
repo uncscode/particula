@@ -1,6 +1,8 @@
 """Strategies for surface effects on particles.
 
-Should add the organic film strategy in the future."""
+Should add the organic film strategy in the future.
+"""
+
 from abc import ABC, abstractmethod
 from typing import Union
 from numpy.typing import NDArray
@@ -8,13 +10,15 @@ import numpy as np
 
 from particula.util.convert import (
     mass_concentration_to_mole_fraction,
-    mass_concentration_to_volume_fraction
-    )
+    mass_concentration_to_volume_fraction,
+)
 from particula.next.particles.properties import kelvin_radius, kelvin_term
 
 
 class SurfaceStrategy(ABC):
-    """Abstract class for implementing strategies to calculate surface tension
+    """ABC class for Surface Strategies.
+
+    Abstract class for implementing strategies to calculate surface tension
     and the Kelvin effect for species in particulate phases.
 
     Methods:
@@ -30,77 +34,62 @@ class SurfaceStrategy(ABC):
 
     @abstractmethod
     def effective_surface_tension(
-        self,
-        mass_concentration: Union[float, NDArray[np.float_]]
+        self, mass_concentration: Union[float, NDArray[np.float_]]
     ) -> float:
-        """
-        Calculate the effective surface tension of species based on their
-        concentration.
+        """Calculate the effective surface tension of the species mixture.
 
         Args:
-        -----
-        - mass_concentration (float or NDArray[float]): Concentration of the
-        species [kg/m^3].
+            mass_concentration: Concentration of the species [kg/m^3].
 
         Returns:
-        -------
-        - float or NDArray[float]: Effective surface tension [N/m].
+            float or NDArray[float]: Effective surface tension [N/m].
         """
 
     @abstractmethod
     def effective_density(
-        self,
-        mass_concentration: Union[float, NDArray[np.float_]]
+        self, mass_concentration: Union[float, NDArray[np.float_]]
     ) -> float:
-        """
-        Calculate the effective density of species based on their
-        concentration.
+        """Calculate the effective density of the species mixture.
 
         Args:
-        -----
-        - mass_concentration (float or NDArray[float]): Concentration of the
-        species [kg/m^3].
+            mass_concentration: Concentration of the species [kg/m^3].
 
         Returns:
-        --------
-        - float or NDArray[float]: Effective density of the species [kg/m^3].
+            float or NDArray[float]: Effective density of the species [kg/m^3].
         """
 
     def kelvin_radius(
         self,
         molar_mass: Union[float, NDArray[np.float_]],
         mass_concentration: Union[float, NDArray[np.float_]],
-        temperature: float
+        temperature: float,
     ) -> Union[float, NDArray[np.float_]]:
-        """
-        Calculate the Kelvin radius which determines the curvature effect on
-        vapor pressure.
+        """Calculate the Kelvin radius which determines the curvature effect.
+
+        The kelvin radius is molecule specific and depends on the surface
+        tension, molar mass, density, and temperature of the system. It is
+        used to calculate the Kelvin term, which quantifies the effect of
+        particle curvature on vapor pressure.
 
         Args:
-        -----
-        - surface_tension (float or NDArray[float]): Surface tension of the
-        mixture [N/m].
-        - molar_mass (float or NDArray[float]): Molar mass of the species
-        [kg/mol].
-        - mass_concentration (float or NDArray[float]): Concentration of the
-        species [kg/m^3].
-        - temperature (float): Temperature of the system [K].
+            surface_tension: Surface tension of the mixture [N/m].
+            molar_mass: Molar mass of the species [kg/mol].
+            mass_concentration: Concentration of the species [kg/m^3].
+            temperature: Temperature of the system [K].
 
         Returns:
-        --------
-        - float or NDArray[float]: Kelvin radius [m].
+            float or NDArray[float]: Kelvin radius [m].
 
         References:
-        -----------
         - Based on Neil Donahue's approach to the Kelvin equation:
         r = 2 * surface_tension * molar_mass / (R * T * density)
-        See more: https://en.wikipedia.org/wiki/Kelvin_equation
+        [Kelvin Wikipedia](https://en.wikipedia.org/wiki/Kelvin_equation)
         """
         return kelvin_radius(
             self.effective_surface_tension(mass_concentration),
             self.effective_density(mass_concentration),
             molar_mass,
-            temperature
+            temperature,
         )
 
     def kelvin_term(
@@ -108,16 +97,16 @@ class SurfaceStrategy(ABC):
         radius: Union[float, NDArray[np.float_]],
         molar_mass: Union[float, NDArray[np.float_]],
         mass_concentration: Union[float, NDArray[np.float_]],
-        temperature: float
+        temperature: float,
     ) -> Union[float, NDArray[np.float_]]:
-        """
-        Calculate the Kelvin term, which quantifies the effect of particle
-        curvature on vapor pressure.
+        """Calculate the Kelvin term, which multiplies the vapor pressure.
+
+        The Kelvin term is used to adjust the vapor pressure of a species due
+        to the curvature of the particle.
 
         Args:
-        -----
-        - radius (float or NDArray[float]): Radius of the particle [m].
-        - molar_mass (float or NDArray[float]): Molar mass of the species a
+            radius: Radius of the particle [m].
+            molar_mass: Molar mass of the species a
         [kg/mol].
         - mass_concentration (float or NDArray[float]): Concentration of the
         species [kg/m^3].
@@ -162,35 +151,37 @@ class SurfaceStrategyMolar(SurfaceStrategy):
         self,
         surface_tension: Union[float, NDArray[np.float_]] = 0.072,  # water
         density: Union[float, NDArray[np.float_]] = 1000,  # water
-        molar_mass: Union[float, NDArray[np.float_]] = 0.01815  # water
+        molar_mass: Union[float, NDArray[np.float_]] = 0.01815,  # water
     ):
         self.surface_tension = surface_tension
         self.density = density
         self.molar_mass = molar_mass
 
     def effective_surface_tension(
-                self,
-                mass_concentration: Union[float, NDArray[np.float_]]
-            ) -> float:
+        self, mass_concentration: Union[float, NDArray[np.float_]]
+    ) -> float:
         if isinstance(self.surface_tension, float):
             return self.surface_tension
         return np.sum(
-            self.surface_tension * mass_concentration_to_mole_fraction(
-                mass_concentration, self.molar_mass),  # type: ignore
-            dtype=np.float_)
+            self.surface_tension
+            * mass_concentration_to_mole_fraction(
+                mass_concentration, self.molar_mass
+            ),  # type: ignore
+            dtype=np.float_,
+        )
 
     def effective_density(
-                self,
-                mass_concentration: Union[float, NDArray[np.float_]]
-            ) -> float:
+        self, mass_concentration: Union[float, NDArray[np.float_]]
+    ) -> float:
         if isinstance(self.density, float):
             return self.density
         return np.sum(
             self.density
             * mass_concentration_to_mole_fraction(
-                mass_concentration, self.molar_mass),  # type: ignore
-            dtype=np.float_
-            )
+                mass_concentration, self.molar_mass
+            ),  # type: ignore
+            dtype=np.float_,
+        )
 
 
 class SurfaceStrategyMass(SurfaceStrategy):
@@ -212,35 +203,32 @@ class SurfaceStrategyMass(SurfaceStrategy):
     def __init__(
         self,
         surface_tension: Union[float, NDArray[np.float_]] = 0.072,  # water
-        density: Union[float, NDArray[np.float_]] = 1000  # water
+        density: Union[float, NDArray[np.float_]] = 1000,  # water
     ):
         self.surface_tension = surface_tension
         self.density = density
 
     def effective_surface_tension(
-                self,
-                mass_concentration: Union[float, NDArray[np.float_]]
-            ) -> float:
+        self, mass_concentration: Union[float, NDArray[np.float_]]
+    ) -> float:
         if isinstance(self.surface_tension, float):
             return self.surface_tension
         return np.sum(
             self.surface_tension
             * mass_concentration
             / np.sum(mass_concentration),
-            dtype=np.float_)
+            dtype=np.float_,
+        )
 
     def effective_density(
-                self,
-                mass_concentration: Union[float, NDArray[np.float_]]
-            ) -> float:
+        self, mass_concentration: Union[float, NDArray[np.float_]]
+    ) -> float:
         if isinstance(self.density, float):
             return self.density
         return np.sum(
-            self.density
-            * mass_concentration
-            / np.sum(mass_concentration),
-            dtype=np.float_
-            )
+            self.density * mass_concentration / np.sum(mass_concentration),
+            dtype=np.float_,
+        )
 
 
 class SurfaceStrategyVolume(SurfaceStrategy):
@@ -262,32 +250,33 @@ class SurfaceStrategyVolume(SurfaceStrategy):
     def __init__(
         self,
         surface_tension: Union[float, NDArray[np.float_]] = 0.072,  # water
-        density: Union[float, NDArray[np.float_]] = 1000  # water
+        density: Union[float, NDArray[np.float_]] = 1000,  # water
     ):
         self.surface_tension = surface_tension
         self.density = density
 
     def effective_surface_tension(
-                self,
-                mass_concentration: Union[float, NDArray[np.float_]]
-            ) -> float:
+        self, mass_concentration: Union[float, NDArray[np.float_]]
+    ) -> float:
         if isinstance(self.surface_tension, float):
             return self.surface_tension
         return np.sum(
             self.surface_tension
             * mass_concentration_to_volume_fraction(
-                mass_concentration, self.density),  # type: ignore
-            dtype=np.float_)
+                mass_concentration, self.density
+            ),  # type: ignore
+            dtype=np.float_,
+        )
 
     def effective_density(
-                self,
-                mass_concentration: Union[float, NDArray[np.float_]]
-            ) -> float:
+        self, mass_concentration: Union[float, NDArray[np.float_]]
+    ) -> float:
         if isinstance(self.density, float):
             return self.density
         return np.sum(
             self.density
             * mass_concentration_to_volume_fraction(
-                mass_concentration, self.density),  # type: ignore
-            dtype=np.float_
-            )
+                mass_concentration, self.density
+            ),  # type: ignore
+            dtype=np.float_,
+        )
