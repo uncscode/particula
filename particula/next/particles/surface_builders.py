@@ -3,12 +3,6 @@ surface tension in the calculation of the Kelvin effect.
 
 This builds the strategy and checks that the required parameters are set,
 and converts the units of the parameters if necessary.
-
-Mixins are used to set the common parameters of the Surface strategies.
-
-We use explicit initialization of the mixins in the __init__ method, for
-clarity and traceability steps. Using super() would be more concise, but
-it would be harder to trace the inheritance chain.
 """
 
 import logging
@@ -31,16 +25,15 @@ class SurfaceStrategyMolarBuilder(
     """Builder class for SurfaceStrategyMolar objects.
 
     Methods:
-    --------
-    - set_surface_tension(surface_tension, surface_tension_units): Set the
-        surface tension of the particle in N/m. Default units are 'N/m'.
-    - set_density(density, density_units): Set the density of the particle in
-        kg/m^3. Default units are 'kg/m^3'.
-    - set_molar_mass(molar_mass, molar_mass_units): Set the molar mass of the
-        particle in kg/mol. Default units are 'kg/mol'.
-    - set_parameters(params): Set the parameters of the SurfaceStrategyMolar
-        object from a dictionary including optional units.
-    - build(): Validate and return the SurfaceStrategyMolar object.
+        set_surface_tension(surface_tension, surface_tension_units): Set the
+            surface tension of the particle in N/m. Default units are 'N/m'.
+        set_density(density, density_units): Set the density of the particle in
+            kg/m^3. Default units are 'kg/m^3'.
+        set_molar_mass(molar_mass, molar_mass_units): Set the molar mass of the
+            particle in kg/mol. Default units are 'kg/mol'.
+        set_parameters(params): Set the parameters of the SurfaceStrategyMolar
+            object from a dictionary including optional units.
+        build(): Validate and return the SurfaceStrategyMolar object.
     """
 
     def __init__(self):
@@ -54,8 +47,7 @@ class SurfaceStrategyMolarBuilder(
         """Validate and return the SurfaceStrategyMass object.
 
         Returns:
-        --------
-        - SurfaceStrategyMolar: Instance of the SurfaceStrategyMolar object.
+            SurfaceStrategyMolar: Instance of the SurfaceStrategyMolar object.
         """
         self.pre_build_check()
         return SurfaceStrategyMolar(
@@ -73,14 +65,13 @@ class SurfaceStrategyMassBuilder(
     """Builder class for SurfaceStrategyMass objects.
 
     Methods:
-    --------
-    - set_surface_tension(surface_tension, surface_tension_units): Set the
-        surface tension of the particle in N/m. Default units are 'N/m'.
-    - set_density(density, density_units): Set the density of the particle in
-        kg/m^3. Default units are 'kg/m^3'.
-    - set_parameters(params): Set the parameters of the SurfaceStrategyMass
-        object from a dictionary including optional units.
-    - build(): Validate and return the SurfaceStrategyMass object.
+        set_surface_tension(surface_tension, surface_tension_units): Set the
+            surface tension of the particle in N/m. Default units are 'N/m'.
+        set_density(density, density_units): Set the density of the particle in
+            kg/m^3. Default units are 'kg/m^3'.
+        set_parameters(params): Set the parameters of the SurfaceStrategyMass
+            object from a dictionary including optional units.
+        build(): Validate and return the SurfaceStrategyMass object.
     """
 
     def __init__(self):
@@ -93,8 +84,7 @@ class SurfaceStrategyMassBuilder(
         """Validate and return the SurfaceStrategyMass object.
 
         Returns:
-        --------
-        - SurfaceStrategyMass: Instance of the SurfaceStrategyMass object.
+            SurfaceStrategyMass: Instance of the SurfaceStrategyMass object.
         """
         self.pre_build_check()
         return SurfaceStrategyMass(
@@ -111,14 +101,13 @@ class SurfaceStrategyVolumeBuilder(
     """Builder class for SurfaceStrategyVolume objects.
 
     Methods:
-    --------
-    - set_surface_tension(surface_tension, surface_tension_units): Set the
-        surface tension of the particle in N/m. Default units are 'N/m'.
-    - set_density(density, density_units): Set the density of the particle in
-        kg/m^3. Default units are 'kg/m^3'.
-    - set_parameters(params): Set the parameters of the SurfaceStrategyVolume
-        object from a dictionary including optional units.
-    - build(): Validate and return the SurfaceStrategyVolume object.
+        set_surface_tension(surface_tension, surface_tension_units): Set the
+            surface tension of the particle in N/m. Default units are 'N/m'.
+        set_density(density, density_units): Set the density of the particle in
+            kg/m^3. Default units are 'kg/m^3'.
+        set_parameters(params): Set the parameters of the SurfaceStrategyVolume
+            object from a dictionary including optional units.
+        build(): Validate and return the SurfaceStrategyVolume object.
     """
 
     def __init__(self):
@@ -131,8 +120,8 @@ class SurfaceStrategyVolumeBuilder(
         """Validate and return the SurfaceStrategyVolume object.
 
         Returns:
-        --------
-        - SurfaceStrategyVolume: Instance of the SurfaceStrategyVolume object.
+            SurfaceStrategyVolume: Instance of the SurfaceStrategyVolume
+                object.
         """
         self.pre_build_check()
         return SurfaceStrategyVolume(
