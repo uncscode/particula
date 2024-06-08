@@ -77,8 +77,7 @@ class IdealActivityMolar(ActivityStrategy):
         is provided.
 
     References:
-        Molar Based [Raoult's Law](
-            https://en.wikipedia.org/wiki/Raoult%27s_law)
+        Molar [Raoult's Law](https://en.wikipedia.org/wiki/Raoult%27s_law)
     """
 
     def __init__(self, molar_mass: Union[float, NDArray[np.float_]] = 0.0):
@@ -116,8 +115,7 @@ class IdealActivityMass(ActivityStrategy):
     with the principles outlined in Raoult's Law.
 
     References:
-        Mass Based [Raoult's Law](
-            https://en.wikipedia.org/wiki/Raoult%27s_law)
+        Mass Based [Raoult's Law](https://en.wikipedia.org/wiki/Raoult%27s_law)
     """
 
     def activity(

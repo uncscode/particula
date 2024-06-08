@@ -73,5 +73,6 @@ class ActivityFactory(
         return {
             "mass_ideal": IdealActivityMassBuilder(),
             "molar_ideal": IdealActivityMolarBuilder(),
-            "kappa_parameter": KappaParameterActivityBuilder()
+            "kappa_parameter": KappaParameterActivityBuilder(),
+            "kappa": KappaParameterActivityBuilder()
         }
