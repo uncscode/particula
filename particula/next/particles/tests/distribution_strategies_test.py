@@ -101,11 +101,11 @@ def test_speciated_mass_strategy_get_mass():
 def test_speciated_mass_strategy_get_radius():
     """Test speciated mass strategy radius calculation."""
     # Example 2D distribution matrix
-    distribution = np.array([[100, 200], [300, 400]], dtype=np.float64)
+    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     # Example densities for each species
     densities = np.array([2, 3], dtype=np.float64)
     # Calculate expected volumes and then radii
-    volumes = np.sum(distribution / densities, axis=0)  # Volume calculation
+    volumes = np.sum(distribution / densities, axis=1)  # Volume calculation
     expected_radii = (3 * volumes / (4 * np.pi)
                       ) ** (1 / 3)  # Radius calculation
     np.testing.assert_array_almost_equal(
