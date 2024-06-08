@@ -1,6 +1,9 @@
 # ignore .DS_Store on macs
 .DS_Store
 
+# ignore local mkdocs source folder
+*Source-Code*
+.cache/
 # ignore local .vscode folder
 .vscode/
 
