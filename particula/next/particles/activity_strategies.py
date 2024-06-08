@@ -25,15 +25,14 @@ class ActivityStrategy(ABC):
     Methods:
         activity: Calculate the activity of a species.
         partial_pressure: Calculate the partial pressure of a species in
-                        the mixture.
+            the mixture.
     """
 
     @abstractmethod
     def activity(
         self, mass_concentration: Union[float, NDArray[np.float_]]
     ) -> Union[float, NDArray[np.float_]]:
-        """
-        Calculate the activity of a species based on its mass concentration.
+        """Calculate the activity of a species based on its mass concentration.
 
         Args:
             mass_concentration: Concentration of the species [kg/m^3]
@@ -78,7 +77,7 @@ class IdealActivityMolar(ActivityStrategy):
         is provided.
 
     References:
-        - Molar Based Raoult's Law: [Raoult's Law](
+        Molar Based [Raoult's Law](
             https://en.wikipedia.org/wiki/Raoult%27s_law)
     """
 
@@ -117,7 +116,7 @@ class IdealActivityMass(ActivityStrategy):
     with the principles outlined in Raoult's Law.
 
     References:
-        - Mass Based Raoult's Law: [Raoult's Law](
+        Mass Based [Raoult's Law](
             https://en.wikipedia.org/wiki/Raoult%27s_law)
     """
 
@@ -150,13 +149,13 @@ class KappaParameterActivity(ActivityStrategy):
     species' mass concentration along with the hygroscopic parameter.
 
     Args:
-        kappa (NDArray[np.float_]): Kappa hygroscopic parameter, unitless.
+        kappa: Kappa hygroscopic parameter, unitless.
             Includes a value for water which is excluded in calculations.
-        density (NDArray[np.float_]): Density of the species in kilograms per
+        density: Density of the species in kilograms per
             cubic meter (kg/m^3).
-        molar_mass (NDArray[np.float_]): Molar mass of the species in kilograms
+        molar_mass: Molar mass of the species in kilograms
             per mole (kg/mol).
-        water_index (int): Index of water in the mass concentration array.
+        water_index: Index of water in the mass concentration array.
     """
 
     def __init__(
