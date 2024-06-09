@@ -92,7 +92,7 @@ class ParticleRepresentation:
             added_mass: The mass to be added per
             distribution bin.
         """
-        self.concentration, self.distribution = self.strategy.add_mass(
+        (self.distribution, self.concentration) = self.strategy.add_mass(
             self.distribution, self.concentration, self.density, added_mass
         )
 

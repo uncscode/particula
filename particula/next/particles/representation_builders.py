@@ -39,7 +39,7 @@ from particula.next.particles.surface_strategies import (
 )
 from particula.next.particles.representation import ParticleRepresentation
 from particula.next.particles.properties.lognormal_size_distribution import (
-    lognormal_pdf_distribution,
+    lognormal_pdf_distribution, lognormal_pmf_distribution
 )
 
 logger = logging.getLogger("particula")
@@ -218,11 +218,12 @@ class LimitedRadiusParticleBuilder(
         self.radius_bins = np.logspace(-9, -4, 250)
         self.set_distribution_strategy(RadiiBasedMovingBin())
         self.set_activity_strategy(IdealActivityMass())
-        self.set_surface_strategy(SurfaceStrategyVolume(
-            surface_tension=0.072, density=1000
-        ))
+        self.set_surface_strategy(
+            SurfaceStrategyVolume(surface_tension=0.072, density=1000)
+        )
         self.set_density(1000, "kg/m^3")
         self.set_charge(0)
+        self.distribution_type = "pdf"
 
     def set_mode(
         self,
@@ -276,9 +277,8 @@ class LimitedRadiusParticleBuilder(
             message = "The number concentration must be positive."
             logger.error(message)
             raise ValueError(message)
-        self.number_concentration = (
-            number_concentration
-            * convert_units(number_concentration_units, "1/m^3")
+        self.number_concentration = number_concentration * convert_units(
+            number_concentration_units, "1/m^3"
         )
         return self
 
@@ -296,9 +296,26 @@ class LimitedRadiusParticleBuilder(
             message = "The radius bins must be positive."
             logger.error(message)
             raise ValueError(message)
-        self.radius_bins = radius_bins * convert_units(
-            radius_bins_units, "m"
-        )
+        self.radius_bins = radius_bins * convert_units(radius_bins_units, "m")
+        return self
+
+    def set_distribution_type(
+        self,
+        distribution_type: str,
+        distribution_type_units: Optional[str] = None,
+    ):
+        """Set the distribution type for the particle representation.
+
+        Args:
+            distribution_type: The type of distribution to use.
+        """
+        if distribution_type not in ["pdf", "pmf"]:
+            message = "The distribution type must be either 'pdf' or 'pmf'."
+            logger.error(message)
+            raise ValueError(message)
+        if distribution_type_units is not None:
+            logger.warning("Ignoring units for distribution type parameter.")
+        self.distribution_type = distribution_type
         return self
 
     def build(self) -> ParticleRepresentation:
@@ -310,12 +327,24 @@ class LimitedRadiusParticleBuilder(
         Returns:
             The validated ParticleRepresentation object.
         """
-        number_concentration = lognormal_pdf_distribution(
-            x_values=self.radius_bins,
-            mode=self.mode,
-            geometric_standard_deviation=self.geometric_standard_deviation,
-            number_of_particles=self.number_concentration,
-        )
+        if self.distribution_type == "pdf":
+            number_concentration = lognormal_pdf_distribution(
+                x_values=self.radius_bins,
+                mode=self.mode,
+                geometric_standard_deviation=self.geometric_standard_deviation,
+                number_of_particles=self.number_concentration,
+            )
+        elif self.distribution_type == "pmf":
+            number_concentration = lognormal_pmf_distribution(
+                x_values=self.radius_bins,
+                mode=self.mode,
+                geometric_standard_deviation=self.geometric_standard_deviation,
+                number_of_particles=self.number_concentration,
+            )
+        else:
+            message = "The distribution type must be either 'pdf' or 'pmf'."
+            logger.error(message)
+            raise ValueError(message)
 
         self.pre_build_check()
         return ParticleRepresentation(

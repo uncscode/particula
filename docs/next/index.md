@@ -18,6 +18,18 @@ Next is the next iteration of the particula simulation model. It is a complete r
 - [Types of Distributions Tutorial](Tutorials/Aerosol_Distributions.ipynb)
 - [Particle Representation Tutorial](Tutorials/Particle_Representation_Tutorial.ipynb)
 
+### Aerosol
+
+- [Aerosol Tutorial](Tutorials/Aerosol_Tutorial.ipynb)
+
+### Dynamics
+
+- [Condensation Tutorial](Tutorials/Condensation_Tutorial.ipynb)
+
+## Discussions
+
+- [Condensation Discussion](Discussions/Condensation_Discussion.md)
+
 ## Guides for Developers
 
 ![Four Quadrant representation of Tutorials, How to guides, References, and Discussions Areas](DocsImageDevGuide.png)

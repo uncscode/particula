@@ -52,8 +52,8 @@ class MassCondensation(Runnable):
                 mass_rate = self.condensation_strategy.mass_transfer_rate(
                     particle=particle,
                     gas_species=gas_species,
-                    temperature=aerosol.gas.temperature,
-                    pressure=aerosol.gas.total_pressure,
+                    temperature=aerosol.atmosphere.temperature,
+                    pressure=aerosol.atmosphere.total_pressure,
                 )
                 # mass rate per particle * time step * particle concentration
                 mass_gain_per_bin = (
@@ -63,7 +63,8 @@ class MassCondensation(Runnable):
                 particle.add_mass(added_mass=mass_gain_per_bin)
                 # remove mass from gas phase
                 gas_species.add_concentration(
-                    added_concentration=-mass_gain_per_bin)
+                    added_concentration=-mass_gain_per_bin
+                )
         return aerosol
 
     def rate(self, aerosol: Aerosol) -> Any:
@@ -91,8 +92,8 @@ class MassCondensation(Runnable):
                 mass_rate = self.condensation_strategy.mass_transfer_rate(
                     particle=particle,
                     gas_species=gas_species,
-                    temperature=aerosol.gas.temperature,
-                    pressure=aerosol.gas.total_pressure
+                    temperature=aerosol.atmosphere.temperature,
+                    pressure=aerosol.atmosphere.total_pressure,
                 )
                 # Multiply mass rate by particle concentration
                 rates = np.append(rates, mass_rate * particle.concentration)
@@ -130,8 +131,8 @@ class Coagulation(Runnable):
             # Calculate the net coagulation rate for the particle
             net_rate = self.coagulation_strategy.net_rate(
                 particle=particle,
-                temperature=aerosol.gas.temperature,
-                pressure=aerosol.gas.total_pressure
+                temperature=aerosol.atmosphere.temperature,
+                pressure=aerosol.atmosphere.total_pressure,
             )
             # Apply the change in distribution
             particle.add_concentration(net_rate * time_step)  # type: ignore
@@ -155,8 +156,8 @@ class Coagulation(Runnable):
             # Calculate the net coagulation rate for the particle
             net_rate = self.coagulation_strategy.net_rate(
                 particle=particle,
-                temperature=aerosol.gas.temperature,
-                pressure=aerosol.gas.total_pressure
+                temperature=aerosol.atmosphere.temperature,
+                pressure=aerosol.atmosphere.total_pressure,
             )
             rates = np.append(rates, net_rate)
         return rates
