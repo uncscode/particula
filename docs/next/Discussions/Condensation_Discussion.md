@@ -17,13 +17,13 @@ $$
 Where:
 
 - $m_{i}$ is the mass of species $i$ in the particle phase, of a specific bin
-- N is the number of particles
-- k_{cond} is the per-particle for order condensation coefficient
-- p_{i, gas} is the partial pressure of species $i$ in the gas phase
-- p_{i, particle~surface} is the partial pressure of species $i$ at the surface of the particle, acounting for Kelvin effect and activity coefficients.
-- R is the ideal gas constant
-- T is the temperature
-- molar mass_{i} is the molar mass of species $i$
+- $N$ is the number of particles
+- $k_{cond}$ is the per-particle for order condensation coefficient
+- $p_{i, gas}$ is the partial pressure of species $i$ in the gas phase
+- $p_{i, particle~surface}$ is the partial pressure of species $i$ at the surface of the particle, acounting for Kelvin effect and activity coefficients.
+- $R$ is the ideal gas constant
+- $T$ is the temperature
+- $molar mass_{i}$ is the molar mass of species $i$
 - $dm_{i}/dt$ is the rate of change of mass of species $i$ in the particle phase
 
 The first order condensation coefficient is defined as:
@@ -48,7 +48,7 @@ $$
 Where:
 
 - $\alpha_{i, accom.}$ is the accommodation coefficient of species $i$
-- Kn is the Knudsen number
+- $Kn$ is the Knudsen number
 - $Kn = \frac{\lambda_{i}}{radius_{particle}}$
   - $\lambda$ is the mean free path of the gas molecules of species $i$
   - $radius$ is the radius of the particle

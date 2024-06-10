@@ -193,7 +193,7 @@ class SpeciatedMassMovingBin(DistributionStrategy):
         # Broadcasting works natively as each column represents a species
         if distribution.ndim == 1:
             return distribution
-        return np.sum(distribution, axis=1)
+        return distribution
 
     def get_radius(
         self, distribution: NDArray[np.float_], density: NDArray[np.float_]
@@ -209,7 +209,8 @@ class SpeciatedMassMovingBin(DistributionStrategy):
         density: NDArray[np.float_],
     ) -> np.float_:
         # Calculate mass for each bin and species, then sum for total mass
-        mass_per_species = self.get_mass(distribution, density)
+        # mass_per_species = self.get_mass(distribution, density)
+        mass_per_species = np.sum(distribution, axis=1)
         return np.sum(mass_per_species * concentration)
 
     def add_mass(
@@ -221,8 +222,12 @@ class SpeciatedMassMovingBin(DistributionStrategy):
     ) -> tuple[NDArray[np.float_], NDArray[np.float_]]:
         # Add the mass to the distribution moving the bins
         # limit add to zero, total mass cannot be negative
+        if distribution.ndim == 2:
+            concentration_expand = concentration[:, np.newaxis]
+        else:
+            concentration_expand = concentration
         new_mass = (
-            np.maximum(distribution * concentration + added_mass, 0)
-            / concentration
+            np.maximum(distribution * concentration_expand + added_mass, 0)
+            / concentration_expand
         )
-        return (concentration, new_mass)
+        return (new_mass, concentration)

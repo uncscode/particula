@@ -91,7 +91,7 @@ def test_speciated_mass_strategy_get_mass():
     distribution = np.array([[100, 200], [300, 400]], dtype=np.float64)
     # Example densities for each species
     densities = np.array([2, 3], dtype=np.float64)
-    expected_mass = np.sum(distribution, axis=1)  # Expected mass calculation
+    expected_mass = distribution
     np.testing.assert_array_almost_equal(
         speciated_mass_strategy.get_mass(distribution, densities),
         expected_mass
@@ -108,8 +108,9 @@ def test_speciated_mass_strategy_get_radius():
     volumes = np.sum(distribution / densities, axis=1)  # Volume calculation
     expected_radii = (3 * volumes / (4 * np.pi)
                       ) ** (1 / 3)  # Radius calculation
+    result = speciated_mass_strategy.get_radius(distribution, densities)
     np.testing.assert_array_almost_equal(
-        speciated_mass_strategy.get_radius(distribution, densities),
+        result,
         expected_radii
     )
 
@@ -117,16 +118,15 @@ def test_speciated_mass_strategy_get_radius():
 def test_speciated_mass_strategy_get_total_mass():
     """Test speciated mass strategy total mass calculation."""
     # Example 2D distribution matrix
-    distribution = np.array([[100, 200], [300, 400]], dtype=np.float64)
+    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     # Example densities for each species
-    densities = np.array([2, 3], dtype=np.float64)
+    densities = np.array([2, 3, 5], dtype=np.float64)
     # Example concentrations for each species
-    concentration = np.array([10, 20], dtype=np.float64)
+    concentration = np.array([10, 20, 50], dtype=np.float64)
     # Expected total mass calculation
-    mass_per_species = speciated_mass_strategy.get_mass(
-        distribution, densities)
+    mass_per_particles = np.sum(distribution, axis=1)
     expected_total_mass = np.sum(
-        mass_per_species *
+        mass_per_particles *
         concentration)  # Total mass calculation
     assert speciated_mass_strategy.get_total_mass(
         distribution, concentration, densities) \

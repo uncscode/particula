@@ -270,3 +270,4 @@ class GasSpecies:
         - added_concentration (float): The concentration to add to the gas
             species."""
         self.concentration = self.concentration + added_concentration
+        self.concentration = np.maximum(self.concentration, 0.0)

@@ -55,13 +55,21 @@ class MassCondensation(Runnable):
                     temperature=aerosol.atmosphere.temperature,
                     pressure=aerosol.atmosphere.total_pressure,
                 )
+
+                # Multiply mass rate by particle concentration
+                if mass_rate.ndim == 2:
+                    concentration = particle.concentration[:, np.newaxis]
+                else:
+                    concentration = particle.concentration
                 # mass rate per particle * time step * particle concentration
                 mass_gain_per_bin = (
-                    mass_rate * time_step * particle.concentration
+                    mass_rate * time_step * concentration
                 )
                 # apply the mass change
                 particle.add_mass(added_mass=mass_gain_per_bin)
-                # remove mass from gas phase
+                # remove mass from gas phase concentration
+                if mass_rate.ndim == 2:
+                    mass_gain_per_bin = np.sum(mass_gain_per_bin, axis=0)
                 gas_species.add_concentration(
                     added_concentration=-mass_gain_per_bin
                 )
@@ -96,7 +104,11 @@ class MassCondensation(Runnable):
                     pressure=aerosol.atmosphere.total_pressure,
                 )
                 # Multiply mass rate by particle concentration
-                rates = np.append(rates, mass_rate * particle.concentration)
+                if mass_rate.ndim == 2:
+                    concentration = particle.concentration[:, np.newaxis]
+                else:
+                    concentration = particle.concentration
+                rates = np.append(rates, mass_rate * concentration)
         return rates
 
 

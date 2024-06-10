@@ -45,18 +45,19 @@ from particula.next.particles.representation import ParticleRepresentation
 from particula.next.gas.species import GasSpecies
 from particula.constants import GAS_CONSTANT
 from particula.next.particles.properties import (
-    calculate_knudsen_number, vapor_transition_correction,
-    partial_pressure_delta)
-from particula.next.gas.properties import (
-    molecule_mean_free_path)
+    calculate_knudsen_number,
+    vapor_transition_correction,
+    partial_pressure_delta,
+)
+from particula.next.gas.properties import molecule_mean_free_path
 
 
 def first_order_mass_transport_k(
-        radius: Union[float, NDArray[np.float_]],
-        vapor_transition: Union[float, NDArray[np.float_]],
-        diffusion_coefficient: Union[float, NDArray[np.float_]] = 2*1e-9
+    radius: Union[float, NDArray[np.float_]],
+    vapor_transition: Union[float, NDArray[np.float_]],
+    diffusion_coefficient: Union[float, NDArray[np.float_]] = 2 * 1e-9,
 ) -> Union[float, NDArray[np.float_]]:
-    """ First-order mass transport coefficient per particle.
+    """First-order mass transport coefficient per particle.
 
     Calculate the first-order mass transport coefficient, K, for a given radius
     diffusion coefficient, and vapor transition correction factor. For a
@@ -77,14 +78,18 @@ def first_order_mass_transport_k(
         - Mass Diffusivity:
             [Wikipedia](https://en.wikipedia.org/wiki/Mass_diffusivity)
     """
+    if isinstance(vapor_transition, np.ndarray) and (
+        vapor_transition.ndim == 2
+    ):  # extent radius
+        radius = radius[:, np.newaxis]
     return 4 * np.pi * radius * diffusion_coefficient * vapor_transition
 
 
 def mass_transfer_rate(
-        pressure_delta: Union[float, NDArray[np.float_]],
-        first_order_mass_transport: Union[float, NDArray[np.float_]],
-        temperature: Union[float, NDArray[np.float_]],
-        molar_mass: Union[float, NDArray[np.float_]]
+    pressure_delta: Union[float, NDArray[np.float_]],
+    first_order_mass_transport: Union[float, NDArray[np.float_]],
+    temperature: Union[float, NDArray[np.float_]],
+    molar_mass: Union[float, NDArray[np.float_]],
 ) -> Union[float, NDArray[np.float_]]:
     """Calculate the mass transfer rate for a particle.
 
@@ -109,9 +114,10 @@ def mass_transfer_rate(
             Equation 13.3
     """
     return np.array(
-        first_order_mass_transport * pressure_delta
-        / (GAS_CONSTANT.m/molar_mass * temperature),
-        dtype=np.float_
+        first_order_mass_transport
+        * pressure_delta
+        / (GAS_CONSTANT.m / molar_mass * temperature),
+        dtype=np.float_,
     )
 
 
@@ -137,8 +143,8 @@ class CondensationStrategy(ABC):
     def __init__(
         self,
         molar_mass: Union[float, NDArray[np.float_]],
-        diffusion_coefficient: Union[float, NDArray[np.float_]] = 2*1e-9,
-        accommodation_coefficient: Union[float, NDArray[np.float_]] = 1.0
+        diffusion_coefficient: Union[float, NDArray[np.float_]] = 2 * 1e-9,
+        accommodation_coefficient: Union[float, NDArray[np.float_]] = 1.0,
     ):
         self.molar_mass = molar_mass
         self.diffusion_coefficient = diffusion_coefficient
@@ -148,7 +154,7 @@ class CondensationStrategy(ABC):
         self,
         temperature: float,
         pressure: float,
-        dynamic_viscosity: Optional[float] = None
+        dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float_]]:
         """
         Calculate the mean free path of the gas molecules based on the
@@ -172,7 +178,7 @@ class CondensationStrategy(ABC):
             molar_mass=self.molar_mass,
             temperature=temperature,
             pressure=pressure,
-            dynamic_viscosity=dynamic_viscosity
+            dynamic_viscosity=dynamic_viscosity,
         )
 
     def knudsen_number(
@@ -180,7 +186,7 @@ class CondensationStrategy(ABC):
         radius: Union[float, NDArray[np.float_]],
         temperature: float,
         pressure: float,
-        dynamic_viscosity: Optional[float] = None
+        dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float_]]:
         """The Knudsen number for a particle.
 
@@ -205,9 +211,9 @@ class CondensationStrategy(ABC):
             mean_free_path=self.mean_free_path(
                 temperature=temperature,
                 pressure=pressure,
-                dynamic_viscosity=dynamic_viscosity
+                dynamic_viscosity=dynamic_viscosity,
             ),
-            particle_radius=radius
+            particle_radius=radius,
         )
 
     def first_order_mass_transport(
@@ -215,7 +221,7 @@ class CondensationStrategy(ABC):
         radius: Union[float, NDArray[np.float_]],
         temperature: float,
         pressure: float,
-        dynamic_viscosity: Optional[float] = None
+        dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float_]]:
         """First-order mass transport coefficient per particle.
 
@@ -244,9 +250,9 @@ class CondensationStrategy(ABC):
                 radius=radius,
                 temperature=temperature,
                 pressure=pressure,
-                dynamic_viscosity=dynamic_viscosity
+                dynamic_viscosity=dynamic_viscosity,
             ),
-            mass_accommodation=self.accommodation_coefficient
+            mass_accommodation=self.accommodation_coefficient,
         )
         return first_order_mass_transport_k(
             radius=radius,
@@ -261,7 +267,7 @@ class CondensationStrategy(ABC):
         gas_species: GasSpecies,
         temperature: float,
         pressure: float,
-        dynamic_viscosity: Optional[float] = None
+        dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float_]]:
         # pylint: disable=too-many-arguments
         """Mass transfer rate for a particle.
@@ -294,16 +300,17 @@ class CondensationIsothermal(CondensationStrategy):
     for condensation of particles based on partial pressures. No Latent heat
     of vaporization effect is considered.
     """
+
     def __init__(
         self,
         molar_mass: Union[float, NDArray[np.float_]],
-        diffusion_coefficient: Union[float, NDArray[np.float_]] = 2*1e-9,
-        accommodation_coefficient: Union[float, NDArray[np.float_]] = 1.0
+        diffusion_coefficient: Union[float, NDArray[np.float_]] = 2 * 1e-9,
+        accommodation_coefficient: Union[float, NDArray[np.float_]] = 1.0,
     ):
         super().__init__(
             molar_mass=molar_mass,
             diffusion_coefficient=diffusion_coefficient,
-            accommodation_coefficient=accommodation_coefficient
+            accommodation_coefficient=accommodation_coefficient,
         )
 
     def mass_transfer_rate(
@@ -312,7 +319,7 @@ class CondensationIsothermal(CondensationStrategy):
         gas_species: GasSpecies,
         temperature: float,
         pressure: float,
-        dynamic_viscosity: Optional[float] = None
+        dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float_]]:
         # pylint: disable=too-many-arguments
 
@@ -321,13 +328,14 @@ class CondensationIsothermal(CondensationStrategy):
             radius=particle.get_radius(),
             temperature=temperature,
             pressure=pressure,
-            dynamic_viscosity=dynamic_viscosity
+            dynamic_viscosity=dynamic_viscosity,
         )
         # calculate the partial pressure
         partial_pressure_particle = particle.activity.partial_pressure(
             pure_vapor_pressure=gas_species.get_pure_vapor_pressure(
-                temperature),
-            mass_concentration=particle.get_mass()
+                temperature
+            ),
+            mass_concentration=particle.get_mass(),
         )
         partial_pressure_gas = gas_species.get_partial_pressure(temperature)
         # calculate the kelvin term
@@ -335,18 +343,18 @@ class CondensationIsothermal(CondensationStrategy):
             radius=particle.get_radius(),
             molar_mass=self.molar_mass,
             mass_concentration=particle.get_mass(),
-            temperature=temperature
+            temperature=temperature,
         )
         # calculate the pressure delta accounting for the kelvin term
         pressure_delta = partial_pressure_delta(
             partial_pressure_gas=partial_pressure_gas,
             partial_pressure_particle=partial_pressure_particle,
-            kelvin_term=kelvin_term
+            kelvin_term=kelvin_term,
         )
         # Calculate the mass transfer rate per particle
         return mass_transfer_rate(
             pressure_delta=pressure_delta,
             first_order_mass_transport=first_order_mass_transport,
             temperature=temperature,
-            molar_mass=self.molar_mass
+            molar_mass=self.molar_mass,
         )

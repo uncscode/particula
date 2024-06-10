@@ -14,32 +14,31 @@ def kelvin_radius(
     temperature: float,
 ) -> Union[float, NDArray[np.float_]]:
     """
-        Calculate the Kelvin radius which determines the curvature effect on
-        vapor pressure.
+    Calculate the Kelvin radius which determines the curvature effect on
+    vapor pressure.
 
-        Args:
-        -----
-        - surface_tension (float or NDArray[float]): Surface tension of the
-        mixture [N/m].
-        - molar_mass (float or NDArray[float]): Molar mass of the species
-        [kg/mol].
-        - mass_concentration (float or NDArray[float]): Concentration of the
-        species [kg/m^3].
-        - temperature (float): Temperature of the system [K].
+    Args:
+    -----
+    - surface_tension (float or NDArray[float]): Surface tension of the
+    mixture [N/m].
+    - molar_mass (float or NDArray[float]): Molar mass of the species
+    [kg/mol].
+    - mass_concentration (float or NDArray[float]): Concentration of the
+    species [kg/m^3].
+    - temperature (float): Temperature of the system [K].
 
-        Returns:
-        --------
-        - float or NDArray[float]: Kelvin radius [m].
+    Returns:
+    --------
+    - float or NDArray[float]: Kelvin radius [m].
 
-        References:
-        -----------
-        - Based on Neil Donahue's approach to the Kelvin equation:
-        r = 2 * surface_tension * molar_mass / (R * T * density)
-        See more: https://en.wikipedia.org/wiki/Kelvin_equation
-        """
-    return (
-        (2 * effective_surface_tension * molar_mass)
-        / (GAS_CONSTANT.m * temperature * effective_density)
+    References:
+    -----------
+    - Based on Neil Donahue's approach to the Kelvin equation:
+    r = 2 * surface_tension * molar_mass / (R * T * density)
+    See more: https://en.wikipedia.org/wiki/Kelvin_equation
+    """
+    return (2 * effective_surface_tension * molar_mass) / (
+        GAS_CONSTANT.m * temperature * effective_density
     )
 
 
@@ -66,4 +65,11 @@ def kelvin_term(
         exp(kelvin_radius / particle_radius)
         See more: https://en.wikipedia.org/wiki/Kelvin_equation
     """
+    # Broadcast the arrays if necessary
+    if isinstance(kelvin_radius_value, np.ndarray) and (
+        kelvin_radius_value.size > 1
+    ):
+        kelvin_radius_value = kelvin_radius_value[np.newaxis, :]
+    if isinstance(radius, np.ndarray) and (radius.size > 1):
+        radius = radius[:, np.newaxis]
     return np.exp(kelvin_radius_value / radius)

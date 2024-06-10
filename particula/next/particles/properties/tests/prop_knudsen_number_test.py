@@ -25,6 +25,15 @@ def test_numpy_array_input():
     np.testing.assert_array_equal(kn, expected_results)
 
 
+def test_array_in_both_inputs():
+    """Test when numpy arrays are provided for both radius and mfp"""
+    mfp = np.array([0.1, 0.2])
+    radius = np.array([0.05, 0.1, 0.8, 3])
+    expected_results = mfp[np.newaxis, :] / radius[:, np.newaxis]
+    kn = calculate_knudsen_number(mfp, radius)
+    np.testing.assert_array_equal(kn, expected_results)
+
+
 def test_zero_particle_radius():
     """Test when the particle radius is zero,
     which should raise an exception"""
@@ -45,17 +54,3 @@ def test_invalid_type_inputs():
 
     with pytest.raises(TypeError):
         calculate_knudsen_number(0.1, "0.05")  # Invalid string input
-
-
-@pytest.mark.parametrize("mfp, radius, expected", [
-    (1, 0.5, 2),
-    (0.1, 0.05, 2),
-    (np.array([0.1, 0.2]), np.array([0.05, 0.1]), np.array([2.0, 2.0]))
-])
-def test_parametrized(mfp, radius, expected):
-    """Parameterized tests to cover multiple scenarios"""
-    result = calculate_knudsen_number(mfp, radius)
-    if isinstance(expected, np.ndarray):
-        np.testing.assert_array_equal(result, expected)
-    else:
-        assert result == expected  # Single value comparison
