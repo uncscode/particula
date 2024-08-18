@@ -27,6 +27,8 @@ Next is the next iteration of the particula simulation model. It is a complete r
 - [Condensation Tutorial: Moving Bin](Tutorials/Condensation_Tutorial-1.ipynb)
 - [Condensation Tutorial: Particle Resolved](Tutorials/Condensation_Tutorial-2.ipynb)
 
+- [Coagulation Tutorial: Basic 1](Tutorials/Coagulation_Basic.ipynb)
+
 ## Discussions
 
 - [Condensation Discussion](Discussions/Condensation_Discussion.md)

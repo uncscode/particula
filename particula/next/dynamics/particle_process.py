@@ -62,9 +62,7 @@ class MassCondensation(Runnable):
                 else:
                     concentration = particle.concentration
                 # mass rate per particle * time step * particle concentration
-                mass_gain_per_bin = (
-                    mass_rate * time_step * concentration
-                )
+                mass_gain_per_bin = mass_rate * time_step * concentration
                 # apply the mass change
                 particle.add_mass(added_mass=mass_gain_per_bin)
                 # remove mass from gas phase concentration
@@ -88,7 +86,7 @@ class MassCondensation(Runnable):
         --------
         - np.ndarray: An array of condensation rates for each particle.
         """
-        rates = np.array([], dtype=np.float_)
+        rates = np.array([], dtype=np.float64)
         # Loop over gas species in the aerosol
         for gas_species in aerosol.iterate_gas():
             # Check if the gas species is condensable
@@ -162,7 +160,7 @@ class Coagulation(Runnable):
         --------
         - np.ndarray: An array of coagulation rates for each particle.
         """
-        rates = np.array([], dtype=np.float_)
+        rates = np.array([], dtype=np.float64)
         # Loop over particles
         for particle in aerosol.iterate_particle():
             # Calculate the net coagulation rate for the particle

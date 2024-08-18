@@ -8,11 +8,11 @@ from numpy.typing import NDArray
 
 
 def lognormal_pdf_distribution(
-    x_values: NDArray[np.float_],
-    mode: NDArray[np.float_],
-    geometric_standard_deviation: NDArray[np.float_],
-    number_of_particles: NDArray[np.float_],
-) -> NDArray[np.float_]:
+    x_values: NDArray[np.float64],
+    mode: NDArray[np.float64],
+    geometric_standard_deviation: NDArray[np.float64],
+    number_of_particles: NDArray[np.float64],
+) -> NDArray[np.float64]:
     """
     Probability Density Function for the lognormal distribution of particles
     for varying modes, geometric standard deviations, and numbers of particles,
@@ -60,11 +60,11 @@ def lognormal_pdf_distribution(
 
 
 def lognormal_pmf_distribution(
-    x_values: NDArray[np.float_],
-    mode: NDArray[np.float_],
-    geometric_standard_deviation: NDArray[np.float_],
-    number_of_particles: NDArray[np.float_],
-) -> NDArray[np.float_]:
+    x_values: NDArray[np.float64],
+    mode: NDArray[np.float64],
+    geometric_standard_deviation: NDArray[np.float64],
+    number_of_particles: NDArray[np.float64],
+) -> NDArray[np.float64]:
     """
     Probability Mass function for lognormal distribution of particles for
     varying modes, geometric standard deviations, and numbers of particles,
@@ -112,11 +112,11 @@ def lognormal_pmf_distribution(
 
 
 def lognormal_sample_distribution(
-    mode: NDArray[np.float_],
-    geometric_standard_deviation: NDArray[np.float_],
-    number_of_particles: NDArray[np.float_],
+    mode: NDArray[np.float64],
+    geometric_standard_deviation: NDArray[np.float64],
+    number_of_particles: NDArray[np.float64],
     number_of_samples: int,
-) -> NDArray[np.float_]:
+) -> NDArray[np.float64]:
     """Sample a Probability Density Function for the lognormal distribution.
 
     Samples a set of samples (particle) to represent the lognormal distribution

@@ -39,7 +39,8 @@ from particula.next.particles.surface_strategies import (
 )
 from particula.next.particles.representation import ParticleRepresentation
 from particula.next.particles.properties.lognormal_size_distribution import (
-    lognormal_pdf_distribution, lognormal_pmf_distribution
+    lognormal_pdf_distribution,
+    lognormal_pmf_distribution,
 )
 
 logger = logging.getLogger("particula")
@@ -227,7 +228,7 @@ class LimitedRadiusParticleBuilder(
 
     def set_mode(
         self,
-        mode: NDArray[np.float_],
+        mode: NDArray[np.float64],
         mode_units: str = "m",
     ):
         """Set the modes for distribution
@@ -245,7 +246,7 @@ class LimitedRadiusParticleBuilder(
 
     def set_geometric_standard_deviation(
         self,
-        geometric_standard_deviation: NDArray[np.float_],
+        geometric_standard_deviation: NDArray[np.float64],
         geometric_standard_deviation_units: Optional[str] = None,
     ):
         """Set the geometric standard deviation for the distribution
@@ -265,7 +266,7 @@ class LimitedRadiusParticleBuilder(
 
     def set_number_concentration(
         self,
-        number_concentration: NDArray[np.float_],
+        number_concentration: NDArray[np.float64],
         number_concentration_units: str = "1/m^3",
     ):
         """Set the number concentration for the distribution
@@ -284,7 +285,7 @@ class LimitedRadiusParticleBuilder(
 
     def set_radius_bins(
         self,
-        radius_bins: NDArray[np.float_],
+        radius_bins: NDArray[np.float64],
         radius_bins_units: str = "m",
     ):
         """Set the radius bins for the distribution

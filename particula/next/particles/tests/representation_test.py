@@ -37,4 +37,4 @@ def test_particle_properties():
     # Validate the types of the returned values
     assert isinstance(mass, np.ndarray)
     assert isinstance(radius, np.ndarray)
-    assert isinstance(total_mass, np.float_)
+    assert isinstance(total_mass, np.float64)

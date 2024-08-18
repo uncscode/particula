@@ -5,12 +5,13 @@ Units are in kg/mol for molar mass, Kelvin for temperature, Pascals for
 pressure, and kg/m^3 for concentration.
 """
 
-
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 from particula.next.gas.vapor_pressure_strategies import (
-    VaporPressureStrategy, ConstantVaporPressureStrategy)
+    VaporPressureStrategy,
+    ConstantVaporPressureStrategy,
+)
 
 
 class GasSpecies:
@@ -48,12 +49,12 @@ class GasSpecies:
     def __init__(  # pylint: disable=too-many-arguments
         self,
         name: Union[str, NDArray[np.str_]],
-        molar_mass: Union[float, NDArray[np.float_]],
+        molar_mass: Union[float, NDArray[np.float64]],
         vapor_pressure_strategy: Union[
             VaporPressureStrategy, list[VaporPressureStrategy]
-            ] = ConstantVaporPressureStrategy(0.0),
+        ] = ConstantVaporPressureStrategy(0.0),
         condensable: Union[bool, NDArray[np.bool_]] = True,
-        concentration: Union[float, NDArray[np.float_]] = 0.0
+        concentration: Union[float, NDArray[np.float64]] = 0.0,
     ) -> None:
         self.name = name
         self.molar_mass = molar_mass
@@ -80,11 +81,11 @@ class GasSpecies:
         - name (str or NDArray[np.str_]): The name of the gas species."""
         return self.name
 
-    def get_molar_mass(self) -> Union[float, NDArray[np.float_]]:
+    def get_molar_mass(self) -> Union[float, NDArray[np.float64]]:
         """Get the molar mass of the gas species in kg/mol.
 
         Returns:
-        - molar_mass (float or NDArray[np.float_]): The molar mass of the gas
+        - molar_mass (float or NDArray[np.float64]): The molar mass of the gas
             species, in kg/mol."""
         return self.molar_mass
 
@@ -96,18 +97,17 @@ class GasSpecies:
             otherwise."""
         return self.condensable
 
-    def get_concentration(self) -> Union[float, NDArray[np.float_]]:
+    def get_concentration(self) -> Union[float, NDArray[np.float64]]:
         """Get the concentration of the gas species in the mixture, in kg/m^3.
 
         Returns:
-        - concentration (float or NDArray[np.float_]): The concentration of the
+        - concentration (float or NDArray[np.float64]): The concentration of the
             gas species in the mixture."""
         return self.concentration
 
     def get_pure_vapor_pressure(
-        self,
-        temperature: Union[float, NDArray[np.float_]]
-    ) -> Union[float, NDArray[np.float_]]:
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
         """Calculate the pure vapor pressure of the gas species at a given
         temperature in Kelvin.
 
@@ -115,11 +115,11 @@ class GasSpecies:
         for calculating vapor pressure.
 
         Args:
-        - temperature (float or NDArray[np.float_]): The temperature in
+        - temperature (float or NDArray[np.float64]): The temperature in
         Kelvin at which to calculate vapor pressure.
 
         Returns:
-        - vapor_pressure (float or NDArray[np.float_]): The calculated pure
+        - vapor_pressure (float or NDArray[np.float64]): The calculated pure
         vapor pressure in Pascals.
 
         Raises:
@@ -129,18 +129,21 @@ class GasSpecies:
             # Handle a list of strategies: calculate and return a list of vapor
             # pressures
             return np.array(
-                [strategy.pure_vapor_pressure(temperature)
-                 for strategy in self.pure_vapor_pressure_strategy],
-                dtype=np.float_)
+                [
+                    strategy.pure_vapor_pressure(temperature)
+                    for strategy in self.pure_vapor_pressure_strategy
+                ],
+                dtype=np.float64,
+            )
 
         # Handle a single strategy: calculate and return the vapor pressure
         return self.pure_vapor_pressure_strategy.pure_vapor_pressure(
-            temperature)
+            temperature
+        )
 
     def get_partial_pressure(
-        self,
-        temperature: Union[float, NDArray[np.float_]]
-    ) -> Union[float, NDArray[np.float_]]:
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
         """
         Calculate the partial pressure of the gas based on the vapor
         pressure strategy. This method accounts for multiple strategies if
@@ -148,11 +151,11 @@ class GasSpecies:
         the corresponding concentration and molar mass.
 
         Parameters:
-        - temperature (float or NDArray[np.float_]): The temperature in
+        - temperature (float or NDArray[np.float64]): The temperature in
         Kelvin at which to calculate the partial pressure.
 
         Returns:
-        - partial_pressure (float or NDArray[np.float_]): Partial pressure
+        - partial_pressure (float or NDArray[np.float64]): Partial pressure
         of the gas in Pascals.
 
         Raises:
@@ -162,27 +165,28 @@ class GasSpecies:
         if isinstance(self.pure_vapor_pressure_strategy, list):
             # Calculate partial pressure for each strategy
             return np.array(
-                [strategy.partial_pressure(
-                    concentration=c,
-                    molar_mass=m,
-                    temperature=temperature)
-                 for (strategy, c, m) in zip(
-                     self.pure_vapor_pressure_strategy,
-                     self.concentration,
-                     self.molar_mass)],
-                dtype=np.float_
+                [
+                    strategy.partial_pressure(
+                        concentration=c, molar_mass=m, temperature=temperature
+                    )
+                    for (strategy, c, m) in zip(
+                        self.pure_vapor_pressure_strategy,
+                        self.concentration,
+                        self.molar_mass,
+                    )
+                ],
+                dtype=np.float64,
             )
         # Calculate partial pressure using a single strategy
         return self.pure_vapor_pressure_strategy.partial_pressure(
             concentration=self.concentration,
             molar_mass=self.molar_mass,
-            temperature=temperature
+            temperature=temperature,
         )
 
     def get_saturation_ratio(
-        self,
-        temperature: Union[float, NDArray[np.float_]]
-    ) -> Union[float, NDArray[np.float_]]:
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
         """
         Calculate the saturation ratio of the gas based on the vapor
         pressure strategy. This method accounts for multiple strategies if
@@ -190,11 +194,11 @@ class GasSpecies:
         the corresponding concentration and molar mass.
 
         Parameters:
-        - temperature (float or NDArray[np.float_]): The temperature in
+        - temperature (float or NDArray[np.float64]): The temperature in
         Kelvin at which to calculate the partial pressure.
 
         Returns:
-        - saturation_ratio (float or NDArray[np.float_]): The saturation ratio
+        - saturation_ratio (float or NDArray[np.float64]): The saturation ratio
         of the gas
 
         Raises:
@@ -204,27 +208,28 @@ class GasSpecies:
         if isinstance(self.pure_vapor_pressure_strategy, list):
             # Calculate saturation ratio for each strategy
             return np.array(
-                [strategy.saturation_ratio(
-                    concentration=c,
-                    molar_mass=m,
-                    temperature=temperature)
-                 for (strategy, c, m) in zip(
-                     self.pure_vapor_pressure_strategy,
-                     self.concentration,
-                     self.molar_mass)],
-                dtype=np.float_
+                [
+                    strategy.saturation_ratio(
+                        concentration=c, molar_mass=m, temperature=temperature
+                    )
+                    for (strategy, c, m) in zip(
+                        self.pure_vapor_pressure_strategy,
+                        self.concentration,
+                        self.molar_mass,
+                    )
+                ],
+                dtype=np.float64,
             )
         # Calculate saturation ratio using a single strategy
         return self.pure_vapor_pressure_strategy.saturation_ratio(
             concentration=self.concentration,
             molar_mass=self.molar_mass,
-            temperature=temperature
+            temperature=temperature,
         )
 
     def get_saturation_concentration(
-        self,
-        temperature: Union[float, NDArray[np.float_]]
-    ) -> Union[float, NDArray[np.float_]]:
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
         """
         Calculate the saturation concentration of the gas based on the vapor
         pressure strategy. This method accounts for multiple strategies if
@@ -232,11 +237,11 @@ class GasSpecies:
         based on the molar mass.
 
         Parameters:
-        - temperature (float or NDArray[np.float_]): The temperature in
+        - temperature (float or NDArray[np.float64]): The temperature in
         Kelvin at which to calculate the partial pressure.
 
         Returns:
-        - saturation_concentration (float or NDArray[np.float_]): The
+        - saturation_concentration (float or NDArray[np.float64]): The
         saturation concentration of the gas
 
         Raises:
@@ -246,23 +251,23 @@ class GasSpecies:
         if isinstance(self.pure_vapor_pressure_strategy, list):
             # Calculate saturation concentraiton for each strategy
             return np.array(
-                [strategy.saturation_concentration(
-                    molar_mass=m,
-                    temperature=temperature)
-                 for (strategy, m) in zip(
-                     self.pure_vapor_pressure_strategy,
-                     self.molar_mass)],
-                dtype=np.float_
+                [
+                    strategy.saturation_concentration(
+                        molar_mass=m, temperature=temperature
+                    )
+                    for (strategy, m) in zip(
+                        self.pure_vapor_pressure_strategy, self.molar_mass
+                    )
+                ],
+                dtype=np.float64,
             )
         # Calculate saturation concentration using a single strategy
         return self.pure_vapor_pressure_strategy.saturation_concentration(
-            molar_mass=self.molar_mass,
-            temperature=temperature
+            molar_mass=self.molar_mass, temperature=temperature
         )
 
     def add_concentration(
-        self,
-        added_concentration: Union[float, NDArray[np.float_]]
+        self, added_concentration: Union[float, NDArray[np.float64]]
     ):
         """Add concentration to the gas species.
 

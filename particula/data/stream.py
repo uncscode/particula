@@ -35,8 +35,8 @@ class Stream:
     """
 
     header: List[str] = field(default_factory=list)
-    data: NDArray[np.float_] = field(default_factory=lambda: np.array([]))
-    time: NDArray[np.float_] = field(default_factory=lambda: np.array([]))
+    data: NDArray[np.float64] = field(default_factory=lambda: np.array([]))
+    time: NDArray[np.float64] = field(default_factory=lambda: np.array([]))
     files: List[str] = field(default_factory=list)
 
     def __post_init__(self):
@@ -51,7 +51,7 @@ class Stream:
         if not isinstance(self.header, list):  # type: ignore
             raise TypeError("header must be a list of strings")
 
-    def __getitem__(self, index: Union[int, str]) -> NDArray[np.float_]:
+    def __getitem__(self, index: Union[int, str]) -> NDArray[np.float64]:
         """Gets data at a specified index or header name.
 
         Allows indexing of the data stream using an integer index or a string
@@ -70,7 +70,7 @@ class Stream:
             index = self.header.index(index)
         return self.data[:, index]
 
-    def __setitem__(self, index: Union[int, str], value: NDArray[np.float_]):
+    def __setitem__(self, index: Union[int, str], value: NDArray[np.float64]):
         """Sets or adds data at a specified index.
 
         If index is a string and not in headers, it is added. This is used
@@ -106,7 +106,7 @@ class Stream:
         return len(self.time)
 
     @property
-    def datetime64(self) -> NDArray[np.float_]:
+    def datetime64(self) -> NDArray[np.float64]:
         """Converts the epoch time array to a datetime64 for plotting.
 
         This method converts the time array to a datetime64 array, which
@@ -128,7 +128,7 @@ class Stream:
         return dict(enumerate(self.header))
 
     @property
-    def header_float(self) -> NDArray[np.float_]:
+    def header_float(self) -> NDArray[np.float64]:
         """Attempts to convert header names to a float array, where possible.
 
         Returns:
@@ -190,7 +190,7 @@ class StreamAveraged(Stream):
             logger.error(message)
             raise ValueError(message)
 
-    def get_std(self, index: Union[int, str]) -> NDArray[np.float_]:
+    def get_std(self, index: Union[int, str]) -> NDArray[np.float64]:
         """Retrieves the standard deviation
 
         In the averaged data stream, the standard deviation of the data is

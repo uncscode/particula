@@ -13,9 +13,9 @@ import numpy as np
 
 
 def friction_factor(
-    radius: Union[float, NDArray[np.float_]],
+    radius: Union[float, NDArray[np.float64]],
     dynamic_viscosity: float,
-    slip_correction: Union[float, NDArray[np.float_]],
+    slip_correction: Union[float, NDArray[np.float64]],
 ):
     """
     Returns a particle's friction factor. Property of the particle's size and
@@ -54,8 +54,4 @@ def friction_factor(
     Technology, 46(10), 1065-1078. https://doi.org/10.1080/02786826.2012.690543
     """
 
-    return (
-        6 * np.pi * dynamic_viscosity * radius
-        /
-        slip_correction
-    )
+    return 6 * np.pi * dynamic_viscosity * radius / slip_correction

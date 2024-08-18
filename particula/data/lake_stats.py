@@ -11,7 +11,7 @@ from particula.data import stream_stats
 def average_std(
     lake: Lake,
     average_interval: Union[float, int] = 60,
-    new_time_array: Optional[NDArray[np.float_]] = None,
+    new_time_array: Optional[NDArray[np.float64]] = None,
     clone: bool = True,
 ) -> Lake:
     """Averages the data in each stream within a 'Lake' object.

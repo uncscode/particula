@@ -5,9 +5,8 @@ import numpy as np
 
 
 def to_mole_fraction(
-    mass_concentrations: NDArray[np.float_],
-    molar_masses: NDArray[np.float_]
-) -> NDArray[np.float_]:
+    mass_concentrations: NDArray[np.float64], molar_masses: NDArray[np.float64]
+) -> NDArray[np.float64]:
     """Convert mass concentrations to mole fractions for N components.
 
     Args:
@@ -39,9 +38,8 @@ def to_mole_fraction(
 
 
 def to_volume_fraction(
-    mass_concentrations: NDArray[np.float_],
-    densities: NDArray[np.float_]
-) -> NDArray[np.float_]:
+    mass_concentrations: NDArray[np.float64], densities: NDArray[np.float64]
+) -> NDArray[np.float64]:
     """Convert mass concentrations to volume fractions for N components.
 
     Args:

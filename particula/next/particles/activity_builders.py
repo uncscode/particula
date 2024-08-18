@@ -8,10 +8,15 @@ from typing import Optional, Union
 from numpy.typing import NDArray
 import numpy as np
 from particula.next.abc_builder import (
-    BuilderABC, BuilderMolarMassMixin, BuilderDensityMixin)
+    BuilderABC,
+    BuilderMolarMassMixin,
+    BuilderDensityMixin,
+)
 from particula.next.particles.activity_strategies import (
-    IdealActivityMass, IdealActivityMolar, KappaParameterActivity,
-    ActivityStrategy
+    IdealActivityMass,
+    IdealActivityMolar,
+    KappaParameterActivity,
+    ActivityStrategy,
 )
 
 logger = logging.getLogger("particula")
@@ -37,10 +42,7 @@ class IdealActivityMassBuilder(BuilderABC):
         return IdealActivityMass()
 
 
-class IdealActivityMolarBuilder(
-    BuilderABC,
-    BuilderMolarMassMixin
-):
+class IdealActivityMolarBuilder(BuilderABC, BuilderMolarMassMixin):
     """Builder class for IdealActivityMolar objects.
 
     Methods:
@@ -52,7 +54,7 @@ class IdealActivityMolarBuilder(
     """
 
     def __init__(self):
-        required_parameters = ['molar_mass']
+        required_parameters = ["molar_mass"]
         BuilderABC.__init__(self, required_parameters)
         BuilderMolarMassMixin.__init__(self)
 
@@ -67,9 +69,7 @@ class IdealActivityMolarBuilder(
 
 
 class KappaParameterActivityBuilder(
-    BuilderABC,
-    BuilderDensityMixin,
-    BuilderMolarMassMixin
+    BuilderABC, BuilderDensityMixin, BuilderMolarMassMixin
 ):
     """Builder class for KappaParameterActivity objects.
 
@@ -86,8 +86,7 @@ class KappaParameterActivityBuilder(
     """
 
     def __init__(self):
-        required_parameters = [
-            'kappa', 'density', 'molar_mass', 'water_index']
+        required_parameters = ["kappa", "density", "molar_mass", "water_index"]
         BuilderABC.__init__(self, required_parameters)
         BuilderDensityMixin.__init__(self)
         BuilderMolarMassMixin.__init__(self)
@@ -96,8 +95,8 @@ class KappaParameterActivityBuilder(
 
     def set_kappa(
         self,
-        kappa: Union[float, NDArray[np.float_]],
-        kappa_units: Optional[str] = None
+        kappa: Union[float, NDArray[np.float64]],
+        kappa_units: Optional[str] = None,
     ):
         """Set the kappa parameter for the activity calculation.
 
@@ -115,9 +114,7 @@ class KappaParameterActivityBuilder(
         return self
 
     def set_water_index(
-        self,
-        water_index: int,
-        water_index_units: Optional[str] = None
+        self, water_index: int, water_index_units: Optional[str] = None
     ):
         """Set the array index of the species.
 
@@ -145,5 +142,5 @@ class KappaParameterActivityBuilder(
             kappa=self.kappa,  # type: ignore
             density=self.density,  # type: ignore
             molar_mass=self.molar_mass,  # type: ignore
-            water_index=self.water_index  # type: ignore
+            water_index=self.water_index,  # type: ignore
         )

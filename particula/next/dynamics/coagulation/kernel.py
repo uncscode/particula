@@ -25,9 +25,9 @@ class KernelStrategy(ABC):
     @abstractmethod
     def dimensionless(
         self,
-        diffusive_knudsen: NDArray[np.float_],
-        coulomb_potential_ratio: NDArray[np.float_],
-    ) -> NDArray[np.float_]:
+        diffusive_knudsen: NDArray[np.float64],
+        coulomb_potential_ratio: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
         """Return the dimensionless coagulation kernel (H)
 
         Args:
@@ -67,12 +67,12 @@ class KernelStrategy(ABC):
 
     def kernel(  # pylint: disable=too-many-arguments
         self,
-        dimensionless_kernel: NDArray[np.float_],
-        coulomb_potential_ratio: NDArray[np.float_],
-        sum_of_radii: NDArray[np.float_],
-        reduced_mass: NDArray[np.float_],
-        reduced_friction_factor: NDArray[np.float_],
-    ) -> NDArray[np.float_]:
+        dimensionless_kernel: NDArray[np.float64],
+        coulomb_potential_ratio: NDArray[np.float64],
+        sum_of_radii: NDArray[np.float64],
+        reduced_mass: NDArray[np.float64],
+        reduced_friction_factor: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
         """
         The dimensioned coagulation kernel for each particle pair, calculated
         from the dimensionless coagulation kernel and the reduced quantities.
@@ -121,9 +121,9 @@ class HardSphere(KernelStrategy):
 
     def dimensionless(
         self,
-        diffusive_knudsen: NDArray[np.float_],
-        coulomb_potential_ratio: NDArray[np.float_],  # type: ignore
-    ) -> NDArray[np.float_]:
+        diffusive_knudsen: NDArray[np.float64],
+        coulomb_potential_ratio: NDArray[np.float64],  # type: ignore
+    ) -> NDArray[np.float64]:
         return transition_regime.hard_sphere(diffusive_knudsen)  # type: ignore
 
 
@@ -142,9 +142,9 @@ class CoulombDyachkov2007(KernelStrategy):
 
     def dimensionless(
         self,
-        diffusive_knudsen: NDArray[np.float_],
-        coulomb_potential_ratio: NDArray[np.float_],
-    ) -> NDArray[np.float_]:
+        diffusive_knudsen: NDArray[np.float64],
+        coulomb_potential_ratio: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
         return transition_regime.coulomb_dyachkov2007(
             diffusive_knudsen, coulomb_potential_ratio
         )  # type: ignore
@@ -165,9 +165,9 @@ class CoulombGatti2008(KernelStrategy):
 
     def dimensionless(
         self,
-        diffusive_knudsen: NDArray[np.float_],
-        coulomb_potential_ratio: NDArray[np.float_],
-    ) -> NDArray[np.float_]:
+        diffusive_knudsen: NDArray[np.float64],
+        coulomb_potential_ratio: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
         return transition_regime.coulomb_gatti2008(
             diffusive_knudsen, coulomb_potential_ratio
         )  # type: ignore
@@ -188,9 +188,9 @@ class CoulombGopalakrishnan2012(KernelStrategy):
 
     def dimensionless(
         self,
-        diffusive_knudsen: NDArray[np.float_],
-        coulomb_potential_ratio: NDArray[np.float_],
-    ) -> NDArray[np.float_]:
+        diffusive_knudsen: NDArray[np.float64],
+        coulomb_potential_ratio: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
         return transition_regime.coulomb_gopalakrishnan2012(
             diffusive_knudsen, coulomb_potential_ratio
         )  # type: ignore
@@ -211,9 +211,9 @@ class CoulumbChahl2019(KernelStrategy):
 
     def dimensionless(
         self,
-        diffusive_knudsen: NDArray[np.float_],
-        coulomb_potential_ratio: NDArray[np.float_],
-    ) -> NDArray[np.float_]:
+        diffusive_knudsen: NDArray[np.float64],
+        coulomb_potential_ratio: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
         return transition_regime.coulomb_chahl2019(
             diffusive_knudsen, coulomb_potential_ratio
         )  # type: ignore

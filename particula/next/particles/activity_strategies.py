@@ -30,8 +30,8 @@ class ActivityStrategy(ABC):
 
     @abstractmethod
     def activity(
-        self, mass_concentration: Union[float, NDArray[np.float_]]
-    ) -> Union[float, NDArray[np.float_]]:
+        self, mass_concentration: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
         """Calculate the activity of a species based on its mass concentration.
 
         Args:
@@ -43,9 +43,9 @@ class ActivityStrategy(ABC):
 
     def partial_pressure(
         self,
-        pure_vapor_pressure: Union[float, NDArray[np.float_]],
-        mass_concentration: Union[float, NDArray[np.float_]],
-    ) -> Union[float, NDArray[np.float_]]:
+        pure_vapor_pressure: Union[float, NDArray[np.float64]],
+        mass_concentration: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         """Calculate the vapor pressure of species in the particle phase.
 
         This method computes the vapor pressure based on the species' activity
@@ -58,7 +58,7 @@ class ActivityStrategy(ABC):
             cubic meter (kg/m^3).
 
         Returns:
-            Union[float, NDArray[np.float_]]: Vapor pressure of the particle
+            Union[float, NDArray[np.float64]]: Vapor pressure of the particle
             in pascals (Pa).
         """
         return pure_vapor_pressure * self.activity(mass_concentration)
@@ -72,7 +72,7 @@ class IdealActivityMolar(ActivityStrategy):
     the principles of Raoult's Law.
 
     Args:
-        molar_mass (Union[float, NDArray[np.float_]]): Molar mass of the
+        molar_mass (Union[float, NDArray[np.float64]]): Molar mass of the
         species [kg/mol]. A single value applies to all species if only one
         is provided.
 
@@ -80,12 +80,12 @@ class IdealActivityMolar(ActivityStrategy):
         Molar [Raoult's Law](https://en.wikipedia.org/wiki/Raoult%27s_law)
     """
 
-    def __init__(self, molar_mass: Union[float, NDArray[np.float_]] = 0.0):
+    def __init__(self, molar_mass: Union[float, NDArray[np.float64]] = 0.0):
         self.molar_mass = molar_mass
 
     def activity(
-        self, mass_concentration: Union[float, NDArray[np.float_]]
-    ) -> Union[float, NDArray[np.float_]]:
+        self, mass_concentration: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
         """Calculate the activity of a species based on mass concentration.
 
         Args:
@@ -93,7 +93,7 @@ class IdealActivityMolar(ActivityStrategy):
             cubic meter (kg/m^3).
 
         Returns:
-            Union[float, NDArray[np.float_]]: Activity of the species,
+            Union[float, NDArray[np.float64]]: Activity of the species,
             unitless.
         """
 
@@ -118,8 +118,8 @@ class IdealActivityMass(ActivityStrategy):
     """
 
     def activity(
-        self, mass_concentration: Union[float, NDArray[np.float_]]
-    ) -> Union[float, NDArray[np.float_]]:
+        self, mass_concentration: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
         """Calculate the activity of a species based on mass concentration.
 
         Args:
@@ -127,7 +127,7 @@ class IdealActivityMass(ActivityStrategy):
             per cubic meter (kg/m^3).
 
         Returns:
-            Union[float, NDArray[np.float_]]: Activity of the particle,
+            Union[float, NDArray[np.float64]]: Activity of the particle,
             unitless.
         """
 
@@ -157,9 +157,9 @@ class KappaParameterActivity(ActivityStrategy):
 
     def __init__(
         self,
-        kappa: NDArray[np.float_] = np.array([0.0], dtype=np.float_),
-        density: NDArray[np.float_] = np.array([0.0], dtype=np.float_),
-        molar_mass: NDArray[np.float_] = np.array([0.0], dtype=np.float_),
+        kappa: NDArray[np.float64] = np.array([0.0], dtype=np.float64),
+        density: NDArray[np.float64] = np.array([0.0], dtype=np.float64),
+        molar_mass: NDArray[np.float64] = np.array([0.0], dtype=np.float64),
         water_index: int = 0,
     ):
         self.kappa = np.delete(kappa, water_index)  # maybe change this later
@@ -168,8 +168,8 @@ class KappaParameterActivity(ActivityStrategy):
         self.water_index = water_index
 
     def activity(
-        self, mass_concentration: Union[float, NDArray[np.float_]]
-    ) -> Union[float, NDArray[np.float_]]:
+        self, mass_concentration: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
         """Calculate the activity of a species based on mass concentration.
 
         Args:
@@ -177,7 +177,7 @@ class KappaParameterActivity(ActivityStrategy):
             cubic meter (kg/m^3).
 
         Returns:
-            Union[float, NDArray[np.float_]]: Activity of the particle,
+            Union[float, NDArray[np.float64]]: Activity of the particle,
             unitless.
 
         References:

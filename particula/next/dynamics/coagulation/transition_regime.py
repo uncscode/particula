@@ -10,9 +10,9 @@ from particula.next.particles.properties import coulomb_enhancement
 
 
 def hard_sphere(
-    diffusive_knudsen: Union[float, NDArray[np.float_]]
-) -> Union[float, NDArray[np.float_]]:
-    """ Hard sphere approximation for the dimensionless coagulation kernel.
+    diffusive_knudsen: Union[float, NDArray[np.float64]]
+) -> Union[float, NDArray[np.float64]]:
+    """Hard sphere approximation for the dimensionless coagulation kernel.
 
     Args:
     -----
@@ -35,24 +35,24 @@ def hard_sphere(
     fit_constants = [25.836, 11.211, 3.502, 7.211]
 
     numerator = (
-        continuum_limit +
-        (fit_constants[0] * diffusive_knudsen**3) +
-        ((8 * np.pi)**(1/2) * fit_constants[1] * diffusive_knudsen**4)
+        continuum_limit
+        + (fit_constants[0] * diffusive_knudsen**3)
+        + ((8 * np.pi) ** (1 / 2) * fit_constants[1] * diffusive_knudsen**4)
     )
     denominator = (
-        1 +
-        (fit_constants[2] * diffusive_knudsen) +
-        (fit_constants[3] * diffusive_knudsen**2) +
-        (fit_constants[1] * diffusive_knudsen**3)
+        1
+        + (fit_constants[2] * diffusive_knudsen)
+        + (fit_constants[3] * diffusive_knudsen**2)
+        + (fit_constants[1] * diffusive_knudsen**3)
     )
     return numerator / denominator
 
 
 def coulomb_dyachkov2007(
-    diffusive_knudsen: Union[float, NDArray[np.float_]],
-    coulomb_potential_ratio: Union[float, NDArray[np.float_]]
-) -> Union[float, NDArray[np.float_]]:
-    """ Dyachkov et al. (2007) approximation for the dimensionless coagulation
+    diffusive_knudsen: Union[float, NDArray[np.float64]],
+    coulomb_potential_ratio: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """Dyachkov et al. (2007) approximation for the dimensionless coagulation
     kernel. Accounts for the Coulomb potential between particles.
 
     Args:
@@ -74,8 +74,8 @@ def coulomb_dyachkov2007(
     https://doi.org/10.1063/1.2713719
     """
     coulomb_potential_ratio = np.maximum(
-        coulomb_potential_ratio,
-        1e-16)  # Avoid division by zero
+        coulomb_potential_ratio, 1e-16
+    )  # Avoid division by zero
 
     continuum_limit = 4 * np.pi * diffusive_knudsen**2
     kinetic = coulomb_enhancement.kinetic(coulomb_potential_ratio)
@@ -90,13 +90,11 @@ def coulomb_dyachkov2007(
         np.sqrt(2 * np.pi) * diffusive_knudsen * kinetic * exponential_decay
     )
 
-    term2 = (
-        adjustment_factor**2
-        - (2 + diffusive_knudsen * ratio_k_c) * diffusive_knudsen * ratio_k_c
-        * np.exp(
-            -coulomb_potential_ratio
-            / (adjustment_factor * (2 + diffusive_knudsen * ratio_k_c))
-            )
+    term2 = adjustment_factor**2 - (
+        2 + diffusive_knudsen * ratio_k_c
+    ) * diffusive_knudsen * ratio_k_c * np.exp(
+        -coulomb_potential_ratio
+        / (adjustment_factor * (2 + diffusive_knudsen * ratio_k_c))
     )
     term3 = 1 - exponential_decay
     term4 = 1 - np.exp(-coulomb_potential_ratio)
@@ -106,10 +104,10 @@ def coulomb_dyachkov2007(
 
 
 def coulomb_gatti2008(
-    diffusive_knudsen: Union[float, NDArray[np.float_]],
-    coulomb_potential_ratio: Union[float, NDArray[np.float_]]
-) -> Union[float, NDArray[np.float_]]:
-    """ Gatti et al. (2008) approximation for the dimensionless coagulation
+    diffusive_knudsen: Union[float, NDArray[np.float64]],
+    coulomb_potential_ratio: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """Gatti et al. (2008) approximation for the dimensionless coagulation
     kernel. Accounts for the Coulomb potential between particles.
 
     Args:
@@ -139,32 +137,41 @@ def coulomb_gatti2008(
     continuum_limit = 4 * np.pi * diffusive_knudsen**2
     pi_sqrt = np.sqrt(np.pi)
 
-    factored_term = (
-        pi_sqrt * continuum * coulomb_potential_ratio * 1.22
-    ) / (2 * kinetic * diffusive_knudsen)
+    factored_term = (pi_sqrt * continuum * coulomb_potential_ratio * 1.22) / (
+        2 * kinetic * diffusive_knudsen
+    )
     exponential_decay = np.exp(-factored_term)
 
     term1 = continuum_limit * (1 - (1 + factored_term) * exponential_decay)
     term2 = (
-        np.sqrt(8 * np.pi) * diffusive_knudsen
-        * (1 + (2 * pi_sqrt * (1.22**3) * continuum
-                * (coulomb_potential_ratio**3))
-           / (9 * (kinetic**2) * diffusive_knudsen))
+        np.sqrt(8 * np.pi)
+        * diffusive_knudsen
+        * (
+            1
+            + (
+                2
+                * pi_sqrt
+                * (1.22**3)
+                * continuum
+                * (coulomb_potential_ratio**3)
+            )
+            / (9 * (kinetic**2) * diffusive_knudsen)
+        )
         * exponential_decay
     )
     # coulomb_potential_ratio is below 0 returns hard sphere
     return np.where(
         coulomb_potential_ratio > 0,
         term1 + term2,
-        hard_sphere(diffusive_knudsen)
+        hard_sphere(diffusive_knudsen),
     )
 
 
 def coulomb_gopalakrishnan2012(
-    diffusive_knudsen: Union[float, NDArray[np.float_]],
-    coulomb_potential_ratio: Union[float, NDArray[np.float_]]
-) -> Union[float, NDArray[np.float_]]:
-    """ Gopalakrishnan and Hogan (2012) approximation for the dimensionless
+    diffusive_knudsen: Union[float, NDArray[np.float64]],
+    coulomb_potential_ratio: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """Gopalakrishnan and Hogan (2012) approximation for the dimensionless
     coagulation kernel. Accounts for the Coulomb potential between particles.
 
     Args:
@@ -188,22 +195,22 @@ def coulomb_gopalakrishnan2012(
     continuum_limit = 4 * np.pi * diffusive_knudsen**2
     min_fxn = np.minimum(
         diffusive_knudsen,
-        3 * diffusive_knudsen / (2 * coulomb_potential_ratio)
+        3 * diffusive_knudsen / (2 * coulomb_potential_ratio),
     )
     # Condition for the transition regime
     condition = (coulomb_potential_ratio > 0.5) & (min_fxn < 2.5)
     return np.where(
         condition,
         continuum_limit / (1 + 1.598 * min_fxn**1.1709),
-        hard_sphere(diffusive_knudsen)
+        hard_sphere(diffusive_knudsen),
     )
 
 
 def coulomb_chahl2019(
-    diffusive_knudsen: Union[float, NDArray[np.float_]],
-    coulomb_potential_ratio: Union[float, NDArray[np.float_]]
-) -> Union[float, NDArray[np.float_]]:
-    """ Chahl and Gopalakrishnan (2019) approximation for the dimensionless
+    diffusive_knudsen: Union[float, NDArray[np.float64]],
+    coulomb_potential_ratio: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """Chahl and Gopalakrishnan (2019) approximation for the dimensionless
     coagulation kernel. Accounts for the Coulomb potential between particles.
 
     Args:
@@ -228,22 +235,27 @@ def coulomb_chahl2019(
     coulomb_potential_ratio = np.maximum(coulomb_potential_ratio, 1e-12)
 
     correction0 = 2.5
-    correction1 = 4.528 * np.exp(-1.088 * coulomb_potential_ratio) + \
-        0.7091 * np.log(1 + 1.527 * coulomb_potential_ratio)
+    correction1 = 4.528 * np.exp(
+        -1.088 * coulomb_potential_ratio
+    ) + 0.7091 * np.log(1 + 1.527 * coulomb_potential_ratio)
     correction2 = 11.36 * (coulomb_potential_ratio**0.272) - 10.33
     correction3 = -0.003533 * coulomb_potential_ratio + 0.05971
     diff_knudsen_log = np.log(diffusive_knudsen)
 
     correction_mu = (correction2 / correction0) * (
-        (1 + correction3 * (diff_knudsen_log - correction1) /
-            correction0)**(-1 / correction3 - 1)
+        (1 + correction3 * (diff_knudsen_log - correction1) / correction0)
+        ** (-1 / correction3 - 1)
         * np.exp(
-            -1 * (1 + correction3 * (diff_knudsen_log -
-                  correction1) / correction0)**(-1 / correction3)
+            -1
+            * (
+                1
+                + correction3 * (diff_knudsen_log - correction1) / correction0
+            )
+            ** (-1 / correction3)
         )
     )
     return np.where(
         coulomb_potential_ratio > 0,
         np.exp(correction_mu) * hard_sphere(diffusive_knudsen),
-        hard_sphere(diffusive_knudsen)
+        hard_sphere(diffusive_knudsen),
     )

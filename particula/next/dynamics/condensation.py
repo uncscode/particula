@@ -53,10 +53,10 @@ from particula.next.gas.properties import molecule_mean_free_path
 
 
 def first_order_mass_transport_k(
-    radius: Union[float, NDArray[np.float_]],
-    vapor_transition: Union[float, NDArray[np.float_]],
-    diffusion_coefficient: Union[float, NDArray[np.float_]] = 2 * 1e-9,
-) -> Union[float, NDArray[np.float_]]:
+    radius: Union[float, NDArray[np.float64]],
+    vapor_transition: Union[float, NDArray[np.float64]],
+    diffusion_coefficient: Union[float, NDArray[np.float64]] = 2 * 1e-9,
+) -> Union[float, NDArray[np.float64]]:
     """First-order mass transport coefficient per particle.
 
     Calculate the first-order mass transport coefficient, K, for a given radius
@@ -70,7 +70,7 @@ def first_order_mass_transport_k(
         vapor_transition: The vapor transition correction factor. [unitless]
 
     Returns:
-        Union[float, NDArray[np.float_]]: The first-order mass transport
+        Union[float, NDArray[np.float64]]: The first-order mass transport
         coefficient per particle (m^3/s).
 
     References:
@@ -86,11 +86,11 @@ def first_order_mass_transport_k(
 
 
 def mass_transfer_rate(
-    pressure_delta: Union[float, NDArray[np.float_]],
-    first_order_mass_transport: Union[float, NDArray[np.float_]],
-    temperature: Union[float, NDArray[np.float_]],
-    molar_mass: Union[float, NDArray[np.float_]],
-) -> Union[float, NDArray[np.float_]]:
+    pressure_delta: Union[float, NDArray[np.float64]],
+    first_order_mass_transport: Union[float, NDArray[np.float64]],
+    temperature: Union[float, NDArray[np.float64]],
+    molar_mass: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
     """Calculate the mass transfer rate for a particle.
 
     Calculate the mass transfer rate based on the difference in partial
@@ -105,7 +105,7 @@ def mass_transfer_rate(
         calculated.
 
     Returns:
-        Union[float, NDArray[np.float_]]: The mass transfer rate for the
+        Union[float, NDArray[np.float64]]: The mass transfer rate for the
         particle [kg/s].
 
     References:
@@ -117,7 +117,7 @@ def mass_transfer_rate(
         first_order_mass_transport
         * pressure_delta
         / (GAS_CONSTANT.m / molar_mass * temperature),
-        dtype=np.float_,
+        dtype=np.float64,
     )
 
 
@@ -142,9 +142,9 @@ class CondensationStrategy(ABC):
 
     def __init__(
         self,
-        molar_mass: Union[float, NDArray[np.float_]],
-        diffusion_coefficient: Union[float, NDArray[np.float_]] = 2 * 1e-9,
-        accommodation_coefficient: Union[float, NDArray[np.float_]] = 1.0,
+        molar_mass: Union[float, NDArray[np.float64]],
+        diffusion_coefficient: Union[float, NDArray[np.float64]] = 2 * 1e-9,
+        accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
     ):
         self.molar_mass = molar_mass
         self.diffusion_coefficient = diffusion_coefficient
@@ -155,7 +155,7 @@ class CondensationStrategy(ABC):
         temperature: float,
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
-    ) -> Union[float, NDArray[np.float_]]:
+    ) -> Union[float, NDArray[np.float64]]:
         """
         Calculate the mean free path of the gas molecules based on the
         temperature, pressure, and dynamic viscosity of the gas.
@@ -167,7 +167,7 @@ class CondensationStrategy(ABC):
             provided, it will be calculated based on the temperature
 
         Returns:
-            Union[float, NDArray[np.float_]]: The mean free path of the gas
+            Union[float, NDArray[np.float64]]: The mean free path of the gas
             molecules in meters (m).
 
         References:
@@ -183,11 +183,11 @@ class CondensationStrategy(ABC):
 
     def knudsen_number(
         self,
-        radius: Union[float, NDArray[np.float_]],
+        radius: Union[float, NDArray[np.float64]],
         temperature: float,
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
-    ) -> Union[float, NDArray[np.float_]]:
+    ) -> Union[float, NDArray[np.float64]]:
         """The Knudsen number for a particle.
 
         Calculate the Knudsen number based on the mean free path of the gas
@@ -201,7 +201,7 @@ class CondensationStrategy(ABC):
             not provided, it will be calculated based on the temperature
 
         Returns:
-            Union[float, NDArray[np.float_]]: The Knudsen number, which is the
+            Union[float, NDArray[np.float64]]: The Knudsen number, which is the
             ratio of the mean free path to the particle radius.
 
         References:
@@ -218,11 +218,11 @@ class CondensationStrategy(ABC):
 
     def first_order_mass_transport(
         self,
-        radius: Union[float, NDArray[np.float_]],
+        radius: Union[float, NDArray[np.float64]],
         temperature: float,
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
-    ) -> Union[float, NDArray[np.float_]]:
+    ) -> Union[float, NDArray[np.float64]]:
         """First-order mass transport coefficient per particle.
 
         Calculate the first-order mass transport coefficient, K, for a given
@@ -238,7 +238,7 @@ class CondensationStrategy(ABC):
             provided, it will be calculated based on the temperature
 
         Returns:
-            Union[float, NDArray[np.float_]]: The first-order mass transport
+            Union[float, NDArray[np.float64]]: The first-order mass transport
             coefficient per particle (m^3/s).
 
         References:
@@ -268,7 +268,7 @@ class CondensationStrategy(ABC):
         temperature: float,
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
-    ) -> Union[float, NDArray[np.float_]]:
+    ) -> Union[float, NDArray[np.float64]]:
         # pylint: disable=too-many-arguments
         """Mass transfer rate for a particle.
 
@@ -286,7 +286,7 @@ class CondensationStrategy(ABC):
             provided, it will be calculated based on the temperature
 
         Returns:
-            Union[float, NDArray[np.float_]]: The mass transfer rate for the
+            Union[float, NDArray[np.float64]]: The mass transfer rate for the
             particle [kg/s].
         """
 
@@ -303,9 +303,9 @@ class CondensationIsothermal(CondensationStrategy):
 
     def __init__(
         self,
-        molar_mass: Union[float, NDArray[np.float_]],
-        diffusion_coefficient: Union[float, NDArray[np.float_]] = 2 * 1e-9,
-        accommodation_coefficient: Union[float, NDArray[np.float_]] = 1.0,
+        molar_mass: Union[float, NDArray[np.float64]],
+        diffusion_coefficient: Union[float, NDArray[np.float64]] = 2 * 1e-9,
+        accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
     ):
         super().__init__(
             molar_mass=molar_mass,
@@ -320,7 +320,7 @@ class CondensationIsothermal(CondensationStrategy):
         temperature: float,
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
-    ) -> Union[float, NDArray[np.float_]]:
+    ) -> Union[float, NDArray[np.float64]]:
         # pylint: disable=too-many-arguments
 
         # Calculate the first-order mass transport coefficient

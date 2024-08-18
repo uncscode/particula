@@ -160,7 +160,7 @@ class BuilderDensityMixin:
 
     def set_density(
         self,
-        density: Union[float, NDArray[np.float_]],
+        density: Union[float, NDArray[np.float64]],
         density_units: Optional[str] = "kg/m^3",
     ):
         """Set the density of the particle in kg/m^3.
@@ -190,7 +190,7 @@ class BuilderSurfaceTensionMixin:
 
     def set_surface_tension(
         self,
-        surface_tension: Union[float, NDArray[np.float_]],
+        surface_tension: Union[float, NDArray[np.float64]],
         surface_tension_units: Optional[str] = "N/m",
     ):
         """Set the surface tension of the particle in N/m.
@@ -221,7 +221,7 @@ class BuilderMolarMassMixin:
 
     def set_molar_mass(
         self,
-        molar_mass: Union[float, NDArray[np.float_]],
+        molar_mass: Union[float, NDArray[np.float64]],
         molar_mass_units: Optional[str] = "kg/mol",
     ):
         """Set the molar mass of the particle in kg/mol.
@@ -258,7 +258,7 @@ class BuilderConcentrationMixin:
 
     def set_concentration(
         self,
-        concentration: Union[float, NDArray[np.float_]],
+        concentration: Union[float, NDArray[np.float64]],
         concentration_units: Optional[str] = None,
     ):
         """Set the concentration.
@@ -292,7 +292,7 @@ class BuilderChargeMixin:
 
     def set_charge(
         self,
-        charge: Union[float, NDArray[np.float_]],
+        charge: Union[float, NDArray[np.float64]],
         charge_units: Optional[str] = None,
     ):
         """Set the number of elemental charges on the particle.
@@ -319,7 +319,7 @@ class BuilderMassMixin:
 
     def set_mass(
         self,
-        mass: Union[float, NDArray[np.float_]],
+        mass: Union[float, NDArray[np.float64]],
         mass_units: Optional[str] = "kg",
     ):
         """Set the mass of the particle in kg.
@@ -351,7 +351,7 @@ class BuilderRadiusMixin:
 
     def set_radius(
         self,
-        radius: Union[float, NDArray[np.float_]],
+        radius: Union[float, NDArray[np.float64]],
         radius_units: Optional[str] = "m",
     ):
         """Set the radius of the particle in meters.
@@ -419,7 +419,7 @@ class BuilderPressureMixin:
 
     def set_pressure(
         self,
-        pressure: Union[float, NDArray[np.float_]],
+        pressure: Union[float, NDArray[np.float64]],
         pressure_units: str = "Pa",
     ):
         """Set the total pressure of the atmosphere.

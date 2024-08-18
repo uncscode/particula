@@ -7,8 +7,8 @@ import numpy as np
 
 
 def cunningham_slip_correction(
-    knudsen_number: Union[float, NDArray[np.float_]]
-) -> Union[float, NDArray[np.float_]]:
+    knudsen_number: Union[float, NDArray[np.float64]]
+) -> Union[float, NDArray[np.float64]]:
     """
     Calculate the Cunningham slip correction factor. Accounts for
     non-continuum effects on small particles.
@@ -34,6 +34,4 @@ def cunningham_slip_correction(
     it tends to scale linearly on a log-log scale, log Cc vs log Kn.
     - https://en.wikipedia.org/wiki/Cunningham_correction_factor
     """
-    return 1 + knudsen_number * (
-        1.257 + 0.4 * np.exp(-1.1 / knudsen_number)
-    )
+    return 1 + knudsen_number * (1.257 + 0.4 * np.exp(-1.1 / knudsen_number))
