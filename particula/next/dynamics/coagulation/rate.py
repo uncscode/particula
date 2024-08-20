@@ -23,7 +23,7 @@ def discrete_loss(
     """
     Calculate the coagulation loss rate, via the summation method.
 
-    Args:
+    Arguments:
         concentraiton : The distribution of particles.
         kernel : The coagulation kernel.
 
@@ -44,39 +44,31 @@ def discrete_gain(
     """
     Calculate the coagulation gain rate, via the summation method.
 
-    Args:
-    -----
-    - concentration: The distribution of particles.
-    - kernel: The coagulation kernel.
+    Arguments:
+        concentration : The distribution of particles.
+        kernel : The coagulation kernel.
 
     Returns:
-    --------
-    - The coagulation gain rate.
+        The coagulation gain rate.
 
     References:
-    ----------
     - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Chapter 13 Equations 13.61
     """
     # gain
     # 0.5* C_i * C_j * K_ij
-    # outer replaces, concentration * np.transpose([concentration])
-    gain_matrix = 0.5 * kernel * np.outer(concentration, concentration)
 
-    # select the diagonal to sum over, skip the first one, size as no particles
-    # will coagulate into it.
-    # rotate matrix
-    flipped_matrix = np.fliplr(gain_matrix)
+    # Initialize the gain array
+    gain = np.zeros_like(concentration)
 
-    # Generate offsets
-    offsets = len(flipped_matrix) - 1 - np.arange(len(flipped_matrix))
+    # Compute the concentration outer product only once
+    concentration_outer = np.outer(concentration, concentration)
 
-    # Calculate traces of each diagonal
-    gain = np.array(
-        [np.trace(flipped_matrix, offset=off) for off in offsets[:-1]]
-    )
-    # prepend the first element, as zero
-    return np.insert(gain, 0, 0)
+    # Compute slices of the kernel and the concentration outer product
+    for k in range(1, np.size(concentration)):
+        gain[k] = np.dot(kernel[:k, k - 1], concentration_outer[:k, k - 1])
+
+    return gain
 
 
 def continuous_loss(
@@ -87,20 +79,17 @@ def continuous_loss(
     """
     Calculate the coagulation loss rate, via the integration method.
 
-    Args:
-    -----
-    - radius: The radius of the particles.
-    - concentration: The distribution of particles.
-    - kernel: The coagulation kernel.
+    Arguments:
+        radius : The radius of the particles.
+        concentration : The distribution of particles.
+        kernel : The coagulation kernel.
 
     Returns:
-    --------
-    - The coagulation loss rate.
+        The coagulation loss rate.
 
     References:
-    ----------
-    Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-    physics, Chapter 13 Equations 13.61
+    - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+        physics, Chapter 13 Equations 13.61
     """
     # concentration (n,) and kernel (n,n)
     return concentration * np.trapz(y=kernel * concentration, x=radius)
@@ -114,15 +103,13 @@ def continuous_gain(
     """
     Calculate the coagulation gain rate, via the integration method.
 
-    Args:
-    -----
-    - radius: The radius of the particles.
-    - concentration: The distribution of particles.
-    - kernel: The coagulation kernel.
+    Arguments:
+        radius : The radius of the particles.
+        concentration : The distribution of particles.
+        kernel : The coagulation kernel.
 
     Returns:
-    --------
-    - The coagulation gain rate.
+        The coagulation gain rate.
 
     References:
     ----------

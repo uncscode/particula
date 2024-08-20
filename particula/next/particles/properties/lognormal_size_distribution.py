@@ -6,6 +6,8 @@ from scipy.stats import lognorm
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.util.convert import distribution_convert_pdf_pms
+
 
 def lognormal_pdf_distribution(
     x_values: NDArray[np.float64],
@@ -88,27 +90,25 @@ def lognormal_pmf_distribution(
         - [Probability Mass Function Wikipedia](
             https://en.wikipedia.org/wiki/Probability_mass_function)
     """
-    if not (
-        x_values.ndim == 1
-        and geometric_standard_deviation.shape
-        == mode.shape
-        == number_of_particles.shape
-    ):
-        raise ValueError(
-            "The shapes of geometric_standard_deviation, "
-            "mode, and number_of_particles must match."
-        )
 
-    # Calculate PDF for each set of parameters
-    distribution = lognorm.pdf(
-        x=x_values[:, np.newaxis],
-        s=np.log(geometric_standard_deviation),
-        scale=mode,
+    distribution_pdf = lognormal_pdf_distribution(
+        x_values=x_values,
+        mode=mode,
+        geometric_standard_deviation=geometric_standard_deviation,
+        number_of_particles=number_of_particles,
     )
 
-    bin_sum = np.sum(distribution, axis=0)
-    scaled_distribution = distribution * (number_of_particles / bin_sum)
-    return scaled_distribution.sum(axis=1)
+    # convert PDF to PMF
+    distribution_pmf = distribution_convert_pdf_pms(
+        x_array=x_values,
+        distribution=distribution_pdf,
+        to_pdf=False,
+    )
+
+    # check total number of particles
+    distribution_pmf_sum = np.sum(distribution_pmf)
+    return distribution_pmf * (
+        np.sum(number_of_particles)/distribution_pmf_sum)
 
 
 def lognormal_sample_distribution(

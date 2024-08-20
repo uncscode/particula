@@ -36,7 +36,9 @@ def test_discrete_gain():
     values.
     """
     result = rate.discrete_gain(CONCENTRATION, KERNEL)
-    expected = np.array([0., 0.05, 0.4, 1.7, 5.2, 12.95, 28.])
+    expected = np.array(
+        [0.000e00, 1.000e-01, 2.000e00, 1.260e01, 4.800e01, 1.375e02, 3.276e02]
+    )
     np.testing.assert_almost_equal(result, expected, decimal=6)
 
 
