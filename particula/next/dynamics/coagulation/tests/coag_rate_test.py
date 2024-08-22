@@ -35,10 +35,18 @@ def test_discrete_gain():
     Test the discrete_gain function with predefined concentration and kernel
     values.
     """
-    result = rate.discrete_gain(CONCENTRATION, KERNEL)
+    result = rate.discrete_gain(RADIUS, CONCENTRATION, KERNEL)
     expected = np.array(
-        [0.000e00, 1.000e-01, 2.000e00, 1.260e01, 4.800e01, 1.375e02, 3.276e02]
-    )
+            [
+                8.88984299e-02,
+                8.07430616e-01,
+                4.71791309e00,
+                1.83365875e01,
+                5.45636475e01,
+                1.33885983e02,
+                2.86922649e02,
+            ]
+        )
     np.testing.assert_almost_equal(result, expected, decimal=6)
 
 

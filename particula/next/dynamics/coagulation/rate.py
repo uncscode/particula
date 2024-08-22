@@ -37,14 +37,50 @@ def discrete_loss(
     return np.sum(kernel * np.outer(concentration, concentration), axis=0)
 
 
+# def discrete_gain(
+#     concentration: Union[float, NDArray[np.float64]],
+#     kernel: NDArray[np.float64],
+# ) -> Union[float, NDArray[np.float64]]:
+#     """
+#     Calculate the coagulation gain rate, via the summation method.
+
+#     Arguments:
+#         concentration : The distribution of particles.
+#         kernel : The coagulation kernel.
+
+#     Returns:
+#         The coagulation gain rate.
+
+#     References:
+#     - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+#     physics, Chapter 13 Equations 13.61
+#     """
+#     # discrete distribution, kernel (n,n)
+
+#     # Initialize the gain array
+#     gain = np.zeros_like(concentration)
+
+#     # Compute the concentration outer product only once
+#     concentration_outer = np.outer(concentration, concentration)
+
+#     # Compute slices of the kernel and the concentration outer product
+#     for k in range(1, np.size(concentration)):
+#         gain[k] = np.dot(kernel[:k, k - 1], concentration_outer[:k, k - 1])
+
+#     return gain
+
+
 def discrete_gain(
+    radius: Union[float, NDArray[np.float64]],
     concentration: Union[float, NDArray[np.float64]],
     kernel: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the coagulation gain rate, via the summation method.
+    Calculate the coagulation gain rate, via the integration method, by
+    converting to a continuous distribution.
 
     Arguments:
+        radius : The radius of the particles.
         concentration : The distribution of particles.
         kernel : The coagulation kernel.
 
@@ -52,23 +88,42 @@ def discrete_gain(
         The coagulation gain rate.
 
     References:
-    - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+    ----------
+    - This equation necessitates the use of a for-loop due to the
+    convoluted use of different radii at different stages. This is the
+    most expensive step of all coagulation calculations. Using
+    `RectBivariateSpline` accelerates this significantly.
+    - Note, to estimate the kernel and distribution at
+    (other_radius**3 - some_radius**3)*(1/3) we use interporlation techniques.
+    - Seinfeld, J. H., & Pandis, S. (2016). Atmospheric chemistry and
     physics, Chapter 13 Equations 13.61
     """
-    # gain
-    # 0.5* C_i * C_j * K_ij
+    # Calculate bin widths (delta_x_array)
+    delta_x_array = np.diff(
+        radius, append=2 * radius[-1] - radius[-2])  # type: ignore
 
-    # Initialize the gain array
-    gain = np.zeros_like(concentration)
+    # Convert concentration to a probability density function (PDF)
+    concentration_pdf = concentration / delta_x_array
 
-    # Compute the concentration outer product only once
-    concentration_outer = np.outer(concentration, concentration)
+    # Prepare interpolation for continuous distribution
+    interp = RectBivariateSpline(
+        x=radius,
+        y=radius,
+        z=kernel * np.outer(concentration_pdf, concentration_pdf),
+    )
 
-    # Compute slices of the kernel and the concentration outer product
-    for k in range(1, np.size(concentration)):
-        gain[k] = np.dot(kernel[:k, k - 1], concentration_outer[:k, k - 1])
+    # Define dpd and dpi for integration
+    # integration variable
+    dpd = np.linspace(0, radius / 2 ** (1 / 3), radius.size)  # type: ignore
+    # adjusted for broadcasting
+    dpi = (np.transpose(radius) ** 3 - dpd**3) ** (1 / 3)
 
-    return gain
+    # Compute gain using numerical integration
+    gain = radius**2 * np.trapz(
+        interp.ev(dpd, dpi) / dpi**2, dpd, axis=0)  # type: ignore
+
+    # Convert back to original scale (from PDF to PMF)
+    return gain * delta_x_array
 
 
 def continuous_loss(
@@ -123,7 +178,7 @@ def continuous_gain(
     - Seinfeld, J. H., & Pandis, S. (2016). Atmospheric chemistry and
     physics, Chapter 13 Equations 13.61
     """
-
+    # continuous distribution, kernel (n,n)
     # outer replaces, concentration * np.transpose([concentration])
     interp = RectBivariateSpline(
         x=radius, y=radius, z=kernel * np.outer(concentration, concentration)
@@ -133,5 +188,7 @@ def continuous_gain(
     dpi = (np.transpose(radius) ** 3 - dpd**3) ** (1 / 3)
 
     return radius**2 * np.trapz(
-        interp.ev(dpd, dpi) / dpi**2, dpd, axis=0  # type: ignore
+        interp.ev(dpd, dpi) / dpi**2,  # type: ignore
+        dpd,
+        axis=0  # type: ignore
     )

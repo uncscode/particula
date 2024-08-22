@@ -12,6 +12,7 @@ particula.next.particles.properties.
 # pytype: skip-file
 
 from particula.next.particles.properties.aerodynamic_mobility_module import particle_aerodynamic_mobility
+from particula.next.particles.properties.aerodynamic_size import particle_aerodynamic_length, get_aerodynamic_shape_factor, AERODYNAMIC_SHAPE_FACTOR_DICT
 from particula.next.particles.properties.mean_thermal_speed_module import mean_thermal_speed
 from particula.next.particles.properties.slip_correction_module import cunningham_slip_correction
 from particula.next.particles.properties.knudsen_number_module import calculate_knudsen_number

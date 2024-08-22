@@ -320,6 +320,7 @@ class DiscreteSimple(CoagulationStrategy):
     ) -> Union[float, NDArray[np.float64]]:
 
         return rate.discrete_gain(
+            radius=particle.get_radius(),
             concentration=particle.concentration,
             kernel=kernel,
         )
@@ -411,6 +412,7 @@ class DiscreteGeneral(CoagulationStrategy):
     ) -> Union[float, NDArray[np.float64]]:
 
         return rate.discrete_gain(
+            radius=particle.get_radius(),
             concentration=particle.concentration,
             kernel=kernel,
         )

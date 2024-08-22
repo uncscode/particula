@@ -608,17 +608,17 @@ def distribution_convert_pdf_pms(
     mass spectrum (PMS) based on the specified direction.
 
     Args:
-        x_array: An array of radii corresponding to the bins of the
-        distribution, shape (m).
-        distribution: The concentration values of the distribution
-        (either PDF or PMS) at the given radii. Supports broadcasting across
-        x_array (n,m).
-        to_PDF: Direction of conversion. If True, converts PMS to PDF.
-        If False, converts PDF to PMS.
+        x_array : An array of radii corresponding to the bins of the
+            distribution, shape (m).
+        distribution : The concentration values of the distribution
+            (either PDF or PMS) at the given radii. Supports broadcasting
+            across x_array (n,m).
+        to_PDF : Direction of conversion. If True, converts PMS to PDF.
+            If False, converts PDF to PMS.
 
     Returns:
-        converted_distribution: The converted distribution array
-        (either PDF or PMS).
+        converted_distribution : The converted distribution array
+            (either PDF or PMS).
     """
 
     # Calculate the differences between consecutive x_array values for bin

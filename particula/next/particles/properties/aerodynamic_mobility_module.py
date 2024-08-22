@@ -19,15 +19,13 @@ def particle_aerodynamic_mobility(
     This mobility quantifies the ease with which a particle can move through
     a fluid.
 
-    Args:
-    -----
-    - radius: The radius of the particle (m).
-    - slip_correction_factor: The slip correction factor for the particle
-    in the fluid (dimensionless).
-    - dynamic_viscosity: The dynamic viscosity of the fluid (Pa.s).
+    Arguments:
+        radius : The radius of the particle (m).
+        slip_correction_factor : The slip correction factor for the particle
+            in the fluid (dimensionless).
+        dynamic_viscosity : The dynamic viscosity of the fluid (Pa.s).
 
     Returns:
-    --------
-    - The particle aerodynamic mobility (m^2/s).
+        The particle aerodynamic mobility (m^2/s).
     """
     return slip_correction_factor / (6 * np.pi * dynamic_viscosity * radius)
