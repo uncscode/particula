@@ -30,6 +30,8 @@ Next is the next iteration of the particula simulation model. It is a complete r
 - [Coagulation Tutorial: Basic 1-PMF](Tutorials/Coagulation_Basic_1_PMF.ipynb)
 - [Coagulation Tutorial: Basic 2-PDF](Tutorials/Coagulation_Basic_2_PDF.ipynb)
 - [Coagulation Tutorial: Basic 3-Compared](Tutorials/Coagulation_Basic_3_compared.ipynb)
+- [Coagulation Tutorial: Basic 4-Particle Resolved](Tutorials/Coagulation_Basic_4_ParticleResolved.ipynb)
+- [Coagulation Tutorial: Basic 5-Super Droplet Method](Tutorials/Coagulation_Basic_5_SDM.ipynb)
 
 ## Discussions
 
