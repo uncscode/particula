@@ -23,23 +23,18 @@ def get_truncated_scattering(
     Extracts the truncated scattering intensity and corresponding angles based
     on the given truncation angles.
 
-    Parameters
-    ----------
-    su : np.ndarray
-        The scattering intensity for unpolarized light as a function of angle.
-    theta : np.ndarray
-        The array of angles corresponding to the scattering intensity
-        measurements.
-    theta1 : float
-        The lower bound of the angle range for truncation in radians.
-    theta2 : float
-        The upper bound of the angle range for truncation in radians.
+    Arguments:
+        su: The scattering intensity for unpolarized light as a function of
+            angle.
+        theta: The array of angles corresponding to the scattering intensity
+            measurements.
+        theta1: The lower bound of the angle range for truncation in radians.
+        theta2: The upper bound of the angle range for truncation in radians.
 
-    Returns
-    -------
-    Tuple[np.ndarray, np.ndarray]
-        A tuple containing the truncated scattering intensity and the
-        corresponding angles within the truncated range.
+    Returns:
+        Tuple (np.ndarray, np.ndarray):
+            A tuple containing the truncated scattering intensity and the
+            corresponding angles within the truncated range.
     """
     trunc_indices = np.where((theta >= theta1) & (theta <= theta2))
     scattering_unpolarized_trunc = scattering_unpolarized[trunc_indices]
@@ -61,39 +56,37 @@ def trunc_mono(
                float, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
                np.ndarray]]:
     """
+    Truncation correction for monodisperse aerosol particle.
+
     Calculates the single scattering albedo (SSA) correction due to truncation
     for monodisperse aerosol measurements using the CAPS-PM-SSA instrument. The
     correction accounts for the incomplete angular range of scattering
     measurements due to the instrument's geometry.
 
-    Parameters
-    ----------
-    m_sphere : Union[complex, float]
-        Complex or real refractive index of the aerosol.
-    wavelength : float
-        Wavelength of light in nanometers used in the CAPS instrument.
-    diameter : Union[float, np.float64]
-        Diameter of the monodisperse aerosol in nanometers.
-    full_output : bool, optional
-        If True, additional details about the calculation are returned,
-        including z-axis values, angles of integration, and both truncated and
-        ideal scattering efficiencies.
-    calibrated_trunc : bool, optional
-        If True, applies a numberical calibration factor to the truncation
-        correction, so 150 is 1. Default is True.
-    discretize : bool, optional
-        If True, discretizes the input parameters for potentially improved
-        stability/performance in scattering function calculations. Can not be
-        done for full_output=True
+    Arguments:
+        m_sphere: Complex or real refractive index of the aerosol.
+        wavelength: Wavelength of light in nanometers used in the CAPS
+            instrument.
+        diameter: Diameter of the monodisperse aerosol in nanometers.
+        full_output: If True, additional details about the calculation
+            are returned, including z-axis values, angles of integration,
+            and both truncated
+            and ideal scattering efficiencies.
+        calibrated_trunc : bool, optional
+            If True, applies a numberical calibration factor to the truncation
+            correction, so 150 is 1. Default is True.
+        discretize : bool, optional
+            If True, discretizes the input parameters for potentially improved
+            stability/performance in scattering function calculations. Can not
+            be done for full_output=True
 
-    Returns
-    -------
-    Union[float, Tuple[float, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
-    np.ndarray]]
-    If fullOutput is False, returns only the truncation correction factor.
-    If fullOutput is True, returns a tuple containing the truncation correction
-    factor, z-axis positions, truncated scattering efficiency, ideal scattering
-    efficiency, forward scattering angle, and backward scattering angle.
+    Returns:
+        Tuple:
+            If fullOutput is False, returns only the truncation correction
+            factor. If fullOutput is True, returns a tuple containing the
+            truncation correction factor, z-axis positions, truncated
+            scattering efficiency, ideal scattering efficiency, forward
+            scattering angle, and backward scattering angle.
     """
     if full_output:
         discretize = False  # can not have full output discretized due to hash
@@ -194,32 +187,27 @@ def truncation_for_diameters(
     calibrated_trunc: bool = True
 ) -> NDArray[np.float64]:
     """
+    Truncation correction for an array of particle diameters.
+
     Calculates the truncation correction for an array of particle diameters
     given a specific refractive index and wavelength. This function is
     particularly useful for aerosol optical property measurements where
     truncation effects due to instrument geometry need to be accounted for.
 
-    Parameters
-    ----------
-    m_sphere : Union[complex, float]
-        The complex or real refractive index of the particles.
-    wavelength : float
-        The wavelength of the incident light in nanometers (nm).
-    diameter_sizes : NDArray[np.float64]
-        An array of particle diameters in nanometers (nm) for which the
-        truncation correction will be calculated.
-    discretize : bool, optional
-        A flag indicating whether to discretize the input parameters for
-        potentially improved calculation performance. Default is True.
-    calibrated_trunc : bool, optional
-        If True, applies a numberical calibration factor to the truncation
-        correction, so 150 is 1. Default is True.
+    Arguments:
+        m_sphere: The complex or real refractive index of the particles.
+        wavelength: The wavelength of the incident light in nanometers (nm).
+        diameter_sizes: An array of particle diameters in nanometers (nm) for
+            which the truncation correction will be calculated.
+        discretize: A flag indicating whether to discretize the input
+            parameters for potentially improved calculation performance.
+            Default is True.
+        calibrated_trunc: If True, applies a numberical calibration factor to
+            the truncation correction, so 150 is 1. Default is True.
 
-    Returns
-    -------
-    NDArray[np.float64]
-        An array of truncation corrections corresponding to the input array of
-        particle diameters.
+    Returns:
+        An array of truncation corrections corresponding to the input
+        array of particle diameters.
     """
     truncation_array = np.zeros_like(diameter_sizes, dtype=np.float64)
 
@@ -250,40 +238,33 @@ def correction_for_distribution(
     number_per_cm3: NDArray[np.float64],
     discretize: bool = True,
 ) -> Union[float, np.float64]:
-    """
+    """ Correction for a size distribution of particles.
+
     Calculates the correction factor for scattering measurements due to
     truncation effects in aerosol size distribution measurements. This
     correction factor is used to adjust the measured scattering
     coefficient, accounting for the limited angular range of the instrument.
 
-    Parameters
-    ----------
-    m_sphere : Union[complex, float]
-        The complex or real refractive index of the particles.
-    wavelength : float
-        The wavelength of the incident light in nanometers (nm).
-    diameter_sizes : NDArray[np.float64]
-        An array of particle diameters in nanometers (nm) corresponding to the
-        size distribution.
-    number_per_cm3 : NDArray[np.float64]
-        An array of particle number concentrations (#/cm^3) for each diameter
-        in the size distribution.
-    discretize : bool, optional
-        If True, the calculation will use discretized values for the
-        refractive index, wavelength, and diameters to potentially improve
-        computation performance. Default is True.
+    Arguments:
+        m_sphere: The complex or real refractive index of the particles.
+        wavelength: The wavelength of the incident light in nanometers (nm).
+        diameter_sizes: An array of particle diameters in nanometers (nm)
+            corresponding to the size distribution.
+        number_per_cm3: An array of particle number concentrations
+            (#/cm^3) for each diameter in the size distribution.
+        discretize: If True, the calculation will use discretized values
+            for the refractive index, wavelength, and diameters to
+            potentially improve computation performance. Default is True.
 
-    Returns
-    -------
-    float
-        The correction factor for scattering measurements. This factor is
-        dimensionless and is used to correct the measured scattering
-        coefficient for truncation effects, calculated as the ratio of
-        the ideal (full angular range) to truncated scattering coefficient.
+    Returns:
+        Array:
+            The correction factor for scattering measurements. This factor is
+            dimensionless and is used to correct the measured scattering
+            coefficient for truncation effects, calculated as the ratio of
+            the ideal (full angular range) to truncated scattering coefficient.
 
-    Example
-    -------
-    b_sca_corrected = b_sca_measured * bsca_correction
+    Example:
+        b_sca_corrected = b_sca_measured * bsca_correction
     """
     # Calculate the truncation correction array for each diameter
     trunc_corr = truncation_for_diameters(
@@ -329,44 +310,37 @@ def correction_for_humidified(
     wavelength: float = 450,
     discretize: bool = True
 ) -> np.float64:
-    """
+    """Truncation Correction for humidified aerosol measurements.
+
     Calculates the scattering correction for humidified aerosol measurements,
     accounting for water uptake by adjusting the aerosol's refractive index.
     This function requires the kappa values for the particles, which describe
     their hygroscopic growth.
 
-    Parameters
-    ----------
-    kappa : Union[float, NDArray[np.float64]]
-        Hygroscopicity parameter kappa, indicating the water uptake capability
-        of the particles.
-    number_per_cm3 : NDArray[np.float64]
-        Number concentration of particles per cubic centimeter (#/cm³) for
-        each size bin.
-    diameter : NDArray[np.float64]
-        Array of particle diameters in nanometers (nm).
-    water_activity_sizer : NDArray[np.float64]
-        Water activity (relative humidity/100) of the air sample used for
-        sizing.
-    water_activity_sample : NDArray[np.float64]
-        Water activity (relative humidity/100) of the air sample in optical
-        measurements.
-    refractive_index_dry : Union[complex, float], optional
-        Refractive index of the dry particles. Default is 1.45.
-    water_refractive_index : Union[complex, float], optional
-        Refractive index of water. Default is 1.33.
-    wavelength : float, optional
-        Wavelength of the incident light in nanometers (nm). Default is 450.
-    discretize : bool, optional
-        If True, calculation uses discretized values for refractive index,
-        wavelength, and diameters to improve performance. Default is True.
+    Arguments:
+        kappa: Hygroscopicity parameter kappa, indicating the water uptake
+            capability of the particles.
+        number_per_cm3: Number concentration of particles per cubic
+            centimeter (#/cm³) for each size bin.
+        diameter: Array of particle diameters in nanometers (nm).
+        water_activity_sizer: Water activity (relative humidity/100) of the
+            air sample used for sizing.
+        water_activity_sample: Water activity (relative humidity/100) of the
+            air sample in optical measurements.
+        refractive_index_dry: Refractive index of the dry particles.
+            Default is 1.45.
+        water_refractive_index: Refractive index of water. Default is 1.33.
+        wavelength: Wavelength of the incident light in nanometers (nm).
+            Default is 450.
+        discretize: If True, calculation uses discretized values for
+            refractive index, wavelength, and diameters to improve performance.
+            Default is True.
 
-    Returns
-    -------
-    np.float64
-        A numpy array of scattering correction factors for each particle size
-        in the distribution, to be applied to measured backscatter
-        coefficients to account for truncation effects due to humidity.
+    Returns:
+        np.float64:
+            A numpy array of scattering correction factors for each particle
+            size in the distribution, to be applied to measured backscatter
+            coefficients to account for truncation effects due to humidity.
     """
     # calculate the volume of the dry aerosol
     volume_sizer = convert.length_to_volume(diameter, length_type='diameter')
@@ -415,7 +389,8 @@ def correction_for_humidified_looped(
     wavelength: float = 450,
     discretize: bool = True
 ) -> NDArray[np.float64]:
-    """
+    """ Looped correction for humidified aerosol measurements.
+
     Corrects scattering measurements for aerosol particles to account for
     truncation errors in CAPS instrument. This correction is vital for
     accurate representation of particle scattering properties under different
@@ -423,43 +398,34 @@ def correction_for_humidified_looped(
     calculating corrections based on input parameters reflecting the particles'
     physical and chemical characteristics.
 
-    Parameters
-    ----------
-    kappa : NDArray[np.float64]
-        Hygroscopicity parameter array for the aerosol particles, indicating
-        water uptake ability.
-    number_per_cm3 : NDArray[np.float64]
-        Time-indexed number concentration of particles in #/cm³ for each size.
-    diameter : NDArray[np.float64]
-        Particle diameters, crucial for calculating scattering effects.
-    water_activity_sizer : NDArray[np.float64]
-        Water activity measured by the sizing instrument, indicating relative
-        humidity.
-    water_activity_sample : NDArray[np.float64]
-        Sample water activity, corresponding to the ambient conditions during
-        measurement.
-    refractive_index_dry : Union[complex, float], optional
-        Refractive index of the dry particles, affecting their scattering
-        behavior. Default is 1.45.
-    water_refractive_index : Union[complex, float], optional
-        Refractive index of water, important for calculations involving
-        humidified conditions. Default is 1.33.
-    wavelength : float, optional
-        Wavelength of the incident light in nanometers, which influences
-        scattering intensity. Default is 450.
-    discretize : bool, optional
-        If set to True, performs discretized calculations for potentially
-        improved computational performance. Default is True.
+    Arguments:
+        kappa: Hygroscopicity parameter array for the aerosol particles,
+            indicating water uptake ability.
+        number_per_cm3: Time-indexed number concentration of particles
+            in #/cm³ for each size.
+        diameter: Particle diameters, crucial for calculating scattering
+            effects.
+        water_activity_sizer: Water activity measured by the sizing
+            instrument, indicating relative humidity.
+        water_activity_sample: Sample water activity, corresponding to
+            the ambient conditions during measurement.
+        refractive_index_dry: Refractive index of the dry particles,
+            affecting their scattering behavior. Default is 1.45.
+        water_refractive_index: Refractive index of water, important
+            for calculations involving humidified conditions. Default is 1.33.
+        wavelength: Wavelength of the incident light in nanometers,
+            which influences scattering intensity. Default is 450.
+        discretize: If set to True, performs discretized calculations for
+            potentially improved computational performance. Default is True.
 
-    Returns
-    -------
-    NDArray[np.float64]
-    An array of corrected scattering multipliers for each time index,
-    accounting for aerosol particle size, composition, and environmental
-    conditions.
+    Returns:
+        An array of corrected scattering multipliers for each time index,
+        accounting for aerosol particle size, composition, and environmental
+        conditions.
 
-    The correction process includes data nan checks for missing values,
-    ensuring robust and reliable correction outcomes.
+    Notes:
+        The correction process includes data nan checks for missing values,
+        ensuring robust and reliable correction outcomes.
     """
     # Initialize an array to store the correction factors
     correction_multiple = np.zeros((len(kappa)), dtype=np.float64)
@@ -472,7 +438,7 @@ def correction_for_humidified_looped(
 
     # Iterate over each time index to apply the scattering correction
     for index, row_number_per_cm3 in tqdm(enumerate(number_per_cm3),
-                                          'Processing Scattering Correction'):
+                                          'Scattering Truncation'):
         if skip_data[index]:
             # Assign NaN for indices with incomplete data
             correction_multiple[index] = np.nan

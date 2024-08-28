@@ -21,37 +21,30 @@ def discretize_scattering_angles(
     angular_resolution: float = 1
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    Discretizes and caches the scattering function for a spherical particle
-    with specified material properties and size. This function aims to optimize
-    the performance of scattering calculations by caching results for
-    frequently used parameters, reducing the need for repeated calculations.
+    Discretize and cache the scattering function for a spherical particle
+    with specified material properties and size.
 
-    Parameters
-    ----------
-    m_sphere : Union[complex, float]
-        The complex or real refractive index of the particle.
-    wavelength : float
-        The wavelength of the incident light in nanometers (nm).
-    diameter : Union[float, np.float64]
-        The diameter of the particle in nanometers (nm).
-    min_angle : float, optional
-        The minimum scattering angle in degrees to be considered in the
-        calculation. Defaults to 0.
-    max_angle : float, optional
-        The maximum scattering angle in degrees to be considered in the
-        calculation. Defaults to 180.
-    angular_resolution : float, optional
-        The resolution in degrees between calculated scattering angles.
-        Defaults to 1.
+    This function optimizes the performance of scattering calculations by
+    caching results for frequently used parameters, thereby reducing the
+    need for repeated calculations.
 
-    Returns
-    -------
-    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]
-    A tuple containing numpy arrays for the scattering function measurements:
+    Parameters:
+        m_sphere: The complex or real refractive index of the particle.
+        wavelength: The wavelength of the incident light in nanometers (nm).
+        diameter: The diameter of the particle in nanometers (nm).
+        min_angle: The minimum scattering angle in degrees to be considered in
+            the calculation. Defaults to 0.
+        max_angle: The maximum scattering angle in degrees to be considered in
+            the calculation. Defaults to 180.
+        angular_resolution: The resolution in degrees between calculated
+            scattering angles. Defaults to 1.
+
+    Returns:
+        Tuple:
         - measure: The scattering intensity as a function of angle.
         - parallel: The scattering intensity for parallel polarization.
-        - perpendicular: The scattering intensity for
-            perpendicular polarization.
+        - perpendicular: The scattering intensity for perpendicular
+            polarization.
         - unpolarized: The unpolarized scattering intensity.
     """
     measure, parallel, perpendicular, unpolarized = ps.ScatteringFunction(
@@ -71,23 +64,19 @@ def calculate_scattering_angles(
     tube_diameter_cm: float
 ) -> Tuple[float, float]:
     """
-    Calculates forward and backward scattering angles for a given position
+    Calculate forward and backward scattering angles for a given position
     along the z-axis within the CAPS instrument geometry.
 
-    Parameters
-    ----------
-    z_position : Union[float, np.float64]
-        The position along the z-axis (in cm).
-    integrate_sphere_diameter_cm : float
-        The diameter of the integrating sphere (in cm).
-    tube_diameter_cm : float
-        The diameter of the sample tube (in cm).
+    Parameters:
+        z_position: The position along the z-axis in centimeters (cm).
+        integrate_sphere_diameter_cm: The diameter of the integrating sphere
+            in centimeters (cm).
+        tube_diameter_cm: The diameter of the sample tube in centimeters (cm).
 
-    Returns
-    -------
-    Tuple[float, float]
-        A tuple containing the forward (alpha) and backward (beta)
-        scattering angles in radians.
+    Returns:
+        Tuple:
+        - The forward scattering angle (alpha) in radians.
+        - The backward scattering angle (beta) in radians.
     """
     sphere_radius_cm = integrate_sphere_diameter_cm / 2
     tube_radius_cm = tube_diameter_cm / 2
@@ -115,28 +104,23 @@ def assign_scattering_thetas(
     integrate_sphere_diameter_cm: float
 ) -> Tuple[float, float, float]:
     """
-    Assigns scattering angles and efficiencies based on the z-axis position
+    Assign scattering angles and efficiencies based on the z-axis position
     within the CAPS instrument.
 
-    Parameters
-    ----------
-    alpha : float
-        Forward scattering angle in radians.
-    beta : float
-        Backward scattering angle in radians.
-    q_mie : float
-        The Mie scattering efficiency.
-    z_position : Union[float, np.float64]
-        The position along the z-axis (in cm).
-    integrate_sphere_diameter_cm : float
-        The diameter of the integrating sphere (in cm).
+    Parameters:
+        alpha: The forward scattering angle in radians.
+        beta: The backward scattering angle in radians.
+        q_mie: The Mie scattering efficiency.
+        z_position: The position along the z-axis in centimeters (cm).
+        integrate_sphere_diameter_cm: The diameter of the integrating sphere
+            in centimeters (cm).
 
-    Returns
-    -------
-    Tuple[float, float, float]
-        A tuple containing the forward scattering angle (theta1), backward
-        scattering angle (theta2), and the ideal scattering efficiency
-        (qsca_ideal) for the given z-axis position.
+    Returns:
+        Tuple:
+        - The forward scattering angle (theta1) in radians.
+        - The backward scattering angle (theta2) in radians.
+        - The ideal scattering efficiency (qsca_ideal) for the given z-axis
+            position.
     """
     sphere_radius_cm = integrate_sphere_diameter_cm / 2
 

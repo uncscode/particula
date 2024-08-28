@@ -8,7 +8,7 @@
 ## Continuous Particle PDF and PMF
 
 - [ ] Bin Remapping after condensation and evaporation is needed
-- [ ] Coagulation needs to be checked for PMF vs PDF handling
+- [x] Coagulation needs to be checked for PMF vs PDF handling
 
 ## Scavenging
 

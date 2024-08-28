@@ -24,9 +24,12 @@ Next is the next iteration of the particula simulation model. It is a complete r
 
 ### Dynamics
 
+#### Condensation
+
 - [Condensation Tutorial: Moving Bin](Tutorials/Condensation_Tutorial-1.ipynb)
 - [Condensation Tutorial: Particle Resolved](Tutorials/Condensation_Tutorial-2.ipynb)
 
+#### Coagulation
 - [Coagulation Tutorial: Basic 1-PMF](Tutorials/Coagulation_Basic_1_PMF.ipynb)
 - [Coagulation Tutorial: Basic 2-PDF](Tutorials/Coagulation_Basic_2_PDF.ipynb)
 - [Coagulation Tutorial: Basic 3-Compared](Tutorials/Coagulation_Basic_3_compared.ipynb)
@@ -41,71 +44,6 @@ Next is the next iteration of the particula simulation model. It is a complete r
 
 ![Four Quadrant representation of Tutorials, How to guides, References, and Discussions Areas](DocsImageDevGuide.png)
 
+## Prioritization
 
-## Diagrams
-
-
-### Activity Component
-
-```mermaid
-graph TD
-    AS[Activity Strategies] --> AFn[Functions]
-    AB[Activity Builders] --> AS
-    AF[Activity Factories] --> AB
-    AFn --> link3["[Activity Strategies](./activity_strategies.md)"]
-    AB --> link1["[Activity Builders](./activity_builders.md)"]
-    AF --> link2["[Activity Factories](./activity_factories.md)"]
-```
-
-*Description of Activity Component here...*
-
-### Distribution Component
-
-```mermaid
-graph TD
-    DS[Distribution Strategies] --> DFn[Functions]
-    DB[Distribution Builders] --> DS
-    DF[Distribution Factories] --> DB
-    DFn --> link6["[Distribution Strategies](./distribution_strategies.md)"]
-    DB --> link4["[Distribution Builders](./distribution_builders.md)"]
-    DF --> link5["[Distribution Factories](./distribution_factories.md)"]
-```
-
-*Description of Distribution Component here...*
-
-### Properties Component
-
-```mermaid
-graph TD
-    P[Properties] --> PLink["[Properties](properties/index.md)"]
-```
-
-*Description of Properties Component here...*
-
-### Representation Component
-
-```mermaid
-graph TD
-    RS[Representation Strategies] --> RFn[Functions]
-    RB[Representation Builders] --> RS
-    R[Representation] --> RB
-    RFn --> link13["[Representation Strategies](./representation.md)"]
-    RB --> link9["[Representation Builders](./representation_builders.md)"]
-    R --> link8["[Representation](./representation.md)"]
-```
-
-*Description of Representation Component here...*
-
-### Surface Component
-
-```mermaid
-graph TD
-    SS[Surface Strategies] --> SFn[Functions]
-    SB[Surface Builders] --> SS
-    SF[Surface Factories] --> SB
-    SFn --> link12["[Surface Strategies](./surface_strategies.md)"]
-    SB --> link10["[Surface Builders](./surface_builders.md)"]
-    SF --> link11["[Surface Factories](./surface_factories.md)"]
-```
-
-*Description of Surface Component here...*
+- [Features](Discussions/Features.md)

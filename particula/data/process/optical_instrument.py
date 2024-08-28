@@ -100,65 +100,79 @@ class CapsInstrumentKeywordBuilder:
 
 
 def caps_processing(
-        stream_size_distribution: Stream,
-        stream_sizer_properties: Stream,
-        stream_caps: Stream,
-        keywords: dict[str, Union[str, float, int, bool]]
+    stream_size_distribution: Stream,
+    stream_sizer_properties: Stream,
+    stream_caps: Stream,
+    keywords: dict[str, Union[str, float, int, bool]],
 ):
     """
-    Function to process the CAPS data, and smps for kappa fitting, and then add
-    it to the datalake. Also applies truncation corrections to the CAPS data.
+    Process CAPS data and SMPS data for kappa fitting, apply truncation
+    corrections, and add the results to the caps stream.
 
-    Args:
+    Arguments:
+        stream_size_distribution: Stream containing size distribution data.
+        stream_sizer_properties: Stream containing sizer properties data.
+        stream_caps: Stream containing CAPS data.
+        keywords: Dictionary containing configuration parameters.
 
     Returns:
+        Stream with processed CAPS data, including kappa fitting results
+        and truncation corrections.
     """
-    # calc kappa and add to datalake
+
+    # Log the start of CAPS data processing
     logger.info("Processing CAPS data")
 
-    if keywords['fit_kappa']:
-        kappa_matrix = \
-            kappa_via_extinction.kappa_from_extinction_looped(
-                extinction_dry=stream_caps[keywords['caps_extinction_dry']],
-                extinction_wet=stream_caps[keywords['caps_extinction_wet']],
-                number_per_cm3=stream_size_distribution.data,
-                diameter=stream_size_distribution.header_float,
-                water_activity_sizer=stream_sizer_properties[
-                    keywords['sizer_relative_humidity']]/100,
-                water_activity_sample_dry=stream_caps[
-                    keywords['caps_relative_humidity_dry']]/100,
-                water_activity_sample_wet=stream_caps[
-                    keywords['caps_relative_humidity_wet']]/100,
-                refractive_index_dry=keywords['refractive_index_dry'],
-                water_refractive_index=keywords['water_refractive_index'],
-                wavelength=keywords['wavelength'],
-                discretize=keywords['discretize_kappa_fit']
-            )
-
+    # Calculate kappa and add it to the datalake if fitting is enabled
+    if keywords["fit_kappa"]:
+        kappa_matrix = kappa_via_extinction.kappa_from_extinction_looped(
+            extinction_dry=stream_caps[keywords["caps_extinction_dry"]],
+            extinction_wet=stream_caps[keywords["caps_extinction_wet"]],
+            number_per_cm3=stream_size_distribution.data,
+            diameter=stream_size_distribution.header_float,
+            water_activity_sizer=stream_sizer_properties[
+                keywords["sizer_relative_humidity"]
+            ]
+            / 100,
+            water_activity_sample_dry=stream_caps[
+                keywords["caps_relative_humidity_dry"]
+            ]
+            / 100,
+            water_activity_sample_wet=stream_caps[
+                keywords["caps_relative_humidity_wet"]
+            ]
+            / 100,
+            refractive_index_dry=keywords["refractive_index_dry"],
+            water_refractive_index=keywords["water_refractive_index"],
+            wavelength=keywords["wavelength"],
+            discretize=keywords["discretize_kappa_fit"],
+        )
     else:
-        kappa_fixed = keywords.get('kappa_fixed', 0.1)
-        kappa_matrix = np.ones(
-            (len(stream_caps.time), 3), dtype=np.float64) * kappa_fixed
+        # Use a fixed kappa value if kappa fitting is not enabled
+        kappa_fixed = keywords.get("kappa_fixed", 0.1)
+        kappa_matrix = (
+            np.ones((len(stream_caps.time), 3), dtype=np.float64) * kappa_fixed
+        )
 
-    # add kappa_matrix to datalake
-    stream_caps['kappa_fit'] = kappa_matrix[:, 0]
-    stream_caps['kappa_fit_lower'] = kappa_matrix[:, 1]
-    stream_caps['kappa_fit_upper'] = kappa_matrix[:, 2]
+    # Add kappa fitting results to the datalake
+    stream_caps["kappa_fit"] = kappa_matrix[:, 0]
+    stream_caps["kappa_fit_lower"] = kappa_matrix[:, 1]
+    stream_caps["kappa_fit_upper"] = kappa_matrix[:, 2]
 
-    # check if raw in dict
+    # Check if raw data is already stored in the stream, and if not, save it
     index_dic = stream_caps.header_dict
     if "raw_" + keywords["caps_scattering_dry"] in index_dic:
-        pass
+        pass  # Raw data already exists, no need to copy
     else:
-        # copy and save raw data
+        # Copy and save raw scattering data for both dry and wet conditions
         stream_caps["raw_" + keywords["caps_scattering_dry"]] = stream_caps[
             keywords["caps_scattering_dry"]
         ]
-        stream_caps["raw_" + keywords["caps_scattering_dry"]] = stream_caps[
+        stream_caps["raw_" + keywords["caps_scattering_wet"]] = stream_caps[
             keywords["caps_scattering_wet"]
         ]
 
-    # reset the stream data to the raw data
+    # Reset the stream data to use the raw scattering data
     stream_caps[keywords["caps_scattering_dry"]] = stream_caps[
         "raw_" + keywords["caps_scattering_dry"]
     ]
@@ -166,54 +180,66 @@ def caps_processing(
         "raw_" + keywords["caps_scattering_wet"]
     ]
 
-    # apply calibration factors
+    # Apply calibration factors to the scattering data
     stream_caps[keywords["caps_scattering_dry"]] *= keywords["calibration_dry"]
     stream_caps[keywords["caps_scattering_wet"]] *= keywords["calibration_wet"]
 
-    # calc truncation corrections and add to datalake
+    # Log the start of truncation corrections
     logger.info("CAPS truncation corrections")
-    if keywords['calculate_truncation']:
 
-        truncation_dry = \
+    # Calculate and apply truncation corrections if enabled
+    if keywords["calculate_truncation"]:
+        truncation_dry = (
             scattering_truncation.correction_for_humidified_looped(
                 kappa=kappa_matrix[:, 0],
                 number_per_cm3=stream_size_distribution.data,
                 diameter=stream_size_distribution.header_float,
                 water_activity_sizer=stream_sizer_properties[
-                    keywords['sizer_relative_humidity']]/100,
+                    keywords["sizer_relative_humidity"]
+                ]
+                / 100,
                 water_activity_sample=stream_caps[
-                    keywords['caps_relative_humidity_dry']]/100,
-                refractive_index_dry=keywords['refractive_index_dry'],
-                water_refractive_index=keywords['water_refractive_index'],
-                wavelength=keywords['wavelength'],
-                discretize=keywords['discretize_truncation']
+                    keywords["caps_relative_humidity_dry"]
+                ]
+                / 100,
+                refractive_index_dry=keywords["refractive_index_dry"],
+                water_refractive_index=keywords["water_refractive_index"],
+                wavelength=keywords["wavelength"],
+                discretize=keywords["discretize_truncation"],
             )
+        )
 
-        truncation_wet = \
+        truncation_wet = (
             scattering_truncation.correction_for_humidified_looped(
                 kappa=kappa_matrix[:, 0],
                 number_per_cm3=stream_size_distribution.data,
                 diameter=stream_size_distribution.header_float,
                 water_activity_sizer=stream_sizer_properties[
-                    keywords['sizer_relative_humidity']]/100,
+                    keywords["sizer_relative_humidity"]
+                ]
+                / 100,
                 water_activity_sample=stream_caps[
-                    keywords['caps_relative_humidity_wet']]/100,
-                refractive_index_dry=keywords['refractive_index_dry'],
-                water_refractive_index=keywords['water_refractive_index'],
-                wavelength=keywords['wavelength'],
-                discretize=keywords['discretize_truncation']
+                    keywords["caps_relative_humidity_wet"]
+                ]
+                / 100,
+                refractive_index_dry=keywords["refractive_index_dry"],
+                water_refractive_index=keywords["water_refractive_index"],
+                wavelength=keywords["wavelength"],
+                discretize=keywords["discretize_truncation"],
             )
+        )
 
-        # apply truncation corrections
-        stream_caps[keywords['caps_scattering_dry']] *= truncation_dry
-        stream_caps[keywords['caps_scattering_wet']] *= truncation_wet
+        # Apply truncation corrections to the scattering data
+        stream_caps[keywords["caps_scattering_dry"]] *= truncation_dry
+        stream_caps[keywords["caps_scattering_wet"]] *= truncation_wet
     else:
+        # If truncation corrections are not calculated, use default ones
         truncation_dry = np.ones_like(stream_caps.time, dtype=np.float64)
         truncation_wet = np.ones_like(stream_caps.time, dtype=np.float64)
 
-    # add truncation corrections to stream
-    stream_caps['truncation_dry'] = truncation_dry
-    stream_caps['truncation_wet'] = truncation_wet
+    # Add truncation corrections to the stream
+    stream_caps["truncation_dry"] = truncation_dry
+    stream_caps["truncation_wet"] = truncation_wet
 
     return stream_caps
 
@@ -226,26 +252,25 @@ def albedo_from_ext_scat(
     new_albedo_key: str,
 ) -> Stream:
     """
-    Calculates the albedo from the extinction and scattering data in Stream.
+    Calculate the albedo from the extinction and scattering data in the stream.
 
-    The function computes the absorption as the difference between extinction
-    and scattering, and the single-scattering albedo as the ratio of
-    scattering to extinction. If the extinction values are zero or negative,
-    the albedo is set to np.nan. The user can choose to filter out
-    zero or negative extinction values before calculation.
+    This function computes the absorption as the difference between extinction
+    and scattering, and the single-scattering albedo as the ratio of scattering
+    to extinction. If the extinction values are zero or negative, the albedo is
+    set to `np.nan`.
 
-    Args:
-        stream (Stream): The datastream containing CAPS data.
-        extinction_key (str): The key for the extinction data in the stream.
-        scattering_key (str): The key for the scattering data in the stream.
-        new_absorption_key (str): The key where the calculated absorption will
+    Arguments:
+        stream: The datastream containing CAPS data.
+        extinction_key: The key for the extinction data in the stream.
+        scattering_key: The key for the scattering data in the stream.
+        new_absorption_key: The key where the calculated absorption will
             be stored.
-        new_albedo_key (str): The key where the calculated albedo will
+        new_albedo_key: The key where the calculated albedo will
             be stored.
 
     Returns:
         Stream: The updated datastream with the new absorption and albedo
-            values.
+        values.
 
     Raises:
         KeyError: If the provided extinction or scattering keys are not found

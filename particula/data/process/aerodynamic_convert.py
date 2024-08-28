@@ -19,25 +19,24 @@ def _cost_aerodynamic_radius(
     **kwargs,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Optimization cost function to find the aerodynamic radius of a particle.
+    Optimization cost function to determine the aerodynamic radius of a
+    particle.
 
-    Args:
-        guess_aerodynamic_radius : The initial guess for the
-            aerodynamic radius.
-        mean_free_path_air : The mean free path of air.
-        particle_radius : The known physical radius of
-            the particle.
-        kwargs : Additional keyword arguments for the optimization function
-            - density (float): The density of the particle. Default is 1500
-                kg/m^3.
+    Arguments:
+        guess_aerodynamic_radius: The initial guess for the aerodynamic radius.
+        mean_free_path_air: The mean free path of air molecules.
+        particle_radius: The known physical radius of the particle.
+        kwargs: Additional keyword arguments for the optimization.
+            - density (float): The density of the particle. Default is
+                1500 kg/m^3.
             - reference_density (float): The reference density for the
-                aerodynamic radius. Default is 1000 kg/m^3.
+                aerodynamic radius calculation. Default is 1000 kg/m^3.
             - aerodynamic_shape_factor (float): The aerodynamic shape factor.
                 Default is 1.0.
 
     Returns:
         The squared error between the guessed aerodynamic radius and
-        the calculated aerodynamic radius.
+            the calculated aerodynamic radius.
     """
     # Calculate the physical Knudsen number and corresponding
     # slip correction factor
@@ -79,24 +78,23 @@ def _cost_physical_radius(
     **kwargs,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Optimization cost function to find the physical radius of a particle.
+    Optimization cost function to determine the physical radius of a particle.
 
-    Args:
-        guess_physical_radius : The initial guess for the physical radius.
-        mean_free_path_air : The mean free path of air.
-        aerodynamic_radius : The known aerodynamic radius of
-            the particle.
-        kwargs : Additional keyword arguments for the optimization function
-            - density (float): The density of the particle. Default is 1500
-                kg/m^3.
+    Arguments:
+        guess_physical_radius: The initial guess for the physical radius.
+        mean_free_path_air: The mean free path of air molecules.
+        aerodynamic_radius: The known aerodynamic radius of the particle.
+        kwargs: Additional keyword arguments for the optimization
+            - density (float): The density of the particle. Default is
+                1500 kg/m^3.
             - reference_density (float): The reference density for the
-                aerodynamic radius. Default is 1000 kg/m^3.
+                aerodynamic radius calculation. Default is 1000 kg/m^3.
             - aerodynamic_shape_factor (float): The aerodynamic shape factor.
                 Default is 1.0.
 
     Returns:
-        float: The squared error between the guessed physical radius and the
-            calculated aerodynamic radius.
+        The squared error between the guessed physical radius and the
+        calculated aerodynamic radius.
     """
     # Calculate the physical Knudsen number and corresponding slip correction
     # factor
@@ -141,21 +139,22 @@ def convert_aerodynamic_to_physical_radius(
     reference_density: float = 1000.0,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Convert aerodynamic radius to physical radius for an array of particles.
+    Convert aerodynamic radius to physical radius for a particle or an array
+    of particles.
 
-    Args:
-        aerodynamic_radius : Array of aerodynamic radii to be
+    Arguments:
+        aerodynamic_radius: The aerodynamic radius or array of radii to be
             converted.
-        pressure : The ambient pressure.
-        temperature : The ambient temperature.
-        particle_density : The density of the particles.
-        aerodynamic_shape_factor : The aerodynamic shape factor. Default is 1.
-        reference_density : The reference density for the aerodynamic radius.
-            Default is 1000 kg/m^3.
+        pressure: The ambient pressure in Pascals.
+        temperature: The ambient temperature in Kelvin.
+        particle_density: The density of the particles in kg/m^3.
+        aerodynamic_shape_factor: The aerodynamic shape factor. Default is 1.0.
+        reference_density: The reference density for the aerodynamic radius
+            in kg/m^3. Default is 1000 kg/m^3.
 
     Returns:
-        np.ndarray: Array of physical radii corresponding to the aerodynamic
-            radii.
+        The physical radius or array of radii corresponding to the aerodynamic
+        radius/radii.
     """
     # Calculate the mean free path of air
     mean_free_path_air = mean_free_path.molecule_mean_free_path(
@@ -199,20 +198,21 @@ def convert_physical_to_aerodynamic_radius(
     reference_density: float = 1000.0,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Convert physical to aerodynamic radius for an array of particles.
+    Convert physical radius to aerodynamic radius for a particle or an array
+    of particles.
 
-    Args:
-        physical_radius : Array of physical radii to be converted.
-        pressure : The ambient pressure.
-        temperature : The ambient temperature.
-        particle_density : The density of the particles.
-        aerodynamic_shape_factor : The aerodynamic shape factor. Default is 1.
-        reference_density : The reference density for the aerodynamic radius.
-            Default is 1000 kg/m^3.
+    Arguments:
+        physical_radius: The physical radius or array of radii to be converted.
+        pressure: The ambient pressure in Pascals.
+        temperature: The ambient temperature in Kelvin.
+        particle_density: The density of the particles in kg/m^3.
+        aerodynamic_shape_factor: The aerodynamic shape factor. Default is 1.0.
+        reference_density: The reference density for the aerodynamic radius
+            in kg/m^3. Default is 1000 kg/m^3.
 
     Returns:
-        np.ndarray: Array of aerodynamic radii corresponding to the physical
-            radii.
+        The aerodynamic radius or array of radii corresponding to the physical
+        radius/radii.
     """
     # Calculate the mean free path of air
     mean_free_path_air = mean_free_path.molecule_mean_free_path(

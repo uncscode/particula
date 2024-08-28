@@ -105,6 +105,23 @@ class Stream:
         """
         return len(self.time)
 
+    def __pop__(self, index: Union[int, str]) -> None:
+        """Removes data at a specified index or header name.
+
+        Allows indexing of the data stream using an integer index or a string
+        corresponding to the header. If a string is used, the header index is
+        retrieved and used to return the data array. Only one str
+        argument is allowed. A list of int is allowed.
+
+        Args:
+            index: The index or name of the data column to
+                retrieve.
+        """
+        if isinstance(index, str):
+            index = self.header.index(index)
+        self.data = np.delete(self.data, index, axis=1)
+        self.header.pop(index)
+
     @property
     def datetime64(self) -> NDArray[np.float64]:
         """Converts the epoch time array to a datetime64 for plotting.

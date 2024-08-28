@@ -24,29 +24,25 @@ def mean_properties(
     sizer_limits: Optional[list] = None
 ) -> Tuple[float, float, float, float, float, float, float]:
     """
-    Calculates the mean properties of the size distribution.
+    Calculate the mean properties of the size distribution.
 
-    Args
-    ----------
-    sizer_dndlogdp : List[float]
-        Concentration of particles in each bin.
-    sizer_diameter : List[float]
-        Bin centers
-    total_concentration : Optional[float], default=None
-        Total concentration of particles in the distribution.
-    sizer_limits : Optional[Tuple[float, float]], default=None
-        The lower and upper limits of the size of interest.
+    Arguments:
+        sizer_dndlogdp: Array of particle concentrations in each bin.
+        sizer_diameter: Array of bin center diameters.
+        total_concentration: Optional; the total concentration of particles
+            in the distribution. If not provided, it will be calculated.
+        sizer_limits: Optional; the lower and upper limits of the size
+            range of interest. If not provided, the full range will be used.
 
-    Returns
-    -------
-    Tuple[float, float, float, float, float, float, float]
-        Total concentration of particles in the distribution.
-        Total mass of particles in the distribution.
-        Mean diameter of the distribution by number.
-        Mean diameter of the distribution by volume.
-        Geometric mean diameter of the distribution.
-        Mode diameter of the distribution by number.
-        Mode diameter of the distribution by volume.
+    Returns:
+        Tuple:
+        - Total concentration of particles in the distribution.
+        - Total mass of particles in the distribution.
+        - Mean diameter of the distribution by number.
+        - Mean diameter of the distribution by volume.
+        - Geometric mean diameter of the distribution.
+        - Mode diameter of the distribution by number.
+        - Mode diameter of the distribution by volume.
     """
 
     # convert to dn from dn/dlogDp
@@ -120,27 +116,21 @@ def sizer_mean_properties(
     diameter_units: str = 'nm',
 ) -> Stream:
     """
-    Calculates the mean properties of the size distribution, and returns a
-    stream.
+    Calculate the mean properties of the size distribution and return the
+    updated stream.
 
-    Args
-    ----------
-    stream : Stream
-        The stream to process.
-    sizer_limits : list, optional [in diameter_units]
-        The lower and upper limits of the size of interest. The default is None
-    density : float, optional
-        The density of the particles. The default is 1.5 g/cm3.
-    diameter_units : str
-        The units of the diameter. The default is 'nm'. This will be converted
-        to nm.
+    Arguments:
+        stream: The stream containing the size distribution data to process.
+        sizer_limits: A list specifying the lower and upper limits of the
+            size range of interest, in the units specified by `diameter_units`.
+            Default is None, which means the full range is used.
+        density: The density of the particles in g/cm³. Default is 1.5 g/cm³.
+        diameter_units: The units of the diameter. Default is 'nm'. The
+            specified units will be converted to nanometers.
 
-    Returns
-    -------
-    stream : Stream
-        The stream with the mean properties added.
+    Returns:
+        Stream: The updated stream with the mean properties added.
     """
-
     sizer_diameter_smps = np.array(stream.header).astype(float) \
         * convert_units(diameter_units, 'nm')
     if sizer_limits is not None:  # convert to nm
@@ -275,24 +265,24 @@ def merge_distributions(
     diameters_upper: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray]:
     """
-    Merge two particle size distributions using linear weighting.
+    Merge two particle size distributions using linear weighting,
+    accounting for mobility versus aerodynamic diameters.
 
-    Args:
-    concentration_lower:
-        The concentration of particles in the lower
-        distribution.
-    diameters_lower:
-        The diameters corresponding to the lower distribution.
+    Arguments:
+        concentration_lower: The concentration of particles in the lower
+            distribution.
+        diameters_lower: The diameters corresponding to the lower distribution.
         concentration_upper: The concentration of particles in the upper
-        distribution.
-    diameters_upper:
-        The diameters corresponding to the upper distribution.
+            distribution.
+        diameters_upper: The diameters corresponding to the upper distribution.
 
     Returns:
-    new_2d: The merged concentration distribution.
-    new_diameter: The merged diameter distribution.
+        Tuple:
+        - new_2d: The merged concentration distribution.
+        - new_diameter: The merged diameter distribution.
 
-    add in an acount for the moblity vs aerodynamic diameters
+    Note:
+        Add process the moblity vs aerodynamic diameters
     """
     # Define the linear weight function
     def weight_func(diameter, min_diameter, max_diameter):
@@ -357,18 +347,18 @@ def iterate_merge_distributions(
     """
     Merge two sets of particle size distributions using linear weighting.
 
-    Args:
-    concentration_lower: The concentration of particles in the
-        lower distribution.
-    diameters_lower: The diameters corresponding to the
-        lower distribution.
-    concentration_upper: The concentration of particles in the
-        upper distribution.
-    diameters_upper: The diameters corresponding to the upper distribution.
+    Arguments:
+        concentration_lower: The concentration of particles in the lower
+            distribution.
+        diameters_lower: The diameters corresponding to the lower distribution.
+        concentration_upper: The concentration of particles in the upper
+            distribution.
+        diameters_upper: The diameters corresponding to the upper distribution.
 
     Returns:
-    A tuple containing the merged diameter distribution and the merged
-        concentration distribution.
+        Tuple:
+        - The merged diameter distribution.
+        - The merged concentration distribution.
     """
     # Iterate over all columns in the concentration datastream
     merged_2d_list = []
@@ -401,17 +391,18 @@ def merge_size_distribution(
     upper_units: str = 'um',
 ) -> object:
     """
-    Merge two sets of particle size distributions using linear weighting.
-    The concentration should be in dN/dlogDp.
+    Merge two particle size distributions using linear weighting.
+    The concentrations should be in dN/dlogDp.
 
-    Args:
-    stream_smaller: The stream with lower sizes, e.g. SMPS.
-    stream_larger: The stream with larger sizes, e.g. OPS. or APS
-    lower_units: The units of the lower distribution. The default is 'nm'.
-    upper_units: The units of the upper distribution. The default is 'um'.
+    Arguments:
+        stream_lower: The stream with the lower size range, e.g., from an SMPS.
+        stream_upper: The stream with the upper size range, e.g., from an
+            OPS or APS.
+        lower_units: The units of the lower distribution. Default is 'nm'.
+        upper_units: The units of the upper distribution. Default is 'um'.
 
     Returns:
-    Stream: A stream object containing the merged size distribution.
+        Stream: A stream object containing the merged size distribution.
     """
     # Get the diameter data from the datastreams
     diameters_lower = np.array(stream_lower.header).astype(float) \
@@ -441,20 +432,20 @@ def resample_distribution(
     clone: bool = False,
 ) -> Stream:
     """
-    Resample a particle size distribution to a new set of diameters.
-    Using np interpolation, and extrapolation is nan.
+    Resample a particle size distribution to a new set of diameters using
+    numpy interpolation. Extrapolated values will be set to NaN.
 
-    Args:
-    stream: (Stream)
-        The stream to resample.
-    new_diameters: (np.ndarry)
-        The new diameters to resample to.
-    concentration_scale: (str)
-        The concentration scale of the distribution. Either, 'dn/dlogdp',
-        'dn', 'pms' (which is dn), or 'pdf'.
+    Arguments:
+        stream: The stream object containing the size distribution to resample.
+        new_diameters: The new diameters to which the distribution will be
+            resampled.
+        concentration_scale: The concentration scale of the distribution.
+            Options are 'dn/dlogdp', 'dn', 'pms'
+            (which is equivalent to 'dn'), or 'pdf'. Default is 'dn/dlogdp'.
+        clone: Whether to clone the stream before resampling. Default is False.
 
     Returns:
-    Stream: The resampled stream.
+        Stream: The resampled stream object.
     """
     # copy of stream object to avoid modifying original
     if clone:
@@ -480,6 +471,10 @@ def resample_distribution(
     # resample the pdf
     for i, row in enumerate(concentration_pdf):
         is_nan = np.isnan(row)  # nan mask
+        # is full of nans
+        if np.all(is_nan):
+            new_concentration[i, :] = np.nan
+            continue
         new_concentration[i, :] = np.interp(
             new_diameters,
             diameters[~is_nan],
