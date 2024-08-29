@@ -426,11 +426,10 @@ class ContinuousGeneralPDF(CoagulationStrategy):
     kernel representation.
 
     Methods:
-    --------
-    - kernel: Calculate the coagulation kernel.
-    - loss_rate: Calculate the coagulation loss rate.
-    - gain_rate: Calculate the coagulation gain rate.
-    - net_rate: Calculate the net coagulation rate.
+        kernel: Calculate the coagulation kernel.
+        loss_rate: Calculate the coagulation loss rate.
+        gain_rate: Calculate the coagulation gain rate.
+        net_rate: Calculate the net coagulation rate.
     """
 
     def __init__(self, kernel_strategy: KernelStrategy):

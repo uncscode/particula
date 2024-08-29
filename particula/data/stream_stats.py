@@ -182,16 +182,16 @@ def remove_time_window(
     Remove a time window from a stream object.
 
     Args:
-    - stream: The input stream object containing 'data' and 'time'
-        attributes.
-    - epoch_start: The start time of the time window to be
-        removed.
-    - epoch_end: The end time of the time window to be
-        removed. If not provided, the time window is the closest time point to
-        'epoch_start'.
+        stream: The input stream object containing 'data' and 'time'
+            attributes.
+        epoch_start: The start time of the time window to be
+            removed.
+        epoch_end: The end time of the time window to be
+            removed. If not provided, the time window is the closest time
+            point to 'epoch_start'.
 
     Returns:
-    - Stream: The 'stream' object with the specified time window removed.
+        Stream: The 'stream' object with the specified time window removed.
     """
     # get index of start time
     index_start = np.argmin(np.abs(stream.time - epoch_start))
@@ -205,4 +205,43 @@ def remove_time_window(
     # remove time and data between start and end times
     stream.time = np.delete(stream.time, slice(index_start, index_end))
     stream.data = np.delete(stream.data, slice(index_start, index_end), axis=0)
+    return stream
+
+
+def select_time_window(
+    stream: Stream,
+    epoch_start: Union[float, int],
+    epoch_end: Optional[Union[float, int]] = None,
+    clone: Optional[bool] = True,
+) -> Stream:
+    """
+    Keep only a specified time window in a stream object and remove all other
+    data.
+
+    Arguments:
+        stream: The input stream object containing 'data' and 'time'
+            attributes.
+        epoch_start: The start time of the time window to be kept.
+        epoch_end: The end time of the time window to be kept. If not provided,
+            only the closest time point to 'epoch_start' will be kept.
+
+    Returns:
+        Stream: The stream object with only the specified time window retained.
+    """
+    if clone:
+        stream = copy.copy(stream)
+    # Get index of start time
+    index_start = np.argmin(np.abs(stream.time - epoch_start))
+
+    if epoch_end is None:
+        # If no end time provided, keep only the closest time point
+        stream.time = stream.time[index_start:index_start + 1]
+        stream.data = stream.data[index_start:index_start + 1, :]
+    else:
+        # Get index of end time
+        index_end = np.argmin(np.abs(stream.time - epoch_end)) + 1
+        # Keep only the time and data between start and end times
+        stream.time = stream.time[index_start:index_end]
+        stream.data = stream.data[index_start:index_end, :]
+
     return stream
