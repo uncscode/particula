@@ -296,13 +296,71 @@ def albedo_from_ext_scat(
     )
 
     # Initialize albedo with NaN
-    albedo = np.full_like(stream[extinction_key], np.nan)
+    albedo = np.full_like(stream.time, np.nan)
 
     # Calculate albedo
     select = stream[extinction_key] > 0
-    albedo = stream[scattering_key][select] / stream[extinction_key][select]
+    albedo[select] = (
+        stream[scattering_key][select] / stream[extinction_key][select]
+    )
 
     # Store albedo in the stream
     stream[new_albedo_key] = albedo
+
+    return stream
+
+
+def enhancement_ratio(
+    stream: Stream,
+    numerator_key: str,
+    denominator_key: str,
+    new_key: str,
+) -> Stream:
+    """
+    Calculate the enhancement ratio from two data keys in the stream.
+
+    This is the ratio between the numerator and the denominator. If the
+    denominator is zero, then the ratio is set to `np.nan`. This function
+    is useful for f(RH) calculations.
+
+    Arguments:
+        stream: The datastream containing the data.
+        numerator_key: The key for the numerator data in the stream.
+        denominator_key: The key for the denominator data in the stream.
+        new_key: The key where the calculated enhancement ratio will
+            be stored.
+
+    Returns:
+        Stream: The updated datastream with the new enhancement ratio values.
+
+    Raises:
+        KeyError: If the provided numerator or denominator keys are not found
+            in the stream.
+    """
+    if numerator_key not in stream.header:
+        key_message = (
+            f"Numerator key '{numerator_key}' not found in the stream."
+        )
+        logger.error(key_message)
+        raise KeyError(key_message)
+
+    if denominator_key not in stream.header:
+        key_message = (
+            f"Denominator key '{denominator_key}' not found in the stream."
+        )
+        logger.error(key_message)
+        raise KeyError(key_message)
+
+    # Initialize enhancement ratio with NaN
+    ratio = np.full_like(stream.time, np.nan)
+
+    # Calculate enhancement ratio
+    select = stream[denominator_key] > 0
+    ratio[select] = (
+        stream[numerator_key][select] / stream[denominator_key][select]
+    )
+
+    # Store enhancement ratio in the stream
+    stream[new_key] = ratio
 
     return stream
