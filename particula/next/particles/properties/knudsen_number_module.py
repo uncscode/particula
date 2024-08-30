@@ -41,7 +41,7 @@ def calculate_knudsen_number(
         logger.error(message)
         raise TypeError(message)
     if isinstance(mean_free_path, float) and isinstance(
-        particle_radius, float
+        particle_radius, (float, np.ndarray)
     ):
         return mean_free_path / particle_radius
 

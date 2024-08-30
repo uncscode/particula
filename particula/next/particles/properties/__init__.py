@@ -22,3 +22,6 @@ from particula.next.particles.properties.diffusive_knudsen_module import diffusi
 from particula.next.particles.properties.vapor_correction_module import vapor_transition_correction
 from particula.next.particles.properties.partial_pressure_module import partial_pressure_delta
 from particula.next.particles.properties.kelvin_effect_module import kelvin_radius, kelvin_term
+from particula.next.particles.properties.special_functions import debye_function
+from particula.next.particles.properties.settling_velocity import particle_settling_velocity, particle_settling_velocity_via_system_state
+from particula.next.particles.properties.diffusion_coefficient import particle_diffusion_coefficient, particle_diffusion_coefficient_via_system_state

@@ -68,9 +68,9 @@ def molecule_mean_free_path(
         raise ValueError("Molar mass must be positive [kg/mol]")
     if dynamic_viscosity is None:
         dynamic_viscosity = get_dynamic_viscosity(temperature)
+    gas_constant = float(GAS_CONSTANT.m)
 
-    return np.array(
+    return (
         (2 * dynamic_viscosity / pressure)
-        / (8 * molar_mass / (np.pi * GAS_CONSTANT.m * temperature)) ** 0.5,
-        dtype=np.float64,
+        / (8 * molar_mass / (np.pi * gas_constant * temperature)) ** 0.5
     )
