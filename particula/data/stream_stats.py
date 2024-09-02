@@ -2,13 +2,16 @@
 
 from typing import Optional, Union
 import copy
+
 import numpy as np
+from sklearn.linear_model import LinearRegression
 
 from particula.util import stats
 from particula.data.stream import StreamAveraged, Stream
+from particula.util import time_manage
 
 
-def drop_masked(stream: Stream, mask: np.ndarray) -> Stream:
+def drop_masked(stream: Stream, mask: np.ndarray) -> Stream:  # type: ignore
     """Drop rows where mask is false, and return data stream.
 
     Args
@@ -245,3 +248,64 @@ def select_time_window(
         stream.data = stream.data[index_start:index_end, :]
 
     return stream
+
+
+def time_derivative_of_stream(
+    stream: Stream, liner_slope_window_size: int = 12
+) -> Stream:
+    """
+    Calculate the rate of change of the concentration PMF over time and
+    return a new stream.
+
+    Uses a linear regression model to fit the slope over a time window.
+    The edge cases are handled by using a smaller window size.
+
+    Arguments:
+        pmf_fitted_stream: Stream object containing the fitted concentration
+            PMF data.
+        window_size: Size of the time window for fitting the slope.
+
+    Returns:
+        rate_of_change_stream: Stream object containing the rate of
+            change of the concentration PMF.
+    """
+    # Extract necessary data from the input stream
+    concentration_m3_pmf_fits = stream.data
+    experiment_time_seconds = time_manage.relative_time(  # type: ignore
+        epoch_array=stream.time,
+        units="sec",
+    )
+
+    n_rows = concentration_m3_pmf_fits.shape[0]
+    dstream_dt = np.zeros_like(concentration_m3_pmf_fits)
+    half_window = liner_slope_window_size // 2
+
+    # Iterate over each time point to fit the slope
+    for i in range(n_rows):
+        if i < half_window:  # Beginning edge case
+            start_index = 0
+            end_index = i + half_window + 1
+        elif i > n_rows - half_window - 1:  # Ending edge case
+            start_index = i - half_window
+            end_index = n_rows
+        else:  # General case
+            start_index = i - half_window
+            end_index = i + half_window + 1
+
+        # Fit a linear model for each bin size over the current time window
+        model = LinearRegression()
+        model.fit(  # type: ignore
+            experiment_time_seconds[start_index:end_index].reshape(-1, 1),
+            concentration_m3_pmf_fits[start_index:end_index, :],
+        )
+
+        # Store the slope (rate of change)
+        dstream_dt[i, :] = model.coef_.flatten()  # type: ignore
+
+    # Create a new stream for the rate of change
+    derivative = Stream()
+    derivative.time = stream.time
+    derivative.header = stream.header
+    derivative.data = dstream_dt
+
+    return derivative

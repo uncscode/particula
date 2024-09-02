@@ -1,7 +1,7 @@
 """Tests for the wall loss rate dynamics module."""
 
 import numpy as np
-from particula.next.dynamics.wall_loss_rate import (
+from particula.next.dynamics.wall_loss import (
     spherical_wall_loss_rate,
     rectangle_wall_loss_rate,
 )

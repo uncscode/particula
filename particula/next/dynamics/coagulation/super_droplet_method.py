@@ -107,7 +107,7 @@ def event_pairs(
     lower_bin: int,
     upper_bin: int,
     kernel_max: Union[float, NDArray[np.float64]],
-    number_in_bins: NDArray[np.float64 | np.int64],
+    number_in_bins: Union[NDArray[np.float64], NDArray[np.int64]],
 ) -> float:
     """Calculate the number of particle pairs based on kernel value.
 
@@ -453,7 +453,7 @@ def calculate_concentration_in_bins(
 
 
 # pylint: disable=too-many-arguments, too-many-locals
-def coagulation_step(
+def super_droplet_coagulation_step(
     particle_radius: NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
     kernel: NDArray[np.float64],

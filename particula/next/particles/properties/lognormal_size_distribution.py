@@ -57,8 +57,11 @@ def lognormal_pdf_distribution(
     )
 
     area = np.trapz(distribution, x=x_values[:, np.newaxis], axis=0)
+    area[area == 0] = np.nan
+
     scaled_distribution = distribution * (number_of_particles / area)
-    return scaled_distribution.sum(axis=1)
+
+    return np.nansum(scaled_distribution, axis=1)
 
 
 def lognormal_pmf_distribution(

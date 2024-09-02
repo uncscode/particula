@@ -37,39 +37,6 @@ def discrete_loss(
     return np.sum(kernel * np.outer(concentration, concentration), axis=0)
 
 
-# def discrete_gain(
-#     concentration: Union[float, NDArray[np.float64]],
-#     kernel: NDArray[np.float64],
-# ) -> Union[float, NDArray[np.float64]]:
-#     """
-#     Calculate the coagulation gain rate, via the summation method.
-
-#     Arguments:
-#         concentration : The distribution of particles.
-#         kernel : The coagulation kernel.
-
-#     Returns:
-#         The coagulation gain rate.
-
-#     References:
-#     - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-#     physics, Chapter 13 Equations 13.61
-#     """
-#     # discrete distribution, kernel (n,n)
-
-#     # Initialize the gain array
-#     gain = np.zeros_like(concentration)
-
-#     # Compute the concentration outer product only once
-#     concentration_outer = np.outer(concentration, concentration)
-
-#     # Compute slices of the kernel and the concentration outer product
-#     for k in range(1, np.size(concentration)):
-#         gain[k] = np.dot(kernel[:k, k - 1], concentration_outer[:k, k - 1])
-
-#     return gain
-
-
 def discrete_gain(
     radius: Union[float, NDArray[np.float64]],
     concentration: Union[float, NDArray[np.float64]],

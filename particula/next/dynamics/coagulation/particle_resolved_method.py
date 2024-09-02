@@ -64,7 +64,7 @@ def particle_resolved_update_step(
 
 
 # pylint: disable=too-many-arguments, too-many-locals
-def coagulation_step(
+def particle_resolved_coagulation_step(
     particle_radius: NDArray[np.float64],
     kernel: NDArray[np.float64],
     kernel_radius: NDArray[np.float64],

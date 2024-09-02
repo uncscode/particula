@@ -10,4 +10,3 @@ This is a collection of jupyter notebooks that demonstrate how to use the aspect
 - [Lagrangian (Direct Numerical Simulation)](lagrangian/index.md)
 - [Light Scattering](light_scattering/index.md)
 - [Data Streams and Lakes](streamlake/index.md)
-- [Chamber Wall Loss](wall_loss/index.md)

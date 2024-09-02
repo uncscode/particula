@@ -2,7 +2,7 @@
 
 import pytest
 import numpy as np
-from particula.next.dynamics.dilution_rate import (
+from particula.next.dynamics.dilution import (
     volume_dilution_coefficient, dilution_rate
 )
 

@@ -40,6 +40,10 @@ Next is the next iteration of the particula simulation model. It is a complete r
 
 - [Condensation Discussion](Discussions/Condensation_Discussion.md)
 
+## Data Analysis
+
+- [Fitting Lognormal PDF: 2 Modes](Tutorials/Data/Fitting_lognormal_PDFs_2modes.ipynb)
+
 ## Guides for Developers
 
 ![Four Quadrant representation of Tutorials, How to guides, References, and Discussions Areas](DocsImageDevGuide.png)

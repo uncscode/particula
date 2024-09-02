@@ -25,3 +25,4 @@ from particula.next.particles.properties.kelvin_effect_module import kelvin_radi
 from particula.next.particles.properties.special_functions import debye_function
 from particula.next.particles.properties.settling_velocity import particle_settling_velocity, particle_settling_velocity_via_system_state
 from particula.next.particles.properties.diffusion_coefficient import particle_diffusion_coefficient, particle_diffusion_coefficient_via_system_state
+from particula.next.particles.properties.lognormal_size_distribution import lognormal_pdf_distribution, lognormal_pmf_distribution
