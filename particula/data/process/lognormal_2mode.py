@@ -190,7 +190,6 @@ def optimize_fit(
             "Powell",
             "L-BFGS-B",
             "TNC",
-            "COBYLA",
             "SLSQP",
             "trust-constr",
         ]

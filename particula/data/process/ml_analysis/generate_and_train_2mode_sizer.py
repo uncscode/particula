@@ -33,7 +33,7 @@ logger = logging.getLogger("particula")
 warnings.filterwarnings("ignore")
 
 # Training parameters
-TOTAL_NUMBER_SIMULATED = 1_000_000
+TOTAL_NUMBER_SIMULATED = 10_000_000
 NUMBER_OF_MODES_SIM = 2
 X_ARRAY_MAX_INDEX = 128
 LOWER_BOUND_GSD = 1.0
@@ -411,7 +411,10 @@ def train_network_and_save():
     )
 
     # Train the pipeline
-    pipeline, _, x_test, _, y_test = train_pipeline(
+    # pipeline, _, x_test, _, y_test = train_pipeline(
+    #     x_input=number_pdf_sim, y=y
+    # )
+    pipeline, _, x_test, _, y_test = train_pipeline_with_progress(
         x_input=number_pdf_sim, y=y
     )
 
