@@ -1,4 +1,4 @@
-# Aerosol Optics
+# Index: Light Scattering
 
 Aerosol optics examines the interaction between light and aerosol particles suspended in the atmosphere. These interactions, encompassing absorption, scattering, and the emission of light, are pivotal in deciphering the physical properties of aerosols and their environmental ramifications.
 

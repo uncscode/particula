@@ -20,12 +20,12 @@ path_finder = PathFinder(repo_path)
 path_finder.exclude("tests/*", "build/*")
 
 # generate folder structure, if needed
-os.makedirs(repo_path / "docs/Source-Code/", exist_ok=True)
+os.makedirs(repo_path / "docs/API/", exist_ok=True)
 
 # initialize generator
 handsdown = MaterialGenerator(
     input_path=repo_path,
-    output_path=repo_path / "docs/Source-Code",
+    output_path=repo_path / "docs/API",
     source_paths=path_finder.glob("**/*.py"),
     source_code_url="https://github.com/Gorkowski/particula/blob/main/",
     docstring_processor=PEP257DocstringProcessor(),

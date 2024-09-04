@@ -1,4 +1,4 @@
-# Equilibria of Aerosols
+# Equilibria Index
 
 ## Notebooks
 

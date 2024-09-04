@@ -4,4 +4,3 @@ This is a tour of the `particula` library. The tour is designed to give you a br
 
 ## Notebooks
 
-- [Tour 1](part-tour.ipynb)

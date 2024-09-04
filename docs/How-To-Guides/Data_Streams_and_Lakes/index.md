@@ -1,4 +1,4 @@
-# Data in Particula
+# Data Streams and Lakes Index
 
 Within Particula, instrument data loading and processing is handled by the
 `particula.data` module. This module contains a number of classes and
