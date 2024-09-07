@@ -4,13 +4,14 @@ of species in a mixture of liquids."""
 from typing import Union
 from particula.next.abc_factory import StrategyFactory
 from particula.next.particles.activity_builders import (
-    IdealActivityMassBuilder, IdealActivityMolarBuilder,
-    KappaParameterActivityBuilder
+    ActivityIdealMassBuilder,
+    ActivityIdealMolarBuilder,
+    ActivityKappaParameterBuilder,
 )
 from particula.next.particles.activity_strategies import (
-    IdealActivityMass,
-    IdealActivityMolar,
-    KappaParameterActivity
+    ActivityIdealMass,
+    ActivityIdealMolar,
+    ActivityKappaParameter,
 )
 
 
@@ -19,15 +20,12 @@ from particula.next.particles.activity_strategies import (
 class ActivityFactory(
     StrategyFactory[
         Union[
-            IdealActivityMassBuilder,
-            IdealActivityMolarBuilder,
-            KappaParameterActivityBuilder
+            ActivityIdealMassBuilder,
+            ActivityIdealMolarBuilder,
+            ActivityKappaParameterBuilder,
         ],
-        Union[
-            IdealActivityMass,
-            IdealActivityMolar,
-            KappaParameterActivity
-        ]]
+        Union[ActivityIdealMass, ActivityIdealMolar, ActivityKappaParameter],
+    ]
 ):
     """Factory class to create activity strategy builders
 
@@ -71,8 +69,8 @@ class ActivityFactory(
                 kappa_parameter: KappaParameterActivityBuilder
         """
         return {
-            "mass_ideal": IdealActivityMassBuilder(),
-            "molar_ideal": IdealActivityMolarBuilder(),
-            "kappa_parameter": KappaParameterActivityBuilder(),
-            "kappa": KappaParameterActivityBuilder()
+            "mass_ideal": ActivityIdealMassBuilder(),
+            "molar_ideal": ActivityIdealMolarBuilder(),
+            "kappa_parameter": ActivityKappaParameterBuilder(),
+            "kappa": ActivityKappaParameterBuilder(),
         }

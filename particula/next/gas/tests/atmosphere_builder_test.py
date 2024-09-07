@@ -2,7 +2,7 @@
 
 import pytest
 import numpy as np
-from particula.next.gas.atmosphere_builder import AtmosphereBuilder
+from particula.next.gas.atmosphere_builders import AtmosphereBuilder
 from particula.next.gas.species import GasSpecies
 from particula.next.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy)

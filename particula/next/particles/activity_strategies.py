@@ -14,6 +14,7 @@ from particula.util.convert import (
     mass_concentration_to_mole_fraction,
     mass_concentration_to_volume_fraction,
 )
+from particula.util.machine_limit import MIN_POSITIVE_VALUE
 
 
 class ActivityStrategy(ABC):
@@ -65,7 +66,7 @@ class ActivityStrategy(ABC):
 
 
 # Ideal activity strategies
-class IdealActivityMolar(ActivityStrategy):
+class ActivityIdealMolar(ActivityStrategy):
     """Calculate ideal activity based on mole fractions.
 
     This strategy uses mole fractions to compute the activity, adhering to
@@ -107,7 +108,7 @@ class IdealActivityMolar(ActivityStrategy):
         )
 
 
-class IdealActivityMass(ActivityStrategy):
+class ActivityIdealMass(ActivityStrategy):
     """Calculate ideal activity based on mass fractions.
 
     This strategy utilizes mass fractions to determine the activity, consistent
@@ -138,7 +139,7 @@ class IdealActivityMass(ActivityStrategy):
 
 
 # Non-ideal activity strategies
-class KappaParameterActivity(ActivityStrategy):
+class ActivityKappaParameter(ActivityStrategy):
     """Non-ideal activity strategy based on the kappa hygroscopic parameter.
 
     This strategy calculates the activity using the kappa hygroscopic
@@ -202,10 +203,14 @@ class KappaParameterActivity(ActivityStrategy):
             kappa_weighted = np.sum(
                 solute_volume_fractions / solute_volume * self.kappa, axis=1
             )
-            # kappa activity parameterization, EQ 2 Petters and Kreidenweis (2007)
-            water_activity = (
-                1 + kappa_weighted * solute_volume / water_volume_fraction
-            ) ** (-1)
+            # kappa activity parameterization, EQ 2 Petters and Kreidenweis
+            # (2007)
+            water_activity = np.where(
+                water_volume_fraction <= 10 * MIN_POSITIVE_VALUE,
+                0,
+                (1 + kappa_weighted * solute_volume / water_volume_fraction)
+                ** -1,
+            )
             # other species activity based on mole fraction
             activity = mass_concentration_to_mole_fraction(
                 mass_concentrations=mass_concentration,

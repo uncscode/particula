@@ -9,20 +9,22 @@ from numpy.typing import NDArray
 import numpy as np
 from particula.next.abc_builder import (
     BuilderABC,
+)
+from particula.next.builder_mixin import (
     BuilderMolarMassMixin,
     BuilderDensityMixin,
 )
 from particula.next.particles.activity_strategies import (
-    IdealActivityMass,
-    IdealActivityMolar,
-    KappaParameterActivity,
+    ActivityIdealMass,
+    ActivityIdealMolar,
+    ActivityKappaParameter,
     ActivityStrategy,
 )
 
 logger = logging.getLogger("particula")
 
 
-class IdealActivityMassBuilder(BuilderABC):
+class ActivityIdealMassBuilder(BuilderABC):
     """Builder class for IdealActivityMass objects. No additional parameters.
 
     Methods:
@@ -39,10 +41,10 @@ class IdealActivityMassBuilder(BuilderABC):
         Returns:
             IdealActivityMass: The validated IdealActivityMass object.
         """
-        return IdealActivityMass()
+        return ActivityIdealMass()
 
 
-class IdealActivityMolarBuilder(BuilderABC, BuilderMolarMassMixin):
+class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
     """Builder class for IdealActivityMolar objects.
 
     Methods:
@@ -65,10 +67,10 @@ class IdealActivityMolarBuilder(BuilderABC, BuilderMolarMassMixin):
             IdealActivityMolar: The validated IdealActivityMolar object.
         """
         self.pre_build_check()
-        return IdealActivityMolar(molar_mass=self.molar_mass)  # type: ignore
+        return ActivityIdealMolar(molar_mass=self.molar_mass)  # type: ignore
 
 
-class KappaParameterActivityBuilder(
+class ActivityKappaParameterBuilder(
     BuilderABC, BuilderDensityMixin, BuilderMolarMassMixin
 ):
     """Builder class for KappaParameterActivity objects.
@@ -138,7 +140,7 @@ class KappaParameterActivityBuilder(
             KappaParameterActivity: The validated KappaParameterActivity object.
         """
         self.pre_build_check()
-        return KappaParameterActivity(
+        return ActivityKappaParameter(
             kappa=self.kappa,  # type: ignore
             density=self.density,  # type: ignore
             molar_mass=self.molar_mass,  # type: ignore

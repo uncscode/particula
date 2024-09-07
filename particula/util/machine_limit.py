@@ -4,6 +4,11 @@ from numpy.typing import ArrayLike
 import numpy as np
 
 
+MIN_POSITIVE_VALUE = np.nextafter(0, 1, dtype=np.float64)
+MAX_POSITIVE_VALUE = np.finfo(np.float64).max
+MAX_NEGATIVE_VALUE = np.finfo(np.float64).min
+
+
 def safe_exp(value: ArrayLike) -> np.ndarray:
     """
     Compute the exponential of each element in the input array, with limits

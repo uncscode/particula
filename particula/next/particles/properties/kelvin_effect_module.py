@@ -65,17 +65,15 @@ def kelvin_term(
         exp(kelvin_radius / particle_radius)
         See more: https://en.wikipedia.org/wiki/Kelvin_equation
     """
+    kelvin_expand = False
     # Broadcast the arrays if necessary np.isscalar(kelvin_radius_value)
     if isinstance(kelvin_radius_value, np.ndarray) and (
         kelvin_radius_value.size > 1
     ):
+        kelvin_expand = True
         kelvin_radius_value = kelvin_radius_value[np.newaxis, :]
-    if (
-        isinstance(radius, np.ndarray)
-        and isinstance(kelvin_radius_value, np.ndarray)
-        and kelvin_radius_value.size == 1
-       ):
+    if isinstance(radius, np.ndarray) and not kelvin_expand:
         return np.exp(kelvin_radius_value / radius)
-    if isinstance(radius, np.ndarray) and (radius.size > 1):
+    if isinstance(radius, np.ndarray) and (radius.size > 1) and kelvin_expand:
         radius = radius[:, np.newaxis]
     return np.exp(kelvin_radius_value / radius)

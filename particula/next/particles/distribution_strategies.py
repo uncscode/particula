@@ -335,7 +335,10 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         # Calculate volume from mass and density, then derive radius
-        volumes = np.sum(distribution / density, axis=1)
+        if distribution.ndim == 1:
+            volumes = distribution / density
+        else:
+            volumes = np.sum(distribution / density, axis=1)
         return (3 * volumes / (4 * np.pi)) ** (1 / 3)
 
     def get_total_mass(
@@ -346,7 +349,7 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
     ) -> np.float64:
         # Calculate mass for each bin and species, then sum for total mass
         # mass_per_species = self.get_mass(distribution, density)
-        mass_per_species = np.sum(distribution, axis=1)
+        mass_per_species = np.sum(distribution, axis=-1)
         return np.sum(mass_per_species * concentration)
 
     def add_mass(
@@ -378,6 +381,16 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         # Get the indices of the smaller and larger particles
         small_index = indices[:, 0]
         large_index = indices[:, 1]
+        # Check if the distribution is 1D or 2D
+        if distribution.ndim == 1:
+            # Step 1: Transfer all species mass from smaller to larger particles
+            distribution[large_index] += distribution[small_index]
+            # Step 2: Zero out the mass of the smaller particles
+            distribution[small_index] = 0
+            # Step 3: Zero out the concentration of the smaller particles
+            concentration[small_index] = 0
+            return distribution, concentration
+
         # Step 1: Transfer all species mass from smaller to larger particles
         distribution[large_index, :] += distribution[small_index, :]
         # Step 2: Zero out the mass of the smaller particles

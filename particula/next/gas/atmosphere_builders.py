@@ -4,8 +4,9 @@ unit conversion, and a fluent interface."""
 import logging
 from particula.next.abc_builder import (
     BuilderABC,
-    BuilderPressureMixin,
-    BuilderTemperatureMixin,
+)
+from particula.next.builder_mixin import (
+    BuilderPressureMixin, BuilderTemperatureMixin
 )
 from particula.next.gas.species import GasSpecies
 from particula.next.gas.atmosphere import Atmosphere

@@ -19,6 +19,8 @@ from particula.util.input_handling import convert_units
 
 from particula.next.abc_builder import (
     BuilderABC,
+)
+from particula.next.builder_mixin import (
     BuilderDistributionStrategyMixin,
     BuilderSurfaceStrategyMixin,
     BuilderActivityStrategyMixin,
@@ -27,12 +29,16 @@ from particula.next.abc_builder import (
     BuilderMassMixin,
     BuilderDensityMixin,
     BuilderChargeMixin,
+    BuilderVolumeMixin,
+    BuilderLognormalMixin,
+    BuilderParticleResolvedCountMixin,
 )
 from particula.next.particles.distribution_strategies import (
     RadiiBasedMovingBin,
+    ParticleResolvedSpeciatedMass,
 )
 from particula.next.particles.activity_strategies import (
-    IdealActivityMass,
+    ActivityIdealMass,
 )
 from particula.next.particles.surface_strategies import (
     SurfaceStrategyVolume,
@@ -41,12 +47,13 @@ from particula.next.particles.representation import ParticleRepresentation
 from particula.next.particles.properties.lognormal_size_distribution import (
     lognormal_pdf_distribution,
     lognormal_pmf_distribution,
+    lognormal_sample_distribution,
 )
 
 logger = logging.getLogger("particula")
 
 
-class MassParticleRepresentationBuilder(
+class ParticleMassRepresentationBuilder(
     BuilderABC,
     BuilderDistributionStrategyMixin,
     BuilderActivityStrategyMixin,
@@ -58,17 +65,15 @@ class MassParticleRepresentationBuilder(
 ):  # pylint: disable=too-many-ancestors
     """General ParticleRepresentation objects with mass-based bins.
 
-    Methods:
-        set_distribution_strategy(strategy): Set the DistributionStrategy.
-        set_activity_strategy(strategy): Set the ActivityStrategy.
-        set_surface_strategy(strategy): Set the SurfaceStrategy.
-        set_mass(mass, mass_units): Set the mass of the particles. Default
-            units are 'kg'.
-        set_density(density, density_units): Set the density of the particles.
-            Default units are 'kg/m**3'.
-        set_concentration(concentration, concentration_units): Set the
-            concentration of the particles. Default units are '/m**3'.
-        set_charge(charge, charge_units): Set the number of charges.
+    Attributes:
+        distribution_strategy: Set the DistributionStrategy.
+        activity_strategy: Set the ActivityStrategy.
+        surface_strategy: Set the SurfaceStrategy.
+        mass: Set the mass of the particles. Default units are 'kg'.
+        density: Set the density of the particles. Default units are 'kg/m^3'.
+        concentration: Set the concentration of the particles.
+            Default units are '1/m^3'.
+        charge: Set the number of charges.
     """
 
     def __init__(self):
@@ -108,7 +113,7 @@ class MassParticleRepresentationBuilder(
         )
 
 
-class RadiusParticleRepresentationBuilder(
+class ParticleRadiusRepresentationBuilder(
     BuilderABC,
     BuilderDistributionStrategyMixin,
     BuilderActivityStrategyMixin,
@@ -120,17 +125,15 @@ class RadiusParticleRepresentationBuilder(
 ):  # pylint: disable=too-many-ancestors
     """General ParticleRepresentation objects with radius-based bins.
 
-    Methods:
-        set_distribution_strategy(strategy): Set the DistributionStrategy.
-        set_activity_strategy(strategy): Set the ActivityStrategy.
-        set_surface_strategy(strategy): Set the SurfaceStrategy.
-        set_radius(radius, radius_units): Set the radius of the particles.
-            Default units are 'm'.
-        set_density(density, density_units): Set the density of the particles.
-            Default units are 'kg/m**3'.
-        set_concentration(concentration, concentration_units): Set the
-            concentration of the particles. Default units are '1/m^3'.
-        set_charge(charge, charge_units): Set the number of charges.
+    Attributes:
+        distribution_strategy: Set the DistributionStrategy.
+        activity_strategy: Set the ActivityStrategy.
+        surface_strategy: Set the SurfaceStrategy.
+        radius: Set the radius of the particles. Default units are 'm'.
+        density: Set the density of the particles. Default units are 'kg/m**3'.
+        concentration: Set the concentration of the particles. Default units
+            are '1/m^3'.
+        charge: Set the number of charges.
     """
 
     def __init__(self):
@@ -170,7 +173,7 @@ class RadiusParticleRepresentationBuilder(
         )
 
 
-class LimitedRadiusParticleBuilder(
+class PresetParticleRadiusBuilder(
     BuilderABC,
     BuilderDistributionStrategyMixin,
     BuilderActivityStrategyMixin,
@@ -179,22 +182,19 @@ class LimitedRadiusParticleBuilder(
     BuilderDensityMixin,
     BuilderConcentrationMixin,
     BuilderChargeMixin,
+    BuilderLognormalMixin,
 ):  # pylint: disable=too-many-ancestors
     """General ParticleRepresentation objects with radius-based bins.
 
-    Methods:
-        set_mode(mode,mode_units): Set the mode(s) of the distribution.
+    Attributes:
+        mode: Set the mode(s) of the distribution.
             Default is np.array([100e-9, 1e-6]) meters.
-        set_geometric_standard_deviation(
-            geometric_standard_deviation,geometric_standard_deviation_units):
-                Set the geometric standard deviation(s) of the distribution.
-                Default is np.array([1.2, 1.4]).
-        set_number_concentration(
-            number_concentration,number_concentration_units): Set the
-                number concentration of the distribution. Default is
-                np.array([1e4*1e6, 1e3*1e6]) particles/m**3.
-        set_radius_bins(radius_bins,radius_bins_units): Set the radius bins
-            of the distribution. Default is np.logspace(-9, -4, 250), meters.
+        geometric_standard_deviation: Set the geometric standard deviation(s)
+            of the distribution. Default is np.array([1.2, 1.4]).
+        number_concentration: Set the number concentration of the distribution.
+            Default is np.array([1e4x1e6, 1e3x1e6]) particles/m^3.
+        radius_bins: Set the radius bins of the distribution. Default is
+            np.logspace(-9, -4, 250), meters.
     """
 
     def __init__(self):
@@ -211,6 +211,7 @@ class LimitedRadiusParticleBuilder(
         BuilderDensityMixin.__init__(self)
         BuilderConcentrationMixin.__init__(self, default_units="1/m^3")
         BuilderChargeMixin.__init__(self)
+        BuilderLognormalMixin.__init__(self)
 
         # set defaults
         self.mode = np.array([100e-9, 1e-6])
@@ -218,70 +219,13 @@ class LimitedRadiusParticleBuilder(
         self.number_concentration = np.array([1e4 * 1e6, 1e3 * 1e6])
         self.radius_bins = np.logspace(-9, -4, 250)
         self.set_distribution_strategy(RadiiBasedMovingBin())
-        self.set_activity_strategy(IdealActivityMass())
+        self.set_activity_strategy(ActivityIdealMass())
         self.set_surface_strategy(
             SurfaceStrategyVolume(surface_tension=0.072, density=1000)
         )
         self.set_density(1000, "kg/m^3")
         self.set_charge(0)
         self.distribution_type = "pdf"
-
-    def set_mode(
-        self,
-        mode: NDArray[np.float64],
-        mode_units: str = "m",
-    ):
-        """Set the modes for distribution
-
-        Args:
-            modes: The modes for the radius.
-            modes_units: The units for the modes.
-        """
-        if np.any(mode < 0):
-            message = "The mode must be positive."
-            logger.error(message)
-            raise ValueError(message)
-        self.mode = mode * convert_units(mode_units, "m")
-        return self
-
-    def set_geometric_standard_deviation(
-        self,
-        geometric_standard_deviation: NDArray[np.float64],
-        geometric_standard_deviation_units: Optional[str] = None,
-    ):
-        """Set the geometric standard deviation for the distribution
-
-        Args:
-            geometric_standard_deviation: The geometric standard deviation for
-            the radius.
-        """
-        if np.any(geometric_standard_deviation < 0):
-            message = "The geometric standard deviation must be positive."
-            logger.error(message)
-            raise ValueError(message)
-        if geometric_standard_deviation_units is not None:
-            logger.warning("Ignoring units for surface strategy parameter.")
-        self.geometric_standard_deviation = geometric_standard_deviation
-        return self
-
-    def set_number_concentration(
-        self,
-        number_concentration: NDArray[np.float64],
-        number_concentration_units: str = "1/m^3",
-    ):
-        """Set the number concentration for the distribution
-
-        Args:
-            number_concentration: The number concentration for the radius.
-        """
-        if np.any(number_concentration < 0):
-            message = "The number concentration must be positive."
-            logger.error(message)
-            raise ValueError(message)
-        self.number_concentration = number_concentration * convert_units(
-            number_concentration_units, "1/m^3"
-        )
-        return self
 
     def set_radius_bins(
         self,
@@ -290,7 +234,7 @@ class LimitedRadiusParticleBuilder(
     ):
         """Set the radius bins for the distribution
 
-        Args:
+        Arguments:
             radius_bins: The radius bins for the distribution.
         """
         if np.any(radius_bins < 0):
@@ -307,7 +251,7 @@ class LimitedRadiusParticleBuilder(
     ):
         """Set the distribution type for the particle representation.
 
-        Args:
+        Arguments:
             distribution_type: The type of distribution to use.
         """
         if distribution_type not in ["pdf", "pmf"]:
@@ -356,4 +300,181 @@ class LimitedRadiusParticleBuilder(
             density=self.density,  # type: ignore
             concentration=number_concentration,  # type: ignore
             charge=self.charge,  # type: ignore
+        )
+
+
+class ResolvedParticleMassRepresentationBuilder(
+    BuilderABC,
+    BuilderDistributionStrategyMixin,
+    BuilderActivityStrategyMixin,
+    BuilderSurfaceStrategyMixin,
+    BuilderDensityMixin,
+    BuilderChargeMixin,
+    BuilderVolumeMixin,
+    BuilderMassMixin,
+):  # pylint: disable=too-many-ancestors
+    """
+    Builder class for constructing ParticleRepresentation objects with
+    resolved masses.
+
+    This class allows you to set various attributes for a particle
+    representation, such as distribution strategy, mass, density, charge,
+    volume, and more. These attributes are validated and there a no presets.
+
+    Attributes:
+        distribution_strategy: Set the distribution strategy for particles.
+        activity_strategy: Set the activity strategy for the particles.
+        surface_strategy: Set the surface strategy for the particles.
+        mass: Set the particle mass. Defaults to 'kg'.
+        density: Set the particle density. Defaults to 'kg/m^3'.
+        charge: Set the particle charge.
+        volume: Set the particle volume. Defaults to 'm^3'.
+    """
+
+    def __init__(self):
+        required_parameters = [
+            "distribution_strategy",
+            "activity_strategy",
+            "surface_strategy",
+            "mass",
+            "density",
+            "charge",
+            "volume",
+        ]
+        BuilderABC.__init__(self, required_parameters)
+        BuilderDistributionStrategyMixin.__init__(self)
+        BuilderActivityStrategyMixin.__init__(self)
+        BuilderSurfaceStrategyMixin.__init__(self)
+        BuilderMassMixin.__init__(self)
+        BuilderDensityMixin.__init__(self)
+        BuilderChargeMixin.__init__(self)
+        BuilderVolumeMixin.__init__(self)
+
+    def build(self) -> ParticleRepresentation:
+        """
+        Validate and return a ParticleRepresentation object.
+
+        This method validates all the required attributes and builds a particle
+        representation with a lognormal size distribution.
+
+        Returns:
+            ParticleRepresentation: A validated particle representation object.
+        """
+        number_concentration = np.ones_like(  # type: ignore
+            self.mass, dtype=np.float64  # type: ignore
+        )
+
+        self.pre_build_check()
+        return ParticleRepresentation(
+            strategy=self.distribution_strategy,  # type: ignore
+            activity=self.activity_strategy,  # type: ignore
+            surface=self.surface_strategy,  # type: ignore
+            distribution=self.mass,  # type: ignore
+            density=self.density,  # type: ignore
+            concentration=number_concentration,  # type: ignore
+            charge=self.charge,  # type: ignore
+            volume=self.volume,  # type: ignore
+        )
+
+
+class PresetResolvedParticleMassBuilder(
+    BuilderABC,
+    BuilderDistributionStrategyMixin,
+    BuilderActivityStrategyMixin,
+    BuilderSurfaceStrategyMixin,
+    BuilderDensityMixin,
+    BuilderChargeMixin,
+    BuilderLognormalMixin,
+    BuilderVolumeMixin,
+    BuilderParticleResolvedCountMixin,
+):  # pylint: disable=too-many-ancestors
+    """General ParticleRepresentation objects with particle resolved masses.
+
+    This class has preset values for all the attributes, and allows you to
+    override them as needed. This is useful when you want to quickly
+    particle representation object with resolved masses.
+
+    Attributes:
+        distribution_strategy: Set the DistributionStrategy.
+        activity_strategy: Set the ActivityStrategy.
+        surface_strategy: Set the SurfaceStrategy.
+        mass: Set the mass of the particles Default
+            units are 'kg'.
+        density: Set the density of the particles.
+            Default units are 'kg/m^3'.
+        charge: Set the number of charges.
+        mode: Set the mode(s) of the distribution.
+            Default is np.array([100e-9, 1e-6]) meters.
+        geometric_standard_deviation: Set the geometric standard
+            deviation(s) of the distribution. Default is np.array([1.2, 1.4]).
+        number_concentration: Set the number concentration of the
+            distribution. Default is np.array([1e4 1e6, 1e3 1e6])
+            particles/m^3.
+        particle_resolved_count: Set the number of resolved particles.
+    """
+
+    def __init__(self):
+        required_parameters = [
+            "mode",
+            "geometric_standard_deviation",
+            "number_concentration",
+            "particle_resolved_count",
+            "volume",
+        ]
+        BuilderABC.__init__(self, required_parameters)
+        BuilderDistributionStrategyMixin.__init__(self)
+        BuilderActivityStrategyMixin.__init__(self)
+        BuilderSurfaceStrategyMixin.__init__(self)
+        BuilderDensityMixin.__init__(self)
+        BuilderChargeMixin.__init__(self)
+        BuilderLognormalMixin.__init__(self)
+        BuilderVolumeMixin.__init__(self)
+        BuilderParticleResolvedCountMixin.__init__(self)
+
+        # set defaults
+        self.mode = np.array([100e-9, 1e-6])
+        self.geometric_standard_deviation = np.array([1.2, 1.4])
+        self.number_concentration = np.array([1e4 * 1e6, 1e3 * 1e6])
+        self.particle_resolved_count = int(10_000)
+        self.set_distribution_strategy(ParticleResolvedSpeciatedMass())
+        self.set_activity_strategy(ActivityIdealMass())
+        self.set_surface_strategy(
+            SurfaceStrategyVolume(surface_tension=0.072, density=1000)
+        )
+        self.set_density(1000, "kg/m^3")
+        self.set_charge(0)
+        self.set_volume(1)
+
+    def build(self) -> ParticleRepresentation:
+        """Validate and return the ParticleRepresentation object.
+
+        This will build a distribution of particles with a lognormal size
+        distribution, before returning the ParticleRepresentation object.
+
+        Returns:
+            The validated ParticleRepresentation object.
+        """
+
+        resolved_radii = lognormal_sample_distribution(
+            mode=self.mode,
+            geometric_standard_deviation=self.geometric_standard_deviation,
+            number_of_particles=self.number_concentration,
+            number_of_samples=self.particle_resolved_count,
+        )
+        # convert radii to masses
+        resolved_masses = np.float64(
+            4 / 3 * np.pi * resolved_radii**3 * self.density  # type: ignore
+        )
+        number_concentration = np.ones_like(resolved_masses, dtype=np.float64)
+
+        self.pre_build_check()
+        return ParticleRepresentation(
+            strategy=self.distribution_strategy,  # type: ignore
+            activity=self.activity_strategy,  # type: ignore
+            surface=self.surface_strategy,  # type: ignore
+            distribution=resolved_masses,  # type: ignore
+            density=self.density,  # type: ignore
+            concentration=number_concentration,
+            charge=self.charge,  # type: ignore
+            volume=self.volume,  # type: ignore
         )

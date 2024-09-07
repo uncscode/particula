@@ -52,6 +52,22 @@ def test_mass_transfer_rate():
     )
 
 
+def test_mass_transfer_mulit_particle_rate():
+    """Test the mass_transfer_rate multi radii function."""
+    pressure_delta = np.array([10.0, 15.0])
+    first_order_mass_transport = np.array([1e-17, 2e-17])
+    temperature = 300.0
+    molar_mass = 0.02897
+    expected_result = np.array([1.16143004e-21, 3.48429013e-21])
+    result = mass_transfer_rate(
+        pressure_delta,
+        first_order_mass_transport,
+        temperature,
+        molar_mass
+    )
+    np.testing.assert_allclose(result, expected_result, rtol=1e-8)
+
+
 def test_multi_species_mass_transfer_rate():
     """Test the mass_transfer_rate function for multiple species."""
     pressure_delta = np.array([10.0, 15.0])
@@ -97,6 +113,12 @@ def test_single_species_condensation_not_enough_gas_mass():
     )
     np.testing.assert_allclose(
         result_direct, expected_mass_transfer, rtol=1e-8)
+    # second calc
+    result_direct2 = calculate_mass_transfer_single_species(
+        mass_rate, time_step, gas_mass, particle_mass, particle_concentration
+    )
+    np.testing.assert_allclose(
+        result_direct2, expected_mass_transfer, rtol=1e-8)
 
     # Calculate using the general helper function
     result = calculate_mass_transfer(

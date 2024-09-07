@@ -6,14 +6,14 @@ from particula.next.particles.distribution_strategies import (
     RadiiBasedMovingBin,
 )
 from particula.next.particles.surface_strategies import SurfaceStrategyVolume
-from particula.next.particles.activity_strategies import IdealActivityMass
+from particula.next.particles.activity_strategies import ActivityIdealMass
 
 
 def test_particle_properties():
     """Building ParticleRepresentation properties."""
 
     set_strategy = RadiiBasedMovingBin()
-    set_activity = IdealActivityMass()
+    set_activity = ActivityIdealMass()
     set_surface = SurfaceStrategyVolume()
     set_distribution = np.array([1.0, 2.0, 3.0])
     set_density = 1.0

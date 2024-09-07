@@ -34,6 +34,7 @@ from particula.next.dynamics.coagulation.strategy import (
     DiscreteSimple,
     DiscreteGeneral,
     ContinuousGeneralPDF,
+    ParticleResolved,
 )
 from particula.next.dynamics.coagulation.rate import (
     continuous_loss,

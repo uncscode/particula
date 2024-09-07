@@ -4,7 +4,9 @@ and checking/validation of the parameters.
 
 import pytest
 from particula.next.gas.species import GasSpecies
-from particula.next.gas.species_builder import GasSpeciesBuilder
+from particula.next.gas.species_builders import (
+    GasSpeciesBuilder, PresetGasSpeciesBuilder,
+)
 from particula.next.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy)
 
@@ -118,3 +120,14 @@ def test_build():
     gas_species = builder.build()
     assert isinstance(gas_species, GasSpecies)
     assert gas_species.get_name() == "Oxygen"
+
+
+def test_preset_builder():
+    """Test the preset gas species builder."""
+    builder = PresetGasSpeciesBuilder()
+    gas_species = builder.build()
+    assert isinstance(gas_species, GasSpecies)
+    assert gas_species.get_name() == "Preset100"
+    assert gas_species.get_molar_mass() == 0.100
+    assert gas_species.get_condensable() is False
+    assert gas_species.get_concentration() == 1.0

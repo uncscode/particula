@@ -9,14 +9,14 @@ from particula.next.particles.distribution_strategies import (
     ParticleResolvedSpeciatedMass,
 )
 from particula.next.particles.surface_strategies import SurfaceStrategyVolume
-from particula.next.particles.activity_strategies import IdealActivityMass
+from particula.next.particles.activity_strategies import ActivityIdealMass
 
 
 mass_based_strategy = MassBasedMovingBin()
 radii_based_strategy = RadiiBasedMovingBin()
 speciated_mass_strategy = SpeciatedMassMovingBin()
 surface_strategy = SurfaceStrategyVolume()
-activity_strategy = IdealActivityMass()
+activity_strategy = ActivityIdealMass()
 particle_resolved_mass_strategy = ParticleResolvedSpeciatedMass()
 
 
@@ -292,13 +292,14 @@ def test_particle_resolved_mass_strategy_get_radius():
     expected_radii = (3 * volumes / (4 * np.pi)) ** (
         1 / 3
     )  # Radius calculation
-    result = particle_resolved_mass_strategy.get_radius(distribution, densities)
+    result = particle_resolved_mass_strategy.get_radius(
+        distribution, densities
+    )
     np.testing.assert_array_almost_equal(result, expected_radii)
 
 
 def test_particle_resolved_mass_strategy_get_total_mass():
-    """Test particle-resolved mass strategy total mass calculation
-    """
+    """Test particle-resolved mass strategy total mass calculation"""
     # Example 2D distribution matrix
     distribution = np.array(
         [[100, 200], [300, 400], [500, 600]], dtype=np.float64

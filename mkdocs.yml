@@ -11,8 +11,9 @@ theme:
     - navigation.sections
     - navigation.tracking
     - navigation.top
+    - navigation.indexes
     # - navigation.footer
-    - toc.integrate
+    # - toc.integrate
     - header.autohide
     - search.suggest
     - search.highlight

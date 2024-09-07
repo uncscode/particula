@@ -621,11 +621,9 @@ class ParticleResolved(CoagulationStrategy):
 
     def __init__(
         self,
-        kernel_strategy: KernelStrategy,
         kernel_radius: Optional[NDArray[np.float64]] = None,
         kernel_bins_number: int = 100,
     ):
-        self.kernel_strategy = kernel_strategy
         self.kernel_radius = kernel_radius
         self.kernel_bins_number = kernel_bins_number
 
@@ -679,7 +677,7 @@ class ParticleResolved(CoagulationStrategy):
         # need to update later with the correct mass dependency
         radius_bins = self.get_kernel_radius(particle)
         mass_bins = 4 / 3 * np.pi * np.power(  # type: ignore
-            x1=radius_bins, x2=3) * 1000
+            radius_bins, 3) * 1000
         return brownian_coagulation_kernel_via_system_state(
             radius_particle=radius_bins,  # type: ignore
             mass_particle=mass_bins,  # type: ignore

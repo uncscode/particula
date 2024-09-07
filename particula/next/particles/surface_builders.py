@@ -7,8 +7,13 @@ and converts the units of the parameters if necessary.
 
 import logging
 from particula.next.abc_builder import (
-    BuilderABC, BuilderDensityMixin, BuilderSurfaceTensionMixin,
-    BuilderMolarMassMixin)
+    BuilderABC,
+)
+from particula.next.builder_mixin import (
+    BuilderDensityMixin,
+    BuilderSurfaceTensionMixin,
+    BuilderMolarMassMixin,
+)
 from particula.next.particles.surface_strategies import (
     SurfaceStrategyMass, SurfaceStrategyMolar, SurfaceStrategyVolume
 )
