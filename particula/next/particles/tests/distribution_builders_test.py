@@ -8,10 +8,11 @@ The Strategy is tested independently.
 
 from particula.next.particles.distribution_builders import (
     MassBasedMovingBinBuilder, RadiiBasedMovingBinBuilder,
-    SpeciatedMassMovingBinBuilder
+    SpeciatedMassMovingBinBuilder, ParticleResolvedSpeciatedMassBuilder
 )
 from particula.next.particles.distribution_strategies import (
-    MassBasedMovingBin, RadiiBasedMovingBin, SpeciatedMassMovingBin
+    MassBasedMovingBin, RadiiBasedMovingBin, SpeciatedMassMovingBin,
+    ParticleResolvedSpeciatedMass
 )
 
 
@@ -34,3 +35,10 @@ def test_speciated_mass_moving_bin_builder():
     builder = SpeciatedMassMovingBinBuilder()
     distribution = builder.build()
     assert isinstance(distribution, SpeciatedMassMovingBin)
+
+
+def test_particle_resolved_speciated_mass_builder():
+    """Test returning the ParticleResolvedSpeciatedMass."""
+    builder = ParticleResolvedSpeciatedMassBuilder()
+    distribution = builder.build()
+    assert isinstance(distribution, ParticleResolvedSpeciatedMass)

@@ -6,6 +6,7 @@ with other builder patterns in the codebase.
 
 from particula.next.particles.distribution_strategies import (
     MassBasedMovingBin, RadiiBasedMovingBin, SpeciatedMassMovingBin,
+    ParticleResolvedSpeciatedMass,
 )
 from particula.next.abc_builder import BuilderABC
 
@@ -44,3 +45,14 @@ class SpeciatedMassMovingBinBuilder(BuilderABC):
     def build(self) -> SpeciatedMassMovingBin:
         """Builds a SpeciatedMassMovingBin instance."""
         return SpeciatedMassMovingBin()
+
+
+class ParticleResolvedSpeciatedMassBuilder(BuilderABC):
+    """Builds a ParticleResolvedSpeciatedMass instance."""
+
+    def __init__(self) -> None:
+        required_parameters = None
+        BuilderABC.__init__(self, required_parameters)
+
+    def build(self) -> ParticleResolvedSpeciatedMass:
+        return ParticleResolvedSpeciatedMass()

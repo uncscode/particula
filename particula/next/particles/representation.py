@@ -11,6 +11,7 @@ from particula.next.particles.distribution_strategies import (
 )
 
 
+# pylint: disable=too-many-instance-attributes
 class ParticleRepresentation:
     """Everything needed to represent a particle or a collection of particles.
 
@@ -24,10 +25,12 @@ class ParticleRepresentation:
         activity: The activity strategy for the partial pressure calculations.
         surface: The surface strategy for surface tension and Kelvin effect.
         distribution: The distribution data for the particles, which could
-        represent sizes, masses, or another relevant metric.
+            represent sizes, masses, or another relevant metric.
         density: The density of the material from which the particles are made.
         concentration: The concentration of particles within the distribution.
         charge: The charge on each particle.
+        volume: The air volume for simulation of particles in the air,
+            default is 1 m^3. This is only used in ParticleResolved Strategies.
     """
 
     def __init__(
@@ -39,6 +42,7 @@ class ParticleRepresentation:
         density: NDArray[np.float64],
         concentration: NDArray[np.float64],
         charge: NDArray[np.float64],
+        volume: float = 1,
     ):  # pylint: disable=too-many-arguments
         self.strategy = strategy
         self.activity = activity
@@ -47,6 +51,7 @@ class ParticleRepresentation:
         self.density = density
         self.concentration = concentration
         self.charge = charge
+        self.volume = volume
 
     def get_mass(self) -> NDArray[np.float64]:
         """Returns the mass of the particles as calculated by the strategy.
@@ -90,7 +95,7 @@ class ParticleRepresentation:
 
         Args:
             added_mass: The mass to be added per
-            distribution bin.
+                distribution bin.
         """
         (self.distribution, self.concentration) = self.strategy.add_mass(
             self.distribution, self.concentration, self.density, added_mass
@@ -103,6 +108,18 @@ class ParticleRepresentation:
 
         Args:
             added_concentration: The concentration to be
-            added per distribution bin.
+                added per distribution bin.
         """
         self.concentration += added_concentration
+
+    def collide_pairs(
+        self, indices: NDArray[np.int64]
+    ) -> None:
+        """Collide pairs of indices, used for ParticleResolved Strategies.
+
+        Args:
+            indices: The indices to collide.
+        """
+        (self.distribution, self.concentration) = self.strategy.collide_pairs(
+            self.distribution, self.concentration, self.density, indices
+        )

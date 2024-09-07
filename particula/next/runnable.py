@@ -26,12 +26,21 @@ class Runnable(ABC):
         - aerosol (Aerosol): The aerosol instance to modify."""
 
     @abstractmethod
-    def execute(self, aerosol: Aerosol, time_step: float) -> Aerosol:
+    def execute(
+        self,
+        aerosol: Aerosol,
+        time_step: float,
+        sub_steps: int = 1,
+    ) -> Aerosol:
         """Execute the process and modify the aerosol instance.
 
         Parameters:
-        - aerosol (Aerosol): The aerosol instance to modify.
-        - time_step (float): The time step for the process in seconds."""
+            aerosol (Aerosol): The aerosol instance to modify.
+            time_step (float): The time step for the process in seconds.
+            sub_steps (int): The number of sub-steps to use for the process,
+                default is 1. Which means the full time step is used. A value
+                of 2 would mean the time step is divided into two sub-steps.
+        """
 
     def __or__(self, other: "Runnable"):
         """Chain this process with another process using the | operator."""

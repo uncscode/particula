@@ -14,6 +14,7 @@ from particula.next.particles.distribution_strategies import (
     MassBasedMovingBin,
     RadiiBasedMovingBin,
     SpeciatedMassMovingBin,
+    ParticleResolvedSpeciatedMass,
 )
 
 
@@ -33,6 +34,13 @@ def test_speciated_mass_moving_bin():
     """Test factory function for speciated mass moving bin strategy."""
     strategy = DistributionFactory().get_strategy("speciated_mass_moving_bin")
     assert isinstance(strategy, SpeciatedMassMovingBin)
+
+
+def test_particle_resolved_speciated_mass():
+    """Test factory function for particle resolved speciated mass strategy."""
+    strategy = DistributionFactory().get_strategy(
+        "particle_resolved_speciated_mass")
+    assert isinstance(strategy, ParticleResolvedSpeciatedMass)
 
 
 def test_invalid_strategy():

@@ -2,7 +2,8 @@
 """
 
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import Union, Optional
+import logging
 from numpy.typing import NDArray
 import numpy as np
 
@@ -11,10 +12,15 @@ from particula.next.dynamics.coagulation import rate
 from particula.next.dynamics.coagulation.brownian_kernel import (
     brownian_coagulation_kernel_via_system_state,
 )
+from particula.next.dynamics.coagulation.particle_resolved_method import (
+    particle_resolved_coagulation_step,
+)
 from particula.next.dynamics.coagulation.kernel import KernelStrategy
 from particula.next.particles import properties
 from particula.next.gas import properties as gas_properties
 from particula.util.reduced_quantity import reduced_self_broadcast
+
+logger = logging.getLogger("particula")
 
 
 class CoagulationStrategy(ABC):
@@ -23,13 +29,12 @@ class CoagulationStrategy(ABC):
     methods that must be implemented by any coagulation strategy.
 
     Methods:
-    --------
-    - kernel (abstractmethod): Calculate the coagulation kernel.
-    - loss_rate: Calculate the coagulation loss rate.
-    - gain_rate: Calculate the coagulation gain rate.
-    - net_rate: Calculate the net coagulation rate.
-    - diffusive_knudsen: Calculate the diffusive Knudsen number.
-    - coulomb_potential_ratio: Calculate the Coulomb potential ratio.
+        kernel: Calculate the coagulation kernel.
+        loss_rate: Calculate the coagulation loss rate.
+        gain_rate: Calculate the coagulation gain rate.
+        net_rate: Calculate the net coagulation rate.
+        diffusive_knudsen: Calculate the diffusive Knudsen number.
+        coulomb_potential_ratio: Calculate the Coulomb potential ratio.
     """
 
     @abstractmethod
@@ -44,16 +49,14 @@ class CoagulationStrategy(ABC):
         diffusive Knudsen number and Coulomb potential
 
         Args:
-        -----
-        - diffusive_knudsen (NDArray[np.float64]): The diffusive Knudsen number
-        for the particle [dimensionless].
-        - coulomb_potential_ratio (NDArray[np.float64]): The Coulomb potential
-        ratio for the particle [dimensionless].
+            diffusive_knudsen: The diffusive Knudsen number
+                for the particle [dimensionless].
+            coulomb_potential_ratio: The Coulomb potential
+                ratio for the particle [dimensionless].
 
         Returns:
-        --------
-        - NDArray[np.float64]: The dimensionless coagulation kernel for the
-        particle [dimensionless].
+            The dimensionless coagulation kernel for the particle
+                [dimensionless].
         """
 
     @abstractmethod
@@ -68,15 +71,13 @@ class CoagulationStrategy(ABC):
         temperature, and pressure.
 
         Args:
-        -----
-        - particle (Particle class): The particle for which the coagulation
-        kernel is to be calculated.
-        - temperature (float): The temperature of the gas phase [K].
-        - pressure (float): The pressure of the gas phase [Pa].
+            particle: The particle for which the coagulation
+                kernel is to be calculated.
+            temperature: The temperature of the gas phase [K].
+            pressure: The pressure of the gas phase [Pa].
 
         Returns:
-        --------
-        - NDArray[np.float64]: The coagulation kernel for the particle [m^3/s].
+            The coagulation kernel for the particle [m^3/s].
         """
 
     @abstractmethod
@@ -90,15 +91,12 @@ class CoagulationStrategy(ABC):
         distribution, and the coagulation kernel.
 
         Args:
-        -----
-        - particle (Particle class): The particle for which the coagulation
-        loss rate is to be calculated.
-        - kernel (NDArray[np.float64]): The coagulation kernel.
+            particle: The particle for which the coagulation
+                loss rate is to be calculated.
+            kernel: The coagulation kernel.
 
         Returns:
-        --------
-        - Union[float, NDArray[np.float64]]: The coagulation loss rate for the
-        particle [kg/s].
+            The coagulation loss rate for the particle [kg/s].
         """
 
     @abstractmethod
@@ -112,22 +110,19 @@ class CoagulationStrategy(ABC):
         distribution, and the coagulation kernel.
 
         Args:
-        -----
-        - particle (Particle class): The particle for which the coagulation
-        gain rate is to be calculated.
-        - kernel (NDArray[np.float64]): The coagulation kernel.
+            particle: The particle for which the coagulation
+                gain rate is to be calculated.
+            kernel: The coagulation kernel.
 
         Returns:
-        --------
-        - Union[float, NDArray[np.float64]]: The coagulation gain rate for the
-        particle [kg/s].
+            The coagulation gain rate for the particle [kg/s].
 
         Notes:
-        ------
-        May be abstracted to a separate module when different coagulation
-        strategies are implemented (super droplet).
+            May be abstracted to a separate module when different coagulation
+                strategies are implemented (super droplet).
         """
 
+    @abstractmethod
     def net_rate(
         self,
         particle: ParticleRepresentation,
@@ -139,23 +134,37 @@ class CoagulationStrategy(ABC):
         distribution, and the coagulation kernel.
 
         Args:
-        -----
-        - particle (Particle class): The particle class for which the
-        coagulation net rate is to be calculated.
-        - temperature (float): The temperature of the gas phase [K].
-        - pressure (float): The pressure of the gas phase [Pa].
+            particle: The particle class for which the
+                coagulation net rate is to be calculated.
+            temperature: The temperature of the gas phase [K].
+            pressure: The pressure of the gas phase [Pa].
 
         Returns:
-        --------
-        - Union[float, NDArray[np.float64]]: The net coagulation rate for the
-        particle [kg/s].
+            Union[float, NDArray[np.float64]]: The net coagulation rate for the
+                particle [kg/s].
         """
-        kernel = self.kernel(particle, temperature, pressure)
-        return self.gain_rate(
-            particle, kernel
-        ) - self.loss_rate(  # type: ignore
-            particle, kernel
-        )  # type: ignore
+
+    @abstractmethod
+    def step(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+        time_step: float,
+    ) -> ParticleRepresentation:
+        """
+        Perform a single step of the coagulation process.
+
+        Args:
+            particle: The particle for which the coagulation step
+                is to be performed.
+            temperature: The temperature of the gas phase [K].
+            pressure: The pressure of the gas phase [Pa].
+            time_step: The time step for the coagulation process [s].
+
+        Returns:
+            ParticleRepresentation: The particle after the coagulation step.
+        """
 
     def diffusive_knudsen(
         self,
@@ -168,16 +177,14 @@ class CoagulationStrategy(ABC):
         properties, temperature, and pressure.
 
         Args:
-        -----
-        - particle (Particle class): The particle for which the diffusive
-        Knudsen number is to be calculated.
-        - temperature (float): The temperature of the gas phase [K].
-        - pressure (float): The pressure of the gas phase [Pa].
+            particle: The particle for which the diffusive
+                Knudsen number is to be calculated.
+            temperature: The temperature of the gas phase [K].
+            pressure: The pressure of the gas phase [Pa].
 
         Returns:
-        --------
-        - NDArray[np.float64]: The diffusive Knudsen number for the particle
-        [dimensionless].
+            NDArray[np.float64]: The diffusive Knudsen number for the particle
+                [dimensionless].
         """
         # properties calculation for friction factor
         friction_factor = self.friction_factor(
@@ -203,15 +210,13 @@ class CoagulationStrategy(ABC):
         and temperature.
 
         Args:
-        -----
-        - particle (Particle class): The particles for which the Coulomb
-        potential ratio is to be calculated.
-        - temperature (float): The temperature of the gas phase [K].
+            particle: The particles for which the Coulomb
+                potential ratio is to be calculated.
+            temperature: The temperature of the gas phase [K].
 
         Returns:
-        --------
-        - NDArray[np.float64]: The Coulomb potential ratio for the particle
-        [dimensionless].
+            The Coulomb potential ratio for the particle
+                [dimensionless].
         """
         return properties.coulomb_enhancement.ratio(
             radius=particle.get_radius(),
@@ -230,16 +235,13 @@ class CoagulationStrategy(ABC):
         temperature, and pressure.
 
         Args:
-        -----
-        - particle (Particle class): The particle for which the friction factor
-        is to be calculated.
-        - temperature (float): The temperature of the gas phase [K].
-        - pressure (float): The pressure of the gas phase [Pa].
+            particle: The particle for which the friction factor
+                is to be calculated.
+            temperature: The temperature of the gas phase [K].
+            pressure: The pressure of the gas phase [Pa].
 
         Returns:
-        --------
-        - NDArray[np.float64]: The friction factor for the particle
-        [dimensionless].
+            The friction factor for the particle [dimensionless].
         """
         dynamic_viscosity = gas_properties.get_dynamic_viscosity(
             temperature=temperature  # assume standard atmospheric composition
@@ -282,11 +284,12 @@ class DiscreteSimple(CoagulationStrategy):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-
-        raise NotImplementedError(
-            "Dimensionless kernel not implemented in \
-            simple coagulation strategy. Use a general strategy."
+        message = (
+            "Dimensionless kernel not implemented in simple "
+            + "coagulation strategy."
         )
+        logger.error(message)
+        raise NotImplementedError(message)
 
     def kernel(
         self,
@@ -324,6 +327,38 @@ class DiscreteSimple(CoagulationStrategy):
             concentration=particle.concentration,
             kernel=kernel,
         )
+
+    def net_rate(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+    ) -> Union[float, NDArray[np.float64]]:
+
+        kernel = self.kernel(
+            particle=particle, temperature=temperature, pressure=pressure
+        )
+        loss_rate = self.loss_rate(
+            particle=particle, kernel=kernel  # type: ignore
+        )
+        gain_rate = self.gain_rate(
+            particle=particle, kernel=kernel  # type: ignore
+        )
+        return gain_rate - loss_rate
+
+    def step(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+        time_step: float,
+    ) -> ParticleRepresentation:
+
+        particle.add_concentration(
+            self.net_rate(  # type: ignore
+                particle=particle, temperature=temperature, pressure=pressure)
+            * time_step)
+        return particle
 
 
 class DiscreteGeneral(CoagulationStrategy):
@@ -417,6 +452,38 @@ class DiscreteGeneral(CoagulationStrategy):
             kernel=kernel,
         )
 
+    def net_rate(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+    ) -> Union[float, NDArray[np.float64]]:
+
+        kernel = self.kernel(
+            particle=particle, temperature=temperature, pressure=pressure
+        )
+        loss_rate = self.loss_rate(
+            particle=particle, kernel=kernel  # type: ignore
+        )
+        gain_rate = self.gain_rate(
+            particle=particle, kernel=kernel  # type: ignore
+        )
+        return gain_rate - loss_rate
+
+    def step(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+        time_step: float,
+    ) -> ParticleRepresentation:
+
+        particle.add_concentration(
+            self.net_rate(  # type: ignore
+                particle=particle, temperature=temperature, pressure=pressure)
+            * time_step)
+        return particle
+
 
 class ContinuousGeneralPDF(CoagulationStrategy):
     """
@@ -503,3 +570,172 @@ class ContinuousGeneralPDF(CoagulationStrategy):
             concentration=particle.concentration,
             kernel=kernel,
         )
+
+    def net_rate(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+    ) -> Union[float, NDArray[np.float64]]:
+
+        kernel = self.kernel(
+            particle=particle, temperature=temperature, pressure=pressure
+        )
+        loss_rate = self.loss_rate(
+            particle=particle, kernel=kernel  # type: ignore
+        )
+        gain_rate = self.gain_rate(
+            particle=particle, kernel=kernel  # type: ignore
+        )
+        return gain_rate - loss_rate
+
+    def step(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+        time_step: float,
+    ) -> ParticleRepresentation:
+
+        particle.add_concentration(
+            self.net_rate(  # type: ignore
+                particle=particle, temperature=temperature, pressure=pressure)
+            * time_step)
+        return particle
+
+
+class ParticleResolved(CoagulationStrategy):
+    """
+    Particle-resolved coagulation strategy class. This class implements the
+    methods defined in the CoagulationStrategy abstract class. The kernel
+    strategy is passed as an argument to the class, should use a dimensionless
+    kernel representation.
+
+    Methods:
+        kernel: Calculate the coagulation kernel.
+        loss_rate: Not implemented.
+        gain_rate: Not implemented.
+        net_rate: Not implemented.
+        step: Perform a single step of the coagulation process.
+    """
+
+    def __init__(
+        self,
+        kernel_strategy: KernelStrategy,
+        kernel_radius: Optional[NDArray[np.float64]] = None,
+        kernel_bins_number: int = 100,
+    ):
+        self.kernel_strategy = kernel_strategy
+        self.kernel_radius = kernel_radius
+        self.kernel_bins_number = kernel_bins_number
+
+    def get_kernel_radius(
+            self,
+            particle: ParticleRepresentation
+    ) -> NDArray[np.float64]:
+        """Get the binning for the kernel radius.
+
+        If the kernel radius is not set, it will be calculated based on the
+        particle radius.
+
+        Args:
+            particle: The particle for which the kernel radius is to be
+                calculated.
+
+        Returns:
+            The kernel radius for the particle [m].
+        """
+        if self.kernel_radius is not None:
+            return self.kernel_radius
+        # else find the non-zero min and max radii, the log space them
+        min_radius = np.min(particle.get_radius()[particle.get_radius() > 0])
+        max_radius = np.max(particle.get_radius())
+        return np.logspace(
+            np.log10(min_radius), np.log10(max_radius),
+            num=self.kernel_bins_number,
+            base=10,
+            dtype=np.float64
+        )
+
+    def dimensionless_kernel(
+        self,
+        diffusive_knudsen: NDArray[np.float64],
+        coulomb_potential_ratio: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
+
+        message = (
+            "Dimensionless kernel not implemented in simple "
+            + "coagulation strategy."
+        )
+        logger.error(message)
+        raise NotImplementedError(message)
+
+    def kernel(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+    ) -> Union[float, NDArray[np.float64]]:
+        # need to update later with the correct mass dependency
+        radius_bins = self.get_kernel_radius(particle)
+        mass_bins = 4 / 3 * np.pi * np.power(  # type: ignore
+            x1=radius_bins, x2=3) * 1000
+        return brownian_coagulation_kernel_via_system_state(
+            radius_particle=radius_bins,  # type: ignore
+            mass_particle=mass_bins,  # type: ignore
+            temperature=temperature,
+            pressure=pressure,
+        )
+
+    def loss_rate(
+        self,
+        particle: ParticleRepresentation,
+        kernel: NDArray[np.float64],
+    ) -> Union[float, NDArray[np.float64]]:
+
+        message = "Loss rate not implemented in particle-resolved coagulation."
+        logger.error(message)
+        raise NotImplementedError(message)
+
+    def gain_rate(
+        self,
+        particle: ParticleRepresentation,
+        kernel: NDArray[np.float64],
+    ) -> Union[float, NDArray[np.float64]]:
+
+        message = "Gain rate not implemented in particle-resolved coagulation."
+        logger.error(message)
+        raise NotImplementedError(message)
+
+    def net_rate(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+    ) -> Union[float, NDArray[np.float64]]:
+
+        message = "Net rate not implemented in particle-resolved coagulation."
+        logger.error(message)
+        raise NotImplementedError(message)
+
+    def step(
+        self,
+        particle: ParticleRepresentation,
+        temperature: float,
+        pressure: float,
+        time_step: float,
+    ) -> ParticleRepresentation:
+
+        # need to add the particle resolved coagulation step
+        _, _, _, indices = particle_resolved_coagulation_step(
+            particle_radius=particle.get_radius(),
+            kernel=self.kernel(  # type: ignore
+                particle=particle, temperature=temperature, pressure=pressure
+            ),
+            kernel_radius=self.get_kernel_radius(particle),
+            volume=particle.volume,
+            time_step=time_step,
+            random_generator=np.random.default_rng(),
+        )
+        particle.collide_pairs(indices)
+        return particle

@@ -71,7 +71,12 @@ def particle_resolved_coagulation_step(
     volume: float,
     time_step: float,
     random_generator: np.random.Generator,
-) -> Tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+) -> Tuple[
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.int64]
+]:
     """
     Perform a single step of particle coagulation, updating particle radii
     based on coagulation events.
@@ -116,6 +121,8 @@ def particle_resolved_coagulation_step(
     # Initialize loss and gain arrays
     loss = np.zeros_like(particle_radius, dtype=np.float64)
     gain = np.zeros_like(particle_radius, dtype=np.float64)
+    loss_index = np.zeros_like(particle_radius, dtype=np.int64)
+    gain_index = np.zeros_like(particle_radius, dtype=np.int64)
 
     # Iterate over each bin pair to calculate potential coagulation events
     for lower_bin, upper_bin in pair_indices:
@@ -199,11 +206,18 @@ def particle_resolved_coagulation_step(
             small_index=small_index,
             large_index=large_index,
         )
+        loss_index[small_index] = small_index
+        gain_index[small_index] = large_index
 
     # Unsort the particle radii and loss/gain arrays to match the original
     # order
     particle_radius = particle_radius[unsort_indices]
     loss = loss[unsort_indices]
     gain = gain[unsort_indices]
+    loss_gain_index = np.column_stack(
+        [loss_index, gain_index])
+    loss_gain_index = loss_gain_index[unsort_indices]
+    # remove particles with zero radius
+    loss_gain_index = loss_gain_index[loss_gain_index.sum(axis=1) > 0]
 
-    return particle_radius, loss, gain
+    return particle_radius, loss, gain, loss_gain_index
