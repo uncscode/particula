@@ -622,10 +622,12 @@ class ParticleResolved(CoagulationStrategy):
     def __init__(
         self,
         kernel_radius: Optional[NDArray[np.float64]] = None,
-        kernel_bins_number: int = 100,
+        kernel_bins_number: Optional[int] = None,
+        kernel_bins_per_decade: int = 10,
     ):
         self.kernel_radius = kernel_radius
         self.kernel_bins_number = kernel_bins_number
+        self.kernel_bins_per_decade = kernel_bins_per_decade
 
     def get_kernel_radius(
             self,
@@ -648,9 +650,21 @@ class ParticleResolved(CoagulationStrategy):
         # else find the non-zero min and max radii, the log space them
         min_radius = np.min(particle.get_radius()[particle.get_radius() > 0])
         max_radius = np.max(particle.get_radius())
+        if self.kernel_bins_number is not None:
+            return np.logspace(
+                np.log10(min_radius), np.log10(max_radius),
+                num=self.kernel_bins_number,
+                base=10,
+                dtype=np.float64
+            )
+        # else kernel bins per decade
+        num = np.ceil(
+            self.kernel_bins_per_decade * np.log10(max_radius / min_radius),
+        )
+        # print(num)
         return np.logspace(
             np.log10(min_radius), np.log10(max_radius),
-            num=self.kernel_bins_number,
+            num=int(num),
             base=10,
             dtype=np.float64
         )
@@ -725,7 +739,7 @@ class ParticleResolved(CoagulationStrategy):
     ) -> ParticleRepresentation:
 
         # need to add the particle resolved coagulation step
-        _, _, _, indices = particle_resolved_coagulation_step(
+        loss_gain_indices = particle_resolved_coagulation_step(
             particle_radius=particle.get_radius(),
             kernel=self.kernel(  # type: ignore
                 particle=particle, temperature=temperature, pressure=pressure
@@ -735,5 +749,5 @@ class ParticleResolved(CoagulationStrategy):
             time_step=time_step,
             random_generator=np.random.default_rng(),
         )
-        particle.collide_pairs(indices)
+        particle.collide_pairs(loss_gain_indices)
         return particle

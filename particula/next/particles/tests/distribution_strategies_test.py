@@ -175,10 +175,22 @@ def test_speciated_mass_strategy_get_mass():
     distribution = np.array([[100, 200], [300, 400]], dtype=np.float64)
     # Example densities for each species
     densities = np.array([2, 3], dtype=np.float64)
-    expected_mass = distribution
+    concentration = np.ones(len(densities), dtype=np.float64)
+    expected_species_mass = distribution
+    np.testing.assert_array_almost_equal(
+        speciated_mass_strategy.get_species_mass(distribution, densities),
+        expected_species_mass,
+    )
+    expected_mass = np.sum(distribution, axis=1)
     np.testing.assert_array_almost_equal(
         speciated_mass_strategy.get_mass(distribution, densities),
-        expected_mass,
+        expected_mass
+    )
+    expected_total_mass = np.sum(expected_mass)
+    np.testing.assert_array_almost_equal(
+        speciated_mass_strategy.get_total_mass(
+            distribution, concentration, densities),
+        expected_total_mass
     )
 
 
@@ -272,7 +284,7 @@ def test_particle_resolved_mass_strategy_get_mass():
     )
     # Example densities for each species
     densities = np.array([2, 3], dtype=np.float64)
-    expected_mass = distribution
+    expected_mass = np.sum(distribution, axis=1)
     np.testing.assert_array_almost_equal(
         particle_resolved_mass_strategy.get_mass(distribution, densities),
         expected_mass,

@@ -33,8 +33,16 @@ def test_particle_properties():
     mass = particle.get_mass()
     radius = particle.get_radius()
     total_mass = particle.get_total_mass()
+    mass_clone = particle.get_mass(clone=True)
+    radius_clone = particle.get_radius(clone=True)
+    total_mass_clone = particle.get_total_mass(clone=True)
 
     # Validate the types of the returned values
     assert isinstance(mass, np.ndarray)
     assert isinstance(radius, np.ndarray)
     assert isinstance(total_mass, np.float64)
+
+    # Validate clone types
+    assert isinstance(mass_clone, np.ndarray)
+    assert isinstance(radius_clone, np.ndarray)
+    assert isinstance(total_mass_clone, np.float64)

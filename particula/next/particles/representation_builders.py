@@ -225,7 +225,7 @@ class PresetParticleRadiusBuilder(
         )
         self.set_density(1000, "kg/m^3")
         self.set_charge(0)
-        self.distribution_type = "pdf"
+        self.distribution_type = "pmf"
 
     def set_radius_bins(
         self,

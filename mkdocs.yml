@@ -12,6 +12,8 @@ theme:
     - navigation.tracking
     - navigation.top
     - navigation.indexes
+    - navigation.instant
+    - navigation.instant.progress
     # - navigation.footer
     # - toc.integrate
     - header.autohide

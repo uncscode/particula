@@ -36,6 +36,18 @@ class Aerosol:
             else particles
         )
 
+    def __str__(self) -> str:
+        """Returns a string representation of the aerosol.
+
+        Returns:
+            str: A string representation of the aerosol.
+        """
+        message = str(self.atmosphere)
+        for index, particle in enumerate(self.particles):
+            message += f"\n[{index}]: {str(particle)}"
+
+        return message
+
     def iterate_gas(self) -> Iterator[GasSpecies]:
         """Returns an iterator for atmosphere species.
 

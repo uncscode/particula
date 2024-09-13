@@ -26,7 +26,7 @@ def test_build_surface_strategy_molar_dict():
 
     # build the object
     strategy = builder.build()
-    assert strategy.__class__.__name__ == "SurfaceStrategyMolar"
+    assert strategy.get_name() == "SurfaceStrategyMolar"
 
 
 def test_build_surface_strategy_molar_missing_parameters():
@@ -53,7 +53,7 @@ def test_build_surface_strategy_mass_dict():
 
     # build the object
     strategy = builder.build()
-    assert strategy.__class__.__name__ == "SurfaceStrategyMass"
+    assert strategy.get_name() == "SurfaceStrategyMass"
 
 
 def test_build_surface_strategy_mass_missing_parameters():

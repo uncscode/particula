@@ -17,17 +17,35 @@ class DistributionStrategy(ABC):
     particle representations.
 
     Methods:
+        get_name: Returns the type of the distribution strategy.
         get_mass: Calculates the mass of particles.
         get_radius: Calculates the radius of particles.
         get_total_mass: Calculates the total mass of particles.
         add_mass: Adds mass to the distribution of particles.
     """
 
+    def get_name(self) -> str:
+        """Return the type of the distribution strategy."""
+        return self.__class__.__name__
+
     @abstractmethod
+    def get_species_mass(
+        self, distribution: NDArray[np.float64], density: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        """The mass per species in the particles (or bin).
+
+        Args:
+            distribution: The distribution of particle sizes or masses.
+            density: The density of the particles.
+
+        Returns:
+            NDArray[np.float64]: The mass of the particles
+        """
+
     def get_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """Calculates the mass of the particles.
+        """Calculates the mass of the particles (or bin).
 
         Args:
             distribution: The distribution of particle sizes or masses.
@@ -36,6 +54,32 @@ class DistributionStrategy(ABC):
         Returns:
             NDArray[np.float64]: The mass of the particles.
         """
+        # one species present
+        if distribution.ndim == 1:
+            return self.get_species_mass(distribution, density)
+        # each column represents a species
+        return np.sum(self.get_species_mass(distribution, density), axis=1)
+
+    def get_total_mass(
+        self,
+        distribution: NDArray[np.float64],
+        concentration: NDArray[np.float64],
+        density: NDArray[np.float64],
+    ) -> np.float64:
+        """Calculates the total mass of all particles (or bin).
+
+        Args:
+            distribution: The distribution of particle sizes or masses.
+            concentration: The concentration of each particle size or mass in
+            the distribution.
+            density: The density of the particles.
+
+        Returns:
+            np.float64: The total mass of the particles.
+        """
+        # Calculate the mass of each particle and multiply by the concentration
+        masses = self.get_mass(distribution, density)
+        return np.sum(masses * concentration)
 
     @abstractmethod
     def get_radius(
@@ -49,25 +93,6 @@ class DistributionStrategy(ABC):
 
         Returns:
             NDArray[np.float64]: The radius of the particles.
-        """
-
-    @abstractmethod
-    def get_total_mass(
-        self,
-        distribution: NDArray[np.float64],
-        concentration: NDArray[np.float64],
-        density: NDArray[np.float64],
-    ) -> np.float64:
-        """Calculates the total mass of particles.
-
-        Args:
-            distribution: The distribution of particle sizes or masses.
-            concentration: The concentration of each particle size or mass in
-            the distribution.
-            density: The density of the particles.
-
-        Returns:
-            np.float64: The total mass of the particles.
         """
 
     @abstractmethod
@@ -123,7 +148,7 @@ class MassBasedMovingBin(DistributionStrategy):
     bins when adding mass to the distribution.
     """
 
-    def get_mass(
+    def get_species_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         # In a mass-based strategy, the mass distribution is directly returned.
@@ -136,16 +161,6 @@ class MassBasedMovingBin(DistributionStrategy):
         # then calculate the radius.
         volumes = distribution / density
         return (3 * volumes / (4 * np.pi)) ** (1 / 3)
-
-    def get_total_mass(
-        self,
-        distribution: NDArray[np.float64],
-        concentration: NDArray[np.float64],
-        density: NDArray[np.float64],
-    ) -> np.float64:
-        # Calculate the total mass by summing the product of the mass
-        # distribution and its concentration.
-        return np.sum(distribution * concentration)
 
     def add_mass(
         self,
@@ -179,7 +194,7 @@ class RadiiBasedMovingBin(DistributionStrategy):
     the particle's radius, number concentration, and density.
     """
 
-    def get_mass(
+    def get_species_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         # Calculate the volume of each particle
@@ -193,17 +208,6 @@ class RadiiBasedMovingBin(DistributionStrategy):
     ) -> NDArray[np.float64]:
         return distribution  # Radii are directly available
 
-    def get_total_mass(
-        self,
-        distribution: NDArray[np.float64],
-        concentration: NDArray[np.float64],
-        density: NDArray[np.float64],
-    ) -> np.float64:
-        # Calculate individual masses
-        masses = self.get_mass(distribution, density)
-        # Total mass is the sum of individual masses times their concentrations
-        return np.sum(masses * concentration)
-
     def add_mass(
         self,
         distribution: NDArray[np.float64],
@@ -213,9 +217,7 @@ class RadiiBasedMovingBin(DistributionStrategy):
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         # Step 1: Calculate mass added per particle
         mass_per_particle = np.where(
-            concentration > 0,
-            added_mass / concentration,
-            0
+            concentration > 0, added_mass / concentration, 0
         )
         # Step 2: Calculate new volumes
         initial_volumes = (4 / 3) * np.pi * np.power(distribution, 3)
@@ -249,12 +251,9 @@ class SpeciatedMassMovingBin(DistributionStrategy):
     the particle concentration.
     """
 
-    def get_mass(
+    def get_species_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        # Broadcasting works natively as each column represents a species
-        if distribution.ndim == 1:
-            return distribution
         return distribution
 
     def get_radius(
@@ -263,16 +262,6 @@ class SpeciatedMassMovingBin(DistributionStrategy):
         # Calculate volume from mass and density, then derive radius
         volumes = np.sum(distribution / density, axis=1)
         return (3 * volumes / (4 * np.pi)) ** (1 / 3)
-
-    def get_total_mass(
-        self,
-        distribution: NDArray[np.float64],
-        concentration: NDArray[np.float64],
-        density: NDArray[np.float64],
-    ) -> np.float64:
-        # Calculate mass for each bin and species, then sum for total mass
-        mass_per_species = np.sum(distribution, axis=1)
-        return np.sum(mass_per_species * concentration)
 
     def add_mass(
         self,
@@ -290,9 +279,7 @@ class SpeciatedMassMovingBin(DistributionStrategy):
             concentration_expand = concentration
         # Step 2: Calculate mass added per particle (handle zero concentration)
         mass_per_particle = np.where(
-            concentration_expand > 0,
-            added_mass / concentration_expand,
-            0
+            concentration_expand > 0, added_mass / concentration_expand, 0
         )
         # Step 3: Update the distribution by adding the mass per particle
         new_distribution = np.maximum(distribution + mass_per_particle, 0)
@@ -323,12 +310,9 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
     the particle concentration.
     """
 
-    def get_mass(
+    def get_species_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        # Broadcasting works natively as each column represents a species
-        if distribution.ndim == 1:
-            return distribution
         return distribution
 
     def get_radius(
@@ -340,17 +324,6 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         else:
             volumes = np.sum(distribution / density, axis=1)
         return (3 * volumes / (4 * np.pi)) ** (1 / 3)
-
-    def get_total_mass(
-        self,
-        distribution: NDArray[np.float64],
-        concentration: NDArray[np.float64],
-        density: NDArray[np.float64],
-    ) -> np.float64:
-        # Calculate mass for each bin and species, then sum for total mass
-        # mass_per_species = self.get_mass(distribution, density)
-        mass_per_species = np.sum(distribution, axis=-1)
-        return np.sum(mass_per_species * concentration)
 
     def add_mass(
         self,
@@ -383,7 +356,8 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         large_index = indices[:, 1]
         # Check if the distribution is 1D or 2D
         if distribution.ndim == 1:
-            # Step 1: Transfer all species mass from smaller to larger particles
+            # Step 1: Transfer all species mass from smaller to larger
+            # particles
             distribution[large_index] += distribution[small_index]
             # Step 2: Zero out the mass of the smaller particles
             distribution[small_index] = 0

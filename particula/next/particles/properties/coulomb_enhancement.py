@@ -28,22 +28,18 @@ def ratio(
     particle interactions.
 
     Args:
-    -----
-    - radius: The radius of the particle [m].
-    - charge: The number of charges on the particle [dimensionless].
-    - temperature: The temperature of the system [K].
+        radius: The radius of the particle [m].
+        charge: The number of charges on the particle [dimensionless].
+        temperature: The temperature of the system [K].
 
     Returns:
-    -------
-    The Coulomb potential ratio [dimensionless].
+        The Coulomb potential ratio [dimensionless].
 
     References:
-    ----------
-    Equation 7 in:
-    Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
-    in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear,
-    and Soft Matter Physics, 85(2).
-    https://doi.org/10.1103/PhysRevE.85.026410
+        Equation (7): Gopalakrishnan, R., & Hogan, C. J. (2012).
+            Coulomb-influenced collisions in aerosols and dusty plasmas.
+            Physical Review E - Statistical, Nonlinear, and Soft Matter
+            Physics, 85(2). (https://doi.org/10.1103/PhysRevE.85.026410)
     """
     if isinstance(radius, np.ndarray):
         # square matrix of radius
@@ -69,20 +65,17 @@ def kinetic(
     particle interactions.
 
     Args:
-    -----
-    - coulomb_potential: The Coulomb potential ratio [dimensionless].
+        coulomb_potential: The Coulomb potential ratio [dimensionless].
 
     Returns:
-    -------
-    - The Coulomb enhancement for the kinetic limit [dimensionless].
+        The Coulomb enhancement for the kinetic limit [dimensionless].
 
     References:
-    ----------
-    Equation 6d and 6e in:
-    Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
-    in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear,
-    and Soft Matter Physics, 85(2).
-    https://doi.org/10.1103/PhysRevE.85.026410
+        Equation 6d and 6e in, Gopalakrishnan, R., & Hogan, C. J. (2012).
+        Coulomb-influenced collisions in aerosols and dusty plasmas.
+        Physical Review E - Statistical, Nonlinear,
+        and Soft Matter Physics, 85(2).
+        (https://doi.org/10.1103/PhysRevE.85.026410)
     """
     # return 1 + coulumb_potential if ratio >=0,
     # otherwise np.exp(coulomb_potential)
@@ -100,22 +93,24 @@ def continuum(
     particle interactions.
 
     Args:
-    -----
-    - coulomb_potential: The Coulomb potential ratio [dimensionless].
+        coulomb_potential: The Coulomb potential ratio [dimensionless].
 
     Returns:
-    -------
-    - The Coulomb enhancement for the continuum limit [dimensionless].
+        The Coulomb enhancement for the continuum limit [dimensionless].
 
     References:
-    ----------
-    Equation 6b in:
-    Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
-    in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear,
-    and Soft Matter Physics, 85(2).
-    https://doi.org/10.1103/PhysRevE.85.026410
+        Equation 6b in: Gopalakrishnan, R., & Hogan, C. J. (2012).
+        Coulomb-influenced collisions in aerosols and dusty plasmas.
+        Physical Review E - Statistical, Nonlinear,
+        and Soft Matter Physics, 85(2).
+        (https://doi.org/10.1103/PhysRevE.85.026410)
     """
     # return coulomb_potential/(1-np.exp(-1*coulomb_potential)) if ratio != 0,
     # otherwise 1
     denominator = 1 - np.exp(-1 * coulomb_potential)
-    return np.where(denominator == 0, 1, coulomb_potential / denominator)
+    return np.divide(
+        coulomb_potential,
+        denominator,
+        out=np.ones_like(denominator),
+        where=denominator != 0,
+    )

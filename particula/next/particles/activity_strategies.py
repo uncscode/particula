@@ -24,6 +24,7 @@ class ActivityStrategy(ABC):
     activity calculations, specifically for calculating vapor pressures.
 
     Methods:
+        get_name: Return the type of the activity strategy.
         activity: Calculate the activity of a species.
         partial_pressure: Calculate the partial pressure of a species in
             the mixture.
@@ -41,6 +42,10 @@ class ActivityStrategy(ABC):
         Returns:
             float or NDArray[float]: Activity of the particle, unitless.
         """
+
+    def get_name(self) -> str:
+        """Return the type of the activity strategy."""
+        return self.__class__.__name__
 
     def partial_pressure(
         self,

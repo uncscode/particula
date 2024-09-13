@@ -23,13 +23,14 @@ class SurfaceStrategy(ABC):
 
     Methods:
         effective_surface_tension: Calculate the effective surface tension of
-        species based on their concentration.
+            species based on their concentration.
         effective_density: Calculate the effective density of species based on
-        their concentration.
+            their concentration.
+        get_name: Return the type of the surface strategy.
         kelvin_radius: Calculate the Kelvin radius which determines the
-        curvature effect on vapor pressure.
+            curvature effect on vapor pressure.
         kelvin_term: Calculate the Kelvin term, which quantifies the effect of
-        particle curvature on vapor pressure.
+            particle curvature on vapor pressure.
     """
 
     @abstractmethod
@@ -57,6 +58,10 @@ class SurfaceStrategy(ABC):
         Returns:
             float or NDArray[float]: Effective density of the species [kg/m^3].
         """
+
+    def get_name(self) -> str:
+        """Return the type of the surface strategy."""
+        return self.__class__.__name__
 
     def kelvin_radius(
         self,

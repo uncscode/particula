@@ -17,7 +17,7 @@ def test_build_ideal_activity_mass():
     """Test building an IdealActivityMass object."""
     builder = ActivityIdealMassBuilder()
     activity = builder.build()
-    assert activity.__class__.__name__ == "ActivityIdealMass"
+    assert activity.get_name() == "ActivityIdealMass"
 
 
 def test_build_ideal_activity_molar_parameter():

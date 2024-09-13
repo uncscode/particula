@@ -4,7 +4,7 @@ Super droplet method for coagulation dynamics.
 Need to validate the code.
 """
 
-from itertools import combinations
+from itertools import combinations_with_replacement
 from typing import Tuple, Union, Optional
 import numpy as np
 from numpy.typing import NDArray
@@ -130,7 +130,7 @@ def event_pairs(
         )
     return (
         kernel_max
-        * 0.5
+        # * 0.5
         * number_in_bins[lower_bin]
         * (number_in_bins[upper_bin] - 1)
     )
@@ -165,6 +165,70 @@ def sample_events(
 
     # Sample the actual number of events from a Poisson distribution
     return generator.poisson(events_exact * time_step)
+
+
+# pylint: disable=too-many-arguments
+def random_choice_indices(
+    lower_bin: int,
+    upper_bin: int,
+    events: int,
+    particle_radius: NDArray[np.float64],
+    bin_indices: NDArray[np.int64],
+    generator: np.random.Generator,
+) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
+    """
+    Filter valid indices and select random indices for coagulation events.
+
+    This function filters particle indices based on bin indices and ensures
+    the selected particles have a positive radius. It then randomly selects
+    indices from both a lower bin and an upper bin for a given number of
+    events.
+
+    Args:
+        lower_bin: The index of the lower bin to filter particles from.
+        upper_bin: The index of the upper bin to filter particles from.
+        events: Number of events (indices) to sample for each bin.
+        particle_radius: A NumPy array of particle radii. Only particles with
+            radius > 0 are considered.
+        bin_indices: A NumPy array of bin indices corresponding to each
+            particle.
+        generator: A NumPy random generator used to sample indices.
+
+    Returns:
+        Tuple:
+            - Indices of particles from the lower bin.
+            - Indices of particles from the upper bin.
+
+    Example:
+        ``` py title="Example choice indices (update)"
+        rng = np.random.default_rng()
+        particle_radius = np.array([0.5, 0.0, 1.2, 0.3, 0.9])
+        bin_indices = np.array([1, 1, 1, 2, 2])
+        lower_bin = 1
+        upper_bin = 2
+        events = 2
+        lower_indices, upper_indices = random_choice_indices(
+            lower_bin, upper_bin, events, particle_radius, bin_indices, rng)
+        # lower_indices: array([0, 4])
+        # upper_indices: array([0, 1])
+        ```
+    """
+    try:
+        # Directly find the indices where the condition is True
+        lower_indices = generator.choice(
+            np.flatnonzero((bin_indices == lower_bin) & (particle_radius > 0)),
+            events,
+            replace=True,
+        )
+        upper_indices = generator.choice(
+            np.flatnonzero((bin_indices == upper_bin) & (particle_radius > 0)),
+            events,
+            replace=True,
+        )
+    except ValueError:
+        # If no valid indices are found, return empty arrays
+        return np.array([], dtype=np.int64), np.array([], dtype=np.int64)
+    return lower_indices, upper_indices
 
 
 def select_random_indices(
@@ -331,12 +395,14 @@ def coagulation_events(
     """
     # Calculate the coagulation probabilities for each particle pair
     coagulation_probabilities = kernel_values / kernel_max
+    # coagulation_probabilities = kernel_values * kernel_max
 
     # Determine which events occur based on these probabilities
     coagulation_occurs = (
-        generator.random(len(coagulation_probabilities))
+        generator.uniform(low=0, high=1, size=len(coagulation_probabilities))
         < coagulation_probabilities
     )
+    # coagulation_occurs = coagulation_probabilities>0
 
     # Return the indices of particles that underwent coagulation
     return small_index[coagulation_occurs], large_index[coagulation_occurs]
@@ -422,7 +488,7 @@ def get_bin_pairs(
         Unique bin pairs for vectorized operations.
     """
     unique_bins = np.unique(bin_indices)
-    return list(combinations(unique_bins, 2))
+    return list(combinations_with_replacement(unique_bins, 2))
 
 
 def calculate_concentration_in_bins(
