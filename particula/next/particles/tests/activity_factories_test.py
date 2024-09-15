@@ -43,7 +43,7 @@ def test_kappa_parameter_strategy_with_parameters():
     strategy = ActivityFactory().get_strategy("kappa_parameter", parameters)
     assert isinstance(strategy, ActivityKappaParameter)
     np.testing.assert_allclose(
-        strategy.kappa, parameters["kappa"][1:], atol=1e-4
+        strategy.kappa, parameters["kappa"], atol=1e-4
     )
     np.testing.assert_allclose(
         strategy.density, parameters["density"], atol=1e-4

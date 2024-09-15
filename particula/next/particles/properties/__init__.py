@@ -61,3 +61,10 @@ from particula.next.particles.properties.lognormal_size_distribution import (
     lognormal_pmf_distribution,
     lognormal_sample_distribution,
 )
+from particula.next.particles.properties.activity_module import (
+    ideal_activity_mass,
+    ideal_activity_molar,
+    ideal_activity_volume,
+    kappa_activity,
+    calculate_partial_pressure,
+)

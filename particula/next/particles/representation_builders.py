@@ -15,7 +15,7 @@ import logging
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.util.input_handling import convert_units
+from particula.util.input_handling import convert_units  # type: ignore
 
 from particula.next.abc_builder import (
     BuilderABC,
@@ -363,6 +363,8 @@ class ResolvedParticleMassRepresentationBuilder(
         number_concentration = np.ones_like(  # type: ignore
             self.mass, dtype=np.float64  # type: ignore
         )
+        if number_concentration.ndim > 1:
+            number_concentration = number_concentration[:, 0]
 
         self.pre_build_check()
         return ParticleRepresentation(

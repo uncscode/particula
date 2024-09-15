@@ -18,6 +18,11 @@ from particula.next.gas.properties.thermal_conductivity import (
 from particula.next.gas.properties.concentration_function import (
     calculate_concentration,
 )
-from particula.next.gas.properties.partial_pressure_function import (
+from particula.next.gas.properties.pressure_function import (
     calculate_partial_pressure,
+)
+from particula.next.gas.properties.vapor_pressure_module import (
+    antoine_vapor_pressure,
+    clausius_clapeyron_vapor_pressure,
+    buck_vapor_pressure,
 )

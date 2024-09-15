@@ -12,7 +12,8 @@ Next is the next iteration of the particula simulation model. It is a complete r
 
 - [ ] Bin Remapping after condensation and evaporation is needed
 - [x] Coagulation needs to be checked for PMF vs PDF handling
-- [ ] ODE solver for both needs to be implemented
+- [x] ODE solver for both needs to be implemented
+- [ ] Condensation check for resolved
 
 ## Scavenging
 

@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from particula.constants import GAS_CONSTANT
 
-from particula.next.gas.properties.partial_pressure_function import (
+from particula.next.gas.properties.pressure_function import (
     calculate_partial_pressure,
 )
 

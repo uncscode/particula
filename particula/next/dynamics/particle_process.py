@@ -8,7 +8,9 @@ import numpy as np
 # Particula imports
 from particula.next.runnable import Runnable
 from particula.next.aerosol import Aerosol
-from particula.next.dynamics.condensation import CondensationStrategy
+from particula.next.dynamics.condensation.condensation_strategies import (
+    CondensationStrategy
+)
 from particula.next.dynamics.coagulation.strategy import CoagulationStrategy
 
 

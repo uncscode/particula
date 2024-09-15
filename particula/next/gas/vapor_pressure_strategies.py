@@ -15,10 +15,14 @@ import numpy as np
 from particula.next.gas.properties.concentration_function import (
     calculate_concentration,
 )
-from particula.next.gas.properties.partial_pressure_function import (
+from particula.next.gas.properties.pressure_function import (
     calculate_partial_pressure,
 )
-from particula.constants import GAS_CONSTANT
+from particula.next.gas.properties.vapor_pressure_module import (
+    antoine_vapor_pressure,
+    buck_vapor_pressure,
+    clausius_clapeyron_vapor_pressure,
+)
 
 
 class VaporPressureStrategy(ABC):
@@ -36,17 +40,14 @@ class VaporPressureStrategy(ABC):
         mass, and temperature.
 
         Args:
-        ----
-        - concentration (float or NDArray[np.float64]): Concentration of the gas
-        in kg/m^3.
-        - molar_mass (float or NDArray[np.float64]): Molar mass of the gas in
-        kg/mol.
-        - temperature (float or NDArray[np.float64]): Temperature in Kelvin.
+            concentration (float or NDArray[np.float64]): Concentration of the
+                gas in kg/m^3.
+            molar_mass (float or NDArray[np.float64]): Molar mass of the gas in
+                kg/mol.
+            temperature (float or NDArray[np.float64]): Temperature in Kelvin.
 
         Returns:
-        -------
-        - partial_pressure (float or NDArray[np.float64]): Partial pressure of
-        the gas in Pascals.
+            partial_pressure: Partial pressure of the gas in Pascals.
         """
         return calculate_partial_pressure(
             concentration, molar_mass, temperature
@@ -63,16 +64,12 @@ class VaporPressureStrategy(ABC):
         temperature.
 
         Args:
-        ----
-        - partial_pressure (float or NDArray[np.float64]): Pressure in Pascals.
-        - molar_mass (float or NDArray[np.float64]): Molar mass of the gas in
-        kg/mol.
-        - temperature (float or NDArray[np.float64]): Temperature in Kelvin.
+            partial_pressure: Pressure in Pascals.
+            molar_mass: Molar mass of the gas in kg/mol.
+            temperature: Temperature in Kelvin.
 
         Returns:
-        -------
-        - concentration (float or NDArray[np.float64]): The concentration of the
-        gas in kg/m^3.
+            concentration: The concentration of the gas in kg/m^3.
         """
         return calculate_concentration(
             partial_pressure, molar_mass, temperature
@@ -89,14 +86,11 @@ class VaporPressureStrategy(ABC):
         temperature.
 
         Args:
-        ----
-        - pressure (float or NDArray[np.float64]): Pressure in Pascals.
-        - temperature (float or NDArray[np.float64]): Temperature in Kelvin.
+            pressure: Pressure in Pascals.
+            temperature: Temperature in Kelvin.
 
         Returns:
-        -------
-        - saturation_ratio (float or NDArray[np.float64]): The saturation ratio
-        of the gas.
+            saturation_ratio: The saturation ratio of the gas.
         """
         return self.partial_pressure(
             concentration, molar_mass, temperature
@@ -185,30 +179,24 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
         """
-        Calculate the pure (saturation) vapor pressure using the Antoine
-        equation.
+        Calculate vapor pressure using the Antoine equation.
 
         Args:
-        ----
-        - temperature (float or NDArray[np.float64]): Temperature in Kelvin.
+            a, b, c: Antoine equation parameters.
+            temperature: Temperature in Kelvin.
 
         Returns:
-        -------
-        - vapor_pressure (float or NDArray[np.float64]): The vapor pressure in
-        Pascals.
+            Vapor pressure in Pascals.
 
         References:
-        ----------
-        - Equation: log10(P) = a - b / (T - c)
-        - https://en.wikipedia.org/wiki/Antoine_equation (but in Kelvin)
-        - Kelvin form:
-        https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781118135341.app1
+            - Equation: log10(P) = a - b / (T - c)
+            - https://en.wikipedia.org/wiki/Antoine_equation (but in Kelvin)
+            - Kelvin form:
+                https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781118135341.app1
         """
-        # Antoine equation for Kelvin temperature
-        vapor_pressure_log = self.a - (self.b / (temperature - self.c))
-        vapor_pressure = 10**vapor_pressure_log
-        # Convert to Pascals as the result from Antoine is in mmHg
-        return vapor_pressure * self.MMHG_TO_PA
+        return antoine_vapor_pressure(
+            a=self.a, b=self.b, c=self.c, temperature=temperature
+        )
 
 
 class ClausiusClapeyronStrategy(VaporPressureStrategy):
@@ -244,30 +232,26 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
         """
-        Calculate the vapor pressure at a new temperature using the
-        Clausius-Clapeyron equation. For ideal gases at low temperatures.
+        Calculate vapor pressure using Clausius-Clapeyron equation.
 
         Args:
-        ----
-        - temperature_initial (float or NDArray[np.float64]): Initial
-        temperature in Kelvin.
-        - pressure_initial (float or NDArray[np.float64]): Initial vapor
-        pressure in Pascals.
-        - temperature_final (float or NDArray[np.float64]): Final temperature
-        in Kelvin.
+            latent_heat: Latent heat of vaporization in J/mol.
+            temperature_initial: Initial temperature in Kelvin.
+            pressure_initial: Initial vapor pressure in Pascals.
+            temperature: Final temperature in Kelvin.
+            gas_constant: gas constant (default is 8.314 J/(mol·K)).
 
         Returns:
-        - vapor_pressure_final (float or NDArray[np.float64]): Final vapor
-        pressure in Pascals.
+            Pure vapor pressure in Pascals.
 
         References:
-        ----------
-        - https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation
-        Ideal_gas_approximation_at_low_temperatures
+            - https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation
         """
-        return self.pressure_initial * np.exp(
-            (self.latent_heat / np.array(GAS_CONSTANT.m))
-            * (1 / self.temperature_initial - 1 / temperature)
+        return clausius_clapeyron_vapor_pressure(
+            latent_heat=self.latent_heat,
+            temperature_initial=self.temperature_initial,
+            pressure_initial=self.pressure_initial,
+            temperature=temperature,
         )
 
 
@@ -279,46 +263,18 @@ class WaterBuckStrategy(VaporPressureStrategy):
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
         """
-        Calculate the pure (saturation) vapor pressure using the Buck
-        equation for water vapor.
+        Calculate vapor pressure using the Buck equation for water vapor.
 
         Args:
-        ----
-        - temperature (float or NDArray[np.float64]): Temperature in Kelvin.
+            temperature: Temperature in Kelvin.
 
         Returns:
-        -------
-        - vapor_pressure (float or NDArray[np.float64]): The vapor pressure in
-        Pascals.
+            Vapor pressure in Pascals.
 
         References:
-        ----------
-        Buck, A. L., 1981: New Equations for Computing Vapor Pressure and
-        Enhancement Factor. J. Appl. Meteor. Climatol., 20, 1527-1532,
-        https://doi.org/10.1175/1520-0450(1981)020<1527:NEFCVP>2.0.CO;2.
-
-        https://en.wikipedia.org/wiki/Arden_Buck_equation
+            - Buck, A. L., 1981: New Equations for Computing Vapor Pressure and
+                Enhancement Factor. J. Appl. Meteor. Climatol., 20, 1527-1532,
+                https://doi.org/10.1175/1520-0450(1981)020<1527:NEFCVP>2.0.CO;2.
+            - https://en.wikipedia.org/wiki/Arden_Buck_equation
         """
-        # Constants for the Buck equation
-        # Ensure input is numpy array for vectorized operations
-        temp = np.array(temperature) - 273.15  # Convert to Celsius
-        temp_below_freezing = temp < 0.0
-        temp_above_freezing = temp >= 0.0
-
-        # Buck equation separated for temperatures below and above freezing
-        vapor_pressure_below_freezing = (
-            6.1115
-            * np.exp((23.036 - temp / 333.7) * temp / (279.82 + temp))
-            * 100
-        )  # Convert from hPa to Pa
-        vapor_pressure_above_freezing = (
-            6.1121
-            * np.exp((18.678 - temp / 234.5) * temp / (257.14 + temp))
-            * 100
-        )  # Convert from hPa to Pa
-
-        # Select the appropriate equation based on temperature
-        return (
-            vapor_pressure_below_freezing * temp_below_freezing
-            + vapor_pressure_above_freezing * temp_above_freezing
-        )
+        return buck_vapor_pressure(temperature)

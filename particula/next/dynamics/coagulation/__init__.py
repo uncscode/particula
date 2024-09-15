@@ -4,9 +4,7 @@ If you want specific sub functions, import them directly from
 `particula.next.dynamics.coagulation.xxx.xxx` instead.
 """
 
-# later: pytype does not like these imports. These also need to be moved
-# up in the import directory to make the particula package more flat. We can
-# fix this later, when we have a better understanding of the package structure.
+# later: pytype does not like these imports.
 
 # pylint: disable=unused-import, disable=line-too-long
 # flake8: noqa
@@ -41,4 +39,11 @@ from particula.next.dynamics.coagulation.rate import (
     discrete_loss,
     discrete_gain,
     continuous_gain,
+)
+from particula.next.dynamics.coagulation.transition_regime import (
+    hard_sphere,
+    coulomb_dyachkov2007,
+    coulomb_gatti2008,
+    coulomb_gopalakrishnan2012,
+    coulomb_chahl2019,
 )

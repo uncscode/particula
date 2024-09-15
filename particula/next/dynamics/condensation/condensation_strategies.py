@@ -43,235 +43,17 @@ import numpy as np
 # particula imports
 from particula.next.particles.representation import ParticleRepresentation
 from particula.next.gas.species import GasSpecies
-from particula.constants import GAS_CONSTANT  # type: ignore
 from particula.next.particles.properties import (
     calculate_knudsen_number,
     vapor_transition_correction,
     partial_pressure_delta,
 )
 from particula.next.gas.properties import molecule_mean_free_path
-
-
-def first_order_mass_transport_k(
-    radius: Union[float, NDArray[np.float64]],
-    vapor_transition: Union[float, NDArray[np.float64]],
-    diffusion_coefficient: Union[float, NDArray[np.float64]] = 2 * 1e-9,
-) -> Union[float, NDArray[np.float64]]:
-    """First-order mass transport coefficient per particle.
-
-    Calculate the first-order mass transport coefficient, K, for a given radius
-    diffusion coefficient, and vapor transition correction factor. For a
-    single particle.
-
-    Args:
-        radius: The radius of the particle [m].
-        diffusion_coefficient: The diffusion coefficient of the vapor [m^2/s],
-        default to air.
-        vapor_transition: The vapor transition correction factor. [unitless]
-
-    Returns:
-        Union[float, NDArray[np.float64]]: The first-order mass transport
-        coefficient per particle (m^3/s).
-
-    References:
-        - Aerosol Modeling: Chapter 2, Equation 2.49 (excluding number)
-        - Mass Diffusivity:
-            [Wikipedia](https://en.wikipedia.org/wiki/Mass_diffusivity)
-    """
-    if (
-        isinstance(vapor_transition, np.ndarray)
-        and vapor_transition.dtype == np.float64
-        and vapor_transition.ndim == 2
-       ):  # extent radius
-        radius = radius[:, np.newaxis]  # type: ignore
-    return (
-        4 * np.pi * radius
-        * diffusion_coefficient * vapor_transition
-    )  # type: ignore
-
-
-def mass_transfer_rate(
-    pressure_delta: Union[float, NDArray[np.float64]],
-    first_order_mass_transport: Union[float, NDArray[np.float64]],
-    temperature: Union[float, NDArray[np.float64]],
-    molar_mass: Union[float, NDArray[np.float64]],
-) -> Union[float, NDArray[np.float64]]:
-    """Calculate the mass transfer rate for a particle.
-
-    Calculate the mass transfer rate based on the difference in partial
-    pressure and the first-order mass transport coefficient.
-
-    Args:
-        pressure_delta: The difference in partial pressure between the gas
-        phase and the particle phase.
-        first_order_mass_transport: The first-order mass transport coefficient
-        per particle.
-        temperature: The temperature at which the mass transfer rate is to be
-        calculated.
-
-    Returns:
-        Union[float, NDArray[np.float64]]: The mass transfer rate for the
-        particle [kg/s].
-
-    References:
-        - Aerosol Modeling Chapter 2, Equation 2.41 (excluding particle number)
-        - Seinfeld and Pandis: "Atmospheric Chemistry and Physics",
-            Equation 13.3
-    """
-    return np.array(
-        first_order_mass_transport
-        * pressure_delta
-        / (GAS_CONSTANT.m / molar_mass * temperature),
-        dtype=np.float64,
-    )
-
-
-def calculate_mass_transfer(
-    mass_rate: NDArray[np.float64],
-    time_step: float,
-    gas_mass: NDArray[np.float64],
-    particle_mass: NDArray[np.float64],
-    particle_concentration: NDArray[np.float64],
-) -> NDArray[np.float64]:
-    """
-    Helper function that routes the mass transfer calculation to either the
-    single-species or multi-species calculation functions based on the input
-    dimensions of gas_mass.
-
-    Args:
-        mass_rate: The rate of mass transfer per particle (kg/s).
-        time_step: The time step for the mass transfer calculation (seconds).
-        gas_mass: The available mass of gas species (kg).
-        particle_mass: The mass of each particle (kg).
-        particle_concentration: The concentration of particles (number/m^3).
-
-    Returns:
-        The amount of mass transferred, accounting for gas and particle
-            limitations.
-    """
-    if gas_mass.size == 1:  # Single species case
-        return calculate_mass_transfer_single_species(
-            mass_rate,
-            time_step,
-            gas_mass,
-            particle_mass,
-            particle_concentration,
-        )
-    # Multiple species case
-    return calculate_mass_transfer_multiple_species(
-        mass_rate,
-        time_step,
-        gas_mass,
-        particle_mass,
-        particle_concentration,
-    )
-
-
-def calculate_mass_transfer_single_species(
-    mass_rate: NDArray[np.float64],
-    time_step: float,
-    gas_mass: NDArray[np.float64],
-    particle_mass: NDArray[np.float64],
-    particle_concentration: NDArray[np.float64],
-) -> NDArray[np.float64]:
-    """
-    Calculate mass transfer for a single gas species (m=1).
-
-    Args:
-        mass_rate: The rate of mass transfer per particle (number*kg/s).
-        time_step: The time step for the mass transfer calculation (seconds).
-        gas_mass: The available mass of gas species (kg).
-        particle_mass: The mass of each particle (kg).
-        particle_concentration: The concentration of particles (number/m^3).
-
-    Returns:
-        The amount of mass transferred for a single gas species.
-    """
-    # Step 1: Calculate the total mass to be transferred
-    # (accounting for particle concentration)
-    mass_to_change = mass_rate * time_step * particle_concentration
-    # Step 2: Calculate the total requested mass
-    total_requested_mass = mass_to_change.sum()
-    # Step 3: Scale the mass if total requested mass exceeds available gas mass
-    if total_requested_mass > gas_mass:
-        scaling_factor = gas_mass / total_requested_mass
-        mass_to_change *= scaling_factor
-    # Step 4: Limit condensation by available gas mass
-    condensible_mass_transfer = np.minimum(mass_to_change, gas_mass)
-    # Step 5: Limit evaporation by available particle mass
-    evaporative_mass_transfer = np.maximum(
-        mass_to_change, -particle_mass * particle_concentration
-    )
-    # Step 6: Determine final transferable mass (condensation or evaporation)
-    transferable_mass = np.where(
-        mass_to_change > 0,  # Condensation scenario
-        condensible_mass_transfer,  # Limited by gas mass
-        evaporative_mass_transfer,  # Limited by particle mass
-    )
-    return transferable_mass
-
-
-def calculate_mass_transfer_multiple_species(
-    mass_rate: NDArray[np.float64],
-    time_step: float,
-    gas_mass: NDArray[np.float64],
-    particle_mass: NDArray[np.float64],
-    particle_concentration: NDArray[np.float64],
-) -> NDArray[np.float64]:
-    """
-    Calculate mass transfer for multiple gas species.
-
-    Args:
-        mass_rate: The rate of mass transfer per particle for each gas species
-            (kg/s).
-        time_step: The time step for the mass transfer calculation (seconds).
-        gas_mass: The available mass of each gas species (kg).
-        particle_mass: The mass of each particle for each gas species (kg).
-        particle_concentration: The concentration of particles for each gas
-            species (number/m^3).
-
-    Returns:
-        The amount of mass transferred for multiple gas species.
-    """
-    # Step 1: Calculate the total mass to change
-    # (considering particle concentration)
-    mass_to_change = (
-        mass_rate * time_step * particle_concentration[:, np.newaxis]
-    )
-
-    # Step 2: Total requested mass for each gas species (sum over particles)
-    total_requested_mass = mass_to_change.sum(axis=0)
-
-    # Step 3: Create scaling factors where requested mass exceeds available
-    # gas mass
-    scaling_factors = np.ones_like(mass_to_change)
-    scaling_mask = total_requested_mass > gas_mass
-
-    # Apply scaling where needed (scaling along the gas species axis)
-    scaling_factors[:, scaling_mask] = (
-        gas_mass[scaling_mask] / total_requested_mass[scaling_mask]
-    )
-
-    # Step 4: Apply scaling factors to the mass_to_change
-    mass_to_change *= scaling_factors
-
-    # Step 5: Limit condensation by available gas mass
-    condensible_mass_transfer = np.minimum(np.abs(mass_to_change), gas_mass)
-
-    # Step 6: Limit evaporation by available particle mass
-    evaporative_mass_transfer = np.maximum(
-        mass_to_change, -particle_mass * particle_concentration[:, np.newaxis]
-    )
-
-    # Step 7: Determine the final transferable mass
-    # (condensation or evaporation)
-    transferable_mass = np.where(
-        mass_to_change > 0,  # Condensation scenario
-        condensible_mass_transfer,  # Limited by gas mass
-        evaporative_mass_transfer,  # Limited by particle mass
-    )
-
-    return transferable_mass
+from particula.next.dynamics.condensation.mass_transfer import (
+    first_order_mass_transport_k,
+    mass_transfer_rate,
+    calculate_mass_transfer,
+)
 
 
 # mass transfer abstract class
@@ -284,24 +66,26 @@ class CondensationStrategy(ABC):
 
     Args:
         molar_mass: The molar mass of the species [kg/mol]. If a single value
-        is provided, it will be used for all species.
+            is provided, it will be used for all species.
         diffusion_coefficient: The diffusion coefficient of the species
-        [m^2/s]. If a single value is provided, it will be used for all
-        species. Default is 2*1e-9 m^2/s for air.
+            [m^2/s]. If a single value is provided, it will be used for all
+            species. Default is 2e-5 m^2/s for air.
         accommodation_coefficient: The mass accommodation coefficient of the
-        species. If a single value is provided, it will be used for all
-        species. Default is 1.0.
+            species. If a single value is provided, it will be used for all
+            species. Default is 1.0.
     """
 
     def __init__(
         self,
         molar_mass: Union[float, NDArray[np.float64]],
-        diffusion_coefficient: Union[float, NDArray[np.float64]] = 2 * 1e-9,
+        diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
+        update_gases: bool = True,
     ):
         self.molar_mass = molar_mass
         self.diffusion_coefficient = diffusion_coefficient
         self.accommodation_coefficient = accommodation_coefficient
+        self.update_gases = update_gases
 
     def mean_free_path(
         self,
@@ -321,7 +105,7 @@ class CondensationStrategy(ABC):
 
         Returns:
             Union[float, NDArray[np.float64]]: The mean free path of the gas
-            molecules in meters (m).
+                molecules in meters (m).
 
         References:
             Mean Free Path:
@@ -351,11 +135,11 @@ class CondensationStrategy(ABC):
             temperature: The temperature of the gas [K].
             pressure: The pressure of the gas [Pa].
             dynamic_viscosity: The dynamic viscosity of the gas [Pa*s]. If
-            not provided, it will be calculated based on the temperature
+                not provided, it will be calculated based on the temperature
 
         Returns:
-            Union[float, NDArray[np.float64]]: The Knudsen number, which is the
-            ratio of the mean free path to the particle radius.
+            The Knudsen number, which is the ratio of the mean free path to
+                the particle radius.
 
         References:
             [Knudsen Number](https://en.wikipedia.org/wiki/Knudsen_number)
@@ -391,12 +175,11 @@ class CondensationStrategy(ABC):
             provided, it will be calculated based on the temperature
 
         Returns:
-            Union[float, NDArray[np.float64]]: The first-order mass transport
-            coefficient per particle (m^3/s).
+            The first-order mass transport coefficient per particle (m^3/s).
 
         References:
-            Aerosol Modeling, Chapter 2, Equation 2.49 (excluding particle
-            number)
+            - Aerosol Modeling, Chapter 2, Equation 2.49 (excluding particle
+                number)
         """
         vapor_transition = vapor_transition_correction(
             knudsen_number=self.knudsen_number(
@@ -430,17 +213,16 @@ class CondensationStrategy(ABC):
 
         Args:
             particle: The particle for which the mass transfer rate is to be
-            calculated.
+                calculated.
             gas_species: The gas species with which the particle is in contact.
             temperature: The temperature at which the mass transfer rate
-            is to be calculated.
+                is to be calculated.
             pressure: The pressure of the gas phase.
             dynamic_viscosity: The dynamic viscosity of the gas [Pa*s]. If not
-            provided, it will be calculated based on the temperature
+                provided, it will be calculated based on the temperature
 
         Returns:
-            Union[float, NDArray[np.float64]]: The mass transfer rate for the
-            particle [kg/s].
+            The mass transfer rate for the particle [kg/s].
         """
 
     @abstractmethod
@@ -470,9 +252,8 @@ class CondensationStrategy(ABC):
             pressure (float): The pressure of the system in Pascals.
 
         Returns:
-            An array of condensation rates for each particle,
-            scaled by
-            particle concentration.
+            An array of condensation rates for each particle, scaled by
+                particle concentration.
         """
 
     # pylint: disable=too-many-arguments
@@ -497,8 +278,8 @@ class CondensationStrategy(ABC):
             time_step (float): The time step for the process in seconds.
 
         Returns:
-            ParticleRepresentation: The modified particle instance.
-            GasSpecies: The modified gas species instance.
+            (ParticleRepresentation, GasSpecies): The modified particle
+                instance and the modified gas species instance.
         """
 
 
@@ -515,13 +296,15 @@ class CondensationIsothermal(CondensationStrategy):
     def __init__(
         self,
         molar_mass: Union[float, NDArray[np.float64]],
-        diffusion_coefficient: Union[float, NDArray[np.float64]] = 2 * 1e-9,
+        diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
+        update_gases: bool = True,
     ):
         super().__init__(
             molar_mass=molar_mass,
             diffusion_coefficient=diffusion_coefficient,
             accommodation_coefficient=accommodation_coefficient,
+            update_gases=update_gases,
         )
 
     def mass_transfer_rate(
@@ -623,11 +406,11 @@ class CondensationIsothermal(CondensationStrategy):
             particle_mass=particle.get_species_mass(),
             particle_concentration=particle.get_concentration(),
         )
-
         # apply the mass change
         particle.add_mass(added_mass=mass_transfer)
-        # remove mass from gas phase concentration
-        gas_species.add_concentration(
-            added_concentration=-mass_transfer.sum(axis=0)
-        )
+        if self.update_gases:
+            # remove mass from gas phase concentration
+            gas_species.add_concentration(
+                added_concentration=-mass_transfer.sum(axis=0)
+            )
         return particle, gas_species

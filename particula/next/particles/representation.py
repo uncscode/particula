@@ -66,7 +66,9 @@ class ParticleRepresentation:
             f"\tActivity: {self.get_activity_name()}\n"
             f"\tSurface: {self.get_surface_name()}\n"
             f"\tMass Concentration: "
-            f"{self.get_mass_concentration():.3e} [kg/m^3]"
+            f"{self.get_mass_concentration():.3e} [kg/m^3]\n"
+            f"\tNumber Concentration: "
+            f"{self.get_total_concentration():.3e} [#/m^3]"
         )
 
     def get_strategy(self, clone: bool = False) -> DistributionStrategy:
@@ -165,7 +167,11 @@ class ParticleRepresentation:
         return self.density
 
     def get_concentration(self, clone: bool = False) -> NDArray[np.float64]:
-        """Returns the concentration of the particles.
+        """Returns the volume concentration of the particles.
+
+        For ParticleResolved Strategies, the concentration is the number of
+        particles per self.volume to get concentration/m^3. For other
+        Strategies, the concentration is the already per 1/m^3.
 
         Args:
             clone: If True, then return a copy of the concentration array.
@@ -174,8 +180,19 @@ class ParticleRepresentation:
             The concentration of the particles.
         """
         if clone:
-            return np.copy(self.concentration)
-        return self.concentration
+            return np.copy(self.concentration / self.volume)
+        return self.concentration / self.volume
+
+    def get_total_concentration(self, clone: bool = False) -> np.float64:
+        """Returns the total concentration of the particles.
+
+        Args:
+            clone: If True, then return a copy of the concentration array.
+
+        Returns:
+            The concentration of the particles.
+        """
+        return np.sum(self.get_concentration(clone=clone))
 
     def get_charge(self, clone: bool = False) -> NDArray[np.float64]:
         """Returns the charge per particle.
@@ -233,28 +250,6 @@ class ParticleRepresentation:
             )
         return self.strategy.get_mass(self.distribution, self.density)
 
-    def get_total_mass(self, clone: bool = False) -> np.float64:
-        """Returns the total mass of the particles.
-
-        The total mass is as calculated by the strategy, taking into account
-        the distribution and concentration.
-
-        Args:
-            clone: If True, then return a copy of the total mass.
-
-        Returns:
-            np.float64: The total mass of the particles.
-        """
-        if clone:
-            return deepcopy(
-                self.strategy.get_total_mass(
-                    self.distribution, self.concentration, self.density
-                )
-            )
-        return self.strategy.get_total_mass(
-            self.distribution, self.concentration, self.density
-        )
-
     def get_mass_concentration(
         self, clone: bool = False
     ) -> np.float64:
@@ -272,13 +267,17 @@ class ParticleRepresentation:
         if clone:
             return deepcopy(
                 self.strategy.get_total_mass(
-                    self.distribution, self.concentration, self.density
-                ) / self.volume
+                    self.get_distribution(),
+                    self.get_concentration(),
+                    self.get_density()
+                )
             )
         return (
             self.strategy.get_total_mass(
-                self.distribution, self.concentration, self.density
-            ) / self.volume
+                self.get_distribution(),
+                self.get_concentration(),
+                self.get_density()
+            )
         )
 
     def get_radius(self, clone: bool = False) -> NDArray[np.float64]:
@@ -302,8 +301,12 @@ class ParticleRepresentation:
             added_mass: The mass to be added per
                 distribution bin.
         """
-        (self.distribution, self.concentration) = self.strategy.add_mass(
-            self.distribution, self.concentration, self.density, added_mass
+        # maybe remove return concentration
+        (self.distribution, _) = self.strategy.add_mass(
+            self.get_distribution(),
+            self.get_concentration(),
+            self.get_density(),
+            added_mass
         )
 
     def add_concentration(

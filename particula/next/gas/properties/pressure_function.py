@@ -26,3 +26,21 @@ def calculate_partial_pressure(
     """
     # Calculate the partial pressure
     return (concentration * float(GAS_CONSTANT.m) * temperature) / molar_mass
+
+
+def calculate_saturation_ratio(
+    partial_pressure: Union[float, NDArray[np.float64]],
+    pure_vapor_pressure: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """
+    Calculate the saturation ratio of the gas at a given pressure and
+    temperature.
+
+    Args:
+        partial_pressure: Pressure in Pascals.
+        pure_vapor_pressure: Pure vapor pressure of the gas in Pascals.
+
+    Returns:
+        saturation_ratio: The saturation ratio of the gas.
+    """
+    return partial_pressure / pure_vapor_pressure

@@ -10,11 +10,13 @@ from abc import ABC, abstractmethod
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
-from particula.util.convert import (
-    mass_concentration_to_mole_fraction,
-    mass_concentration_to_volume_fraction,
+from particula.next.particles.properties.activity_module import (
+    ideal_activity_molar,
+    ideal_activity_volume,
+    ideal_activity_mass,
+    kappa_activity,
+    calculate_partial_pressure,
 )
-from particula.util.machine_limit import MIN_POSITIVE_VALUE
 
 
 class ActivityStrategy(ABC):
@@ -67,7 +69,10 @@ class ActivityStrategy(ABC):
             Union[float, NDArray[np.float64]]: Vapor pressure of the particle
             in pascals (Pa).
         """
-        return pure_vapor_pressure * self.activity(mass_concentration)
+        return calculate_partial_pressure(
+            pure_vapor_pressure=pure_vapor_pressure,
+            activity=self.activity(mass_concentration),
+        )
 
 
 # Ideal activity strategies
@@ -102,14 +107,8 @@ class ActivityIdealMolar(ActivityStrategy):
             Union[float, NDArray[np.float64]]: Activity of the species,
             unitless.
         """
-
-        # return for single species, activity is always 1
-        if isinstance(mass_concentration, float):
-            return 1.0
-        # multiple species, calculate mole fractions
-        return mass_concentration_to_mole_fraction(
-            mass_concentrations=mass_concentration,
-            molar_masses=self.molar_mass,
+        return ideal_activity_molar(
+            mass_concentration=mass_concentration, molar_mass=self.molar_mass
         )
 
 
@@ -136,11 +135,41 @@ class ActivityIdealMass(ActivityStrategy):
             Union[float, NDArray[np.float64]]: Activity of the particle,
             unitless.
         """
+        return ideal_activity_mass(mass_concentration=mass_concentration)
 
-        # return for single species, activity is always 1
-        if isinstance(mass_concentration, float):
-            return 1.0
-        return mass_concentration / np.sum(mass_concentration)
+
+class ActivityIdealVolume(ActivityStrategy):
+    """Calculate ideal activity based on volume fractions.
+
+    This strategy uses volume fractions to compute the activity, following
+    the principles of Raoult's Law.
+
+    References:
+        Volume Based
+            [Raoult's Law](https://en.wikipedia.org/wiki/Raoult%27s_law)
+    """
+
+    def __init__(self, density: Union[float, NDArray[np.float64]] = 0.0):
+        self.density = density
+
+    def activity(
+        self, mass_concentration: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
+        """Calculate the activity of a species based on mass concentration.
+
+        Args:
+            mass_concentration: Concentration of the species in kilograms per
+                cubic meter (kg/m^3).
+            density: Density of the species in kilograms per cubic meter
+                (kg/m^3).
+
+        Returns:
+            Union[float, NDArray[np.float64]]: Activity of the particle,
+            unitless.
+        """
+        return ideal_activity_volume(
+            mass_concentration=mass_concentration, density=self.density
+        )
 
 
 # Non-ideal activity strategies
@@ -168,7 +197,7 @@ class ActivityKappaParameter(ActivityStrategy):
         molar_mass: NDArray[np.float64] = np.array([0.0], dtype=np.float64),
         water_index: int = 0,
     ):
-        self.kappa = np.delete(kappa, water_index)  # maybe change this later
+        self.kappa = kappa
         self.density = density
         self.molar_mass = molar_mass
         self.water_index = water_index
@@ -192,55 +221,10 @@ class ActivityKappaParameter(ActivityStrategy):
             activity. Atmospheric Chemistry and Physics, 7(8), 1961-1971.
             [DOI](https://doi.org/10.5194/acp-7-1961-2007), see EQ 2 and 7.
         """
-
-        volume_fractions = mass_concentration_to_volume_fraction(
-            mass_concentrations=mass_concentration, densities=self.density
+        return kappa_activity(
+            mass_concentration=mass_concentration,
+            kappa=self.kappa,
+            density=self.density,
+            molar_mass=self.molar_mass,
+            water_index=self.water_index,
         )
-        if isinstance(mass_concentration, np.ndarray) and (
-            mass_concentration.ndim == 2
-        ):
-            water_volume_fraction = volume_fractions[:, self.water_index]
-            solute_volume_fractions = np.delete(
-                volume_fractions, self.water_index, axis=1
-            )
-            solute_volume = 1 - water_volume_fraction
-            # volume weighted kappa, EQ 7 Petters and Kreidenweis (2007)
-            kappa_weighted = np.sum(
-                solute_volume_fractions / solute_volume * self.kappa, axis=1
-            )
-            # kappa activity parameterization, EQ 2 Petters and Kreidenweis
-            # (2007)
-            water_activity = np.where(
-                water_volume_fraction <= 10 * MIN_POSITIVE_VALUE,
-                0,
-                (1 + kappa_weighted * solute_volume / water_volume_fraction)
-                ** -1,
-            )
-            # other species activity based on mole fraction
-            activity = mass_concentration_to_mole_fraction(
-                mass_concentrations=mass_concentration,
-                molar_masses=self.molar_mass,
-            )
-            # replace water activity with kappa activity
-            activity[:, self.water_index] = water_activity
-            return activity
-        # single species
-        water_volume_fraction = volume_fractions[self.water_index]
-        solute_volume_fractions = np.delete(volume_fractions, self.water_index)
-        solute_volume = 1 - water_volume_fraction
-        # volume weighted kappa, EQ 7 Petters and Kreidenweis (2007)
-        kappa_weighted = np.sum(
-            solute_volume_fractions / solute_volume * self.kappa
-        )
-        # kappa activity parameterization, EQ 2 Petters and Kreidenweis (2007)
-        water_activity = (
-            1 + kappa_weighted * solute_volume / water_volume_fraction
-        ) ** (-1)
-        # other species activity based on mole fraction
-        activity = mass_concentration_to_mole_fraction(
-            mass_concentrations=mass_concentration,
-            molar_masses=self.molar_mass,
-        )
-        # replace water activity with kappa activity
-        activity[self.water_index] = water_activity
-        return activity

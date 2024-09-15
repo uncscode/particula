@@ -1,7 +1,7 @@
 """Test the Condensation module."""
 
 import numpy as np
-from particula.next.dynamics.condensation import (
+from particula.next.dynamics.condensation.mass_transfer import (
     first_order_mass_transport_k,
     mass_transfer_rate,
     calculate_mass_transfer,

@@ -32,10 +32,10 @@ def test_particle_properties():
     # call inputs
     mass = particle.get_mass()
     radius = particle.get_radius()
-    total_mass = particle.get_total_mass()
+    total_mass = particle.get_mass_concentration()
     mass_clone = particle.get_mass(clone=True)
     radius_clone = particle.get_radius(clone=True)
-    total_mass_clone = particle.get_total_mass(clone=True)
+    total_mass_clone = particle.get_mass_concentration(clone=True)
 
     # Validate the types of the returned values
     assert isinstance(mass, np.ndarray)
