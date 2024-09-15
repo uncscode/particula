@@ -1,4 +1,4 @@
-# Equilibria Index
+# Index Equilibria
 
 ## Notebooks
 

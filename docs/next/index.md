@@ -6,14 +6,13 @@ Next is the next iteration of the particula simulation model. It is a complete r
 ## Particle Resolved
 
 - [x] Coagulation needs to be implemented
-- [ ] check equilibrium for condensation and evaporation
+- [x] check equilibrium for condensation and evaporation
 
 ## Continuous Particle PDF and PMF
 
-- [ ] Bin Remapping after condensation and evaporation is needed
+- [ ] Bin Remapping after condensation and evaporation is needed, or dr/dt method
 - [x] Coagulation needs to be checked for PMF vs PDF handling
 - [x] ODE solver for both needs to be implemented
-- [ ] Condensation check for resolved
 
 ## Scavenging
 
@@ -25,6 +24,6 @@ Next is the next iteration of the particula simulation model. It is a complete r
 
 # Guides for Developers
 
-- [ ] More focused reorganization of the code and examples.
+- [x] More focused reorganization of the code and examples.
 
 ![Four Quadrant representation of Tutorials, How to guides, References, and Discussions Areas](DocsImageDevGuide.png)

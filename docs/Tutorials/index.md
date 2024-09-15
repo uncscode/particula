@@ -1,38 +1,45 @@
 # Tutorials
 
-### Gas Phase
+<div class="grid cards" markdown>
 
-- [Vapor Pressure Tutorial](Gas_Phase/Vapor_Pressure.ipynb)
-- [Gas Species Tutorial](Gas_Phase/Gas_Species.ipynb)
-- [Atmosphere Tutorial](Gas_Phase/AtmosphereTutorial.ipynb)
+-   __[Aerosol](Aerosol/index.md)__
 
-### Particle Phase
+    ---
 
-- [Aerosol Surface Tutorial](Particle_Phase/Particle_Surface_Tutorial.ipynb)
-- [Activity Tutorial](Particle_Phase/Activity_Tutorial.ipynb)
-- [Distribution Tutorial](Particle_Phase/Distribution_Tutorial.ipynb)
-- [Types of Distributions Tutorial](Particle_Phase/Aerosol_Distributions.ipynb)
-- [Particle Representation Tutorial](Particle_Phase/Particle_Representation_Tutorial.ipynb)
+    Learn what goes into the [Aerosol](Aerosol/index.md) object and why it is used.
 
-### Aerosol
+    [:octicons-arrow-right-24: Tutorial](Aerosol/index.md)
 
-- [Aerosol Tutorial](Aerosol/Aerosol_Tutorial.ipynb)
+-   __[Dynamics](Dynamics/index.md)__
 
-### Dynamics
+    ---
 
-#### Condensation
+    [Dynamics](Dynamics/index.md) is a collection of classes that processes for the `Aerosol` objects, to perform coagulation, condensation, and other processes.
 
-- [Condensation Tutorial: Moving Bin](Dynamics/Condensation/Condensation_Tutorial-1.ipynb)
-- [Condensation Tutorial: Particle Resolved](Dynamics/Condensation/Condensation_Tutorial-2.ipynb)
+    [:octicons-arrow-right-24: Tutorial](Dynamics/index.md)
 
-#### Coagulation
+-   __[Gas Phase](Gas_Phase/index.md)__
 
-- [Coagulation Tutorial: Basic 1-PMF](Dynamics/Coagulation/Coagulation_Basic_1_PMF.ipynb)
-- [Coagulation Tutorial: Basic 2-PDF](Dynamics/Coagulation/Coagulation_Basic_2_PDF.ipynb)
-- [Coagulation Tutorial: Basic 3-Compared](Dynamics/Coagulation/Coagulation_Basic_3_compared.ipynb)
-- [Coagulation Tutorial: Basic 4-Particle Resolved](Dynamics/Coagulation/Coagulation_Basic_4_ParticleResolved.ipynb)
-- [Coagulation Tutorial: Basic 5-Super Droplet Method](Dynamics/Coagulation/Coagulation_Basic_5_SDM.ipynb)
+    ---
 
-## Data Analysis
+    Learn how to represent the [Gas Phase](Gas_Phase/index.md), including vapor pressures and atmospheric properties.
 
-- [Fitting Lognormal PDF: 2 Modes](Data/Fitting_lognormal_PDFs_2modes.ipynb)
+    [:octicons-arrow-right-24: Tutorial](Gas_Phase/index.md)
+
+-   __[Particle Phase](Particle_Phase)__
+
+    ---
+
+    Learn about how to represent the [Particle Phase](Particle_Phase/index.md), including different particle representations; radius bins, speciated mass bins, and particle resolved.
+
+    [:octicons-arrow-right-24: Tutorial](Particle_Phase/index.md)
+
+-   __[Data Analysis](Data_Analysis/index.md) :material-progress-clock:__
+
+    ---
+
+    **in BETA** :material-progress-clock: Some preliminary tools available for [Data Analysis](Data_Analysis/index.md).
+
+    [:octicons-arrow-right-24: Tutorial](Data_Analysis/index.md)
+
+</div>
