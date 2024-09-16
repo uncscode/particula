@@ -113,8 +113,30 @@ class DistributionStrategy(ABC):
             added_mass: The mass to be added per distribution bin.
 
         Returns:
-            NDArray[np.float64]: The new concentration array.
-            NDArray[np.float64]: The new distribution array.
+            (distribution, concentration): The new distribution array and the
+                new concentration array.
+        """
+
+    @abstractmethod
+    def add_concentration(
+        self,
+        distribution: NDArray[np.float64],
+        concentration: NDArray[np.float64],
+        added_distribution: NDArray[np.float64],
+        added_concentration: NDArray[np.float64],
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Adds concentration to the distribution of particles.
+
+        Args:
+            distribution: The distribution of particle sizes or masses.
+            concentration: The concentration of each particle size or mass in
+                the distribution.
+            added_distribution: The distribution to be added.
+            added_concentration: The concentration to be added.
+
+        Returns:
+            (distribution, concentration): The new distribution array and the
+                new concentration array.
         """
 
     @abstractmethod
@@ -135,8 +157,8 @@ class DistributionStrategy(ABC):
             indices: The indices of the particles to collide.
 
         Returns:
-            NDArray[np.float64]: The new concentration array.
-            NDArray[np.float64]: The new distribution array.
+            (distribution, concentration): The new distribution array and the
+                new concentration array.
         """
 
 
@@ -171,6 +193,43 @@ class MassBasedMovingBin(DistributionStrategy):
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         # Add the mass to the distribution moving the bins
         return (distribution + added_mass, concentration)
+
+    def add_concentration(
+        self,
+        distribution: NDArray[np.float64],
+        concentration: NDArray[np.float64],
+        added_distribution: NDArray[np.float64],
+        added_concentration: NDArray[np.float64],
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        # check if distribution and added distribution have same elements
+        if (
+            (distribution.shape != added_distribution.shape) and
+            (np.allclose(distribution, added_distribution, rtol=1e-6))
+        ):
+            message = (
+                "When adding concentration to MassBasedMovingBin,"
+                + " the distribution and added distribution should have "
+                "the same elements. The current distribution shape is "
+                f"{distribution.shape} and the added distribution shape is "
+                f"{added_distribution.shape}."
+            )
+            logger.error(message)
+            raise ValueError(message)
+        # concentration shape should be equal
+        if concentration.shape != added_concentration.shape:
+            message = (
+                "When adding concentration to MassBasedMovingBin,"
+                " the concentration and added concentration should have "
+                "the same shape. The current concentration shape is "
+                f"{concentration.shape} and the added concentration shape is "
+                f"{added_concentration.shape}."
+            )
+            logger.error(message)
+            raise ValueError(message)
+
+        # add the concentration in place
+        concentration += added_concentration
+        return (distribution, concentration)
 
     def collide_pairs(
         self,
@@ -225,6 +284,41 @@ class RadiiBasedMovingBin(DistributionStrategy):
         # Step 3: Convert new volumes back to radii
         new_radii = np.power(3 * new_volumes / (4 * np.pi), 1 / 3)
         return (new_radii, concentration)
+
+    def add_concentration(
+        self,
+        distribution: NDArray[np.float64],
+        concentration: NDArray[np.float64],
+        added_distribution: NDArray[np.float64],
+        added_concentration: NDArray[np.float64],
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        # check if distribution and added distribution have same elements
+        if (distribution.shape != added_distribution.shape) and (
+            np.allclose(distribution, added_distribution, rtol=1e-6)
+        ):
+            message = (
+                "When adding concentration to RadiiBasedMovingBin,"
+                " the distribution and added distribution should have "
+                "the same elements. The current distribution shape is "
+                f"{distribution.shape} and the added distribution shape is "
+                f"{added_distribution.shape}."
+            )
+            logger.error(message)
+            raise ValueError(message)
+        # concentration shape should be equal
+        if concentration.shape != added_concentration.shape:
+            message = (
+                "When adding concentration to RadiiBasedMovingBin,"
+                " the concentration and added concentration should have "
+                "the same shape. The current concentration shape is "
+                f"{concentration.shape} and the added concentration shape is "
+                f"{added_concentration.shape}."
+            )
+            logger.error(message)
+            raise ValueError(message)
+        # add the concentration in place
+        concentration += added_concentration
+        return (distribution, concentration)
 
     def collide_pairs(
         self,
@@ -285,6 +379,41 @@ class SpeciatedMassMovingBin(DistributionStrategy):
         new_distribution = np.maximum(distribution + mass_per_particle, 0)
         return new_distribution, concentration
 
+    def add_concentration(
+        self,
+        distribution: NDArray[np.float64],
+        concentration: NDArray[np.float64],
+        added_distribution: NDArray[np.float64],
+        added_concentration: NDArray[np.float64],
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        # check if distribution and added distribution have same elements
+        if (distribution.shape != added_distribution.shape) and (
+            np.allclose(distribution, added_distribution, rtol=1e-6)
+        ):
+            message = (
+                "When adding concentration to SpeciatedMassMovingBin,"
+                " the distribution and added distribution should have "
+                "the same elements. The current distribution shape is "
+                f"{distribution.shape} and the added distribution shape is "
+                f"{added_distribution.shape}."
+            )
+            logger.error(message)
+            raise ValueError(message)
+        # concentration shape should be equal
+        if concentration.shape != added_concentration.shape:
+            message = (
+                "When adding concentration to SpeciatedMassMovingBin,"
+                " the concentration and added concentration should have "
+                "the same shape. The current concentration shape is "
+                f"{concentration.shape} and the added concentration shape is "
+                f"{added_concentration.shape}."
+            )
+            logger.error(message)
+            raise ValueError(message)
+        # add the concentration in place
+        concentration += added_concentration
+        return (distribution, concentration)
+
     def collide_pairs(
         self,
         distribution: NDArray[np.float64],
@@ -344,6 +473,68 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
             / concentration_expand
         )
         return (new_mass, concentration)
+
+    def add_concentration(
+        self,
+        distribution: NDArray[np.float64],
+        concentration: NDArray[np.float64],
+        added_distribution: NDArray[np.float64],
+        added_concentration: NDArray[np.float64],
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        # Check if added concentration is all ones
+        rescaled = False
+        if np.all(added_concentration == 1):
+            rescaled = True
+        if (
+            np.allclose(
+                added_concentration, np.max(concentration), atol=1e-2) or
+            np.all(concentration == 0)
+           ):
+            # then rescale the added concentration
+            added_concentration = added_concentration / np.max(concentration)
+            rescaled = True
+        if not rescaled:
+            message = (
+                "When adding concentration to ParticleResolvedSpeciatedMass,"
+                + " the added concentration should be all ones or all the same"
+                + " value of 1/volume."
+            )
+            logger.error(message)
+            raise ValueError(message)
+
+        # replace concentration with ones, as it is not defined by volume,
+        # when it is stored in the class
+        concentration = np.divide(
+            concentration,
+            concentration,
+            out=np.zeros_like(concentration),
+            where=concentration != 0
+        )
+
+        # find empty distribution bins
+        empty_bins = np.flatnonzero(np.all(concentration == 0))
+        # count of empty bins
+        empty_bins_count = len(empty_bins)
+        added_bins_count = len(added_concentration)
+        if empty_bins_count >= added_bins_count:
+            # add all added bins to empty bins
+            distribution[empty_bins] = added_distribution
+            concentration[empty_bins] = added_concentration
+            return distribution, concentration
+        # add added bins to empty bins
+        if empty_bins_count > 0:
+            distribution[empty_bins] = added_distribution[:empty_bins_count]
+            concentration[empty_bins] = added_concentration[:empty_bins_count]
+        # add the rest of the added bins to the end of the distribution
+        distribution = np.concatenate(
+            (distribution, added_distribution[empty_bins_count:]),
+            axis=0
+        )
+        concentration = np.concatenate(
+            (concentration, added_concentration[empty_bins_count:]),
+            axis=0
+        )
+        return distribution, concentration
 
     def collide_pairs(
         self,

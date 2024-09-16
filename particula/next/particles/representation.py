@@ -1,5 +1,6 @@
 """Particle representation."""
 
+from typing import Optional
 from copy import deepcopy
 import numpy as np
 from numpy.typing import NDArray
@@ -310,7 +311,9 @@ class ParticleRepresentation:
         )
 
     def add_concentration(
-        self, added_concentration: NDArray[np.float64]
+        self,
+        added_concentration: NDArray[np.float64],
+        added_distribution: Optional[NDArray[np.float64]] = None,
     ) -> None:
         """Adds concentration to the particle distribution.
 
@@ -318,7 +321,19 @@ class ParticleRepresentation:
             added_concentration: The concentration to be
                 added per distribution bin.
         """
-        self.concentration += added_concentration
+        # if added_distribution is None, then it will be calculated
+        if added_distribution is None:
+            print("None distribution")
+            added_distribution = self.get_distribution()
+        # self.concentration += added_concentration
+        (self.distribution, self.concentration) = (
+            self.strategy.add_concentration(
+                distribution=self.get_distribution(),
+                concentration=self.get_concentration(),
+                added_distribution=added_distribution,
+                added_concentration=added_concentration,
+            )
+        )
 
     def collide_pairs(self, indices: NDArray[np.int64]) -> None:
         """Collide pairs of indices, used for ParticleResolved Strategies.

@@ -124,13 +124,6 @@ class Coagulation(Runnable):
                     pressure=aerosol.atmosphere.total_pressure,
                     time_step=time_step/sub_steps,
                 )
-            # net_rate = self.coagulation_strategy.net_rate(
-            #     particle=particle,
-            #     temperature=aerosol.atmosphere.temperature,
-            #     pressure=aerosol.atmosphere.total_pressure,
-            # )
-            # # Apply the change in distribution
-            # particle.add_concentration(net_rate * time_step)  # type: ignore
         return aerosol
 
     def rate(self, aerosol: Aerosol) -> Any:
