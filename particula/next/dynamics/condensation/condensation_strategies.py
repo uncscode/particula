@@ -317,9 +317,17 @@ class CondensationIsothermal(CondensationStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         # pylint: disable=too-many-arguments
 
+        # fill zero radius with a maximum value, the zero concentration
+        # will ensure no mass transfer for those filled particles
+        radius_with_fill = particle.get_radius()
+        radius_with_fill = np.where(
+            radius_with_fill == 0,
+            np.max(radius_with_fill),
+            radius_with_fill
+        )
         # Calculate the first-order mass transport coefficient
         first_order_mass_transport = self.first_order_mass_transport(
-            radius=particle.get_radius(),
+            radius=radius_with_fill,
             temperature=temperature,
             pressure=pressure,
             dynamic_viscosity=dynamic_viscosity,
@@ -334,7 +342,7 @@ class CondensationIsothermal(CondensationStrategy):
         partial_pressure_gas = gas_species.get_partial_pressure(temperature)
         # calculate the kelvin term
         kelvin_term = particle.surface.kelvin_term(
-            radius=particle.get_radius(),
+            radius=radius_with_fill,
             molar_mass=self.molar_mass,
             mass_concentration=particle.get_species_mass(),
             temperature=temperature,

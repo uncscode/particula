@@ -649,7 +649,7 @@ class ParticleResolved(CoagulationStrategy):
             return self.kernel_radius
         # else find the non-zero min and max radii, the log space them
         min_radius = np.min(particle.get_radius()[particle.get_radius() > 0])
-        max_radius = np.max(particle.get_radius())
+        max_radius = np.max(particle.get_radius()[particle.get_radius() > 0])
         if self.kernel_bins_number is not None:
             return np.logspace(
                 np.log10(min_radius), np.log10(max_radius),

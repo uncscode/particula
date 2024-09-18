@@ -26,15 +26,6 @@
 
     [:octicons-arrow-right-24: Tutorial](Equilibria/index.md)
 
-
--   __[Lagrangian](Lagrangian/index.md) :material-progress-clock:__
-
-    ---
-
-    *in BETA*:material-progress-clock: How to simulate aerosol coagulation dynamics using the Lagrangian method. Useful for tracking individual particles.
-
-    [:octicons-arrow-right-24: Tutorial](Lagrangian/index.md)
-
 -   __[Light Scattering](Light_Scattering/index.md)__
 
     ---
@@ -43,6 +34,14 @@
 
     [:octicons-arrow-right-24: Tutorial](Light_Scattering/index.md)
 
+-   __[Nucleation](Nucleation/index.md)__
+
+    ---
+
+    How to simulate aerosol nucleation using a custom process. Showing how to add a custom process for a nucleation event.
+
+    [:octicons-arrow-right-24: Tutorial](Nucleation/index.md)
+
 -   __[Data Streams and Lakes](Data_Streams_and_Lakes/index.md) :material-progress-clock:__
 
     ---
@@ -50,5 +49,13 @@
     *in BETA*:material-progress-clock: How to organize and analyze data from multiple instruments using `Streams` and `Lakes` organization. Useful for bulk and repeatable data analysis.
 
     [:octicons-arrow-right-24: Tutorial](Data_Streams_and_Lakes/index.md)
+
+-   __[Lagrangian](Lagrangian/index.md) :material-progress-clock:__
+
+    ---
+
+    *in BETA*:material-progress-clock: How to simulate aerosol coagulation dynamics using the Lagrangian method. Useful for tracking individual particles.
+
+    [:octicons-arrow-right-24: Tutorial](Lagrangian/index.md)
 
 </div>
