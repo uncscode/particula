@@ -1,8 +1,10 @@
 """Calculate Kappa hygroscopic parameters from extinction data."""
+
 # pyright: reportReturnType=false, reportAssignmentType=false
 # pyright: reportIndexIssue=false
 # pyright: reportArgumentType=false, reportOperatorIssue=false
-# pylint: disable=too-many-arguments, too-many-locals
+# pylint: disable=too-many-positional-arguments, too-many-arguments
+# pylint: disable=too-many-locals
 
 
 from typing import Union, Tuple
@@ -66,34 +68,41 @@ def extinction_ratio_wet_dry(
         respectively.
     """
     # Convert particle diameters to volumes for dry aerosol calculations
-    volume_sizer = convert.length_to_volume(diameters, length_type='diameter')
+    volume_sizer = convert.length_to_volume(diameters, length_type="diameter")
 
     # Calculate volumes for solute and water in dry and wet conditions
     volume_dry = convert.kappa_volume_solute(
-        volume_sizer, kappa, water_activity_sizer)
+        volume_sizer, kappa, water_activity_sizer
+    )
     volume_water_dry = convert.kappa_volume_water(
-        volume_dry, kappa, water_activity_dry)
+        volume_dry, kappa, water_activity_dry
+    )
     volume_water_wet = convert.kappa_volume_water(
-        volume_dry, kappa, water_activity_wet)
+        volume_dry, kappa, water_activity_wet
+    )
 
     # Determine effective refractive indices for dry and wet aerosols
     n_effective_dry = convert.effective_refractive_index(
-        refractive_index_dry, water_refractive_index,
+        refractive_index_dry,
+        water_refractive_index,
         volume_dry[-1],  # pyright: ignore[reportIndexIssue]
-        volume_water_dry[-1]  # pyright: ignore[reportIndexIssue]
-        )
+        volume_water_dry[-1],  # pyright: ignore[reportIndexIssue]
+    )
     n_effective_wet = convert.effective_refractive_index(
-        refractive_index_dry, water_refractive_index,
+        refractive_index_dry,
+        water_refractive_index,
         volume_dry[-1],  # pyright: ignore[reportIndexIssue]
-        volume_water_wet[-1]  # pyright: ignore[reportIndexIssue]
-        )
+        volume_water_wet[-1],  # pyright: ignore[reportIndexIssue]
+    )
 
     # Adjust diameters for wet and dry conditions and calculate optical
     # properties
     diameters_dry = convert.volume_to_length(
-        volume_dry + volume_water_dry, length_type='diameter')
+        volume_dry + volume_water_dry, length_type="diameter"
+    )
     diameters_wet = convert.volume_to_length(
-        volume_dry + volume_water_wet, length_type='diameter')
+        volume_dry + volume_water_wet, length_type="diameter"
+    )
 
     optics_dry = mie_bulk.mie_size_distribution(
         m_sphere=n_effective_dry,
@@ -102,7 +111,8 @@ def extinction_ratio_wet_dry(
         number_per_cm3=number_per_cm3,
         pms=True,
         extinction_only=not return_all_optics,
-        discretize=discretize)
+        discretize=discretize,
+    )
 
     optics_wet = mie_bulk.mie_size_distribution(
         m_sphere=n_effective_wet,
@@ -111,7 +121,8 @@ def extinction_ratio_wet_dry(
         number_per_cm3=number_per_cm3,
         pms=True,
         extinction_only=not return_all_optics,
-        discretize=discretize)
+        discretize=discretize,
+    )
 
     # Return either the extinction coefficients or their ratio based on user
     # choice
@@ -190,12 +201,14 @@ def fit_extinction_ratio_with_kappa(
             water_refractive_index=water_refractive_index,
             wavelength=wavelength,
             discretize=discretize,
-            return_coefficients=False
+            return_coefficients=False,
         )
         # type check
-        ratio_guess = ratio_guess \
-            if isinstance(ratio_guess, float) \
-            else float(ratio_guess)  # pyright: ignore
+        ratio_guess = (
+            ratio_guess
+            if isinstance(ratio_guess, float)
+            else float(ratio_guess)
+        )  # pyright: ignore
         return np.abs(ratio_guess - b_ext_wet / b_ext_dry)
 
     # Use fminbound to optimize the kappa value within the specified bounds
@@ -207,7 +220,7 @@ def fit_extinction_ratio_with_kappa(
         xtol=kappa_tolerance,
         maxfun=kappa_maxiter,
         full_output=True,
-        disp=0
+        disp=0,
     )
     return kappa_opt
 
@@ -223,7 +236,7 @@ def kappa_from_extinction_looped(
     refractive_index_dry: Union[complex, float] = 1.45,
     water_refractive_index: Union[complex, float] = 1.33,
     wavelength: float = 450,
-    discretize: bool = True
+    discretize: bool = True,
 ) -> NDArray[np.float64]:
     """
     Fit the extinction ratio to the kappa value for a set of measurements,
@@ -268,11 +281,14 @@ def kappa_from_extinction_looped(
     kappa_fit = np.zeros((len(extinction_wet), 3), dtype=np.float64)
 
     # Combine NaN checks for input arrays
-    skip_data = np.isnan(extinction_dry) | np.isnan(extinction_wet) | \
-        np.isnan(water_activity_sample_wet) | \
-        np.isnan(water_activity_sizer) | \
-        np.isnan(water_activity_sample_dry) | \
-        np.isnan(number_per_cm3).any(axis=1)
+    skip_data = (
+        np.isnan(extinction_dry)
+        | np.isnan(extinction_wet)
+        | np.isnan(water_activity_sample_wet)
+        | np.isnan(water_activity_sizer)
+        | np.isnan(water_activity_sample_dry)
+        | np.isnan(number_per_cm3).any(axis=1)
+    )
 
     # Loop over each time index
     for index, row_number_per_cm3 in enumerate(number_per_cm3):

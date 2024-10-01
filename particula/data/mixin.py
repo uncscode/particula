@@ -505,6 +505,53 @@ class ChecksSkipEndMixin:
         return self
 
 
+class ChecksReplaceCharsMixin:
+    """Mixin class for setting the characters to replace in the data lines."""
+
+    def __init__(self):
+        self.replace_chars = {}
+
+    def set_replace_chars(self, replace_chars: dict[str, str]):
+        """Set the characters to replace in the data lines.
+
+        This is useful to replace unwanted characters from the data lines
+        before converting the data to the required format. Each key in the
+        replace_dict represents the character to replace, and the corresponding
+        value is the replacement target.
+
+        Args:
+            replace_dict (dict): Dictionary with keys as characters to replace
+                and values as the replacement targets.
+
+        Examples:
+        ``` py title="Replace brackets with empty string"
+        replace_dict = {"[": "", "]": ""}
+        # data: '[1], [2], [3]' -> '1, 2, 3'
+        ```
+
+        ``` py title="Replace spaces with underscores"
+        replace_dict = {" ": "_"}
+        # data: '1, 2, 3' -> '1,_2,_3'
+        ```
+
+        ``` py title="Replace multiple characters"
+        replace_dict = {"[": "", "]": "", "\n": " "}
+        # data: '[1]\n[2]\n[3]' -> '1 2 3'
+        ```
+
+        Returns:
+            self: The instance of the class to allow for method chaining.
+
+        References:
+            [Python str.replace](https://docs.python.org/3/library/stdtypes.html#str.replace)
+        """
+        if not isinstance(replace_chars, dict):
+            raise TypeError(
+                f"Expected dictionary, but got {type(replace_chars)}.")
+        self.replace_chars = replace_chars
+        return self
+
+
 class SizerStartKeywordMixin:
     """Mixin class for setting the start key for the sizer data."""
 

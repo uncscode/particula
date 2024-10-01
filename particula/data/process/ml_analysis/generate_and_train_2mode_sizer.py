@@ -44,7 +44,7 @@ SAVE_NAME = "lognormal_2mode_NN128.pkl"
 _cached_pipeline: Optional[Pipeline] = None
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments, too-many-arguments
 def generate_simulated_data(
     total_number_simulated: int = 10000,
     number_of_modes_sim: int = 2,

@@ -1,5 +1,6 @@
 """Scattering Truncation Correction Functions"""
-# pylint: disable=too-many-arguments, too-many-locals
+
+# pylint: disable=too-many-positional-arguments, too-many-arguments, too-many-locals
 
 from typing import Union, Tuple
 from functools import lru_cache
@@ -17,7 +18,7 @@ def get_truncated_scattering(
     scattering_unpolarized: np.ndarray,
     theta: np.ndarray,
     theta1: float,
-    theta2: float
+    theta2: float,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Extracts the truncated scattering intensity and corresponding angles based
@@ -51,10 +52,10 @@ def trunc_mono(
     full_output: bool = False,
     calibrated_trunc: bool = True,
     discretize: bool = True,
-) -> Union[float,
-           Tuple[
-               float, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
-               np.ndarray]]:
+) -> Union[
+    float,
+    Tuple[float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+]:
     """
     Truncation correction for monodisperse aerosol particle.
 
@@ -111,9 +112,7 @@ def trunc_mono(
     # Discretize parameters if enabled
     if discretize:
         m_sphere, wavelength, diameter = mie_bulk.discretize_mie_parameters(
-            m_sphere=m_sphere,
-            wavelength=wavelength,
-            diameter=diameter
+            m_sphere=m_sphere, wavelength=wavelength, diameter=diameter
         )
 
     # Choose the appropriate scattering function based on discretization
@@ -125,7 +124,7 @@ def trunc_mono(
             diameter=diameter,
             min_angle=0,
             max_angle=180,
-            angular_resolution=ang_res
+            angular_resolution=ang_res,
         )
     else:
         theta, _, _, su = ps.ScatteringFunction(
@@ -134,7 +133,7 @@ def trunc_mono(
             diameter=diameter,
             minAngle=0,
             maxAngle=180,
-            angularResolution=ang_res
+            angularResolution=ang_res,
         )
 
     # Integrate the Mie scattering efficiency over all angles
@@ -152,19 +151,23 @@ def trunc_mono(
     for i, z in enumerate(z_axis):
         # Calculate forward and backward scattering angles based on geometry
         alpha, beta = mie_angular.calculate_scattering_angles(
-            z, diam_sphere, diam_tube)
+            z, diam_sphere, diam_tube
+        )
 
         # Assign scattering angles and efficiencies based on z-axis position
-        theta1[i], theta2[i], qsca_ideal[i] = \
+        theta1[i], theta2[i], qsca_ideal[i] = (
             mie_angular.assign_scattering_thetas(
-                alpha, beta, q_mie, z, diam_sphere)
+                alpha, beta, q_mie, z, diam_sphere
+            )
+        )
 
         # Calculate truncated scattering efficiency for this z-axis position
         su_trunc, theta_trunc = get_truncated_scattering(
-            su, theta, theta1[i], theta2[i])
+            su, theta, theta1[i], theta2[i]
+        )
         qsca_trunc[i] = trapz(
-            (2 * su_trunc * np.sin(theta_trunc)) / size_param**2,
-            theta_trunc)
+            (2 * su_trunc * np.sin(theta_trunc)) / size_param**2, theta_trunc
+        )
 
     # Integrate scattering efficiencies over the z-axis to get total
     # efficiencies
@@ -172,11 +175,17 @@ def trunc_mono(
     ideal = trapz(qsca_ideal, z_axis)
 
     # Apply calibration factor to truncation correction if requested
-    trunc_corr = (ideal / trunc) / \
-        trunc_calibration if calibrated_trunc else ideal / trunc
+    trunc_corr = (
+        (ideal / trunc) / trunc_calibration
+        if calibrated_trunc
+        else ideal / trunc
+    )
 
-    return (trunc_corr, z_axis, trunc, ideal,
-            theta1, theta2) if full_output else trunc_corr
+    return (
+        (trunc_corr, z_axis, trunc, ideal, theta1, theta2)
+        if full_output
+        else trunc_corr
+    )
 
 
 def truncation_for_diameters(
@@ -184,7 +193,7 @@ def truncation_for_diameters(
     wavelength: float,
     diameter_sizes: NDArray[np.float64],
     discretize: bool = True,
-    calibrated_trunc: bool = True
+    calibrated_trunc: bool = True,
 ) -> NDArray[np.float64]:
     """
     Truncation correction for an array of particle diameters.
@@ -212,11 +221,13 @@ def truncation_for_diameters(
     truncation_array = np.zeros_like(diameter_sizes, dtype=np.float64)
 
     if discretize:
-        m_sphere, wavelength, diameter_sizes = \
+        m_sphere, wavelength, diameter_sizes = (
             mie_bulk.discretize_mie_parameters(
                 m_sphere=m_sphere,
                 wavelength=wavelength,
-                diameter=diameter_sizes)
+                diameter=diameter_sizes,
+            )
+        )
 
     # For each diameter, calculate the truncation correction
     for i, diameter in enumerate(diameter_sizes):
@@ -226,7 +237,7 @@ def truncation_for_diameters(
             diameter=diameter,
             full_output=False,
             calibrated_trunc=calibrated_trunc,
-            discretize=discretize
+            discretize=discretize,
         )
     return truncation_array
 
@@ -238,7 +249,7 @@ def correction_for_distribution(
     number_per_cm3: NDArray[np.float64],
     discretize: bool = True,
 ) -> Union[float, np.float64]:
-    """ Correction for a size distribution of particles.
+    """Correction for a size distribution of particles.
 
     Calculates the correction factor for scattering measurements due to
     truncation effects in aerosol size distribution measurements. This
@@ -271,7 +282,7 @@ def correction_for_distribution(
         m_sphere=m_sphere,
         wavelength=wavelength,
         diameter_sizes=diameter_sizes,
-        discretize=discretize
+        discretize=discretize,
     )
 
     # Calculate the scattering coefficient with truncation effects
@@ -282,7 +293,7 @@ def correction_for_distribution(
         number_per_cm3=number_per_cm3,
         discretize=discretize,
         truncation_calculation=True,
-        truncation_b_sca_multiple=1 / trunc_corr
+        truncation_b_sca_multiple=1 / trunc_corr,
     )
 
     # Calculate the ideal (non-truncated) scattering coefficient
@@ -291,7 +302,7 @@ def correction_for_distribution(
         wavelength=wavelength,
         diameter=diameter_sizes,
         number_per_cm3=number_per_cm3,
-        discretize=discretize
+        discretize=discretize,
     )
 
     # Return the correction factor as the ratio of ideal to truncated
@@ -308,7 +319,7 @@ def correction_for_humidified(
     refractive_index_dry: Union[complex, float] = 1.45,
     water_refractive_index: Union[complex, float] = 1.33,
     wavelength: float = 450,
-    discretize: bool = True
+    discretize: bool = True,
 ) -> np.float64:
     """Truncation Correction for humidified aerosol measurements.
 
@@ -343,16 +354,12 @@ def correction_for_humidified(
             coefficients to account for truncation effects due to humidity.
     """
     # calculate the volume of the dry aerosol
-    volume_sizer = convert.length_to_volume(diameter, length_type='diameter')
+    volume_sizer = convert.length_to_volume(diameter, length_type="diameter")
     volume_dry = convert.kappa_volume_solute(
-        volume_sizer,
-        kappa,
-        water_activity_sizer
+        volume_sizer, kappa, water_activity_sizer
     )
     volume_water_sample = convert.kappa_volume_water(
-        volume_dry,
-        kappa,
-        water_activity_sample
+        volume_dry, kappa, water_activity_sample
     )
 
     # calculate the effective refractive index of the dry+water aerosol
@@ -360,12 +367,11 @@ def correction_for_humidified(
         refractive_index_dry,
         water_refractive_index,
         volume_water_sample[-1],
-        volume_dry[-1]
+        volume_dry[-1],
     )
     # wet diameter sizes
     diameter_sizes = convert.volume_to_length(
-        volume_dry + volume_water_sample,
-        length_type='diameter'
+        volume_dry + volume_water_sample, length_type="diameter"
     )
     # calculate the b_sca correction
     bsca_correction = correction_for_distribution(
@@ -387,9 +393,9 @@ def correction_for_humidified_looped(
     refractive_index_dry: Union[complex, float] = 1.45,
     water_refractive_index: Union[complex, float] = 1.33,
     wavelength: float = 450,
-    discretize: bool = True
+    discretize: bool = True,
 ) -> NDArray[np.float64]:
-    """ Looped correction for humidified aerosol measurements.
+    """Looped correction for humidified aerosol measurements.
 
     Corrects scattering measurements for aerosol particles to account for
     truncation errors in CAPS instrument. This correction is vital for
@@ -431,30 +437,32 @@ def correction_for_humidified_looped(
     correction_multiple = np.zeros((len(kappa)), dtype=np.float64)
 
     # Determine indices with missing input data to exclude from correction
-    skip_data = np.isnan(kappa) | \
-        np.isnan(water_activity_sample) | \
-        np.isnan(water_activity_sizer) | \
-        np.isnan(number_per_cm3).any(axis=1)
+    skip_data = (
+        np.isnan(kappa)
+        | np.isnan(water_activity_sample)
+        | np.isnan(water_activity_sizer)
+        | np.isnan(number_per_cm3).any(axis=1)
+    )
 
     # Iterate over each time index to apply the scattering correction
-    for index, row_number_per_cm3 in tqdm(enumerate(number_per_cm3),
-                                          'Scattering Truncation'):
+    for index, row_number_per_cm3 in tqdm(
+        enumerate(number_per_cm3), "Scattering Truncation"
+    ):
         if skip_data[index]:
             # Assign NaN for indices with incomplete data
             correction_multiple[index] = np.nan
             continue
         # Correct scattering for the current time index using the specified
         # parameters
-        correction_multiple[index] = \
-            correction_for_humidified(
-                kappa=kappa[index],
-                number_per_cm3=row_number_per_cm3,
-                diameter=diameter,
-                water_activity_sizer=water_activity_sizer[index],
-                water_activity_sample=water_activity_sample[index],
-                refractive_index_dry=refractive_index_dry,
-                water_refractive_index=water_refractive_index,
-                wavelength=wavelength,
-                discretize=discretize
+        correction_multiple[index] = correction_for_humidified(
+            kappa=kappa[index],
+            number_per_cm3=row_number_per_cm3,
+            diameter=diameter,
+            water_activity_sizer=water_activity_sizer[index],
+            water_activity_sample=water_activity_sample[index],
+            refractive_index_dry=refractive_index_dry,
+            water_refractive_index=water_refractive_index,
+            wavelength=wavelength,
+            discretize=discretize,
         )
     return correction_multiple

@@ -21,7 +21,7 @@ AERODYNAMIC_SHAPE_FACTOR_DICT = {
 }
 
 
-def particle_aerodynamic_length(  # pylint: disable=too-many-arguments
+def particle_aerodynamic_length(  # pylint: disable=too-many-positional-arguments, too-many-arguments
     physical_length: Union[float, NDArray[np.float64]],
     physical_slip_correction_factor: Union[float, NDArray[np.float64]],
     aerodynamic_slip_correction_factor: Union[float, NDArray[np.float64]],
@@ -65,9 +65,7 @@ def particle_aerodynamic_length(  # pylint: disable=too-many-arguments
     )
 
 
-def get_aerodynamic_shape_factor(
-    shape_key: str
-) -> float:
+def get_aerodynamic_shape_factor(shape_key: str) -> float:
     """Retrieve the aerodynamic shape factor for a given particle shape.
 
     Args:

@@ -1,8 +1,10 @@
 """Caculate Mie angular scattering properties for aerosol particles."""
+
 # pyright: reportReturnType=false, reportAssignmentType=false
 # pyright: reportIndexIssue=false
 # pyright: reportArgumentType=false, reportOperatorIssue=false
-# pylint: disable=too-many-arguments, too-many-locals
+# pylint: disable=too-many-positional-arguments, too-many-arguments,
+# pylint: disable=too-many-locals
 
 
 from typing import Union, Tuple
@@ -18,7 +20,7 @@ def discretize_scattering_angles(
     diameter: Union[float, np.float64],
     min_angle: int = 0,
     max_angle: int = 180,
-    angular_resolution: float = 1
+    angular_resolution: float = 1,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Discretize and cache the scattering function for a spherical particle
@@ -53,7 +55,7 @@ def discretize_scattering_angles(
         diameter=diameter,
         minAngle=min_angle,
         maxAngle=max_angle,
-        angularResolution=angular_resolution
+        angularResolution=angular_resolution,
     )
     return measure, parallel, perpendicular, unpolarized
 
@@ -61,7 +63,7 @@ def discretize_scattering_angles(
 def calculate_scattering_angles(
     z_position: Union[float, np.float64],
     integrate_sphere_diameter_cm: float,
-    tube_diameter_cm: float
+    tube_diameter_cm: float,
 ) -> Tuple[float, float]:
     """
     Calculate forward and backward scattering angles for a given position
@@ -101,7 +103,7 @@ def assign_scattering_thetas(
     beta: float,
     q_mie: float,
     z_position: Union[float, np.float64],
-    integrate_sphere_diameter_cm: float
+    integrate_sphere_diameter_cm: float,
 ) -> Tuple[float, float, float]:
     """
     Assign scattering angles and efficiencies based on the z-axis position

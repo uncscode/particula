@@ -20,8 +20,8 @@ def combine_data(
     time_new: np.ndarray,
     header_new: list,
 ) -> Tuple[np.ndarray, list]:
-    # pylint: disable=too-many-arguments
-    """"
+    # pylint: disable=too-many-positional-arguments, too-many-arguments
+    """ "
     Merge or adds processed data together. Accounts for data shape
     miss matches and duplicate timestamps. If the data is a different shape
     than
@@ -52,9 +52,8 @@ def combine_data(
     """
 
     data_new = convert.data_shape_check(
-        time=time_new,
-        data=data_new,
-        header=header_new)
+        time=time_new, data=data_new, header=header_new
+    )
 
     # Check if time_new matches the dimensions of data_new
     if np.array_equal(time, time_new):
@@ -102,7 +101,7 @@ def stream_add_data(
     time_new: np.ndarray,
     data_new: np.ndarray,
     header_check: Optional[bool] = False,
-    header_new: Optional[list] = None
+    header_new: Optional[list] = None,
 ) -> Stream:
     """
     Adds a new data stream and corresponding time stream to the
@@ -155,13 +154,14 @@ def stream_add_data(
     elif header_check:
         header_new = stream.header if header_new is None else header_new
 
-        stream.data, stream.header, data_new, header_new = \
+        stream.data, stream.header, data_new, header_new = (
             stats.merge_formatting(
                 data_current=stream.data,
                 header_current=stream.header,
                 data_new=data_new,
-                header_new=header_new
+                header_new=header_new,
             )
+        )
         # updates stream
         stream.data = np.vstack((stream.data, data_new))
         stream.time = np.concatenate((stream.time, time_new))
@@ -170,10 +170,7 @@ def stream_add_data(
         stream.time = np.concatenate((stream.time, time_new))
 
     # check if the time stream added is increasing
-    increasing_time = np.all(
-        stream.time[1:] >= stream.time[:-1],
-        axis=0
-    )
+    increasing_time = np.all(stream.time[1:] >= stream.time[:-1], axis=0)
 
     if not increasing_time:
         # sort the time stream

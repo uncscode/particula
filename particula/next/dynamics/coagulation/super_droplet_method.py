@@ -80,9 +80,7 @@ def super_droplet_update_step(
         concentration[large_index[more_large]] = np.abs(
             concentration_delta[more_large]
         )
-        particle_radius[small_index[more_large]] = new_radii[
-            more_large
-        ]
+        particle_radius[small_index[more_large]] = new_radii[more_large]
 
     # Step 6: Handle cases where there are more small particles than large ones
     # Update the concentration of small particles and adjust the radii of
@@ -92,9 +90,7 @@ def super_droplet_update_step(
         concentration[small_index[more_small]] = np.abs(
             concentration_delta[more_small]
         )
-        particle_radius[large_index[more_small]] = new_radii[
-            more_small
-        ]
+        particle_radius[large_index[more_small]] = new_radii[more_small]
 
     # Increment event counters for both small and large particles
     single_event_counter[small_index] += 1
@@ -124,9 +120,7 @@ def event_pairs(
     # Calculate the number of particle pairs based on the kernel value
     if lower_bin != upper_bin:
         return (
-            kernel_max
-            * number_in_bins[lower_bin]
-            * number_in_bins[upper_bin]
+            kernel_max * number_in_bins[lower_bin] * number_in_bins[upper_bin]
         )
     return (
         kernel_max
@@ -167,7 +161,7 @@ def sample_events(
     return generator.poisson(events_exact * time_step)
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments, too-many-arguments
 def random_choice_indices(
     lower_bin: int,
     upper_bin: int,
@@ -261,13 +255,19 @@ def select_random_indices(
     """
     # Select random indices for particles in the lower_bin
     lower_indices = generator.integers(  # type: ignore
-        0, number_in_bins[lower_bin],
-        size=events, endpoint=False, dtype=np.int64
+        0,
+        number_in_bins[lower_bin],
+        size=events,
+        endpoint=False,
+        dtype=np.int64,
     )
     # Select random indices for particles in the upper_bin
     upper_indices = generator.integers(  # type: ignore
-        0, number_in_bins[upper_bin],
-        size=events, endpoint=False, dtype=np.int64
+        0,
+        number_in_bins[upper_bin],
+        size=events,
+        endpoint=False,
+        dtype=np.int64,
     )
     return lower_indices, upper_indices
 
@@ -412,9 +412,7 @@ def sort_particles(
     particle_radius: NDArray[np.float64],
     particle_concentration: Optional[NDArray[np.float64]] = None,
 ) -> Tuple[
-    NDArray[np.int64],
-    NDArray[np.float64],
-    Optional[NDArray[np.float64]]
+    NDArray[np.int64], NDArray[np.float64], Optional[NDArray[np.float64]]
 ]:
     """
     Sort particles by size and optionally sort their concentrations.
@@ -518,7 +516,7 @@ def calculate_concentration_in_bins(
     return concentration_in_bins
 
 
-# pylint: disable=too-many-arguments, too-many-locals
+# pylint: disable=too-many-positional-arguments, too-many-arguments, too-many-locals
 def super_droplet_coagulation_step(
     particle_radius: NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
@@ -560,8 +558,7 @@ def super_droplet_coagulation_step(
     )
     # Step 2: Bin particles by size using the provided kernel radius bins
     number_in_bins, bin_indices = bin_particles(
-        particle_radius=sorted_radius,
-        radius_bins=kernel_radius
+        particle_radius=sorted_radius, radius_bins=kernel_radius
     )
     # Step 3: Precompute unique bin pairs for efficient coagulation
     # computations

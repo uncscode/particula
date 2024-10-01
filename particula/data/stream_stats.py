@@ -32,9 +32,9 @@ def drop_masked(stream: Stream, mask: np.ndarray) -> Stream:  # type: ignore
 
 
 def average_std(
-        stream: Stream,
-        average_interval: Union[float, int] = 60,
-        new_time_array: Optional[np.ndarray] = None,
+    stream: Stream,
+    average_interval: Union[float, int] = 60,
+    new_time_array: Optional[np.ndarray] = None,
 ) -> StreamAveraged:
     """
     Calculate the average and standard deviation of data within a given
@@ -72,9 +72,7 @@ def average_std(
     if new_time_array is None:
         # generate new time array from start and end times
         new_time_array = np.arange(
-            start=stream.time[0],
-            stop=stream.time[-1],
-            step=average_interval
+            start=stream.time[0], stop=stream.time[-1], step=average_interval
         )
     # generate empty arrays for averaged data and std to be filled in
     average = np.zeros([len(new_time_array), len(stream.header)]) * np.nan
@@ -102,7 +100,7 @@ def average_std(
     )
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments, too-many-arguments
 def filtering(
     stream: Stream,
     bottom: Optional[float] = None,
@@ -112,7 +110,7 @@ def filtering(
     clone: Optional[bool] = True,
     replace_with: Optional[Union[float, int]] = None,
     drop: Optional[bool] = False,
-    header: Optional[Union[list, int, str]] = None
+    header: Optional[Union[list, int, str]] = None,
 ) -> Stream:
     """
     Filters the data of the given 'stream' object based on the specified
@@ -155,14 +153,12 @@ def filtering(
     if clone:
         stream = copy.copy(stream)
     # Get the data to be filtered
-    data_is = stream[header] if header is not None else stream.data
+    data_is = (
+        stream[header] if header is not None else stream.data  # type: ignore
+    )
     # Create a mask for the data that should be retained or replaced
     mask = stats.mask_outliers(
-        data=data_is,
-        bottom=bottom,
-        top=top,
-        value=value,
-        invert=invert
+        data=data_is, bottom=bottom, top=top, value=value, invert=invert
     )
     if drop and replace_with is None:
         # Apply mask to data and time, dropping filtered values
@@ -177,9 +173,9 @@ def filtering(
 
 
 def remove_time_window(
-        stream: Stream,
-        epoch_start: Union[float, int],
-        epoch_end: Optional[Union[float, int]] = None,
+    stream: Stream,
+    epoch_start: Union[float, int],
+    epoch_end: Optional[Union[float, int]] = None,
 ) -> Stream:
     """
     Remove a time window from a stream object.
@@ -238,8 +234,8 @@ def select_time_window(
 
     if epoch_end is None:
         # If no end time provided, keep only the closest time point
-        stream.time = stream.time[index_start:index_start + 1]
-        stream.data = stream.data[index_start:index_start + 1, :]
+        stream.time = stream.time[index_start: index_start + 1]
+        stream.data = stream.data[index_start: index_start + 1, :]
     else:
         # Get index of end time
         index_end = np.argmin(np.abs(stream.time - epoch_end)) + 1

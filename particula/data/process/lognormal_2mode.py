@@ -161,7 +161,7 @@ def evaluate_fit(
     )
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments, too-many-arguments
 def optimize_fit(
     mode_guess: NDArray[np.float64],
     geometric_standard_deviation_guess: NDArray[np.float64],

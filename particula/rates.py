@@ -10,16 +10,14 @@ from particula.util.coagulation_rate import CoagulationRate
 
 
 class Rates:
-    """ The class to calculate the rates
-    """
+    """The class to calculate the rates"""
 
     def __init__(
         self,
         particle=None,
         lazy=True,
     ):
-        """ setting up the class
-        """
+        """setting up the class"""
 
         if particle is None or not isinstance(particle, Particle):
             raise ValueError("You must provide a baseline Particle object!")
@@ -36,12 +34,11 @@ class Rates:
                 distribution=self.particle_distribution,
                 radius=self.particle_radius,
                 kernel=self.particle_coagulation,
-                lazy=self.lazy
+                lazy=self.lazy,
             ).eager_coags
 
     def _coag_loss_gain(self):
-        """ get both loss and gain
-        """
+        """get both loss and gain"""
         return CoagulationRate(
             distribution=self.particle_distribution,
             radius=self.particle_radius,
@@ -49,73 +46,72 @@ class Rates:
         )
 
     def coagulation_loss(self):
-        """ get the coagulation loss rate
-        """
-        return self._coag_loss_gain().coag_loss() if self.lazy \
+        """get the coagulation loss rate"""
+        return (
+            self._coag_loss_gain().coag_loss()
+            if self.lazy
             else self.eager_coags[0]
+        )
 
     def coagulation_gain(self):
-        """ get coagulation gain rate
-        """
-        return self._coag_loss_gain().coag_gain() if self.lazy \
+        """get coagulation gain rate"""
+        return (
+            self._coag_loss_gain().coag_gain()
+            if self.lazy
             else self.eager_coags[1]
+        )
 
     def coagulation_rate(self):
-        """ get the coagulation rate by summing the loss and gain rates
-        """
+        """get the coagulation rate by summing the loss and gain rates"""
 
         return self.coagulation_gain() - self.coagulation_loss()
 
     def condensation_growth_speed(self):
-        """ condensation speed
-        """
+        """condensation speed"""
 
         return self.particle.particle_growth()
 
     def condensation_growth_rate(self):
-        """ condensation rate
-        """
+        """condensation rate"""
         return ord1_acc4(
             -self.condensation_growth_speed().m * self.particle_distribution.m,
-            self.particle_radius.m
+            self.particle_radius.m,
         ) * (
-            self.condensation_growth_speed().u * self.particle_distribution.u /
-            self.particle_radius.u
+            self.condensation_growth_speed().u
+            * self.particle_distribution.u
+            / self.particle_radius.u
         )
 
     def nucleation_rate(self):
-        """ nucleation rate
-        """
-        result = np.zeros(
-            self.condensation_growth_rate().m.shape
-        )*self.particle_formation_rate.u
+        """nucleation rate"""
+        result = (
+            np.zeros(self.condensation_growth_rate().m.shape)
+            * self.particle_formation_rate.u
+        )
         result[0] = self.particle_formation_rate
         return result
 
     def dilution_rate(self):
-        """ dilution rate
-        """
+        """dilution rate"""
         return (
-            - self.particle.dilution_rate_coefficient() *
-            self.particle_distribution
+            -self.particle.dilution_rate_coefficient()
+            * self.particle_distribution
         )
 
     def wall_loss_rate(self):
-        """ wall loss rate
-        """
+        """wall loss rate"""
         return (
-            - self.particle.wall_loss_coefficient() *
-            self.particle_distribution
+            -self.particle.wall_loss_coefficient() * self.particle_distribution
         )
 
     def sum_rates(
-            self,
-            coagulation=True,
-            condensation=True,
-            nucleation=True,
-            dilution=False,
-            wall_loss=False,
-    ):  # pylint: disable=too-many-arguments
+        self,
+        coagulation=True,
+        condensation=True,
+        nucleation=True,
+        dilution=False,
+        wall_loss=False,
+    ):  # pylint: disable=too-many-positional-arguments, too-many-arguments
         """Sum rates, with options to disable individual rate terms.
 
         Args:
@@ -135,20 +131,20 @@ class Rates:
 
         # Define a dictionary that maps option names to rate functions
         rates = {
-            'coagulation': self.coagulation_rate,
-            'condensation': self.condensation_growth_rate,
-            'nucleation': self.nucleation_rate,
-            'dilution': self.dilution_rate,
-            'wall_loss': self.wall_loss_rate,
+            "coagulation": self.coagulation_rate,
+            "condensation": self.condensation_growth_rate,
+            "nucleation": self.nucleation_rate,
+            "dilution": self.dilution_rate,
+            "wall_loss": self.wall_loss_rate,
         }
 
         # Define a dictionary that maps option names to their Boolean values
         options = {
-            'coagulation': coagulation,
-            'condensation': condensation,
-            'nucleation': nucleation,
-            'dilution': dilution,
-            'wall_loss': wall_loss,
+            "coagulation": coagulation,
+            "condensation": condensation,
+            "nucleation": nucleation,
+            "dilution": dilution,
+            "wall_loss": wall_loss,
         }
         # Return the sum of the rates that are enabled
         return sum(

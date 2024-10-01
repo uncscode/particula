@@ -46,7 +46,8 @@ class GasSpecies:
     - add_concentration: Add concentration to the gas species.
     """
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-positional-arguments
+        # pylint: disable=too-many-arguments
         self,
         name: Union[str, NDArray[np.str_]],
         molar_mass: Union[float, NDArray[np.float64]],
@@ -101,8 +102,9 @@ class GasSpecies:
         """Get the concentration of the gas species in the mixture, in kg/m^3.
 
         Returns:
-        - concentration (float or NDArray[np.float64]): The concentration of the
-            gas species in the mixture."""
+        - concentration (float or NDArray[np.float64]): The concentration of
+            the gas species in the mixture.
+        """
         return self.concentration
 
     def get_pure_vapor_pressure(
@@ -171,8 +173,8 @@ class GasSpecies:
                     )
                     for (strategy, c, m) in zip(
                         self.pure_vapor_pressure_strategy,
-                        self.concentration,
-                        self.molar_mass,
+                        self.concentration,  # type: ignore
+                        self.molar_mass,  # type: ignore
                     )
                 ],
                 dtype=np.float64,
@@ -214,8 +216,8 @@ class GasSpecies:
                     )
                     for (strategy, c, m) in zip(
                         self.pure_vapor_pressure_strategy,
-                        self.concentration,
-                        self.molar_mass,
+                        self.concentration,  # type: ignore
+                        self.molar_mass,  # type: ignore
                     )
                 ],
                 dtype=np.float64,
@@ -256,7 +258,8 @@ class GasSpecies:
                         molar_mass=m, temperature=temperature
                     )
                     for (strategy, m) in zip(
-                        self.pure_vapor_pressure_strategy, self.molar_mass
+                        self.pure_vapor_pressure_strategy,
+                        self.molar_mass  # type: ignore
                     )
                 ],
                 dtype=np.float64,

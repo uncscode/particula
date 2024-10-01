@@ -12,7 +12,7 @@ from particula.next.dynamics.properties.wall_loss_coefficient import (
 )
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments, too-many-arguments
 def spherical_wall_loss_rate(
     wall_eddy_diffusivity: float,
     particle_radius: Union[float, NDArray[np.float64]],
@@ -61,7 +61,7 @@ def spherical_wall_loss_rate(
     return -loss_coefficient * particle_concentration
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments, too-many-arguments
 def rectangle_wall_loss_rate(
     wall_eddy_diffusivity: float,
     particle_radius: Union[float, NDArray[np.float64]],

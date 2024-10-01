@@ -21,6 +21,7 @@ from particula.data.mixin import (
     ChecksCharCountsMixin,
     ChecksSkipRowsMixin,
     ChecksSkipEndMixin,
+    ChecksReplaceCharsMixin,
     SizerConcentrationConvertFromMixin,
     SizerStartKeywordMixin,
     SizerEndKeywordMixin,
@@ -100,6 +101,7 @@ class DataChecksBuilder(
     BuilderABC,
     ChecksCharactersMixin,
     ChecksCharCountsMixin,
+    ChecksReplaceCharsMixin,
     ChecksSkipRowsMixin,
     ChecksSkipEndMixin,
 ):
@@ -109,12 +111,14 @@ class DataChecksBuilder(
         required_parameters = [
             "characters",
             "char_counts",
+            "strip_chars",
             "skip_rows",
             "skip_end",
         ]
         BuilderABC.__init__(self, required_parameters)
         ChecksCharactersMixin.__init__(self)
         ChecksCharCountsMixin.__init__(self)
+        ChecksReplaceCharsMixin.__init__(self)
         ChecksSkipRowsMixin.__init__(self)
         ChecksSkipEndMixin.__init__(self)
 
@@ -123,6 +127,7 @@ class DataChecksBuilder(
         return {
             "characters": self.characters,
             "char_counts": self.char_counts,
+            "replace_chars": self.replace_chars,
             "skip_rows": self.skip_rows,
             "skip_end": self.skip_end,
         }

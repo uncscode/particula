@@ -135,7 +135,7 @@ def _cost_physical_radius(
     return (new_aerodynamic_radius - aerodynamic_radius) ** 2
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments, too-many-arguments
 def convert_aerodynamic_to_physical_radius(
     aerodynamic_radius: Union[float, NDArray[np.float64]],
     pressure: float,
@@ -182,19 +182,18 @@ def convert_aerodynamic_to_physical_radius(
         _cost_physical_radius,
         mean_free_path_air=mean_free_path_air,
         aerodynamic_radius=aerodynamic_radius,
-        **keywords
+        **keywords,
     )
 
     # Solve for physical radius using fsolve
     optimal_physical_radius = fsolve(
-        cost_function_with_kwargs,
-        initial_physical_guess
+        cost_function_with_kwargs, initial_physical_guess
     )
 
     return optimal_physical_radius  # type: ignore
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments, too-many-arguments
 def convert_physical_to_aerodynamic_radius(
     physical_radius: Union[float, NDArray[np.float64]],
     pressure: float,
@@ -240,13 +239,12 @@ def convert_physical_to_aerodynamic_radius(
         _cost_aerodynamic_radius,
         mean_free_path_air=mean_free_path_air,
         particle_radius=physical_radius,
-        **keywords
+        **keywords,
     )
 
     # Solve for aerodynamic radius using fsolve
     optimal_aerodynamic_radius = fsolve(
-        cost_function_with_kwargs,
-        initial_guess
+        cost_function_with_kwargs, initial_guess
     )
 
     return optimal_aerodynamic_radius  # type: ignore

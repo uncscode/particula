@@ -1,9 +1,11 @@
 """Calculate Mie optical properties for a size distribution of
 spherical particles. With discretization options."""
+
 # pyright: reportReturnType=false, reportAssignmentType=false
 # pyright: reportIndexIssue=false
 # pyright: reportArgumentType=false, reportOperatorIssue=false
-# pylint: disable=too-many-arguments, too-many-locals
+# pylint: disable=too-many-positional-arguments, too-many-arguments,
+# pylint: disable=too-many-locals
 
 
 from typing import Union, Tuple, Optional
@@ -54,10 +56,9 @@ def discretize_auto_mieq(
             - q_back, Backscatter efficiency.
             - q_ratio, Ratio of backscatter to extinction efficiency.
     """
-    return ps.AutoMieQ(m=m_sphere,
-                       wavelength=wavelength,
-                       diameter=diameter,
-                       nMedium=m_medium)
+    return ps.AutoMieQ(
+        m=m_sphere, wavelength=wavelength, diameter=diameter, nMedium=m_medium
+    )
 
 
 def discretize_mie_parameters(
@@ -67,11 +68,7 @@ def discretize_mie_parameters(
     base_m_sphere: float = 0.001,
     base_wavelength: float = 1,
     base_diameter: float = 5,
-) -> Tuple[
-    Union[complex, float],
-    float,
-    Union[float, list[float]]
-]:
+) -> Tuple[Union[complex, float], float, Union[float, list[float]]]:
     """
     Discretize the refractive index, wavelength, and diameters for Mie
     scattering calculations.
@@ -108,28 +105,23 @@ def discretize_mie_parameters(
                 performance and reduced computational overhead.
     """
     m_real = convert.round_arbitrary(
-        values=np.real(m_sphere),
-        base=base_m_sphere,
-        mode='round')
+        values=np.real(m_sphere), base=base_m_sphere, mode="round"
+    )
     m_imag = convert.round_arbitrary(
-        values=np.imag(m_sphere),
-        base=base_m_sphere,
-        mode='round')
+        values=np.imag(m_sphere), base=base_m_sphere, mode="round"
+    )
     # Recombine the discretized real and imaginary parts
     m_discretized = m_real + 1j * m_imag if m_imag != 0 else m_real
 
     # Discretize the wavelength, assuming nm units
     wavelength_discretized = convert.round_arbitrary(
-        values=wavelength,
-        base=base_wavelength,
-        mode='round')
+        values=wavelength, base=base_wavelength, mode="round"
+    )
 
     # Discretize the particle diameters, assuming nm units
     dp_discretized = convert.round_arbitrary(
-        values=diameter,
-        base=base_diameter,
-        mode='round',
-        nonzero_edge=True)
+        values=diameter, base=base_diameter, mode="round", nonzero_edge=True
+    )
 
     return m_discretized, wavelength_discretized, dp_discretized
 
@@ -143,7 +135,7 @@ def compute_bulk_optics(
     area_dist: NDArray[np.float64],
     extinction_only: bool,
     pms: bool,
-    dp: NDArray[np.float64]
+    dp: NDArray[np.float64],
 ) -> Union[NDArray[np.float64], tuple[NDArray[np.float64], ...]]:
     """
     Compute bulk optical properties from size-dependent efficiency factors for
@@ -182,8 +174,7 @@ def compute_bulk_optics(
         b_abs = b_ext - b_sca
         b_back = np.sum(q_back * area_dist)
         b_ratio = np.sum(q_ratio * area_dist)
-        big_g = np.sum(g * q_sca * area_dist) / b_sca \
-            if b_sca != 0 else 0
+        big_g = np.sum(g * q_sca * area_dist) / b_sca if b_sca != 0 else 0
         b_pr = b_ext - big_g * b_sca
     else:  # then pdf so the integral is used
         b_ext = np.trapz(q_ext * area_dist, dp)
@@ -193,8 +184,9 @@ def compute_bulk_optics(
         b_abs = b_ext - b_sca
         b_back = np.trapz(q_back * area_dist, dp)
         b_ratio = np.trapz(q_ratio * area_dist, dp)
-        big_g = np.trapz(g * q_sca * area_dist, dp) / b_sca \
-            if b_sca != 0 else 0
+        big_g = (
+            np.trapz(g * q_sca * area_dist, dp) / b_sca if b_sca != 0 else 0
+        )
         b_pr = b_ext - big_g * b_sca
     return b_ext, b_sca, b_abs, b_pr, b_back, b_ratio, big_g
 
@@ -207,7 +199,7 @@ def format_mie_results(
     b_pr: NDArray[np.float64],
     b_back: NDArray[np.float64],
     b_ratio: NDArray[np.float64],
-    as_dict: bool
+    as_dict: bool,
 ) -> Union[dict[str, NDArray[np.float64]], tuple[NDArray[np.float64], ...]]:
     """
     Format the output results of the Mie scattering calculations.
@@ -233,13 +225,13 @@ def format_mie_results(
     """
     if as_dict:
         return {
-            'b_ext': b_ext,
-            'b_sca': b_sca,
-            'b_abs': b_abs,
-            'G': big_g,
-            'b_pr': b_pr,
-            'b_back': b_back,
-            'b_ratio': b_ratio
+            "b_ext": b_ext,
+            "b_sca": b_sca,
+            "b_abs": b_abs,
+            "G": big_g,
+            "b_pr": b_pr,
+            "b_back": b_back,
+            "b_ratio": b_ratio,
         }
     return b_ext, b_sca, b_abs, big_g, b_pr, b_back, b_ratio
 
@@ -255,11 +247,12 @@ def mie_size_distribution(
     extinction_only: bool = False,
     discretize: bool = False,
     truncation_calculation: bool = False,
-    truncation_b_sca_multiple: Optional[float] = None
+    truncation_b_sca_multiple: Optional[float] = None,
 ) -> Union[
-        NDArray[np.float64],
-        dict[str, NDArray[np.float64]],
-        Tuple[NDArray[np.float64], ...]]:
+    NDArray[np.float64],
+    dict[str, NDArray[np.float64]],
+    Tuple[NDArray[np.float64], ...],
+]:
     """
     Calculate Mie scattering parameters for a size distribution of spherical
     particles.
@@ -311,22 +304,22 @@ def mie_size_distribution(
     # Ensure inputs are numpy arrays for vectorized operations
     diameter, number_per_cm3 = map(
         lambda x: convert.coerce_type(x, np.ndarray),
-        (diameter, number_per_cm3))
+        (diameter, number_per_cm3),
+    )
 
     # Initialize arrays for Mie efficiencies and asymmetry factor
     q_ext, q_sca, q_abs, q_pr, q_back, q_ratio, g = (
-        np.zeros(diameter.size) for _ in range(7))
+        np.zeros(diameter.size) for _ in range(7)
+    )
 
     # Calculate area size distribution normalized to inverse megameters
-    area_dist = np.pi * (diameter / 2)**2 * number_per_cm3 * 1e-6
+    area_dist = np.pi * (diameter / 2) ** 2 * number_per_cm3 * 1e-6
 
     # discretize parameters
     if discretize:
         # Discretize parameters for potentially improved stability/performance
         m_sphere, wavelength, diameter = discretize_mie_parameters(
-            m_sphere=m_sphere,
-            wavelength=wavelength,
-            diameter=diameter
+            m_sphere=m_sphere, wavelength=wavelength, diameter=diameter
         )
 
     # Select the appropriate Mie calculation function with discretize flag
@@ -334,9 +327,8 @@ def mie_size_distribution(
     # applying discretized parameters if they were set else full MieQ
     for i in range(diameter.size):
         # Perform the calculation
-        q_ext[i], q_sca[i], q_abs[i], g[i], q_pr[i], q_back[i], q_ratio[i] = \
-            mie_function(
-            m_sphere, wavelength, diameter[i], n_medium
+        q_ext[i], q_sca[i], q_abs[i], g[i], q_pr[i], q_back[i], q_ratio[i] = (
+            mie_function(m_sphere, wavelength, diameter[i], n_medium)
         )  # pyright: ignore[reportGeneralTypeIssues]
 
     # Apply optional truncation to scattering efficiency
@@ -344,17 +336,27 @@ def mie_size_distribution(
         if truncation_b_sca_multiple is None:
             raise ValueError(
                 "truncation_b_sca_multiple must be specified \
-                    for truncation calculation.")
+                    for truncation calculation."
+            )
         q_sca *= truncation_b_sca_multiple
 
     # Compute bulk optical properties based on size distribution and selected
     # mode
     b_ext, b_sca, b_abs, b_pr, b_back, b_ratio, big_g = compute_bulk_optics(
-        q_ext, q_sca, q_back, q_ratio,
-        g, area_dist, extinction_only, pms, diameter)
+        q_ext,
+        q_sca,
+        q_back,
+        q_ratio,
+        g,
+        area_dist,
+        extinction_only,
+        pms,
+        diameter,
+    )
 
     # Return results based on requested format
     if extinction_only:
         return b_ext
-    return format_mie_results(b_ext, b_sca, b_abs, big_g,
-                              b_pr, b_back, b_ratio, as_dict)
+    return format_mie_results(
+        b_ext, b_sca, b_abs, big_g, b_pr, b_back, b_ratio, as_dict
+    )

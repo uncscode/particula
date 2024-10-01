@@ -4,6 +4,7 @@ from typing import Union, List
 from typing import List, Union, Tuple, Dict, Any, Optional
 from datetime import datetime, timezone
 import warnings
+import codecs
 import glob
 import os
 import pickle
@@ -23,7 +24,8 @@ def data_raw_loader(file_path: str) -> list:
     """Loads raw data from file.
 
     Load raw data from a file at the specified file path and return it as a
-    list of strings.
+    list of strings. Attempts to handle UTF-8, UTF-16, and UTF-32 encodings.
+    Defaults to UTF-8 if no byte order mark (BOM) is found.
 
     Args:
         file_path (str): The file path of the file to read.
@@ -40,11 +42,30 @@ def data_raw_loader(file_path: str) -> list:
         ```
     """
     try:
-        with open(file_path, "r", encoding="utf8", errors="replace") as file:
+        # Read a small part of the file to detect BOM (byte order mark)
+        with open(file_path, "rb") as f:
+            raw_bytes = f.read(4)
+
+        # Determine encoding based on BOM
+        if raw_bytes.startswith(codecs.BOM_UTF16_LE) or raw_bytes.startswith(
+            codecs.BOM_UTF16_BE
+        ):
+            encoding = "utf-16"
+        elif raw_bytes.startswith(codecs.BOM_UTF32_LE) or raw_bytes.startswith(
+            codecs.BOM_UTF32_BE
+        ):
+            encoding = "utf-32"
+        else:
+            encoding = "utf8"  # Default to utf-8 if no BOM is found
+
+        # Read file with the detected encoding
+        with open(file_path, "r", encoding=encoding, errors="replace") as file:
             data = [line.rstrip() for line in file]
+
     except FileNotFoundError:
         print(f"File not found: {file_path}")
         data = []
+
     return data
 
 
@@ -93,6 +114,41 @@ def filter_list(data: List[str], char_counts: dict) -> List[str]:
                 + f"been filtered out based on the character: {char}."
             )
     return filtered_data
+
+
+def replace_list(data: List[str], replace_dict: Dict[str, str]) -> List[str]:
+    """
+    Replace characters in each string of a list based on a replacement
+    dictionary.
+
+    Each character specified in the `replace_dict` will be replaced with the
+    corresponding value in every string in the input list.
+
+    Arguments:
+        data: A list of strings in which the characters will be replaced.
+        replace_dict: A dictionary specifying character replacements.
+            The keys are the characters to be replaced, and the values are the
+            replacement characters or strings.
+
+    Returns:
+        A new list of strings with the replacements applied.
+
+    Examples:
+        ``` py title="Replace characters in a list of strings"
+        data = ['apple[banana]orange', '[pear] kiwi plum']
+        replace_dict = {'[': '', ']': ''}
+        replaced_data = replace_list(data, replace_dict)
+        print(replaced_data)
+        ['applebananaorange', 'pear kiwi plum']
+        ```
+    """
+    replaced_data = []
+    for row in data:
+        modified_row = row
+        for old_char, new_char in replace_dict.items():
+            modified_row = modified_row.replace(old_char, new_char)
+        replaced_data.append(modified_row)
+    return replaced_data
 
 
 def data_format_checks(data: List[str], data_checks: dict) -> List[str]:
@@ -155,6 +211,9 @@ def data_format_checks(data: List[str], data_checks: dict) -> List[str]:
     if "char_counts" in data_checks:
         char_counts = data_checks.get("char_counts", {})
         data = filter_list(data, char_counts)
+    if "replace_chars" in data_checks:
+        replace_dict = data_checks.get("replace_chars", {})
+        data = replace_list(data, replace_dict)
     if data := [x.strip() for x in data]:
         return data
     else:
@@ -194,7 +253,10 @@ def parse_time_column(
         return float(line[time_column]) + seconds_shift
     if date_offset:
         # if the time is in one column, and the date is fixed
-        time_str = f"{date_offset} {line[time_column]}"
+        if isinstance(time_column, int):
+            time_str = f"{date_offset} {line[time_column]}"
+        else:
+            time_str = f"{date_offset} {line[time_column[0]]}"
         return (
             time_str_to_epoch(time_str, time_format, timezone_identifier)
             + seconds_shift
@@ -203,6 +265,13 @@ def parse_time_column(
         return (
             time_str_to_epoch(
                 line[time_column], time_format, timezone_identifier
+            )
+            + seconds_shift
+        )
+    if isinstance(time_column, list) and len(time_column) == 1:
+        return (
+            time_str_to_epoch(
+                line[time_column[0]], time_format, timezone_identifier
             )
             + seconds_shift
         )
@@ -215,6 +284,7 @@ def parse_time_column(
         )
     raise ValueError(
         f"Invalid time column or format: {time_column}, {time_format}"
+        f"{line}"
     )
 
 
@@ -256,7 +326,7 @@ def sample_data(
             if no matching data value is found.
     """
     # flake8: noqa
-    # pylint disable: too-many-arguments
+    # pylint disable: too-many-positional-arguments
     epoch_time = np.zeros(len(data))
     epoch_time = np.zeros(len(data))
     data_array = np.zeros((len(data), len(data_columns)))
@@ -318,6 +388,10 @@ def sample_data(
                     "yES",
                     "y",
                     "Y",
+                    "OK",
+                    "ok",
+                    "Ok",
+                    "Okay",
                 ]
                 false_match = [
                     "OFF",
@@ -494,9 +568,9 @@ def sizer_data_formatter(
     Arguments:
         data: List of raw data strings to be formatted.
         data_checks: Dictionary specifying validation rules for the data.
-        data_sizer_reader: Dictionary containing mappings for interpreting 
+        data_sizer_reader: Dictionary containing mappings for interpreting
             the sizer data format.
-        time_column: Index or list of indices indicating the position of 
+        time_column: Index or list of indices indicating the position of
             the time column(s) in the data.
         time_format: Format string for parsing time information in the data.
         delimiter: Delimiter used to separate values in the data.

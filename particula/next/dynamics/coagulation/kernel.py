@@ -65,7 +65,7 @@ class KernelStrategy(ABC):
         https://doi.org/10.1080/02786826.2019.1614522
         """
 
-    def kernel(  # pylint: disable=too-many-arguments
+    def kernel(  # pylint: disable=too-many-positional-arguments, too-many-arguments
         self,
         dimensionless_kernel: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],

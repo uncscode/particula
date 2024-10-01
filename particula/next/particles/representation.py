@@ -45,7 +45,7 @@ class ParticleRepresentation:
         concentration: NDArray[np.float64],
         charge: NDArray[np.float64],
         volume: float = 1,
-    ):  # pylint: disable=too-many-arguments
+    ):  # pylint: disable=too-many-positional-arguments, too-many-arguments
         self.strategy = strategy
         self.activity = activity
         self.surface = surface
@@ -251,9 +251,7 @@ class ParticleRepresentation:
             )
         return self.strategy.get_mass(self.distribution, self.density)
 
-    def get_mass_concentration(
-        self, clone: bool = False
-    ) -> np.float64:
+    def get_mass_concentration(self, clone: bool = False) -> np.float64:
         """Returns the total mass / volume simulated.
 
         The mass concentration is as calculated by the strategy, taking into
@@ -270,15 +268,13 @@ class ParticleRepresentation:
                 self.strategy.get_total_mass(
                     self.get_distribution(),
                     self.get_concentration(),
-                    self.get_density()
+                    self.get_density(),
                 )
             )
-        return (
-            self.strategy.get_total_mass(
-                self.get_distribution(),
-                self.get_concentration(),
-                self.get_density()
-            )
+        return self.strategy.get_total_mass(
+            self.get_distribution(),
+            self.get_concentration(),
+            self.get_density(),
         )
 
     def get_radius(self, clone: bool = False) -> NDArray[np.float64]:
@@ -307,7 +303,7 @@ class ParticleRepresentation:
             self.get_distribution(),
             self.get_concentration(),
             self.get_density(),
-            added_mass
+            added_mass,
         )
 
     def add_concentration(

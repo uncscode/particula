@@ -116,7 +116,7 @@ def rectangle_wall_loss_coefficient(
     )
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments, too-many-arguments
 def spherical_wall_loss_coefficient_via_system_state(
     wall_eddy_diffusivity: float,
     particle_radius: Union[float, NDArray[np.float64]],
@@ -173,7 +173,7 @@ def spherical_wall_loss_coefficient_via_system_state(
     )
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments, too-many-arguments
 def rectangle_wall_loss_coefficient_via_system_state(
     wall_eddy_diffusivity: float,
     particle_radius: Union[float, NDArray[np.float64]],

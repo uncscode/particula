@@ -205,7 +205,7 @@ class CondensationStrategy(ABC):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-positional-arguments, too-many-arguments
         """Mass transfer rate for a particle.
 
         Calculate the mass transfer rate based on the difference in partial
@@ -256,7 +256,7 @@ class CondensationStrategy(ABC):
                 particle concentration.
         """
 
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments, too-many-arguments
     @abstractmethod
     def step(
         self,
@@ -315,15 +315,13 @@ class CondensationIsothermal(CondensationStrategy):
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-positional-arguments, too-many-arguments
 
         # fill zero radius with a maximum value, the zero concentration
         # will ensure no mass transfer for those filled particles
         radius_with_fill = particle.get_radius()
         radius_with_fill = np.where(
-            radius_with_fill == 0,
-            np.max(radius_with_fill),
-            radius_with_fill
+            radius_with_fill == 0, np.max(radius_with_fill), radius_with_fill
         )
         # Calculate the first-order mass transport coefficient
         first_order_mass_transport = self.first_order_mass_transport(
@@ -389,7 +387,7 @@ class CondensationIsothermal(CondensationStrategy):
 
         return rates
 
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments, too-many-arguments
     def step(
         self,
         particle: ParticleRepresentation,
