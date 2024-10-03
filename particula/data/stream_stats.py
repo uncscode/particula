@@ -163,6 +163,8 @@ def filtering(
     if drop and replace_with is None:
         # Apply mask to data and time, dropping filtered values
         # if any rows are then drop that whole row
+        if mask.ndim == 1:
+            mask = np.expand_dims(mask, axis=1)
         mask_sum = np.invert(np.sum(np.invert(mask), axis=1) > 0)
         stream = drop_masked(stream, mask_sum)
     elif replace_with is not None:

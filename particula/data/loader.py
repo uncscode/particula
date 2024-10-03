@@ -493,7 +493,12 @@ def general_data_formatter(
     if isinstance(data_column[0], str):
         data_header = data[header_row].split(delimiter)
         # Get data column indices
-        data_column = [data_header.index(x) for x in data_column]
+        try:
+            data_column = [data_header.index(x) for x in data_column]
+        except ValueError as exc:
+            raise ValueError(
+                f"Header column not found in header: {data_header}"
+            ) from exc
 
     # Check the data format
     data = data_format_checks(data, data_checks)
