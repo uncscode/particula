@@ -134,25 +134,27 @@ def get_conversion_strategy(input_scale: str,
     converter to invert the directions of the input and output scales.
 
     Args:
-        input_scale (str): The scale of the input concentration values.
+        input_scale: The scale of the input concentration values.
             Either 'dn/dlogdp' or 'pms'.
-        output_scale (str): The desired scale of the output concentration
-        values. Either 'pms' or 'pdf'. Use inverse flag to invert the input
-        and output scales.
+        output_scale: The desired scale of the output concentration
+            values. Either 'pms' or 'pdf'. Use inverse flag to invert the input
+            and output scales.
 
     Returns:
         ConversionStrategy: A strategy object capable of converting between
-        the specified scales.
+            the specified scales.
 
     Raises:
         ValueError: If the input_scale or output_scale is not supported, or
-        if the specified conversion is unsupported.
+            if the specified conversion is unsupported.
 
-    Example usage:
+    Example:
+        ``` py title="Convert dn/dlogdp to PMS"
         strategy = get_conversion_strategy('dn/dlogdp', 'pms')
         converter = Converter(strategy)
         converted_concentration = converter.convert(
             diameters, concentration, inverse=False)
+        ```
     """
     # force lower case scales
     input_scale = input_scale.lower()

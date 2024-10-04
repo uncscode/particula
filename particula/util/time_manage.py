@@ -1,5 +1,6 @@
 """Time management utilities."""
 
+import copy
 from datetime import datetime
 import numpy as np
 import pytz
@@ -96,6 +97,7 @@ def relative_time(
     Returns:
     -np.ndarray: Array of relative times in the specified units.
     """
+    epoch_array = copy.copy(epoch_array)
     assert len(epoch_array) > 0, "Input epoch_array must not be empty."
 
     epoch_array -= epoch_array[0]

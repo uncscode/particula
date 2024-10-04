@@ -1,8 +1,10 @@
 """Calculate Kappa hygroscopic parameters from extinction data."""
+
 # pyright: reportReturnType=false, reportAssignmentType=false
 # pyright: reportIndexIssue=false
 # pyright: reportArgumentType=false, reportOperatorIssue=false
-# pylint: disable=too-many-arguments, too-many-locals
+# pylint: disable=too-many-positional-arguments, too-many-arguments
+# pylint: disable=too-many-locals
 
 
 from typing import Union, Tuple
@@ -28,80 +30,79 @@ def extinction_ratio_wet_dry(
     return_all_optics: bool = False,
 ) -> Union[float, Tuple[NDArray, NDArray]]:
     """
-    Calculates the extinction ratio between wet and dry aerosols, considering
-    water uptake through kappa. This function uses Mie theory to determine the
-    optical properties of aerosols with varying water content, allowing for
-    analysis of hygroscopic growth and its impact on aerosol optical
-    characteristics.
+    Calculate the extinction ratio between wet and dry aerosols, considering
+    water uptake through the kappa parameter.
 
-    Parameters
-    ----------
-    kappa : Union[float, NDArray[np.float64]]
-        Hygroscopicity parameter, defining water uptake ability of particles.
-    number_per_cm3 : NDArray[np.float64]
-        Number concentration of particles per cubic centimeter for each size
-        bin.
-    diameters : NDArray[np.float64]
-        Diameters of particles in nanometers for each size bin.
-    water_activity_sizer : NDArray[np.float64]
-        Water activity of the aerosol size distribution.
-    water_activity_dry : NDArray[np.float64]
-        Water activity for the calculation of 'dry' aerosol properties.
-    water_activity_wet : NDArray[np.float64]
-        Water activity for the calculation of 'wet' aerosol properties.
-    refractive_index_dry : Union[complex, float, np.float16], optional
-        Refractive index of the dry aerosol particles.
-    water_refractive_index : Union[complex, float], optional
-        Refractive index of water.
-    wavelength : float, optional
-        Wavelength of the incident light in nanometers.
-    discretize : bool, optional
-        If True, discretizes input parameters for Mie calculations to enable
-        caching.
-    return_coefficients : bool, optional
-        If True, returns the individual extinction coefficients for wet and
-        dry aerosols instead of their ratio.
-    return_all_optics : bool, optional
-        If True, returns all optical properties calculated by Mie theory,
-        not just extinction.
+    This function uses Mie theory to determine the optical properties of
+    aerosols with varying water content, allowing for analysis of hygroscopic
+    growth and its impact on aerosol optical characteristics.
 
-    Returns
-    -------
-    Union[float, Tuple[NDArray, NDArray]]
+    Arguments:
+        kappa: Hygroscopicity parameter, defining the water uptake ability
+            of particles.
+        number_per_cm3: Number concentration of particles per cubic
+            centimeter for each size bin.
+        diameters: Diameters of particles in nanometers for each size bin.
+        water_activity_sizer: Water activity of the aerosol size distribution.
+        water_activity_dry: Water activity for the calculation of "dry"
+            aerosol properties.
+        water_activity_wet: Water activity for the calculation of "wet"
+            aerosol properties.
+        refractive_index_dry: Refractive index of the dry aerosol particles.
+            Default is 1.45.
+        water_refractive_index: Refractive index of water. Default is 1.33.
+        wavelength: Wavelength of the incident light in nanometers.
+            Default is 450 nm.
+        discretize: If True, discretizes input arguments for Mie calculations
+            to enable caching. Default is True.
+        return_coefficients: If True, returns the individual extinction
+            coefficients for wet and dry aerosols instead of their ratio.
+            Default is False.
+        return_all_optics: If True, returns all optical properties calculated
+            by Mie theory, not just extinction. Default is False.
+
+    Returns:
         By default, returns the ratio of wet to dry aerosol extinction.
         If `return_coefficients` is True, returns a tuple of NDArrays
         containing the extinction coefficients for wet and dry aerosols,
         respectively.
     """
     # Convert particle diameters to volumes for dry aerosol calculations
-    volume_sizer = convert.length_to_volume(diameters, length_type='diameter')
+    volume_sizer = convert.length_to_volume(diameters, length_type="diameter")
 
     # Calculate volumes for solute and water in dry and wet conditions
     volume_dry = convert.kappa_volume_solute(
-        volume_sizer, kappa, water_activity_sizer)
+        volume_sizer, kappa, water_activity_sizer
+    )
     volume_water_dry = convert.kappa_volume_water(
-        volume_dry, kappa, water_activity_dry)
+        volume_dry, kappa, water_activity_dry
+    )
     volume_water_wet = convert.kappa_volume_water(
-        volume_dry, kappa, water_activity_wet)
+        volume_dry, kappa, water_activity_wet
+    )
 
     # Determine effective refractive indices for dry and wet aerosols
     n_effective_dry = convert.effective_refractive_index(
-        refractive_index_dry, water_refractive_index,
+        refractive_index_dry,
+        water_refractive_index,
         volume_dry[-1],  # pyright: ignore[reportIndexIssue]
-        volume_water_dry[-1]  # pyright: ignore[reportIndexIssue]
-        )
+        volume_water_dry[-1],  # pyright: ignore[reportIndexIssue]
+    )
     n_effective_wet = convert.effective_refractive_index(
-        refractive_index_dry, water_refractive_index,
+        refractive_index_dry,
+        water_refractive_index,
         volume_dry[-1],  # pyright: ignore[reportIndexIssue]
-        volume_water_wet[-1]  # pyright: ignore[reportIndexIssue]
-        )
+        volume_water_wet[-1],  # pyright: ignore[reportIndexIssue]
+    )
 
     # Adjust diameters for wet and dry conditions and calculate optical
     # properties
     diameters_dry = convert.volume_to_length(
-        volume_dry + volume_water_dry, length_type='diameter')
+        volume_dry + volume_water_dry, length_type="diameter"
+    )
     diameters_wet = convert.volume_to_length(
-        volume_dry + volume_water_wet, length_type='diameter')
+        volume_dry + volume_water_wet, length_type="diameter"
+    )
 
     optics_dry = mie_bulk.mie_size_distribution(
         m_sphere=n_effective_dry,
@@ -110,7 +111,8 @@ def extinction_ratio_wet_dry(
         number_per_cm3=number_per_cm3,
         pms=True,
         extinction_only=not return_all_optics,
-        discretize=discretize)
+        discretize=discretize,
+    )
 
     optics_wet = mie_bulk.mie_size_distribution(
         m_sphere=n_effective_wet,
@@ -119,7 +121,8 @@ def extinction_ratio_wet_dry(
         number_per_cm3=number_per_cm3,
         pms=True,
         extinction_only=not return_all_optics,
-        discretize=discretize)
+        discretize=discretize,
+    )
 
     # Return either the extinction coefficients or their ratio based on user
     # choice
@@ -145,47 +148,38 @@ def fit_extinction_ratio_with_kappa(
     kappa_maxiter: int = 200,
 ) -> Union[float, np.float64]:
     """
-    Fits the kappa parameter based on the measured extinction ratios of dry
-    and wet aerosols, utilizing Mie theory to account for water uptake
-    effects. This method optimizes kappa to minimize the difference between
-    the calculated and observed extinction ratio of wet to dry aerosols.
+    Fit the kappa parameter based on the measured extinction ratios of dry
+    and wet aerosols, considering water uptake effects.
 
-    Parameters
-    ----------
-    b_ext_dry : Union[float, np.float64]
-        The measured extinction of the dry aerosol.
-    b_ext_wet : Union[float, np.float64]
-        The measured extinction of the wet aerosol.
-    number_per_cm3 : NDArray[np.float64]
-        The number concentration of particles per cubic centimeter for each
-        size bin.
-    diameters : NDArray[np.float64]
-        The diameters of particles in nanometers for each size bin.
-    water_activity_sizer : NDArray[np.float64]
-        The water activity corresponding to the aerosol size distribution.
-    water_activity_dry : NDArray[np.float64]
-        The water activity for the 'dry' aerosol condition.
-    water_activity_wet : NDArray[np.float64]
-        The water activity for the 'wet' aerosol condition.
-    refractive_index_dry : Union[complex, float, np.float16], optional
-        The refractive index of the dry aerosol particles.
-    water_refractive_index : Union[complex, float], optional
-        The refractive index of water.
-    wavelength : float, optional
-        The wavelength of incident light in nanometers.
-    discretize : bool, optional
-        If True, discretizes input parameters for Mie calculations to enable
-        caching.
-    kappa_bounds : Tuple[float, float], optional
-        The bounds within which to fit the kappa parameter.
-    kappa_tolerance : float, optional
-        The tolerance level for the optimization of kappa.
-    kappa_maxiter : int, optional
-        The maximum number of iterations allowed in the optimization process.
+    This method uses Mie theory to optimize kappa by minimizing the difference
+    between the calculated and observed extinction ratios of wet to dry
+    aerosols.
 
-    Returns
-    -------
-    Union[float, np.float64]
+    Arguments:
+        b_ext_dry: The measured extinction of the dry aerosol.
+        b_ext_wet: The measured extinction of the wet aerosol.
+        number_per_cm3: Number concentration of particles per cubic centimeter
+            for each size bin.
+        diameters: Diameters of particles in nanometers for each size bin.
+        water_activity_sizer: Water activity corresponding to the aerosol
+            size distribution.
+        water_activity_dry: Water activity for the "dry" aerosol condition.
+        water_activity_wet: Water activity for the "wet" aerosol condition.
+        refractive_index_dry: Refractive index of the dry aerosol particles.
+            Default is 1.45.
+        water_refractive_index: Refractive index of water. Default is 1.33.
+        wavelength: Wavelength of incident light in nanometers. Default is
+            450 nm.
+        discretize: If True, discretizes input arguments for Mie calculations
+            to enable caching. Default is True.
+        kappa_bounds: Bounds within which to fit the kappa parameter.
+            Default is (0, 1).
+        kappa_tolerance: Tolerance level for the optimization of kappa.
+            Default is 1e-6.
+        kappa_maxiter: Maximum number of iterations allowed in the optimization
+            process. Default is 200.
+
+    Returns:
         The optimized kappa parameter that best fits the observed extinction
         ratios.
     """
@@ -207,12 +201,14 @@ def fit_extinction_ratio_with_kappa(
             water_refractive_index=water_refractive_index,
             wavelength=wavelength,
             discretize=discretize,
-            return_coefficients=False
+            return_coefficients=False,
         )
         # type check
-        ratio_guess = ratio_guess \
-            if isinstance(ratio_guess, float) \
-            else float(ratio_guess)  # pyright: ignore
+        ratio_guess = (
+            ratio_guess
+            if isinstance(ratio_guess, float)
+            else float(ratio_guess)
+        )  # pyright: ignore
         return np.abs(ratio_guess - b_ext_wet / b_ext_dry)
 
     # Use fminbound to optimize the kappa value within the specified bounds
@@ -224,7 +220,7 @@ def fit_extinction_ratio_with_kappa(
         xtol=kappa_tolerance,
         maxfun=kappa_maxiter,
         full_output=True,
-        disp=0
+        disp=0,
     )
     return kappa_opt
 
@@ -240,43 +236,36 @@ def kappa_from_extinction_looped(
     refractive_index_dry: Union[complex, float] = 1.45,
     water_refractive_index: Union[complex, float] = 1.33,
     wavelength: float = 450,
-    discretize: bool = True
+    discretize: bool = True,
 ) -> NDArray[np.float64]:
     """
-    Fits the extinction ratio to the kappa value for a given set of
-    measurements, looping over time indexes in number_per_cm3. This function
-    is tailored for analyzing data from a CAPS (Cavity Attenuated Phase Shift)
-    instrument under varying humidities.
+    Fit the extinction ratio to the kappa value for a set of measurements,
+    looping over time indexes in `number_per_cm3`.
 
-    Parameters
-    ----------
-    extinction_dry : NDArray[np.float64]
-        Array of dry aerosol extinction measurements.
-    extinction_wet : NDArray[np.float64]
-        Array of wet aerosol extinction measurements.
-    number_per_cm3 : NDArray[np.float64]
-        Array of particle number concentrations in #/cm³.
-    diameter : NDArray[np.float64]
-        Array of particle diameters.
-    water_activity_sizer : NDArray[np.float64]
-        Water activity (relative humidity/100) of the sizing instrument's air.
-    water_activity_sample_dry : NDArray[np.float64]
-        Water activity (relative humidity/100) of the air for dry measurements.
-    water_activity_sample_wet : NDArray[np.float64]
-        Water activity (relative humidity/100) of the air for wet measurements.
-    refractive_index_dry : Union[complex, float], optional
-        Refractive index of dry particles. Default is 1.45.
-    water_refractive_index : Union[complex, float], optional
-        Refractive index of water. Default is 1.33.
-    wavelength : float, optional
-        Wavelength of the light source in nanometers. Default is 450.
-    discretize : bool, optional
-        If True, calculations are performed with discretized parameter values
-        to potentially improve performance. Default is True.
+    This function is designed for analyzing data from a CAPS (Cavity Attenuated
+    Phase Shift) instrument under varying humidities.
 
-    Returns
-    -------
-    NDArray[np.float64]
+    Arguments:
+        extinction_dry: Array of dry aerosol extinction measurements.
+        extinction_wet: Array of wet aerosol extinction measurements.
+        number_per_cm3: Array of particle number concentrations in #/cm³.
+        diameter: Array of particle diameters in nanometers.
+        water_activity_sizer: Water activity (relative humidity/100) of the
+            sizing instrument's air.
+        water_activity_sample_dry: Water activity (relative humidity/100) of
+            the air for dry measurements.
+        water_activity_sample_wet: Water activity (relative humidity/100) of
+            the air for wet measurements.
+        refractive_index_dry: Refractive index of dry particles.
+            Default is 1.45.
+        water_refractive_index: Refractive index of water. Default is 1.33.
+        wavelength: Wavelength of the light source in nanometers.
+            Default is 450 nm.
+        discretize: If True, calculations are performed with discretized
+            parameter values to potentially improve performance.
+            Default is True.
+
+    Returns:
         A 2D array where each row corresponds to the time-indexed kappa value,
         lower and upper bounds of the kappa estimation, structured as
         [kappa, lower, upper].
@@ -292,11 +281,14 @@ def kappa_from_extinction_looped(
     kappa_fit = np.zeros((len(extinction_wet), 3), dtype=np.float64)
 
     # Combine NaN checks for input arrays
-    skip_data = np.isnan(extinction_dry) | np.isnan(extinction_wet) | \
-        np.isnan(water_activity_sample_wet) | \
-        np.isnan(water_activity_sizer) | \
-        np.isnan(water_activity_sample_dry) | \
-        np.isnan(number_per_cm3).any(axis=1)
+    skip_data = (
+        np.isnan(extinction_dry)
+        | np.isnan(extinction_wet)
+        | np.isnan(water_activity_sample_wet)
+        | np.isnan(water_activity_sizer)
+        | np.isnan(water_activity_sample_dry)
+        | np.isnan(number_per_cm3).any(axis=1)
+    )
 
     # Loop over each time index
     for index, row_number_per_cm3 in enumerate(number_per_cm3):

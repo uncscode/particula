@@ -9,10 +9,10 @@ from particula.constants import BOLTZMANN_CONSTANT
 
 
 def mean_thermal_speed(
-    mass: Union[float, NDArray[np.float_]],
-    temperature: Union[float, NDArray[np.float_]],
-) -> Union[float, NDArray[np.float_]]:
-    """ Returns the particles mean thermal speed. Due to the the impact
+    mass: Union[float, NDArray[np.float64]],
+    temperature: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """Returns the particles mean thermal speed. Due to the the impact
     of air molecules on the particles, the particles will have a mean
     thermal speed.
 
@@ -30,7 +30,4 @@ def mean_thermal_speed(
     Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Section 9.5.3 Mean Free Path of an Aerosol Particle Equation 9.87.
     """
-    return np.sqrt(
-        (8 * BOLTZMANN_CONSTANT.m * temperature)
-        / (np.pi * mass)
-    )
+    return np.sqrt((8 * BOLTZMANN_CONSTANT.m * temperature) / (np.pi * mass))

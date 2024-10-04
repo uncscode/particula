@@ -1,4 +1,5 @@
 """stats module for datacula"""
+
 # linting disabled until reformatting of this file
 
 
@@ -7,10 +8,10 @@ import numpy as np
 
 
 def merge_formatting(
-        data_current: np.ndarray,
-        header_current: list,
-        data_new: np.ndarray,
-        header_new: list
+    data_current: np.ndarray,
+    header_current: list,
+    data_new: np.ndarray,
+    header_new: list,
 ) -> Tuple[np.ndarray, list, np.ndarray, list]:
     """
     Formats two data arrays and their headers so that the data new can be
@@ -31,61 +32,49 @@ def merge_formatting(
         ValueError: If the headers are not the same length.
     """
     # elements in header_new that are not in header_current
-    header_new_not_listed = [
-        x for x in header_new if x not in header_current
-    ]
-    header_list_not_new = [
-        x for x in header_current if x not in header_new
-    ]
+    header_new_not_listed = [x for x in header_new if x not in header_current]
+    header_list_not_new = [x for x in header_current if x not in header_new]
 
     # expand the data array to include the new columns if there are any
     if bool(header_new_not_listed):
-        header_current.extend(
-            header_new_not_listed
-        )
+        header_current.extend(header_new_not_listed)
         # add other rows to the data array
         data_current = np.concatenate(
             (
                 data_current,
-                np.full((
-                        data_current.shape[0],
-                        len(header_new_not_listed)
-                        ), np.nan)
+                np.full(
+                    (data_current.shape[0], len(header_new_not_listed)), np.nan
+                ),
             ),
-            axis=1
+            axis=1,
         )
 
     if bool(header_list_not_new):
-        header_new.extend(
-            header_list_not_new
-        )
+        header_new.extend(header_list_not_new)
         data_new = np.concatenate(
             (
                 data_new,
-                np.full((
-                        data_new.shape[0],
-                        len(header_list_not_new)
-                        ), np.nan)
+                np.full((data_new.shape[0], len(header_list_not_new)), np.nan),
             ),
-            axis=1
+            axis=1,
         )
 
     # check that the shapes are the same
     if data_current.shape[1] != data_new.shape[1]:
         raise ValueError(
-            'data_current  ',
+            "data_current  ",
             data_current.shape,
-            ' and data_new ',
+            " and data_new ",
             data_new.shape,
-            ' are not the same shape, check the data formatting'
+            " are not the same shape, check the data formatting",
         )
     if len(header_current) != len(header_new):
         raise ValueError(
-            'header_current ',
+            "header_current ",
             len(header_current),
-            ' and header_new ',
+            " and header_new ",
             len(header_new),
-            ' are not the same shape, check the data formatting'
+            " are not the same shape, check the data formatting",
         )
     # check if the headers are numeric
     if np.all([x[0].isnumeric() for x in header_current]):
@@ -103,9 +92,7 @@ def merge_formatting(
         data_current = data_current[:, header_stored_indices]
     else:
         # match header_new to header_current and sort the data
-        header_new_indices = [
-            header_new.index(x) for x in header_current
-        ]
+        header_new_indices = [header_new.index(x) for x in header_current]
         header_new = [header_new[i] for i in header_new_indices]
     data_new = data_new[:, header_new_indices]
     return data_current, header_current, data_new, header_new
@@ -117,9 +104,9 @@ def average_to_interval(
     average_interval: float,
     average_interval_array: np.ndarray,
     average_data: np.ndarray,
-    average_data_std: np.ndarray
+    average_data_std: np.ndarray,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    # pylint: disable=too-many-arguments, too-many-branches
+    # pylint: disable=too-many-positional-arguments, too-many-arguments, too-many-branches
     """
     Calculate the average of the data stream over the specified time intervals.
 
@@ -181,17 +168,14 @@ def average_to_interval(
             # interval, assumes that the time stream is sorted
             if start_index + time_lookup_span < len(time_raw):
                 compare_bool = np.nonzero(
-                    time_raw[start_index:start_index + time_lookup_span]
+                    time_raw[start_index: start_index + time_lookup_span]
                     >= time_i
                 )
                 if len(compare_bool[0]) > 0:
                     stop_index = start_index + compare_bool[0][0]
                 else:
                     # used it all for this iteration
-                    compare_bool = np.nonzero(
-                        time_raw[start_index:]
-                        >= time_i
-                    )
+                    compare_bool = np.nonzero(time_raw[start_index:] >= time_i)
                     stop_index = start_index + compare_bool[0][0]
                     # re-calculate time look up span,
                     # as timesteps have changed
@@ -201,9 +185,7 @@ def average_to_interval(
                             * interval_look_buffer_multiple
                             / np.nanmean(
                                 np.diff(
-                                    time_raw[
-                                        start_index:start_index + 100
-                                    ]
+                                    time_raw[start_index: start_index + 100]
                                 )
                             )
                         )
@@ -211,9 +193,8 @@ def average_to_interval(
                         time_lookup_span = 100
             else:
                 compare_bool = np.nonzero(
-                    time_raw[
-                        start_index:start_index + time_lookup_span
-                    ] >= time_i
+                    time_raw[start_index: start_index + time_lookup_span]
+                    >= time_i
                 )
                 if len(compare_bool[0]) > 0:
                     stop_index = start_index + compare_bool[0][0]
@@ -236,11 +217,11 @@ def average_to_interval(
 
 
 def mask_outliers(
-        data: np.ndarray,
-        bottom: Optional[float] = None,
-        top: Optional[float] = None,
-        value: Optional[float] = None,
-        invert: Optional[bool] = False
+    data: np.ndarray,
+    bottom: Optional[float] = None,
+    top: Optional[float] = None,
+    value: Optional[float] = None,
+    invert: Optional[bool] = False,
 ) -> np.ndarray:
     """
     Create a boolean mask for outliers in a data array. Outliers are defined as
@@ -289,9 +270,9 @@ def mask_outliers(
 
 
 def distribution_integration(
-        distribution: np.ndarray,
-        x_array: Optional[np.ndarray] = None,
-        axis: int = 0
+    distribution: np.ndarray,
+    x_array: Optional[np.ndarray] = None,
+    axis: int = 0,
 ) -> np.ndarray:
     """
     Performs either PDF integration or PMS integration based on the input.

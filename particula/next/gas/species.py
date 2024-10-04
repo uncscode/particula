@@ -1,203 +1,281 @@
 """
-This module demonstrates the Composite Pattern through the modeling of gases
-and their constituent species. In this pattern, both composite objects (gases)
-and leaf objects (gas species) are treated uniformly.
+Gas Species module.
 
-The Composite Pattern is particularly useful in scenarios where a part-whole
-hierarchy is present. In our case, a `Gas` represents the whole, which can be
-composed of various parts - the `GasSpecies`. Each `GasSpecies` can have
-distinct properties such as mass and vapor pressure, and the `Gas` itself can
-consist of multiple species, mimicking real-world gas mixtures.
-
-Classes:
-- GasSpecies: Represents an individual gas species with properties like name,
-mass, and vapor pressure. Acts as a leaf in the composite structure.
-- Gas: Represents a composite object that can contain multiple GasSpecies.
-It manages the collection of these species and performs operations on them as
-a group.
-
-The Composite Pattern allows for the Gas class to manage an arbitrary number
-of GasSpecies objects, facilitating operations that need to consider the gas
-mixture as a whole or interact with its individual components seamlessly.
+Units are in kg/mol for molar mass, Kelvin for temperature, Pascals for
+pressure, and kg/m^3 for concentration.
 """
 
-
-from typing import Optional
-from dataclasses import dataclass, field
-import numpy as np
+from typing import Union
 from numpy.typing import NDArray
+import numpy as np
+from particula.next.gas.vapor_pressure_strategies import (
+    VaporPressureStrategy,
+    ConstantVaporPressureStrategy,
+)
 
 
-@dataclass
 class GasSpecies:
-    """
-    Represents a single species of gas, including its properties such as
-    name, mass, vapor pressure, and whether it is condensable.
+    """GasSpecies represents an individual or array of gas species with
+    properties like name, molar mass, vapor pressure, and condensability.
 
     Attributes:
+    ------------
     - name (str): The name of the gas species.
-    - mass (float): The mass of the gas species.
-    - vapor_pressure (Optional[float]): The vapor pressure of the gas
-        species. None if not applicable.
+    - molar_mass (float): The molar mass of the gas species.
+    - pure_vapor_pressure_strategy (VaporPressureStrategy): The strategy for
+        calculating the pure vapor pressure of the gas species. Can be a single
+        strategy or a list of strategies. Default is a constant vapor pressure
+        strategy with a vapor pressure of 0.0 Pa.
     - condensable (bool): Indicates whether the gas species is condensable.
-    """
-    name: str
-    mass: float
-    vapor_pressure: Optional[float] = None
-    condensable: bool = field(default=False)
-
-    def get_mass(self) -> np.float64:
-        """
-        Returns the mass of the gas species as an np.float64.
-
-        Returns:
-            np.float64: The mass of the gas species.
-        """
-        return np.float64(self.mass)
-
-    def is_condensable(self) -> bool:
-        """
-        Checks if the gas species is condensable.
-
-        Returns:
-            bool: True if the gas species is condensable, False otherwise.
-        """
-        return self.condensable
-
-    def get_mass_condensable(self) -> np.float64:
-        """
-        Returns the mass of the gas species if it is condensable,
-        otherwise returns 0.
-
-        Returns:
-            np.float64: The mass of the gas species if it is condensable,
-            otherwise 0.
-        """
-        return np.float64(self.mass) if self.condensable else np.float64(0)
-
-
-@dataclass
-class Gas:
-    """
-    Represents a mixture of gas species, including properties such as
-    temperature, total pressure, and a list of gas species components.
-
-    Attributes:
-    - temperature (float): The temperature of the gas mixture.
-    - total_pressure (float): The total pressure of the gas mixture.
-    - components (List[GasSpecies]): A list of GasSpecies objects
-        representing the components of the gas mixture.
+        Default is True.
+    - concentration (float): The concentration of the gas species in the
+        mixture. Default is 0.0 kg/m^3.
 
     Methods:
-    - add_species: Adds a gas species to the mixture.
-    - remove_species: Removes a gas species from the mixture by name.
-    - get_mass: Returns the mass of a specified species or the masses of all
-        species in the gas mixture as an np.ndarray.
-    - get_mass_condensable: Returns the mass of a specific condensable species
-        or the masses of all condensable species in the gas mixture as an
-        np.ndarray.
-
+    --------
+    - get_molar_mass: Get the molar mass of the gas species.
+    - get_condensable: Check if the gas species is condensable.
+    - get_concentration: Get the concentration of the gas species in the
+        mixture.
+    - get_pure_vapor_pressure: Calculate the pure vapor pressure of the gas
+        species at a given temperature.
+    - get_partial_pressure: Calculate the partial pressure of the gas species.
+    - get_saturation_ratio: Calculate the saturation ratio of the gas species.
+    - get_saturation_concentration: Calculate the saturation concentration of
+        the gas species.
+    - add_concentration: Add concentration to the gas species.
     """
-    temperature: float = 298.15
-    total_pressure: float = 101325
-    components: list[GasSpecies] = field(default_factory=list)
 
-    def add_species(
-            self,
-            name: str,
-            mass: float,
-            vapor_pressure: Optional[float] = None,
-            condensable: bool = False) -> None:
-        """
-        Adds a gas species to the mixture.
+    def __init__(  # pylint: disable=too-many-positional-arguments
+        # pylint: disable=too-many-arguments
+        self,
+        name: Union[str, NDArray[np.str_]],
+        molar_mass: Union[float, NDArray[np.float64]],
+        vapor_pressure_strategy: Union[
+            VaporPressureStrategy, list[VaporPressureStrategy]
+        ] = ConstantVaporPressureStrategy(0.0),
+        condensable: Union[bool, NDArray[np.bool_]] = True,
+        concentration: Union[float, NDArray[np.float64]] = 0.0,
+    ) -> None:
+        self.name = name
+        self.molar_mass = molar_mass
+        self.pure_vapor_pressure_strategy = vapor_pressure_strategy
+        self.condensable = condensable
+        self.concentration = concentration
 
-        Parameters:
-        - name (str): The name of the gas species.
-        - mass (float): The mass of the gas species.
-        - vapor_pressure (Optional[float]): The vapor pressure of the gas
-            species. None if not applicable.
-        - condensable (bool): Indicates whether the gas species is
-            condensable.
-        """
-        species = GasSpecies(name, mass, vapor_pressure, condensable)
-        self.components.append(species)
+    def __str__(self):
+        """Return a string representation of the GasSpecies object."""
+        return str(self.name)
 
-    def remove_species(self, name: str) -> None:
-        """
-        Removes a gas species from the mixture by name.
+    def __len__(self):
+        """Return the number of gas species."""
+        return (
+            len(self.molar_mass)
+            if isinstance(self.molar_mass, np.ndarray)
+            else 1.0
+        )
 
-        Parameters:
-        - name (str): The name of the gas species to be removed.
-        """
-        self.components = [c for c in self.components if c.name != name]
-
-    def get_mass(self, name: Optional[str] = None) -> NDArray[np.float64]:
-        """
-        Returns the mass of a specified species or the masses of all species
-        in the gas mixture as an np.ndarray.
-
-        If a name is specified, the method returns an array containing the
-        mass of the named species. If the specified name is not found in the
-        mixture, a ValueError is raised. If no name is specified, it returns
-        an array of the masses of all species in the mixture.
-
-        Parameters:
-            name (Optional[str]): The name of the gas species for which to
-            return the mass. If None, returns masses of all species.
+    def get_name(self) -> Union[str, NDArray[np.str_]]:
+        """Get the name of the gas species.
 
         Returns:
-            NDArray[np.float64]: An array containing the requested mass(es).
+        - name (str or NDArray[np.str_]): The name of the gas species."""
+        return self.name
 
-        Raises:
-            ValueError: If the specified name is not found in the mixture.
-        """
-        if name:
-            matching_masses = [component.get_mass()
-                               for component in self.components
-                               if component.name == name]
-            if not matching_masses:
-                raise ValueError(
-                    f"Gas species '{name}' not found in the mixture.")
-            return np.array(matching_masses, dtype=np.float64)
-
-        # Return the masses of all components if no name is specified.
-        masses = [component.get_mass() for component in self.components]
-        return np.array(masses, dtype=np.float64)
-
-    def get_mass_condensable(
-            self, name: Optional[str] = None) -> NDArray[np.float64]:
-        """
-        Returns the mass of a specific condensable species or the masses of
-        all condensable species in the gas mixture as an np.ndarray. If a name
-        is provided, only the mass of that specific condensable species is
-        returned.
-
-        Parameters:
-            name (Optional[str]): The name of the specific condensable gas
-            species to retrieve the mass for. If None (the default), the
-            masses of all condensable species are returned.
+    def get_molar_mass(self) -> Union[float, NDArray[np.float64]]:
+        """Get the molar mass of the gas species in kg/mol.
 
         Returns:
-            NDArray[np.float64]: An array of the mass of the specified
-            condensable species, or an array of the masses of all condensable
-            species in the gas mixture.
+        - molar_mass (float or NDArray[np.float64]): The molar mass of the gas
+            species, in kg/mol."""
+        return self.molar_mass
+
+    def get_condensable(self) -> Union[bool, NDArray[np.bool_]]:
+        """Check if the gas species is condensable or not.
+
+        Returns:
+        - condensable (bool): True if the gas species is condensable, False
+            otherwise."""
+        return self.condensable
+
+    def get_concentration(self) -> Union[float, NDArray[np.float64]]:
+        """Get the concentration of the gas species in the mixture, in kg/m^3.
+
+        Returns:
+        - concentration (float or NDArray[np.float64]): The concentration of
+            the gas species in the mixture.
+        """
+        return self.concentration
+
+    def get_pure_vapor_pressure(
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
+        """Calculate the pure vapor pressure of the gas species at a given
+        temperature in Kelvin.
+
+        This method supports both a single strategy or a list of strategies
+        for calculating vapor pressure.
+
+        Args:
+        - temperature (float or NDArray[np.float64]): The temperature in
+        Kelvin at which to calculate vapor pressure.
+
+        Returns:
+        - vapor_pressure (float or NDArray[np.float64]): The calculated pure
+        vapor pressure in Pascals.
 
         Raises:
-            ValueError: If a specific species name is provided but not found
-            in the mixture, or if it's not condensable.
+            ValueError: If no vapor pressure strategy is set.
         """
-        if name:
-            for component in self.components:
-                if component.name == name:
-                    if component.is_condensable():
-                        return np.array(
-                            [component.get_mass()], dtype=np.float64)
-                    raise ValueError(
-                        f"Gas species '{name}' is not condensable.")
-            raise ValueError(f"Gas species '{name}' not found in the mixture.")
+        if isinstance(self.pure_vapor_pressure_strategy, list):
+            # Handle a list of strategies: calculate and return a list of vapor
+            # pressures
+            return np.array(
+                [
+                    strategy.pure_vapor_pressure(temperature)
+                    for strategy in self.pure_vapor_pressure_strategy
+                ],
+                dtype=np.float64,
+            )
 
-        masses_condensable = [
-            component.get_mass()
-            for component in self.components if component.is_condensable()
-        ]
-        return np.array(masses_condensable, dtype=np.float64)
+        # Handle a single strategy: calculate and return the vapor pressure
+        return self.pure_vapor_pressure_strategy.pure_vapor_pressure(
+            temperature
+        )
+
+    def get_partial_pressure(
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
+        """
+        Calculate the partial pressure of the gas based on the vapor
+        pressure strategy. This method accounts for multiple strategies if
+        assigned and calculates partial pressure for each strategy based on
+        the corresponding concentration and molar mass.
+
+        Parameters:
+        - temperature (float or NDArray[np.float64]): The temperature in
+        Kelvin at which to calculate the partial pressure.
+
+        Returns:
+        - partial_pressure (float or NDArray[np.float64]): Partial pressure
+        of the gas in Pascals.
+
+        Raises:
+        - ValueError: If the vapor pressure strategy is not set.
+        """
+        # Handle multiple vapor pressure strategies
+        if isinstance(self.pure_vapor_pressure_strategy, list):
+            # Calculate partial pressure for each strategy
+            return np.array(
+                [
+                    strategy.partial_pressure(
+                        concentration=c, molar_mass=m, temperature=temperature
+                    )
+                    for (strategy, c, m) in zip(
+                        self.pure_vapor_pressure_strategy,
+                        self.concentration,  # type: ignore
+                        self.molar_mass,  # type: ignore
+                    )
+                ],
+                dtype=np.float64,
+            )
+        # Calculate partial pressure using a single strategy
+        return self.pure_vapor_pressure_strategy.partial_pressure(
+            concentration=self.concentration,
+            molar_mass=self.molar_mass,
+            temperature=temperature,
+        )
+
+    def get_saturation_ratio(
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
+        """
+        Calculate the saturation ratio of the gas based on the vapor
+        pressure strategy. This method accounts for multiple strategies if
+        assigned and calculates saturation ratio for each strategy based on
+        the corresponding concentration and molar mass.
+
+        Parameters:
+        - temperature (float or NDArray[np.float64]): The temperature in
+        Kelvin at which to calculate the partial pressure.
+
+        Returns:
+        - saturation_ratio (float or NDArray[np.float64]): The saturation ratio
+        of the gas
+
+        Raises:
+        - ValueError: If the vapor pressure strategy is not set.
+        """
+        # Handle multiple vapor pressure strategies
+        if isinstance(self.pure_vapor_pressure_strategy, list):
+            # Calculate saturation ratio for each strategy
+            return np.array(
+                [
+                    strategy.saturation_ratio(
+                        concentration=c, molar_mass=m, temperature=temperature
+                    )
+                    for (strategy, c, m) in zip(
+                        self.pure_vapor_pressure_strategy,
+                        self.concentration,  # type: ignore
+                        self.molar_mass,  # type: ignore
+                    )
+                ],
+                dtype=np.float64,
+            )
+        # Calculate saturation ratio using a single strategy
+        return self.pure_vapor_pressure_strategy.saturation_ratio(
+            concentration=self.concentration,
+            molar_mass=self.molar_mass,
+            temperature=temperature,
+        )
+
+    def get_saturation_concentration(
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
+        """
+        Calculate the saturation concentration of the gas based on the vapor
+        pressure strategy. This method accounts for multiple strategies if
+        assigned and calculates saturation concentration for each strategy
+        based on the molar mass.
+
+        Parameters:
+        - temperature (float or NDArray[np.float64]): The temperature in
+        Kelvin at which to calculate the partial pressure.
+
+        Returns:
+        - saturation_concentration (float or NDArray[np.float64]): The
+        saturation concentration of the gas
+
+        Raises:
+        - ValueError: If the vapor pressure strategy is not set.
+        """
+        # Handle multiple vapor pressure strategies
+        if isinstance(self.pure_vapor_pressure_strategy, list):
+            # Calculate saturation concentraiton for each strategy
+            return np.array(
+                [
+                    strategy.saturation_concentration(
+                        molar_mass=m, temperature=temperature
+                    )
+                    for (strategy, m) in zip(
+                        self.pure_vapor_pressure_strategy,
+                        self.molar_mass  # type: ignore
+                    )
+                ],
+                dtype=np.float64,
+            )
+        # Calculate saturation concentration using a single strategy
+        return self.pure_vapor_pressure_strategy.saturation_concentration(
+            molar_mass=self.molar_mass, temperature=temperature
+        )
+
+    def add_concentration(
+        self, added_concentration: Union[float, NDArray[np.float64]]
+    ):
+        """Add concentration to the gas species.
+
+        Args:
+        - added_concentration (float): The concentration to add to the gas
+            species."""
+        self.concentration = self.concentration + added_concentration
+        self.concentration = np.maximum(self.concentration, 0.0)

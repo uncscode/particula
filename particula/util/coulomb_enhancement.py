@@ -8,25 +8,31 @@
 
 import numpy as np
 from particula import u
-from particula.constants import (BOLTZMANN_CONSTANT, ELECTRIC_PERMITTIVITY,
-                                 ELEMENTARY_CHARGE_VALUE)
-from particula.util.input_handling import (in_handling, in_radius, in_scalar,
-                                           in_temperature)
+from particula.constants import (
+    BOLTZMANN_CONSTANT,
+    ELECTRIC_PERMITTIVITY,
+    ELEMENTARY_CHARGE_VALUE,
+)
+from particula.util.input_handling import (
+    in_handling,
+    in_radius,
+    in_scalar,
+    in_temperature,
+)
 
 
 class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
+    """Calculate coulomb-related enhancements
 
-    """ Calculate coulomb-related enhancements
-
-        Attributes:
-            radius          (float) [m]
-            other_radius    (float) [m]             (default: radius)
-            charge          (float) [dimensionless] (default: 0)
-            other_charge    (float) [dimensionless] (default: 0)
-            temperature     (float) [K]             (default: 298)
+    Attributes:
+        radius          (float) [m]
+        other_radius    (float) [m]             (default: radius)
+        charge          (float) [dimensionless] (default: 0)
+        other_charge    (float) [dimensionless] (default: 0)
+        temperature     (float) [K]             (default: 298)
     """
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-positional-arguments, too-many-arguments
         self,
         radius=None,
         other_radius=None,
@@ -36,10 +42,9 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
         elementary_charge_value=ELEMENTARY_CHARGE_VALUE,
         electric_permittivity=ELECTRIC_PERMITTIVITY,
         boltzmann_constant=BOLTZMANN_CONSTANT,
-        **kwargs
+        **kwargs,
     ):
-        """ Initialize CoulombEnhancement object
-        """
+        """Initialize CoulombEnhancement object"""
 
         other_radius = radius if other_radius is None else other_radius
 
@@ -64,9 +69,10 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
                 f"\tYou can repeat this routine for different temperatures."
             )
 
-        if np.array(
-            self.charge.m
-        ).size + np.array(self.other_charge.m).size > 2:
+        if (
+            np.array(self.charge.m).size + np.array(self.other_charge.m).size
+            > 2
+        ):
             raise ValueError(
                 f"\t\n"
                 f"\t Charges {self.charge} and {self.other_charge} must\n"
@@ -75,43 +81,46 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
             )
 
     def coulomb_potential_ratio(self):
-        """ Calculates the Coulomb potential ratio.
+        """Calculates the Coulomb potential ratio.
 
-            Args:
-                radius          (float) [m]
-                other_radius    (float) [m]             (default: radius)
-                charge          (int)   [dimensionless] (default: 0)
-                other_charge    (int)   [dimensionless] (default: 0)
-                temperature     (float) [K]             (default: 298)
+        Args:
+            radius          (float) [m]
+            other_radius    (float) [m]             (default: radius)
+            charge          (int)   [dimensionless] (default: 0)
+            other_charge    (int)   [dimensionless] (default: 0)
+            temperature     (float) [K]             (default: 298)
 
-            Returns:
-                                (float) [dimensionless]
+        Returns:
+                            (float) [dimensionless]
         """
 
-        numerator = -1 * self.charge * self.other_charge * (
-            self.elem_char_val ** 2
+        numerator = (
+            -1 * self.charge * self.other_charge * (self.elem_char_val**2)
         )
-        denominator = 4 * np.pi * self.elec_perm * (
-            np.transpose([self.radius.m]) * self.radius.u +
-            self.other_radius
+        denominator = (
+            4
+            * np.pi
+            * self.elec_perm
+            * (
+                np.transpose([self.radius.m]) * self.radius.u
+                + self.other_radius
+            )
         )
 
-        return numerator / (
-            denominator * self.boltz_const * self.temperature
-        )
+        return numerator / (denominator * self.boltz_const * self.temperature)
 
     def coulomb_enhancement_kinetic_limit(self):
-        """ Coulombic coagulation enhancement kinetic limit.
+        """Coulombic coagulation enhancement kinetic limit.
 
-            Args:
-                radius          (float) [m]
-                other_radius    (float) [m]             (default: radius)
-                charge          (float) [dimensionless] (default: 0)
-                other_charge    (float) [dimensionless] (default: 0)
-                temperature     (float) [K]             (default: 298)
+        Args:
+            radius          (float) [m]
+            other_radius    (float) [m]             (default: radius)
+            charge          (float) [dimensionless] (default: 0)
+            other_charge    (float) [dimensionless] (default: 0)
+            temperature     (float) [K]             (default: 298)
 
-            Returns:
-                                (float) [dimensionless]
+        Returns:
+                            (float) [dimensionless]
         """
 
         ratio = self.coulomb_potential_ratio()
@@ -122,17 +131,17 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
         ).to_base_units()
 
     def coulomb_enhancement_continuum_limit(self):
-        """ Coulombic coagulation enhancement continuum limit.
+        """Coulombic coagulation enhancement continuum limit.
 
-            Args:
-                radius          (float) [m]
-                other_radius    (float) [m]             (default: radius)
-                charge          (float) [dimensionless] (default: 0)
-                other_charge    (float) [dimensionless] (default: 0)
-                temperature     (float) [K]             (default: 298)
+        Args:
+            radius          (float) [m]
+            other_radius    (float) [m]             (default: radius)
+            charge          (float) [dimensionless] (default: 0)
+            other_charge    (float) [dimensionless] (default: 0)
+            temperature     (float) [K]             (default: 298)
 
-            Returns:
-                                (float) [dimensionless]
+        Returns:
+                            (float) [dimensionless]
         """
 
         ratio = self.coulomb_potential_ratio()
@@ -145,29 +154,25 @@ class CoulombEnhancement:  # pylint: disable=too-many-instance-attributes
 
 
 def cpr(**kwargs):
-    """ Calculate coulomb potential ratio
-    """
+    """Calculate coulomb potential ratio"""
     return CoulombEnhancement(**kwargs).coulomb_potential_ratio()
 
 
 def cekl(**kwargs):
-    """ Calculate coulombic enhancement kinetic limit
-    """
+    """Calculate coulombic enhancement kinetic limit"""
     return CoulombEnhancement(**kwargs).coulomb_enhancement_kinetic_limit()
 
 
 def cecl(**kwargs):
-    """ Calculate coulombic enhancement continuum limit
-    """
+    """Calculate coulombic enhancement continuum limit"""
     return CoulombEnhancement(**kwargs).coulomb_enhancement_continuum_limit()
 
 
 def coulomb_enhancement_all(**kwargs):
-    """ Return all the values above in one call
-    """
+    """Return all the values above in one call"""
     cea = CoulombEnhancement(**kwargs)
     return (
         cea.coulomb_potential_ratio(),
         cea.coulomb_enhancement_kinetic_limit(),
-        cea.coulomb_enhancement_continuum_limit()
+        cea.coulomb_enhancement_continuum_limit(),
     )
