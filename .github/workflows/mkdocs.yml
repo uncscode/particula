@@ -1,4 +1,4 @@
-name: Build and Deploy Documentation
+name: mkdocs
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ on:
       - 'docs/**'
 
 jobs:
-  build-deploy:
+  blds:
     runs-on: ubuntu-latest
     steps:
         - name: Check out code
@@ -31,7 +31,7 @@ jobs:
             pip install mkdocs mkdocs-material handsdown mkdocs-jupyter
 
         - name: Generate Source Code Documentation with Handsdown
-          run: python mk_generator.py
+          run: python docs/mk_generator.py
 
         - name: Build MkDocs site and Run Jupyter Books
           run: mkdocs build
