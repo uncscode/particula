@@ -1,7 +1,7 @@
 {
     "relative_data_folder": "CPC_3010_data",
     "filename_regex": "*.csv",
-    "MIN_SIZE_BYTES": 10,
+    "MIN_SIZE_BYTES": 10000,
     "data_loading_function": "general_1d_load",
     "header_row": 0,
     "data_checks": {

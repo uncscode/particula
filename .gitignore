@@ -3,6 +3,7 @@
 
 # ignore local mkdocs source folder
 *Source-Code*
+*API*
 .cache/
 # ignore local .vscode folder
 .vscode/

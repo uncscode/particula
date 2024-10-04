@@ -1,5 +1,6 @@
 """ Module for the diffusive knudsen number
 """
+
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
@@ -10,12 +11,12 @@ from particula.util.reduced_quantity import reduced_self_broadcast
 
 
 def diffusive_knudsen_number(
-    radius: Union[float, NDArray[np.float_]],
-    mass_particle: Union[float, NDArray[np.float_]],
-    friction_factor: Union[float, NDArray[np.float_]],
-    coulomb_potential_ratio: Union[float, NDArray[np.float_]] = 0.0,
-    temperature: float = 298.15
-) -> Union[float, NDArray[np.float_]]:
+    radius: Union[float, NDArray[np.float64]],
+    mass_particle: Union[float, NDArray[np.float64]],
+    friction_factor: Union[float, NDArray[np.float64]],
+    coulomb_potential_ratio: Union[float, NDArray[np.float64]] = 0.0,
+    temperature: float = 298.15,
+) -> Union[float, NDArray[np.float64]]:
     """
     Diffusive Knudsen number. The *diffusive* Knudsen number is different
     from Knudsen number. Ratio of: mean persistence of one particle to the
@@ -71,8 +72,10 @@ def diffusive_knudsen_number(
     continuum_enhance = coulomb_enhancement.continuum(coulomb_potential_ratio)
 
     # Final calculation of diffusive Knudsen number
-    numerator = np.sqrt(temperature * BOLTZMANN_CONSTANT.m *
-                        reduced_mass) / reduced_friction_factor
+    numerator = (
+        np.sqrt(temperature * BOLTZMANN_CONSTANT.m * reduced_mass)
+        / reduced_friction_factor
+    )
     denominator = sum_of_radii * continuum_enhance / kinetic_enhance
 
     return numerator / denominator

@@ -9,8 +9,8 @@ logger = logging.getLogger("particula")  # get instance of logger
 
 
 def get_thermal_conductivity(
-    temperature: Union[float, NDArray[np.float_]]
-) -> Union[float, NDArray[np.float_]]:
+    temperature: Union[float, NDArray[np.float64]]
+) -> Union[float, NDArray[np.float64]]:
     """
     Calculate the thermal conductivity of air as a function of temperature.
     Based on a simplified linear relation from atmospheric science literature.
@@ -19,12 +19,12 @@ def get_thermal_conductivity(
 
     Args:
     -----
-    - temperature (Union[float, NDArray[np.float_]]): The temperature at which
+    - temperature (Union[float, NDArray[np.float64]]): The temperature at which
     the thermal conductivity of air is to be calculated, in Kelvin (K).
 
     Returns:
     --------
-    - Union[float, NDArray[np.float_]]: The thermal conductivity of air at the
+    - Union[float, NDArray[np.float64]]: The thermal conductivity of air at the
     specified temperature in Watts per meter-Kelvin (W/m·K) or J/(m s K).
 
     Raises:
@@ -38,5 +38,6 @@ def get_thermal_conductivity(
     if np.any(temperature < 0):
         logger.error("Temperature must be greater than or equal to 0 Kelvin.")
         raise ValueError(
-            "Temperature must be greater than or equal to 0 Kelvin.")
+            "Temperature must be greater than or equal to 0 Kelvin."
+        )
     return 1e-3 * (4.39 + 0.071 * temperature)

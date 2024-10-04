@@ -7,8 +7,9 @@ import numpy as np
 
 
 # flake8: noqa: C901
-# pylint: disable=too-many-arguments, too-many-locals, too-many-branches
-# pylint: disable=possibly-used-before-assignment
+# pylint: disable=too-many-positional-arguments, too-many-arguments, too-many-locals, too-many-branches
+# pylint: disable=possibly-used-before-assignment, too-many-positional-arguments
+
 
 def lf2013_coag_full(
     ion_type="air",
@@ -18,11 +19,11 @@ def lf2013_coag_full(
     charge_vals=None,
     radius_vals=None,
 ):
-    """ calculate ion--particle coagulation according to lf2013
-    """
+    """calculate ion--particle coagulation according to lf2013"""
 
     if charge_vals is not None and (
-            max(charge_vals) > 100 or min(charge_vals) < -100):
+        max(charge_vals) > 100 or min(charge_vals) < -100
+    ):
         raise ValueError("charge_vals must be between -100 and 100")
 
     if ion_type == "air" and particle_type == "conductive":
@@ -54,39 +55,43 @@ def lf2013_coag_full(
 
     # expand dims to account for size
     negdata = np.expand_dims(
-        np.loadtxt(os.path.join(dir_path, negfn), skiprows=1), axis=0)
+        np.loadtxt(os.path.join(dir_path, negfn), skiprows=1), axis=0
+    )
     posdata = np.expand_dims(
-        np.loadtxt(os.path.join(dir_path, posfn), skiprows=1), axis=0)
+        np.loadtxt(os.path.join(dir_path, posfn), skiprows=1), axis=0
+    )
 
-    coeffs = negdata.shape[-1]-5  # take 5 out (metdata)
+    coeffs = negdata.shape[-1] - 5  # take 5 out (metdata)
 
     if isinstance(radius_vals, float):
         radius_vals = np.array([radius_vals])
 
     rads = np.expand_dims(
-        np.expand_dims(
-            radius_vals.squeeze(), axis=-1), axis=-1)
-    powers = np.linspace(0, coeffs-1, coeffs)
+        np.expand_dims(radius_vals.squeeze(), axis=-1), axis=-1
+    )
+    powers = np.linspace(0, coeffs - 1, coeffs)
 
-    neg = 10**np.sum(
-        (rads >= negdata[:, :, -2:-1]) *
-        (rads <= negdata[:, :, -1:]) *
-        negdata[:, :, 1:coeffs+1] *
-        (np.log10(rads))**powers,
-        axis=-1)
+    neg = 10 ** np.sum(
+        (rads >= negdata[:, :, -2:-1])
+        * (rads <= negdata[:, :, -1:])
+        * negdata[:, :, 1 : coeffs + 1]
+        * (np.log10(rads)) ** powers,
+        axis=-1,
+    )
 
-    pos = 10**np.sum(
-        (rads >= posdata[:, :, -2:-1]) *
-        (rads <= posdata[:, :, -1:]) *
-        posdata[:, :, 1:coeffs+1] *
-        (np.log10(rads))**powers,
-        axis=-1)
+    pos = 10 ** np.sum(
+        (rads >= posdata[:, :, -2:-1])
+        * (rads <= posdata[:, :, -1:])
+        * posdata[:, :, 1 : coeffs + 1]
+        * (np.log10(rads)) ** powers,
+        axis=-1,
+    )
 
     neg[neg == 1] = np.nan
     pos[pos == 1] = np.nan
 
     if isinstance(charge_vals, list):
-        charges = [i+100 for i in charge_vals]
+        charges = [i + 100 for i in charge_vals]
     else:
         charges = [charge_vals + 100]
 

@@ -1,5 +1,6 @@
 """Callable to generate settings file from template."""
-# pylint: disable=dangerous-default-value, too-many-locals, too-many-arguments
+
+# pylint: disable=dangerous-default-value, too-many-locals, too-many-positional-arguments, too-many-arguments
 
 
 from typing import List, Optional
@@ -11,18 +12,18 @@ from particula.data.loader import get_files_in_folder_with_size
 
 
 def for_general_1d_load(
-    relative_data_folder: str = 'instrument_data',
-    filename_regex: str = '*.csv',
+    relative_data_folder: str = "instrument_data",
+    filename_regex: str = "*.csv",
     file_min_size_bytes: int = 10,
     header_row: int = 0,
     data_checks: Optional[dict] = None,
     data_column: list = [3, 5],
-    data_header: List[str] = ['data 1', 'data 3'],
+    data_header: List[str] = ["data 1", "data 3"],
     time_column: List[int] = [0, 1],
-    time_format: str = '%Y-%m-%d %H:%M:%S.%f',
-    delimiter: str = ',',
+    time_format: str = "%Y-%m-%d %H:%M:%S.%f",
+    delimiter: str = ",",
     time_shift_seconds: int = 0,
-    timezone_identifier: str = 'UTC',
+    timezone_identifier: str = "UTC",
 ) -> dict:
     """
     Generate a settings dictionary for loading and checking 1D data from CSV
@@ -69,38 +70,38 @@ def for_general_1d_load(
             "skip_end": 0,
         }
     return {
-        'relative_data_folder': relative_data_folder,
-        'filename_regex': filename_regex,
-        'MIN_SIZE_BYTES': file_min_size_bytes,
-        'data_loading_function': 'general_1d_load',
-        'header_row': header_row,
-        'data_checks': data_checks,
-        'data_column': data_column,
-        'data_header': data_header,
-        'time_column': time_column,
-        'time_format': time_format,
-        'delimiter': delimiter,
-        'time_shift_seconds': time_shift_seconds,
-        'timezone_identifier': timezone_identifier,
+        "relative_data_folder": relative_data_folder,
+        "filename_regex": filename_regex,
+        "MIN_SIZE_BYTES": file_min_size_bytes,
+        "data_loading_function": "general_1d_load",
+        "header_row": header_row,
+        "data_checks": data_checks,
+        "data_column": data_column,
+        "data_header": data_header,
+        "time_column": time_column,
+        "time_format": time_format,
+        "delimiter": delimiter,
+        "time_shift_seconds": time_shift_seconds,
+        "timezone_identifier": timezone_identifier,
     }
 
 
 def for_general_sizer_1d_2d_load(
-        relative_data_folder: str = 'instrument_data',
-        filename_regex: str = '*.csv',
-        file_min_size_bytes: int = 10,
-        header_row: int = 0,
-        data_checks: Optional[dict] = None,
-        data_1d_column: list = [3, 5],
-        data_1d_header: List[str] = ['data 1', 'data 3'],
-        data_2d_dp_start_keyword: str = "Date Time",
-        data_2d_dp_end_keyword: str = "Total Conc",
-        data_2d_convert_concentration_from: str = "dw/dlogdp",  # or dw
-        time_column: List[int] = [0, 1],
-        time_format: str = '%Y-%m-%d %H:%M:%S.%f',
-        delimiter: str = ',',
-        time_shift_seconds: int = 0,
-        timezone_identifier: str = 'UTC',
+    relative_data_folder: str = "instrument_data",
+    filename_regex: str = "*.csv",
+    file_min_size_bytes: int = 10,
+    header_row: int = 0,
+    data_checks: Optional[dict] = None,
+    data_1d_column: list = [3, 5],
+    data_1d_header: List[str] = ["data 1", "data 3"],
+    data_2d_dp_start_keyword: str = "Date Time",
+    data_2d_dp_end_keyword: str = "Total Conc",
+    data_2d_convert_concentration_from: str = "dw/dlogdp",  # or dw
+    time_column: List[int] = [0, 1],
+    time_format: str = "%Y-%m-%d %H:%M:%S.%f",
+    delimiter: str = ",",
+    time_shift_seconds: int = 0,
+    timezone_identifier: str = "UTC",
 ) -> tuple:
     """
     Generate settings for the 1D general file loader and the 2D general sizer
@@ -147,45 +148,43 @@ def for_general_sizer_1d_2d_load(
             "skip_end": 0,
         }
     settings_1d = {
-        'relative_data_folder': relative_data_folder,
-        'filename_regex': filename_regex,
-        'MIN_SIZE_BYTES': file_min_size_bytes,
-        'data_loading_function': 'general_1d_load',
-        'header_row': header_row,
-        'data_checks': data_checks,
-        'data_column': data_1d_column,
-        'data_header': data_1d_header,
-        'time_column': time_column,
-        'time_format': time_format,
-        'delimiter': delimiter,
-        'time_shift_seconds': time_shift_seconds,
-        'timezone_identifier': timezone_identifier,
+        "relative_data_folder": relative_data_folder,
+        "filename_regex": filename_regex,
+        "MIN_SIZE_BYTES": file_min_size_bytes,
+        "data_loading_function": "general_1d_load",
+        "header_row": header_row,
+        "data_checks": data_checks,
+        "data_column": data_1d_column,
+        "data_header": data_1d_header,
+        "time_column": time_column,
+        "time_format": time_format,
+        "delimiter": delimiter,
+        "time_shift_seconds": time_shift_seconds,
+        "timezone_identifier": timezone_identifier,
     }
     settings_2d = {
-        'relative_data_folder': relative_data_folder,
-        'filename_regex': filename_regex,
-        'MIN_SIZE_BYTES': file_min_size_bytes,
-        'data_loading_function': 'general_2d_load',
-        'header_row': header_row,
-        'data_checks': data_checks,
-        'data_sizer_reader': {
+        "relative_data_folder": relative_data_folder,
+        "filename_regex": filename_regex,
+        "MIN_SIZE_BYTES": file_min_size_bytes,
+        "data_loading_function": "general_2d_load",
+        "header_row": header_row,
+        "data_checks": data_checks,
+        "data_sizer_reader": {
             "Dp_start_keyword": data_2d_dp_start_keyword,
             "Dp_end_keyword": data_2d_dp_end_keyword,
             "convert_scale_from": data_2d_convert_concentration_from,
         },
-        'time_column': time_column,
-        'time_format': time_format,
-        'delimiter': delimiter,
-        'time_shift_seconds': time_shift_seconds,
-        'timezone_identifier': timezone_identifier,
+        "time_column": time_column,
+        "time_format": time_format,
+        "delimiter": delimiter,
+        "time_shift_seconds": time_shift_seconds,
+        "timezone_identifier": timezone_identifier,
     }
     return settings_1d, settings_2d
 
 
 def load_settings_for_stream(
-    path: str,
-    subfolder: str,
-    settings_suffix: str = ''
+    path: str, subfolder: str, settings_suffix: str = ""
 ) -> dict:
     """
     Load settings for Stream data from a JSON file.
@@ -208,30 +207,30 @@ def load_settings_for_stream(
     - FileNotFoundError: If no settings file is found.
     - Warning: If more than one settings file is found.
     """
-    settings_file_name = f'stream_settings{settings_suffix}.json'
+    settings_file_name = f"stream_settings{settings_suffix}.json"
     _, full_path, file_size_in_bytes = get_files_in_folder_with_size(
         path=path,
         subfolder=subfolder,
         filename_regex=settings_file_name,
-        min_size=10)
+        min_size=10,
+    )
 
     if len(file_size_in_bytes) == 0:
         raise FileNotFoundError(
-            f'No stream_settings file found in {path}/{subfolder}.')
+            f"No stream_settings file found in {path}/{subfolder}."
+        )
     if len(file_size_in_bytes) > 1:
         warnings.warn(
-            f'More than one stream_settings file found in {path}/{subfolder}. '
-            'Using the first one found.')
+            f"More than one stream_settings file found in {path}/{subfolder}. "
+            "Using the first one found."
+        )
 
-    with open(full_path[0], 'r', encoding='utf-8') as file:
+    with open(full_path[0], "r", encoding="utf-8") as file:
         return json.load(file)
 
 
 def save_settings_for_stream(
-    settings: dict,
-    path: str,
-    subfolder: str,
-    settings_suffix: str = ''
+    settings: dict, path: str, subfolder: str, settings_suffix: str = ""
 ) -> None:
     """
     Save settings for lake data to a JSON file.
@@ -250,18 +249,16 @@ def save_settings_for_stream(
     Returns:
     - None
     """
-    settings_file_name = f'stream_settings{settings_suffix}.json'
+    settings_file_name = f"stream_settings{settings_suffix}.json"
     save_path = os.path.join(path, subfolder, settings_file_name)
 
-    with open(save_path, 'w', encoding='utf-8') as file:
+    with open(save_path, "w", encoding="utf-8") as file:
         json.dump(settings, file, indent=4)
-        file.write('\n')  # Add an empty line at the bottom
+        file.write("\n")  # Add an empty line at the bottom
 
 
 def load_settings_for_lake(
-    path: str,
-    subfolder: str = '',
-    settings_suffix: str = ''
+    path: str, subfolder: str = "", settings_suffix: str = ""
 ) -> dict:
     """
     Load settings for Lake data from a JSON file. The settings file is
@@ -285,30 +282,30 @@ def load_settings_for_lake(
     - FileNotFoundError: If no settings file is found.
     - Warning: If more than one settings file is found.
     """
-    settings_file_name = f'lake_settings{settings_suffix}.json'
+    settings_file_name = f"lake_settings{settings_suffix}.json"
     _, full_path, file_size_in_bytes = get_files_in_folder_with_size(
         path=path,
         subfolder=subfolder,
         filename_regex=settings_file_name,
-        min_size=10)
+        min_size=10,
+    )
 
     if len(file_size_in_bytes) == 0:
         raise FileNotFoundError(
-            f'No lake_settings file found in {path}/{subfolder}.')
+            f"No lake_settings file found in {path}/{subfolder}."
+        )
     if len(file_size_in_bytes) > 1:
         warnings.warn(
-            f'More than one lake_settings file found in {path}/{subfolder}. '
-            'Using the first one found.')
+            f"More than one lake_settings file found in {path}/{subfolder}. "
+            "Using the first one found."
+        )
 
-    with open(full_path[0], 'r', encoding='utf-8') as file:
+    with open(full_path[0], "r", encoding="utf-8") as file:
         return json.load(file)
 
 
 def save_settings_for_lake(
-    settings: dict,
-    path: str,
-    subfolder: str = '',
-    settings_suffix: str = ''
+    settings: dict, path: str, subfolder: str = "", settings_suffix: str = ""
 ) -> None:
     """
     Save settings for lake data to a JSON file.
@@ -327,9 +324,9 @@ def save_settings_for_lake(
     Returns:
     - None
     """
-    settings_file_name = f'lake_settings{settings_suffix}.json'
+    settings_file_name = f"lake_settings{settings_suffix}.json"
     save_path = os.path.join(path, subfolder, settings_file_name)
 
-    with open(save_path, 'w', encoding='utf-8') as file:
+    with open(save_path, "w", encoding="utf-8") as file:
         json.dump(settings, file, indent=4)
-        file.write('\n')  # Add an empty line at the bottom
+        file.write("\n")  # Add an empty line at the bottom
