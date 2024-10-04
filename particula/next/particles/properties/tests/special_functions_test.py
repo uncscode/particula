@@ -9,12 +9,13 @@ from particula.next.particles.properties.special_functions import (
 
 
 def test_debye_function_single_float():
-    """Test the Debye function for a single float value."""
-    result = debye_function(1.0)
-    assert np.isclose(result, 0.7765038970390566)
-
-    result = debye_function(1.0, n=2)
-    assert np.isclose(result, 0.7078773477535959)
+    """Test the Debye function for single float values, including extremes."""
+    assert np.isclose(debye_function(1.0), 0.7765038970390566)
+    assert np.isclose(debye_function(1.0, n=2), 0.7078773477535959)
+    assert np.isclose(debye_function(1e-10), 1.0)
+    assert np.isclose(debye_function(1e10), 0.0)
+    assert np.isclose(debye_function(1e-10, n=2), 1.0)
+    assert np.isclose(debye_function(1e10, n=2), 0.0)
 
 
 def test_debye_function_numpy_array():
