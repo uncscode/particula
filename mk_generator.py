@@ -27,7 +27,7 @@ handsdown = MaterialGenerator(
     input_path=repo_path,
     output_path=repo_path / "docs/API",
     source_paths=path_finder.glob("**/*.py"),
-    source_code_url="https://github.com/Gorkowski/particula/blob/main/",
+    source_code_url="https://github.com/uncscode/particula/blob/main/",
     docstring_processor=PEP257DocstringProcessor(),
 )
 

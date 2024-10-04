@@ -1,6 +1,6 @@
 site_name: Particula
 repo_url: https://github.com/uncscode/particula
-repo_name: development-fork
+repo_name: particula-main
 edit_uri: edit/main/docs/_builds
 
 theme:
