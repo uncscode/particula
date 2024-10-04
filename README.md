@@ -1,12 +1,4 @@
-# Gorkowski/PARTICULA
-
-This repository is a development fork of `Particula`. Since this is an active development environment, the codebase may undergo frequent changes, and instability can occur. To install this version directly, use the following `pip` command:
-
-```bash
-pip install git+https://github.com/Gorkowski/particula.git
-```
-
-# PARITCULA
+# *PARTICULA*
 
 Particula is a simple aerosol particle simulator. It is designed to be easy to use and easy to extend. The goal is to have a robust aerosol (gas phase *and* particle phase) simulation system that can be used to answer scientific questions that arise in experiments and research endeavors.
 
@@ -25,4 +17,3 @@ For development, you can fork this repository and then install `particula` in an
 ## Tour & Examples
 
 [Start here...](https://uncscode.github.io/particula/tour/part-tour.html)
-
