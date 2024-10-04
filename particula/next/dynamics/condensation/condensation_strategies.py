@@ -58,11 +58,12 @@ from particula.next.dynamics.condensation.mass_transfer import (
 
 # mass transfer abstract class
 class CondensationStrategy(ABC):
-    """Condensation strategy abstract class.
+    """
+    Abstract base class for condensation strategies.
 
-    Abstract class for mass transfer strategies, for condensation or
-    evaporation of particles. This class should be subclassed to implement
-    specific mass transfer strategies.
+    This class defines the interface for various condensation models
+    used in atmospheric physics. Subclasses should implement specific
+    condensation algorithms based on different physical models and equations.
 
     Args:
         molar_mass: The molar mass of the species [kg/mol]. If a single value
