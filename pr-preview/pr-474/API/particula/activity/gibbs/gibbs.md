@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Activity](./index.md#activity) / Gibbs
 
-> Auto-generated documentation for [particula.activity.gibbs](https://github.com/Gorkowski/particula/blob/main/particula/activity/gibbs.py) module.
+> Auto-generated documentation for [particula.activity.gibbs](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs.py) module.
 
 ## gibbs_free_engery
 
-[Show source in gibbs.py:6](https://github.com/Gorkowski/particula/blob/main/particula/activity/gibbs.py#L6)
+[Show source in gibbs.py:6](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs.py#L6)
 
 Calculate the gibbs free energy of the mixture. Ideal and non-ideal.
 

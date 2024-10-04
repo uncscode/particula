@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / DiffusiveKnudsen
 
-> Auto-generated documentation for [particula.util.diffusive_knudsen](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py) module.
+> Auto-generated documentation for [particula.util.diffusive_knudsen](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py) module.
 
 ## DiffusiveKnudsen
 
-[Show source in diffusive_knudsen.py:14](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L14)
+[Show source in diffusive_knudsen.py:14](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L14)
 
 A class for Diff..Knu
 
@@ -23,7 +23,7 @@ class DiffusiveKnudsen(CoulombEnhancement):
 
 ### DiffusiveKnudsen().get_celimits
 
-[Show source in diffusive_knudsen.py:73](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L73)
+[Show source in diffusive_knudsen.py:73](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L73)
 
 get coag enh limits
 
@@ -35,7 +35,7 @@ def get_celimits(self): ...
 
 ### DiffusiveKnudsen().get_ces
 
-[Show source in diffusive_knudsen.py:67](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L67)
+[Show source in diffusive_knudsen.py:67](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L67)
 
 get coulomb enhancement parameters
 
@@ -47,7 +47,7 @@ def get_ces(self): ...
 
 ### DiffusiveKnudsen().get_diff_knu
 
-[Show source in diffusive_knudsen.py:80](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L80)
+[Show source in diffusive_knudsen.py:80](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L80)
 
 calculate it
 
@@ -59,7 +59,7 @@ def get_diff_knu(self): ...
 
 ### DiffusiveKnudsen().get_red_frifac
 
-[Show source in diffusive_knudsen.py:51](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L51)
+[Show source in diffusive_knudsen.py:51](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L51)
 
 get the reduced friction factor
 
@@ -71,7 +71,7 @@ def get_red_frifac(self): ...
 
 ### DiffusiveKnudsen().get_red_mass
 
-[Show source in diffusive_knudsen.py:34](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L34)
+[Show source in diffusive_knudsen.py:34](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L34)
 
 get the reduced mass
 
@@ -83,7 +83,7 @@ def get_red_mass(self): ...
 
 ### DiffusiveKnudsen().get_rxr
 
-[Show source in diffusive_knudsen.py:45](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L45)
+[Show source in diffusive_knudsen.py:45](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L45)
 
 add two radii
 
@@ -97,7 +97,7 @@ def get_rxr(self): ...
 
 ## celimits
 
-[Show source in diffusive_knudsen.py:163](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L163)
+[Show source in diffusive_knudsen.py:163](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L163)
 
 get coag enh limits
 
@@ -111,7 +111,7 @@ def celimits(**kwargs): ...
 
 ## ces
 
-[Show source in diffusive_knudsen.py:156](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L156)
+[Show source in diffusive_knudsen.py:156](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L156)
 
 get the coulomb enhancement limits
 
@@ -125,7 +125,7 @@ def ces(**kwargs): ...
 
 ## diff_knu
 
-[Show source in diffusive_knudsen.py:94](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L94)
+[Show source in diffusive_knudsen.py:94](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L94)
 
 Diffusive Knudsen number.
 
@@ -184,7 +184,7 @@ def diff_knu(**kwargs): ...
 
 ## red_frifac
 
-[Show source in diffusive_knudsen.py:149](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L149)
+[Show source in diffusive_knudsen.py:149](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L149)
 
 get the reduced friction factor
 
@@ -198,7 +198,7 @@ def red_frifac(**kwargs): ...
 
 ## red_mass
 
-[Show source in diffusive_knudsen.py:142](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L142)
+[Show source in diffusive_knudsen.py:142](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L142)
 
 get the reduced mass
 
@@ -212,7 +212,7 @@ def red_mass(**kwargs): ...
 
 ## rxr
 
-[Show source in diffusive_knudsen.py:170](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusive_knudsen.py#L170)
+[Show source in diffusive_knudsen.py:170](https://github.com/uncscode/particula/blob/main/particula/util/diffusive_knudsen.py#L170)
 
 add two radii
 

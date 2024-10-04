@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Dynamics](../index.md#dynamics) / [Coagulation](./index.md#coagulation) / Rate
 
-> Auto-generated documentation for [particula.next.dynamics.coagulation.rate](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/rate.py) module.
+> Auto-generated documentation for [particula.next.dynamics.coagulation.rate](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/rate.py) module.
 
 ## continuous_gain
 
-[Show source in rate.py:120](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/rate.py#L120)
+[Show source in rate.py:120](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/rate.py#L120)
 
 Calculate the coagulation gain rate, via the integration method.
 
@@ -47,7 +47,7 @@ def continuous_gain(
 
 ## continuous_loss
 
-[Show source in rate.py:96](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/rate.py#L96)
+[Show source in rate.py:96](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/rate.py#L96)
 
 Calculate the coagulation loss rate, via the integration method.
 
@@ -80,7 +80,7 @@ def continuous_loss(
 
 ## discrete_gain
 
-[Show source in rate.py:40](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/rate.py#L40)
+[Show source in rate.py:40](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/rate.py#L40)
 
 Calculate the coagulation gain rate, via the integration method, by
 converting to a continuous distribution.
@@ -121,7 +121,7 @@ def discrete_gain(
 
 ## discrete_loss
 
-[Show source in rate.py:19](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/rate.py#L19)
+[Show source in rate.py:19](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/rate.py#L19)
 
 Calculate the coagulation loss rate, via the summation method.
 

@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Partial Pressure Module
 
-> Auto-generated documentation for [particula.next.particles.properties.partial_pressure_module](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/partial_pressure_module.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.partial_pressure_module](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/partial_pressure_module.py) module.
 
 ## partial_pressure_delta
 
-[Show source in partial_pressure_module.py:9](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/partial_pressure_module.py#L9)
+[Show source in partial_pressure_module.py:9](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/partial_pressure_module.py#L9)
 
 Calculate the difference in partial pressure of a species between the gas
 phase and the particle phase, which is used in the calculation of the rate

@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Settling Velocity
 
-> Auto-generated documentation for [particula.util.settling_velocity](https://github.com/Gorkowski/particula/blob/main/particula/util/settling_velocity.py) module.
+> Auto-generated documentation for [particula.util.settling_velocity](https://github.com/uncscode/particula/blob/main/particula/util/settling_velocity.py) module.
 
 ## psv
 
-[Show source in settling_velocity.py:8](https://github.com/Gorkowski/particula/blob/main/particula/util/settling_velocity.py#L8)
+[Show source in settling_velocity.py:8](https://github.com/uncscode/particula/blob/main/particula/util/settling_velocity.py#L8)
 
 calculate the settling velocity
 

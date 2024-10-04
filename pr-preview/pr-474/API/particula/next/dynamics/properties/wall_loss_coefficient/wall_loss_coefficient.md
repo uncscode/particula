@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Dynamics](../index.md#dynamics) / [Properties](./index.md#properties) / Wall Loss Coefficient
 
-> Auto-generated documentation for [particula.next.dynamics.properties.wall_loss_coefficient](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/properties/wall_loss_coefficient.py) module.
+> Auto-generated documentation for [particula.next.dynamics.properties.wall_loss_coefficient](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/properties/wall_loss_coefficient.py) module.
 
 ## rectangle_wall_loss_coefficient
 
-[Show source in wall_loss_coefficient.py:65](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/properties/wall_loss_coefficient.py#L65)
+[Show source in wall_loss_coefficient.py:65](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/properties/wall_loss_coefficient.py#L65)
 
 Calculate the wall loss coefficient, β₀, for a rectangular chamber.
 
@@ -54,7 +54,7 @@ def rectangle_wall_loss_coefficient(
 
 ## rectangle_wall_loss_coefficient_via_system_state
 
-[Show source in wall_loss_coefficient.py:177](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/properties/wall_loss_coefficient.py#L177)
+[Show source in wall_loss_coefficient.py:177](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/properties/wall_loss_coefficient.py#L177)
 
 Calculate the wall loss coefficient for a rectangular chamber based on
 the system state.
@@ -105,7 +105,7 @@ def rectangle_wall_loss_coefficient_via_system_state(
 
 ## spherical_wall_loss_coefficient
 
-[Show source in wall_loss_coefficient.py:28](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/properties/wall_loss_coefficient.py#L28)
+[Show source in wall_loss_coefficient.py:28](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/properties/wall_loss_coefficient.py#L28)
 
 Calculate the wall loss coefficient for a spherical chamber
 approximation.
@@ -143,7 +143,7 @@ def spherical_wall_loss_coefficient(
 
 ## spherical_wall_loss_coefficient_via_system_state
 
-[Show source in wall_loss_coefficient.py:120](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/properties/wall_loss_coefficient.py#L120)
+[Show source in wall_loss_coefficient.py:120](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/properties/wall_loss_coefficient.py#L120)
 
 Calculate the wall loss coefficient for a spherical chamber based on the
 system state.

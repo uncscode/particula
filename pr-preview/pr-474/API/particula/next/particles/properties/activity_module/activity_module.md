@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Activity Module
 
-> Auto-generated documentation for [particula.next.particles.properties.activity_module](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/activity_module.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.activity_module](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/activity_module.py) module.
 
 ## calculate_partial_pressure
 
-[Show source in activity_module.py:223](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/activity_module.py#L223)
+[Show source in activity_module.py:223](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/activity_module.py#L223)
 
 Calculate the partial pressure of a species based on its activity and pure
     vapor pressure.
@@ -43,7 +43,7 @@ def calculate_partial_pressure(
 
 ## ideal_activity_mass
 
-[Show source in activity_module.py:88](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/activity_module.py#L88)
+[Show source in activity_module.py:88](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/activity_module.py#L88)
 
 Calculate the ideal activity of a species based on mass fractions.
 
@@ -82,7 +82,7 @@ def ideal_activity_mass(
 
 ## ideal_activity_molar
 
-[Show source in activity_module.py:10](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/activity_module.py#L10)
+[Show source in activity_module.py:10](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/activity_module.py#L10)
 
 Calculate the ideal activity of a species based on mole fractions.
 
@@ -127,7 +127,7 @@ def ideal_activity_molar(
 
 ## ideal_activity_volume
 
-[Show source in activity_module.py:49](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/activity_module.py#L49)
+[Show source in activity_module.py:49](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/activity_module.py#L49)
 
 Calculate the ideal activity of a species based on volume fractions.
 
@@ -172,7 +172,7 @@ def ideal_activity_volume(
 
 ## kappa_activity
 
-[Show source in activity_module.py:121](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/activity_module.py#L121)
+[Show source in activity_module.py:121](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/activity_module.py#L121)
 
 Calculate the activity of species based on the kappa hygroscopic parameter.
 

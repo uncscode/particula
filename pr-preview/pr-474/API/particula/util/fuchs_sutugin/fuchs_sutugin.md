@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Fuchs Sutugin
 
-> Auto-generated documentation for [particula.util.fuchs_sutugin](https://github.com/Gorkowski/particula/blob/main/particula/util/fuchs_sutugin.py) module.
+> Auto-generated documentation for [particula.util.fuchs_sutugin](https://github.com/uncscode/particula/blob/main/particula/util/fuchs_sutugin.py) module.
 
 ## fsc
 
-[Show source in fuchs_sutugin.py:9](https://github.com/Gorkowski/particula/blob/main/particula/util/fuchs_sutugin.py#L9)
+[Show source in fuchs_sutugin.py:9](https://github.com/uncscode/particula/blob/main/particula/util/fuchs_sutugin.py#L9)
 
 Returns the Fuchs-Sutugin model transition regime correction.
 

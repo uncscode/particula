@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Gas](../index.md#gas) / [Properties](./index.md#properties) / Mean Free Path
 
-> Auto-generated documentation for [particula.next.gas.properties.mean_free_path](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/mean_free_path.py) module.
+> Auto-generated documentation for [particula.next.gas.properties.mean_free_path](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/mean_free_path.py) module.
 
 ## molecule_mean_free_path
 
-[Show source in mean_free_path.py:27](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/mean_free_path.py#L27)
+[Show source in mean_free_path.py:27](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/mean_free_path.py#L27)
 
 Calculate the mean free path of a gas molecule in air based on the
 temperature, pressure, and molar mass of the gas. The mean free path

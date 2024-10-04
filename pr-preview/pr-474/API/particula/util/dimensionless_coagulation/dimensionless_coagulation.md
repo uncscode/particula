@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / DimensionlessCoagulation
 
-> Auto-generated documentation for [particula.util.dimensionless_coagulation](https://github.com/Gorkowski/particula/blob/main/particula/util/dimensionless_coagulation.py) module.
+> Auto-generated documentation for [particula.util.dimensionless_coagulation](https://github.com/uncscode/particula/blob/main/particula/util/dimensionless_coagulation.py) module.
 
 ## DimensionlessCoagulation
 
-[Show source in dimensionless_coagulation.py:12](https://github.com/Gorkowski/particula/blob/main/particula/util/dimensionless_coagulation.py#L12)
+[Show source in dimensionless_coagulation.py:12](https://github.com/uncscode/particula/blob/main/particula/util/dimensionless_coagulation.py#L12)
 
 dimensionless coagulation
 
@@ -23,7 +23,7 @@ class DimensionlessCoagulation(DKn):
 
 ### DimensionlessCoagulation().coag_full
 
-[Show source in dimensionless_coagulation.py:58](https://github.com/Gorkowski/particula/blob/main/particula/util/dimensionless_coagulation.py#L58)
+[Show source in dimensionless_coagulation.py:58](https://github.com/uncscode/particula/blob/main/particula/util/dimensionless_coagulation.py#L58)
 
 Retrun the dimensioned coagulation kernel
 
@@ -35,7 +35,7 @@ def coag_full(self): ...
 
 ### DimensionlessCoagulation().coag_less
 
-[Show source in dimensionless_coagulation.py:43](https://github.com/Gorkowski/particula/blob/main/particula/util/dimensionless_coagulation.py#L43)
+[Show source in dimensionless_coagulation.py:43](https://github.com/uncscode/particula/blob/main/particula/util/dimensionless_coagulation.py#L43)
 
 Return the dimensionless coagulation kernel.
 
@@ -49,7 +49,7 @@ def coag_less(self): ...
 
 ## full_coag
 
-[Show source in dimensionless_coagulation.py:102](https://github.com/Gorkowski/particula/blob/main/particula/util/dimensionless_coagulation.py#L102)
+[Show source in dimensionless_coagulation.py:102](https://github.com/uncscode/particula/blob/main/particula/util/dimensionless_coagulation.py#L102)
 
 Return the dimensioned coagulation kernel
 
@@ -63,7 +63,7 @@ def full_coag(**kwargs): ...
 
 ## less_coag
 
-[Show source in dimensionless_coagulation.py:73](https://github.com/Gorkowski/particula/blob/main/particula/util/dimensionless_coagulation.py#L73)
+[Show source in dimensionless_coagulation.py:73](https://github.com/uncscode/particula/blob/main/particula/util/dimensionless_coagulation.py#L73)
 
 Return the dimensionless coagulation kernel.
 

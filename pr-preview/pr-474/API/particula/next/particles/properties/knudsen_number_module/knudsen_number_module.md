@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Knudsen Number Module
 
-> Auto-generated documentation for [particula.next.particles.properties.knudsen_number_module](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/knudsen_number_module.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.knudsen_number_module](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/knudsen_number_module.py) module.
 
 ## calculate_knudsen_number
 
-[Show source in knudsen_number_module.py:12](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/knudsen_number_module.py#L12)
+[Show source in knudsen_number_module.py:12](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/knudsen_number_module.py#L12)
 
 Calculate the Knudsen number using the mean free path of the gas and the
 radius of the particle. The Knudsen number is a dimensionless number that

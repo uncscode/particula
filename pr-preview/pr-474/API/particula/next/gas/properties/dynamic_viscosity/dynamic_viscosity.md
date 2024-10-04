@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Gas](../index.md#gas) / [Properties](./index.md#properties) / Dynamic Viscosity
 
-> Auto-generated documentation for [particula.next.gas.properties.dynamic_viscosity](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/dynamic_viscosity.py) module.
+> Auto-generated documentation for [particula.next.gas.properties.dynamic_viscosity](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/dynamic_viscosity.py) module.
 
 ## get_dynamic_viscosity
 
-[Show source in dynamic_viscosity.py:22](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/dynamic_viscosity.py#L22)
+[Show source in dynamic_viscosity.py:22](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/dynamic_viscosity.py#L22)
 
 Calculates the dynamic viscosity of air via Sutherland's formula, which is
 a common method in fluid dynamics for gases that involves temperature

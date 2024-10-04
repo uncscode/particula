@@ -2,7 +2,7 @@
 
 [Particula Index](../README.md#particula-index) / [Particula](./index.md#particula) / Constants
 
-> Auto-generated documentation for [particula.constants](https://github.com/Gorkowski/particula/blob/main/particula/constants.py) module.
+> Auto-generated documentation for [particula.constants](https://github.com/uncscode/particula/blob/main/particula/constants.py) module.
 
 #### Attributes
 

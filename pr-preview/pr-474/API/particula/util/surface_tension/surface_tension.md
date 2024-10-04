@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Surface Tension
 
-> Auto-generated documentation for [particula.util.surface_tension](https://github.com/Gorkowski/particula/blob/main/particula/util/surface_tension.py) module.
+> Auto-generated documentation for [particula.util.surface_tension](https://github.com/uncscode/particula/blob/main/particula/util/surface_tension.py) module.
 
 ## dry_mixing
 
-[Show source in surface_tension.py:42](https://github.com/Gorkowski/particula/blob/main/particula/util/surface_tension.py#L42)
+[Show source in surface_tension.py:42](https://github.com/uncscode/particula/blob/main/particula/util/surface_tension.py#L42)
 
 Function to calculate the effective surface tension of a dry mixture.
 
@@ -31,7 +31,7 @@ def dry_mixing(volume_fractions, surface_tensions): ...
 
 ## water
 
-[Show source in surface_tension.py:15](https://github.com/Gorkowski/particula/blob/main/particula/util/surface_tension.py#L15)
+[Show source in surface_tension.py:15](https://github.com/uncscode/particula/blob/main/particula/util/surface_tension.py#L15)
 
 Calculate the surface tension of water using the equation from Kalova
 and Mares (2018).
@@ -57,7 +57,7 @@ def water(temperature, critical_temperature=647.15): ...
 
 ## wet_mixing
 
-[Show source in surface_tension.py:64](https://github.com/Gorkowski/particula/blob/main/particula/util/surface_tension.py#L64)
+[Show source in surface_tension.py:64](https://github.com/uncscode/particula/blob/main/particula/util/surface_tension.py#L64)
 
 Function to calculate the effective surface tension of a wet mixture.
 

@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Diffusion Coefficient
 
-> Auto-generated documentation for [particula.util.diffusion_coefficient](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusion_coefficient.py) module.
+> Auto-generated documentation for [particula.util.diffusion_coefficient](https://github.com/uncscode/particula/blob/main/particula/util/diffusion_coefficient.py) module.
 
 ## pdc
 
-[Show source in diffusion_coefficient.py:11](https://github.com/Gorkowski/particula/blob/main/particula/util/diffusion_coefficient.py#L11)
+[Show source in diffusion_coefficient.py:11](https://github.com/uncscode/particula/blob/main/particula/util/diffusion_coefficient.py#L11)
 
 particle diffusion coefficient
 

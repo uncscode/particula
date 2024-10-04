@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Next](../index.md#next) / [Dynamics](./index.md#dynamics) / Wall Loss
 
-> Auto-generated documentation for [particula.next.dynamics.wall_loss](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/wall_loss.py) module.
+> Auto-generated documentation for [particula.next.dynamics.wall_loss](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/wall_loss.py) module.
 
 ## rectangle_wall_loss_rate
 
-[Show source in wall_loss.py:65](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/wall_loss.py#L65)
+[Show source in wall_loss.py:65](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/wall_loss.py#L65)
 
 Calculate the wall loss rate of particles in a rectangular chamber.
 
@@ -53,7 +53,7 @@ def rectangle_wall_loss_rate(
 
 ## spherical_wall_loss_rate
 
-[Show source in wall_loss.py:16](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/wall_loss.py#L16)
+[Show source in wall_loss.py:16](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/wall_loss.py#L16)
 
 Calculate the wall loss rate of particles in a spherical chamber.
 

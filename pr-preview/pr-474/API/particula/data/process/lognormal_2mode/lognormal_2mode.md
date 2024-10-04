@@ -2,7 +2,7 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Data](../index.md#data) / [Process](./index.md#process) / Lognormal 2mode
 
-> Auto-generated documentation for [particula.data.process.lognormal_2mode](https://github.com/Gorkowski/particula/blob/main/particula/data/process/lognormal_2mode.py) module.
+> Auto-generated documentation for [particula.data.process.lognormal_2mode](https://github.com/uncscode/particula/blob/main/particula/data/process/lognormal_2mode.py) module.
 
 #### Attributes
 
@@ -11,7 +11,7 @@
 
 ## cost_function
 
-[Show source in lognormal_2mode.py:26](https://github.com/Gorkowski/particula/blob/main/particula/data/process/lognormal_2mode.py#L26)
+[Show source in lognormal_2mode.py:26](https://github.com/uncscode/particula/blob/main/particula/data/process/lognormal_2mode.py#L26)
 
 Cost function for the lognormal distribution with 2 modes.
 
@@ -41,7 +41,7 @@ def cost_function(
 
 ## create_lognormal_2mode_from_fit
 
-[Show source in lognormal_2mode.py:383](https://github.com/Gorkowski/particula/blob/main/particula/data/process/lognormal_2mode.py#L383)
+[Show source in lognormal_2mode.py:383](https://github.com/uncscode/particula/blob/main/particula/data/process/lognormal_2mode.py#L383)
 
 Create a fitted PMF stream and concentration matrix based on
 optimized parameters.
@@ -80,7 +80,7 @@ def create_lognormal_2mode_from_fit(
 
 ## evaluate_fit
 
-[Show source in lognormal_2mode.py:131](https://github.com/Gorkowski/particula/blob/main/particula/data/process/lognormal_2mode.py#L131)
+[Show source in lognormal_2mode.py:131](https://github.com/uncscode/particula/blob/main/particula/data/process/lognormal_2mode.py#L131)
 
 Evaluate the best fit and calculate R² score.
 
@@ -98,7 +98,7 @@ def evaluate_fit(
 
 ## get_bounds
 
-[Show source in lognormal_2mode.py:73](https://github.com/Gorkowski/particula/blob/main/particula/data/process/lognormal_2mode.py#L73)
+[Show source in lognormal_2mode.py:73](https://github.com/uncscode/particula/blob/main/particula/data/process/lognormal_2mode.py#L73)
 
 Provide default bounds for optimization parameters.
 
@@ -112,7 +112,7 @@ def get_bounds() -> List[Tuple[float, Any]]: ...
 
 ## get_initial_guesses
 
-[Show source in lognormal_2mode.py:85](https://github.com/Gorkowski/particula/blob/main/particula/data/process/lognormal_2mode.py#L85)
+[Show source in lognormal_2mode.py:85](https://github.com/uncscode/particula/blob/main/particula/data/process/lognormal_2mode.py#L85)
 
 Combine initial guesses into a single array.
 
@@ -130,7 +130,7 @@ def get_initial_guesses(
 
 ## guess_and_optimize_looped
 
-[Show source in lognormal_2mode.py:301](https://github.com/Gorkowski/particula/blob/main/particula/data/process/lognormal_2mode.py#L301)
+[Show source in lognormal_2mode.py:301](https://github.com/uncscode/particula/blob/main/particula/data/process/lognormal_2mode.py#L301)
 
 Generate initial guesses using a machine learning model, optimize them,
 and return a Stream object with the results.
@@ -165,7 +165,7 @@ def guess_and_optimize_looped(
 
 ## optimize_fit
 
-[Show source in lognormal_2mode.py:165](https://github.com/Gorkowski/particula/blob/main/particula/data/process/lognormal_2mode.py#L165)
+[Show source in lognormal_2mode.py:165](https://github.com/uncscode/particula/blob/main/particula/data/process/lognormal_2mode.py#L165)
 
 Optimize the lognormal 2-mode distribution parameters using multiple
 optimization methods.
@@ -190,7 +190,7 @@ def optimize_fit(
 
 ## optimize_fit_looped
 
-[Show source in lognormal_2mode.py:232](https://github.com/Gorkowski/particula/blob/main/particula/data/process/lognormal_2mode.py#L232)
+[Show source in lognormal_2mode.py:232](https://github.com/uncscode/particula/blob/main/particula/data/process/lognormal_2mode.py#L232)
 
 Loop through the concentration PDFs to get the best optimization.
 
@@ -233,7 +233,7 @@ def optimize_fit_looped(
 
 ## run_optimization
 
-[Show source in lognormal_2mode.py:100](https://github.com/Gorkowski/particula/blob/main/particula/data/process/lognormal_2mode.py#L100)
+[Show source in lognormal_2mode.py:100](https://github.com/uncscode/particula/blob/main/particula/data/process/lognormal_2mode.py#L100)
 
 Perform the optimization using the specified method.
 

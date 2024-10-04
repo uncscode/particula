@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Lagrangian](./index.md#lagrangian) / Collisions
 
-> Auto-generated documentation for [particula.lagrangian.collisions](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/collisions.py) module.
+> Auto-generated documentation for [particula.lagrangian.collisions](https://github.com/uncscode/particula/blob/main/particula/lagrangian/collisions.py) module.
 
 ## coalescence
 
-[Show source in collisions.py:69](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/collisions.py#L69)
+[Show source in collisions.py:69](https://github.com/uncscode/particula/blob/main/particula/lagrangian/collisions.py#L69)
 
 Update mass and velocity of particles based on collision pairs, conserving
 mass and momentum.
@@ -57,7 +57,7 @@ def coalescence(
 
 ## elastic_collision
 
-[Show source in collisions.py:136](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/collisions.py#L136)
+[Show source in collisions.py:136](https://github.com/uncscode/particula/blob/main/particula/lagrangian/collisions.py#L136)
 
 Update velocities of particles based on elastic collision pairs using
 matrix operations, conserving kinetic energy and momentum.
@@ -105,7 +105,7 @@ def elastic_collision(
 
 ## find_collisions
 
-[Show source in collisions.py:9](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/collisions.py#L9)
+[Show source in collisions.py:9](https://github.com/uncscode/particula/blob/main/particula/lagrangian/collisions.py#L9)
 
 Find the collision pairs from a distance matrix, given the mass and
 indices of particles.

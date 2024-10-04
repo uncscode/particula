@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Lagrangian](./index.md#lagrangian) / Particle Pairs
 
-> Auto-generated documentation for [particula.lagrangian.particle_pairs](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_pairs.py) module.
+> Auto-generated documentation for [particula.lagrangian.particle_pairs](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_pairs.py) module.
 
 ## calculate_pairwise_distance
 
-[Show source in particle_pairs.py:48](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_pairs.py#L48)
+[Show source in particle_pairs.py:48](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_pairs.py#L48)
 
 need to test this:
 
@@ -44,7 +44,7 @@ def calculate_pairwise_distance(position: torch.Tensor) -> torch.Tensor: ...
 
 ## full_sweep_and_prune
 
-[Show source in particle_pairs.py:159](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_pairs.py#L159)
+[Show source in particle_pairs.py:159](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_pairs.py#L159)
 
 Sweep and prune algorithm for collision detection along all three axes
 (x, y, z). This function identifies pairs of particles that are close
@@ -73,7 +73,7 @@ def full_sweep_and_prune(
 
 ## full_sweep_and_prune_simplified
 
-[Show source in particle_pairs.py:240](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_pairs.py#L240)
+[Show source in particle_pairs.py:240](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_pairs.py#L240)
 
 A simplified version of the full sweep and prune algorithm for collision
 written above, it is not working yet. there is an error in the update of
@@ -106,7 +106,7 @@ def full_sweep_and_prune_simplified(
 
 ## remove_duplicates
 
-[Show source in particle_pairs.py:7](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_pairs.py#L7)
+[Show source in particle_pairs.py:7](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_pairs.py#L7)
 
 Removes duplicate entries from a specified column in a tensor of index
 pairs.
@@ -146,7 +146,7 @@ def remove_duplicates(
 
 ## single_axis_sweep_and_prune
 
-[Show source in particle_pairs.py:118](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_pairs.py#L118)
+[Show source in particle_pairs.py:118](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_pairs.py#L118)
 
 Sweep and prune algorithm for collision detection along a single axis.
 This function identifies pairs of particles that are close enough to
@@ -175,7 +175,7 @@ def single_axis_sweep_and_prune(
 
 ## validate_pair_distance
 
-[Show source in particle_pairs.py:79](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_pairs.py#L79)
+[Show source in particle_pairs.py:79](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_pairs.py#L79)
 
 Validates if the Euclidean distances between pairs of points are smaller
 than the sum of their radii.

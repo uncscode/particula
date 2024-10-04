@@ -2,7 +2,7 @@
 
 > Auto-generated documentation index.
 
-A full list of [Particula](https://github.com/Gorkowski/particula) project modules.
+A full list of [Particula](https://github.com/uncscode/particula) project modules.
 
 - [Particula](particula/index.md#particula)
     - [Activity](particula/activity/index.md#activity)

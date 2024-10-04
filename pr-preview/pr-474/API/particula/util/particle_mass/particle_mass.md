@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Particle Mass
 
-> Auto-generated documentation for [particula.util.particle_mass](https://github.com/Gorkowski/particula/blob/main/particula/util/particle_mass.py) module.
+> Auto-generated documentation for [particula.util.particle_mass](https://github.com/uncscode/particula/blob/main/particula/util/particle_mass.py) module.
 
 ## mass
 
-[Show source in particle_mass.py:8](https://github.com/Gorkowski/particula/blob/main/particula/util/particle_mass.py#L8)
+[Show source in particle_mass.py:8](https://github.com/uncscode/particula/blob/main/particula/util/particle_mass.py#L8)
 
 Returns particle's mass: 4/3 pi r^3 * density.
 

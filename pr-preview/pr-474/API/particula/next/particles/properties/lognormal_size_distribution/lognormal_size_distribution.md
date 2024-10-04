@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Lognormal Size Distribution
 
-> Auto-generated documentation for [particula.next.particles.properties.lognormal_size_distribution](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/lognormal_size_distribution.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.lognormal_size_distribution](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/lognormal_size_distribution.py) module.
 
 ## lognormal_pdf_distribution
 
-[Show source in lognormal_size_distribution.py:12](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/lognormal_size_distribution.py#L12)
+[Show source in lognormal_size_distribution.py:12](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/lognormal_size_distribution.py#L12)
 
 Probability Density Function for the lognormal distribution of particles
 for varying modes, geometric standard deviations, and numbers of particles,
@@ -48,7 +48,7 @@ def lognormal_pdf_distribution(
 
 ## lognormal_pmf_distribution
 
-[Show source in lognormal_size_distribution.py:67](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/lognormal_size_distribution.py#L67)
+[Show source in lognormal_size_distribution.py:67](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/lognormal_size_distribution.py#L67)
 
 Probability Mass function for lognormal distribution of particles for
 varying modes, geometric standard deviations, and numbers of particles,
@@ -90,7 +90,7 @@ def lognormal_pmf_distribution(
 
 ## lognormal_sample_distribution
 
-[Show source in lognormal_size_distribution.py:117](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/lognormal_size_distribution.py#L117)
+[Show source in lognormal_size_distribution.py:117](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/lognormal_size_distribution.py#L117)
 
 Sample a Probability Density Function for the lognormal distribution.
 

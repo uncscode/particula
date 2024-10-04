@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Next](../index.md#next) / [Particles](./index.md#particles) / Surface Factories
 
-> Auto-generated documentation for [particula.next.particles.surface_factories](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/surface_factories.py) module.
+> Auto-generated documentation for [particula.next.particles.surface_factories](https://github.com/uncscode/particula/blob/main/particula/next/particles/surface_factories.py) module.
 
 ## SurfaceFactory
 
-[Show source in surface_factories.py:17](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/surface_factories.py#L17)
+[Show source in surface_factories.py:17](https://github.com/uncscode/particula/blob/main/particula/next/particles/surface_factories.py#L17)
 
 Factory class to call and create surface tension strategies.
 
@@ -64,7 +64,7 @@ class SurfaceFactory(
 
 ### SurfaceFactory().get_builders
 
-[Show source in surface_factories.py:58](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/surface_factories.py#L58)
+[Show source in surface_factories.py:58](https://github.com/uncscode/particula/blob/main/particula/next/particles/surface_factories.py#L58)
 
 Returns the mapping of strategy types to builder instances.
 

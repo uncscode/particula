@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Dynamics](../index.md#dynamics) / [Condensation](./index.md#condensation) / Condensation Strategies
 
-> Auto-generated documentation for [particula.next.dynamics.condensation.condensation_strategies](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py) module.
+> Auto-generated documentation for [particula.next.dynamics.condensation.condensation_strategies](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py) module.
 
 ## CondensationIsothermal
 
-[Show source in condensation_strategies.py:288](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L288)
+[Show source in condensation_strategies.py:288](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L288)
 
 Condensation strategy for isothermal conditions.
 
@@ -34,7 +34,7 @@ class CondensationIsothermal(CondensationStrategy):
 
 ### CondensationIsothermal().mass_transfer_rate
 
-[Show source in condensation_strategies.py:311](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L311)
+[Show source in condensation_strategies.py:311](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L311)
 
 #### Signature
 
@@ -56,7 +56,7 @@ def mass_transfer_rate(
 
 ### CondensationIsothermal().rate
 
-[Show source in condensation_strategies.py:363](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L363)
+[Show source in condensation_strategies.py:363](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L363)
 
 #### Signature
 
@@ -77,7 +77,7 @@ def rate(
 
 ### CondensationIsothermal().step
 
-[Show source in condensation_strategies.py:392](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L392)
+[Show source in condensation_strategies.py:392](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L392)
 
 #### Signature
 
@@ -101,7 +101,7 @@ def step(
 
 ## CondensationStrategy
 
-[Show source in condensation_strategies.py:60](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L60)
+[Show source in condensation_strategies.py:60](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L60)
 
 Abstract base class for condensation strategies.
 
@@ -135,7 +135,7 @@ class CondensationStrategy(ABC):
 
 ### CondensationStrategy().first_order_mass_transport
 
-[Show source in condensation_strategies.py:157](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L157)
+[Show source in condensation_strategies.py:157](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L157)
 
 First-order mass transport coefficient per particle.
 
@@ -175,7 +175,7 @@ def first_order_mass_transport(
 
 ### CondensationStrategy().knudsen_number
 
-[Show source in condensation_strategies.py:122](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L122)
+[Show source in condensation_strategies.py:122](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L122)
 
 The Knudsen number for a particle.
 
@@ -213,7 +213,7 @@ def knudsen_number(
 
 ### CondensationStrategy().mass_transfer_rate
 
-[Show source in condensation_strategies.py:200](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L200)
+[Show source in condensation_strategies.py:200](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L200)
 
 Mass transfer rate for a particle.
 
@@ -256,7 +256,7 @@ def mass_transfer_rate(
 
 ### CondensationStrategy().mean_free_path
 
-[Show source in condensation_strategies.py:91](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L91)
+[Show source in condensation_strategies.py:91](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L91)
 
 Calculate the mean free path of the gas molecules based on the
 temperature, pressure, and dynamic viscosity of the gas.
@@ -288,7 +288,7 @@ def mean_free_path(
 
 ### CondensationStrategy().rate
 
-[Show source in condensation_strategies.py:229](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L229)
+[Show source in condensation_strategies.py:229](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L229)
 
 Calculate the rate of mass condensation for each particle due to
 each condensable gas species.
@@ -333,7 +333,7 @@ def rate(
 
 ### CondensationStrategy().step
 
-[Show source in condensation_strategies.py:261](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L261)
+[Show source in condensation_strategies.py:261](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/condensation_strategies.py#L261)
 
 Execute the condensation process for a given time step.
 

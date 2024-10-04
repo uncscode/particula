@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Special Functions
 
-> Auto-generated documentation for [particula.next.particles.properties.special_functions](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/special_functions.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.special_functions](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/special_functions.py) module.
 
 ## debye_function
 
-[Show source in special_functions.py:10](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/special_functions.py#L10)
+[Show source in special_functions.py:10](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/special_functions.py#L10)
 
 Calculate the Debye function for a given variable.
 

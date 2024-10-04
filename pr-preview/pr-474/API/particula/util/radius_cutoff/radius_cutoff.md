@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Radius Cutoff
 
-> Auto-generated documentation for [particula.util.radius_cutoff](https://github.com/Gorkowski/particula/blob/main/particula/util/radius_cutoff.py) module.
+> Auto-generated documentation for [particula.util.radius_cutoff](https://github.com/uncscode/particula/blob/main/particula/util/radius_cutoff.py) module.
 
 ## cut_rad
 
-[Show source in radius_cutoff.py:11](https://github.com/Gorkowski/particula/blob/main/particula/util/radius_cutoff.py#L11)
+[Show source in radius_cutoff.py:11](https://github.com/uncscode/particula/blob/main/particula/util/radius_cutoff.py#L11)
 
 This routine determins the radius cutoff for the particle distribution
 

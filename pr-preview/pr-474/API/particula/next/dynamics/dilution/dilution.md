@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Next](../index.md#next) / [Dynamics](./index.md#dynamics) / Dilution
 
-> Auto-generated documentation for [particula.next.dynamics.dilution](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/dilution.py) module.
+> Auto-generated documentation for [particula.next.dynamics.dilution](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/dilution.py) module.
 
 ## dilution_rate
 
-[Show source in dilution.py:49](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/dilution.py#L49)
+[Show source in dilution.py:49](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/dilution.py#L49)
 
 Calculate the dilution rate of a substance.
 
@@ -57,7 +57,7 @@ def dilution_rate(
 
 ## volume_dilution_coefficient
 
-[Show source in dilution.py:10](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/dilution.py#L10)
+[Show source in dilution.py:10](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/dilution.py#L10)
 
 Calculate the volume dilution coefficient.
 

@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Lagrangian](./index.md#lagrangian) / Boundary
 
-> Auto-generated documentation for [particula.lagrangian.boundary](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/boundary.py) module.
+> Auto-generated documentation for [particula.lagrangian.boundary](https://github.com/uncscode/particula/blob/main/particula/lagrangian/boundary.py) module.
 
 ## wrapped_cube
 
-[Show source in boundary.py:6](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/boundary.py#L6)
+[Show source in boundary.py:6](https://github.com/uncscode/particula/blob/main/particula/lagrangian/boundary.py#L6)
 
 Apply cubic boundary conditions with wrap-around, to the position tensor.
 

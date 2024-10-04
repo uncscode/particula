@@ -2,7 +2,7 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Next](../index.md#next) / Dynamics
 
-> Auto-generated documentation for [particula.next.dynamics](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/__init__.py) module.
+> Auto-generated documentation for [particula.next.dynamics](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/__init__.py) module.
 
 ## Modules
 

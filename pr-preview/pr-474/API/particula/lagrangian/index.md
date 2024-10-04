@@ -2,7 +2,7 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / Lagrangian
 
-> Auto-generated documentation for [particula.lagrangian](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/__init__.py) module.
+> Auto-generated documentation for [particula.lagrangian](https://github.com/uncscode/particula/blob/main/particula/lagrangian/__init__.py) module.
 
 ## Modules
 

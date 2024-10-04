@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Data](./index.md#data) / Lake
 
-> Auto-generated documentation for [particula.data.lake](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py) module.
+> Auto-generated documentation for [particula.data.lake](https://github.com/uncscode/particula/blob/main/particula/data/lake.py) module.
 
 ## Lake
 
-[Show source in lake.py:10](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L10)
+[Show source in lake.py:10](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L10)
 
 A class representing a lake which is a collection of streams.
 
@@ -23,7 +23,7 @@ class Lake: ...
 
 ### Lake().__delitem__
 
-[Show source in lake.py:90](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L90)
+[Show source in lake.py:90](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L90)
 
 Remove a stream by name.
 Example: del lake['stream_name']
@@ -36,7 +36,7 @@ def __delitem__(self, key: str) -> None: ...
 
 ### Lake().__dir__
 
-[Show source in lake.py:49](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L49)
+[Show source in lake.py:49](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L49)
 
 List available streams.
 Example: dir(lake)
@@ -49,7 +49,7 @@ def __dir__(self) -> list: ...
 
 ### Lake().__getattr__
 
-[Show source in lake.py:38](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L38)
+[Show source in lake.py:38](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L38)
 
 Allow accessing streams as an attributes.
 
@@ -66,7 +66,7 @@ def __getattr__(self, name: str) -> Any: ...
 
 ### Lake().__getitem__
 
-[Show source in lake.py:77](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L77)
+[Show source in lake.py:77](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L77)
 
 Get a stream by name.
 Example: lake['stream_name']
@@ -79,7 +79,7 @@ def __getitem__(self, key: str) -> Any: ...
 
 ### Lake().__iter__
 
-[Show source in lake.py:54](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L54)
+[Show source in lake.py:54](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L54)
 
 Iterate over the streams in the lake.
 Example: [stream.header for stream in lake]""
@@ -92,7 +92,7 @@ def __iter__(self) -> Iterator[Any]: ...
 
 ### Lake().__len__
 
-[Show source in lake.py:72](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L72)
+[Show source in lake.py:72](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L72)
 
 Return the number of streams in the lake.
 Example: len(lake)
@@ -105,7 +105,7 @@ def __len__(self) -> int: ...
 
 ### Lake().__repr__
 
-[Show source in lake.py:98](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L98)
+[Show source in lake.py:98](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L98)
 
 Return a string representation of the lake.
 Example: print(lake)
@@ -118,7 +118,7 @@ def __repr__(self) -> str: ...
 
 ### Lake().__setitem__
 
-[Show source in lake.py:82](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L82)
+[Show source in lake.py:82](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L82)
 
 Set a stream by name.
 Example: lake['stream_name'] = new_stream
@@ -135,7 +135,7 @@ def __setitem__(self, key: str, value: Stream) -> None: ...
 
 ### Lake().add_stream
 
-[Show source in lake.py:19](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L19)
+[Show source in lake.py:19](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L19)
 
 Add a stream to the lake.
 
@@ -162,7 +162,7 @@ def add_stream(self, stream: Stream, name: str) -> None: ...
 
 ### Lake().items
 
-[Show source in lake.py:60](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L60)
+[Show source in lake.py:60](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L60)
 
 Return an iterator over the key-value pairs.
 
@@ -174,7 +174,7 @@ def items(self) -> Iterator[Tuple[Any, Any]]: ...
 
 ### Lake().keys
 
-[Show source in lake.py:68](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L68)
+[Show source in lake.py:68](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L68)
 
 Return an iterator over the keys.
 
@@ -186,7 +186,7 @@ def keys(self) -> Iterator[Any]: ...
 
 ### Lake().summary
 
-[Show source in lake.py:103](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L103)
+[Show source in lake.py:103](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L103)
 
     Return a string summary iterating over each stream
     and print Stream.header.
@@ -201,7 +201,7 @@ def summary(self) -> None: ...
 
 ### Lake().values
 
-[Show source in lake.py:64](https://github.com/Gorkowski/particula/blob/main/particula/data/lake.py#L64)
+[Show source in lake.py:64](https://github.com/uncscode/particula/blob/main/particula/data/lake.py#L64)
 
 Return an iterator over the values.
 

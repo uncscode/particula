@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / CoagulationRate
 
-> Auto-generated documentation for [particula.util.coagulation_rate](https://github.com/Gorkowski/particula/blob/main/particula/util/coagulation_rate.py) module.
+> Auto-generated documentation for [particula.util.coagulation_rate](https://github.com/uncscode/particula/blob/main/particula/util/coagulation_rate.py) module.
 
 ## CoagulationRate
 
-[Show source in coagulation_rate.py:8](https://github.com/Gorkowski/particula/blob/main/particula/util/coagulation_rate.py#L8)
+[Show source in coagulation_rate.py:8](https://github.com/uncscode/particula/blob/main/particula/util/coagulation_rate.py#L8)
 
 A class to calculate the coagulation rate.
 
@@ -25,7 +25,7 @@ class CoagulationRate:
 
 ### CoagulationRate().coag_gain
 
-[Show source in coagulation_rate.py:76](https://github.com/Gorkowski/particula/blob/main/particula/util/coagulation_rate.py#L76)
+[Show source in coagulation_rate.py:76](https://github.com/uncscode/particula/blob/main/particula/util/coagulation_rate.py#L76)
 
 Returns the coagulation gain rate
 
@@ -62,7 +62,7 @@ def coag_gain(self): ...
 
 ### CoagulationRate().coag_loss
 
-[Show source in coagulation_rate.py:54](https://github.com/Gorkowski/particula/blob/main/particula/util/coagulation_rate.py#L54)
+[Show source in coagulation_rate.py:54](https://github.com/uncscode/particula/blob/main/particula/util/coagulation_rate.py#L54)
 
 Returns the coagulation loss rate
 
@@ -88,7 +88,7 @@ def coag_loss(self): ...
 
 ### CoagulationRate().coag_prep
 
-[Show source in coagulation_rate.py:44](https://github.com/Gorkowski/particula/blob/main/particula/util/coagulation_rate.py#L44)
+[Show source in coagulation_rate.py:44](https://github.com/uncscode/particula/blob/main/particula/util/coagulation_rate.py#L44)
 
 Repackage the parameters
 

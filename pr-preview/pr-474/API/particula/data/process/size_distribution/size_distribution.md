@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Data](../index.md#data) / [Process](./index.md#process) / Size Distribution
 
-> Auto-generated documentation for [particula.data.process.size_distribution](https://github.com/Gorkowski/particula/blob/main/particula/data/process/size_distribution.py) module.
+> Auto-generated documentation for [particula.data.process.size_distribution](https://github.com/uncscode/particula/blob/main/particula/data/process/size_distribution.py) module.
 
 ## iterate_merge_distributions
 
-[Show source in size_distribution.py:341](https://github.com/Gorkowski/particula/blob/main/particula/data/process/size_distribution.py#L341)
+[Show source in size_distribution.py:341](https://github.com/uncscode/particula/blob/main/particula/data/process/size_distribution.py#L341)
 
 Merge two sets of particle size distributions using linear weighting.
 
@@ -40,7 +40,7 @@ def iterate_merge_distributions(
 
 ## mean_properties
 
-[Show source in size_distribution.py:20](https://github.com/Gorkowski/particula/blob/main/particula/data/process/size_distribution.py#L20)
+[Show source in size_distribution.py:20](https://github.com/uncscode/particula/blob/main/particula/data/process/size_distribution.py#L20)
 
 Calculate the mean properties of the size distribution.
 
@@ -79,7 +79,7 @@ def mean_properties(
 
 ## merge_distributions
 
-[Show source in size_distribution.py:261](https://github.com/Gorkowski/particula/blob/main/particula/data/process/size_distribution.py#L261)
+[Show source in size_distribution.py:261](https://github.com/uncscode/particula/blob/main/particula/data/process/size_distribution.py#L261)
 
 Merge two particle size distributions using linear weighting,
 accounting for mobility versus aerodynamic diameters.
@@ -118,7 +118,7 @@ def merge_distributions(
 
 ## merge_size_distribution
 
-[Show source in size_distribution.py:387](https://github.com/Gorkowski/particula/blob/main/particula/data/process/size_distribution.py#L387)
+[Show source in size_distribution.py:387](https://github.com/uncscode/particula/blob/main/particula/data/process/size_distribution.py#L387)
 
 Merge two particle size distributions using linear weighting.
 The concentrations should be in dN/dlogDp.
@@ -154,7 +154,7 @@ def merge_size_distribution(
 
 ## resample_distribution
 
-[Show source in size_distribution.py:428](https://github.com/Gorkowski/particula/blob/main/particula/data/process/size_distribution.py#L428)
+[Show source in size_distribution.py:428](https://github.com/uncscode/particula/blob/main/particula/data/process/size_distribution.py#L428)
 
 Resample a particle size distribution to a new set of diameters using
 numpy interpolation. Extrapolated values will be set to NaN.
@@ -192,7 +192,7 @@ def resample_distribution(
 
 ## sizer_mean_properties
 
-[Show source in size_distribution.py:112](https://github.com/Gorkowski/particula/blob/main/particula/data/process/size_distribution.py#L112)
+[Show source in size_distribution.py:112](https://github.com/uncscode/particula/blob/main/particula/data/process/size_distribution.py#L112)
 
 Calculate the mean properties of the size distribution and return the
 updated stream.

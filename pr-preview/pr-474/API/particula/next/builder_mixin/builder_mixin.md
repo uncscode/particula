@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Next](./index.md#next) / Builder Mixin
 
-> Auto-generated documentation for [particula.next.builder_mixin](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py) module.
+> Auto-generated documentation for [particula.next.builder_mixin](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py) module.
 
 ## BuilderActivityStrategyMixin
 
-[Show source in builder_mixin.py:373](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L373)
+[Show source in builder_mixin.py:373](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L373)
 
 Mixin class for Builder classes to set activity_strategy.
 
@@ -23,7 +23,7 @@ class BuilderActivityStrategyMixin:
 
 ### BuilderActivityStrategyMixin().set_activity_strategy
 
-[Show source in builder_mixin.py:383](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L383)
+[Show source in builder_mixin.py:383](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L383)
 
 Set the activity strategy of the particle.
 
@@ -50,7 +50,7 @@ def set_activity_strategy(
 
 ## BuilderChargeMixin
 
-[Show source in builder_mixin.py:152](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L152)
+[Show source in builder_mixin.py:152](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L152)
 
 Mixin class for Builder classes to set charge and charge_units.
 
@@ -67,7 +67,7 @@ class BuilderChargeMixin:
 
 ### BuilderChargeMixin().set_charge
 
-[Show source in builder_mixin.py:162](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L162)
+[Show source in builder_mixin.py:162](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L162)
 
 Set the number of elemental charges on the particle.
 
@@ -88,7 +88,7 @@ def set_charge(
 
 ## BuilderConcentrationMixin
 
-[Show source in builder_mixin.py:113](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L113)
+[Show source in builder_mixin.py:113](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L113)
 
 Mixin class for Builder classes to set concentration and
 concentration_units.
@@ -110,7 +110,7 @@ class BuilderConcentrationMixin:
 
 ### BuilderConcentrationMixin().set_concentration
 
-[Show source in builder_mixin.py:128](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L128)
+[Show source in builder_mixin.py:128](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L128)
 
 Set the concentration.
 
@@ -134,7 +134,7 @@ def set_concentration(
 
 ## BuilderDensityMixin
 
-[Show source in builder_mixin.py:20](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L20)
+[Show source in builder_mixin.py:20](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L20)
 
 Mixin class for Builder classes to set density and density_units.
 
@@ -151,7 +151,7 @@ class BuilderDensityMixin:
 
 ### BuilderDensityMixin().set_density
 
-[Show source in builder_mixin.py:30](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L30)
+[Show source in builder_mixin.py:30](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L30)
 
 Set the density of the particle in kg/m^3.
 
@@ -174,7 +174,7 @@ def set_density(
 
 ## BuilderDistributionStrategyMixin
 
-[Show source in builder_mixin.py:400](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L400)
+[Show source in builder_mixin.py:400](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L400)
 
 Mixin class for Builder classes to set distribution_strategy.
 
@@ -191,7 +191,7 @@ class BuilderDistributionStrategyMixin:
 
 ### BuilderDistributionStrategyMixin().set_distribution_strategy
 
-[Show source in builder_mixin.py:410](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L410)
+[Show source in builder_mixin.py:410](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L410)
 
 Set the distribution strategy of the particle.
 
@@ -218,7 +218,7 @@ def set_distribution_strategy(
 
 ## BuilderLognormalMixin
 
-[Show source in builder_mixin.py:429](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L429)
+[Show source in builder_mixin.py:429](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L429)
 
 Mixin class for Builder classes to set lognormal distributions.
 
@@ -239,7 +239,7 @@ class BuilderLognormalMixin:
 
 ### BuilderLognormalMixin().set_geometric_standard_deviation
 
-[Show source in builder_mixin.py:466](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L466)
+[Show source in builder_mixin.py:466](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L466)
 
 Set the geometric standard deviation for the distribution.
 
@@ -266,7 +266,7 @@ def set_geometric_standard_deviation(
 
 ### BuilderLognormalMixin().set_mode
 
-[Show source in builder_mixin.py:445](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L445)
+[Show source in builder_mixin.py:445](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L445)
 
 Set the mode for distribution.
 
@@ -287,7 +287,7 @@ def set_mode(self, mode: NDArray[np.float64], mode_units: str = "m"): ...
 
 ### BuilderLognormalMixin().set_number_concentration
 
-[Show source in builder_mixin.py:491](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L491)
+[Show source in builder_mixin.py:491](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L491)
 
 Set the number concentration for the distribution.
 
@@ -315,7 +315,7 @@ def set_number_concentration(
 
 ## BuilderMassMixin
 
-[Show source in builder_mixin.py:179](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L179)
+[Show source in builder_mixin.py:179](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L179)
 
 Mixin class for Builder classes to set mass and mass_units.
 
@@ -332,7 +332,7 @@ class BuilderMassMixin:
 
 ### BuilderMassMixin().set_mass
 
-[Show source in builder_mixin.py:189](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L189)
+[Show source in builder_mixin.py:189](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L189)
 
 Set the mass of the particle in kg.
 
@@ -357,7 +357,7 @@ def set_mass(
 
 ## BuilderMolarMassMixin
 
-[Show source in builder_mixin.py:81](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L81)
+[Show source in builder_mixin.py:81](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L81)
 
 Mixin class for Builder classes to set molar_mass and molar_mass_units.
 
@@ -374,7 +374,7 @@ class BuilderMolarMassMixin:
 
 ### BuilderMolarMassMixin().set_molar_mass
 
-[Show source in builder_mixin.py:91](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L91)
+[Show source in builder_mixin.py:91](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L91)
 
 Set the molar mass of the particle in kg/mol.
 
@@ -398,7 +398,7 @@ def set_molar_mass(
 
 ## BuilderParticleResolvedCountMixin
 
-[Show source in builder_mixin.py:516](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L516)
+[Show source in builder_mixin.py:516](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L516)
 
 Mixin class for Builder classes to set particle_resolved_count.
 
@@ -415,7 +415,7 @@ class BuilderParticleResolvedCountMixin:
 
 ### BuilderParticleResolvedCountMixin().set_particle_resolved_count
 
-[Show source in builder_mixin.py:526](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L526)
+[Show source in builder_mixin.py:526](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L526)
 
 Set the number of particles to resolve.
 
@@ -442,7 +442,7 @@ def set_particle_resolved_count(
 
 ## BuilderPressureMixin
 
-[Show source in builder_mixin.py:311](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L311)
+[Show source in builder_mixin.py:311](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L311)
 
 Mixin class for AtmosphereBuilder to set total pressure.
 
@@ -459,7 +459,7 @@ class BuilderPressureMixin:
 
 ### BuilderPressureMixin().set_pressure
 
-[Show source in builder_mixin.py:321](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L321)
+[Show source in builder_mixin.py:321](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L321)
 
 Set the total pressure of the atmosphere.
 
@@ -489,7 +489,7 @@ def set_pressure(
 
 ## BuilderRadiusMixin
 
-[Show source in builder_mixin.py:243](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L243)
+[Show source in builder_mixin.py:243](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L243)
 
 Mixin class for Builder classes to set radius and radius_units.
 
@@ -506,7 +506,7 @@ class BuilderRadiusMixin:
 
 ### BuilderRadiusMixin().set_radius
 
-[Show source in builder_mixin.py:253](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L253)
+[Show source in builder_mixin.py:253](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L253)
 
 Set the radius of the particle in meters.
 
@@ -531,7 +531,7 @@ def set_radius(
 
 ## BuilderSurfaceStrategyMixin
 
-[Show source in builder_mixin.py:346](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L346)
+[Show source in builder_mixin.py:346](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L346)
 
 Mixin class for Builder classes to set surface_strategy.
 
@@ -548,7 +548,7 @@ class BuilderSurfaceStrategyMixin:
 
 ### BuilderSurfaceStrategyMixin().set_surface_strategy
 
-[Show source in builder_mixin.py:356](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L356)
+[Show source in builder_mixin.py:356](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L356)
 
 Set the surface strategy of the particle.
 
@@ -573,7 +573,7 @@ def set_surface_strategy(
 
 ## BuilderSurfaceTensionMixin
 
-[Show source in builder_mixin.py:49](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L49)
+[Show source in builder_mixin.py:49](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L49)
 
 Mixin class for Builder classes to set surface_tension.
 
@@ -591,7 +591,7 @@ class BuilderSurfaceTensionMixin:
 
 ### BuilderSurfaceTensionMixin().set_surface_tension
 
-[Show source in builder_mixin.py:60](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L60)
+[Show source in builder_mixin.py:60](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L60)
 
 Set the surface tension of the particle in N/m.
 
@@ -614,7 +614,7 @@ def set_surface_tension(
 
 ## BuilderTemperatureMixin
 
-[Show source in builder_mixin.py:275](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L275)
+[Show source in builder_mixin.py:275](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L275)
 
 Mixin class for AtmosphereBuilder to set temperature.
 
@@ -631,7 +631,7 @@ class BuilderTemperatureMixin:
 
 ### BuilderTemperatureMixin().set_temperature
 
-[Show source in builder_mixin.py:285](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L285)
+[Show source in builder_mixin.py:285](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L285)
 
 Set the temperature of the atmosphere.
 
@@ -660,7 +660,7 @@ def set_temperature(self, temperature: float, temperature_units: str = "K"): ...
 
 ## BuilderVolumeMixin
 
-[Show source in builder_mixin.py:211](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L211)
+[Show source in builder_mixin.py:211](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L211)
 
 Mixin class for Builder classes to set volume and volume_units.
 
@@ -677,7 +677,7 @@ class BuilderVolumeMixin:
 
 ### BuilderVolumeMixin().set_volume
 
-[Show source in builder_mixin.py:221](https://github.com/Gorkowski/particula/blob/main/particula/next/builder_mixin.py#L221)
+[Show source in builder_mixin.py:221](https://github.com/uncscode/particula/blob/main/particula/next/builder_mixin.py#L221)
 
 Set the volume in m^3.
 

@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Diffusion Coefficient
 
-> Auto-generated documentation for [particula.next.particles.properties.diffusion_coefficient](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/diffusion_coefficient.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.diffusion_coefficient](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/diffusion_coefficient.py) module.
 
 ## particle_diffusion_coefficient
 
-[Show source in diffusion_coefficient.py:25](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/diffusion_coefficient.py#L25)
+[Show source in diffusion_coefficient.py:25](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/diffusion_coefficient.py#L25)
 
 Calculate the diffusion coefficient of a particle.
 
@@ -37,7 +37,7 @@ def particle_diffusion_coefficient(
 
 ## particle_diffusion_coefficient_via_system_state
 
-[Show source in diffusion_coefficient.py:49](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/diffusion_coefficient.py#L49)
+[Show source in diffusion_coefficient.py:49](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/diffusion_coefficient.py#L49)
 
 Calculate the diffusion coefficient of a particle.
 

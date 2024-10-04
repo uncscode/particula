@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Wall Loss
 
-> Auto-generated documentation for [particula.util.wall_loss](https://github.com/Gorkowski/particula/blob/main/particula/util/wall_loss.py) module.
+> Auto-generated documentation for [particula.util.wall_loss](https://github.com/uncscode/particula/blob/main/particula/util/wall_loss.py) module.
 
 ## rectangle_wall_loss
 
-[Show source in wall_loss.py:39](https://github.com/Gorkowski/particula/blob/main/particula/util/wall_loss.py#L39)
+[Show source in wall_loss.py:39](https://github.com/uncscode/particula/blob/main/particula/util/wall_loss.py#L39)
 
 Calculate the wall loss coefficient, β₀, for a rectangular chamber.
 
@@ -58,7 +58,7 @@ def rectangle_wall_loss(
 
 ## spherical_wall_loss_coefficient
 
-[Show source in wall_loss.py:12](https://github.com/Gorkowski/particula/blob/main/particula/util/wall_loss.py#L12)
+[Show source in wall_loss.py:12](https://github.com/uncscode/particula/blob/main/particula/util/wall_loss.py#L12)
 
 Calculate the wall loss coefficient for a spherical chamber
 approximation.
@@ -86,7 +86,7 @@ def spherical_wall_loss_coefficient(
 
 ## wlc
 
-[Show source in wall_loss.py:94](https://github.com/Gorkowski/particula/blob/main/particula/util/wall_loss.py#L94)
+[Show source in wall_loss.py:94](https://github.com/uncscode/particula/blob/main/particula/util/wall_loss.py#L94)
 
 Calculate the wall loss coefficient.
 

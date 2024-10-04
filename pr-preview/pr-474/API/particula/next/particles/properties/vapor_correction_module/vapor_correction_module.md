@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Vapor Correction Module
 
-> Auto-generated documentation for [particula.next.particles.properties.vapor_correction_module](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/vapor_correction_module.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.vapor_correction_module](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/vapor_correction_module.py) module.
 
 ## vapor_transition_correction
 
-[Show source in vapor_correction_module.py:11](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/vapor_correction_module.py#L11)
+[Show source in vapor_correction_module.py:11](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/vapor_correction_module.py#L11)
 
 Calculate the transition correction factor, f(Kn, alpha), for a given
 Knudsen number and mass accommodation coefficient. This function is used to

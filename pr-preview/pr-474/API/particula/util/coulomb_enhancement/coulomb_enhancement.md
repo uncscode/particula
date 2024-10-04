@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / CoulombEnhancement
 
-> Auto-generated documentation for [particula.util.coulomb_enhancement](https://github.com/Gorkowski/particula/blob/main/particula/util/coulomb_enhancement.py) module.
+> Auto-generated documentation for [particula.util.coulomb_enhancement](https://github.com/uncscode/particula/blob/main/particula/util/coulomb_enhancement.py) module.
 
 ## CoulombEnhancement
 
-[Show source in coulomb_enhancement.py:24](https://github.com/Gorkowski/particula/blob/main/particula/util/coulomb_enhancement.py#L24)
+[Show source in coulomb_enhancement.py:24](https://github.com/uncscode/particula/blob/main/particula/util/coulomb_enhancement.py#L24)
 
 Calculate coulomb-related enhancements
 
@@ -44,7 +44,7 @@ class CoulombEnhancement:
 
 ### CoulombEnhancement().coulomb_enhancement_continuum_limit
 
-[Show source in coulomb_enhancement.py:133](https://github.com/Gorkowski/particula/blob/main/particula/util/coulomb_enhancement.py#L133)
+[Show source in coulomb_enhancement.py:133](https://github.com/uncscode/particula/blob/main/particula/util/coulomb_enhancement.py#L133)
 
 Coulombic coagulation enhancement continuum limit.
 
@@ -68,7 +68,7 @@ def coulomb_enhancement_continuum_limit(self): ...
 
 ### CoulombEnhancement().coulomb_enhancement_kinetic_limit
 
-[Show source in coulomb_enhancement.py:112](https://github.com/Gorkowski/particula/blob/main/particula/util/coulomb_enhancement.py#L112)
+[Show source in coulomb_enhancement.py:112](https://github.com/uncscode/particula/blob/main/particula/util/coulomb_enhancement.py#L112)
 
 Coulombic coagulation enhancement kinetic limit.
 
@@ -92,7 +92,7 @@ def coulomb_enhancement_kinetic_limit(self): ...
 
 ### CoulombEnhancement().coulomb_potential_ratio
 
-[Show source in coulomb_enhancement.py:83](https://github.com/Gorkowski/particula/blob/main/particula/util/coulomb_enhancement.py#L83)
+[Show source in coulomb_enhancement.py:83](https://github.com/uncscode/particula/blob/main/particula/util/coulomb_enhancement.py#L83)
 
 Calculates the Coulomb potential ratio.
 
@@ -118,7 +118,7 @@ def coulomb_potential_ratio(self): ...
 
 ## cecl
 
-[Show source in coulomb_enhancement.py:166](https://github.com/Gorkowski/particula/blob/main/particula/util/coulomb_enhancement.py#L166)
+[Show source in coulomb_enhancement.py:166](https://github.com/uncscode/particula/blob/main/particula/util/coulomb_enhancement.py#L166)
 
 Calculate coulombic enhancement continuum limit
 
@@ -132,7 +132,7 @@ def cecl(**kwargs): ...
 
 ## cekl
 
-[Show source in coulomb_enhancement.py:161](https://github.com/Gorkowski/particula/blob/main/particula/util/coulomb_enhancement.py#L161)
+[Show source in coulomb_enhancement.py:161](https://github.com/uncscode/particula/blob/main/particula/util/coulomb_enhancement.py#L161)
 
 Calculate coulombic enhancement kinetic limit
 
@@ -146,7 +146,7 @@ def cekl(**kwargs): ...
 
 ## coulomb_enhancement_all
 
-[Show source in coulomb_enhancement.py:171](https://github.com/Gorkowski/particula/blob/main/particula/util/coulomb_enhancement.py#L171)
+[Show source in coulomb_enhancement.py:171](https://github.com/uncscode/particula/blob/main/particula/util/coulomb_enhancement.py#L171)
 
 Return all the values above in one call
 
@@ -160,7 +160,7 @@ def coulomb_enhancement_all(**kwargs): ...
 
 ## cpr
 
-[Show source in coulomb_enhancement.py:156](https://github.com/Gorkowski/particula/blob/main/particula/util/coulomb_enhancement.py#L156)
+[Show source in coulomb_enhancement.py:156](https://github.com/uncscode/particula/blob/main/particula/util/coulomb_enhancement.py#L156)
 
 Calculate coulomb potential ratio
 

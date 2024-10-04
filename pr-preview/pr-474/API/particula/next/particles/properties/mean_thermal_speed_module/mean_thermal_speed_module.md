@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Mean Thermal Speed Module
 
-> Auto-generated documentation for [particula.next.particles.properties.mean_thermal_speed_module](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/mean_thermal_speed_module.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.mean_thermal_speed_module](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/mean_thermal_speed_module.py) module.
 
 ## mean_thermal_speed
 
-[Show source in mean_thermal_speed_module.py:11](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/mean_thermal_speed_module.py#L11)
+[Show source in mean_thermal_speed_module.py:11](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/mean_thermal_speed_module.py#L11)
 
 Returns the particles mean thermal speed. Due to the the impact
 of air molecules on the particles, the particles will have a mean

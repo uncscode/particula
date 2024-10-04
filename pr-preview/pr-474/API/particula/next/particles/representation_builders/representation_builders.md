@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Next](../index.md#next) / [Particles](./index.md#particles) / Representation Builders
 
-> Auto-generated documentation for [particula.next.particles.representation_builders](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py) module.
+> Auto-generated documentation for [particula.next.particles.representation_builders](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py) module.
 
 ## ParticleMassRepresentationBuilder
 
-[Show source in representation_builders.py:56](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py#L56)
+[Show source in representation_builders.py:56](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py#L56)
 
 General ParticleRepresentation objects with mass-based bins.
 
@@ -50,7 +50,7 @@ class ParticleMassRepresentationBuilder(
 
 ### ParticleMassRepresentationBuilder().build
 
-[Show source in representation_builders.py:98](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py#L98)
+[Show source in representation_builders.py:98](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py#L98)
 
 Validate and return the ParticleRepresentation object.
 
@@ -72,7 +72,7 @@ def build(self) -> ParticleRepresentation: ...
 
 ## ParticleRadiusRepresentationBuilder
 
-[Show source in representation_builders.py:116](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py#L116)
+[Show source in representation_builders.py:116](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py#L116)
 
 General ParticleRepresentation objects with radius-based bins.
 
@@ -116,7 +116,7 @@ class ParticleRadiusRepresentationBuilder(
 
 ### ParticleRadiusRepresentationBuilder().build
 
-[Show source in representation_builders.py:158](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py#L158)
+[Show source in representation_builders.py:158](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py#L158)
 
 Validate and return the ParticleRepresentation object.
 
@@ -138,7 +138,7 @@ def build(self) -> ParticleRepresentation: ...
 
 ## PresetParticleRadiusBuilder
 
-[Show source in representation_builders.py:176](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py#L176)
+[Show source in representation_builders.py:176](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py#L176)
 
 General ParticleRepresentation objects with radius-based bins.
 
@@ -184,7 +184,7 @@ class PresetParticleRadiusBuilder(
 
 ### PresetParticleRadiusBuilder().build
 
-[Show source in representation_builders.py:266](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py#L266)
+[Show source in representation_builders.py:266](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py#L266)
 
 Validate and return the ParticleRepresentation object.
 
@@ -207,7 +207,7 @@ def build(self) -> ParticleRepresentation: ...
 
 ### PresetParticleRadiusBuilder().set_distribution_type
 
-[Show source in representation_builders.py:247](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py#L247)
+[Show source in representation_builders.py:247](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py#L247)
 
 Set the distribution type for the particle representation.
 
@@ -225,7 +225,7 @@ def set_distribution_type(
 
 ### PresetParticleRadiusBuilder().set_radius_bins
 
-[Show source in representation_builders.py:230](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py#L230)
+[Show source in representation_builders.py:230](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py#L230)
 
 Set the radius bins for the distribution
 
@@ -245,7 +245,7 @@ def set_radius_bins(
 
 ## PresetResolvedParticleMassBuilder
 
-[Show source in representation_builders.py:382](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py#L382)
+[Show source in representation_builders.py:382](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py#L382)
 
 General ParticleRepresentation objects with particle resolved masses.
 
@@ -303,7 +303,7 @@ class PresetResolvedParticleMassBuilder(
 
 ### PresetResolvedParticleMassBuilder().build
 
-[Show source in representation_builders.py:450](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py#L450)
+[Show source in representation_builders.py:450](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py#L450)
 
 Validate and return the ParticleRepresentation object.
 
@@ -328,7 +328,7 @@ def build(self) -> ParticleRepresentation: ...
 
 ## ResolvedParticleMassRepresentationBuilder
 
-[Show source in representation_builders.py:306](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py#L306)
+[Show source in representation_builders.py:306](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py#L306)
 
 Builder class for constructing ParticleRepresentation objects with
 resolved masses.
@@ -376,7 +376,7 @@ class ResolvedParticleMassRepresentationBuilder(
 
 ### ResolvedParticleMassRepresentationBuilder().build
 
-[Show source in representation_builders.py:353](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/representation_builders.py#L353)
+[Show source in representation_builders.py:353](https://github.com/uncscode/particula/blob/main/particula/next/particles/representation_builders.py#L353)
 
 Validate and return a ParticleRepresentation object.
 

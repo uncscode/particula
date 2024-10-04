@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Data](../index.md#data) / [Process](./index.md#process) / Optical Instrument
 
-> Auto-generated documentation for [particula.data.process.optical_instrument](https://github.com/Gorkowski/particula/blob/main/particula/data/process/optical_instrument.py) module.
+> Auto-generated documentation for [particula.data.process.optical_instrument](https://github.com/uncscode/particula/blob/main/particula/data/process/optical_instrument.py) module.
 
 ## CapsInstrumentKeywordBuilder
 
-[Show source in optical_instrument.py:13](https://github.com/Gorkowski/particula/blob/main/particula/data/process/optical_instrument.py#L13)
+[Show source in optical_instrument.py:13](https://github.com/uncscode/particula/blob/main/particula/data/process/optical_instrument.py#L13)
 
 Builder class for CAPS Instrument Keywords dictionary.
 
@@ -19,7 +19,7 @@ class CapsInstrumentKeywordBuilder:
 
 ### CapsInstrumentKeywordBuilder().build
 
-[Show source in optical_instrument.py:92](https://github.com/Gorkowski/particula/blob/main/particula/data/process/optical_instrument.py#L92)
+[Show source in optical_instrument.py:92](https://github.com/uncscode/particula/blob/main/particula/data/process/optical_instrument.py#L92)
 
 Validate and return the keywords dictionary.
 
@@ -35,7 +35,7 @@ def build(self) -> dict[str, Union[str, float, int, bool]]: ...
 
 ### CapsInstrumentKeywordBuilder().pre_build_check
 
-[Show source in optical_instrument.py:77](https://github.com/Gorkowski/particula/blob/main/particula/data/process/optical_instrument.py#L77)
+[Show source in optical_instrument.py:77](https://github.com/uncscode/particula/blob/main/particula/data/process/optical_instrument.py#L77)
 
 Check that all required parameters have been set.
 
@@ -51,7 +51,7 @@ def pre_build_check(self): ...
 
 ### CapsInstrumentKeywordBuilder().set_keyword
 
-[Show source in optical_instrument.py:38](https://github.com/Gorkowski/particula/blob/main/particula/data/process/optical_instrument.py#L38)
+[Show source in optical_instrument.py:38](https://github.com/uncscode/particula/blob/main/particula/data/process/optical_instrument.py#L38)
 
 Set the keyword parameter for the activity calculation.
 
@@ -73,7 +73,7 @@ def set_keyword(self, keyword: str, value: Optional[Union[str, float, int, bool]
 
 ### CapsInstrumentKeywordBuilder().set_keywords
 
-[Show source in optical_instrument.py:67](https://github.com/Gorkowski/particula/blob/main/particula/data/process/optical_instrument.py#L67)
+[Show source in optical_instrument.py:67](https://github.com/uncscode/particula/blob/main/particula/data/process/optical_instrument.py#L67)
 
 Set multiple keywords at once.
 
@@ -91,7 +91,7 @@ def set_keywords(self, **kwargs: Union[str, float, int, bool]): ...
 
 ## albedo_from_ext_scat
 
-[Show source in optical_instrument.py:247](https://github.com/Gorkowski/particula/blob/main/particula/data/process/optical_instrument.py#L247)
+[Show source in optical_instrument.py:247](https://github.com/uncscode/particula/blob/main/particula/data/process/optical_instrument.py#L247)
 
 Calculate the albedo from the extinction and scattering data in the stream.
 
@@ -140,7 +140,7 @@ def albedo_from_ext_scat(
 
 ## caps_processing
 
-[Show source in optical_instrument.py:102](https://github.com/Gorkowski/particula/blob/main/particula/data/process/optical_instrument.py#L102)
+[Show source in optical_instrument.py:102](https://github.com/uncscode/particula/blob/main/particula/data/process/optical_instrument.py#L102)
 
 Process CAPS data and SMPS data for kappa fitting, apply truncation
 corrections, and add the results to the caps stream.
@@ -176,7 +176,7 @@ def caps_processing(
 
 ## enhancement_ratio
 
-[Show source in optical_instrument.py:313](https://github.com/Gorkowski/particula/blob/main/particula/data/process/optical_instrument.py#L313)
+[Show source in optical_instrument.py:313](https://github.com/uncscode/particula/blob/main/particula/data/process/optical_instrument.py#L313)
 
 Calculate the enhancement ratio from two data keys in the stream.
 

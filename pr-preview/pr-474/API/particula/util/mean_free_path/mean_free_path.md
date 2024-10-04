@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Mean Free Path
 
-> Auto-generated documentation for [particula.util.mean_free_path](https://github.com/Gorkowski/particula/blob/main/particula/util/mean_free_path.py) module.
+> Auto-generated documentation for [particula.util.mean_free_path](https://github.com/uncscode/particula/blob/main/particula/util/mean_free_path.py) module.
 
 ## mfp
 
-[Show source in mean_free_path.py:22](https://github.com/Gorkowski/particula/blob/main/particula/util/mean_free_path.py#L22)
+[Show source in mean_free_path.py:22](https://github.com/uncscode/particula/blob/main/particula/util/mean_free_path.py#L22)
 
 Returns the mean free path of in air.
 

@@ -2,11 +2,11 @@
 
 [Particula Index](../README.md#particula-index) / [Particula](./index.md#particula) / Dynamics
 
-> Auto-generated documentation for [particula.dynamics](https://github.com/Gorkowski/particula/blob/main/particula/dynamics.py) module.
+> Auto-generated documentation for [particula.dynamics](https://github.com/uncscode/particula/blob/main/particula/dynamics.py) module.
 
 ## Solver
 
-[Show source in dynamics.py:9](https://github.com/Gorkowski/particula/blob/main/particula/dynamics.py#L9)
+[Show source in dynamics.py:9](https://github.com/uncscode/particula/blob/main/particula/dynamics.py#L9)
 
 dynamic solver
 
@@ -32,7 +32,7 @@ class Solver(Rates):
 
 ### Solver()._ode_func
 
-[Show source in dynamics.py:35](https://github.com/Gorkowski/particula/blob/main/particula/dynamics.py#L35)
+[Show source in dynamics.py:35](https://github.com/uncscode/particula/blob/main/particula/dynamics.py#L35)
 
 ode_func
 
@@ -44,7 +44,7 @@ def _ode_func(self, _nums, _): ...
 
 ### Solver().solution
 
-[Show source in dynamics.py:53](https://github.com/Gorkowski/particula/blob/main/particula/dynamics.py#L53)
+[Show source in dynamics.py:53](https://github.com/uncscode/particula/blob/main/particula/dynamics.py#L53)
 
 solve the equation
 

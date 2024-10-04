@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Rms Speed
 
-> Auto-generated documentation for [particula.util.rms_speed](https://github.com/Gorkowski/particula/blob/main/particula/util/rms_speed.py) module.
+> Auto-generated documentation for [particula.util.rms_speed](https://github.com/uncscode/particula/blob/main/particula/util/rms_speed.py) module.
 
 ## cbar
 
-[Show source in rms_speed.py:10](https://github.com/Gorkowski/particula/blob/main/particula/util/rms_speed.py#L10)
+[Show source in rms_speed.py:10](https://github.com/uncscode/particula/blob/main/particula/util/rms_speed.py#L10)
 
 Returns the mean speed of molecules in an ideal gas.
 

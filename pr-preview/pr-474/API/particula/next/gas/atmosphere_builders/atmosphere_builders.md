@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Next](../index.md#next) / [Gas](./index.md#gas) / Atmosphere Builders
 
-> Auto-generated documentation for [particula.next.gas.atmosphere_builders](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/atmosphere_builders.py) module.
+> Auto-generated documentation for [particula.next.gas.atmosphere_builders](https://github.com/uncscode/particula/blob/main/particula/next/gas/atmosphere_builders.py) module.
 
 ## AtmosphereBuilder
 
-[Show source in atmosphere_builders.py:17](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/atmosphere_builders.py#L17)
+[Show source in atmosphere_builders.py:17](https://github.com/uncscode/particula/blob/main/particula/next/gas/atmosphere_builders.py#L17)
 
 Builder class for creating Atmosphere objects using a fluent interface.
 
@@ -44,7 +44,7 @@ class AtmosphereBuilder(BuilderABC, BuilderTemperatureMixin, BuilderPressureMixi
 
 ### AtmosphereBuilder().add_species
 
-[Show source in atmosphere_builders.py:49](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/atmosphere_builders.py#L49)
+[Show source in atmosphere_builders.py:49](https://github.com/uncscode/particula/blob/main/particula/next/gas/atmosphere_builders.py#L49)
 
 Adds a GasSpecies object to the gas mixture.
 
@@ -68,7 +68,7 @@ def add_species(self, species: GasSpecies) -> "AtmosphereBuilder": ...
 
 ### AtmosphereBuilder().build
 
-[Show source in atmosphere_builders.py:61](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/atmosphere_builders.py#L61)
+[Show source in atmosphere_builders.py:61](https://github.com/uncscode/particula/blob/main/particula/next/gas/atmosphere_builders.py#L61)
 
 Validates the configuration and constructs the Atmosphere object.
 

@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Data](./index.md#data) / Stream
 
-> Auto-generated documentation for [particula.data.stream](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py) module.
+> Auto-generated documentation for [particula.data.stream](https://github.com/uncscode/particula/blob/main/particula/data/stream.py) module.
 
 ## Stream
 
-[Show source in stream.py:13](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py#L13)
+[Show source in stream.py:13](https://github.com/uncscode/particula/blob/main/particula/data/stream.py#L13)
 
 Consistent format for storing data.
 
@@ -40,7 +40,7 @@ class Stream: ...
 
 ### Stream().__getitem__
 
-[Show source in stream.py:54](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py#L54)
+[Show source in stream.py:54](https://github.com/uncscode/particula/blob/main/particula/data/stream.py#L54)
 
 Gets data at a specified index or header name.
 
@@ -66,7 +66,7 @@ def __getitem__(self, index: Union[int, str]) -> NDArray[np.float64]: ...
 
 ### Stream().__len__
 
-[Show source in stream.py:99](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py#L99)
+[Show source in stream.py:99](https://github.com/uncscode/particula/blob/main/particula/data/stream.py#L99)
 
 Returns the number of time points in the data stream.
 
@@ -82,7 +82,7 @@ def __len__(self) -> int: ...
 
 ### Stream().__pop__
 
-[Show source in stream.py:108](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py#L108)
+[Show source in stream.py:108](https://github.com/uncscode/particula/blob/main/particula/data/stream.py#L108)
 
 Removes data at a specified index or header name.
 
@@ -104,7 +104,7 @@ def __pop__(self, index: Union[int, str]) -> None: ...
 
 ### Stream().__setitem__
 
-[Show source in stream.py:73](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py#L73)
+[Show source in stream.py:73](https://github.com/uncscode/particula/blob/main/particula/data/stream.py#L73)
 
 Sets or adds data at a specified index.
 
@@ -128,7 +128,7 @@ def __setitem__(self, index: Union[int, str], value: NDArray[np.float64]): ...
 
 ### Stream().datetime64
 
-[Show source in stream.py:125](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py#L125)
+[Show source in stream.py:125](https://github.com/uncscode/particula/blob/main/particula/data/stream.py#L125)
 
 Converts the epoch time array to a datetime64 for plotting.
 
@@ -149,7 +149,7 @@ def datetime64(self) -> NDArray[np.float64]: ...
 
 ### Stream().header_dict
 
-[Show source in stream.py:138](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py#L138)
+[Show source in stream.py:138](https://github.com/uncscode/particula/blob/main/particula/data/stream.py#L138)
 
 Provides a dictionary mapping from index to header names.
 
@@ -166,7 +166,7 @@ def header_dict(self) -> dict[int, str]: ...
 
 ### Stream().header_float
 
-[Show source in stream.py:147](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py#L147)
+[Show source in stream.py:147](https://github.com/uncscode/particula/blob/main/particula/data/stream.py#L147)
 
 Attempts to convert header names to a float array, where possible.
 
@@ -183,7 +183,7 @@ def header_float(self) -> NDArray[np.float64]: ...
 
 ### Stream().validate_inputs
 
-[Show source in stream.py:45](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py#L45)
+[Show source in stream.py:45](https://github.com/uncscode/particula/blob/main/particula/data/stream.py#L45)
 
 Validates that header is a list.
 
@@ -201,7 +201,7 @@ def validate_inputs(self): ...
 
 ## StreamAveraged
 
-[Show source in stream.py:158](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py#L158)
+[Show source in stream.py:158](https://github.com/uncscode/particula/blob/main/particula/data/stream.py#L158)
 
 Stream Class with Averaged Data and Standard Deviation.
 
@@ -230,7 +230,7 @@ class StreamAveraged(Stream): ...
 
 ### StreamAveraged().get_std
 
-[Show source in stream.py:210](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py#L210)
+[Show source in stream.py:210](https://github.com/uncscode/particula/blob/main/particula/data/stream.py#L210)
 
 Retrieves the standard deviation
 
@@ -260,7 +260,7 @@ def get_std(self, index: Union[int, str]) -> NDArray[np.float64]: ...
 
 ### StreamAveraged().validate_averaging_params
 
-[Show source in stream.py:185](https://github.com/Gorkowski/particula/blob/main/particula/data/stream.py#L185)
+[Show source in stream.py:185](https://github.com/uncscode/particula/blob/main/particula/data/stream.py#L185)
 
 Ensures that averaging parameters are valid.
 

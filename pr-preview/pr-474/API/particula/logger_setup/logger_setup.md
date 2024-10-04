@@ -2,7 +2,7 @@
 
 [Particula Index](../README.md#particula-index) / [Particula](./index.md#particula) / Logger Setup
 
-> Auto-generated documentation for [particula.logger_setup](https://github.com/Gorkowski/particula/blob/main/particula/logger_setup.py) module.
+> Auto-generated documentation for [particula.logger_setup](https://github.com/uncscode/particula/blob/main/particula/logger_setup.py) module.
 
 #### Attributes
 
@@ -13,7 +13,7 @@
 
 ## setup
 
-[Show source in logger_setup.py:65](https://github.com/Gorkowski/particula/blob/main/particula/logger_setup.py#L65)
+[Show source in logger_setup.py:65](https://github.com/uncscode/particula/blob/main/particula/logger_setup.py#L65)
 
 Setup for logging in the particula package.
 

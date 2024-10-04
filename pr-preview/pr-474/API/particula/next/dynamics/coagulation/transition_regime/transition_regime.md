@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Dynamics](../index.md#dynamics) / [Coagulation](./index.md#coagulation) / Transition Regime
 
-> Auto-generated documentation for [particula.next.dynamics.coagulation.transition_regime](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/transition_regime.py) module.
+> Auto-generated documentation for [particula.next.dynamics.coagulation.transition_regime](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/transition_regime.py) module.
 
 ## coulomb_chahl2019
 
-[Show source in transition_regime.py:209](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/transition_regime.py#L209)
+[Show source in transition_regime.py:209](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/transition_regime.py#L209)
 
 Chahl and Gopalakrishnan (2019) approximation for the dimensionless
 coagulation kernel. Accounts for the Coulomb potential between particles.
@@ -45,7 +45,7 @@ def coulomb_chahl2019(
 
 ## coulomb_dyachkov2007
 
-[Show source in transition_regime.py:51](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/transition_regime.py#L51)
+[Show source in transition_regime.py:51](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/transition_regime.py#L51)
 
 Dyachkov et al. (2007) approximation for the dimensionless coagulation
 kernel. Accounts for the Coulomb potential between particles.
@@ -84,7 +84,7 @@ def coulomb_dyachkov2007(
 
 ## coulomb_gatti2008
 
-[Show source in transition_regime.py:106](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/transition_regime.py#L106)
+[Show source in transition_regime.py:106](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/transition_regime.py#L106)
 
 Gatti et al. (2008) approximation for the dimensionless coagulation
 kernel. Accounts for the Coulomb potential between particles.
@@ -123,7 +123,7 @@ def coulomb_gatti2008(
 
 ## coulomb_gopalakrishnan2012
 
-[Show source in transition_regime.py:170](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/transition_regime.py#L170)
+[Show source in transition_regime.py:170](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/transition_regime.py#L170)
 
 Gopalakrishnan and Hogan (2012) approximation for the dimensionless
 coagulation kernel. Accounts for the Coulomb potential between particles.
@@ -162,7 +162,7 @@ def coulomb_gopalakrishnan2012(
 
 ## hard_sphere
 
-[Show source in transition_regime.py:12](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/transition_regime.py#L12)
+[Show source in transition_regime.py:12](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/transition_regime.py#L12)
 
 Hard sphere approximation for the dimensionless coagulation kernel.
 

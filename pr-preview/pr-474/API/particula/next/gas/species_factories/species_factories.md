@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Next](../index.md#next) / [Gas](./index.md#gas) / Species Factories
 
-> Auto-generated documentation for [particula.next.gas.species_factories](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/species_factories.py) module.
+> Auto-generated documentation for [particula.next.gas.species_factories](https://github.com/uncscode/particula/blob/main/particula/next/gas/species_factories.py) module.
 
 ## GasSpeciesFactory
 
-[Show source in species_factories.py:12](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/species_factories.py#L12)
+[Show source in species_factories.py:12](https://github.com/uncscode/particula/blob/main/particula/next/gas/species_factories.py#L12)
 
 Factory class to create species builders
 
@@ -47,7 +47,7 @@ class GasSpeciesFactory(
 
 ### GasSpeciesFactory().get_builders
 
-[Show source in species_factories.py:42](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/species_factories.py#L42)
+[Show source in species_factories.py:42](https://github.com/uncscode/particula/blob/main/particula/next/gas/species_factories.py#L42)
 
 Returns the mapping of strategy types to builder instances.
 

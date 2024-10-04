@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Data](./index.md#data) / Loader Setting Builders
 
-> Auto-generated documentation for [particula.data.loader_setting_builders](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_setting_builders.py) module.
+> Auto-generated documentation for [particula.data.loader_setting_builders](https://github.com/uncscode/particula/blob/main/particula/data/loader_setting_builders.py) module.
 
 ## DataChecksBuilder
 
-[Show source in loader_setting_builders.py:100](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_setting_builders.py#L100)
+[Show source in loader_setting_builders.py:100](https://github.com/uncscode/particula/blob/main/particula/data/loader_setting_builders.py#L100)
 
 Builder class for constructing the data checks dictionary.
 
@@ -35,7 +35,7 @@ class DataChecksBuilder(
 
 ### DataChecksBuilder().build
 
-[Show source in loader_setting_builders.py:125](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_setting_builders.py#L125)
+[Show source in loader_setting_builders.py:125](https://github.com/uncscode/particula/blob/main/particula/data/loader_setting_builders.py#L125)
 
 Build and return the data checks dictionary.
 
@@ -49,7 +49,7 @@ def build(self) -> Dict[str, Any]: ...
 
 ## Loader1DSettingsBuilder
 
-[Show source in loader_setting_builders.py:33](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_setting_builders.py#L33)
+[Show source in loader_setting_builders.py:33](https://github.com/uncscode/particula/blob/main/particula/data/loader_setting_builders.py#L33)
 
 Builder class for creating settings for loading and checking 1D data
 from CSV files.
@@ -93,7 +93,7 @@ class Loader1DSettingsBuilder(
 
 ### Loader1DSettingsBuilder().build
 
-[Show source in loader_setting_builders.py:80](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_setting_builders.py#L80)
+[Show source in loader_setting_builders.py:80](https://github.com/uncscode/particula/blob/main/particula/data/loader_setting_builders.py#L80)
 
 Build and return the settings dictionary for 1D data loading.
 
@@ -107,7 +107,7 @@ def build(self) -> Dict[str, Any]: ...
 
 ## LoaderSizerSettingsBuilder
 
-[Show source in loader_setting_builders.py:164](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_setting_builders.py#L164)
+[Show source in loader_setting_builders.py:164](https://github.com/uncscode/particula/blob/main/particula/data/loader_setting_builders.py#L164)
 
 Builder class for creating settings for loading and checking sizer
 1D and 2D data from CSV files.
@@ -153,7 +153,7 @@ class LoaderSizerSettingsBuilder(
 
 ### LoaderSizerSettingsBuilder().build
 
-[Show source in loader_setting_builders.py:214](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_setting_builders.py#L214)
+[Show source in loader_setting_builders.py:214](https://github.com/uncscode/particula/blob/main/particula/data/loader_setting_builders.py#L214)
 
 Build and return the two dictionaries for 1D and 2D sizer data
 loading .
@@ -168,7 +168,7 @@ def build(self) -> Tuple[Dict[str, Any], Dict[str, Any]]: ...
 
 ## SizerDataReaderBuilder
 
-[Show source in loader_setting_builders.py:136](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_setting_builders.py#L136)
+[Show source in loader_setting_builders.py:136](https://github.com/uncscode/particula/blob/main/particula/data/loader_setting_builders.py#L136)
 
 Builder class for constructing the sizer data reader dictionary.
 
@@ -193,7 +193,7 @@ class SizerDataReaderBuilder(
 
 ### SizerDataReaderBuilder().build
 
-[Show source in loader_setting_builders.py:154](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_setting_builders.py#L154)
+[Show source in loader_setting_builders.py:154](https://github.com/uncscode/particula/blob/main/particula/data/loader_setting_builders.py#L154)
 
 Build and return the sizer data reader dictionary.
 

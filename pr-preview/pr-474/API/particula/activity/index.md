@@ -2,7 +2,7 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / Activity
 
-> Auto-generated documentation for [particula.activity](https://github.com/Gorkowski/particula/blob/main/particula/activity/__init__.py) module.
+> Auto-generated documentation for [particula.activity](https://github.com/uncscode/particula/blob/main/particula/activity/__init__.py) module.
 
 ## Modules
 

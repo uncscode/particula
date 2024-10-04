@@ -2,11 +2,11 @@
 
 [Particula Index](../README.md#particula-index) / [Particula](./index.md#particula) / Rates
 
-> Auto-generated documentation for [particula.rates](https://github.com/Gorkowski/particula/blob/main/particula/rates.py) module.
+> Auto-generated documentation for [particula.rates](https://github.com/uncscode/particula/blob/main/particula/rates.py) module.
 
 ## Rates
 
-[Show source in rates.py:12](https://github.com/Gorkowski/particula/blob/main/particula/rates.py#L12)
+[Show source in rates.py:12](https://github.com/uncscode/particula/blob/main/particula/rates.py#L12)
 
 The class to calculate the rates
 
@@ -19,7 +19,7 @@ class Rates:
 
 ### Rates()._coag_loss_gain
 
-[Show source in rates.py:40](https://github.com/Gorkowski/particula/blob/main/particula/rates.py#L40)
+[Show source in rates.py:40](https://github.com/uncscode/particula/blob/main/particula/rates.py#L40)
 
 get both loss and gain
 
@@ -31,7 +31,7 @@ def _coag_loss_gain(self): ...
 
 ### Rates().coagulation_gain
 
-[Show source in rates.py:56](https://github.com/Gorkowski/particula/blob/main/particula/rates.py#L56)
+[Show source in rates.py:56](https://github.com/uncscode/particula/blob/main/particula/rates.py#L56)
 
 get coagulation gain rate
 
@@ -43,7 +43,7 @@ def coagulation_gain(self): ...
 
 ### Rates().coagulation_loss
 
-[Show source in rates.py:48](https://github.com/Gorkowski/particula/blob/main/particula/rates.py#L48)
+[Show source in rates.py:48](https://github.com/uncscode/particula/blob/main/particula/rates.py#L48)
 
 get the coagulation loss rate
 
@@ -55,7 +55,7 @@ def coagulation_loss(self): ...
 
 ### Rates().coagulation_rate
 
-[Show source in rates.py:64](https://github.com/Gorkowski/particula/blob/main/particula/rates.py#L64)
+[Show source in rates.py:64](https://github.com/uncscode/particula/blob/main/particula/rates.py#L64)
 
 get the coagulation rate by summing the loss and gain rates
 
@@ -67,7 +67,7 @@ def coagulation_rate(self): ...
 
 ### Rates().condensation_growth_rate
 
-[Show source in rates.py:74](https://github.com/Gorkowski/particula/blob/main/particula/rates.py#L74)
+[Show source in rates.py:74](https://github.com/uncscode/particula/blob/main/particula/rates.py#L74)
 
 condensation rate
 
@@ -79,7 +79,7 @@ def condensation_growth_rate(self): ...
 
 ### Rates().condensation_growth_speed
 
-[Show source in rates.py:69](https://github.com/Gorkowski/particula/blob/main/particula/rates.py#L69)
+[Show source in rates.py:69](https://github.com/uncscode/particula/blob/main/particula/rates.py#L69)
 
 condensation speed
 
@@ -91,7 +91,7 @@ def condensation_growth_speed(self): ...
 
 ### Rates().dilution_rate
 
-[Show source in rates.py:94](https://github.com/Gorkowski/particula/blob/main/particula/rates.py#L94)
+[Show source in rates.py:94](https://github.com/uncscode/particula/blob/main/particula/rates.py#L94)
 
 dilution rate
 
@@ -103,7 +103,7 @@ def dilution_rate(self): ...
 
 ### Rates().nucleation_rate
 
-[Show source in rates.py:85](https://github.com/Gorkowski/particula/blob/main/particula/rates.py#L85)
+[Show source in rates.py:85](https://github.com/uncscode/particula/blob/main/particula/rates.py#L85)
 
 nucleation rate
 
@@ -115,7 +115,7 @@ def nucleation_rate(self): ...
 
 ### Rates().sum_rates
 
-[Show source in rates.py:107](https://github.com/Gorkowski/particula/blob/main/particula/rates.py#L107)
+[Show source in rates.py:107](https://github.com/uncscode/particula/blob/main/particula/rates.py#L107)
 
 Sum rates, with options to disable individual rate terms.
 
@@ -148,7 +148,7 @@ def sum_rates(
 
 ### Rates().wall_loss_rate
 
-[Show source in rates.py:101](https://github.com/Gorkowski/particula/blob/main/particula/rates.py#L101)
+[Show source in rates.py:101](https://github.com/uncscode/particula/blob/main/particula/rates.py#L101)
 
 wall loss rate
 

@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Data](./index.md#data) / Lake Stats
 
-> Auto-generated documentation for [particula.data.lake_stats](https://github.com/Gorkowski/particula/blob/main/particula/data/lake_stats.py) module.
+> Auto-generated documentation for [particula.data.lake_stats](https://github.com/uncscode/particula/blob/main/particula/data/lake_stats.py) module.
 
 ## average_std
 
-[Show source in lake_stats.py:11](https://github.com/Gorkowski/particula/blob/main/particula/data/lake_stats.py#L11)
+[Show source in lake_stats.py:11](https://github.com/uncscode/particula/blob/main/particula/data/lake_stats.py#L11)
 
 Averages the data in each stream within a 'Lake' object.
 

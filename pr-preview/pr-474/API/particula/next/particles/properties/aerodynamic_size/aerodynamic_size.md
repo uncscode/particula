@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Aerodynamic Size
 
-> Auto-generated documentation for [particula.next.particles.properties.aerodynamic_size](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/aerodynamic_size.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.aerodynamic_size](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/aerodynamic_size.py) module.
 
 ## get_aerodynamic_shape_factor
 
-[Show source in aerodynamic_size.py:68](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/aerodynamic_size.py#L68)
+[Show source in aerodynamic_size.py:68](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/aerodynamic_size.py#L68)
 
 Retrieve the aerodynamic shape factor for a given particle shape.
 
@@ -33,7 +33,7 @@ def get_aerodynamic_shape_factor(shape_key: str) -> float: ...
 
 ## particle_aerodynamic_length
 
-[Show source in aerodynamic_size.py:24](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/aerodynamic_size.py#L24)
+[Show source in aerodynamic_size.py:24](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/aerodynamic_size.py#L24)
 
 Calculate the aerodynamic length scale of a particle.
 

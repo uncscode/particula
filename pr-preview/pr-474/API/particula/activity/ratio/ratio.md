@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Activity](./index.md#activity) / Ratio
 
-> Auto-generated documentation for [particula.activity.ratio](https://github.com/Gorkowski/particula/blob/main/particula/activity/ratio.py) module.
+> Auto-generated documentation for [particula.activity.ratio](https://github.com/uncscode/particula/blob/main/particula/activity/ratio.py) module.
 
 ## from_molar_mass_ratio
 
-[Show source in ratio.py:22](https://github.com/Gorkowski/particula/blob/main/particula/activity/ratio.py#L22)
+[Show source in ratio.py:22](https://github.com/uncscode/particula/blob/main/particula/activity/ratio.py#L22)
 
 Convert the given molar mass ratio (MW water / MW organic) to a
 molar mass with respect to the other compound.
@@ -31,7 +31,7 @@ def from_molar_mass_ratio(molar_mass_ratio, other_molar_mass=18.01528): ...
 
 ## to_molar_mass_ratio
 
-[Show source in ratio.py:4](https://github.com/Gorkowski/particula/blob/main/particula/activity/ratio.py#L4)
+[Show source in ratio.py:4](https://github.com/uncscode/particula/blob/main/particula/activity/ratio.py#L4)
 
 Convert the given molar mass to a molar mass ratio with respect to water.
 (MW water / MW organic)

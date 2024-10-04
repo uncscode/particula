@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Next](../index.md#next) / [Gas](./index.md#gas) / Species Builders
 
-> Auto-generated documentation for [particula.next.gas.species_builders](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/species_builders.py) module.
+> Auto-generated documentation for [particula.next.gas.species_builders](https://github.com/uncscode/particula/blob/main/particula/next/gas/species_builders.py) module.
 
 ## GasSpeciesBuilder
 
-[Show source in species_builders.py:26](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/species_builders.py#L26)
+[Show source in species_builders.py:26](https://github.com/uncscode/particula/blob/main/particula/next/gas/species_builders.py#L26)
 
 Builder class for GasSpecies objects, allowing for a more fluent and
 readable creation of GasSpecies instances with optional parameters.
@@ -54,7 +54,7 @@ class GasSpeciesBuilder(BuilderABC, BuilderMolarMassMixin, BuilderConcentrationM
 
 ### GasSpeciesBuilder().build
 
-[Show source in species_builders.py:94](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/species_builders.py#L94)
+[Show source in species_builders.py:94](https://github.com/uncscode/particula/blob/main/particula/next/gas/species_builders.py#L94)
 
 Validate and return the GasSpecies object.
 
@@ -70,7 +70,7 @@ def build(self) -> GasSpecies: ...
 
 ### GasSpeciesBuilder().set_condensable
 
-[Show source in species_builders.py:86](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/species_builders.py#L86)
+[Show source in species_builders.py:86](https://github.com/uncscode/particula/blob/main/particula/next/gas/species_builders.py#L86)
 
 Set the condensable bool of the gas species.
 
@@ -82,7 +82,7 @@ def set_condensable(self, condensable: Union[bool, NDArray[np.bool_]]): ...
 
 ### GasSpeciesBuilder().set_name
 
-[Show source in species_builders.py:73](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/species_builders.py#L73)
+[Show source in species_builders.py:73](https://github.com/uncscode/particula/blob/main/particula/next/gas/species_builders.py#L73)
 
 Set the name of the gas species.
 
@@ -94,7 +94,7 @@ def set_name(self, name: Union[str, NDArray[np.str_]]): ...
 
 ### GasSpeciesBuilder().set_vapor_pressure_strategy
 
-[Show source in species_builders.py:78](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/species_builders.py#L78)
+[Show source in species_builders.py:78](https://github.com/uncscode/particula/blob/main/particula/next/gas/species_builders.py#L78)
 
 Set the vapor pressure strategy for the gas species.
 
@@ -114,7 +114,7 @@ def set_vapor_pressure_strategy(
 
 ## PresetGasSpeciesBuilder
 
-[Show source in species_builders.py:107](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/species_builders.py#L107)
+[Show source in species_builders.py:107](https://github.com/uncscode/particula/blob/main/particula/next/gas/species_builders.py#L107)
 
 Builder class for GasSpecies objects, allowing for a more fluent and
 readable creation of GasSpecies instances with optional parameters.
@@ -132,7 +132,7 @@ class PresetGasSpeciesBuilder(GasSpeciesBuilder):
 
 ### PresetGasSpeciesBuilder().build
 
-[Show source in species_builders.py:125](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/species_builders.py#L125)
+[Show source in species_builders.py:125](https://github.com/uncscode/particula/blob/main/particula/next/gas/species_builders.py#L125)
 
 #### Signature
 

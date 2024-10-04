@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Gas](../index.md#gas) / [Properties](./index.md#properties) / Vapor Pressure Module
 
-> Auto-generated documentation for [particula.next.gas.properties.vapor_pressure_module](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/vapor_pressure_module.py) module.
+> Auto-generated documentation for [particula.next.gas.properties.vapor_pressure_module](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/vapor_pressure_module.py) module.
 
 ## antoine_vapor_pressure
 
-[Show source in vapor_pressure_module.py:14](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/vapor_pressure_module.py#L14)
+[Show source in vapor_pressure_module.py:14](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/vapor_pressure_module.py#L14)
 
 Calculate vapor pressure using the Antoine equation.
 
@@ -41,7 +41,7 @@ def antoine_vapor_pressure(
 
 ## buck_vapor_pressure
 
-[Show source in vapor_pressure_module.py:72](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/vapor_pressure_module.py#L72)
+[Show source in vapor_pressure_module.py:72](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/vapor_pressure_module.py#L72)
 
 Calculate vapor pressure using the Buck equation for water vapor.
 
@@ -72,7 +72,7 @@ def buck_vapor_pressure(
 
 ## clausius_clapeyron_vapor_pressure
 
-[Show source in vapor_pressure_module.py:42](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/vapor_pressure_module.py#L42)
+[Show source in vapor_pressure_module.py:42](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/vapor_pressure_module.py#L42)
 
 Calculate vapor pressure using Clausius-Clapeyron equation.
 

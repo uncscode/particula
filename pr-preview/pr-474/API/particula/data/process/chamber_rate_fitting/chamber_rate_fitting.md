@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Data](../index.md#data) / [Process](./index.md#process) / Chamber Rate Fitting
 
-> Auto-generated documentation for [particula.data.process.chamber_rate_fitting](https://github.com/Gorkowski/particula/blob/main/particula/data/process/chamber_rate_fitting.py) module.
+> Auto-generated documentation for [particula.data.process.chamber_rate_fitting](https://github.com/uncscode/particula/blob/main/particula/data/process/chamber_rate_fitting.py) module.
 
 ## ChamberParameters
 
-[Show source in chamber_rate_fitting.py:174](https://github.com/Gorkowski/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L174)
+[Show source in chamber_rate_fitting.py:174](https://github.com/uncscode/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L174)
 
 Data class for the chamber parameters.
 
@@ -20,7 +20,7 @@ class ChamberParameters: ...
 
 ## calculate_optimized_rates
 
-[Show source in chamber_rate_fitting.py:294](https://github.com/Gorkowski/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L294)
+[Show source in chamber_rate_fitting.py:294](https://github.com/uncscode/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L294)
 
 Calculate the coagulation rates using the optimized parameters and return
 the rates and R2 score.
@@ -66,7 +66,7 @@ def calculate_optimized_rates(
 
 ## calculate_pmf_rates
 
-[Show source in chamber_rate_fitting.py:22](https://github.com/Gorkowski/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L22)
+[Show source in chamber_rate_fitting.py:22](https://github.com/uncscode/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L22)
 
 Calculate the coagulation, dilution, and wall loss rates,
 and return the net rate.
@@ -121,7 +121,7 @@ def calculate_pmf_rates(
 
 ## coagulation_rates_cost_function
 
-[Show source in chamber_rate_fitting.py:122](https://github.com/Gorkowski/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L122)
+[Show source in chamber_rate_fitting.py:122](https://github.com/uncscode/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L122)
 
 Cost function for the optimization of the eddy diffusivity
 and alpha collision efficiency.
@@ -147,7 +147,7 @@ def coagulation_rates_cost_function(
 
 ## create_guess_and_bounds
 
-[Show source in chamber_rate_fitting.py:185](https://github.com/Gorkowski/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L185)
+[Show source in chamber_rate_fitting.py:185](https://github.com/uncscode/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L185)
 
 Create the initial guess array and bounds list for the optimization.
 
@@ -180,7 +180,7 @@ def create_guess_and_bounds(
 
 ## optimize_and_calculate_rates_looped
 
-[Show source in chamber_rate_fitting.py:363](https://github.com/Gorkowski/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L363)
+[Show source in chamber_rate_fitting.py:363](https://github.com/uncscode/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L363)
 
 Perform optimization and calculate rates for each time point in the stream.
 
@@ -226,7 +226,7 @@ def optimize_and_calculate_rates_looped(
 
 ## optimize_chamber_parameters
 
-[Show source in chamber_rate_fitting.py:232](https://github.com/Gorkowski/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L232)
+[Show source in chamber_rate_fitting.py:232](https://github.com/uncscode/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L232)
 
 Optimize the eddy diffusivity and alpha collision efficiency parameters
 for a given particle size distribution and its time derivative.
@@ -280,7 +280,7 @@ def optimize_chamber_parameters(
 
 ## optimize_parameters
 
-[Show source in chamber_rate_fitting.py:215](https://github.com/Gorkowski/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L215)
+[Show source in chamber_rate_fitting.py:215](https://github.com/uncscode/particula/blob/main/particula/data/process/chamber_rate_fitting.py#L215)
 
 Get the optimized parameters using the given cost function.
 

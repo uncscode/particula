@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Next](../index.md#next) / [Particles](./index.md#particles) / Distribution Builders
 
-> Auto-generated documentation for [particula.next.particles.distribution_builders](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/distribution_builders.py) module.
+> Auto-generated documentation for [particula.next.particles.distribution_builders](https://github.com/uncscode/particula/blob/main/particula/next/particles/distribution_builders.py) module.
 
 ## MassBasedMovingBinBuilder
 
-[Show source in distribution_builders.py:14](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/distribution_builders.py#L14)
+[Show source in distribution_builders.py:14](https://github.com/uncscode/particula/blob/main/particula/next/particles/distribution_builders.py#L14)
 
 Builds a MassBasedMovingBin instance.
 
@@ -23,7 +23,7 @@ class MassBasedMovingBinBuilder(BuilderABC):
 
 ### MassBasedMovingBinBuilder().build
 
-[Show source in distribution_builders.py:21](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/distribution_builders.py#L21)
+[Show source in distribution_builders.py:21](https://github.com/uncscode/particula/blob/main/particula/next/particles/distribution_builders.py#L21)
 
 Builds a MassBasedMovingBin instance.
 
@@ -41,7 +41,7 @@ def build(self) -> MassBasedMovingBin: ...
 
 ## ParticleResolvedSpeciatedMassBuilder
 
-[Show source in distribution_builders.py:50](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/distribution_builders.py#L50)
+[Show source in distribution_builders.py:50](https://github.com/uncscode/particula/blob/main/particula/next/particles/distribution_builders.py#L50)
 
 Builds a ParticleResolvedSpeciatedMass instance.
 
@@ -58,7 +58,7 @@ class ParticleResolvedSpeciatedMassBuilder(BuilderABC):
 
 ### ParticleResolvedSpeciatedMassBuilder().build
 
-[Show source in distribution_builders.py:57](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/distribution_builders.py#L57)
+[Show source in distribution_builders.py:57](https://github.com/uncscode/particula/blob/main/particula/next/particles/distribution_builders.py#L57)
 
 #### Signature
 
@@ -74,7 +74,7 @@ def build(self) -> ParticleResolvedSpeciatedMass: ...
 
 ## RadiiBasedMovingBinBuilder
 
-[Show source in distribution_builders.py:26](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/distribution_builders.py#L26)
+[Show source in distribution_builders.py:26](https://github.com/uncscode/particula/blob/main/particula/next/particles/distribution_builders.py#L26)
 
 Builds a RadiiBasedMovingBin instance.
 
@@ -91,7 +91,7 @@ class RadiiBasedMovingBinBuilder(BuilderABC):
 
 ### RadiiBasedMovingBinBuilder().build
 
-[Show source in distribution_builders.py:33](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/distribution_builders.py#L33)
+[Show source in distribution_builders.py:33](https://github.com/uncscode/particula/blob/main/particula/next/particles/distribution_builders.py#L33)
 
 Builds a RadiiBasedMovingBin instance.
 
@@ -109,7 +109,7 @@ def build(self) -> RadiiBasedMovingBin: ...
 
 ## SpeciatedMassMovingBinBuilder
 
-[Show source in distribution_builders.py:38](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/distribution_builders.py#L38)
+[Show source in distribution_builders.py:38](https://github.com/uncscode/particula/blob/main/particula/next/particles/distribution_builders.py#L38)
 
 Builds a SpeciatedMassMovingBin instance.
 
@@ -126,7 +126,7 @@ class SpeciatedMassMovingBinBuilder(BuilderABC):
 
 ### SpeciatedMassMovingBinBuilder().build
 
-[Show source in distribution_builders.py:45](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/distribution_builders.py#L45)
+[Show source in distribution_builders.py:45](https://github.com/uncscode/particula/blob/main/particula/next/particles/distribution_builders.py#L45)
 
 Builds a SpeciatedMassMovingBin instance.
 

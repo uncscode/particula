@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Dynamic Viscosity
 
-> Auto-generated documentation for [particula.util.dynamic_viscosity](https://github.com/Gorkowski/particula/blob/main/particula/util/dynamic_viscosity.py) module.
+> Auto-generated documentation for [particula.util.dynamic_viscosity](https://github.com/uncscode/particula/blob/main/particula/util/dynamic_viscosity.py) module.
 
 ## dyn_vis
 
-[Show source in dynamic_viscosity.py:21](https://github.com/Gorkowski/particula/blob/main/particula/util/dynamic_viscosity.py#L21)
+[Show source in dynamic_viscosity.py:21](https://github.com/uncscode/particula/blob/main/particula/util/dynamic_viscosity.py#L21)
 
  The dynamic viscosity of air via Sutherland formula.
 This formula depends on temperature (temp) and the reference

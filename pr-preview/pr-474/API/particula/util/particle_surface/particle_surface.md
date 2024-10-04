@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Particle Surface
 
-> Auto-generated documentation for [particula.util.particle_surface](https://github.com/Gorkowski/particula/blob/main/particula/util/particle_surface.py) module.
+> Auto-generated documentation for [particula.util.particle_surface](https://github.com/uncscode/particula/blob/main/particula/util/particle_surface.py) module.
 
 ## area
 
-[Show source in particle_surface.py:8](https://github.com/Gorkowski/particula/blob/main/particula/util/particle_surface.py#L8)
+[Show source in particle_surface.py:8](https://github.com/uncscode/particula/blob/main/particula/util/particle_surface.py#L8)
 
 Returns particle's surface area: 4 pi r^2 .
 

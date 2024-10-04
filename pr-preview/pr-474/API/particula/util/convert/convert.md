@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Convert
 
-> Auto-generated documentation for [particula.util.convert](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py) module.
+> Auto-generated documentation for [particula.util.convert](https://github.com/uncscode/particula/blob/main/particula/util/convert.py) module.
 
 ## coerce_type
 
-[Show source in convert.py:9](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L9)
+[Show source in convert.py:9](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L9)
 
 Coerces data to dtype if it is not already of that type.
 
@@ -42,7 +42,7 @@ def coerce_type(data, dtype): ...
 
 ## convert_sizer_dn
 
-[Show source in convert.py:440](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L440)
+[Show source in convert.py:440](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L440)
 
 Converts the sizer data from dn/dlogdp to d_num.
 
@@ -80,7 +80,7 @@ def convert_sizer_dn(
 
 ## data_shape_check
 
-[Show source in convert.py:543](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L543)
+[Show source in convert.py:543](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L543)
 
 Check the shape of the input data and header list, and reshape the data if
 necessary. The data array can be 1D or 2D. If the data array is 2D, the
@@ -112,7 +112,7 @@ def data_shape_check(time: np.ndarray, data: np.ndarray, header: list) -> np.nda
 
 ## distribution_convert_pdf_pms
 
-[Show source in convert.py:603](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L603)
+[Show source in convert.py:603](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L603)
 
 Convert between a probability density function (PDF) and a probability
 mass spectrum (PMS) based on the specified direction.
@@ -144,7 +144,7 @@ def distribution_convert_pdf_pms(
 
 ## effective_refractive_index
 
-[Show source in convert.py:402](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L402)
+[Show source in convert.py:402](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L402)
 
 Calculate the effective refractive index of a mixture of two solutes, given
 the refractive index of each solute and the volume of each solute. The
@@ -184,7 +184,7 @@ def effective_refractive_index(
 
 ## get_values_in_dict
 
-[Show source in convert.py:509](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L509)
+[Show source in convert.py:509](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L509)
 
 Returns a list of values for keys in a dictionary.
 
@@ -222,7 +222,7 @@ def get_values_in_dict(
 
 ## kappa_from_volume
 
-[Show source in convert.py:206](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L206)
+[Show source in convert.py:206](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L206)
 
 Calculate the kappa parameter from the volume of solute and water,
 given the water activity.
@@ -252,7 +252,7 @@ def kappa_from_volume(
 
 ## kappa_volume_solute
 
-[Show source in convert.py:148](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L148)
+[Show source in convert.py:148](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L148)
 
 Calculate the volume of solute in a volume of total solution,
 given the kappa parameter and water activity.
@@ -282,7 +282,7 @@ def kappa_volume_solute(
 
 ## kappa_volume_water
 
-[Show source in convert.py:178](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L178)
+[Show source in convert.py:178](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L178)
 
 Calculate the volume of water given volume of solute, kappa parameter,
 and water activity.
@@ -312,7 +312,7 @@ def kappa_volume_water(
 
 ## length_to_volume
 
-[Show source in convert.py:125](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L125)
+[Show source in convert.py:125](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L125)
 
 Convert radius or diameter to volume.
 
@@ -339,7 +339,7 @@ def length_to_volume(
 
 ## list_to_dict
 
-[Show source in convert.py:486](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L486)
+[Show source in convert.py:486](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L486)
 
 Converts a list of strings to a dictionary. The keys are the strings
 and the values are the index of the string in the list.
@@ -363,7 +363,7 @@ def list_to_dict(list_of_str: list) -> dict: ...
 
 ## mass_concentration_to_mole_fraction
 
-[Show source in convert.py:284](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L284)
+[Show source in convert.py:284](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L284)
 
 Convert mass concentrations to mole fractions for N components.
 
@@ -394,7 +394,7 @@ def mass_concentration_to_mole_fraction(
 
 ## mass_concentration_to_volume_fraction
 
-[Show source in convert.py:311](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L311)
+[Show source in convert.py:311](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L311)
 
 Convert mass concentrations to volume fractions for N components.
 
@@ -427,7 +427,7 @@ def mass_concentration_to_volume_fraction(
 
 ## mass_fraction_to_volume_fraction
 
-[Show source in convert.py:342](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L342)
+[Show source in convert.py:342](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L342)
 
 Converts the mass fraction of a solute to the volume fraction in a
 binary mixture.
@@ -462,7 +462,7 @@ def mass_fraction_to_volume_fraction(
 
 ## mole_fraction_to_mass_fraction
 
-[Show source in convert.py:233](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L233)
+[Show source in convert.py:233](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L233)
 
 Convert mole fraction to mass fraction.
 
@@ -488,7 +488,7 @@ def mole_fraction_to_mass_fraction(
 
 ## mole_fraction_to_mass_fraction_multi
 
-[Show source in convert.py:259](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L259)
+[Show source in convert.py:259](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L259)
 
 Convert mole fractions to mass fractions for N components.
 Assumes that sum(mole_fractions) == 1.
@@ -514,7 +514,7 @@ def mole_fraction_to_mass_fraction_multi(
 
 ## radius_diameter
 
-[Show source in convert.py:87](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L87)
+[Show source in convert.py:87](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L87)
 
 Convert a radius to a diameter, or vice versa.
 
@@ -538,7 +538,7 @@ def radius_diameter(value: float, to_diameter: bool = True) -> float: ...
 
 ## round_arbitrary
 
-[Show source in convert.py:37](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L37)
+[Show source in convert.py:37](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L37)
 
 Rounds the input values to the nearest multiple of the base.
 
@@ -573,7 +573,7 @@ def round_arbitrary(
 
 ## volume_to_length
 
-[Show source in convert.py:102](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L102)
+[Show source in convert.py:102](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L102)
 
 Convert a volume to a radius or diameter.
 
@@ -599,7 +599,7 @@ def volume_to_length(
 
 ## volume_water_from_volume_fraction
 
-[Show source in convert.py:376](https://github.com/Gorkowski/particula/blob/main/particula/util/convert.py#L376)
+[Show source in convert.py:376](https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L376)
 
 Calculates the volume of water in a volume of solute, given the volume
 fraction of water in the mixture.

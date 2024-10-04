@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Condensation Force
 
-> Auto-generated documentation for [particula.util.condensation_force](https://github.com/Gorkowski/particula/blob/main/particula/util/condensation_force.py) module.
+> Auto-generated documentation for [particula.util.condensation_force](https://github.com/uncscode/particula/blob/main/particula/util/condensation_force.py) module.
 
 ## condensation_force
 
-[Show source in condensation_force.py:9](https://github.com/Gorkowski/particula/blob/main/particula/util/condensation_force.py#L9)
+[Show source in condensation_force.py:9](https://github.com/uncscode/particula/blob/main/particula/util/condensation_force.py#L9)
 
 calculate the condensation driving force
 
@@ -24,7 +24,7 @@ def condensation_force(
 
 ## particle_activity_fun
 
-[Show source in condensation_force.py:29](https://github.com/Gorkowski/particula/blob/main/particula/util/condensation_force.py#L29)
+[Show source in condensation_force.py:29](https://github.com/uncscode/particula/blob/main/particula/util/condensation_force.py#L29)
 
 calculate the particle activity
 

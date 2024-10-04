@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Friction Factor
 
-> Auto-generated documentation for [particula.util.friction_factor](https://github.com/Gorkowski/particula/blob/main/particula/util/friction_factor.py) module.
+> Auto-generated documentation for [particula.util.friction_factor](https://github.com/uncscode/particula/blob/main/particula/util/friction_factor.py) module.
 
 ## frifac
 
-[Show source in friction_factor.py:10](https://github.com/Gorkowski/particula/blob/main/particula/util/friction_factor.py#L10)
+[Show source in friction_factor.py:10](https://github.com/uncscode/particula/blob/main/particula/util/friction_factor.py#L10)
 
 Returns a particle's friction factor.
 

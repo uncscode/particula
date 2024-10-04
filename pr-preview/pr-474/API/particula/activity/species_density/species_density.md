@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Activity](./index.md#activity) / Species Density
 
-> Auto-generated documentation for [particula.activity.species_density](https://github.com/Gorkowski/particula/blob/main/particula/activity/species_density.py) module.
+> Auto-generated documentation for [particula.activity.species_density](https://github.com/uncscode/particula/blob/main/particula/activity/species_density.py) module.
 
 ## organic_array
 
-[Show source in species_density.py:93](https://github.com/Gorkowski/particula/blob/main/particula/activity/species_density.py#L93)
+[Show source in species_density.py:93](https://github.com/uncscode/particula/blob/main/particula/activity/species_density.py#L93)
 
 Get densities for an array.
 
@@ -26,7 +26,7 @@ def organic_array(
 
 ## organic_density_estimate
 
-[Show source in species_density.py:12](https://github.com/Gorkowski/particula/blob/main/particula/activity/species_density.py#L12)
+[Show source in species_density.py:12](https://github.com/uncscode/particula/blob/main/particula/activity/species_density.py#L12)
 
 Function to estimate the density of organic compounds based on the simple
 model by Girolami (1994). The input parameters include molar mass, O:C

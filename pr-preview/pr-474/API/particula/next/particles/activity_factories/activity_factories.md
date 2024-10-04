@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Next](../index.md#next) / [Particles](./index.md#particles) / Activity Factories
 
-> Auto-generated documentation for [particula.next.particles.activity_factories](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/activity_factories.py) module.
+> Auto-generated documentation for [particula.next.particles.activity_factories](https://github.com/uncscode/particula/blob/main/particula/next/particles/activity_factories.py) module.
 
 ## ActivityFactory
 
-[Show source in activity_factories.py:20](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/activity_factories.py#L20)
+[Show source in activity_factories.py:20](https://github.com/uncscode/particula/blob/main/particula/next/particles/activity_factories.py#L20)
 
 Factory class to create activity strategy builders
 
@@ -70,7 +70,7 @@ class ActivityFactory(
 
 ### ActivityFactory().get_builders
 
-[Show source in activity_factories.py:61](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/activity_factories.py#L61)
+[Show source in activity_factories.py:61](https://github.com/uncscode/particula/blob/main/particula/next/particles/activity_factories.py#L61)
 
 Returns the mapping of strategy types to builder instances.
 

@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Slip Correction Module
 
-> Auto-generated documentation for [particula.next.particles.properties.slip_correction_module](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/slip_correction_module.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.slip_correction_module](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/slip_correction_module.py) module.
 
 ## cunningham_slip_correction
 
-[Show source in slip_correction_module.py:9](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/slip_correction_module.py#L9)
+[Show source in slip_correction_module.py:9](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/slip_correction_module.py#L9)
 
 Calculate the Cunningham slip correction factor. Accounts for
 non-continuum effects on small particles.

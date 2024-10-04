@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Size Distribution Convert
 
-> Auto-generated documentation for [particula.util.size_distribution_convert](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py) module.
+> Auto-generated documentation for [particula.util.size_distribution_convert](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py) module.
 
 ## ConversionStrategy
 
-[Show source in size_distribution_convert.py:23](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L23)
+[Show source in size_distribution_convert.py:23](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L23)
 
 Defines an interface for conversion strategies between particle size
 distribution formats.
@@ -22,7 +22,7 @@ class ConversionStrategy: ...
 
 ### ConversionStrategy().convert
 
-[Show source in size_distribution_convert.py:31](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L31)
+[Show source in size_distribution_convert.py:31](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L31)
 
 Converter method common interface, for subclasses.
 
@@ -52,7 +52,7 @@ def convert(
 
 ## DNdlogDPtoPDFConversionStrategy
 
-[Show source in size_distribution_convert.py:83](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L83)
+[Show source in size_distribution_convert.py:83](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L83)
 
 Implements conversion between dn/dlogdp and PDF formats through an
 intermediate PMS format.
@@ -69,7 +69,7 @@ class DNdlogDPtoPDFConversionStrategy(ConversionStrategy): ...
 
 ### DNdlogDPtoPDFConversionStrategy().convert
 
-[Show source in size_distribution_convert.py:87](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L87)
+[Show source in size_distribution_convert.py:87](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L87)
 
 #### Signature
 
@@ -83,7 +83,7 @@ def convert(
 
 ## DNdlogDPtoPMSConversionStrategy
 
-[Show source in size_distribution_convert.py:61](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L61)
+[Show source in size_distribution_convert.py:61](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L61)
 
 Implements conversion between dn/dlogdp and PMS formats using the
 convert_sizer_dn method.
@@ -100,7 +100,7 @@ class DNdlogDPtoPMSConversionStrategy(ConversionStrategy): ...
 
 ### DNdlogDPtoPMSConversionStrategy().convert
 
-[Show source in size_distribution_convert.py:65](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L65)
+[Show source in size_distribution_convert.py:65](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L65)
 
 #### Signature
 
@@ -114,7 +114,7 @@ def convert(
 
 ## PMStoPDFConversionStrategy
 
-[Show source in size_distribution_convert.py:73](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L73)
+[Show source in size_distribution_convert.py:73](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L73)
 
 Implements conversion between PMS and PDF formats.
 
@@ -130,7 +130,7 @@ class PMStoPDFConversionStrategy(ConversionStrategy): ...
 
 ### PMStoPDFConversionStrategy().convert
 
-[Show source in size_distribution_convert.py:76](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L76)
+[Show source in size_distribution_convert.py:76](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L76)
 
 #### Signature
 
@@ -144,7 +144,7 @@ def convert(
 
 ## SameScaleConversionStrategy
 
-[Show source in size_distribution_convert.py:52](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L52)
+[Show source in size_distribution_convert.py:52](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L52)
 
 Implements conversion between the same scales, which is a no-op.
 
@@ -160,7 +160,7 @@ class SameScaleConversionStrategy(ConversionStrategy): ...
 
 ### SameScaleConversionStrategy().convert
 
-[Show source in size_distribution_convert.py:55](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L55)
+[Show source in size_distribution_convert.py:55](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L55)
 
 #### Signature
 
@@ -174,7 +174,7 @@ def convert(
 
 ## SizerConverter
 
-[Show source in size_distribution_convert.py:102](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L102)
+[Show source in size_distribution_convert.py:102](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L102)
 
 A converter that uses a specified ConversionStrategy to convert
 particle size distribution data between different formats.
@@ -192,7 +192,7 @@ class SizerConverter:
 
 ### SizerConverter().convert
 
-[Show source in size_distribution_convert.py:114](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L114)
+[Show source in size_distribution_convert.py:114](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L114)
 
 Converts particle size distribution data using the specified
 strategy.
@@ -219,7 +219,7 @@ def convert(
 
 ## get_conversion_strategy
 
-[Show source in size_distribution_convert.py:130](https://github.com/Gorkowski/particula/blob/main/particula/util/size_distribution_convert.py#L130)
+[Show source in size_distribution_convert.py:130](https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L130)
 
 Factory function to create and return an appropriate conversion
 strategy based on input and output scales. Use the inverse flag in the

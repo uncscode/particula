@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Data](./index.md#data) / Loader Interface
 
-> Auto-generated documentation for [particula.data.loader_interface](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_interface.py) module.
+> Auto-generated documentation for [particula.data.loader_interface](https://github.com/uncscode/particula/blob/main/particula/data/loader_interface.py) module.
 
 ## get_1d_stream
 
-[Show source in loader_interface.py:226](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_interface.py#L226)
+[Show source in loader_interface.py:226](https://github.com/uncscode/particula/blob/main/particula/data/loader_interface.py#L226)
 
 Loads and formats a 1D data stream from a file and initializes or updates
 a Stream object.
@@ -66,7 +66,7 @@ def get_1d_stream(
 
 ## get_2d_stream
 
-[Show source in loader_interface.py:338](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_interface.py#L338)
+[Show source in loader_interface.py:338](https://github.com/uncscode/particula/blob/main/particula/data/loader_interface.py#L338)
 
 Initializes a 2D stream using the settings in the DataLake object.
 
@@ -101,7 +101,7 @@ def get_2d_stream(
 
 ## get_new_files
 
-[Show source in loader_interface.py:13](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_interface.py#L13)
+[Show source in loader_interface.py:13](https://github.com/uncscode/particula/blob/main/particula/data/loader_interface.py#L13)
 
 Scan a directory for new files based on import settings and stream status.
 
@@ -154,7 +154,7 @@ def get_new_files(
 
 ## load_files_interface
 
-[Show source in loader_interface.py:109](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_interface.py#L109)
+[Show source in loader_interface.py:109](https://github.com/uncscode/particula/blob/main/particula/data/loader_interface.py#L109)
 
 Load files into a stream object based on settings.
 
@@ -198,7 +198,7 @@ def load_files_interface(
 
 ## load_folders_interface
 
-[Show source in loader_interface.py:185](https://github.com/Gorkowski/particula/blob/main/particula/data/loader_interface.py#L185)
+[Show source in loader_interface.py:185](https://github.com/uncscode/particula/blob/main/particula/data/loader_interface.py#L185)
 
 Load files into a lake object based on settings.
 

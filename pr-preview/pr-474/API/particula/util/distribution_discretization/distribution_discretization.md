@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Distribution Discretization
 
-> Auto-generated documentation for [particula.util.distribution_discretization](https://github.com/Gorkowski/particula/blob/main/particula/util/distribution_discretization.py) module.
+> Auto-generated documentation for [particula.util.distribution_discretization](https://github.com/uncscode/particula/blob/main/particula/util/distribution_discretization.py) module.
 
 ## discretize
 
-[Show source in distribution_discretization.py:9](https://github.com/Gorkowski/particula/blob/main/particula/util/distribution_discretization.py#L9)
+[Show source in distribution_discretization.py:9](https://github.com/uncscode/particula/blob/main/particula/util/distribution_discretization.py#L9)
 
 discretize the distribution of the particles
 

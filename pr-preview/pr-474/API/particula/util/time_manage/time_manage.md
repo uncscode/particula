@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Time Manage
 
-> Auto-generated documentation for [particula.util.time_manage](https://github.com/Gorkowski/particula/blob/main/particula/util/time_manage.py) module.
+> Auto-generated documentation for [particula.util.time_manage](https://github.com/uncscode/particula/blob/main/particula/util/time_manage.py) module.
 
 ## datetime64_from_epoch_array
 
-[Show source in time_manage.py:57](https://github.com/Gorkowski/particula/blob/main/particula/util/time_manage.py#L57)
+[Show source in time_manage.py:57](https://github.com/uncscode/particula/blob/main/particula/util/time_manage.py#L57)
 
 Converts an array of epoch times to a numpy array of datetime64 objects.
 
@@ -36,7 +36,7 @@ def datetime64_from_epoch_array(
 
 ## relative_time
 
-[Show source in time_manage.py:85](https://github.com/Gorkowski/particula/blob/main/particula/util/time_manage.py#L85)
+[Show source in time_manage.py:85](https://github.com/uncscode/particula/blob/main/particula/util/time_manage.py#L85)
 
 Cacluates the relative time from the start of the epoch
 array in the specified units.
@@ -61,7 +61,7 @@ def relative_time(epoch_array: np.ndarray, units: str = "hours") -> np.ndarray: 
 
 ## time_str_to_epoch
 
-[Show source in time_manage.py:10](https://github.com/Gorkowski/particula/blob/main/particula/util/time_manage.py#L10)
+[Show source in time_manage.py:10](https://github.com/uncscode/particula/blob/main/particula/util/time_manage.py#L10)
 
 Convert to UTC (epoch) timezone from all inputs. Using pytz library,
 which implements the Olson time zone database. tz identifiers are strings

@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Dynamics](../index.md#dynamics) / [Condensation](./index.md#condensation) / Mass Transfer
 
-> Auto-generated documentation for [particula.next.dynamics.condensation.mass_transfer](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py) module.
+> Auto-generated documentation for [particula.next.dynamics.condensation.mass_transfer](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py) module.
 
 ## calculate_mass_transfer
 
-[Show source in mass_transfer.py:140](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py#L140)
+[Show source in mass_transfer.py:140](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py#L140)
 
 Helper function that routes the mass transfer calculation to either the
 single-species or multi-species calculation functions based on the input
@@ -41,7 +41,7 @@ def calculate_mass_transfer(
 
 ## calculate_mass_transfer_multiple_species
 
-[Show source in mass_transfer.py:225](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py#L225)
+[Show source in mass_transfer.py:225](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py#L225)
 
 Calculate mass transfer for multiple gas species.
 
@@ -75,7 +75,7 @@ def calculate_mass_transfer_multiple_species(
 
 ## calculate_mass_transfer_single_species
 
-[Show source in mass_transfer.py:181](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py#L181)
+[Show source in mass_transfer.py:181](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py#L181)
 
 Calculate mass transfer for a single gas species (m=1).
 
@@ -107,7 +107,7 @@ def calculate_mass_transfer_single_species(
 
 ## first_order_mass_transport_k
 
-[Show source in mass_transfer.py:46](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py#L46)
+[Show source in mass_transfer.py:46](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py#L46)
 
 First-order mass transport coefficient per particle.
 
@@ -147,7 +147,7 @@ def first_order_mass_transport_k(
 
 ## mass_transfer_rate
 
-[Show source in mass_transfer.py:83](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py#L83)
+[Show source in mass_transfer.py:83](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py#L83)
 
 Calculate the mass transfer rate for a particle.
 
@@ -188,7 +188,7 @@ def mass_transfer_rate(
 
 ## radius_transfer_rate
 
-[Show source in mass_transfer.py:117](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py#L117)
+[Show source in mass_transfer.py:117](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/condensation/mass_transfer.py#L117)
 
 Convert mass rate to radius transfer rate.
 

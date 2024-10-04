@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Dynamics](../index.md#dynamics) / [Coagulation](./index.md#coagulation) / Brownian Kernel
 
-> Auto-generated documentation for [particula.next.dynamics.coagulation.brownian_kernel](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/brownian_kernel.py) module.
+> Auto-generated documentation for [particula.next.dynamics.coagulation.brownian_kernel](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/brownian_kernel.py) module.
 
 ## brownian_coagulation_kernel
 
-[Show source in brownian_kernel.py:109](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/brownian_kernel.py#L109)
+[Show source in brownian_kernel.py:109](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/brownian_kernel.py#L109)
 
 Returns the Brownian coagulation kernel for aerosol particles. Defined
 as the product of the diffusivity of the particles, the collection term
@@ -47,7 +47,7 @@ def brownian_coagulation_kernel(
 
 ## brownian_coagulation_kernel_via_system_state
 
-[Show source in brownian_kernel.py:178](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/brownian_kernel.py#L178)
+[Show source in brownian_kernel.py:178](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/brownian_kernel.py#L178)
 
 Returns the Brownian coagulation kernel for aerosol particles,
 calculating the intermediate properties needed.
@@ -88,7 +88,7 @@ def brownian_coagulation_kernel_via_system_state(
 
 ## brownian_diffusivity
 
-[Show source in brownian_kernel.py:83](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/brownian_kernel.py#L83)
+[Show source in brownian_kernel.py:83](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/brownian_kernel.py#L83)
 
 Returns the diffusivity of the particles due to Brownian motion
 
@@ -122,7 +122,7 @@ def brownian_diffusivity(
 
 ## g_collection_term
 
-[Show source in brownian_kernel.py:49](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/brownian_kernel.py#L49)
+[Show source in brownian_kernel.py:49](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/brownian_kernel.py#L49)
 
 Returns the `g` collection term for Brownian coagulation.
 
@@ -161,7 +161,7 @@ def g_collection_term(
 
 ## mean_free_path_l
 
-[Show source in brownian_kernel.py:18](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/brownian_kernel.py#L18)
+[Show source in brownian_kernel.py:18](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/brownian_kernel.py#L18)
 
 Calculate the mean free path of particles for coagulation.
 

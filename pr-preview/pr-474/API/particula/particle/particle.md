@@ -2,11 +2,11 @@
 
 [Particula Index](../README.md#particula-index) / [Particula](./index.md#particula) / Particle
 
-> Auto-generated documentation for [particula.particle](https://github.com/Gorkowski/particula/blob/main/particula/particle.py) module.
+> Auto-generated documentation for [particula.particle](https://github.com/uncscode/particula/blob/main/particula/particle.py) module.
 
 ## Particle
 
-[Show source in particle.py:386](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L386)
+[Show source in particle.py:386](https://github.com/uncscode/particula/blob/main/particula/particle.py#L386)
 
 the Particle class!
 
@@ -23,7 +23,7 @@ class Particle(ParticleWallLoss):
 
 ### Particle()._coag_prep
 
-[Show source in particle.py:410](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L410)
+[Show source in particle.py:410](https://github.com/uncscode/particula/blob/main/particula/particle.py#L410)
 
 get all related quantities to coulomb enhancement
 
@@ -35,7 +35,7 @@ def _coag_prep(self, other: "Particle"): ...
 
 ### Particle().coagulation
 
-[Show source in particle.py:464](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L464)
+[Show source in particle.py:464](https://github.com/uncscode/particula/blob/main/particula/particle.py#L464)
 
 Dimensioned particle--particle coagulation kernel
 
@@ -47,7 +47,7 @@ def coagulation(self, other: "Particle" = None): ...
 
 ### Particle().coulomb_enhancement_continuum_limit
 
-[Show source in particle.py:448](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L448)
+[Show source in particle.py:448](https://github.com/uncscode/particula/blob/main/particula/particle.py#L448)
 
  Continuum limit of Coulomb enhancement for particle--particle
 coagulation.
@@ -60,7 +60,7 @@ def coulomb_enhancement_continuum_limit(self, other: "Particle" = None): ...
 
 ### Particle().coulomb_enhancement_kinetic_limit
 
-[Show source in particle.py:442](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L442)
+[Show source in particle.py:442](https://github.com/uncscode/particula/blob/main/particula/particle.py#L442)
 
  Kinetic limit of Coulomb enhancement for particle--particle
 cooagulation.
@@ -73,7 +73,7 @@ def coulomb_enhancement_kinetic_limit(self, other: "Particle" = None): ...
 
 ### Particle().coulomb_potential_ratio
 
-[Show source in particle.py:437](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L437)
+[Show source in particle.py:437](https://github.com/uncscode/particula/blob/main/particula/particle.py#L437)
 
 Calculates the Coulomb potential ratio.
 
@@ -85,7 +85,7 @@ def coulomb_potential_ratio(self, other: "Particle" = None): ...
 
 ### Particle().diffusive_knudsen_number
 
-[Show source in particle.py:454](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L454)
+[Show source in particle.py:454](https://github.com/uncscode/particula/blob/main/particula/particle.py#L454)
 
 Diffusive Knudsen number.
 
@@ -97,7 +97,7 @@ def diffusive_knudsen_number(self, other: "Particle" = None): ...
 
 ### Particle().dimensionless_coagulation
 
-[Show source in particle.py:459](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L459)
+[Show source in particle.py:459](https://github.com/uncscode/particula/blob/main/particula/particle.py#L459)
 
 Dimensionless particle--particle coagulation kernel.
 
@@ -109,7 +109,7 @@ def dimensionless_coagulation(self, other: "Particle" = None): ...
 
 ### Particle().reduced_friction_factor
 
-[Show source in particle.py:432](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L432)
+[Show source in particle.py:432](https://github.com/uncscode/particula/blob/main/particula/particle.py#L432)
 
 Returns the reduced friction factor between two particles.
 
@@ -121,7 +121,7 @@ def reduced_friction_factor(self, other: "Particle" = None): ...
 
 ### Particle().reduced_mass
 
-[Show source in particle.py:427](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L427)
+[Show source in particle.py:427](https://github.com/uncscode/particula/blob/main/particula/particle.py#L427)
 
 Returns the reduced mass.
 
@@ -135,7 +135,7 @@ def reduced_mass(self, other: "Particle" = None): ...
 
 ## ParticleCondensation
 
-[Show source in particle.py:255](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L255)
+[Show source in particle.py:255](https://github.com/uncscode/particula/blob/main/particula/particle.py#L255)
 
 calculate some condensation stuff
 
@@ -152,7 +152,7 @@ class ParticleCondensation(ParticleInstances):
 
 ### ParticleCondensation().condensation_redmass
 
-[Show source in particle.py:280](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L280)
+[Show source in particle.py:280](https://github.com/uncscode/particula/blob/main/particula/particle.py#L280)
 
 red mass
 
@@ -164,7 +164,7 @@ def condensation_redmass(self): ...
 
 ### ParticleCondensation().fuchs_sutugin
 
-[Show source in particle.py:298](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L298)
+[Show source in particle.py:298](https://github.com/uncscode/particula/blob/main/particula/particle.py#L298)
 
 the fuchs-sutugin correction
 
@@ -176,7 +176,7 @@ def fuchs_sutugin(self): ...
 
 ### ParticleCondensation().molecular_enhancement
 
-[Show source in particle.py:272](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L272)
+[Show source in particle.py:272](https://github.com/uncscode/particula/blob/main/particula/particle.py#L272)
 
 molecular enhancement
 
@@ -188,7 +188,7 @@ def molecular_enhancement(self): ...
 
 ### ParticleCondensation().particle_growth
 
-[Show source in particle.py:317](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L317)
+[Show source in particle.py:317](https://github.com/uncscode/particula/blob/main/particula/particle.py#L317)
 
 particle growth in m/s
 
@@ -200,7 +200,7 @@ def particle_growth(self): ...
 
 ### ParticleCondensation().particle_saturation_ratio
 
-[Show source in particle.py:331](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L331)
+[Show source in particle.py:331](https://github.com/uncscode/particula/blob/main/particula/particle.py#L331)
 
 Calculates the saturation ratio of the particle at its surface,
 accounting for the Kelvin effect.
@@ -219,7 +219,7 @@ def particle_saturation_ratio(self): ...
 
 ### ParticleCondensation().vapor_flux
 
-[Show source in particle.py:305](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L305)
+[Show source in particle.py:305](https://github.com/uncscode/particula/blob/main/particula/particle.py#L305)
 
 vapor flux
 
@@ -231,7 +231,7 @@ def vapor_flux(self): ...
 
 ### ParticleCondensation().vapor_speed
 
-[Show source in particle.py:289](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L289)
+[Show source in particle.py:289](https://github.com/uncscode/particula/blob/main/particula/particle.py#L289)
 
 vapor speed
 
@@ -245,7 +245,7 @@ def vapor_speed(self): ...
 
 ## ParticleDistribution
 
-[Show source in particle.py:34](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L34)
+[Show source in particle.py:34](https://github.com/uncscode/particula/blob/main/particula/particle.py#L34)
 
 starting a particle distribution from continuous pdf
 
@@ -262,7 +262,7 @@ class ParticleDistribution(Vapor):
 
 ### ParticleDistribution().pre_discretize
 
-[Show source in particle.py:106](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L106)
+[Show source in particle.py:106](https://github.com/uncscode/particula/blob/main/particula/particle.py#L106)
 
 Returns a distribution pdf of the particles
 
@@ -280,7 +280,7 @@ def pre_discretize(self): ...
 
 ### ParticleDistribution().pre_distribution
 
-[Show source in particle.py:124](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L124)
+[Show source in particle.py:124](https://github.com/uncscode/particula/blob/main/particula/particle.py#L124)
 
 Returns a distribution pdf of the particles
 
@@ -298,7 +298,7 @@ def pre_distribution(self): ...
 
 ### ParticleDistribution().pre_radius
 
-[Show source in particle.py:60](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L60)
+[Show source in particle.py:60](https://github.com/uncscode/particula/blob/main/particula/particle.py#L60)
 
 Returns the radius space of the particles
 
@@ -319,7 +319,7 @@ def pre_radius(self): ...
 
 ## ParticleInstances
 
-[Show source in particle.py:137](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L137)
+[Show source in particle.py:137](https://github.com/uncscode/particula/blob/main/particula/particle.py#L137)
 
 starting a particle distribution from single particles
 
@@ -336,7 +336,7 @@ class ParticleInstances(ParticleDistribution):
 
 ### ParticleInstances().aerodynamic_mobility
 
-[Show source in particle.py:237](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L237)
+[Show source in particle.py:237](https://github.com/uncscode/particula/blob/main/particula/particle.py#L237)
 
 Returns a particle's aerodynamic mobility.
 
@@ -348,7 +348,7 @@ def aerodynamic_mobility(self): ...
 
 ### ParticleInstances().diffusion_coefficient
 
-[Show source in particle.py:246](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L246)
+[Show source in particle.py:246](https://github.com/uncscode/particula/blob/main/particula/particle.py#L246)
 
 Returns a particle's diffusion coefficient.
 
@@ -360,7 +360,7 @@ def diffusion_coefficient(self): ...
 
 ### ParticleInstances().friction_factor
 
-[Show source in particle.py:218](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L218)
+[Show source in particle.py:218](https://github.com/uncscode/particula/blob/main/particula/particle.py#L218)
 
 Returns a particle's friction factor.
 
@@ -372,7 +372,7 @@ def friction_factor(self): ...
 
 ### ParticleInstances().knudsen_number
 
-[Show source in particle.py:202](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L202)
+[Show source in particle.py:202](https://github.com/uncscode/particula/blob/main/particula/particle.py#L202)
 
 Returns particle's Knudsen number.
 
@@ -384,7 +384,7 @@ def knudsen_number(self): ...
 
 ### ParticleInstances().particle_area
 
-[Show source in particle.py:194](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L194)
+[Show source in particle.py:194](https://github.com/uncscode/particula/blob/main/particula/particle.py#L194)
 
 Returns particle's surface area
 
@@ -396,7 +396,7 @@ def particle_area(self): ...
 
 ### ParticleInstances().particle_distribution
 
-[Show source in particle.py:175](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L175)
+[Show source in particle.py:175](https://github.com/uncscode/particula/blob/main/particula/particle.py#L175)
 
 distribution
 
@@ -408,7 +408,7 @@ def particle_distribution(self): ...
 
 ### ParticleInstances().particle_mass
 
-[Show source in particle.py:184](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L184)
+[Show source in particle.py:184](https://github.com/uncscode/particula/blob/main/particula/particle.py#L184)
 
 Returns mass of particle.
 
@@ -420,7 +420,7 @@ def particle_mass(self): ...
 
 ### ParticleInstances().settling_velocity
 
-[Show source in particle.py:227](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L227)
+[Show source in particle.py:227](https://github.com/uncscode/particula/blob/main/particula/particle.py#L227)
 
 Returns a particle's settling velocity.
 
@@ -432,7 +432,7 @@ def settling_velocity(self): ...
 
 ### ParticleInstances().slip_correction_factor
 
-[Show source in particle.py:210](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L210)
+[Show source in particle.py:210](https://github.com/uncscode/particula/blob/main/particula/particle.py#L210)
 
 Returns particle's Cunningham slip correction factor.
 
@@ -446,7 +446,7 @@ def slip_correction_factor(self): ...
 
 ## ParticleWallLoss
 
-[Show source in particle.py:354](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L354)
+[Show source in particle.py:354](https://github.com/uncscode/particula/blob/main/particula/particle.py#L354)
 
 continuing...
 
@@ -463,7 +463,7 @@ class ParticleWallLoss(ParticleCondensation):
 
 ### ParticleWallLoss().wall_loss_coefficient
 
-[Show source in particle.py:374](https://github.com/Gorkowski/particula/blob/main/particula/particle.py#L374)
+[Show source in particle.py:374](https://github.com/uncscode/particula/blob/main/particula/particle.py#L374)
 
 Returns a particle's wall loss coefficient.
 

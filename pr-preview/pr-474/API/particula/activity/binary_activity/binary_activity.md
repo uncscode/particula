@@ -2,7 +2,7 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Activity](./index.md#activity) / Binary Activity
 
-> Auto-generated documentation for [particula.activity.binary_activity](https://github.com/Gorkowski/particula/blob/main/particula/activity/binary_activity.py) module.
+> Auto-generated documentation for [particula.activity.binary_activity](https://github.com/uncscode/particula/blob/main/particula/activity/binary_activity.py) module.
 
 #### Attributes
 
@@ -13,7 +13,7 @@
 
 ## activity_coefficients
 
-[Show source in binary_activity.py:34](https://github.com/Gorkowski/particula/blob/main/particula/activity/binary_activity.py#L34)
+[Show source in binary_activity.py:34](https://github.com/uncscode/particula/blob/main/particula/activity/binary_activity.py#L34)
 
 Calculate the activity coefficients for water and organic matter in
 organic-water mixtures.
@@ -52,7 +52,7 @@ def activity_coefficients(
 
 ## bat_blending_weights
 
-[Show source in binary_activity.py:335](https://github.com/Gorkowski/particula/blob/main/particula/activity/binary_activity.py#L335)
+[Show source in binary_activity.py:335](https://github.com/uncscode/particula/blob/main/particula/activity/binary_activity.py#L335)
 
 Function to estimate the blending weights for the BAT model.
 
@@ -79,7 +79,7 @@ def bat_blending_weights(
 
 ## biphasic_water_activity_point
 
-[Show source in binary_activity.py:240](https://github.com/Gorkowski/particula/blob/main/particula/activity/binary_activity.py#L240)
+[Show source in binary_activity.py:240](https://github.com/uncscode/particula/blob/main/particula/activity/binary_activity.py#L240)
 
 This function computes the biphasic to single phase
 water activity (RH*100).
@@ -112,7 +112,7 @@ def biphasic_water_activity_point(
 
 ## coefficients_c
 
-[Show source in binary_activity.py:398](https://github.com/Gorkowski/particula/blob/main/particula/activity/binary_activity.py#L398)
+[Show source in binary_activity.py:398](https://github.com/uncscode/particula/blob/main/particula/activity/binary_activity.py#L398)
 
 Coefficients for activity model, see Gorkowski (2019). equation S1 S2.
 
@@ -139,7 +139,7 @@ def coefficients_c(
 
 ## convert_to_oh_equivalent
 
-[Show source in binary_activity.py:314](https://github.com/Gorkowski/particula/blob/main/particula/activity/binary_activity.py#L314)
+[Show source in binary_activity.py:314](https://github.com/uncscode/particula/blob/main/particula/activity/binary_activity.py#L314)
 
 just a pass through now, but will
 add the oh equivalent conversion
@@ -158,7 +158,7 @@ def convert_to_oh_equivalent(
 
 ## fixed_water_activity
 
-[Show source in binary_activity.py:425](https://github.com/Gorkowski/particula/blob/main/particula/activity/binary_activity.py#L425)
+[Show source in binary_activity.py:425](https://github.com/uncscode/particula/blob/main/particula/activity/binary_activity.py#L425)
 
 Calculate the activity coefficients of water and organic matter in
 organic-water mixtures.
@@ -196,7 +196,7 @@ def fixed_water_activity(
 
 ## gibbs_mix_weight
 
-[Show source in binary_activity.py:158](https://github.com/Gorkowski/particula/blob/main/particula/activity/binary_activity.py#L158)
+[Show source in binary_activity.py:158](https://github.com/uncscode/particula/blob/main/particula/activity/binary_activity.py#L158)
 
 Gibbs free energy of mixing, see Gorkowski (2019), with weighted
 oxygen2carbon regions. Only can run one compound at a time.
@@ -233,7 +233,7 @@ def gibbs_mix_weight(
 
 ## gibbs_of_mixing
 
-[Show source in binary_activity.py:98](https://github.com/Gorkowski/particula/blob/main/particula/activity/binary_activity.py#L98)
+[Show source in binary_activity.py:98](https://github.com/uncscode/particula/blob/main/particula/activity/binary_activity.py#L98)
 
 Calculate the Gibbs free energy of mixing for a binary mixture.
 

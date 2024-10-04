@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Dynamics](../index.md#dynamics) / [Coagulation](./index.md#coagulation) / Kernel
 
-> Auto-generated documentation for [particula.next.dynamics.coagulation.kernel](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py) module.
+> Auto-generated documentation for [particula.next.dynamics.coagulation.kernel](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py) module.
 
 ## CoulombDyachkov2007
 
-[Show source in kernel.py:130](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L130)
+[Show source in kernel.py:130](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L130)
 
 Dyachkov et al. (2007) approximation for the dimensionless coagulation
 kernel. Accounts for the Coulomb potential between particles.
@@ -31,7 +31,7 @@ class CoulombDyachkov2007(KernelStrategy): ...
 
 ### CoulombDyachkov2007().dimensionless
 
-[Show source in kernel.py:143](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L143)
+[Show source in kernel.py:143](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L143)
 
 #### Signature
 
@@ -47,7 +47,7 @@ def dimensionless(
 
 ## CoulombGatti2008
 
-[Show source in kernel.py:153](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L153)
+[Show source in kernel.py:153](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L153)
 
 Gatti and Kortshagen (2008) approximation for the dimensionless coagulation
 kernel. Accounts for the Coulomb potential between particles.
@@ -72,7 +72,7 @@ class CoulombGatti2008(KernelStrategy): ...
 
 ### CoulombGatti2008().dimensionless
 
-[Show source in kernel.py:166](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L166)
+[Show source in kernel.py:166](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L166)
 
 #### Signature
 
@@ -88,7 +88,7 @@ def dimensionless(
 
 ## CoulombGopalakrishnan2012
 
-[Show source in kernel.py:176](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L176)
+[Show source in kernel.py:176](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L176)
 
 Gopalakrishnan and Hogan (2012) approximation for the dimensionless
 coagulation kernel. Accounts for the Coulomb potential between particles.
@@ -113,7 +113,7 @@ class CoulombGopalakrishnan2012(KernelStrategy): ...
 
 ### CoulombGopalakrishnan2012().dimensionless
 
-[Show source in kernel.py:189](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L189)
+[Show source in kernel.py:189](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L189)
 
 #### Signature
 
@@ -129,7 +129,7 @@ def dimensionless(
 
 ## CoulumbChahl2019
 
-[Show source in kernel.py:199](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L199)
+[Show source in kernel.py:199](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L199)
 
 Chahl and Gopalakrishnan (2019) approximation for the dimensionless
 coagulation kernel. Accounts for the Coulomb potential between particles.
@@ -154,7 +154,7 @@ class CoulumbChahl2019(KernelStrategy): ...
 
 ### CoulumbChahl2019().dimensionless
 
-[Show source in kernel.py:212](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L212)
+[Show source in kernel.py:212](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L212)
 
 #### Signature
 
@@ -170,7 +170,7 @@ def dimensionless(
 
 ## HardSphere
 
-[Show source in kernel.py:117](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L117)
+[Show source in kernel.py:117](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L117)
 
 Hard sphere dimensionless coagulation strategy.
 
@@ -186,7 +186,7 @@ class HardSphere(KernelStrategy): ...
 
 ### HardSphere().dimensionless
 
-[Show source in kernel.py:122](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L122)
+[Show source in kernel.py:122](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L122)
 
 #### Signature
 
@@ -200,7 +200,7 @@ def dimensionless(
 
 ## KernelStrategy
 
-[Show source in kernel.py:12](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L12)
+[Show source in kernel.py:12](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L12)
 
 Abstract class for dimensionless coagulation strategies. This class defines
 the dimensionless kernel (H) method that must be implemented by any
@@ -221,7 +221,7 @@ class KernelStrategy(ABC): ...
 
 ### KernelStrategy().dimensionless
 
-[Show source in kernel.py:25](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L25)
+[Show source in kernel.py:25](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L25)
 
 Return the dimensionless coagulation kernel (H)
 
@@ -275,7 +275,7 @@ def dimensionless(
 
 ### KernelStrategy().kernel
 
-[Show source in kernel.py:68](https://github.com/Gorkowski/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L68)
+[Show source in kernel.py:68](https://github.com/uncscode/particula/blob/main/particula/next/dynamics/coagulation/kernel.py#L68)
 
 The dimensioned coagulation kernel for each particle pair, calculated
 from the dimensionless coagulation kernel and the reduced quantities.

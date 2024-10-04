@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Approx Coagulation
 
-> Auto-generated documentation for [particula.util.approx_coagulation](https://github.com/Gorkowski/particula/blob/main/particula/util/approx_coagulation.py) module.
+> Auto-generated documentation for [particula.util.approx_coagulation](https://github.com/uncscode/particula/blob/main/particula/util/approx_coagulation.py) module.
 
 ## approx_coag_less
 
-[Show source in approx_coagulation.py:10](https://github.com/Gorkowski/particula/blob/main/particula/util/approx_coagulation.py#L10)
+[Show source in approx_coagulation.py:10](https://github.com/uncscode/particula/blob/main/particula/util/approx_coagulation.py#L10)
 
  dy2007 approx.
 Dimensionless particle--particle coagulation kernel.

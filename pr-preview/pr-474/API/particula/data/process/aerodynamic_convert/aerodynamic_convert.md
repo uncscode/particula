@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Data](../index.md#data) / [Process](./index.md#process) / Aerodynamic Convert
 
-> Auto-generated documentation for [particula.data.process.aerodynamic_convert](https://github.com/Gorkowski/particula/blob/main/particula/data/process/aerodynamic_convert.py) module.
+> Auto-generated documentation for [particula.data.process.aerodynamic_convert](https://github.com/uncscode/particula/blob/main/particula/data/process/aerodynamic_convert.py) module.
 
 ## _cost_aerodynamic_radius
 
-[Show source in aerodynamic_convert.py:21](https://github.com/Gorkowski/particula/blob/main/particula/data/process/aerodynamic_convert.py#L21)
+[Show source in aerodynamic_convert.py:21](https://github.com/uncscode/particula/blob/main/particula/data/process/aerodynamic_convert.py#L21)
 
 Optimization cost function to determine the aerodynamic radius of a
 particle.
@@ -44,7 +44,7 @@ def _cost_aerodynamic_radius(
 
 ## _cost_physical_radius
 
-[Show source in aerodynamic_convert.py:80](https://github.com/Gorkowski/particula/blob/main/particula/data/process/aerodynamic_convert.py#L80)
+[Show source in aerodynamic_convert.py:80](https://github.com/uncscode/particula/blob/main/particula/data/process/aerodynamic_convert.py#L80)
 
 Optimization cost function to determine the physical radius of a particle.
 
@@ -81,7 +81,7 @@ def _cost_physical_radius(
 
 ## convert_aerodynamic_to_physical_radius
 
-[Show source in aerodynamic_convert.py:139](https://github.com/Gorkowski/particula/blob/main/particula/data/process/aerodynamic_convert.py#L139)
+[Show source in aerodynamic_convert.py:139](https://github.com/uncscode/particula/blob/main/particula/data/process/aerodynamic_convert.py#L139)
 
 Convert aerodynamic radius to physical radius for a particle or an array
 of particles.
@@ -119,7 +119,7 @@ def convert_aerodynamic_to_physical_radius(
 
 ## convert_physical_to_aerodynamic_radius
 
-[Show source in aerodynamic_convert.py:197](https://github.com/Gorkowski/particula/blob/main/particula/data/process/aerodynamic_convert.py#L197)
+[Show source in aerodynamic_convert.py:197](https://github.com/uncscode/particula/blob/main/particula/data/process/aerodynamic_convert.py#L197)
 
 Convert physical radius to aerodynamic radius for a particle or an array
 of particles.

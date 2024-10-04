@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Data](../index.md#data) / [Process](./index.md#process) / Mie Angular
 
-> Auto-generated documentation for [particula.data.process.mie_angular](https://github.com/Gorkowski/particula/blob/main/particula/data/process/mie_angular.py) module.
+> Auto-generated documentation for [particula.data.process.mie_angular](https://github.com/uncscode/particula/blob/main/particula/data/process/mie_angular.py) module.
 
 ## assign_scattering_thetas
 
-[Show source in mie_angular.py:101](https://github.com/Gorkowski/particula/blob/main/particula/data/process/mie_angular.py#L101)
+[Show source in mie_angular.py:101](https://github.com/uncscode/particula/blob/main/particula/data/process/mie_angular.py#L101)
 
 Assign scattering angles and efficiencies based on the z-axis position
 within the CAPS instrument.
@@ -44,7 +44,7 @@ def assign_scattering_thetas(
 
 ## calculate_scattering_angles
 
-[Show source in mie_angular.py:63](https://github.com/Gorkowski/particula/blob/main/particula/data/process/mie_angular.py#L63)
+[Show source in mie_angular.py:63](https://github.com/uncscode/particula/blob/main/particula/data/process/mie_angular.py#L63)
 
 Calculate forward and backward scattering angles for a given position
 along the z-axis within the CAPS instrument geometry.
@@ -76,7 +76,7 @@ def calculate_scattering_angles(
 
 ## discretize_scattering_angles
 
-[Show source in mie_angular.py:16](https://github.com/Gorkowski/particula/blob/main/particula/data/process/mie_angular.py#L16)
+[Show source in mie_angular.py:16](https://github.com/uncscode/particula/blob/main/particula/data/process/mie_angular.py#L16)
 
 Discretize and cache the scattering function for a spherical particle
 with specified material properties and size.

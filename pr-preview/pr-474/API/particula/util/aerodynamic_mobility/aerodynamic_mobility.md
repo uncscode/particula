@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Aerodynamic Mobility
 
-> Auto-generated documentation for [particula.util.aerodynamic_mobility](https://github.com/Gorkowski/particula/blob/main/particula/util/aerodynamic_mobility.py) module.
+> Auto-generated documentation for [particula.util.aerodynamic_mobility](https://github.com/uncscode/particula/blob/main/particula/util/aerodynamic_mobility.py) module.
 
 ## pam
 
-[Show source in aerodynamic_mobility.py:10](https://github.com/Gorkowski/particula/blob/main/particula/util/aerodynamic_mobility.py#L10)
+[Show source in aerodynamic_mobility.py:10](https://github.com/uncscode/particula/blob/main/particula/util/aerodynamic_mobility.py#L10)
 
 particle aerodynamic mobility
 

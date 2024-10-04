@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / SimpleSolver
 
-> Auto-generated documentation for [particula.util.simple_solver](https://github.com/Gorkowski/particula/blob/main/particula/util/simple_solver.py) module.
+> Auto-generated documentation for [particula.util.simple_solver](https://github.com/uncscode/particula/blob/main/particula/util/simple_solver.py) module.
 
 ## SimpleSolver
 
-[Show source in simple_solver.py:33](https://github.com/Gorkowski/particula/blob/main/particula/util/simple_solver.py#L33)
+[Show source in simple_solver.py:33](https://github.com/uncscode/particula/blob/main/particula/util/simple_solver.py#L33)
 
 a class to solve the ODE:
 
@@ -27,7 +27,7 @@ class SimpleSolver:
 
 ### SimpleSolver().prep_inputs
 
-[Show source in simple_solver.py:66](https://github.com/Gorkowski/particula/blob/main/particula/util/simple_solver.py#L66)
+[Show source in simple_solver.py:66](https://github.com/uncscode/particula/blob/main/particula/util/simple_solver.py#L66)
 
 strip units, etc.
 
@@ -39,7 +39,7 @@ def prep_inputs(self): ...
 
 ### SimpleSolver().solution
 
-[Show source in simple_solver.py:77](https://github.com/Gorkowski/particula/blob/main/particula/util/simple_solver.py#L77)
+[Show source in simple_solver.py:77](https://github.com/uncscode/particula/blob/main/particula/util/simple_solver.py#L77)
 
 utilize scipy.integrate.odeint
 
@@ -53,7 +53,7 @@ def solution(self): ...
 
 ## ode_func
 
-[Show source in simple_solver.py:21](https://github.com/Gorkowski/particula/blob/main/particula/util/simple_solver.py#L21)
+[Show source in simple_solver.py:21](https://github.com/uncscode/particula/blob/main/particula/util/simple_solver.py#L21)
 
 function to integrate
 

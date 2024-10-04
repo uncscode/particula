@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Settling Velocity
 
-> Auto-generated documentation for [particula.next.particles.properties.settling_velocity](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/settling_velocity.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.settling_velocity](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/settling_velocity.py) module.
 
 ## particle_settling_velocity
 
-[Show source in settling_velocity.py:22](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/settling_velocity.py#L22)
+[Show source in settling_velocity.py:22](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/settling_velocity.py#L22)
 
 Calculate the settling velocity of a particle in a fluid.
 
@@ -40,7 +40,7 @@ def particle_settling_velocity(
 
 ## particle_settling_velocity_via_system_state
 
-[Show source in settling_velocity.py:58](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/settling_velocity.py#L58)
+[Show source in settling_velocity.py:58](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/settling_velocity.py#L58)
 
 Calculate the settling velocity of a particle.
 

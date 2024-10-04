@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Lagrangian](./index.md#lagrangian) / Particle Property
 
-> Auto-generated documentation for [particula.lagrangian.particle_property](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_property.py) module.
+> Auto-generated documentation for [particula.lagrangian.particle_property](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_property.py) module.
 
 ## friction_factor_wrapper
 
-[Show source in particle_property.py:70](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_property.py#L70)
+[Show source in particle_property.py:70](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_property.py#L70)
 
 Calculate the friction factor for a given radius, temperature, and
 pressure.
@@ -39,7 +39,7 @@ def friction_factor_wrapper(
 
 ## generate_particle_masses
 
-[Show source in particle_property.py:122](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_property.py#L122)
+[Show source in particle_property.py:122](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_property.py#L122)
 
 Generate an array of particle masses based on a log-normal distribution of
 particle radii and a given density.
@@ -80,7 +80,7 @@ def generate_particle_masses(
 
 ## mass_calculation
 
-[Show source in particle_property.py:44](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_property.py#L44)
+[Show source in particle_property.py:44](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_property.py#L44)
 
 Calculate the mass of a sphere given its radius and density using the
 formula for the volume of a sphere.
@@ -112,7 +112,7 @@ def mass_calculation(radius: torch.Tensor, density: torch.Tensor) -> torch.Tenso
 
 ## nearest_match
 
-[Show source in particle_property.py:254](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_property.py#L254)
+[Show source in particle_property.py:254](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_property.py#L254)
 
 Perform nearest neighbor interpolation (on torch objects) to find y-values
 corresponding to new x-values. The function identifies the nearest x-value
@@ -143,7 +143,7 @@ def nearest_match(
 
 ## radius_calculation
 
-[Show source in particle_property.py:12](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_property.py#L12)
+[Show source in particle_property.py:12](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_property.py#L12)
 
 Calculate the radius of a sphere given its mass and density using the
 formula for the volume of a sphere.
@@ -182,7 +182,7 @@ def radius_calculation(mass: torch.Tensor, density: torch.Tensor) -> torch.Tenso
 
 ## random_thermal_velocity
 
-[Show source in particle_property.py:221](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_property.py#L221)
+[Show source in particle_property.py:221](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_property.py#L221)
 
 Generate a random thermal velocity for each particle.
 
@@ -212,7 +212,7 @@ def random_thermal_velocity(
 
 ## speed
 
-[Show source in particle_property.py:206](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_property.py#L206)
+[Show source in particle_property.py:206](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_property.py#L206)
 
 Calculate the speed of a particle.
 
@@ -234,7 +234,7 @@ def speed(velocity: torch.Tensor) -> torch.Tensor: ...
 
 ## thermal_speed
 
-[Show source in particle_property.py:173](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/particle_property.py#L173)
+[Show source in particle_property.py:173](https://github.com/uncscode/particula/blob/main/particula/lagrangian/particle_property.py#L173)
 
 Calculate the thermal speed of a particle based on its temperature and
 mass.

@@ -2,7 +2,7 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Species Properties
 
-> Auto-generated documentation for [particula.util.species_properties](https://github.com/Gorkowski/particula/blob/main/particula/util/species_properties.py) module.
+> Auto-generated documentation for [particula.util.species_properties](https://github.com/uncscode/particula/blob/main/particula/util/species_properties.py) module.
 
 #### Attributes
 
@@ -12,7 +12,7 @@
 
 ## MaterialProperties
 
-[Show source in species_properties.py:17](https://github.com/Gorkowski/particula/blob/main/particula/util/species_properties.py#L17)
+[Show source in species_properties.py:17](https://github.com/uncscode/particula/blob/main/particula/util/species_properties.py#L17)
 
 #### Signature
 
@@ -23,7 +23,7 @@ class MaterialProperties:
 
 ### MaterialProperties().latent_heat
 
-[Show source in species_properties.py:34](https://github.com/Gorkowski/particula/blob/main/particula/util/species_properties.py#L34)
+[Show source in species_properties.py:34](https://github.com/uncscode/particula/blob/main/particula/util/species_properties.py#L34)
 
 #### Signature
 
@@ -33,7 +33,7 @@ def latent_heat(self, temperature, species): ...
 
 ### MaterialProperties().saturation_pressure
 
-[Show source in species_properties.py:24](https://github.com/Gorkowski/particula/blob/main/particula/util/species_properties.py#L24)
+[Show source in species_properties.py:24](https://github.com/uncscode/particula/blob/main/particula/util/species_properties.py#L24)
 
 #### Signature
 
@@ -45,7 +45,7 @@ def saturation_pressure(self, temperature, species): ...
 
 ## clausius_clapeyron
 
-[Show source in species_properties.py:63](https://github.com/Gorkowski/particula/blob/main/particula/util/species_properties.py#L63)
+[Show source in species_properties.py:63](https://github.com/uncscode/particula/blob/main/particula/util/species_properties.py#L63)
 
 Calculates the vapor pressure of a substance at a given temperature
 using the Clausius-Clapeyron equation.
@@ -73,7 +73,7 @@ def clausius_clapeyron(
 
 ## material_properties
 
-[Show source in species_properties.py:140](https://github.com/Gorkowski/particula/blob/main/particula/util/species_properties.py#L140)
+[Show source in species_properties.py:140](https://github.com/uncscode/particula/blob/main/particula/util/species_properties.py#L140)
 
 Return the material properties for a given species.
 
@@ -103,7 +103,7 @@ def material_properties(property, species="water", temperature=298.15 * u.K): ..
 
 ## vapor_concentration
 
-[Show source in species_properties.py:177](https://github.com/Gorkowski/particula/blob/main/particula/util/species_properties.py#L177)
+[Show source in species_properties.py:177](https://github.com/uncscode/particula/blob/main/particula/util/species_properties.py#L177)
 
 Convert saturation ratio to mass concentration at a given temperature.
 
@@ -134,7 +134,7 @@ def vapor_concentration(saturation_ratio, temperature=298.15 * u.K, species="wat
 
 ## water_buck_psat
 
-[Show source in species_properties.py:47](https://github.com/Gorkowski/particula/blob/main/particula/util/species_properties.py#L47)
+[Show source in species_properties.py:47](https://github.com/uncscode/particula/blob/main/particula/util/species_properties.py#L47)
 
  Buck equation for water vapor pressure
 https://en.wikipedia.org/wiki/Arden_Buck_equation

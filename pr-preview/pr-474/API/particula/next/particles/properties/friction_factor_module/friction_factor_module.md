@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Friction Factor Module
 
-> Auto-generated documentation for [particula.next.particles.properties.friction_factor_module](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/friction_factor_module.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.friction_factor_module](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/friction_factor_module.py) module.
 
 ## friction_factor
 
-[Show source in friction_factor_module.py:15](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/friction_factor_module.py#L15)
+[Show source in friction_factor_module.py:15](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/friction_factor_module.py#L15)
 
 Returns a particle's friction factor. Property of the particle's size and
 surrounding medium. Multiplying the friction factor by the fluid velocity

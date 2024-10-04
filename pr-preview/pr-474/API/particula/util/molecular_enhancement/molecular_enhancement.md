@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Molecular Enhancement
 
-> Auto-generated documentation for [particula.util.molecular_enhancement](https://github.com/Gorkowski/particula/blob/main/particula/util/molecular_enhancement.py) module.
+> Auto-generated documentation for [particula.util.molecular_enhancement](https://github.com/uncscode/particula/blob/main/particula/util/molecular_enhancement.py) module.
 
 ## mol_enh
 
-[Show source in molecular_enhancement.py:12](https://github.com/Gorkowski/particula/blob/main/particula/util/molecular_enhancement.py#L12)
+[Show source in molecular_enhancement.py:12](https://github.com/uncscode/particula/blob/main/particula/util/molecular_enhancement.py#L12)
 
 Returns the molecular enhancement.
 

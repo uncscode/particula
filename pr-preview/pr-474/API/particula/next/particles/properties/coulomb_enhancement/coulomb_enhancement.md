@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Coulomb Enhancement
 
-> Auto-generated documentation for [particula.next.particles.properties.coulomb_enhancement](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/coulomb_enhancement.py) module.
+> Auto-generated documentation for [particula.next.particles.properties.coulomb_enhancement](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/coulomb_enhancement.py) module.
 
 ## continuum
 
-[Show source in coulomb_enhancement.py:89](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/coulomb_enhancement.py#L89)
+[Show source in coulomb_enhancement.py:89](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/coulomb_enhancement.py#L89)
 
 Calculates the Coulombic enhancement continuum limit. For all particle-
 particle interactions.
@@ -39,7 +39,7 @@ def continuum(
 
 ## kinetic
 
-[Show source in coulomb_enhancement.py:61](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/coulomb_enhancement.py#L61)
+[Show source in coulomb_enhancement.py:61](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/coulomb_enhancement.py#L61)
 
 Calculates the Coulombic enhancement kinetic limit. For all particle-
 particle interactions.
@@ -72,7 +72,7 @@ def kinetic(
 
 ## ratio
 
-[Show source in coulomb_enhancement.py:22](https://github.com/Gorkowski/particula/blob/main/particula/next/particles/properties/coulomb_enhancement.py#L22)
+[Show source in coulomb_enhancement.py:22](https://github.com/uncscode/particula/blob/main/particula/next/particles/properties/coulomb_enhancement.py#L22)
 
 Calculates the Coulomb potential ratio, phi_E. For all particle-
 particle interactions.

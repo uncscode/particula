@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Activity](./index.md#activity) / Phase Separation
 
-> Auto-generated documentation for [particula.activity.phase_separation](https://github.com/Gorkowski/particula/blob/main/particula/activity/phase_separation.py) module.
+> Auto-generated documentation for [particula.activity.phase_separation](https://github.com/uncscode/particula/blob/main/particula/activity/phase_separation.py) module.
 
 ## find_phase_sep_index
 
-[Show source in phase_separation.py:55](https://github.com/Gorkowski/particula/blob/main/particula/activity/phase_separation.py#L55)
+[Show source in phase_separation.py:55](https://github.com/uncscode/particula/blob/main/particula/activity/phase_separation.py#L55)
 
 This function finds phase separation using activity>1 and
 inflections in the activity curve data.
@@ -37,7 +37,7 @@ def find_phase_sep_index(activity_data: ArrayLike) -> dict: ...
 
 ## find_phase_separation
 
-[Show source in phase_separation.py:137](https://github.com/Gorkowski/particula/blob/main/particula/activity/phase_separation.py#L137)
+[Show source in phase_separation.py:137](https://github.com/uncscode/particula/blob/main/particula/activity/phase_separation.py#L137)
 
 This function checks for phase separation in each activity curve.
 
@@ -76,7 +76,7 @@ def find_phase_separation(
 
 ## organic_water_single_phase
 
-[Show source in phase_separation.py:23](https://github.com/Gorkowski/particula/blob/main/particula/activity/phase_separation.py#L23)
+[Show source in phase_separation.py:23](https://github.com/uncscode/particula/blob/main/particula/activity/phase_separation.py#L23)
 
 Convert the given molar mass ratio (MW water / MW organic) to a
 and oxygen2carbon value were above is a single phase with water and below
@@ -110,7 +110,7 @@ def organic_water_single_phase(
 
 ## q_alpha
 
-[Show source in phase_separation.py:233](https://github.com/Gorkowski/particula/blob/main/particula/activity/phase_separation.py#L233)
+[Show source in phase_separation.py:233](https://github.com/uncscode/particula/blob/main/particula/activity/phase_separation.py#L233)
 
 This function calculates the q_alpha value using a squeezed logistic
     function.

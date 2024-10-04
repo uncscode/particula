@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Lagrangian](./index.md#lagrangian) / Integration
 
-> Auto-generated documentation for [particula.lagrangian.integration](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/integration.py) module.
+> Auto-generated documentation for [particula.lagrangian.integration](https://github.com/uncscode/particula/blob/main/particula/lagrangian/integration.py) module.
 
 ## leapfrog
 
-[Show source in integration.py:7](https://github.com/Gorkowski/particula/blob/main/particula/lagrangian/integration.py#L7)
+[Show source in integration.py:7](https://github.com/uncscode/particula/blob/main/particula/lagrangian/integration.py#L7)
 
 Perform a single step of leapfrog integration on the position and velocity
 of a particle.

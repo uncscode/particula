@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Gas](../index.md#gas) / [Properties](./index.md#properties) / Thermal Conductivity
 
-> Auto-generated documentation for [particula.next.gas.properties.thermal_conductivity](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/thermal_conductivity.py) module.
+> Auto-generated documentation for [particula.next.gas.properties.thermal_conductivity](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/thermal_conductivity.py) module.
 
 ## get_thermal_conductivity
 
-[Show source in thermal_conductivity.py:11](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/thermal_conductivity.py#L11)
+[Show source in thermal_conductivity.py:11](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/thermal_conductivity.py#L11)
 
 Calculate the thermal conductivity of air as a function of temperature.
 Based on a simplified linear relation from atmospheric science literature.

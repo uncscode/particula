@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Slip Correction
 
-> Auto-generated documentation for [particula.util.slip_correction](https://github.com/Gorkowski/particula/blob/main/particula/util/slip_correction.py) module.
+> Auto-generated documentation for [particula.util.slip_correction](https://github.com/uncscode/particula/blob/main/particula/util/slip_correction.py) module.
 
 ## scf
 
-[Show source in slip_correction.py:9](https://github.com/Gorkowski/particula/blob/main/particula/util/slip_correction.py#L9)
+[Show source in slip_correction.py:9](https://github.com/uncscode/particula/blob/main/particula/util/slip_correction.py#L9)
 
 Returns particle's Cunningham slip correction factor.
 

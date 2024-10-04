@@ -2,11 +2,11 @@
 
 [Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Next](../index.md#next) / [Gas](./index.md#gas) / Vapor Pressure Factories
 
-> Auto-generated documentation for [particula.next.gas.vapor_pressure_factories](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/vapor_pressure_factories.py) module.
+> Auto-generated documentation for [particula.next.gas.vapor_pressure_factories](https://github.com/uncscode/particula/blob/main/particula/next/gas/vapor_pressure_factories.py) module.
 
 ## VaporPressureFactory
 
-[Show source in vapor_pressure_factories.py:20](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/vapor_pressure_factories.py#L20)
+[Show source in vapor_pressure_factories.py:20](https://github.com/uncscode/particula/blob/main/particula/next/gas/vapor_pressure_factories.py#L20)
 
 Factory class to create vapor pressure strategy builders
 
@@ -76,7 +76,7 @@ class VaporPressureFactory(
 
 ### VaporPressureFactory().get_builders
 
-[Show source in vapor_pressure_factories.py:68](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/vapor_pressure_factories.py#L68)
+[Show source in vapor_pressure_factories.py:68](https://github.com/uncscode/particula/blob/main/particula/next/gas/vapor_pressure_factories.py#L68)
 
 Returns the mapping of strategy types to builder instances.
 

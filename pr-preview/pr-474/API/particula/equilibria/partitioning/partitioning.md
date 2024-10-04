@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Equilibria](./index.md#equilibria) / Partitioning
 
-> Auto-generated documentation for [particula.equilibria.partitioning](https://github.com/Gorkowski/particula/blob/main/particula/equilibria/partitioning.py) module.
+> Auto-generated documentation for [particula.equilibria.partitioning](https://github.com/uncscode/particula/blob/main/particula/equilibria/partitioning.py) module.
 
 ## get_properties_for_liquid_vapor_partitioning
 
-[Show source in partitioning.py:212](https://github.com/Gorkowski/particula/blob/main/particula/equilibria/partitioning.py#L212)
+[Show source in partitioning.py:212](https://github.com/uncscode/particula/blob/main/particula/equilibria/partitioning.py#L212)
 
 Get properties for liquid-vapor partitioning.
 
@@ -22,7 +22,7 @@ def get_properties_for_liquid_vapor_partitioning(
 
 ## liquid_vapor_obj_function
 
-[Show source in partitioning.py:9](https://github.com/Gorkowski/particula/blob/main/particula/equilibria/partitioning.py#L9)
+[Show source in partitioning.py:9](https://github.com/uncscode/particula/blob/main/particula/equilibria/partitioning.py#L9)
 
 Objective function for liquid-vapor partitioning.
 
@@ -45,7 +45,7 @@ def liquid_vapor_obj_function(
 
 ## liquid_vapor_partitioning
 
-[Show source in partitioning.py:158](https://github.com/Gorkowski/particula/blob/main/particula/equilibria/partitioning.py#L158)
+[Show source in partitioning.py:158](https://github.com/uncscode/particula/blob/main/particula/equilibria/partitioning.py#L158)
 
 Thermodynamic equilibrium between liquid and vapor phase.
 with activity coefficients,

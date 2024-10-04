@@ -2,11 +2,11 @@
 
 [Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Knudsen Number
 
-> Auto-generated documentation for [particula.util.knudsen_number](https://github.com/Gorkowski/particula/blob/main/particula/util/knudsen_number.py) module.
+> Auto-generated documentation for [particula.util.knudsen_number](https://github.com/uncscode/particula/blob/main/particula/util/knudsen_number.py) module.
 
 ## knu
 
-[Show source in knudsen_number.py:18](https://github.com/Gorkowski/particula/blob/main/particula/util/knudsen_number.py#L18)
+[Show source in knudsen_number.py:18](https://github.com/uncscode/particula/blob/main/particula/util/knudsen_number.py#L18)
 
 Returns particle's Knudsen number.
 

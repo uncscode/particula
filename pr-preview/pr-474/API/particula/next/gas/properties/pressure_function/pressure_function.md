@@ -2,11 +2,11 @@
 
 [Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Next](../../index.md#next) / [Gas](../index.md#gas) / [Properties](./index.md#properties) / Pressure Function
 
-> Auto-generated documentation for [particula.next.gas.properties.pressure_function](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/pressure_function.py) module.
+> Auto-generated documentation for [particula.next.gas.properties.pressure_function](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/pressure_function.py) module.
 
 ## calculate_partial_pressure
 
-[Show source in pressure_function.py:10](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/pressure_function.py#L10)
+[Show source in pressure_function.py:10](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/pressure_function.py#L10)
 
 Calculate the partial pressure of a gas from its concentration, molar mass,
 and temperature.
@@ -35,7 +35,7 @@ def calculate_partial_pressure(
 
 ## calculate_saturation_ratio
 
-[Show source in pressure_function.py:31](https://github.com/Gorkowski/particula/blob/main/particula/next/gas/properties/pressure_function.py#L31)
+[Show source in pressure_function.py:31](https://github.com/uncscode/particula/blob/main/particula/next/gas/properties/pressure_function.py#L31)
 
 Calculate the saturation ratio of the gas at a given pressure and
 temperature.
