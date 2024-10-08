@@ -1,9 +1,9 @@
 [project]
 name = "particula"
 description = "a simple, fast, and powerful particle simulator"
-readme = "README.md"
+readme = "readme.md"
 requires-python = ">=3.9"
-license = {file = "LICENSE"}
+license = {file = "license"}
 authors = [
     {name = "aktwo", email="aktwo@users.noreply.github.com"},
     {name = "Gorkowski", email="Gorkowski@users.noreply.github.com"},
