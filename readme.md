@@ -11,4 +11,4 @@ If your Python environment is already set up, you can install [`Particula` via p
 
 ``` bash
 pip install particula
-``
+```
