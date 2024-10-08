@@ -1,7 +1,7 @@
 [project]
 name = "particula"
 description = "a simple, fast, and powerful particle simulator"
-readme = "readme"
+readme = "readme.md"
 requires-python = ">=3.9"
 license = {file = "license"}
 authors = [
