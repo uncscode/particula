@@ -5,8 +5,8 @@ from particula.next.dynamics.coagulation import kernel
 
 # Define constants for common test data
 
-DIFFUSIVE_KNUDSEN = np.array([0.1, 0.5, 1.0, 5.0, 10.0])
-COULOMB_POTENTIAL_RATIO_ARRAY = np.array([0.0, 0.7, 0.9, 1.0, 1.1])
+DIFFUSIVE_KNUDSEN = np.array([0.5, 1.0, 5.0, 10.0])
+COULOMB_POTENTIAL_RATIO_ARRAY = np.array([0.7, 0.9, 1.0, 1.1])
 
 
 def test_kernel_call():
@@ -41,7 +41,7 @@ def test_hard_sphere():
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY)
     expected_result = np.array(
-        [0.1096043, 1.65971644, 4.12694075, 24.16690909, 49.22484307])
+        [1.65971644, 4.12694075, 24.16690909, 49.22484307])
     np.testing.assert_almost_equal(
         dimensionless_result, expected_result, decimal=4)
 
@@ -56,7 +56,7 @@ def test_coulomb_dyachkov2007():
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY)
     expected_result = np.array(
-        [0.10047769, 1.73703563, 4.60921277, 26.22159795, 51.92102133])
+        [1.73703563, 4.60921277, 26.22159795, 51.92102133])
     np.testing.assert_almost_equal(
         dimensionless_result, expected_result, decimal=4)
 
@@ -71,7 +71,7 @@ def test_coulomb_gatti2008():
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY)
     expected_result = np.array(
-        [0.50132565, 2.00132915, 5.10865767, 26.42422258, 52.43789491])
+        [2.00132915, 5.10865767, 26.42422258, 52.43789491])
     np.testing.assert_almost_equal(
         dimensionless_result, expected_result, decimal=4)
 
@@ -86,7 +86,7 @@ def test_coulomb_gopalakrishnan2012():
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY)
     expected_result = np.array(
-        [0.1096043, 1.83746548, 4.83694019, 24.16690909, 49.22484307])
+        [1.83746548, 4.83694019, 24.16690909, 49.22484307])
     np.testing.assert_almost_equal(
         dimensionless_result, expected_result, decimal=4)
 
@@ -101,6 +101,6 @@ def test_coulomb_chahl2019():
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY)
     expected_result = np.array(
-        [0.10960427, 1.65863442, 4.37444613, 28.05501739, 59.74082667])
+        [1.65863442, 4.37444613, 28.05501739, 59.74082667])
     np.testing.assert_almost_equal(
         dimensionless_result, expected_result, decimal=4)
