@@ -2,6 +2,9 @@
 
 Next is the next iteration of the particula simulation model. It is a complete rewrite of the model, with a focus on improving the modularity and extensibility of the model. The goal is to make it easier to add new features and to make the model more flexible and easier to use.
 
+## Particula-Beta
+
+For beta features, find them at the [Particula-Beta](https://uncscode.github.io/particula-beta/)
 
 ## Particle Resolved
 
