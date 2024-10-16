@@ -24,7 +24,7 @@ def water(temperature, critical_temperature=647.15):
 
     # Surface tension in mN/m
     sigma = (
-        241.322 * (tau.m**1.26) * (1 - 0.0589 * (tau.m**0.5) - 0.56917 * tau.m)
+        241.322 * (tau**1.26) * (1 - 0.0589 * (tau**0.5) - 0.56917 * tau)
     )
 
     return sigma / 1000
