@@ -7,5 +7,3 @@ chamber.
 ## Notebooks
 
 - [Wall Loss Forward Simulation](Notebooks/Chamber_Forward_Simulation.ipynb)
-- [Chamber Data Observations](Notebooks/Chamber_Observations.ipynb)
-- [Chamber Rates Fit](Notebooks/Chamber_Rates_Fitting.ipynb)
