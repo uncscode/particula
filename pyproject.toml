@@ -22,9 +22,7 @@ keywords = [
 ]
 
 dependencies = [
-    "numpy", "scipy<1.14.0", "pint", "hypersolver==0.0.8", "pandas",
-    "netCDF4", "shapely", "PyMieScatt", "tqdm", "pytz",
-    "matplotlib", "torch", "scikit-learn"
+    "numpy", "scipy", "pint", "hypersolver==0.0.8",
 ]
 
 # This is set automatically by flit using `particula.__version__`
@@ -38,9 +36,10 @@ repository = "https://github.com/uncscode/particula"
 dev = [
     "pylint", "pytest", "autopep8", "jupyterlab",
     "typing", "build", "flake8", "jupyter-book", "ghp-import",
-    "matplotlib", "pandas", "netCDF4", "shapely", "PyMieScatt",
-    "tqdm", "pytz", "torch", "mkdocs-material", "handsdown",
-    "mkdocs-jupyter",
+    "mkdocs-material", "handsdown", "mkdocs-jupyter",
+]
+extra = [
+    "matplotlib", "pandas", "tqdm",
 ]
 
 [build-system]
