@@ -26,14 +26,12 @@
 
     [:octicons-arrow-right-24: Tutorial](Equilibria/index.md)
 
--   __[Light Scattering](Light_Scattering/index.md)__
+-   __[Nucleation](Nucleation/index.md)__
 
     ---
 
     How to simulate aerosol nucleation using a custom process. Showing how to add a custom process for a nucleation event.
 
     [:octicons-arrow-right-24: Tutorial](Nucleation/index.md)
-
--   __[Data Streams and Lakes](Data_Streams_and_Lakes/index.md) :material-progress-clock:__
 
 </div>

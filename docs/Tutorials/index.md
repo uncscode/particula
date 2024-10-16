@@ -34,12 +34,4 @@
 
     [:octicons-arrow-right-24: Tutorial](Particle_Phase/index.md)
 
--   __[Data Analysis](Data_Analysis/index.md) :material-progress-clock:__
-
-    ---
-
-    **in BETA** :material-progress-clock: Some preliminary tools available for [Data Analysis](Data_Analysis/index.md).
-
-    [:octicons-arrow-right-24: Tutorial](Data_Analysis/index.md)
-
 </div>
