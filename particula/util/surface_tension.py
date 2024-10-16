@@ -3,13 +3,6 @@
 # pylint: disable=too-many-positional-arguments, too-many-arguments
 
 import numpy as np
-from particula.util.input_handling import (
-    in_surface_tension,
-    in_temperature,
-    in_scalar,
-    in_volume,
-    in_radius,
-)
 
 
 def water(temperature, critical_temperature=647.15):
@@ -26,8 +19,6 @@ def water(temperature, critical_temperature=647.15):
     -------
     - sigma : float, Surface tension of water at the given temperature
     """
-    temperature = in_temperature(temperature)
-    critical_temperature = in_temperature(critical_temperature)
     # Dimensionless parameter from fitting equation
     tau = 1 - temperature / critical_temperature
 
@@ -36,7 +27,7 @@ def water(temperature, critical_temperature=647.15):
         241.322 * (tau.m**1.26) * (1 - 0.0589 * (tau.m**0.5) - 0.56917 * tau.m)
     )
 
-    return in_surface_tension(sigma / 1000)
+    return sigma / 1000
 
 
 def dry_mixing(volume_fractions, surface_tensions):
@@ -51,8 +42,6 @@ def dry_mixing(volume_fractions, surface_tensions):
     --------
     - sigma : array, surface tension of droplet
     """
-    volume_fractions = in_scalar(volume_fractions)
-    surface_tensions = in_surface_tension(surface_tensions)
     if np.sum(volume_fractions) != 1:
         volume_fractions = volume_fractions / np.sum(volume_fractions)
 
@@ -85,17 +74,11 @@ def wet_mixing(
     - EffSigma : array, effective surface tension of droplet
     """
 
-    volume_solute = in_volume(volume_solute)
-    volume_water = in_volume(volume_water)
-    wet_radius = in_radius(wet_radius)
-    surface_tension_solute = in_surface_tension(surface_tension_solute)
-    temperature = in_temperature(temperature)
-
     # Organic-film method
     if method == "film":
 
         # Characteristic monolayer thickness taken from AIOMFAC
-        mono = in_radius(0.3e-9)
+        mono = 0.3e-9
 
         # Volume of the monolayer
         film_volume = (
