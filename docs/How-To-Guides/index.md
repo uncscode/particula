@@ -14,7 +14,7 @@
 
     ---
 
-    How to simulate and analyze experiments for the loss of particles to the chamber walls.
+    How to simulate experiments for the loss of particles to the chamber walls.
 
     [:octicons-arrow-right-24: Tutorial](Chamber_Wall_Loss/index.md)
 

@@ -1,6 +1,6 @@
 """Import all the particle modules, so they can be accessed from
 
-'from particula.next import particles'
+'from particula import particles'
 """
 
 # pylint: disable=unused-import
