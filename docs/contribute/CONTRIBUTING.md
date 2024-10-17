@@ -85,15 +85,6 @@ Visual Studio Code is a free and open-source code editor for writing code and it
 
 Links: [https://code.visualstudio.com/](https://code.visualstudio.com/)
 
-## `.devcontainer`
-
-In the root of our repository, we have a `.devcontainer` folder that contains the environment variables required for development.
-This is a convenient way to set up the environment for development.
-It requires Docker to be installed and running.
-And the first time it runs it may take a few minutes to install the Docker image (a minimal operating system with Python 3.9).
-
-Links: [https://code.visualstudio.com/docs/remote/containers](https://code.visualstudio.com/docs/remote/containers)
-
 ## Python code style
 
 We follow the Google's Python style guide.
