@@ -4846,10 +4846,6 @@
       
         
       
-        
-      
-        
-      
     
     
       
@@ -4902,8 +4898,56 @@
   
   
   
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_4_2" id="__nav_5_4_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Notebooks
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            Notebooks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../Gas_Phase/AtmosphereTutorial/" class="md-nav__link">
+      <a href="../../Gas_Phase/Notebooks/AtmosphereTutorial/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4924,7 +4968,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Gas_Phase/Gas_Species/" class="md-nav__link">
+      <a href="../../Gas_Phase/Notebooks/Gas_Species/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4945,7 +4989,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Gas_Phase/Vapor_Pressure/" class="md-nav__link">
+      <a href="../../Gas_Phase/Notebooks/Vapor_Pressure/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4954,6 +4998,14 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -5928,19 +5980,15 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">particula.particles.representation_builders</span> <span class="kn">import</span> <span class="n">LimitedRadiusParticleBuilder</span>
-<span class="kn">from</span> <span class="nn">particula.gas.atmosphere_builder</span> <span class="kn">import</span> <span class="n">AtmosphereBuilder</span>
-<span class="kn">from</span> <span class="nn">particula.gas.vapor_pressure_factories</span> <span class="kn">import</span> <span class="n">VaporPressureFactory</span>
-<span class="kn">from</span> <span class="nn">particula.gas.species_builder</span> <span class="kn">import</span> <span class="n">GasSpeciesBuilder</span>
+<span class="kn">from</span> <span class="nn">particula.particles</span> <span class="kn">import</span> <span class="n">PresetParticleRadiusBuilder</span>
+<span class="kn">from</span> <span class="nn">particula.gas</span> <span class="kn">import</span> <span class="n">AtmosphereBuilder</span><span class="p">,</span> <span class="n">VaporPressureFactory</span><span class="p">,</span> <span class="n">GasSpeciesBuilder</span>
 <span class="kn">from</span> <span class="nn">particula.aerosol</span> <span class="kn">import</span> <span class="n">Aerosol</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
-from particula.particles.representation_builders import LimitedRadiusParticleBuilder
-from particula.gas.atmosphere_builder import AtmosphereBuilder
-from particula.gas.vapor_pressure_factories import VaporPressureFactory
-from particula.gas.species_builder import GasSpeciesBuilder
+from particula.particles import PresetParticleRadiusBuilder
+from particula.gas import AtmosphereBuilder, VaporPressureFactory, GasSpeciesBuilder
 from particula.aerosol import Aerosol</div>
 </div>
 </div>
@@ -6016,7 +6064,7 @@ from particula.aerosol import Aerosol</div>
 
 <span class="c1"># Glycerol particle distribution</span>
 <span class="n">lognormal_rep</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">LimitedRadiusParticleBuilder</span><span class="p">()</span>
+    <span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">]),</span> <span class="s2">"nm"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_geometric_standard_deviation</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">]))</span>
     <span class="o">.</span><span class="n">set_number_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e4</span><span class="p">]),</span> <span class="s2">"1/cm^3"</span><span class="p">)</span>
@@ -6062,7 +6110,7 @@ print(atmosphere)
 
 # Glycerol particle distribution
 lognormal_rep = (
-    LimitedRadiusParticleBuilder()
+    PresetParticleRadiusBuilder()
     .set_mode(np.array([100]), "nm")
     .set_geometric_standard_deviation(np.array([1.5]))
     .set_number_concentration(np.array([1e4]), "1/cm^3")
@@ -6121,11 +6169,11 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Glycerol']
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">aerosol</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="o">=</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="o">=</span><span class="n">lognormal_rep</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">aerosol</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">aerosol = Aerosol(atmosphere=atmosphere, particles=lognormal_rep)
 
-print(aerosol.atmosphere)</div>
+print(aerosol)</div>
 </div>
 </div>
 </div>
@@ -6138,6 +6186,12 @@ print(aerosol.atmosphere)</div>
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Glycerol']
+[0]: Particle Representation:
+	Strategy: RadiiBasedMovingBin
+	Activity: ActivityIdealMass
+	Surface: SurfaceStrategyVolume
+	Mass Concentration: 1.106e-07 [kg/m^3]
+	Number Concentration: 1.000e+10 [#/m^3]
 </pre>
 </div>
 </div>
