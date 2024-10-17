@@ -14,7 +14,7 @@
 
     ---
 
-    [Dynamics](Dynamics/index.md) is a collection of classes that processes for the `Aerosol` objects, to perform coagulation, condensation, and other processes.
+    [Dynamics](Dynamics/index.md) is a collection of classes that processes `Aerosol` objects, to perform coagulation, condensation, and other processes.
 
     [:octicons-arrow-right-24: Tutorial](Dynamics/index.md)
 
