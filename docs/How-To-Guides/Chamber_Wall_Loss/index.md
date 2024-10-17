@@ -1,8 +1,6 @@
-# Index: Chamber Wall Loss *BETA*
+# Index: Chamber Wall Loss
 
-In this example we'll go through the steps of combining the data analysis,
-and modeling capabilities of particula to analyze the wall loss in a
-chamber.
+In this example we'll go through the steps for simulation of wall loss in a chamber.
 
 ## Notebooks
 

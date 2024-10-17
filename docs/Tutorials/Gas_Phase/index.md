@@ -2,6 +2,6 @@
 
 ## Notebooks
 
-- [Vapor Pressure Tutorial](Vapor_Pressure.ipynb)
-- [Gas Species Tutorial](Gas_Species.ipynb)
-- [Atmosphere Tutorial](AtmosphereTutorial.ipynb)
+- [Vapor Pressure Tutorial](Notebooks/Vapor_Pressure.ipynb)
+- [Gas Species Tutorial](Notebooks/Gas_Species.ipynb)
+- [Atmosphere Tutorial](Notebooks/AtmosphereTutorial.ipynb)

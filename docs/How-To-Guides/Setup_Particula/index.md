@@ -49,7 +49,7 @@ Avoid conflicts with other development projects by creating an isolated Python e
 - Use the following Conda command to create an environment named `analysisV1` with Python 3.11:
 
 ```bash
-conda create --name analysisV1 python=3.11
+conda create --name analysisV1 python=3.12
 ```
 
 **Step 6: Activate the Environment**  
@@ -73,15 +73,8 @@ Now, install the `Particula` using pip in your activated environment, use one of
 pip install particula
 ```
 
-### or Install the main repository
+### or Install the main repository or any forked repository
 
 ```bash
 pip install git+https://github.com/uncscode/particula.git
 ```
-
-### or Install the *Gorkowski* fork
-
-```bash
-pip install git+https://github.com/Gorkowski/particula.git
-```
-

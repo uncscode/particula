@@ -2,6 +2,7 @@
 
 from typing import Optional
 from copy import deepcopy
+import logging
 import numpy as np
 from numpy.typing import NDArray
 
@@ -11,6 +12,8 @@ from particula.particles.surface_strategies import SurfaceStrategy
 from particula.particles.distribution_strategies import (
     DistributionStrategy,
 )
+
+logger = logging.getLogger("particula")
 
 
 # pylint: disable=too-many-instance-attributes
@@ -319,7 +322,8 @@ class ParticleRepresentation:
         """
         # if added_distribution is None, then it will be calculated
         if added_distribution is None:
-            print("None distribution")
+            message = "Added distribution is value None."
+            logger.warning(message)
             added_distribution = self.get_distribution()
         # self.concentration += added_concentration
         (self.distribution, self.concentration) = (

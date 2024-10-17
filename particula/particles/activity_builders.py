@@ -137,7 +137,8 @@ class ActivityKappaParameterBuilder(
         """Validate and return the KappaParameterActivity object.
 
         Returns:
-            KappaParameterActivity: The validated KappaParameterActivity object.
+            KappaParameterActivity: The validated KappaParameterActivity
+                object.
         """
         self.pre_build_check()
         return ActivityKappaParameter(
