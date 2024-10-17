@@ -9,6 +9,8 @@ on:
       - main
     paths:
       - 'docs/**'
+  merge_group:
+    branches: [ main ]
 
 jobs:
   blds:
