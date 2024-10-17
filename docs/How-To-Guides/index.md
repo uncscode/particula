@@ -30,7 +30,7 @@
 
     ---
 
-    How to simulate aerosol nucleation using a custom process. Showing how to add a custom process for a nucleation event.
+    How to simulate aerosol nucleation by adding particles during simulations. Showing how to add a nucleation event.
 
     [:octicons-arrow-right-24: Tutorial](Nucleation/index.md)
 

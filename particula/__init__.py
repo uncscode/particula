@@ -20,7 +20,7 @@ from particula.logger_setup import setup
 # u is the unit registry name.
 u = UnitRegistry(force_ndarray=True)
 
-__version__ = "0.0.20"
+__version__ = "0.0.21"
 
 # setup the logger
 logger = setup()
