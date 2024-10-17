@@ -6495,7 +6495,7 @@ The coagulation process is modeled using a discrete bin approach. We define the 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -6575,7 +6575,7 @@ from particula.dynamics import coagulation</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -6700,13 +6700,13 @@ print(aerosol)</div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -6726,8 +6726,8 @@ print(aerosol)</div>
 <span class="p">)</span>
 
 <span class="c1"># Set up time and sub-steps for the coagulation process</span>
-<span class="n">time_step</span> <span class="o">=</span> <span class="mi">100</span>
-<span class="n">sub_steps</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">time_step</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">sub_steps</span> <span class="o">=</span> <span class="mi">100</span>
 
 <span class="n">initial_radii</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
 <span class="n">concentration_initial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span>
@@ -6736,15 +6736,15 @@ print(aerosol)</div>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span>
 <span class="p">)</span>
-<span class="c1"># radii_after_step_1 = aerosol.particles[0].get_radius()</span>
-<span class="c1"># concentration_step_1 = np.copy(aerosol.particles[0].concentration)</span>
+<span class="n">radii_after_step_1</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
+<span class="n">concentration_step_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span>
 
-<span class="c1"># # Perform coagulation process for step 2</span>
-<span class="c1"># aerosol = coagulation_process.execute(</span>
-<span class="c1">#     aerosol, time_step=time_step, sub_steps=sub_steps</span>
-<span class="c1"># )</span>
-<span class="c1"># radii_after_step_2 = aerosol.particles[0].get_radius()</span>
-<span class="c1"># concentration_step_2 = np.copy(aerosol.particles[0].concentration)</span>
+<span class="c1"># Perform coagulation process for step 2</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+    <span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span>
+<span class="p">)</span>
+<span class="n">radii_after_step_2</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
+<span class="n">concentration_step_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Define the coagulation strategy and process
 coagulation_strategy = coagulation.DiscreteSimple()
@@ -6753,8 +6753,8 @@ coagulation_process = particle_process.Coagulation(
 )
 
 # Set up time and sub-steps for the coagulation process
-time_step = 100
-sub_steps = 10
+time_step = 1000
+sub_steps = 100
 
 initial_radii = aerosol.particles[0].get_radius()
 concentration_initial = np.copy(aerosol.particles[0].concentration)
@@ -6763,37 +6763,15 @@ concentration_initial = np.copy(aerosol.particles[0].concentration)
 aerosol = coagulation_process.execute(
     aerosol, time_step=time_step, sub_steps=sub_steps
 )
-# radii_after_step_1 = aerosol.particles[0].get_radius()
-# concentration_step_1 = np.copy(aerosol.particles[0].concentration)
+radii_after_step_1 = aerosol.particles[0].get_radius()
+concentration_step_1 = np.copy(aerosol.particles[0].concentration)
 
-# # Perform coagulation process for step 2
-# aerosol = coagulation_process.execute(
-#     aerosol, time_step=time_step, sub_steps=sub_steps
-# )
-# radii_after_step_2 = aerosol.particles[0].get_radius()
-# concentration_step_2 = np.copy(aerosol.particles[0].concentration)</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>None distribution
-None distribution
-None distribution
-None distribution
-None distribution
-None distribution
-None distribution
-None distribution
-None distribution
-None distribution
-</pre>
+# Perform coagulation process for step 2
+aerosol = coagulation_process.execute(
+    aerosol, time_step=time_step, sub_steps=sub_steps
+)
+radii_after_step_2 = aerosol.particles[0].get_radius()
+concentration_step_2 = np.copy(aerosol.particles[0].concentration)</div>
 </div>
 </div>
 </div>
@@ -6833,7 +6811,7 @@ None distribution
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">

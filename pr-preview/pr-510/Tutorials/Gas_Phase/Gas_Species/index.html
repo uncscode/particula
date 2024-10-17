@@ -6612,13 +6612,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -6637,7 +6637,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="c1"># Particula imports</span>
 <span class="kn">from</span> <span class="nn">particula.gas.vapor_pressure_factories</span> <span class="kn">import</span> <span class="n">VaporPressureFactory</span>
 <span class="kn">from</span> <span class="nn">particula.gas.species</span> <span class="kn">import</span> <span class="n">GasSpecies</span>
-<span class="kn">from</span> <span class="nn">particula.gas.species_builder</span> <span class="kn">import</span> <span class="n">GasSpeciesBuilder</span>
+<span class="kn">from</span> <span class="nn">particula.gas.species_builders</span> <span class="kn">import</span> <span class="n">GasSpeciesBuilder</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
@@ -6645,7 +6645,89 @@ import matplotlib.pyplot as plt
 # Particula imports
 from particula.gas.vapor_pressure_factories import VaporPressureFactory
 from particula.gas.species import GasSpecies
-from particula.gas.species_builder import GasSpeciesBuilder</div>
+from particula.gas.species_builders import GasSpeciesBuilder</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>
+<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-intense-fg ansi-bold">ImportError</span>                               Traceback (most recent call last)
+Cell <span class="ansi-green-intense-fg ansi-bold">In[2], line 7</span>
+<span class="ansi-green-fg">      5</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">gas</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">vapor_pressure_factories</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> VaporPressureFactory
+<span class="ansi-green-fg">      6</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">gas</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">species</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> GasSpecies
+<span class="ansi-green-intense-fg ansi-bold">----&gt; 7</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">gas</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">species_builders</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> GasSpeciesBuilder
+
+File <span class="ansi-green-intense-fg ansi-bold">C:\GitHub\particula\particula\gas\species_builders.py:14</span>
+<span class="ansi-green-fg">     10</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">numpy</span> <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> <span class="ansi-bold" style="color: rgb(0,0,255)">np</span>
+<span class="ansi-green-fg">     11</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">abc_builder</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
+<span class="ansi-green-fg">     12</span>     BuilderABC,
+<span class="ansi-green-fg">     13</span> )
+<span class="ansi-green-intense-fg ansi-bold">---&gt; 14</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">builder_mixin</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
+<span class="ansi-green-fg">     15</span>     BuilderMolarMassMixin,
+<span class="ansi-green-fg">     16</span>     BuilderConcentrationMixin,
+<span class="ansi-green-fg">     17</span> )
+<span class="ansi-green-fg">     18</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">gas</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">species</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> GasSpecies
+<span class="ansi-green-fg">     19</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">gas</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">vapor_pressure_strategies</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
+<span class="ansi-green-fg">     20</span>     VaporPressureStrategy,
+<span class="ansi-green-fg">     21</span>     ConstantVaporPressureStrategy,
+<span class="ansi-green-fg">     22</span> )
+
+File <span class="ansi-green-intense-fg ansi-bold">C:\GitHub\particula\particula\builder_mixin.py:12</span>
+<span class="ansi-green-fg">      9</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">numpy</span> <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> <span class="ansi-bold" style="color: rgb(0,0,255)">np</span>
+<span class="ansi-green-fg">     11</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">util</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">input_handling</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> convert_units  <span style="color: rgb(95,135,135)"># type: ignore</span>
+<span class="ansi-green-intense-fg ansi-bold">---&gt; 12</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">particles</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">surface_strategies</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> SurfaceStrategy
+<span class="ansi-green-fg">     13</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">particles</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">activity_strategies</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> ActivityStrategy
+<span class="ansi-green-fg">     14</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">particles</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">distribution_strategies</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
+<span class="ansi-green-fg">     15</span>     DistributionStrategy,
+<span class="ansi-green-fg">     16</span> )
+
+File <span class="ansi-green-intense-fg ansi-bold">C:\GitHub\particula\particula\particles\__init__.py:30</span>
+<span class="ansi-green-fg">     22</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">particles</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">distribution_factories</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
+<span class="ansi-green-fg">     23</span>     DistributionFactory,
+<span class="ansi-green-fg">     24</span> )
+<span class="ansi-green-fg">     25</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">particles</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">activity_strategies</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
+<span class="ansi-green-fg">     26</span>     ActivityIdealMass,
+<span class="ansi-green-fg">     27</span>     ActivityIdealMolar,
+<span class="ansi-green-fg">     28</span>     ActivityKappaParameter,
+<span class="ansi-green-fg">     29</span> )
+<span class="ansi-green-intense-fg ansi-bold">---&gt; 30</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">particles</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">activity_builders</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
+<span class="ansi-green-fg">     31</span>     ActivityIdealMassBuilder,
+<span class="ansi-green-fg">     32</span>     ActivityIdealMolarBuilder,
+<span class="ansi-green-fg">     33</span>     ActivityKappaParameterBuilder,
+<span class="ansi-green-fg">     34</span> )
+<span class="ansi-green-fg">     35</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">particles</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">activity_factories</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
+<span class="ansi-green-fg">     36</span>     ActivityFactory,
+<span class="ansi-green-fg">     37</span> )
+<span class="ansi-green-fg">     38</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">particles</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">representation</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
+<span class="ansi-green-fg">     39</span>     ParticleRepresentation,
+<span class="ansi-green-fg">     40</span> )
+
+File <span class="ansi-green-intense-fg ansi-bold">C:\GitHub\particula\particula\particles\activity_builders.py:13</span>
+<span class="ansi-green-fg">      9</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">numpy</span> <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> <span class="ansi-bold" style="color: rgb(0,0,255)">np</span>
+<span class="ansi-green-fg">     10</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">abc_builder</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
+<span class="ansi-green-fg">     11</span>     BuilderABC,
+<span class="ansi-green-fg">     12</span> )
+<span class="ansi-green-intense-fg ansi-bold">---&gt; 13</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">builder_mixin</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
+<span class="ansi-green-fg">     14</span>     BuilderMolarMassMixin,
+<span class="ansi-green-fg">     15</span>     BuilderDensityMixin,
+<span class="ansi-green-fg">     16</span> )
+<span class="ansi-green-fg">     17</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">particula</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">particles</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">activity_strategies</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
+<span class="ansi-green-fg">     18</span>     ActivityIdealMass,
+<span class="ansi-green-fg">     19</span>     ActivityIdealMolar,
+<span class="ansi-green-fg">     20</span>     ActivityKappaParameter,
+<span class="ansi-green-fg">     21</span>     ActivityStrategy,
+<span class="ansi-green-fg">     22</span> )
+<span class="ansi-green-fg">     24</span> logger <span style="color: rgb(98,98,98)">=</span> logging<span style="color: rgb(98,98,98)">.</span>getLogger(<span style="color: rgb(175,0,0)">"</span><span style="color: rgb(175,0,0)">particula</span><span style="color: rgb(175,0,0)">"</span>)
+
+<span class="ansi-red-intense-fg ansi-bold">ImportError</span>: cannot import name 'BuilderMolarMassMixin' from partially initialized module 'particula.builder_mixin' (most likely due to a circular import) (C:\GitHub\particula\particula\builder_mixin.py)</pre>
 </div>
 </div>
 </div>
