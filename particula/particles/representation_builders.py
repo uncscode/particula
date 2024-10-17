@@ -21,9 +21,6 @@ from particula.abc_builder import (
     BuilderABC,
 )
 from particula.builder_mixin import (
-    # BuilderDistributionStrategyMixin,
-    # BuilderSurfaceStrategyMixin,
-    # BuilderActivityStrategyMixin,
     BuilderRadiusMixin,
     BuilderConcentrationMixin,
     BuilderMassMixin,
@@ -110,6 +107,7 @@ class BuilderDistributionStrategyMixin:
             )
         self.distribution_strategy = distribution_strategy
         return self
+
 
 class BuilderActivityStrategyMixin:
     """Mixin class for Builder classes to set activity_strategy.
