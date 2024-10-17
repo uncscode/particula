@@ -9,11 +9,11 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.util.input_handling import convert_units  # type: ignore
-from particula.particles.surface_strategies import SurfaceStrategy
-from particula.particles.activity_strategies import ActivityStrategy
-from particula.particles.distribution_strategies import (
-    DistributionStrategy,
-)
+# from particula.particles.surface_strategies import SurfaceStrategy
+# from particula.particles.activity_strategies import ActivityStrategy
+# from particula.particles.distribution_strategies import (
+#     DistributionStrategy,
+# )
 
 logger = logging.getLogger("particula")
 
@@ -344,87 +344,87 @@ class BuilderPressureMixin:
         return self
 
 
-class BuilderSurfaceStrategyMixin:
-    """Mixin class for Builder classes to set surface_strategy.
+# class BuilderSurfaceStrategyMixin:
+#     """Mixin class for Builder classes to set surface_strategy.
 
-    Methods:
-        set_surface_strategy: Set the surface_strategy attribute.
-    """
+#     Methods:
+#         set_surface_strategy: Set the surface_strategy attribute.
+#     """
 
-    def __init__(self):
-        self.surface_strategy = None
+#     def __init__(self):
+#         self.surface_strategy = None
 
-    def set_surface_strategy(
-        self,
-        surface_strategy: SurfaceStrategy,
-        surface_strategy_units: Optional[str] = None,
-    ):
-        """Set the surface strategy of the particle.
+#     def set_surface_strategy(
+#         self,
+#         surface_strategy: SurfaceStrategy,
+#         surface_strategy_units: Optional[str] = None,
+#     ):
+#         """Set the surface strategy of the particle.
 
-        Args:
-            surface_strategy: Surface strategy of the particle.
-            surface_strategy_units: Not used. (for interface consistency)
-        """
-        if surface_strategy_units is not None:
-            logger.warning("Ignoring units for surface strategy parameter.")
-        self.surface_strategy = surface_strategy
-        return self
-
-
-class BuilderActivityStrategyMixin:
-    """Mixin class for Builder classes to set activity_strategy.
-
-    Methods:
-        set_activity_strategy: Set the activity_strategy attribute.
-    """
-
-    def __init__(self):
-        self.activity_strategy = None
-
-    def set_activity_strategy(
-        self,
-        activity_strategy: ActivityStrategy,
-        activity_strategy_units: Optional[str] = None,
-    ):
-        """Set the activity strategy of the particle.
-
-        Args:
-            activity_strategy: Activity strategy of the particle.
-            activity_strategy_units: Not used. (for interface consistency)
-        """
-        if activity_strategy_units is not None:
-            logger.warning("Ignoring units for activity strategy parameter.")
-        self.activity_strategy = activity_strategy
-        return self
+#         Args:
+#             surface_strategy: Surface strategy of the particle.
+#             surface_strategy_units: Not used. (for interface consistency)
+#         """
+#         if surface_strategy_units is not None:
+#             logger.warning("Ignoring units for surface strategy parameter.")
+#         self.surface_strategy = surface_strategy
+#         return self
 
 
-class BuilderDistributionStrategyMixin:
-    """Mixin class for Builder classes to set distribution_strategy.
+# class BuilderActivityStrategyMixin:
+#     """Mixin class for Builder classes to set activity_strategy.
 
-    Methods:
-        set_distribution_strategy: Set the distribution_strategy attribute.
-    """
+#     Methods:
+#         set_activity_strategy: Set the activity_strategy attribute.
+#     """
 
-    def __init__(self):
-        self.distribution_strategy = None
+#     def __init__(self):
+#         self.activity_strategy = None
 
-    def set_distribution_strategy(
-        self,
-        distribution_strategy: DistributionStrategy,
-        distribution_strategy_units: Optional[str] = None,
-    ):
-        """Set the distribution strategy of the particle.
+#     def set_activity_strategy(
+#         self,
+#         activity_strategy: ActivityStrategy,
+#         activity_strategy_units: Optional[str] = None,
+#     ):
+#         """Set the activity strategy of the particle.
 
-        Args:
-            distribution_strategy: Distribution strategy of the particle.
-            distribution_strategy_units: Not used. (for interface consistency)
-        """
-        if distribution_strategy_units is not None:
-            logger.warning(
-                "Ignoring units for distribution strategy parameter."
-            )
-        self.distribution_strategy = distribution_strategy
-        return self
+#         Args:
+#             activity_strategy: Activity strategy of the particle.
+#             activity_strategy_units: Not used. (for interface consistency)
+#         """
+#         if activity_strategy_units is not None:
+#             logger.warning("Ignoring units for activity strategy parameter.")
+#         self.activity_strategy = activity_strategy
+#         return self
+
+
+# class BuilderDistributionStrategyMixin:
+#     """Mixin class for Builder classes to set distribution_strategy.
+
+#     Methods:
+#         set_distribution_strategy: Set the distribution_strategy attribute.
+#     """
+
+#     def __init__(self):
+#         self.distribution_strategy = None
+
+#     def set_distribution_strategy(
+#         self,
+#         distribution_strategy: DistributionStrategy,
+#         distribution_strategy_units: Optional[str] = None,
+#     ):
+#         """Set the distribution strategy of the particle.
+
+#         Args:
+#             distribution_strategy: Distribution strategy of the particle.
+#             distribution_strategy_units: Not used. (for interface consistency)
+#         """
+#         if distribution_strategy_units is not None:
+#             logger.warning(
+#                 "Ignoring units for distribution strategy parameter."
+#             )
+#         self.distribution_strategy = distribution_strategy
+#         return self
 
 
 class BuilderLognormalMixin:
