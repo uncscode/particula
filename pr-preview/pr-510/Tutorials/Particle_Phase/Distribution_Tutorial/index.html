@@ -6581,16 +6581,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">particula.particles.distribution_strategies</span> <span class="kn">import</span> <span class="n">MassBasedMovingBin</span>
-<span class="kn">from</span> <span class="nn">particula.particles.distribution_builders</span> <span class="kn">import</span> <span class="n">RadiiBasedMovingBinBuilder</span>
-<span class="kn">from</span> <span class="nn">particula.particles.distribution_factories</span> <span class="kn">import</span> <span class="n">DistributionFactory</span>
+<span class="kn">from</span> <span class="nn">particula.particles</span> <span class="kn">import</span> <span class="n">MassBasedMovingBin</span><span class="p">,</span> <span class="n">RadiiBasedMovingBinBuilder</span><span class="p">,</span> <span class="n">DistributionFactory</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
-from particula.particles.distribution_strategies import MassBasedMovingBin
-from particula.particles.distribution_builders import RadiiBasedMovingBinBuilder
-from particula.particles.distribution_factories import DistributionFactory</div>
+from particula.particles import MassBasedMovingBin, RadiiBasedMovingBinBuilder, DistributionFactory</div>
 </div>
 </div>
 </div>
