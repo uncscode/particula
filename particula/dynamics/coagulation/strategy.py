@@ -667,7 +667,6 @@ class ParticleResolved(CoagulationStrategy):
         num = np.ceil(
             self.kernel_bins_per_decade * np.log10(max_radius / min_radius),
         )
-        # print(num)
         return np.logspace(
             np.log10(min_radius),
             np.log10(max_radius),
