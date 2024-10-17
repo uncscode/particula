@@ -53,6 +53,7 @@ from particula.particles.properties.lognormal_size_distribution import (
 logger = logging.getLogger("particula")
 
 
+# pylint: disable=too-few-public-methods
 class BuilderSurfaceStrategyMixin:
     """Mixin class for Builder classes to set surface_strategy.
 
@@ -80,6 +81,7 @@ class BuilderSurfaceStrategyMixin:
         return self
 
 
+# pylint: disable=too-few-public-methods
 class BuilderDistributionStrategyMixin:
     """Mixin class for Builder classes to set distribution_strategy.
 
@@ -109,6 +111,7 @@ class BuilderDistributionStrategyMixin:
         return self
 
 
+# pylint: disable=too-few-public-methods
 class BuilderActivityStrategyMixin:
     """Mixin class for Builder classes to set activity_strategy.
 
