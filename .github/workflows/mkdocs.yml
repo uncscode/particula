@@ -46,7 +46,7 @@ jobs:
             folder: site  # Assuming mkdocs build output is the default 'site' directory
 
         - name: Preview Documentation (on PR)
-          if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+          if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
           uses: rossjrw/pr-preview-action@v1
           with:
             source-dir: site  # Assuming mkdocs build output is the default 'site' directory
