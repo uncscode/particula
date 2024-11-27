@@ -18,7 +18,9 @@ def test_mulholland_1988():
     assert mulholland_1988(1.5) == 1.5
     assert mulholland_1988(0.0) == 0.0
     assert mulholland_1988(-1.5) == -1.5
-    test_array = np.array([1.5, 0.0, -1.5])
+    assert np.isnan(mulholland_1988(np.nan))
+    assert np.isinf(mulholland_1988(np.inf))
+    test_array = np.array([[1.5, 0.0], [-1.5, 2.0]])
     np.testing.assert_array_equal(mulholland_1988(test_array), test_array)
 
 
