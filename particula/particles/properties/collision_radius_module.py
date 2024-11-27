@@ -12,6 +12,28 @@ import numpy as np
 from numpy.typing import NDArray
 
 
+def _polynomial_calculation(
+    coefficients: Tuple,
+    terms: list[Union[NDArray[np.float64], float]],
+) -> Union[NDArray[np.float64], float]:
+    """Polynomial calculation for the collision radius.
+
+    Args:
+        coefficients: Coefficients for the polynomial model.
+        terms: Terms for the polynomial model.
+
+    Returns:
+        (float or NDArray[float]): Collision radius of the particle [m].
+
+    Examples:
+        ``` py title="Example"
+        _polynomial_model((1, 2, 3), [1, 2, 3])
+        # 1 + 2 * 2 + 3 * 3
+        ```
+    """
+    return np.sum(np.array(coefficients) * np.array(terms))
+
+
 def mulholland_1988(
     radius_gyration: Union[NDArray[np.float64], float]
 ) -> Union[NDArray[np.float64], float]:
@@ -165,11 +187,14 @@ def qian_2022_rg(
         # 1.5036
         ```
     """
-    return (
-        coefficient[0]
-        * (radius_gyration / radius_monomer)
-        + coefficient[1]
-    ) * radius_monomer
+    # return (
+    #     coefficient[0]
+    #     * (radius_gyration / radius_monomer)
+    #     + coefficient[1]
+    # ) * radius_monomer
+    return _polynomial_calculation(
+        coefficient, [radius_gyration / radius_monomer, 1]
+        ) * radius_monomer
 
 
 def qian_2022_rg_df(
