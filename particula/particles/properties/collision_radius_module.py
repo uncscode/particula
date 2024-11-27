@@ -127,6 +127,8 @@ def thajudeen_2012(
     """
     alpha1 = 0.253 * fractal_dimension**2 - 1.209 * fractal_dimension + 1.433
     alpha2 = -0.218 * fractal_dimension**2 + 0.964 * fractal_dimension - 0.180
+    if number_of_particles <= 0:
+        raise ValueError("number_of_particles must be positive")
     phi = 1 / (alpha1 * np.log(number_of_particles) + alpha2)
     radius_s_i = phi * radius_gyration
     radius_s_ii = (
