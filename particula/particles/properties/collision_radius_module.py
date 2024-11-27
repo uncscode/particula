@@ -248,7 +248,7 @@ def qian_2022_rg_df_k0(
     ) * radius_monomer
 
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-arguments, too-many-positional-arguments
 def qian_2022_rg_df_k0_a13(
     fractal_dimension: float,
     fractal_prefactor: float,
