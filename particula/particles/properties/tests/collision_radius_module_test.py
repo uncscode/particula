@@ -1,6 +1,5 @@
 """Test for collision_radius_module.py module."""
 
-import pytest
 import numpy as np
 from particula.particles.properties.collision_radius_module import (
     mulholland_1988,
