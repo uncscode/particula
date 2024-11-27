@@ -60,7 +60,7 @@ def rogak_flagan_1992(
     Examples:
         ``` py title="Example"
         rogak_flagan_1992(1.5, 2.5)
-        # 1.8027756377319946
+        # 1.83711
         ```
     """
     return np.sqrt((fractal_dimension + 2) / 3) * radius_gyration
@@ -90,7 +90,7 @@ def zurita_gotor_2002(
     Examples:
         ``` py title="Example"
         zurita_gotor_2002(1.5, 1.2)
-        # 1.568850650368
+        # 1.577
         ```
     """
     return 1.037 * (fractal_prefactor**0.077) * radius_gyration
@@ -122,7 +122,7 @@ def thajudeen_2012(
     Examples:
         ``` py title="Example"
         thajudeen_2012(2.5, 100, 1.5, 0.1)
-        # 0.075
+        # 2.034
         ```
     """
     alpha1 = 0.253 * fractal_dimension**2 - 1.209 * fractal_dimension + 1.433
@@ -160,7 +160,7 @@ def qian_2022_rg(
     Examples:
         ``` py title="Example"
         qian_2022_rg(1.5, 0.1)
-        # 0.583
+        # 1.5036
         ```
     """
     return (
@@ -196,7 +196,7 @@ def qian_2022_rg_df(
     Examples:
         ``` py title="Example"
         qian_2022_rg_df(2.5, 1.5, 0.1)
-        # 0.583
+        # 1.661
         ```
     """
     return (
@@ -235,7 +235,7 @@ def qian_2022_rg_df_k0(
     Examples:
         ``` py title="Example"
         qian_2022_rg_df_k0(2.5, 1.2, 1.5, 0.1)
-        # 0.583
+        # 1.832
         ```
     """
     return (
@@ -279,7 +279,7 @@ def qian_2022_rg_df_k0_a13(
     Examples:
         ``` py title="Example"
         qian_2022_rg_df_k0_a13(2.5, 1.2, 0.5, 1.5, 0.1)
-        # 0.583
+        # 1.823
         ```
     """
     return (

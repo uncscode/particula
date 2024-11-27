@@ -1,0 +1,84 @@
+"""Test for collision_radius_module.py module."""
+
+import pytest
+import numpy as np
+from particula.particles.properties.collision_radius_module import (
+    mulholland_1988,
+    rogak_flagan_1992,
+    zurita_gotor_2002,
+    thajudeen_2012,
+    qian_2022_rg,
+    qian_2022_rg_df,
+    qian_2022_rg_df_k0,
+    qian_2022_rg_df_k0_a13,
+)
+
+
+def test_mulholland_1988():
+    """Test the mulholland_1988 function."""
+    assert mulholland_1988(1.5) == 1.5
+
+
+def test_rogak_flagan_1992():
+    """Test the rogak_flagan_1992 function."""
+    result = rogak_flagan_1992(1.5, 2.5)
+    expected = np.sqrt((2.5 + 2) / 3) * 1.5
+    assert np.isclose(result, expected)
+
+
+def test_zurita_gotor_2002():
+    """Test the zurita_gotor_2002 function."""
+    result = zurita_gotor_2002(1.5, 1.2)
+    expected = 1.037 * (1.2**0.077) * 1.5
+    assert np.isclose(result, expected)
+
+
+def test_thajudeen_2012():
+    """Test the thajudeen_2012 function."""
+    result = thajudeen_2012(2.5, 100, 1.5, 0.1)
+    alpha1 = 0.253 * 2.5**2 - 1.209 * 2.5 + 1.433
+    alpha2 = -0.218 * 2.5**2 + 0.964 * 2.5 - 0.180
+    phi = 1 / (alpha1 * np.log(100) + alpha2)
+    radius_s_i = phi * 1.5
+    radius_s_ii = (0.1 * (1.203 - 0.4315 / 2.5) / 2) * (
+        4 * radius_s_i / 0.1
+    ) ** (0.8806 + 0.3497 / 2.5)
+    expected = radius_s_ii / 2
+    assert np.isclose(result, expected)
+
+
+def test_qian_2022_rg():
+    """Test the qian_2022_rg function."""
+    result = qian_2022_rg(1.5, 0.1)
+    expected = (0.973 * (1.5 / 0.1) + 0.441) * 0.1
+    assert np.isclose(result, expected)
+
+
+def test_qian_2022_rg_df():
+    """Test the qian_2022_rg_df function."""
+    result = qian_2022_rg_df(2.5, 1.5, 0.1)
+    expected = (0.882 * (2.5**0.223) * (1.5 / 0.1) + 0.387) * 0.1
+    assert np.isclose(result, expected)
+
+
+def test_qian_2022_rg_df_k0():
+    """Test the qian_2022_rg_df_k0 function."""
+    result = qian_2022_rg_df_k0(2.5, 1.2, 1.5, 0.1)
+    expected = (
+        0.777 * (2.5**0.479) * (1.2**0.000970) * (1.5 / 0.1)
+        + 0.267 * 1.2
+        + -0.0790
+    ) * 0.1
+    assert np.isclose(result, expected)
+
+
+def test_qian_2022_rg_df_k0_a13():
+    """Test the qian_2022_rg_df_k0_a13 function."""
+    result = qian_2022_rg_df_k0_a13(2.5, 1.2, 0.5, 1.5, 0.1)
+    expected = (
+        0.876 * (2.5**0.363) * (1.2**-0.105) * (1.5 / 0.1)
+        + 0.421 * 1.2
+        + -0.0360 * 0.5
+        + -0.227
+    ) * 0.1
+    assert np.isclose(result, expected)
