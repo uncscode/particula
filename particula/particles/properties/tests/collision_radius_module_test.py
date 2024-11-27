@@ -15,7 +15,6 @@ from particula.particles.properties.collision_radius_module import (
 
 def test_mulholland_1988():
     """Test the mulholland_1988 function."""
-    import numpy as np
     assert mulholland_1988(1.5) == 1.5
     assert mulholland_1988(0.0) == 0.0
     assert mulholland_1988(-1.5) == -1.5

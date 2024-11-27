@@ -7,31 +7,9 @@ the free molecular regime. Journal of Aerosol Science, 159.
 https://doi.org/10.1016/j.jaerosci.2021.10586
 """
 
-from typing import Union, Tuple
+from typing import Union
 import numpy as np
 from numpy.typing import NDArray
-
-
-def _polynomial_calculation(
-    coefficients: Tuple,
-    terms: list[Union[NDArray[np.float64], float]],
-) -> Union[NDArray[np.float64], float]:
-    """Polynomial calculation for the collision radius.
-
-    Args:
-        coefficients: Coefficients for the polynomial model.
-        terms: Terms for the polynomial model.
-
-    Returns:
-        (float or NDArray[float]): Collision radius of the particle [m].
-
-    Examples:
-        ``` py title="Example"
-        _polynomial_model((1, 2, 3), [1, 2, 3])
-        # 1 + 2 * 2 + 3 * 3
-        ```
-    """
-    return np.sum(np.array(coefficients) * np.array(terms))
 
 
 def mulholland_1988(
@@ -149,8 +127,6 @@ def thajudeen_2012(
     """
     alpha1 = 0.253 * fractal_dimension**2 - 1.209 * fractal_dimension + 1.433
     alpha2 = -0.218 * fractal_dimension**2 + 0.964 * fractal_dimension - 0.180
-    if number_of_particles <= 0:
-        raise ValueError("number_of_particles must be positive")
     phi = 1 / (alpha1 * np.log(number_of_particles) + alpha2)
     radius_s_i = phi * radius_gyration
     radius_s_ii = (
@@ -164,7 +140,6 @@ def thajudeen_2012(
 def qian_2022_rg(
     radius_gyration: Union[NDArray[np.float64], float],
     radius_monomer: float,
-    coefficient: Tuple = (0.973, 0.441),
 ) -> Union[NDArray[np.float64], float]:
     """Fitted model using radius of gyration.
 
@@ -187,21 +162,16 @@ def qian_2022_rg(
         # 1.5036
         ```
     """
-    # return (
-    #     coefficient[0]
-    #     * (radius_gyration / radius_monomer)
-    #     + coefficient[1]
-    # ) * radius_monomer
-    return _polynomial_calculation(
-        coefficient, [radius_gyration / radius_monomer, 1]
-        ) * radius_monomer
+    coefficient = (0.973, 0.441)
+    return (
+        coefficient[0] * (radius_gyration / radius_monomer) + coefficient[1]
+    ) * radius_monomer
 
 
 def qian_2022_rg_df(
     fractal_dimension: Union[NDArray[np.float64], float],
     radius_gyration: Union[NDArray[np.float64], float],
     radius_monomer: float,
-    coefficient: Tuple = (0.882, 0.223, 0.387),
 ) -> Union[NDArray[np.float64], float]:
     """New model Rc with Rg and Df parameters.
 
@@ -209,7 +179,6 @@ def qian_2022_rg_df(
         fractal_dimension: Fractal dimension of the particle [-].
         radius_gyration: Scaled radius of gyration [m].
         radius_monomer: Monomer radius [m].
-        coefficient: Coefficients for the model
 
     Returns:
         (float): Collision radius of the particle [m].
@@ -226,9 +195,10 @@ def qian_2022_rg_df(
         # 1.661
         ```
     """
+    coefficient = (0.882, 0.223, 0.387)
     return (
         coefficient[0]
-        * (fractal_dimension**coefficient[1])
+        * (fractal_dimension ** coefficient[1])
         * (radius_gyration / radius_monomer)
         + coefficient[2]
     ) * radius_monomer
@@ -239,7 +209,6 @@ def qian_2022_rg_df_k0(
     fractal_prefactor: float,
     radius_gyration: Union[NDArray[np.float64], float],
     radius_monomer: float,
-    coefficient: Tuple = (0.777, 0.479, 0.000970, 0.267, -0.0790),
 ) -> Union[NDArray[np.float64], float]:
     """New model Rc with Rg, Df, and k0 parameters.
 
@@ -248,7 +217,6 @@ def qian_2022_rg_df_k0(
         fractal_prefactor: Fractal prefactor of the particle [-].
         radius_gyration: radius of gyration [m].
         radius_monomer: monomer radius [m].
-        coefficient: Coefficients for the model
 
     Returns:
         (float): Collision radius of the particle [m].
@@ -265,24 +233,23 @@ def qian_2022_rg_df_k0(
         # 1.832
         ```
     """
+    coefficient = (0.777, 0.479, 0.000970, 0.267, -0.0790)
     return (
         coefficient[0]
-        * (fractal_dimension**coefficient[1])
-        * (fractal_prefactor**coefficient[2])
+        * (fractal_dimension ** coefficient[1])
+        * (fractal_prefactor ** coefficient[2])
         * (radius_gyration / radius_monomer)
         + coefficient[3] * fractal_prefactor
         + coefficient[4]
     ) * radius_monomer
 
 
-# pylint: disable=too-many-arguments, too-many-positional-arguments
 def qian_2022_rg_df_k0_a13(
     fractal_dimension: float,
     fractal_prefactor: float,
     shape_anisotropy: float,
     radius_gyration: Union[NDArray[np.float64], float],
     radius_monomer: float,
-    coefficient: Tuple = (0.876, 0.363, -0.105, 0.421, -0.0360, -0.227),
 ) -> Union[NDArray[np.float64], float]:
     """New model Rc with Rg, Df, k0, and A13 parameters.
 
@@ -292,7 +259,6 @@ def qian_2022_rg_df_k0_a13(
         shape_anisotropy: Parameter A13 for the model [-].
         radius_gyration: Radius of gyration [m].
         radius_monomer: Monomer radius [m].
-        coefficient: Coefficients for the model
 
     Returns:
         (float): Collision radius of the particle [m].
@@ -309,10 +275,11 @@ def qian_2022_rg_df_k0_a13(
         # 1.823
         ```
     """
+    coefficient = (0.876, 0.363, -0.105, 0.421, -0.0360, -0.227)
     return (
         coefficient[0]
-        * (fractal_dimension**coefficient[1])
-        * (fractal_prefactor**coefficient[2])
+        * (fractal_dimension ** coefficient[1])
+        * (fractal_prefactor ** coefficient[2])
         * (radius_gyration / radius_monomer)
         + coefficient[3] * fractal_prefactor
         + coefficient[4] * shape_anisotropy
