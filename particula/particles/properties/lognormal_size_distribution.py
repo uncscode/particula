@@ -110,6 +110,8 @@ def lognormal_pmf_distribution(
 
     # check total number of particles
     distribution_pmf_sum = np.sum(distribution_pmf)
+    if distribution_pmf_sum == 0:
+        raise ValueError("Sum of distribution PMF is zero, cannot divide by zero.")
     return distribution_pmf * (
         np.sum(number_of_particles)/distribution_pmf_sum)
 

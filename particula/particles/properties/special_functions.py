@@ -56,13 +56,15 @@ def debye_function(
         - https://mathworld.wolfram.com/DebyeFunctions.html
     """
     array = np.linspace(0, variable, integration_points)
+    exp_array = np.exp(array[1:])
+    exp_array[exp_array == np.inf] = np.finfo(np.float64).max
     if n == 1:
         integral = np.trapz(
-            array[1:] / (np.exp(array[1:]) - 1), array[1:], axis=0
+            array[1:] / (exp_array - 1), array[1:], axis=0
         )
         return integral / variable
 
     integral = np.trapz(
-        array[1:] ** n / (np.exp(array[1:]) - 1), array[1:], axis=0
+        array[1:] ** n / (exp_array - 1), array[1:], axis=0
     )
     return (n / variable**n) * integral
