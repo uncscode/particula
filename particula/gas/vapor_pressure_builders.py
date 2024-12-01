@@ -19,6 +19,27 @@ class AntoineBuilder(BuilderABC):
     coefficients 'a', 'b', and 'c' separately and then building the strategy
     object.
 
+    Example:
+        ``` py title="AntoineBuilder"
+        strategy = (
+            AntoineBuilder()
+            .set_a(8.07131)
+            .set_b(1730.63)
+            .set_c(233.426)
+            .build()
+        )
+        ```
+
+        ``` py title="AntoineBuilder with units"
+        strategy = (
+            AntoineBuilder()
+            .set_a(8.07131)
+            .set_b(1730.63, "K")
+            .set_c(233.426, "K")
+            .build()
+        )
+        ```
+
     References:
         - Equation: log10(P_mmHG) = a - b / (Temperature_K - c)
           (Reference: https://en.wikipedia.org/wiki/Antoine_equation)
@@ -71,6 +92,27 @@ class ClausiusClapeyronBuilder(BuilderABC):
     """Builder class for ClausiusClapeyronStrategy. This class facilitates
     setting the latent heat of vaporization, initial temperature, and initial
     pressure with unit handling and then builds the strategy object.
+
+    Example:
+        ``` py title="ClausiusClapeyronBuilder"
+        strategy = (
+            ClausiusClapeyronBuilder()
+            .set_latent_heat(2260)
+            .set_temperature_initial(373.15)
+            .set_pressure_initial(101325)
+            .build()
+        )
+        ```
+
+        ``` py title="ClausiusClapeyronBuilder with units"
+        strategy = (
+            ClausiusClapeyronBuilder()
+            .set_latent_heat(2260, "J/kg")
+            .set_temperature_initial(373.15, "K")
+            .set_pressure_initial(101325, "Pa")
+            .build()
+        )
+        ```
 
     References:
         - Equation: dP/dT = L / (R * T^2)
@@ -140,6 +182,23 @@ class ConstantBuilder(BuilderABC):
     """Builder class for ConstantVaporPressureStrategy. This class facilitates
     setting the constant vapor pressure and then building the strategy object.
 
+    Example:
+        ``` py title="ConstantBuilder"
+        strategy = (
+            ConstantBuilder()
+            .set_vapor_pressure(101325)
+            .build()
+        )
+        ```
+
+        ``` py title="ConstantBuilder with units"
+        strategy = (
+            ConstantBuilder()
+            .set_vapor_pressure(1, "atm")
+            .build()
+        )
+        ```
+
     References:
         - Equation: P = vapor_pressure
           https://en.wikipedia.org/wiki/Vapor_pressure
@@ -173,6 +232,11 @@ class WaterBuckBuilder(BuilderABC):  # pylint: disable=too-few-public-methods
     the building of the WaterBuckStrategy object. Which as of now has no
     additional parameters to set. But could be extended in the future for
     ice only calculations.
+
+    Example:
+        ``` py title="WaterBuckBuilder"
+        WaterBuckBuilder().build()
+        ```
     """
 
     def __init__(self):
