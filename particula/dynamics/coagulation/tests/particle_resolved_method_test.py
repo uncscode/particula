@@ -2,6 +2,7 @@
 
 import time
 import numpy as np
+from scipy.interpolate import RectBivariateSpline
 from particula.dynamics.coagulation.particle_resolved_method import (
     interpolate_kernel,
     calculate_probabilities,
@@ -9,7 +10,6 @@ from particula.dynamics.coagulation.particle_resolved_method import (
     particle_resolved_update_step,
     particle_resolved_coagulation_step,
 )
-from scipy.interpolate import RectBivariateSpline
 
 
 def test_interpolate_kernel():
