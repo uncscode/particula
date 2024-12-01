@@ -21,15 +21,6 @@ class BuilderABC(ABC):
     Args:
         - required_parameters: List of required parameters for the builder.
 
-    Methods:
-        - check_keys (parameters): Check if the keys you want to set are
-        - present in the parameters dictionary.
-        - set_parameters (parameters): Set parameters from a dictionary
-            including optional suffix for units as '_units'.
-        - pre_build_check(): Check if all required attribute parameters are set
-            before building.
-        - build (abstract): Build and return the strategy object.
-
     Raises:
         - ValueError : If any required key is missing during check_keys or
             pre_build_check, or if trying to set an invalid parameter.
@@ -46,10 +37,10 @@ class BuilderABC(ABC):
         """Check if the keys are present and valid.
 
         Args:
-            - parameters: The parameters dictionary to check.
+            - parameters : The parameters dictionary to check.
 
         Raises:
-            - ValueError: If any required key is missing or if trying to set an
+            - ValueError : If any required key is missing or if trying to set an
                 invalid parameter.
 
         Example:
