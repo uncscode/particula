@@ -23,14 +23,13 @@ class AntoineBuilder(BuilderABC):
     - Units: 'a_units' = None, 'b_units' = 'K', 'c_units' = 'K'
 
     Methods:
-    --------
-    - set_a(a, a_units): Set the coefficient 'a' of the Antoine equation.
-    - set_b(b, b_units): Set the coefficient 'b' of the Antoine equation.
-    - set_c(c, c_units): Set the coefficient 'c' of the Antoine equation.
-    - set_parameters(params): Set coefficients from a dictionary including
-        optional units.
-    - build(): Build the AntoineVaporPressureStrategy object with the set
-        coefficients.
+        - set_a(a, a_units): Set the coefficient 'a' of the Antoine equation.
+        - set_b(b, b_units): Set the coefficient 'b' of the Antoine equation.
+        - set_c(c, c_units): Set the coefficient 'c' of the Antoine equation.
+        - set_parameters(params): Set coefficients from a dictionary including
+            optional units.
+        - build(): Build the AntoineVaporPressureStrategy object with the set
+            coefficients.
     """
 
     def __init__(self):
@@ -81,22 +80,8 @@ class ClausiusClapeyronBuilder(BuilderABC):
     setting the latent heat of vaporization, initial temperature, and initial
     pressure with unit handling and then builds the strategy object.
 
-    - Equation: dP/dT = L / (R * T^2)
-    - Units: 'latent_heat_units' = 'J/kg', 'temperature_initial_units' = 'K',
-        'pressure_initial_units' = 'Pa'
-
-    Methods:
-    --------
-    - set_latent_heat(latent_heat, latent_heat_units): Set the latent heat of
-        vaporization.
-    - set_temperature_initial(temperature_initial, temperature_initial_units):
-        Set the initial temperature.
-    - set_pressure_initial(pressure_initial, pressure_initial_units): Set the
-        initial pressure.
-    - set_parameters(parameters): Set parameters from a dictionary including
-        optional units.
-    - build(): Build the ClausiusClapeyronStrategy object with the set
-        parameters.
+    References:
+        - Equation: dP/dT = L / (R * T^2)
     """
 
     def __init__(self):
