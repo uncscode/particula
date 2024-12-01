@@ -40,6 +40,9 @@ jobs:
 
         - name: Deploy to GitHub Pages (on push or merge_group)
           if: github.event_name == 'push' || github.event_name == 'merge_group'
+          concurrency:
+            group: "pages"
+            cancel-in-progress: true
           uses: JamesIves/github-pages-deploy-action@v4
           with:
             branch: gh-pages
