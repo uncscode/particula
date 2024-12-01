@@ -66,12 +66,12 @@ class CondensationStrategy(ABC):
     condensation algorithms based on different physical models and equations.
 
     Args:
-        molar_mass: The molar mass of the species [kg/mol]. If a single value
-            is provided, it will be used for all species.
-        diffusion_coefficient: The diffusion coefficient of the species
+        - molar_mass : The molar mass of the species [kg/mol]. If a single
+            value is provided, it will be used for all species.
+        - diffusion_coefficient : The diffusion coefficient of the species
             [m^2/s]. If a single value is provided, it will be used for all
             species. Default is 2e-5 m^2/s for air.
-        accommodation_coefficient: The mass accommodation coefficient of the
+        - accommodation_coefficient : The mass accommodation coefficient of the
             species. If a single value is provided, it will be used for all
             species. Default is 1.0.
     """
@@ -99,17 +99,16 @@ class CondensationStrategy(ABC):
         temperature, pressure, and dynamic viscosity of the gas.
 
         Args:
-            temperature: The temperature of the gas [K].
-            pressure: The pressure of the gas [Pa].
-            dynamic_viscosity: The dynamic viscosity of the gas [Pa*s]. If not
-            provided, it will be calculated based on the temperature
+            - temperature : The temperature of the gas [K].
+            - pressure : The pressure of the gas [Pa].
+            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If not
+                provided, it will be calculated based on the temperature
 
         Returns:
-            Union[float, NDArray[np.float64]]: The mean free path of the gas
-                molecules in meters (m).
+            The mean free path of the gas molecules in meters (m).
 
         References:
-            Mean Free Path:
+            Mean Free Path
             [Wikipedia](https://en.wikipedia.org/wiki/Mean_free_path)
         """
         return molecule_mean_free_path(
@@ -132,10 +131,10 @@ class CondensationStrategy(ABC):
         molecules and the radius of the particle.
 
         Args:
-            radius: The radius of the particle [m].
-            temperature: The temperature of the gas [K].
-            pressure: The pressure of the gas [Pa].
-            dynamic_viscosity: The dynamic viscosity of the gas [Pa*s]. If
+            - radius : The radius of the particle [m].
+            - temperature : The temperature of the gas [K].
+            - pressure : The pressure of the gas [Pa].
+            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
                 not provided, it will be calculated based on the temperature
 
         Returns:
@@ -168,12 +167,12 @@ class CondensationStrategy(ABC):
         transition correction factor.
 
         Args:
-            radius: The radius of the particle [m].
-            temperature: The temperature at which the first-order mass
-            transport coefficient is to be calculated.
-            pressure: The pressure of the gas phase.
-            dynamic_viscosity: The dynamic viscosity of the gas [Pa*s]. If not
-            provided, it will be calculated based on the temperature
+            - radius : The radius of the particle [m].
+            - temperature : The temperature at which the first-order mass
+                transport coefficient is to be calculated.
+            - pressure : The pressure of the gas phase.
+            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If not
+                provided, it will be calculated based on the temperature
 
         Returns:
             The first-order mass transport coefficient per particle (m^3/s).
@@ -197,6 +196,63 @@ class CondensationStrategy(ABC):
             diffusion_coefficient=self.diffusion_coefficient,
         )
 
+    def _fill_zero_radius(
+        self, radius: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        """Fill zero radius values with the maximum radius. The concentration
+        value of zero will ensure that the rate of condensation is zero. The
+        fill is necessary to avoid division by zero in the array operations.
+
+        Args:
+            - radius : The radius of the particles.
+
+        Returns:
+            - radius : The radius of the particles with zero values filled.
+        """
+        return np.where(radius == 0, np.max(radius), radius)
+
+    def calculate_pressure_delta(
+        self,
+        particle: ParticleRepresentation,
+        gas_species: GasSpecies,
+        temperature: float,
+        radius: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
+        """Calculate the difference in partial pressure between the gas and
+        particle phases.
+
+        Args:
+            - particle : The particle for which the partial pressure difference
+                is to be calculated.
+            - gas_species : The gas species with which the particle is in
+                contact.
+            - temperature : The temperature at which the partial pressure
+                difference is to be calculated.
+            - radius : The radius of the particles.
+
+        Returns:
+            - partial_pressure_delta : The difference in partial pressure
+                between the gas and particle phases.
+        """
+        partial_pressure_particle = particle.activity.partial_pressure(
+            pure_vapor_pressure=gas_species.get_pure_vapor_pressure(
+                temperature=temperature
+            ),
+            mass_concentration=particle.get_species_mass(),
+        )
+        partial_pressure_gas = gas_species.get_partial_pressure(temperature)
+        kelvin_term = particle.surface.kelvin_term(
+            radius=radius,
+            molar_mass=self.molar_mass,
+            mass_concentration=particle.get_species_mass(),
+            temperature=temperature,
+        )
+        return partial_pressure_delta(
+            partial_pressure_gas=partial_pressure_gas,
+            partial_pressure_particle=partial_pressure_particle,
+            kelvin_term=kelvin_term,
+        )
+
     @abstractmethod
     def mass_transfer_rate(
         self,
@@ -213,13 +269,13 @@ class CondensationStrategy(ABC):
         pressure and the first-order mass transport coefficient.
 
         Args:
-            particle: The particle for which the mass transfer rate is to be
+            - particle : The particle for which the mass transfer rate is to be
                 calculated.
-            gas_species: The gas species with which the particle is in contact.
-            temperature: The temperature at which the mass transfer rate
+            - gas_species : The gas species with which the particle is in contact.
+            - temperature : The temperature at which the mass transfer rate
                 is to be calculated.
-            pressure: The pressure of the gas phase.
-            dynamic_viscosity: The dynamic viscosity of the gas [Pa*s]. If not
+            - pressure : The pressure of the gas phase.
+            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If not
                 provided, it will be calculated based on the temperature
 
         Returns:
@@ -245,12 +301,12 @@ class CondensationStrategy(ABC):
         condensation rate for each particle or bin.
 
         Args:
-            particle (ParticleRepresentation): Representation of the particles,
+            - particle (ParticleRepresentation) : Representation of the particles,
                 including properties such as size, concentration, and mass.
-            gas_species (GasSpecies): The species of gas condensing onto the
+            - gas_species (GasSpecies) : The species of gas condensing onto the
                 particles.
-            temperature (float): The temperature of the system in Kelvin.
-            pressure (float): The pressure of the system in Pascals.
+            - temperature (float) : The temperature of the system in Kelvin.
+            - pressure (float) : The pressure of the system in Pascals.
 
         Returns:
             An array of condensation rates for each particle, scaled by
@@ -271,15 +327,15 @@ class CondensationStrategy(ABC):
         Execute the condensation process for a given time step.
 
         Args:
-            particle (ParticleRepresentation): The particle to modify.
-            gas_species (GasSpecies): The gas species to condense onto the
+            - particle (ParticleRepresentation) : The particle to modify.
+            - gas_species (GasSpecies) : The gas species to condense onto the
                 particle.
-            temperature (float): The temperature of the system in Kelvin.
-            pressure (float): The pressure of the system in Pascals.
-            time_step (float): The time step for the process in seconds.
+            - temperature (float) : The temperature of the system in Kelvin.
+            - pressure (float) : The pressure of the system in Pascals.
+            - time_step (float) : The time step for the process in seconds.
 
         Returns:
-            (ParticleRepresentation, GasSpecies): The modified particle
+            (ParticleRepresentation, GasSpecies) : The modified particle
                 instance and the modified gas species instance.
         """
 
@@ -318,41 +374,16 @@ class CondensationIsothermal(CondensationStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         # pylint: disable=too-many-positional-arguments, too-many-arguments
 
-        # fill zero radius with a maximum value, the zero concentration
-        # will ensure no mass transfer for those filled particles
-        radius_with_fill = particle.get_radius()
-        radius_with_fill = np.where(
-            radius_with_fill == 0, np.max(radius_with_fill), radius_with_fill
-        )
-        # Calculate the first-order mass transport coefficient
+        radius_with_fill = self._fill_zero_radius(particle.get_radius())
         first_order_mass_transport = self.first_order_mass_transport(
             radius=radius_with_fill,
             temperature=temperature,
             pressure=pressure,
             dynamic_viscosity=dynamic_viscosity,
         )
-        # calculate the partial pressure
-        partial_pressure_particle = particle.activity.partial_pressure(
-            pure_vapor_pressure=gas_species.get_pure_vapor_pressure(
-                temperature
-            ),
-            mass_concentration=particle.get_species_mass(),
+        pressure_delta = self.calculate_pressure_delta(
+            particle, gas_species, temperature, radius_with_fill
         )
-        partial_pressure_gas = gas_species.get_partial_pressure(temperature)
-        # calculate the kelvin term
-        kelvin_term = particle.surface.kelvin_term(
-            radius=radius_with_fill,
-            molar_mass=self.molar_mass,
-            mass_concentration=particle.get_species_mass(),
-            temperature=temperature,
-        )
-        # calculate the pressure delta accounting for the kelvin term
-        pressure_delta = partial_pressure_delta(
-            partial_pressure_gas=partial_pressure_gas,
-            partial_pressure_particle=partial_pressure_particle,
-            kelvin_term=kelvin_term,
-        )
-        # Calculate the mass transfer rate per particle
         return mass_transfer_rate(
             pressure_delta=pressure_delta,
             first_order_mass_transport=first_order_mass_transport,
