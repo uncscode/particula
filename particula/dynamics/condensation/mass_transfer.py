@@ -63,6 +63,24 @@ def first_order_mass_transport_k(
     Returns:
         The first-order mass transport coefficient per particle (m^3/s).
 
+    Examples:
+        ``` py title="Float input"
+        first_order_mass_transport_k(
+            radius=1e-6,
+            vapor_transition=0.6,
+            diffusion_coefficient=2e-9
+            )
+        # Output: 1.5079644737231005e-14
+        ```
+
+        ``` py title="Array input"
+        first_order_mass_transport_k
+            radius=np.array([1e-6, 2e-6]),
+            vapor_transition=np.array([0.6, 0.6]),
+            diffusion_coefficient=2e-9
+            )
+        # Output: array([1.50796447e-14, 6.03185789e-14])
+        ```
     References:
         - Aerosol Modeling: Chapter 2, Equation 2.49 (excluding number)
         - Mass Diffusivity:
@@ -102,14 +120,36 @@ def mass_transfer_rate(
     Returns:
         The mass transfer rate for the particle [kg/s].
 
+    Examples:
+        ``` py title="Single value input"
+        mass_transfer_rate(
+            pressure_delta=10.0,
+            first_order_mass_transport=1e-17,
+            temperature=300.0,
+            molar_mass=0.02897
+        )
+        # Output: 1.16143004e-21
+        ```
+
+        ``` py title="Array input"
+        mass_transfer_rate(
+            pressure_delta=np.array([10.0, 15.0]),
+            first_order_mass_transport=np.array([1e-17, 2e-17]),
+            temperature=300.0,
+            molar_mass=0.02897
+        )
+        # Output: array([1.16143004e-21, 3.48429013e-21])
+        ```
     References:
         - Aerosol Modeling Chapter 2, Equation 2.41 (excluding particle number)
         - Seinfeld and Pandis: "Atmospheric Chemistry and Physics",
             Equation 13.3
     """
     return np.array(
-        first_order_mass_transport * pressure_delta * molar_mass / (
-            GAS_CONSTANT.m * temperature),
+        first_order_mass_transport
+        * pressure_delta
+        * molar_mass
+        / (GAS_CONSTANT.m * temperature),
         dtype=np.float64,
     )
 
@@ -131,10 +171,29 @@ def radius_transfer_rate(
 
     Returns:
         The radius growth rate for the particle [m/s].
+
+    Examples:
+        ``` py title="Single value input"
+        radius_transfer_rate(
+            mass_rate=1e-21,
+            radius=1e-6,
+            density=1000
+        )
+        # Output: 7.95774715e-14
+        ```
+
+        ``` py title="Array input"
+        radius_transfer_rate(
+            mass_rate=np.array([1e-21, 2e-21]),
+            radius=np.array([1e-6, 2e-6]),
+            density=1000
+        )
+        # Output: array([7.95774715e-14, 1.98943679e-14])
+        ```
     """
     if isinstance(mass_rate, np.ndarray) and mass_rate.ndim == 2:
         radius = radius[:, np.newaxis]  # type: ignore
-    return mass_rate / (density * 4 * np.pi * radius ** 2)  # type: ignore
+    return mass_rate / (density * 4 * np.pi * radius**2)  # type: ignore
 
 
 def calculate_mass_transfer(
@@ -159,6 +218,27 @@ def calculate_mass_transfer(
     Returns:
         The amount of mass transferred, accounting for gas and particle
             limitations.
+
+    Examples:
+        ``` py title="Single species input"
+        calculate_mass_transfer(
+            mass_rate=np.array([0.1, 0.5]),
+            time_step=10,
+            gas_mass=np.array([0.5]),
+            particle_mass=np.array([1.0, 50]),
+            particle_concentration=np.array([1, 0.5])
+        )
+        ```
+
+        ``` py title="Multiple species input"
+        calculate_mass_transfer(
+            mass_rate=np.array([[0.1, 0.05, 0.03], [0.2, 0.15, 0.07]]),
+            time_step=10,
+            gas_mass=np.array([1.0, 0.8, 0.5]),
+            particle_mass=np.array([[1.0, 0.9, 0.8], [1.2, 1.0, 0.7]]),
+            particle_concentration=np.array([5, 4])
+        )
+        ```
     """
     if gas_mass.size == 1:  # Single species case
         return calculate_mass_transfer_single_species(
@@ -197,6 +277,17 @@ def calculate_mass_transfer_single_species(
 
     Returns:
         The amount of mass transferred for a single gas species.
+
+    Examples:
+        ``` py title="Single species input"
+        calculate_mass_transfer_single_species(
+            mass_rate=np.array([0.1, 0.5]),
+            time_step=10,
+            gas_mass=np.array([0.5]),
+            particle_mass=np.array([1.0, 50]),
+            particle_concentration=np.array([1, 0.5])
+        )
+        ```
     """
     # Step 1: Calculate the total mass to be transferred
     # (accounting for particle concentration)
@@ -243,6 +334,17 @@ def calculate_mass_transfer_multiple_species(
 
     Returns:
         The amount of mass transferred for multiple gas species.
+
+    Examples:
+        ``` py title="Multiple species input"
+        calculate_mass_transfer_multiple_species(
+            mass_rate=np.array([[0.1, 0.05, 0.03], [0.2, 0.15, 0.07]]),
+            time_step=10,
+            gas_mass=np.array([1.0, 0.8, 0.5]),
+            particle_mass=np.array([[1.0, 0.9, 0.8], [1.2, 1.0, 0.7]]),
+            particle_concentration=np.array([5, 4])
+        )
+        ```
     """
     # Step 1: Calculate the total mass to change
     # (considering particle concentration)
