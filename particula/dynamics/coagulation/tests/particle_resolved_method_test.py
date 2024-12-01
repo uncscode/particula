@@ -52,7 +52,7 @@ def test_resolve_final_coagulation_state():
 def test_resolve_final_coagulation_state_large():
     """Test the resolve_final_coagulation_state function with a
     large number of particles."""
-    num_particles = 100000
+    num_particles = 100_000
     small_indices = np.random.randint(
         0, num_particles, size=num_particles // 2, dtype=np.int64
     )
