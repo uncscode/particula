@@ -19,17 +19,9 @@ class AntoineBuilder(BuilderABC):
     coefficients 'a', 'b', and 'c' separately and then building the strategy
     object.
 
-    - Equation: log10(P_mmHG) = a - b / (Temperature_K - c)
-    - Units: 'a_units' = None, 'b_units' = 'K', 'c_units' = 'K'
-
-    Methods:
-        - set_a(a, a_units): Set the coefficient 'a' of the Antoine equation.
-        - set_b(b, b_units): Set the coefficient 'b' of the Antoine equation.
-        - set_c(c, c_units): Set the coefficient 'c' of the Antoine equation.
-        - set_parameters(params): Set coefficients from a dictionary including
-            optional units.
-        - build(): Build the AntoineVaporPressureStrategy object with the set
-            coefficients.
+    References:
+        - Equation: log10(P_mmHG) = a - b / (Temperature_K - c)
+          (Reference: https://en.wikipedia.org/wiki/Antoine_equation)
     """
 
     def __init__(self):
@@ -82,6 +74,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
 
     References:
         - Equation: dP/dT = L / (R * T^2)
+          https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation
     """
 
     def __init__(self):
@@ -147,17 +140,9 @@ class ConstantBuilder(BuilderABC):
     """Builder class for ConstantVaporPressureStrategy. This class facilitates
     setting the constant vapor pressure and then building the strategy object.
 
-    - Equation: P = vapor_pressure
-    - Units: 'vapor_pressure_units' = 'Pa'
-
-    Methods:
-    --------
-    - set_vapor_pressure(constant, constant_units): Set the constant vapor
-    pressure.
-    - set_parameters(parameters): Set parameters from a dictionary including
-        optional units.
-    - build(): Build the ConstantVaporPressureStrategy object with the set
-        parameters.
+    References:
+        - Equation: P = vapor_pressure
+          https://en.wikipedia.org/wiki/Vapor_pressure
     """
 
     def __init__(self):
@@ -187,11 +172,7 @@ class WaterBuckBuilder(BuilderABC):  # pylint: disable=too-few-public-methods
     """Builder class for WaterBuckStrategy. This class facilitates
     the building of the WaterBuckStrategy object. Which as of now has no
     additional parameters to set. But could be extended in the future for
-    ice only calculations. We keep the builder for consistency.
-
-    Methods:
-    --------
-    - build(): Build the WaterBuckStrategy object.
+    ice only calculations.
     """
 
     def __init__(self):

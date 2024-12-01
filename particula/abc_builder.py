@@ -1,14 +1,4 @@
 """Abstract Base Class for Builder classes.
-
-This module also defines mixin classes for the Builder classes to set
-some optional method to be used in the Builder classes.
-https://en.wikipedia.org/wiki/Mixin
-
-Mixins are used to set the common parameters of the Surface strategies.
-
-We use explicit initialization of the mixins in the __init__ method, for
-clarity and traceability steps. Using super() would be more concise, but
-it would be harder to trace the inheritance chain.
 """
 
 # pylint: disable=too-few-public-methods
@@ -37,14 +27,12 @@ class BuilderABC(ABC):
         - build (abstract): Build and return the strategy object.
 
     Raises:
-        - ValueError: If any required key is missing during check_keys or
+        - ValueError : If any required key is missing during check_keys or
             pre_build_check, or if trying to set an invalid parameter.
-        - Warning: If using default units for any parameter.
+        - Warning : If using default units for any parameter.
 
     References:
-        This module also defines mixin classes for the Builder classes to set
-        some optional method to be used in the Builder classes.
-        [Mixin Wikipedia](https://en.wikipedia.org/wiki/Mixin)
+        - Builder Pattern : https://refactoring.guru/design-patterns/builder
     """
 
     def __init__(self, required_parameters: Optional[list[str]] = None):
