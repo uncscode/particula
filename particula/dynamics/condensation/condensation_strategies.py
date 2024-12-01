@@ -217,7 +217,7 @@ class CondensationStrategy(ABC):
         """
         if np.max(radius) == 0:
             message = (
-                "All radius values are zero, set to radius to 1 m for "
+                "All radius values are zero, radius set to 1 m for "
                 "condensation calculations. This should be ignored as the "
                 "particle concentration would also be zero."
             )
