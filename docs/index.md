@@ -17,7 +17,6 @@ pip install particula
 [Tutorials](Tutorials/index.md){ .md-button }
 [API Reference](API){ .md-button }
 
-
 ## Contributing to `Particula`
 
 We are open to and we welcome contributions from anyone who wants to contribute to this project.
