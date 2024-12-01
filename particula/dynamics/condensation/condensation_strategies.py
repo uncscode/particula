@@ -248,20 +248,20 @@ class CondensationStrategy(ABC):
             - partial_pressure_delta : The difference in partial pressure
                 between the gas and particle phases.
         """
-        particle_mass_concentration = particle.get_species_mass()
+        mass_concentration_in_particle = particle.get_species_mass()
         pure_vapor_pressure = gas_species.get_pure_vapor_pressure(
             temperature=temperature
         )
         partial_pressure_particle = particle.activity.partial_pressure(
             pure_vapor_pressure=pure_vapor_pressure,
-            mass_concentration=particle_mass_concentration,
+            mass_concentration=mass_concentration_in_particle,
         )
 
         partial_pressure_gas = gas_species.get_partial_pressure(temperature)
         kelvin_term = particle.surface.kelvin_term(
             radius=radius,
             molar_mass=self.molar_mass,
-            mass_concentration=particle_mass_concentration,
+            mass_concentration=mass_concentration_in_particle,
             temperature=temperature,
         )
 
