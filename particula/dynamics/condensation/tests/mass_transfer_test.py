@@ -282,12 +282,13 @@ def test_zero_mass_transfer():
 
 def test_radius_transfer_rate():
     """Test the radius_transfer_rate function."""
-    mass_rate = 1e-21  # kg/s
-    radius = 1e-6  # m
-    density = 1000  # kg/m^3
-    expected_result = 7.95774715e-14  # m/s
-    result = radius_transfer_rate(mass_rate, radius, density)
-    np.testing.assert_allclose(result, expected_result, atol=1e-8)
+    # Test normal case
+    result = radius_transfer_rate(1e-21, 1e-6, 1000)
+    np.testing.assert_allclose(result, 7.95774715e-14, atol=1e-8)
+
+    # Test edge cases
+    np.testing.assert_allclose(radius_transfer_rate(0, 1e-6, 1000), 0)
+    np.testing.assert_array_equal(radius_transfer_rate([1e-21, 0], [1e-6, 1e-6], 1000), [7.95774715e-14, 0])
 
     # Test with array inputs
     mass_rate = np.array([1e-21, 2e-21])  # kg/s
