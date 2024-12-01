@@ -37,6 +37,7 @@ def test_calculate_probabilities():
 
 
 def test_resolve_final_coagulation_state():
+    """Test the resolve_final_coagulation_state function."""
     small_indices = np.array([0, 1, 2], dtype=np.int64)
     large_indices = np.array([2, 3, 4], dtype=np.int64)
     particle_radius = np.array([1.0, 2.0, 3.0, 4.0, 5.0], dtype=np.float64)
