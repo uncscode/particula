@@ -40,14 +40,12 @@ class VaporPressureStrategy(ABC):
         mass, and temperature.
 
         Args:
-            concentration (float or NDArray[np.float64]): Concentration of the
-                gas in kg/m^3.
-            molar_mass (float or NDArray[np.float64]): Molar mass of the gas in
-                kg/mol.
-            temperature (float or NDArray[np.float64]): Temperature in Kelvin.
+            - concentration : Concentration of the gas in kg/m^3.
+            - molar_mass : Molar mass of the gas in kg/mol.
+            - temperature : Temperature in Kelvin.
 
         Returns:
-            partial_pressure: Partial pressure of the gas in Pascals.
+            Partial pressure of the gas in Pascals.
         """
         return calculate_partial_pressure(
             concentration, molar_mass, temperature
@@ -64,12 +62,12 @@ class VaporPressureStrategy(ABC):
         temperature.
 
         Args:
-            partial_pressure: Pressure in Pascals.
-            molar_mass: Molar mass of the gas in kg/mol.
-            temperature: Temperature in Kelvin.
+            - partial_pressure: Pressure in Pascals.
+            - molar_mass: Molar mass of the gas in kg/mol.
+            - temperature: Temperature in Kelvin.
 
         Returns:
-            concentration: The concentration of the gas in kg/m^3.
+            The concentration of the gas in kg/m^3.
         """
         return calculate_concentration(
             partial_pressure, molar_mass, temperature
@@ -86,11 +84,11 @@ class VaporPressureStrategy(ABC):
         temperature.
 
         Args:
-            pressure: Pressure in Pascals.
-            temperature: Temperature in Kelvin.
+           - pressure : Pressure in Pascals.
+           - temperature : Temperature in Kelvin.
 
         Returns:
-            saturation_ratio: The saturation ratio of the gas.
+            The saturation ratio of the gas.
         """
         return self.partial_pressure(
             concentration, molar_mass, temperature
@@ -106,15 +104,11 @@ class VaporPressureStrategy(ABC):
         temperature.
 
         Args:
-        ----
-        - molar_mass (float or NDArray[np.float64]): Molar mass of the gas in
-        kg/mol.
-        - temperature (float or NDArray[np.float64]): Temperature in Kelvin.
+            molar_mass : Molar mass of the gas in kg/mol.
+            temperature : Temperature in Kelvin.
 
         Returns:
-        -------
-        - saturation_concentration (float or NDArray[np.float64]):
-        The saturation concentration of the gas in kg/m^3.
+            The saturation concentration of the gas in kg/m^3.
         """
 
         return self.concentration(
@@ -129,7 +123,7 @@ class VaporPressureStrategy(ABC):
         temperature. Units are in Pascals Pa=kg/(m·s²).
 
         Args:
-            temperature (float or NDArray[np.float64]): Temperature in Kelvin.
+            temperature : Temperature in Kelvin.
         """
 
 
