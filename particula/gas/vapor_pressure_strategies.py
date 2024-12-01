@@ -46,6 +46,15 @@ class VaporPressureStrategy(ABC):
 
         Returns:
             Partial pressure of the gas in Pascals.
+
+        Examples:
+            ``` py title="Partial Pressure Calculation"
+            partial_pressure = strategy.partial_pressure(
+                concentration=5.0,
+                molar_mass=18.01528,
+                temperature=298.15
+            )
+            ```
         """
         return calculate_partial_pressure(
             concentration, molar_mass, temperature
@@ -68,6 +77,15 @@ class VaporPressureStrategy(ABC):
 
         Returns:
             The concentration of the gas in kg/m^3.
+
+        Examples:
+            ``` py title="Concentration Calculation"
+            concentration = strategy.concentration(
+                partial_pressure=101325,
+                molar_mass=18.01528,
+                temperature=298.15
+            )
+            ```
         """
         return calculate_concentration(
             partial_pressure, molar_mass, temperature
@@ -89,6 +107,15 @@ class VaporPressureStrategy(ABC):
 
         Returns:
             The saturation ratio of the gas.
+
+        Examples:
+            ``` py title="Saturation Ratio Calculation"
+            saturation_ratio = strategy.saturation_ratio(
+                concentration=5.0,
+                molar_mass=18.01528,
+                temperature=298.15
+            )
+            ```
         """
         return self.partial_pressure(
             concentration, molar_mass, temperature
@@ -109,6 +136,14 @@ class VaporPressureStrategy(ABC):
 
         Returns:
             The saturation concentration of the gas in kg/m^3.
+
+        Examples:
+            ``` py title="Saturation Concentration Calculation"
+            saturation_concentration = strategy.saturation_concentration(
+                molar_mass=18.01528,
+                temperature=298.15
+            )
+            ```
         """
 
         return self.concentration(
@@ -145,6 +180,13 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy):
 
         Returns:
             The constant vapor pressure value in Pascals.
+
+        Examples:
+            ``` py title="Constant Vapor Pressure Calculation"
+            vapor_pressure = strategy.pure_vapor_pressure(
+                temperature=300
+            )
+            ```
         """
         # repeat the constant value for each element temperature
         return np.full_like(temperature, self.vapor_pressure)
@@ -177,6 +219,13 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
 
         Returns:
             Vapor pressure in Pascals.
+
+        Examples:
+            ``` py title="Antoine Vapor Pressure Calculation"
+            vapor_pressure = strategy.pure_vapor_pressure(
+                temperature=300
+            )
+            ```
 
         References:
             - Equation: log10(P) = a - b / (T - c)
@@ -224,6 +273,13 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
         Returns:
             Pure vapor pressure in Pascals.
 
+        Examples:
+            ``` py title="Clausius-Clapeyron Vapor Pressure Calculation"
+            vapor_pressure = strategy.pure_vapor_pressure(
+                temperature=300
+            )
+            ```
+
         References:
             - https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation
         """
@@ -246,10 +302,17 @@ class WaterBuckStrategy(VaporPressureStrategy):
         Calculate vapor pressure using the Buck equation for water vapor.
 
         Args:
-            - temperature : Temperature in Kelvin.
+            - temperature: Temperature in Kelvin.
 
         Returns:
             Vapor pressure in Pascals.
+
+        Examples:
+            ``` py title="Water Buck Vapor Pressure Calculation"
+            vapor_pressure = strategy.pure_vapor_pressure(
+                temperature=300
+            )
+            ```
 
         References:
             - Buck, A. L., 1981: New Equations for Computing Vapor Pressure and
@@ -258,3 +321,4 @@ class WaterBuckStrategy(VaporPressureStrategy):
             - https://en.wikipedia.org/wiki/Arden_Buck_equation
         """
         return buck_vapor_pressure(temperature)
+ 
