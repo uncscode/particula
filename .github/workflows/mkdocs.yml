@@ -38,8 +38,8 @@ jobs:
         - name: Build MkDocs site and Run Jupyter Books
           run: mkdocs build
 
-        - name: Deploy to GitHub Pages (on push)
-          if: github.event_name == 'push'
+        - name: Deploy to GitHub Pages (on push or merge_group)
+          if: github.event_name == 'push' || github.event_name == 'merge_group'
           uses: JamesIves/github-pages-deploy-action@v4
           with:
             branch: gh-pages
