@@ -101,8 +101,8 @@ class CondensationStrategy(ABC):
         Args:
             - temperature : The temperature of the gas [K].
             - pressure : The pressure of the gas [Pa].
-            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If not
-                provided, it will be calculated based on the temperature
+            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
+                not provided, it will be calculated based on the temperature
 
         Returns:
             The mean free path of the gas molecules in meters (m).
@@ -171,8 +171,8 @@ class CondensationStrategy(ABC):
             - temperature : The temperature at which the first-order mass
                 transport coefficient is to be calculated.
             - pressure : The pressure of the gas phase.
-            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If not
-                provided, it will be calculated based on the temperature
+            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
+                not provided, it will be calculated based on the temperature
 
         Returns:
             The first-order mass transport coefficient per particle (m^3/s).
@@ -271,12 +271,13 @@ class CondensationStrategy(ABC):
         Args:
             - particle : The particle for which the mass transfer rate is to be
                 calculated.
-            - gas_species : The gas species with which the particle is in contact.
+            - gas_species : The gas species with which the particle is in
+                contact.
             - temperature : The temperature at which the mass transfer rate
                 is to be calculated.
             - pressure : The pressure of the gas phase.
-            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If not
-                provided, it will be calculated based on the temperature
+            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
+                not provided, it will be calculated based on the temperature
 
         Returns:
             The mass transfer rate for the particle [kg/s].
@@ -301,12 +302,11 @@ class CondensationStrategy(ABC):
         condensation rate for each particle or bin.
 
         Args:
-            - particle (ParticleRepresentation) : Representation of the particles,
-                including properties such as size, concentration, and mass.
-            - gas_species (GasSpecies) : The species of gas condensing onto the
-                particles.
-            - temperature (float) : The temperature of the system in Kelvin.
-            - pressure (float) : The pressure of the system in Pascals.
+            - particle : Representation of the particles, including properties
+                such as size, concentration, and mass.
+            - gas_species : The species of gas condensing onto the particles.
+            - temperature : The temperature of the system in Kelvin.
+            - pressure : The pressure of the system in Pascals.
 
         Returns:
             An array of condensation rates for each particle, scaled by
@@ -327,16 +327,16 @@ class CondensationStrategy(ABC):
         Execute the condensation process for a given time step.
 
         Args:
-            - particle (ParticleRepresentation) : The particle to modify.
-            - gas_species (GasSpecies) : The gas species to condense onto the
+            - particle : The particle to modify.
+            - gas_species : The gas species to condense onto the
                 particle.
-            - temperature (float) : The temperature of the system in Kelvin.
-            - pressure (float) : The pressure of the system in Pascals.
-            - time_step (float) : The time step for the process in seconds.
+            - temperature : The temperature of the system in Kelvin.
+            - pressure : The pressure of the system in Pascals.
+            - time_step : The time step for the process in seconds.
 
         Returns:
-            (ParticleRepresentation, GasSpecies) : The modified particle
-                instance and the modified gas species instance.
+            The modified particle instance and the modified gas species
+                instance.
         """
 
 

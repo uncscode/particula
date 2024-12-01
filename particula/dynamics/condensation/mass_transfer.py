@@ -55,14 +55,13 @@ def first_order_mass_transport_k(
     single particle.
 
     Args:
-        radius: The radius of the particle [m].
-        diffusion_coefficient: The diffusion coefficient of the vapor [m^2/s],
-            default to air.
-        vapor_transition: The vapor transition correction factor. [unitless]
+        - radius : The radius of the particle [m].
+        - diffusion_coefficient : The diffusion coefficient of the vapor
+            [m^2/s], default to air.
+        - vapor_transition : The vapor transition correction factor. [unitless]
 
     Returns:
-        Union[float, NDArray[np.float64]]: The first-order mass transport
-        coefficient per particle (m^3/s).
+        The first-order mass transport coefficient per particle (m^3/s).
 
     References:
         - Aerosol Modeling: Chapter 2, Equation 2.49 (excluding number)
@@ -92,12 +91,13 @@ def mass_transfer_rate(
     pressure and the first-order mass transport coefficient.
 
     Args:
-        pressure_delta: The difference in partial pressure between the gas
+        - pressure_delta : The difference in partial pressure between the gas
             phase and the particle phase.
-        first_order_mass_transport: The first-order mass transport coefficient
-            per particle.
-        temperature: The temperature at which the mass transfer rate is to be
-            calculated.
+        - first_order_mass_transport : The first-order mass transport
+            coefficient per particle.
+        - temperature : The temperature at which the mass transfer rate is to
+            be calculated.
+        - molar_mass : The molar mass of the species [kg/mol].
 
     Returns:
         The mass transfer rate for the particle [kg/s].
@@ -125,9 +125,9 @@ def radius_transfer_rate(
     volume of the particle.
 
     Args:
-        mass_rate: The mass transfer rate for the particle [kg/s].
-        radius: The radius of the particle [m].
-        density: The density of the particle [kg/m^3].
+        - mass_rate : The mass transfer rate for the particle [kg/s].
+        - radius : The radius of the particle [m].
+        - density : The density of the particle [kg/m^3].
 
     Returns:
         The radius growth rate for the particle [m/s].
@@ -150,11 +150,11 @@ def calculate_mass_transfer(
     dimensions of gas_mass.
 
     Args:
-        mass_rate: The rate of mass transfer per particle (kg/s).
-        time_step: The time step for the mass transfer calculation (seconds).
-        gas_mass: The available mass of gas species (kg).
-        particle_mass: The mass of each particle (kg).
-        particle_concentration: The concentration of particles (number/m^3).
+        - mass_rate : The rate of mass transfer per particle (kg/s).
+        - time_step : The time step for the mass transfer calculation (sec).
+        - gas_mass : The available mass of gas species (kg).
+        - particle_mass : The mass of each particle (kg).
+        - particle_concentration : The concentration of particles (number/m^3).
 
     Returns:
         The amount of mass transferred, accounting for gas and particle
@@ -189,11 +189,11 @@ def calculate_mass_transfer_single_species(
     Calculate mass transfer for a single gas species (m=1).
 
     Args:
-        mass_rate: The rate of mass transfer per particle (number*kg/s).
-        time_step: The time step for the mass transfer calculation (seconds).
-        gas_mass: The available mass of gas species (kg).
-        particle_mass: The mass of each particle (kg).
-        particle_concentration: The concentration of particles (number/m^3).
+        - mass_rate : The rate of mass transfer per particle (number*kg/s).
+        - time_step : The time step for the mass transfer calculation (sec).
+        - gas_mass : The available mass of gas species (kg).
+        - particle_mass : The mass of each particle (kg).
+        - particle_concentration : The concentration of particles (number/m^3).
 
     Returns:
         The amount of mass transferred for a single gas species.
@@ -233,12 +233,12 @@ def calculate_mass_transfer_multiple_species(
     Calculate mass transfer for multiple gas species.
 
     Args:
-        mass_rate: The rate of mass transfer per particle for each gas species
-            (kg/s).
-        time_step: The time step for the mass transfer calculation (seconds).
-        gas_mass: The available mass of each gas species (kg).
-        particle_mass: The mass of each particle for each gas species (kg).
-        particle_concentration: The concentration of particles for each gas
+        - mass_rate : The rate of mass transfer per particle for each gas
+            species (kg/s).
+        - time_step : The time step for the mass transfer calculation (sec).
+        - gas_mass : The available mass of each gas species (kg).
+        - particle_mass : The mass of each particle for each gas species (kg).
+        - particle_concentration : The concentration of particles for each gas
             species (number/m^3).
 
     Returns:
