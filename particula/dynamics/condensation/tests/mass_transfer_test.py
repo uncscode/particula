@@ -7,6 +7,7 @@ from particula.dynamics.condensation.mass_transfer import (
     calculate_mass_transfer,
     calculate_mass_transfer_single_species,
     calculate_mass_transfer_multiple_species,
+    radius_transfer_rate,  # Import the function to be tested
 )
 
 
@@ -277,3 +278,21 @@ def test_zero_mass_transfer():
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
     np.testing.assert_array_almost_equal(result, expected_mass_transfer)
+
+
+def test_radius_transfer_rate():
+    """Test the radius_transfer_rate function."""
+    mass_rate = 1e-21  # kg/s
+    radius = 1e-6  # m
+    density = 1000  # kg/m^3
+    expected_result = 7.95774715e-14  # m/s
+    result = radius_transfer_rate(mass_rate, radius, density)
+    np.testing.assert_allclose(result, expected_result, atol=1e-8)
+
+    # Test with array inputs
+    mass_rate = np.array([1e-21, 2e-21])  # kg/s
+    radius = np.array([1e-6, 2e-6])  # m
+    density = 1000  # kg/m^3
+    expected_result = np.array([7.95774715e-14, 1.98943679e-14])  # m/s
+    result = radius_transfer_rate(mass_rate, radius, density)
+    np.testing.assert_allclose(result, expected_result, atol=1e-8)
