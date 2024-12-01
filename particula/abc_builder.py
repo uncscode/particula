@@ -40,8 +40,8 @@ class BuilderABC(ABC):
             - parameters : The parameters dictionary to check.
 
         Raises:
-            - ValueError : If any required key is missing or if trying to set an
-                invalid parameter.
+            - ValueError : If any required key is missing or if trying to set
+                an invalid parameter.
 
         Example:
             ``` py
