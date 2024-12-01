@@ -104,8 +104,8 @@ class VaporPressureStrategy(ABC):
         temperature.
 
         Args:
-            molar_mass : Molar mass of the gas in kg/mol.
-            temperature : Temperature in Kelvin.
+            - molar_mass : Molar mass of the gas in kg/mol.
+            - temperature : Temperature in Kelvin.
 
         Returns:
             The saturation concentration of the gas in kg/m^3.
@@ -123,7 +123,7 @@ class VaporPressureStrategy(ABC):
         temperature. Units are in Pascals Pa=kg/(m·s²).
 
         Args:
-            temperature : Temperature in Kelvin.
+            - temperature : Temperature in Kelvin.
         """
 
 
@@ -141,13 +141,10 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy):
         Return the constant vapor pressure value.
 
         Args:
-        ----
-        - temperature (float or NDArray[np.float64]): Not used.
+            - temperature : Not used.
 
         Returns:
-        -------
-        - vapor_pressure (float or NDArray[np.float64]): The constant vapor
-        pressure value in Pascals.
+            The constant vapor pressure value in Pascals.
         """
         # repeat the constant value for each element temperature
         return np.full_like(temperature, self.vapor_pressure)
@@ -176,8 +173,7 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
         Calculate vapor pressure using the Antoine equation.
 
         Args:
-            a, b, c: Antoine equation parameters.
-            temperature: Temperature in Kelvin.
+            - temperature : Temperature in Kelvin.
 
         Returns:
             Vapor pressure in Pascals.
@@ -195,8 +191,7 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
 
 class ClausiusClapeyronStrategy(VaporPressureStrategy):
     """Concrete implementation of the VaporPressureStrategy using the
-    Clausius-Clapeyron equation for vapor pressure calculations.
-    """
+    Clausius-Clapeyron equation for vapor pressure calculations."""
 
     def __init__(
         self,
@@ -206,17 +201,12 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
     ):
         """
         Initializes the Clausius-Clapeyron strategy with the specific latent
-        heat
-        of vaporization and the specific gas constant of the substance.
+        heat of vaporization and the specific gas constant of the substance.
 
         Args:
-        ----
-        - latent_heat (float or NDArray[np.float64]): specific Latent heat of
-        in J/mol.
-        - temperature_initial (float or NDArray[np.float64]): Initial
-        temperature in Kelvin.
-        - pressure_initial (float or NDArray[np.float64]): Initial vapor
-        pressure in Pascals.
+            - latent_heat : Latent heat of vaporization in J/mol.
+            - temperature_initial : Initial temperature in Kelvin.
+            - pressure_initial : Initial vapor pressure in Pascals.
         """
         self.latent_heat = latent_heat
         self.temperature_initial = temperature_initial
@@ -229,11 +219,7 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
         Calculate vapor pressure using Clausius-Clapeyron equation.
 
         Args:
-            latent_heat: Latent heat of vaporization in J/mol.
-            temperature_initial: Initial temperature in Kelvin.
-            pressure_initial: Initial vapor pressure in Pascals.
-            temperature: Final temperature in Kelvin.
-            gas_constant: gas constant (default is 8.314 J/(mol·K)).
+            - temperature : Final temperature in Kelvin.
 
         Returns:
             Pure vapor pressure in Pascals.
@@ -260,15 +246,15 @@ class WaterBuckStrategy(VaporPressureStrategy):
         Calculate vapor pressure using the Buck equation for water vapor.
 
         Args:
-            temperature: Temperature in Kelvin.
+            - temperature : Temperature in Kelvin.
 
         Returns:
             Vapor pressure in Pascals.
 
         References:
             - Buck, A. L., 1981: New Equations for Computing Vapor Pressure and
-                Enhancement Factor. J. Appl. Meteor. Climatol., 20, 1527-1532,
-                https://doi.org/10.1175/1520-0450(1981)020<1527:NEFCVP>2.0.CO;2.
+              Enhancement Factor. J. Appl. Meteor. Climatol., 20, 1527-1532,
+              https://doi.org/10.1175/1520-0450(1981)020<1527:NEFCVP>2.0.CO;2.
             - https://en.wikipedia.org/wiki/Arden_Buck_equation
         """
         return buck_vapor_pressure(temperature)
