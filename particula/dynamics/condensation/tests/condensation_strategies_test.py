@@ -11,6 +11,7 @@ from particula.particles.representation import ParticleRepresentation
 from particula.gas.species import GasSpecies
 
 
+# pylint: disable=too-many-instance-attributes
 class TestCondensationIsothermal(unittest.TestCase):
     """
     Test class for the CondensationIsothermal strategy.
