@@ -213,7 +213,7 @@ class CondensationStrategy(ABC):
             - radius : The radius of the particles with zero values filled.
 
         Raises:
-            - ValueError : If all radius values are zero.
+            - Warning : If all radius values are zero.
         """
         if np.max(radius) == 0:
             message = (
