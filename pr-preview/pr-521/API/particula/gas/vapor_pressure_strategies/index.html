@@ -6654,7 +6654,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py">particula.gas.vapor_pressure_strategies</a> module.</p>
 </blockquote>
 <h2 id="antoinevaporpressurestrategy">AntoineVaporPressureStrategy<a class="headerlink" href="#antoinevaporpressurestrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L156">Show source in vapor_pressure_strategies.py:156</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L153">Show source in vapor_pressure_strategies.py:153</a></p>
 <p>Concrete implementation of the VaporPressureStrategy using the
 Antoine equation for vapor pressure calculations.</p>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
@@ -6671,11 +6671,12 @@ Antoine equation for vapor pressure calculations.</p>
 <li><a href="#vaporpressurestrategy">VaporPressureStrategy</a></li>
 </ul>
 <h3 id="antoinevaporpressurestrategypure_vapor_pressure">AntoineVaporPressureStrategy().pure_vapor_pressure<a class="headerlink" href="#antoinevaporpressurestrategypure_vapor_pressure" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L172">Show source in vapor_pressure_strategies.py:172</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L169">Show source in vapor_pressure_strategies.py:169</a></p>
 <p>Calculate vapor pressure using the Antoine equation.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<p>a, b, c: Antoine equation parameters.
-- <code>temperature</code> - Temperature in Kelvin.</p>
+<ul>
+<li>temperature : Temperature in Kelvin.</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <p>Vapor pressure in Pascals.</p>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
@@ -6691,7 +6692,7 @@ Antoine equation for vapor pressure calculations.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="clausiusclapeyronstrategy">ClausiusClapeyronStrategy<a class="headerlink" href="#clausiusclapeyronstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L196">Show source in vapor_pressure_strategies.py:196</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L192">Show source in vapor_pressure_strategies.py:192</a></p>
 <p>Concrete implementation of the VaporPressureStrategy using the
 Clausius-Clapeyron equation for vapor pressure calculations.</p>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
@@ -6708,15 +6709,11 @@ Clausius-Clapeyron equation for vapor pressure calculations.</p>
 <li><a href="#vaporpressurestrategy">VaporPressureStrategy</a></li>
 </ul>
 <h3 id="clausiusclapeyronstrategypure_vapor_pressure">ClausiusClapeyronStrategy().pure_vapor_pressure<a class="headerlink" href="#clausiusclapeyronstrategypure_vapor_pressure" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L225">Show source in vapor_pressure_strategies.py:225</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L215">Show source in vapor_pressure_strategies.py:215</a></p>
 <p>Calculate vapor pressure using Clausius-Clapeyron equation.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>latent_heat</code> - Latent heat of vaporization in J/mol.</li>
-<li><code>temperature_initial</code> - Initial temperature in Kelvin.</li>
-<li><code>pressure_initial</code> - Initial vapor pressure in Pascals.</li>
-<li><code>temperature</code> - Final temperature in Kelvin.</li>
-<li><code>gas_constant</code> - gas constant (default is 8.314 J/(mol·K)).</li>
+<li>temperature : Final temperature in Kelvin.</li>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <p>Pure vapor pressure in Pascals.</p>
@@ -6745,16 +6742,11 @@ vapor pressure value.</p>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L137">Show source in vapor_pressure_strategies.py:137</a></p>
 <p>Return the constant vapor pressure value.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>temperature (float or NDArray[np.float64]): Not used.</li>
+<li>temperature : Not used.</li>
 </ul>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
-<hr />
-<ul>
-<li>vapor_pressure (float or NDArray[np.float64]): The constant vapor
-pressure value in Pascals.</li>
-</ul>
+<p>The constant vapor pressure value in Pascals.</p>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">pure_vapor_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
@@ -6812,7 +6804,9 @@ mass, and temperature.</p>
 <p>Calculate the pure (saturation) vapor pressure at a given
 temperature. Units are in Pascals Pa=kg/(m·s²).</p>
 <h4 id="arguments_5">Arguments<a class="headerlink" href="#arguments_5" title="Permanent link">&para;</a></h4>
-<p>temperature : Temperature in Kelvin.</p>
+<ul>
+<li>temperature : Temperature in Kelvin.</li>
+</ul>
 <h4 id="signature_9">Signature<a class="headerlink" href="#signature_9" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span> <span class="nf">pure_vapor_pressure</span><span class="p">(</span>
@@ -6824,8 +6818,10 @@ temperature. Units are in Pascals Pa=kg/(m·s²).</p>
 <p>Calculate the saturation concentration of the gas at a given
 temperature.</p>
 <h4 id="arguments_6">Arguments<a class="headerlink" href="#arguments_6" title="Permanent link">&para;</a></h4>
-<p>molar_mass : Molar mass of the gas in kg/mol.
-temperature : Temperature in Kelvin.</p>
+<ul>
+<li>molar_mass : Molar mass of the gas in kg/mol.</li>
+<li>temperature : Temperature in Kelvin.</li>
+</ul>
 <h4 id="returns_5">Returns<a class="headerlink" href="#returns_5" title="Permanent link">&para;</a></h4>
 <p>The saturation concentration of the gas in kg/m^3.</p>
 <h4 id="signature_10">Signature<a class="headerlink" href="#signature_10" title="Permanent link">&para;</a></h4>
@@ -6855,7 +6851,7 @@ temperature.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="waterbuckstrategy">WaterBuckStrategy<a class="headerlink" href="#waterbuckstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L252">Show source in vapor_pressure_strategies.py:252</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L238">Show source in vapor_pressure_strategies.py:238</a></p>
 <p>Concrete implementation of the VaporPressureStrategy using the
 Buck equation for water vapor pressure calculations.</p>
 <h4 id="signature_12">Signature<a class="headerlink" href="#signature_12" title="Permanent link">&para;</a></h4>
@@ -6866,19 +6862,19 @@ Buck equation for water vapor pressure calculations.</p>
 <li><a href="#vaporpressurestrategy">VaporPressureStrategy</a></li>
 </ul>
 <h3 id="waterbuckstrategypure_vapor_pressure">WaterBuckStrategy().pure_vapor_pressure<a class="headerlink" href="#waterbuckstrategypure_vapor_pressure" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L256">Show source in vapor_pressure_strategies.py:256</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L242">Show source in vapor_pressure_strategies.py:242</a></p>
 <p>Calculate vapor pressure using the Buck equation for water vapor.</p>
 <h4 id="arguments_8">Arguments<a class="headerlink" href="#arguments_8" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>temperature</code> - Temperature in Kelvin.</li>
+<li>temperature : Temperature in Kelvin.</li>
 </ul>
 <h4 id="returns_7">Returns<a class="headerlink" href="#returns_7" title="Permanent link">&para;</a></h4>
 <p>Vapor pressure in Pascals.</p>
 <h4 id="references_2">References<a class="headerlink" href="#references_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>Buck, A. L., 1981: New Equations for Computing Vapor Pressure and
-    Enhancement Factor. J. Appl. Meteor. Climatol., 20, 1527-1532,
-    https://doi.org/10.1175/1520-0450(1981)020&lt;1527:NEFCVP&gt;2.0.CO;2.</li>
+  Enhancement Factor. J. Appl. Meteor. Climatol., 20, 1527-1532,
+  https://doi.org/10.1175/1520-0450(1981)020&lt;1527:NEFCVP&gt;2.0.CO;2.</li>
 <li>https://en.wikipedia.org/wiki/Arden_Buck_equation</li>
 </ul>
 <h4 id="signature_13">Signature<a class="headerlink" href="#signature_13" title="Permanent link">&para;</a></h4>
