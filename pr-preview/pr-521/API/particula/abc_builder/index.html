@@ -650,15 +650,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      Methods
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#raises" class="md-nav__link">
     <span class="md-ellipsis">
       Raises
@@ -5799,15 +5790,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      Methods
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#raises" class="md-nav__link">
     <span class="md-ellipsis">
       Raises
@@ -6065,16 +6047,6 @@ set parameters from a dictionary.</p>
 <ul>
 <li><code>-</code> <em>required_parameters</em> - List of required parameters for the builder.</li>
 </ul>
-<h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
-<ul>
-<li>check_keys (parameters): Check if the keys you want to set are</li>
-<li>present in the parameters dictionary.</li>
-<li>set_parameters (parameters): Set parameters from a dictionary
-    including optional suffix for units as '_units'.</li>
-<li><code>-</code> <em>pre_build_check()</em> - Check if all required attribute parameters are set
-    before building.</li>
-<li>build (abstract): Build and return the strategy object.</li>
-</ul>
 <h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
 <ul>
 <li>ValueError : If any required key is missing during check_keys or
@@ -6090,7 +6062,7 @@ set parameters from a dictionary.</p>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderabcbuild">BuilderABC().build<a class="headerlink" href="#builderabcbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L149">Show source in abc_builder.py:149</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L140">Show source in abc_builder.py:140</a></p>
 <p>Build and return the strategy object with the set parameters.</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6105,15 +6077,15 @@ set parameters from a dictionary.</p>
 <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderabccheck_keys">BuilderABC().check_keys<a class="headerlink" href="#builderabccheck_keys" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L45">Show source in abc_builder.py:45</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L36">Show source in abc_builder.py:36</a></p>
 <p>Check if the keys are present and valid.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>-</code> <em>parameters</em> - The parameters dictionary to check.</li>
+<li>parameters : The parameters dictionary to check.</li>
 </ul>
 <h4 id="raises_1">Raises<a class="headerlink" href="#raises_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>-</code> <em>ValueError</em> - If any required key is missing or if trying to set an
+<li>ValueError : If any required key is missing or if trying to set an
     invalid parameter.</li>
 </ul>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
@@ -6127,7 +6099,7 @@ set parameters from a dictionary.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">check_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderabcpre_build_check">BuilderABC().pre_build_check<a class="headerlink" href="#builderabcpre_build_check" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L128">Show source in abc_builder.py:128</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L119">Show source in abc_builder.py:119</a></p>
 <p>Check if all required attribute parameters are set before building.</p>
 <h4 id="raises_2">Raises<a class="headerlink" href="#raises_2" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6141,7 +6113,7 @@ set parameters from a dictionary.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">pre_build_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderabcset_parameters">BuilderABC().set_parameters<a class="headerlink" href="#builderabcset_parameters" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L91">Show source in abc_builder.py:91</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L82">Show source in abc_builder.py:82</a></p>
 <p>Set parameters from a dictionary including optional suffix for
 units as '_units'.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
