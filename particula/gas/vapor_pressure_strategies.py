@@ -321,4 +321,3 @@ class WaterBuckStrategy(VaporPressureStrategy):
             - https://en.wikipedia.org/wiki/Arden_Buck_equation
         """
         return buck_vapor_pressure(temperature)
- 
