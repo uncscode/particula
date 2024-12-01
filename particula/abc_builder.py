@@ -1,4 +1,8 @@
 """Abstract Base Class for Builder classes.
+
+References:
+    - Builder Pattern : https://refactoring.guru/design-patterns/builder
+
 """
 
 # pylint: disable=too-few-public-methods
