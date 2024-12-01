@@ -1,7 +1,7 @@
 """pytest tests for particle_resolved_method.py"""
 
-import numpy as np
 import time
+import numpy as np
 from particula.dynamics.coagulation.particle_resolved_method import (
     interpolate_kernel,
     calculate_probabilities,
