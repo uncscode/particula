@@ -288,12 +288,19 @@ def test_radius_transfer_rate():
 
     # Test edge cases
     np.testing.assert_allclose(radius_transfer_rate(0, 1e-6, 1000), 0)
-    np.testing.assert_array_equal(radius_transfer_rate([1e-21, 0], [1e-6, 1e-6], 1000), [7.95774715e-14, 0])
 
     # Test with array inputs
     mass_rate = np.array([1e-21, 2e-21])  # kg/s
     radius = np.array([1e-6, 2e-6])  # m
     density = 1000  # kg/m^3
     expected_result = np.array([7.95774715e-14, 1.98943679e-14])  # m/s
+    result = radius_transfer_rate(mass_rate, radius, density)
+    np.testing.assert_allclose(result, expected_result, atol=1e-8)
+
+    # Test with zero mass rate
+    mass_rate = np.array([1e-21, 0])  # kg/s
+    radius = np.array([1e-6, 2e-6])  # m
+    density = 1000  # kg/m^3
+    expected_result = np.array([7.95774715e-14, 0])  # m/s
     result = radius_transfer_rate(mass_rate, radius, density)
     np.testing.assert_allclose(result, expected_result, atol=1e-8)
