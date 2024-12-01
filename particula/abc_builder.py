@@ -51,6 +51,15 @@ class BuilderABC(ABC):
         Raises:
             - ValueError: If any required key is missing or if trying to set an
                 invalid parameter.
+
+        Example:
+            ``` py
+            builder = Builder()
+            builder.check_keys({
+                "parameter1": 1,
+                "parameter2": 2,
+            })
+            ```
         """
 
         # Check if all required keys are present
@@ -92,6 +101,15 @@ class BuilderABC(ABC):
         Raises:
             - ValueError : If any required key is missing.
             - Warning : If using default units for any parameter.
+
+        Example:
+            ``` py
+            builder = Builder().set_parameters({
+                "parameter1": 1,
+                "parameter2": 2,
+                "parameter2_units": "K",
+            })
+            ```
         """
         self.check_keys(parameters)
         for key in self.required_parameters:
@@ -112,6 +130,12 @@ class BuilderABC(ABC):
 
             Raises:
                 - ValueError : If any required parameter is missing.
+
+            Example:
+                ``` py
+                builder = Builder()
+                builder.pre_build_check()
+                ```
         """
         if missing := [
             p for p in self.required_parameters if getattr(self, p) is None
@@ -128,4 +152,10 @@ class BuilderABC(ABC):
 
         Returns:
             - strategy : The built strategy object.
+
+        Example:
+            ``` py
+            builder = Builder()
+            strategy = builder.build()
+            ```
         """
