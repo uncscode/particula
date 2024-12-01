@@ -53,7 +53,9 @@ class AntoineBuilder(BuilderABC):
         self.b = None
         self.c = None
 
-    def set_a(self, a: float, a_units: Optional[str] = None):
+    def set_a(
+        self, a: float, a_units: Optional[str] = None
+    ) -> "AntoineBuilder":
         """Set the coefficient 'a' of the Antoine equation."""
         if a < 0:
             logger.error("Coefficient 'a' must be a positive value.")
@@ -63,7 +65,7 @@ class AntoineBuilder(BuilderABC):
         self.a = a
         return self
 
-    def set_b(self, b: float, b_units: str = "K"):
+    def set_b(self, b: float, b_units: str = "K") -> "AntoineBuilder":
         """Set the coefficient 'b' of the Antoine equation."""
         if b < 0:
             logger.error("Coefficient 'b' must be a positive value.")
@@ -71,7 +73,7 @@ class AntoineBuilder(BuilderABC):
         self.b = convert_units(b_units, "K", b)
         return self
 
-    def set_c(self, c: float, c_units: str = "K"):
+    def set_c(self, c: float, c_units: str = "K") -> "AntoineBuilder":
         """Set the coefficient 'c' of the Antoine equation."""
         if c < 0:
             logger.error("Coefficient 'c' must be a positive value.")
@@ -79,7 +81,7 @@ class AntoineBuilder(BuilderABC):
         self.c = convert_units(c_units, "K", c)
         return self
 
-    def build(self):
+    def build(self) -> AntoineVaporPressureStrategy:
         """Build the AntoineVaporPressureStrategy object with the set
         coefficients."""
         self.pre_build_check()
@@ -132,7 +134,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
 
     def set_latent_heat(
         self, latent_heat: float, latent_heat_units: str = "J/kg"
-    ):
+    ) -> "ClausiusClapeyronBuilder":
         """Set the latent heat of vaporization: Default units J/kg."""
         if latent_heat < 0:
             raise ValueError("Latent heat must be a positive numeric value.")
@@ -143,7 +145,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
 
     def set_temperature_initial(
         self, temperature_initial: float, temperature_initial_units: str = "K"
-    ):
+    ) -> "ClausiusClapeyronBuilder":
         """Set the initial temperature. Default units: K."""
         if temperature_initial < 0:
             raise ValueError(
@@ -156,7 +158,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
 
     def set_pressure_initial(
         self, pressure_initial: float, pressure_initial_units: str = "Pa"
-    ):
+    ) -> "ClausiusClapeyronBuilder":
         """Set the initial pressure. Default units: Pa."""
         if pressure_initial < 0:
             raise ValueError(
@@ -167,7 +169,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
         )
         return self
 
-    def build(self):
+    def build(self) -> ClausiusClapeyronStrategy:
         """Build and return a ClausiusClapeyronStrategy object with the set
         parameters."""
         self.pre_build_check()
@@ -211,7 +213,7 @@ class ConstantBuilder(BuilderABC):
 
     def set_vapor_pressure(
         self, vapor_pressure: float, vapor_pressure_units: str = "Pa"
-    ):
+    ) -> "ConstantBuilder":
         """Set the constant vapor pressure."""
         if vapor_pressure < 0:
             raise ValueError("Vapor pressure must be a positive value.")
@@ -220,7 +222,7 @@ class ConstantBuilder(BuilderABC):
         )
         return self
 
-    def build(self):
+    def build(self) -> ConstantVaporPressureStrategy:
         """Build and return a ConstantVaporPressureStrategy object with the set
         parameters."""
         self.pre_build_check()
@@ -242,6 +244,6 @@ class WaterBuckBuilder(BuilderABC):  # pylint: disable=too-few-public-methods
     def __init__(self):
         super().__init__()
 
-    def build(self):
+    def build(self) -> WaterBuckStrategy:
         """Build and return a WaterBuckStrategy object."""
         return WaterBuckStrategy()
