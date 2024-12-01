@@ -37,6 +37,7 @@ Units are all Base SI units.
 
 from abc import ABC, abstractmethod
 from typing import Union, Optional, Tuple
+import logging
 from numpy.typing import NDArray
 import numpy as np
 
@@ -54,6 +55,8 @@ from particula.dynamics.condensation.mass_transfer import (
     mass_transfer_rate,
     calculate_mass_transfer,
 )
+
+logger = logging.getLogger("particula")
 
 
 # mass transfer abstract class
@@ -197,7 +200,7 @@ class CondensationStrategy(ABC):
         )
 
     def _fill_zero_radius(
-        self, radius: NDArray[np.float64]
+            self, radius: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         """Fill zero radius values with the maximum radius. The concentration
         value of zero will ensure that the rate of condensation is zero. The
@@ -208,7 +211,18 @@ class CondensationStrategy(ABC):
 
         Returns:
             - radius : The radius of the particles with zero values filled.
+
+        Raises:
+            - ValueError : If all radius values are zero.
         """
+        if np.max(radius) == 0:
+            message = (
+                "All radius values are zero, set to radius to 1 m for "
+                "condensation calculations. This should be ignored as the "
+                "particle concentration would also be zero."
+            )
+            logger.warning(message)
+            radius = np.where(radius == 0, 1, radius)
         return np.where(radius == 0, np.max(radius), radius)
 
     def calculate_pressure_delta(
