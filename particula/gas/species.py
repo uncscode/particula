@@ -5,6 +5,7 @@ Units are in kg/mol for molar mass, Kelvin for temperature, Pascals for
 pressure, and kg/m^3 for concentration.
 """
 
+import logging
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
@@ -12,6 +13,8 @@ from particula.gas.vapor_pressure_strategies import (
     VaporPressureStrategy,
     ConstantVaporPressureStrategy,
 )
+
+logger = logging.getLogger("particula")
 
 
 class GasSpecies:
@@ -43,10 +46,30 @@ class GasSpecies:
         concentration: Union[float, NDArray[np.float64]] = 0.0,
     ) -> None:
         self.name = name
-        self.molar_mass = molar_mass
         self.pure_vapor_pressure_strategy = vapor_pressure_strategy
         self.condensable = condensable
+
+        if isinstance(concentration, np.ndarray):
+            if np.any(concentration < 0.0):
+                message = "Negative concentration in gas species, stopping."
+                logger.error(message)
+                raise ValueError(message)
+        elif concentration < 0.0:
+            message = "Negative concentration in gas species, stopping."
+            logger.error(message)
+            raise ValueError(message)
         self.concentration = concentration
+
+        if isinstance(molar_mass, np.ndarray):
+            if np.any(molar_mass <= 0.0):
+                message = "Non-positive molar mass in gas species, stopping."
+                logger.error(message)
+                raise ValueError(message)
+        elif molar_mass <= 0.0:
+            message = "Non-positive molar mass in gas species, stopping."
+            logger.error(message)
+            raise ValueError(message)
+        self.molar_mass = molar_mass
 
     def __str__(self):
         """Return a string representation of the GasSpecies object."""
@@ -110,6 +133,11 @@ class GasSpecies:
 
         Raises:
             ValueError: If no vapor pressure strategy is set.
+
+        Example:
+            ``` py title="Example usage of get_pure_vapor_pressure"
+            gas_object.get_pure_vapor_pressure(temperature=298)
+            ```
         """
         if isinstance(self.pure_vapor_pressure_strategy, list):
             # Handle a list of strategies: calculate and return a list of vapor
@@ -146,6 +174,11 @@ class GasSpecies:
 
         Raises:
             ValueError: If the vapor pressure strategy is not set.
+
+        Example:
+            ``` py title="Example usage of get_partial_pressure"
+            gas_object.get_partial_pressure(temperature=298)
+            ```
         """
         # Handle multiple vapor pressure strategies
         if isinstance(self.pure_vapor_pressure_strategy, list):
@@ -189,6 +222,11 @@ class GasSpecies:
 
         Raises:
             ValueError : If the vapor pressure strategy is not set.
+
+        Example:
+            ``` py title="Example usage of get_saturation_ratio"
+            gas_object.get_saturation_ratio(temperature=298)
+            ```
         """
         # Handle multiple vapor pressure strategies
         if isinstance(self.pure_vapor_pressure_strategy, list):
@@ -232,6 +270,11 @@ class GasSpecies:
 
         Raises:
             ValueError: If the vapor pressure strategy is not set.
+
+        Example:
+            ``` py title="Example usage of get_saturation_concentration"
+            gas_object.get_saturation_concentration(temperature=298)
+            ```
         """
         # Handle multiple vapor pressure strategies
         if isinstance(self.pure_vapor_pressure_strategy, list):
@@ -261,6 +304,39 @@ class GasSpecies:
         Args:
             - added_concentration : The concentration to add to the gas
                 species.
+
+        Example:
+            ``` py title="Example usage of add_concentration"
+            gas_object.add_concentration(added_concentration=1e-10)
+            ```
         """
         self.concentration = self.concentration + added_concentration
+        self._log_if_negative_concentration()
         self.concentration = np.maximum(self.concentration, 0.0)
+
+    def set_concentration(
+        self, new_concentration: Union[float, NDArray[np.float64]]
+    ) -> None:
+        """Set the concentration of the gas species.
+
+        Args:
+            - new_concentration : The new concentration of the gas species.
+
+        Example:
+            ``` py title="Example usage of set_concentration"
+            gas_object.set_concentration(new_concentration=1e-10)
+            ```
+        """
+        self.concentration = new_concentration
+        self._log_if_negative_concentration()
+        self.concentration = np.maximum(self.concentration, 0.0)
+
+    def _log_if_negative_concentration(self) -> None:
+        """Log a warning if the concentration is negative."""
+        if isinstance(self.concentration, np.ndarray):
+            if np.any(self.concentration < 0.0):
+                message = "Negative concentration in gas species, set = 0."
+                logger.warning(message)
+        elif self.concentration < 0.0:
+            message = "Negative concentration in gas species, set = 0."
+            logger.warning(message)

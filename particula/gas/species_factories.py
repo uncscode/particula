@@ -23,20 +23,40 @@ class GasSpeciesFactory(
     Factory class to create species builders for creating gas species.
 
     Methods:
-        get_builders: Returns the mapping of strategy types to builder
+        - get_builders : Returns the mapping of strategy types to builder
         instances.
-        get_strategy: Gets the strategy instance
-        for the specified strategy type.
-            strategy_type: Type of species builder to use, can be
-            'gas_species' or 'preset_gas_species'.
-            parameters: Parameters required for the
-            builder, dependent on the chosen strategy type.
+        - get_strategy : Gets the strategy instance
+            - strategy_type : Type of species builder to use, can be
+                'gas_species' or 'preset_gas_species'.
+            - parameters : Parameters required for the
+                builder, dependent on the chosen strategy type.
 
     Returns:
-        GasSpecies: An instance of the specified GasSpecies.
+        GasSpecies : An instance of the specified GasSpecies.
 
     Raises:
-        ValueError: If an unknown strategy type is provided.
+        ValueError : If an unknown strategy type is provided.
+
+    Example:
+        ``` py title="Create a preset gas species using the factory"
+        factory = GasSpeciesFactory()
+        gas_object = factory.get_strategy("preset_gas_species", parameters)
+        ```
+
+        ``` py title="Create a gas species using the factory"
+        factory = GasSpeciesFactory()
+        parameters = {
+            "name": "Oxygen",
+            "molar_mass": 0.032,
+            "vapor_pressure_strategy": ConstantVaporPressureStrategy(
+                vapor_pressure=101325
+            ),
+            "condensable": False,
+            "concentration": 1.2,
+        }
+        gas_object = factory.get_strategy("gas_species", parameters)
+        ```
+
     """
 
     def get_builders(self):
@@ -44,8 +64,8 @@ class GasSpeciesFactory(
 
         Returns:
             A dictionary mapping strategy types to builder instances.
-                - gas_species: GasSpeciesBuilder
-                - preset_gas_species: PresetGasSpeciesBuilder
+                - gas_species : GasSpeciesBuilder
+                - preset_gas_species : PresetGasSpeciesBuilder
         """
         return {
             "gas_species": GasSpeciesBuilder(),
