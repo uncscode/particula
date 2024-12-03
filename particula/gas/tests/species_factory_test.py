@@ -45,6 +45,9 @@ class TestGasSpeciesFactory(unittest.TestCase):
             "preset_gas_species", parameters
         )
         self.assertIsInstance(preset_gas_species, GasSpecies)
+        self.assertEqual(preset_gas_species.mass, 28.97)
+        self.assertEqual(preset_gas_species.viscosity, 1.81e-5)
+        self.assertEqual(preset_gas_species.temperature, 293.15)
 
     def test_get_strategy_invalid(self):
         """Test getting an invalid strategy."""
