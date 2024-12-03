@@ -3,6 +3,7 @@
 # pylint: disable=##R0801
 
 import numpy as np
+import pytest
 from particula.gas.species import GasSpecies
 from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
@@ -64,3 +65,138 @@ def test_gas_species_builder_array_species():
         gas_species.get_pure_vapor_pressure(np.array([298, 300])),
         np.array([101325, 101325]),
     )
+
+
+def test_gas_species_negative_molar_mass():
+    """Test gas species with negative molar mass."""
+    with pytest.raises(ValueError):
+        GasSpecies(
+            name="NegativeMass",
+            molar_mass=-1,
+            vapor_pressure_strategy=None,
+            condensable=False,
+            concentration=1e-10,
+        )
+
+    # array input
+    with pytest.raises(ValueError):
+        GasSpecies(
+            name="NegativeMass",
+            molar_mass=np.array([-1, 1]),
+            vapor_pressure_strategy=None,
+            condensable=False,
+            concentration=np.array([1e-10, 1e-10]),
+        )
+
+
+def test_gas_species_zero_molar_mass():
+    """Test gas species with zero molar mass."""
+    with pytest.raises(ValueError):
+        GasSpecies(
+            name="ZeroMass",
+            molar_mass=0,
+            vapor_pressure_strategy=None,
+            condensable=False,
+            concentration=1e-10,
+        )
+
+    # array input
+    with pytest.raises(ValueError):
+        GasSpecies(
+            name="ZeroMass",
+            molar_mass=np.array([0, 1]),
+            vapor_pressure_strategy=None,
+            condensable=False,
+            concentration=np.array([1e-10, 1e-10]),
+        )
+
+
+def test_gas_species_negative_concentration():
+    """Test gas species with negative concentration."""
+    with pytest.raises(ValueError):
+        GasSpecies(
+            name="NegativeConcentration",
+            molar_mass=1e10,
+            vapor_pressure_strategy=None,
+            condensable=False,
+            concentration=-1,
+        )
+
+    # array input
+    with pytest.raises(ValueError):
+        GasSpecies(
+            name="NegativeConcentration",
+            molar_mass=np.array([1, 1]),
+            vapor_pressure_strategy=None,
+            condensable=False,
+            concentration=np.array([-1, 1]),
+        )
+
+
+def test_gas_species_zero_concentration():
+    """Test gas species with zero concentration."""
+    zero_concentration_species = GasSpecies(
+        name="ZeroConcentration",
+        molar_mass=1e10,
+        vapor_pressure_strategy=None,
+        condensable=False,
+        concentration=0,
+    )
+
+    assert zero_concentration_species.get_molar_mass() == 1e10
+    assert zero_concentration_species.get_concentration() == 0
+
+    # array input
+    zero_concentration_species = GasSpecies(
+        name="ZeroConcentration",
+        molar_mass=np.array([1, 1]),
+        vapor_pressure_strategy=None,
+        condensable=False,
+        concentration=np.array([0, 1]),
+    )
+
+    assert np.array_equal(zero_concentration_species.get_molar_mass(), [1, 1])
+    assert np.array_equal(
+        zero_concentration_species.get_concentration(), [0, 1]
+    )
+
+
+def test_gas_species_get_set_methods():
+    """Test the get and set methods of GasSpecies."""
+    gas_species = GasSpecies(
+        name="TestSpecies",
+        molar_mass=0.044,
+        vapor_pressure_strategy=ConstantVaporPressureStrategy(1000),
+        condensable=True,
+        concentration=0.5,
+    )
+
+    # Test get methods
+    assert gas_species.get_name() == "TestSpecies"
+    assert gas_species.get_molar_mass() == 0.044
+    assert gas_species.get_condensable() is True
+    assert gas_species.get_concentration() == 0.5
+
+    # Test set_concentration method
+    gas_species.set_concentration(1.0)
+    assert gas_species.get_concentration() == 1.0
+
+    # Test set_concentration with negative value
+    gas_species.set_concentration(-1.0)
+    assert gas_species.get_concentration() == 0.0
+
+    # Test add_concentration method
+    gas_species.add_concentration(0.5)
+    assert gas_species.get_concentration() == 0.5
+
+    # Test add_concentration with negative value
+    gas_species.add_concentration(-1.0)
+    assert gas_species.get_concentration() == 0.0
+
+    # Test array input for set_concentration
+    gas_species.set_concentration(np.array([0.5, 1.0]))
+    assert np.array_equal(gas_species.get_concentration(), [0.5, 1.0])
+
+    # Test array input for add_concentration
+    gas_species.add_concentration(np.array([0.5, -2.0]))
+    assert np.array_equal(gas_species.get_concentration(), [1.0, 0.0])

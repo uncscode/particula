@@ -31,29 +31,18 @@ class GasSpeciesBuilder(
     readable creation of GasSpecies instances with optional parameters.
 
     Attributes:
-        name: The name of the gas species.
-        molar_mass: The molar mass of the gas species in kg/mol.
-        vapor_pressure_strategy: The vapor pressure strategy for the
+        - name : The name of the gas species.
+        - molar_mass : The molar mass of the gas species in kg/mol.
+        - vapor_pressure_strategy : The vapor pressure strategy for the
             gas species.
-        condensable: Whether the gas species is condensable.
-        concentration: The concentration of the gas species in the
+        - condensable : Whether the gas species is condensable.
+        - concentration : The concentration of the gas species in the
             mixture, in kg/m^3.
-
-    Methods:
-        set_name: Set the name of the gas species.
-        set_molar_mass: Set the molar mass of the gas species in kg/mol.
-        set_vapor_pressure_strategy: Set the vapor pressure strategy
-            for the gas species.
-        set_condensable: Set the condensable bool of the gas species.
-        set_concentration: Set the concentration of the gas species in the
-            mixture, in kg/m^3.
-        set_parameters: Set the parameters of the GasSpecies object from
-            a dictionary including optional units.
 
     Raises:
-        ValueError: If any required key is missing. During check_keys and
+        - ValueError : If any required key is missing. During check_keys and
             pre_build_check. Or if trying to set an invalid parameter.
-        Warning: If using default units for any parameter.
+        - Warning : If using default units for any parameter.
     """
 
     def __init__(self):
@@ -72,7 +61,20 @@ class GasSpeciesBuilder(
         self.condensable = None
 
     def set_name(self, name: Union[str, NDArray[np.str_]]):
-        """Set the name of the gas species."""
+        """Set the name of the gas species.
+
+        Args:
+            name : The name of the gas species.
+
+        Returns:
+            self : The GasSpeciesBuilder object.
+
+        Examples:
+            ``` py title="Set a single name"
+            builder = GasSpeciesBuilder()
+            builder.set_name("Oxygen")
+            ```
+        """
         self.name = name
         return self
 
@@ -80,7 +82,22 @@ class GasSpeciesBuilder(
         self,
         strategy: Union[VaporPressureStrategy, list[VaporPressureStrategy]],
     ):
-        """Set the vapor pressure strategy for the gas species."""
+        """Set the vapor pressure strategy for the gas species.
+
+        Args:
+            strategy : The vapor pressure strategy for the gas species.
+
+        Returns:
+            self : The GasSpeciesBuilder object.
+
+        Examples:
+            ``` py title="Set a single vapor pressure strategy"
+            builder = GasSpeciesBuilder()
+            builder.set_vapor_pressure_strategy(
+                ConstantVaporPressureStrategy(vapor_pressure=1.0)
+            )
+            ```
+        """
         self.vapor_pressure_strategy = strategy
         return self
 
@@ -88,12 +105,24 @@ class GasSpeciesBuilder(
         self,
         condensable: Union[bool, NDArray[np.bool_]],
     ):
-        """Set the condensable bool of the gas species."""
+        """Set the condensable bool of the gas species.
+
+        Args:
+            condensable : Whether the gas species is condensable.
+
+        Returns:
+            self : The GasSpeciesBuilder object.
+
+        Examples:
+            ``` py title="Set a single condensable bool"
+            builder = GasSpeciesBuilder()
+            builder.set_condensable(False)
+            ```
+        """
         self.condensable = condensable
         return self
 
     def build(self) -> GasSpecies:
-        """Validate and return the GasSpecies object."""
         self.pre_build_check()
         return GasSpecies(
             name=self.name,  # type: ignore
@@ -111,7 +140,6 @@ class PresetGasSpeciesBuilder(
 ):
     """Builder class for GasSpecies objects, allowing for a more fluent and
     readable creation of GasSpecies instances with optional parameters.
-
     """
 
     def __init__(self):
@@ -125,7 +153,6 @@ class PresetGasSpeciesBuilder(
         self.concentration = 1.0
 
     def build(self) -> GasSpecies:
-
         self.pre_build_check()
         return GasSpecies(
             name=self.name,  # type: ignore
