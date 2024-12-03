@@ -19,31 +19,16 @@ class GasSpecies:
     properties like name, molar mass, vapor pressure, and condensability.
 
     Attributes:
-    ------------
-    - name (str): The name of the gas species.
-    - molar_mass (float): The molar mass of the gas species.
-    - pure_vapor_pressure_strategy (VaporPressureStrategy): The strategy for
-        calculating the pure vapor pressure of the gas species. Can be a single
-        strategy or a list of strategies. Default is a constant vapor pressure
-        strategy with a vapor pressure of 0.0 Pa.
-    - condensable (bool): Indicates whether the gas species is condensable.
-        Default is True.
-    - concentration (float): The concentration of the gas species in the
-        mixture. Default is 0.0 kg/m^3.
-
-    Methods:
-    --------
-    - get_molar_mass: Get the molar mass of the gas species.
-    - get_condensable: Check if the gas species is condensable.
-    - get_concentration: Get the concentration of the gas species in the
-        mixture.
-    - get_pure_vapor_pressure: Calculate the pure vapor pressure of the gas
-        species at a given temperature.
-    - get_partial_pressure: Calculate the partial pressure of the gas species.
-    - get_saturation_ratio: Calculate the saturation ratio of the gas species.
-    - get_saturation_concentration: Calculate the saturation concentration of
-        the gas species.
-    - add_concentration: Add concentration to the gas species.
+        - name : The name of the gas species.
+        - molar_mass : The molar mass of the gas species.
+        - pure_vapor_pressure_strategy : The strategy for calculating the pure
+            vapor pressure of the gas species. Can be a single strategy or a
+            list of strategies. Default is a constant vapor pressure strategy
+            with a vapor pressure of 0.0 Pa.
+        - condensable : Indicates whether the gas species is condensable.
+            Default is True.
+        - concentration : The concentration of the gas species in the mixture.
+            Default is 0.0 kg/m^3.
     """
 
     def __init__(  # pylint: disable=too-many-positional-arguments
@@ -79,31 +64,31 @@ class GasSpecies:
         """Get the name of the gas species.
 
         Returns:
-        - name (str or NDArray[np.str_]): The name of the gas species."""
+            The name of the gas species.
+        """
         return self.name
 
     def get_molar_mass(self) -> Union[float, NDArray[np.float64]]:
         """Get the molar mass of the gas species in kg/mol.
 
         Returns:
-        - molar_mass (float or NDArray[np.float64]): The molar mass of the gas
-            species, in kg/mol."""
+            The molar mass of the gas species, in kg/mol.
+        """
         return self.molar_mass
 
     def get_condensable(self) -> Union[bool, NDArray[np.bool_]]:
         """Check if the gas species is condensable or not.
 
         Returns:
-        - condensable (bool): True if the gas species is condensable, False
-            otherwise."""
+            True if the gas species is condensable, False otherwise.
+        """
         return self.condensable
 
     def get_concentration(self) -> Union[float, NDArray[np.float64]]:
         """Get the concentration of the gas species in the mixture, in kg/m^3.
 
         Returns:
-        - concentration (float or NDArray[np.float64]): The concentration of
-            the gas species in the mixture.
+            The concentration of the gas species in the mixture.
         """
         return self.concentration
 
@@ -117,12 +102,11 @@ class GasSpecies:
         for calculating vapor pressure.
 
         Args:
-        - temperature (float or NDArray[np.float64]): The temperature in
-        Kelvin at which to calculate vapor pressure.
+            - temperature : The temperature in Kelvin at which to calculate
+                vapor pressure.
 
         Returns:
-        - vapor_pressure (float or NDArray[np.float64]): The calculated pure
-        vapor pressure in Pascals.
+            The calculated pure vapor pressure in Pascals.
 
         Raises:
             ValueError: If no vapor pressure strategy is set.
@@ -146,22 +130,22 @@ class GasSpecies:
     def get_partial_pressure(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the partial pressure of the gas based on the vapor
-        pressure strategy. This method accounts for multiple strategies if
-        assigned and calculates partial pressure for each strategy based on
-        the corresponding concentration and molar mass.
+        """Calculate the partial pressure of the gas based on the vapor
+        pressure strategy.
 
-        Parameters:
-        - temperature (float or NDArray[np.float64]): The temperature in
-        Kelvin at which to calculate the partial pressure.
+        This method accounts for multiple strategies if assigned and
+        calculates partial pressure for each strategy based on the
+        corresponding concentration and molar mass.
+
+        Args:
+            - temperature : The temperature in Kelvin at which to calculate
+                the partial pressure.
 
         Returns:
-        - partial_pressure (float or NDArray[np.float64]): Partial pressure
-        of the gas in Pascals.
+            Partial pressure of the gas in Pascals.
 
         Raises:
-        - ValueError: If the vapor pressure strategy is not set.
+            ValueError: If the vapor pressure strategy is not set.
         """
         # Handle multiple vapor pressure strategies
         if isinstance(self.pure_vapor_pressure_strategy, list):
@@ -189,22 +173,22 @@ class GasSpecies:
     def get_saturation_ratio(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the saturation ratio of the gas based on the vapor
-        pressure strategy. This method accounts for multiple strategies if
-        assigned and calculates saturation ratio for each strategy based on
-        the corresponding concentration and molar mass.
+        """Calculate the saturation ratio of the gas based on the vapor
+        pressure strategy.
 
-        Parameters:
-        - temperature (float or NDArray[np.float64]): The temperature in
-        Kelvin at which to calculate the partial pressure.
+        This method accounts for multiple strategies if assigned and
+        calculates saturation ratio for each strategy based on the
+        corresponding concentration and molar mass.
+
+        Args:
+            - temperature : The temperature in Kelvin at which to calculate
+                the partial pressure.
 
         Returns:
-        - saturation_ratio (float or NDArray[np.float64]): The saturation ratio
-        of the gas
+            The saturation ratio of the gas.
 
         Raises:
-        - ValueError: If the vapor pressure strategy is not set.
+            ValueError : If the vapor pressure strategy is not set.
         """
         # Handle multiple vapor pressure strategies
         if isinstance(self.pure_vapor_pressure_strategy, list):
@@ -232,26 +216,26 @@ class GasSpecies:
     def get_saturation_concentration(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """
-        Calculate the saturation concentration of the gas based on the vapor
-        pressure strategy. This method accounts for multiple strategies if
-        assigned and calculates saturation concentration for each strategy
-        based on the molar mass.
+        """Calculate the saturation concentration of the gas based on the
+        vapor pressure strategy.
 
-        Parameters:
-        - temperature (float or NDArray[np.float64]): The temperature in
-        Kelvin at which to calculate the partial pressure.
+        This method accounts for multiple strategies if assigned and
+        calculates saturation concentration for each strategy based on the
+        molar mass.
+
+        Args:
+            - temperature : The temperature in Kelvin at which to calculate
+                the partial pressure.
 
         Returns:
-        - saturation_concentration (float or NDArray[np.float64]): The
-        saturation concentration of the gas
+            The saturation concentration of the gas.
 
         Raises:
-        - ValueError: If the vapor pressure strategy is not set.
+            ValueError: If the vapor pressure strategy is not set.
         """
         # Handle multiple vapor pressure strategies
         if isinstance(self.pure_vapor_pressure_strategy, list):
-            # Calculate saturation concentraiton for each strategy
+            # Calculate saturation concentration for each strategy
             return np.array(
                 [
                     strategy.saturation_concentration(
@@ -271,11 +255,12 @@ class GasSpecies:
 
     def add_concentration(
         self, added_concentration: Union[float, NDArray[np.float64]]
-    ):
+    ) -> None:
         """Add concentration to the gas species.
 
         Args:
-        - added_concentration (float): The concentration to add to the gas
-            species."""
+            - added_concentration : The concentration to add to the gas
+                species.
+        """
         self.concentration = self.concentration + added_concentration
         self.concentration = np.maximum(self.concentration, 0.0)
