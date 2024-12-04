@@ -315,7 +315,7 @@ class GasSpecies:
 
     def _check_if_negative_concentration(
         self, values: Union[float, NDArray[np.float64]]
-    ) -> None:
+    ) -> Union[float, NDArray[np.float64]]:
         """Log a warning if the concentration is negative."""
         if np.any(values < 0.0):
             message = "Negative concentration in gas species, set = 0."
