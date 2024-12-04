@@ -6,6 +6,7 @@ pressure, and kg/m^3 for concentration.
 """
 
 import logging
+import warnings
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
@@ -13,7 +14,6 @@ from particula.gas.vapor_pressure_strategies import (
     VaporPressureStrategy,
     ConstantVaporPressureStrategy,
 )
-import warnings
 
 logger = logging.getLogger("particula")
 
