@@ -73,7 +73,6 @@ def test_gas_species_negative_molar_mass():
         GasSpecies(
             name="NegativeMass",
             molar_mass=-1,
-            vapor_pressure_strategy=None,
             condensable=False,
             concentration=1e-10,
         )
@@ -83,7 +82,6 @@ def test_gas_species_negative_molar_mass():
         GasSpecies(
             name="NegativeMass",
             molar_mass=np.array([-1, 1]),
-            vapor_pressure_strategy=None,
             condensable=False,
             concentration=np.array([1e-10, 1e-10]),
         )
@@ -95,7 +93,6 @@ def test_gas_species_zero_molar_mass():
         GasSpecies(
             name="ZeroMass",
             molar_mass=0,
-            vapor_pressure_strategy=None,
             condensable=False,
             concentration=1e-10,
         )
@@ -105,7 +102,6 @@ def test_gas_species_zero_molar_mass():
         GasSpecies(
             name="ZeroMass",
             molar_mass=np.array([0, 1]),
-            vapor_pressure_strategy=None,
             condensable=False,
             concentration=np.array([1e-10, 1e-10]),
         )
@@ -117,7 +113,6 @@ def test_gas_species_negative_concentration():
         gas_species = GasSpecies(
             name="NegativeConcentration",
             molar_mass=1e10,
-            vapor_pressure_strategy=None,
             condensable=False,
             concentration=-1,
         )
@@ -128,7 +123,6 @@ def test_gas_species_negative_concentration():
         gas_species = GasSpecies(
             name="NegativeConcentration",
             molar_mass=np.array([1, 1]),
-            vapor_pressure_strategy=None,
             condensable=False,
             concentration=np.array([-1, 1]),
         )
@@ -140,7 +134,6 @@ def test_gas_species_zero_concentration():
     zero_concentration_species = GasSpecies(
         name="ZeroConcentration",
         molar_mass=1e10,
-        vapor_pressure_strategy=None,
         condensable=False,
         concentration=0,
     )
@@ -152,7 +145,6 @@ def test_gas_species_zero_concentration():
     zero_concentration_species = GasSpecies(
         name="ZeroConcentration",
         molar_mass=np.array([1, 1]),
-        vapor_pressure_strategy=None,
         condensable=False,
         concentration=np.array([0, 1]),
     )
