@@ -48,8 +48,8 @@ class GasSpecies:
     ) -> None:
         self._check_non_positive_value(molar_mass, "molar mass")
         self.molar_mass = molar_mass
+        concentration = self._check_if_negative_concentration(concentration)
         self.concentration = concentration
-        self._log_if_negative_concentration()
 
         self.name = name
         self.pure_vapor_pressure_strategy = vapor_pressure_strategy
@@ -309,17 +309,21 @@ class GasSpecies:
             gas_object.set_concentration(new_concentration=1e-10)
             ```
         """
+        new_concentration = self._check_if_negative_concentration(
+            new_concentration)
         self.concentration = new_concentration
-        self._log_if_negative_concentration()
 
-    def _log_if_negative_concentration(self) -> None:
+    def _check_if_negative_concentration(
+        self, values: Union[float, NDArray[np.float64]]
+    ) -> None:
         """Log a warning if the concentration is negative."""
-        if np.any(self.concentration < 0.0):
+        if np.any(values < 0.0):
             message = "Negative concentration in gas species, set = 0."
             logger.warning(message)
             warnings.warn(message, UserWarning)
             # Set negative concentrations to 0
-            self.concentration = np.maximum(self.concentration, 0.0)
+            values = np.maximum(values, 0.0)
+        return values
 
     def _check_non_positive_value(
         self, value: Union[float, NDArray[np.float64]], name: str
