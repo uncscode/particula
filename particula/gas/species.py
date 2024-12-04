@@ -45,31 +45,22 @@ class GasSpecies:
         condensable: Union[bool, NDArray[np.bool_]] = True,
         concentration: Union[float, NDArray[np.float64]] = 0.0,
     ) -> None:
-        self.name = name
-        self.pure_vapor_pressure_strategy = vapor_pressure_strategy
-        self.condensable = condensable
-
-        if isinstance(concentration, np.ndarray):
-            if np.any(concentration < 0.0):
-                message = "Negative concentration in gas species, stopping."
-                logger.error(message)
-                raise ValueError(message)
-        elif concentration < 0.0:
-            message = "Negative concentration in gas species, stopping."
+        if isinstance(molar_mass, np.ndarray) and np.any(molar_mass <= 0.0):
+            message = "Non-positive molar mass in gas species, stopping."
             logger.error(message)
             raise ValueError(message)
-        self.concentration = concentration
-
-        if isinstance(molar_mass, np.ndarray):
-            if np.any(molar_mass <= 0.0):
-                message = "Non-positive molar mass in gas species, stopping."
-                logger.error(message)
-                raise ValueError(message)
         elif molar_mass <= 0.0:
             message = "Non-positive molar mass in gas species, stopping."
             logger.error(message)
             raise ValueError(message)
+
         self.molar_mass = molar_mass
+        self.concentration = concentration
+        self._log_if_negative_concentration()
+
+        self.name = name
+        self.pure_vapor_pressure_strategy = vapor_pressure_strategy
+        self.condensable = condensable
 
     def __str__(self):
         """Return a string representation of the GasSpecies object."""
@@ -310,9 +301,7 @@ class GasSpecies:
             gas_object.add_concentration(added_concentration=1e-10)
             ```
         """
-        self.concentration = self.concentration + added_concentration
-        self._log_if_negative_concentration()
-        self.concentration = np.maximum(self.concentration, 0.0)
+        self.set_concentration(self.concentration + added_concentration)
 
     def set_concentration(
         self, new_concentration: Union[float, NDArray[np.float64]]
