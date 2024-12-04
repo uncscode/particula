@@ -113,24 +113,26 @@ def test_gas_species_zero_molar_mass():
 
 def test_gas_species_negative_concentration():
     """Test gas species with negative concentration."""
-    with pytest.raises(ValueError):
-        GasSpecies(
+    with pytest.warns(UserWarning):
+        gas_species = GasSpecies(
             name="NegativeConcentration",
             molar_mass=1e10,
             vapor_pressure_strategy=None,
             condensable=False,
             concentration=-1,
         )
+        assert gas_species.get_concentration() == 0.0
 
     # array input
-    with pytest.raises(ValueError):
-        GasSpecies(
+    with pytest.warns(UserWarning):
+        gas_species = GasSpecies(
             name="NegativeConcentration",
             molar_mass=np.array([1, 1]),
             vapor_pressure_strategy=None,
             condensable=False,
             concentration=np.array([-1, 1]),
         )
+        assert np.array_equal(gas_species.get_concentration(), [0.0, 1.0])
 
 
 def test_gas_species_zero_concentration():
@@ -182,7 +184,8 @@ def test_gas_species_get_set_methods():
     assert gas_species.get_concentration() == 1.0
 
     # Test set_concentration with negative value
-    gas_species.set_concentration(-1.0)
+    with pytest.warns(UserWarning):
+        gas_species.set_concentration(-1.0)
     assert gas_species.get_concentration() == 0.0
 
     # Test add_concentration method
@@ -190,7 +193,8 @@ def test_gas_species_get_set_methods():
     assert gas_species.get_concentration() == 0.5
 
     # Test add_concentration with negative value
-    gas_species.add_concentration(-1.0)
+    with pytest.warns(UserWarning):
+        gas_species.add_concentration(-1.0)
     assert gas_species.get_concentration() == 0.0
 
     # Test array input for set_concentration
@@ -198,5 +202,5 @@ def test_gas_species_get_set_methods():
     assert np.array_equal(gas_species.get_concentration(), [0.5, 1.0])
 
     # Test array input for add_concentration
-    gas_species.add_concentration(np.array([0.5, -2.0]))
+    gas_species.add_concentration(np.array([0.5, -1.0]))
     assert np.array_equal(gas_species.get_concentration(), [1.0, 0.0])
