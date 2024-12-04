@@ -37,6 +37,15 @@ class TestGasSpeciesFactory(unittest.TestCase):
         }
         gas_species = self.factory.get_strategy("gas_species", parameters)
         self.assertIsInstance(gas_species, GasSpecies)
+        self.assertEqual(gas_species.name, parameters["name"])
+        self.assertEqual(gas_species.molar_mass, parameters["molar_mass"])
+        self.assertEqual(
+            gas_species.pure_vapor_pressure_strategy,
+            parameters["vapor_pressure_strategy"],
+        )
+        self.assertEqual(gas_species.condensable, parameters["condensable"])
+        self.assertEqual(gas_species.concentration, parameters["concentration"])
+        self.assertIsInstance(gas_species, GasSpecies)
 
     def test_get_strategy_preset_gas_species(self):
         """Test getting a preset gas species strategy."""
@@ -45,9 +54,13 @@ class TestGasSpeciesFactory(unittest.TestCase):
             "preset_gas_species", parameters
         )
         self.assertIsInstance(preset_gas_species, GasSpecies)
-        self.assertEqual(preset_gas_species.mass, 28.97)
-        self.assertEqual(preset_gas_species.viscosity, 1.81e-5)
-        self.assertEqual(preset_gas_species.temperature, 293.15)
+        self.assertEqual(preset_gas_species.molar_mass, 0.1)
+        self.assertIsInstance(
+            preset_gas_species.pure_vapor_pressure_strategy,
+            ConstantVaporPressureStrategy,
+        )
+        self.assertEqual(preset_gas_species.condensable, False)
+        self.assertEqual(preset_gas_species.concentration, 1.0)
 
     def test_get_strategy_invalid(self):
         """Test getting an invalid strategy."""

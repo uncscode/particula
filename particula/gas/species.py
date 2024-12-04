@@ -13,6 +13,7 @@ from particula.gas.vapor_pressure_strategies import (
     VaporPressureStrategy,
     ConstantVaporPressureStrategy,
 )
+import warnings
 
 logger = logging.getLogger("particula")
 
@@ -45,15 +46,7 @@ class GasSpecies:
         condensable: Union[bool, NDArray[np.bool_]] = True,
         concentration: Union[float, NDArray[np.float64]] = 0.0,
     ) -> None:
-        if isinstance(molar_mass, np.ndarray) and np.any(molar_mass <= 0.0):
-            message = "Non-positive molar mass in gas species, stopping."
-            logger.error(message)
-            raise ValueError(message)
-        elif molar_mass <= 0.0:
-            message = "Non-positive molar mass in gas species, stopping."
-            logger.error(message)
-            raise ValueError(message)
-
+        self._check_non_positive_value(molar_mass, "molar mass")
         self.molar_mass = molar_mass
         self.concentration = concentration
         self._log_if_negative_concentration()
@@ -318,14 +311,21 @@ class GasSpecies:
         """
         self.concentration = new_concentration
         self._log_if_negative_concentration()
-        self.concentration = np.maximum(self.concentration, 0.0)
 
     def _log_if_negative_concentration(self) -> None:
         """Log a warning if the concentration is negative."""
-        if isinstance(self.concentration, np.ndarray):
-            if np.any(self.concentration < 0.0):
-                message = "Negative concentration in gas species, set = 0."
-                logger.warning(message)
-        elif self.concentration < 0.0:
+        if np.any(self.concentration < 0.0):
             message = "Negative concentration in gas species, set = 0."
             logger.warning(message)
+            warnings.warn(message, UserWarning)
+            # Set negative concentrations to 0
+            self.concentration = np.maximum(self.concentration, 0.0)
+
+    def _check_non_positive_value(
+        self, value: Union[float, NDArray[np.float64]], name: str
+    ) -> None:
+        """Check for non-positive values and raise an error if found."""
+        if np.any(value <= 0.0):
+            message = f"Non-positive {name} in gas species, stopping."
+            logger.error(message)
+            raise ValueError(message)
