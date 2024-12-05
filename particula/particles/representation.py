@@ -68,10 +68,6 @@ class ParticleRepresentation:
             - str : A string representation of the particle representation.
 
         Example:
-            ``` py title="Print"
-            print(particle_representation)
-            ```
-
             ``` py title="Get String Representation"
             str_rep = str(particle_representation)
             print(str_rep)
