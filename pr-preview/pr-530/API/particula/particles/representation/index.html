@@ -7652,8 +7652,6 @@ allows for flexibility in representing particles.</p>
 <li>str : A string representation of the particle representation.</li>
 </ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Print</span><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">particle_representation</span><span class="p">)</span>
-</code></pre></div>
 <div class="highlight"><span class="filename">Get String Representation</span><pre><span></span><code><span class="n">str_rep</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">particle_representation</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">str_rep</span><span class="p">)</span>
 </code></pre></div>
@@ -7661,7 +7659,7 @@ allows for flexibility in representing particles.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationadd_concentration">ParticleRepresentation().add_concentration<a class="headerlink" href="#particlerepresentationadd_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L420">Show source in representation.py:420</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L416">Show source in representation.py:416</a></p>
 <p>Adds concentration to the particle distribution.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7679,7 +7677,7 @@ allows for flexibility in representing particles.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationadd_mass">ParticleRepresentation().add_mass<a class="headerlink" href="#particlerepresentationadd_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L400">Show source in representation.py:400</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L396">Show source in representation.py:396</a></p>
 <p>Adds mass to the particle distribution, and updates parameters.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7693,7 +7691,7 @@ allows for flexibility in representing particles.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">added_mass</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationcollide_pairs">ParticleRepresentation().collide_pairs<a class="headerlink" href="#particlerepresentationcollide_pairs" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L451">Show source in representation.py:451</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L447">Show source in representation.py:447</a></p>
 <p>Collide pairs of indices, used for ParticleResolved Strategies.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7706,7 +7704,7 @@ allows for flexibility in representing particles.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">collide_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_activity">ParticleRepresentation().get_activity<a class="headerlink" href="#particlerepresentationget_activity" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L123">Show source in representation.py:123</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L119">Show source in representation.py:119</a></p>
 <p>Returns the activity strategy used for partial pressure
 calculations.</p>
 <h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
@@ -7728,7 +7726,7 @@ calculations.</p>
 <li><a href="../activity_strategies/#activitystrategy">ActivityStrategy</a></li>
 </ul>
 <h3 id="particlerepresentationget_activity_name">ParticleRepresentation().get_activity_name<a class="headerlink" href="#particlerepresentationget_activity_name" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L142">Show source in representation.py:142</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L138">Show source in representation.py:138</a></p>
 <p>Returns the name of the activity strategy used for partial pressure
 calculations.</p>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
@@ -7744,7 +7742,7 @@ calculations.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_activity_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_charge">ParticleRepresentation().get_charge<a class="headerlink" href="#particlerepresentationget_charge" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L270">Show source in representation.py:270</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L266">Show source in representation.py:266</a></p>
 <p>Returns the charge per particle.</p>
 <h4 id="arguments_4">Arguments<a class="headerlink" href="#arguments_4" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7761,7 +7759,7 @@ calculations.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_concentration">ParticleRepresentation().get_concentration<a class="headerlink" href="#particlerepresentationget_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L229">Show source in representation.py:229</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L225">Show source in representation.py:225</a></p>
 <p>Returns the volume concentration of the particles.</p>
 <p>For ParticleResolved Strategies, the concentration is the number of
 particles per self.volume to get concentration/m^3. For other
@@ -7781,7 +7779,7 @@ Strategies, the concentration is the already per 1/m^3.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_density">ParticleRepresentation().get_density<a class="headerlink" href="#particlerepresentationget_density" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L211">Show source in representation.py:211</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L207">Show source in representation.py:207</a></p>
 <p>Returns the density of the particles.</p>
 <h4 id="arguments_6">Arguments<a class="headerlink" href="#arguments_6" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7798,7 +7796,7 @@ Strategies, the concentration is the already per 1/m^3.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_distribution">ParticleRepresentation().get_distribution<a class="headerlink" href="#particlerepresentationget_distribution" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L193">Show source in representation.py:193</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L189">Show source in representation.py:189</a></p>
 <p>Returns the distribution of the particles.</p>
 <h4 id="arguments_7">Arguments<a class="headerlink" href="#arguments_7" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7815,7 +7813,7 @@ Strategies, the concentration is the already per 1/m^3.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_mass">ParticleRepresentation().get_mass<a class="headerlink" href="#particlerepresentationget_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L326">Show source in representation.py:326</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L322">Show source in representation.py:322</a></p>
 <p>Returns the mass of the particles as calculated by the strategy.</p>
 <h4 id="arguments_8">Arguments<a class="headerlink" href="#arguments_8" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7832,7 +7830,7 @@ Strategies, the concentration is the already per 1/m^3.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_mass_concentration">ParticleRepresentation().get_mass_concentration<a class="headerlink" href="#particlerepresentationget_mass_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L346">Show source in representation.py:346</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L342">Show source in representation.py:342</a></p>
 <p>Returns the total mass / volume simulated.</p>
 <p>The mass concentration is as calculated by the strategy, taking into
 account the distribution and concentration.</p>
@@ -7854,7 +7852,7 @@ account the distribution and concentration.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_mass_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_radius">ParticleRepresentation().get_radius<a class="headerlink" href="#particlerepresentationget_radius" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L380">Show source in representation.py:380</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L376">Show source in representation.py:376</a></p>
 <p>Returns the radius of the particles as calculated by the strategy.</p>
 <h4 id="arguments_10">Arguments<a class="headerlink" href="#arguments_10" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7871,7 +7869,7 @@ account the distribution and concentration.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_species_mass">ParticleRepresentation().get_species_mass<a class="headerlink" href="#particlerepresentationget_species_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L306">Show source in representation.py:306</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L302">Show source in representation.py:302</a></p>
 <p>Returns the masses per species in the particles.</p>
 <h4 id="arguments_11">Arguments<a class="headerlink" href="#arguments_11" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7888,7 +7886,7 @@ account the distribution and concentration.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_species_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_strategy">ParticleRepresentation().get_strategy<a class="headerlink" href="#particlerepresentationget_strategy" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L91">Show source in representation.py:91</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L87">Show source in representation.py:87</a></p>
 <p>Returns the strategy used for particle representation.</p>
 <h4 id="arguments_12">Arguments<a class="headerlink" href="#arguments_12" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7909,7 +7907,7 @@ account the distribution and concentration.</p>
 <li><a href="../distribution_strategies/#distributionstrategy">DistributionStrategy</a></li>
 </ul>
 <h3 id="particlerepresentationget_strategy_name">ParticleRepresentation().get_strategy_name<a class="headerlink" href="#particlerepresentationget_strategy_name" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L109">Show source in representation.py:109</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L105">Show source in representation.py:105</a></p>
 <p>Returns the name of the strategy used for particle representation.</p>
 <h4 id="returns_12">Returns<a class="headerlink" href="#returns_12" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7923,7 +7921,7 @@ account the distribution and concentration.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_strategy_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_surface">ParticleRepresentation().get_surface<a class="headerlink" href="#particlerepresentationget_surface" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L158">Show source in representation.py:158</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L154">Show source in representation.py:154</a></p>
 <p>Returns the surface strategy used for surface tension and
 Kelvin effect.</p>
 <h4 id="arguments_13">Arguments<a class="headerlink" href="#arguments_13" title="Permanent link">&para;</a></h4>
@@ -7945,7 +7943,7 @@ Kelvin effect.</p>
 <li><a href="../surface_strategies/#surfacestrategy">SurfaceStrategy</a></li>
 </ul>
 <h3 id="particlerepresentationget_surface_name">ParticleRepresentation().get_surface_name<a class="headerlink" href="#particlerepresentationget_surface_name" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L177">Show source in representation.py:177</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L173">Show source in representation.py:173</a></p>
 <p>Returns the name of the surface strategy used for surface tension
 and Kelvin effect.</p>
 <h4 id="returns_14">Returns<a class="headerlink" href="#returns_14" title="Permanent link">&para;</a></h4>
@@ -7961,7 +7959,7 @@ and Kelvin effect.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_surface_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_total_concentration">ParticleRepresentation().get_total_concentration<a class="headerlink" href="#particlerepresentationget_total_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L251">Show source in representation.py:251</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L247">Show source in representation.py:247</a></p>
 <p>Returns the total concentration of the particles.</p>
 <h4 id="arguments_14">Arguments<a class="headerlink" href="#arguments_14" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7981,7 +7979,7 @@ and Kelvin effect.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_total_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="particlerepresentationget_volume">ParticleRepresentation().get_volume<a class="headerlink" href="#particlerepresentationget_volume" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L288">Show source in representation.py:288</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L284">Show source in representation.py:284</a></p>
 <p>Returns the volume of the particles.</p>
 <h4 id="arguments_15">Arguments<a class="headerlink" href="#arguments_15" title="Permanent link">&para;</a></h4>
 <ul>
