@@ -33,6 +33,12 @@ def test_mass_based_build():
         "mass", parameters
     )
     assert isinstance(particle_rep, ParticleRepresentation)
+    assert np.array_equal(particle_rep.get_distribution(), parameters["mass"])
+    assert np.array_equal(particle_rep.get_density(), parameters["density"])
+    assert np.array_equal(
+        particle_rep.get_concentration(), parameters["concentration"]
+    )
+    assert particle_rep.get_charge() == parameters["charge"]
 
 
 def test_radii_based_build():
@@ -50,6 +56,12 @@ def test_radii_based_build():
         "radius", parameters
     )
     assert isinstance(strategy, ParticleRepresentation)
+    assert np.array_equal(strategy.get_distribution(), parameters["radius"])
+    assert np.array_equal(strategy.get_density(), parameters["density"])
+    assert np.array_equal(
+        strategy.get_concentration(), parameters["concentration"]
+    )
+    assert np.array_equal(strategy.get_charge(), parameters["charge"])
 
 
 def test_limited_radius_build():
@@ -87,6 +99,10 @@ def test_resolved_mass_build():
         "resolved_mass", parameters
     )
     assert isinstance(particle_rep, ParticleRepresentation)
+    assert np.array_equal(particle_rep.get_distribution(), parameters["mass"])
+    assert np.array_equal(particle_rep.get_density(), parameters["density"])
+    assert particle_rep.get_charge() == parameters["charge"]
+    assert particle_rep.get_volume() == parameters["volume"]
 
 
 def test_preset_resolved_mass_build():
@@ -108,6 +124,7 @@ def test_preset_resolved_mass_build():
         "preset_resolved_mass", parameters
     )
     assert isinstance(particle_rep, ParticleRepresentation)
+    assert particle_rep.get_volume() == parameters["volume"]
 
 
 def test_invalid_strategy():

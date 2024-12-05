@@ -26,15 +26,18 @@ class ParticleRepresentation:
     allows for flexibility in representing particles.
 
     Attributes:
-        strategy: The computation strategy for particle representations.
-        activity: The activity strategy for the partial pressure calculations.
-        surface: The surface strategy for surface tension and Kelvin effect.
-        distribution: The distribution data for the particles, which could
+        - strategy : The computation strategy for particle representations.
+        - activity : The activity strategy for the partial pressure
+            calculations.
+        - surface : The surface strategy for surface tension and Kelvin effect.
+        - distribution : The distribution data for the particles, which could
             represent sizes, masses, or another relevant metric.
-        density: The density of the material from which the particles are made.
-        concentration: The concentration of particles within the distribution.
-        charge: The charge on each particle.
-        volume: The air volume for simulation of particles in the air,
+        - density : The density of the material from which the particles are
+            made.
+        - concentration : The concentration of particles within the
+            distribution.
+        - charge : The charge on each particle.
+        - volume : The air volume for simulation of particles in the air,
             default is 1 m^3. This is only used in ParticleResolved Strategies.
     """
 
@@ -62,7 +65,17 @@ class ParticleRepresentation:
         """Returns a string representation of the particle representation.
 
         Returns:
-            str: A string representation of the particle representation.
+            - str : A string representation of the particle representation.
+
+        Example:
+            ``` py title="Print"
+            print(particle_representation)
+            ```
+
+            ``` py title="Get String Representation"
+            str_rep = str(particle_representation)
+            print(str_rep)
+            ```
         """
         return (
             f"Particle Representation:\n"
@@ -79,10 +92,15 @@ class ParticleRepresentation:
         """Returns the strategy used for particle representation.
 
         Args:
-            clone: If True, then return a deepcopy of the strategy.
+            - clone : If True, then return a deepcopy of the strategy.
 
         Returns:
-            The strategy used for particle representation.
+            - The strategy used for particle representation.
+
+        Example:
+            ``` py title="Get Strategy"
+            strategy = particle_representation.get_strategy()
+            ```
         """
         if clone:
             return deepcopy(self.strategy)
@@ -92,7 +110,13 @@ class ParticleRepresentation:
         """Returns the name of the strategy used for particle representation.
 
         Returns:
-            The name of the strategy used for particle representation.
+            - The name of the strategy used for particle representation.
+
+        Example:
+            ``` py title="Get Strategy Name"
+            strategy_name = particle_representation.get_strategy_name()
+            print(strategy_name)
+            ```
         """
         return self.strategy.get_name()
 
@@ -101,10 +125,15 @@ class ParticleRepresentation:
         calculations.
 
         Args:
-            clone: If True, then return a deepcopy of the activity strategy.
+            - clone : If True, then return a deepcopy of the activity strategy.
 
         Returns:
-            The activity strategy used for partial pressure calculations.
+            - The activity strategy used for partial pressure calculations.
+
+        Example:
+            ``` py title="Get Activity Strategy"
+            activity = particle_representation.get_activity()
+            ```
         """
         if clone:
             return deepcopy(self.activity)
@@ -115,20 +144,31 @@ class ParticleRepresentation:
         calculations.
 
         Returns:
-            The name of the activity strategy used for partial pressure
-            calculations.
+            - The name of the activity strategy used for partial pressure
+              calculations.
+
+        Example:
+            ``` py title="Get Activity Strategy Name"
+            activity_name = particle_representation.get_activity_name()
+            print(activity_name)
+            ```
         """
         return self.activity.get_name()
 
     def get_surface(self, clone: bool = False) -> SurfaceStrategy:
         """Returns the surface strategy used for surface tension and
-            Kelvin effect.
+        Kelvin effect.
 
         Args:
-            clone: If True, then return a deepcopy of the surface strategy.
+            - clone : If True, then return a deepcopy of the surface strategy.
 
         Returns:
-            The surface strategy used for surface tension and Kelvin effect.
+            - The surface strategy used for surface tension and Kelvin effect.
+
+        Example:
+            ``` py title="Get Surface Strategy"
+            surface = particle_representation.get_surface()
+            ```
         """
         if clone:
             return deepcopy(self.surface)
@@ -139,8 +179,14 @@ class ParticleRepresentation:
         and Kelvin effect.
 
         Returns:
-            The name of the surface strategy used for surface tension and
-            Kelvin effect.
+            - The name of the surface strategy used for surface tension and
+              Kelvin effect.
+
+        Example:
+            ``` py title="Get Surface Strategy Name"
+            surface_name = particle_representation.get_surface_name()
+            print(surface_name)
+            ```
         """
         return self.surface.get_name()
 
@@ -148,10 +194,15 @@ class ParticleRepresentation:
         """Returns the distribution of the particles.
 
         Args:
-            clone: If True, then return a copy of the distribution array.
+            - clone : If True, then return a copy of the distribution array.
 
         Returns:
-            The distribution of the particles.
+            - The distribution of the particles.
+
+        Example:
+            ``` py title="Get Distribution Array"
+            distribution = particle_representation.get_distribution()
+            ```
         """
         if clone:
             return np.copy(self.distribution)
@@ -161,10 +212,15 @@ class ParticleRepresentation:
         """Returns the density of the particles.
 
         Args:
-            clone: If True, then return a copy of the density array.
+            - clone : If True, then return a copy of the density array.
 
         Returns:
-            The density of the particles.
+            - The density of the particles.
+
+        Example:
+            ``` py title="Get Density Array"
+            density = particle_representation.get_density()
+            ```
         """
         if clone:
             return np.copy(self.density)
@@ -178,10 +234,15 @@ class ParticleRepresentation:
         Strategies, the concentration is the already per 1/m^3.
 
         Args:
-            clone: If True, then return a copy of the concentration array.
+            - clone : If True, then return a copy of the concentration array.
 
         Returns:
-            The concentration of the particles.
+            - The concentration of the particles.
+
+        Example:
+            ``` py title="Get Concentration Array"
+            concentration = particle_representation.get_concentration()
+            ```
         """
         if clone:
             return np.copy(self.concentration / self.volume)
@@ -191,10 +252,18 @@ class ParticleRepresentation:
         """Returns the total concentration of the particles.
 
         Args:
-            clone: If True, then return a copy of the concentration array.
+            - clone : If True, then return a copy of the concentration array.
 
         Returns:
-            The concentration of the particles.
+            - The concentration of the particles.
+
+        Example:
+            ``` py title="Get Total Concentration"
+            total_concentration = (
+                particle_representation.get_total_concentration()
+            )
+            print(total_concentration)
+            ```
         """
         return np.sum(self.get_concentration(clone=clone))
 
@@ -202,10 +271,15 @@ class ParticleRepresentation:
         """Returns the charge per particle.
 
         Args:
-            clone: If True, then return a copy of the charge array.
+            - clone : If True, then return a copy of the charge array.
 
         Returns:
-            The charge of the particles.
+            - The charge of the particles.
+
+        Example:
+            ``` py title="Get Charge Array"
+            charge = particle_representation.get_charge()
+            ```
         """
         if clone:
             return np.copy(self.charge)
@@ -215,10 +289,15 @@ class ParticleRepresentation:
         """Returns the volume of the particles.
 
         Args:
-            clone: If True, then return a copy of the volume array.
+            - clone : If True, then return a copy of the volume array.
 
         Returns:
-            The volume of the particles.
+            - The volume of the particles.
+
+        Example:
+            ``` py title="Get Volume"
+            volume = particle_representation.get_volume()
+            ```
         """
         if clone:
             return deepcopy(self.volume)
@@ -228,10 +307,15 @@ class ParticleRepresentation:
         """Returns the masses per species in the particles.
 
         Args:
-            clone: If True, then return a copy of the mass array.
+            - clone : If True, then return a copy of the mass array.
 
         Returns:
-            The mass of the particles per species.
+            - The mass of the particles per species.
+
+        Example:
+            ``` py title="Get Species Mass"
+            species_mass = particle_representation.get_species_mass()
+            ```
         """
         if clone:
             return np.copy(
@@ -243,10 +327,15 @@ class ParticleRepresentation:
         """Returns the mass of the particles as calculated by the strategy.
 
         Args:
-            clone: If True, then return a copy of the mass array.
+            - clone : If True, then return a copy of the mass array.
 
         Returns:
-            The mass of the particles.
+            - The mass of the particles.
+
+        Example:
+            ``` py title="Get Mass"
+            mass = particle_representation.get_mass()
+            ```
         """
         if clone:
             return np.copy(
@@ -261,10 +350,18 @@ class ParticleRepresentation:
         account the distribution and concentration.
 
         Args:
-            clone: If True, then return a copy of the mass concentration.
+            - clone : If True, then return a copy of the mass concentration.
 
         Returns:
-            np.float64: The mass concentration of the particles, kg/m^3.
+            - np.float64 : The mass concentration of the particles, kg/m^3.
+
+        Example:
+            ``` py title="Get Mass Concentration"
+            mass_concentration = (
+                particle_representation.get_mass_concentration()
+            )
+            print(mass_concentration)
+            ```
         """
         if clone:
             return deepcopy(
@@ -284,9 +381,15 @@ class ParticleRepresentation:
         """Returns the radius of the particles as calculated by the strategy.
 
         Args:
-            clone: If True, then return a copy of the radius array
+            - clone : If True, then return a copy of the radius array.
+
         Returns:
-            The radius of the particles.
+            - The radius of the particles.
+
+        Example:
+            ``` py title="Get Radius"
+            radius = particle_representation.get_radius()
+            ```
         """
         if clone:
             return np.copy(
@@ -298,8 +401,13 @@ class ParticleRepresentation:
         """Adds mass to the particle distribution, and updates parameters.
 
         Args:
-            added_mass: The mass to be added per
-                distribution bin.
+            - added_mass : The mass to be added per
+              distribution bin.
+
+        Example:
+            ``` py title="Add Mass"
+            particle_representation.add_mass(added_mass)
+            ```
         """
         # maybe remove return concentration
         (self.distribution, _) = self.strategy.add_mass(
@@ -317,8 +425,13 @@ class ParticleRepresentation:
         """Adds concentration to the particle distribution.
 
         Args:
-            added_concentration: The concentration to be
-                added per distribution bin.
+            - added_concentration : The concentration to be
+              added per distribution bin.
+
+        Example:
+            ``` py title="Add Concentration"
+            particle_representation.add_concentration(added_concentration)
+            ```
         """
         # if added_distribution is None, then it will be calculated
         if added_distribution is None:
@@ -339,7 +452,12 @@ class ParticleRepresentation:
         """Collide pairs of indices, used for ParticleResolved Strategies.
 
         Args:
-            indices: The indices to collide.
+            - indices : The indices to collide.
+
+        Example:
+            ``` py title="Collide Pairs"
+            particle_representation.collide_pairs(indices)
+            ```
         """
         (self.distribution, self.concentration) = self.strategy.collide_pairs(
             self.distribution, self.concentration, self.density, indices
