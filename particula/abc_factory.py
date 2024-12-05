@@ -1,7 +1,5 @@
 """Abstract Base Class for Factory classes, that use builders to create
 strategy objects.
-
-Note: Not sure on this approach, we'll see how it grows and if it is useful.
 """
 
 from abc import ABC, abstractmethod
@@ -17,13 +15,13 @@ StrategyT = TypeVar('StrategyT')
 
 class StrategyFactory(ABC, Generic[BuilderT, StrategyT]):
     """
-    Abstract base class for strategy factories.
+    Abstract base class for factories.
     """
 
     @abstractmethod
     def get_builders(self) -> Dict[str, BuilderT]:
         """
-        Returns the mapping of strategy types to builder instances.
+        Returns the mapping of key names to builders.
         """
 
     def get_strategy(
@@ -31,7 +29,16 @@ class StrategyFactory(ABC, Generic[BuilderT, StrategyT]):
         parameters: Optional[Dict[str, Any]] = None
     ) -> StrategyT:
         """
-        Generic factory method to create strategies.
+        Generic factory method to create objects instances.
+
+        Returns:
+            An object, built from selected builder with parameters.
+
+        Raises:
+            - ValueError : If an unknown key is provided.
+            - ValueError : If any required parameter is missing during
+                check_keys or pre_build_check, or if trying to set an
+                invalid parameter.
         """
         builder_map = self.get_builders()
         builder = builder_map.get(strategy_type.lower())
