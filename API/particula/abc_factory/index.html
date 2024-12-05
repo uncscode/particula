@@ -732,6 +732,24 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature_2" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -5713,6 +5731,24 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature_2" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -5768,7 +5804,7 @@
 <li><code>BuilderT</code> - Define a generic type variable for the strategy type, to get good type hints: TypeVar('BuilderT')</li>
 </ul>
 <h2 id="strategyfactory">StrategyFactory<a class="headerlink" href="#strategyfactory" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L18">Show source in abc_factory.py:18</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L16">Show source in abc_factory.py:16</a></p>
 <p>Abstract base class for strategy factories.</p>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">StrategyFactory</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">BuilderT</span><span class="p">,</span> <span class="n">StrategyT</span><span class="p">]):</span> <span class="o">...</span>
@@ -5779,8 +5815,8 @@
 <li><a href="#strategyt">StrategyT</a></li>
 </ul>
 <h3 id="strategyfactoryget_builders">StrategyFactory().get_builders<a class="headerlink" href="#strategyfactoryget_builders" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L23">Show source in abc_factory.py:23</a></p>
-<p>Returns the mapping of strategy types to builder instances.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L21">Show source in abc_factory.py:21</a></p>
+<p>Returns the mapping of key names to builders.</p>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span> <span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BuilderT</span><span class="p">]:</span> <span class="o">...</span>
@@ -5790,8 +5826,17 @@
 <li><a href="#buildert">BuilderT</a></li>
 </ul>
 <h3 id="strategyfactoryget_strategy">StrategyFactory().get_strategy<a class="headerlink" href="#strategyfactoryget_strategy" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L29">Show source in abc_factory.py:29</a></p>
-<p>Generic factory method to create strategies.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L27">Show source in abc_factory.py:27</a></p>
+<p>Generic factory method to create objects instances.</p>
+<h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
+<p>An object, built from selected builder with parameters.</p>
+<h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
+<ul>
+<li>ValueError : If an unknown key is provided.</li>
+<li>ValueError : If any required parameter is missing during
+    check_keys or pre_build_check, or if trying to set an
+    invalid parameter.</li>
+</ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_strategy</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">strategy_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>

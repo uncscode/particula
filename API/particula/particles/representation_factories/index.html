@@ -2328,24 +2328,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#raises" class="md-nav__link">
-    <span class="md-ellipsis">
-      Raises
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -2374,7 +2356,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#returns_1" class="md-nav__link">
+  <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
     </span>
@@ -5639,24 +5621,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#returns" class="md-nav__link">
-    <span class="md-ellipsis">
-      Returns
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#raises" class="md-nav__link">
-    <span class="md-ellipsis">
-      Raises
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -5685,7 +5649,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#returns_1" class="md-nav__link">
+  <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
     </span>
@@ -5740,26 +5704,15 @@
 <p>Factory class to create particle representation builders.</p>
 <h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>get_builders</code> - Returns the mapping of strategy types to builder
+<li>get_builders : Returns the mapping of strategy types to builder
     instances.</li>
-<li><code>get_strategy</code> - Gets the strategy instance for the specified strategy.<ul>
-<li><code>strategy_type</code> - Type of particle representation strategy to use,
-can be 'radius' (default) or 'mass'.</li>
-<li><code>parameters</code> - Parameters required for
-the builder</li>
+<li>get_strategy : Gets the strategy instance for the specified strategy.<ul>
+<li>strategy_type : Type of particle representation strategy to use,
+    can be 'radius' (default) or 'mass'.</li>
+<li>parameters : Parameters required for
+    the builder</li>
 </ul>
 </li>
-</ul>
-<h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<ul>
-<li><code>ParticleRepresentation</code> - An instance of the specified
-ParticleRepresentation.</li>
-</ul>
-<h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
-<ul>
-<li><code>ValueError</code> - If an unknown strategy type is provided.</li>
-<li><code>ValueError</code> - If any required key is missing during check_keys or
-    pre_build_check, or if trying to set an invalid parameter.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ParticleRepresentationFactory</span><span class="p">(</span>
@@ -5785,18 +5738,16 @@ ParticleRepresentation.</li>
 <li><a href="../representation_builders/#resolvedparticlemassrepresentationbuilder">ResolvedParticleMassRepresentationBuilder</a></li>
 </ul>
 <h3 id="particlerepresentationfactoryget_builders">ParticleRepresentationFactory().get_builders<a class="headerlink" href="#particlerepresentationfactoryget_builders" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_factories.py#L50">Show source in representation_factories.py:50</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_factories.py#L43">Show source in representation_factories.py:43</a></p>
 <p>Returns the mapping of strategy types to builder instances.</p>
-<h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<ul>
-<li><code>dict[str,</code> <em>Any]</em> - A dictionary with the strategy types as keys and
-the builder instances as values.</li>
-<li><code>-</code> <em>'mass'</em> - MassParticleRepresentationBuilder</li>
-<li><code>-</code> <em>'radius'</em> - RadiusParticleRepresentationBuilder</li>
-<li><code>-</code> <em>'preset_radius'</em> - LimitedRadiusParticleBuilder</li>
-<li><code>-</code> <em>'resolved_mass'</em> - ResolvedMassParticleRepresentationBuilder</li>
-<li><code>-</code> <em>'preset_resolved_mass'</em> - PresetResolvedMassParticleBuilder</li>
-</ul>
+<h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
+<p>A dictionary with the strategy types as keys and
+the builder instances as values.
+- 'mass' : MassParticleRepresentationBuilder
+- 'radius' : RadiusParticleRepresentationBuilder
+- 'preset_radius' : LimitedRadiusParticleBuilder
+- 'resolved_mass' : ResolvedMassParticleRepresentationBuilder
+- 'preset_resolved_mass' : PresetResolvedMassParticleBuilder</p>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>

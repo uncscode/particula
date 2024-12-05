@@ -6976,7 +6976,7 @@
 <p>Mixin class for Builder classes to set activity_strategy.</p>
 <h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>set_activity_strategy</code> - Set the activity_strategy attribute.</li>
+<li>set_activity_strategy : Set the activity_strategy attribute.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderActivityStrategyMixin</span><span class="p">:</span>
@@ -6987,8 +6987,8 @@
 <p>Set the activity strategy of the particle.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>activity_strategy</code> - Activity strategy of the particle.</li>
-<li><code>activity_strategy_units</code> - Not used. (for interface consistency)</li>
+<li>activity_strategy : Activity strategy of the particle.</li>
+<li>activity_strategy_units : Not used. (for interface consistency)</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_activity_strategy</span><span class="p">(</span>
@@ -7006,7 +7006,7 @@
 <p>Mixin class for Builder classes to set distribution_strategy.</p>
 <h4 id="methods_1">Methods<a class="headerlink" href="#methods_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>set_distribution_strategy</code> - Set the distribution_strategy attribute.</li>
+<li>set_distribution_strategy : Set the distribution_strategy attribute.</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderDistributionStrategyMixin</span><span class="p">:</span>
@@ -7017,8 +7017,8 @@
 <p>Set the distribution strategy of the particle.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>distribution_strategy</code> - Distribution strategy of the particle.</li>
-<li><code>distribution_strategy_units</code> - Not used. (for interface consistency)</li>
+<li>distribution_strategy : Distribution strategy of the particle.</li>
+<li>distribution_strategy_units : Not used. (for interface)</li>
 </ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_distribution_strategy</span><span class="p">(</span>
@@ -7036,7 +7036,7 @@
 <p>Mixin class for Builder classes to set surface_strategy.</p>
 <h4 id="methods_2">Methods<a class="headerlink" href="#methods_2" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>set_surface_strategy</code> - Set the surface_strategy attribute.</li>
+<li>set_surface_strategy : Set the surface_strategy attribute.</li>
 </ul>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderSurfaceStrategyMixin</span><span class="p">:</span>
@@ -7047,8 +7047,8 @@
 <p>Set the surface strategy of the particle.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>surface_strategy</code> - Surface strategy of the particle.</li>
-<li><code>surface_strategy_units</code> - Not used. (for interface consistency)</li>
+<li>surface_strategy : Surface strategy of the particle.</li>
+<li>surface_strategy_units : Not used. (for interface consistency)</li>
 </ul>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_surface_strategy</span><span class="p">(</span>
@@ -7064,14 +7064,15 @@
 <p>General ParticleRepresentation objects with mass-based bins.</p>
 <h4 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>distribution_strategy</code> - Set the DistributionStrategy.</li>
-<li><code>activity_strategy</code> - Set the ActivityStrategy.</li>
-<li><code>surface_strategy</code> - Set the SurfaceStrategy.</li>
-<li><code>mass</code> - Set the mass of the particles. Default units are 'kg'.</li>
-<li><code>density</code> - Set the density of the particles. Default units are 'kg/m^3'.</li>
-<li><code>concentration</code> - Set the concentration of the particles.
+<li>distribution_strategy : Set the DistributionStrategy.</li>
+<li>activity_strategy : Set the ActivityStrategy.</li>
+<li>surface_strategy : Set the SurfaceStrategy.</li>
+<li>mass : Set the mass of the particles. Default units are 'kg'.</li>
+<li>density : Set the density of the particles. Default units are
+    'kg/m^3'.</li>
+<li>concentration : Set the concentration of the particles.
     Default units are '1/m^3'.</li>
-<li><code>charge</code> - Set the number of charges.</li>
+<li>charge : Set the number of charges.</li>
 </ul>
 <h4 id="signature_6">Signature<a class="headerlink" href="#signature_6" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ParticleMassRepresentationBuilder</span><span class="p">(</span>
@@ -7098,10 +7099,12 @@
 <li><a href="#buildersurfacestrategymixin">BuilderSurfaceStrategyMixin</a></li>
 </ul>
 <h3 id="particlemassrepresentationbuilderbuild">ParticleMassRepresentationBuilder().build<a class="headerlink" href="#particlemassrepresentationbuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L184">Show source in representation_builders.py:184</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L185">Show source in representation_builders.py:185</a></p>
 <p>Validate and return the ParticleRepresentation object.</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>The validated ParticleRepresentation object.</p>
+<ul>
+<li>The validated ParticleRepresentation object.</li>
+</ul>
 <h4 id="signature_7">Signature<a class="headerlink" href="#signature_7" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
@@ -7110,18 +7113,19 @@
 <li><a href="../representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h2 id="particleradiusrepresentationbuilder">ParticleRadiusRepresentationBuilder<a class="headerlink" href="#particleradiusrepresentationbuilder" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L202">Show source in representation_builders.py:202</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L203">Show source in representation_builders.py:203</a></p>
 <p>General ParticleRepresentation objects with radius-based bins.</p>
 <h4 id="attributes_1">Attributes<a class="headerlink" href="#attributes_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>distribution_strategy</code> - Set the DistributionStrategy.</li>
-<li><code>activity_strategy</code> - Set the ActivityStrategy.</li>
-<li><code>surface_strategy</code> - Set the SurfaceStrategy.</li>
-<li><code>radius</code> - Set the radius of the particles. Default units are 'm'.</li>
-<li><code>density</code> - Set the density of the particles. Default units are 'kg/m**3'.</li>
-<li><code>concentration</code> - Set the concentration of the particles. Default units
+<li>distribution_strategy : Set the DistributionStrategy.</li>
+<li>activity_strategy : Set the ActivityStrategy.</li>
+<li>surface_strategy : Set the SurfaceStrategy.</li>
+<li>radius : Set the radius of the particles. Default units are 'm'.</li>
+<li>density : Set the density of the particles. Default units are
+    'kg/m**3'.</li>
+<li>concentration : Set the concentration of the particles. Default units
     are '1/m^3'.</li>
-<li><code>charge</code> - Set the number of charges.</li>
+<li>charge : Set the number of charges.</li>
 </ul>
 <h4 id="signature_8">Signature<a class="headerlink" href="#signature_8" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ParticleRadiusRepresentationBuilder</span><span class="p">(</span>
@@ -7148,10 +7152,12 @@
 <li><a href="#buildersurfacestrategymixin">BuilderSurfaceStrategyMixin</a></li>
 </ul>
 <h3 id="particleradiusrepresentationbuilderbuild">ParticleRadiusRepresentationBuilder().build<a class="headerlink" href="#particleradiusrepresentationbuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L244">Show source in representation_builders.py:244</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L246">Show source in representation_builders.py:246</a></p>
 <p>Validate and return the ParticleRepresentation object.</p>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<p>The validated ParticleRepresentation object.</p>
+<ul>
+<li>The validated ParticleRepresentation object.</li>
+</ul>
 <h4 id="signature_9">Signature<a class="headerlink" href="#signature_9" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
@@ -7160,17 +7166,18 @@
 <li><a href="../representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h2 id="presetparticleradiusbuilder">PresetParticleRadiusBuilder<a class="headerlink" href="#presetparticleradiusbuilder" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L262">Show source in representation_builders.py:262</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L264">Show source in representation_builders.py:264</a></p>
 <p>General ParticleRepresentation objects with radius-based bins.</p>
 <h4 id="attributes_2">Attributes<a class="headerlink" href="#attributes_2" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>mode</code> - Set the mode(s) of the distribution.
+<li>mode : Set the mode(s) of the distribution.
     Default is np.array([100e-9, 1e-6]) meters.</li>
-<li><code>geometric_standard_deviation</code> - Set the geometric standard deviation(s)
-    of the distribution. Default is np.array([1.2, 1.4]).</li>
-<li><code>number_concentration</code> - Set the number concentration of the distribution.
-    Default is np.array([1e4x1e6, 1e3x1e6]) particles/m^3.</li>
-<li><code>radius_bins</code> - Set the radius bins of the distribution. Default is
+<li>geometric_standard_deviation : Set the geometric standard
+    deviation(s) of the distribution. Default is np.array([1.2, 1.4]).</li>
+<li>number_concentration : Set the number concentration of the
+    distribution. Default is np.array([1e4x1e6, 1e3x1e6])
+    particles/m^3.</li>
+<li>radius_bins : Set the radius bins of the distribution. Default is
     np.logspace(-9, -4, 250), meters.</li>
 </ul>
 <h4 id="signature_10">Signature<a class="headerlink" href="#signature_10" title="Permanent link">&para;</a></h4>
@@ -7200,12 +7207,14 @@
 <li><a href="#buildersurfacestrategymixin">BuilderSurfaceStrategyMixin</a></li>
 </ul>
 <h3 id="presetparticleradiusbuilderbuild">PresetParticleRadiusBuilder().build<a class="headerlink" href="#presetparticleradiusbuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L352">Show source in representation_builders.py:352</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L355">Show source in representation_builders.py:355</a></p>
 <p>Validate and return the ParticleRepresentation object.</p>
 <p>This will build a distribution of particles with a lognormal size
 distribution, before returning the ParticleRepresentation object.</p>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
-<p>The validated ParticleRepresentation object.</p>
+<ul>
+<li>The validated ParticleRepresentation object.</li>
+</ul>
 <h4 id="signature_11">Signature<a class="headerlink" href="#signature_11" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
@@ -7214,11 +7223,11 @@ distribution, before returning the ParticleRepresentation object.</p>
 <li><a href="../representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="presetparticleradiusbuilderset_distribution_type">PresetParticleRadiusBuilder().set_distribution_type<a class="headerlink" href="#presetparticleradiusbuilderset_distribution_type" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L333">Show source in representation_builders.py:333</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L336">Show source in representation_builders.py:336</a></p>
 <p>Set the distribution type for the particle representation.</p>
 <h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>distribution_type</code> - The type of distribution to use.</li>
+<li>distribution_type : The type of distribution to use.</li>
 </ul>
 <h4 id="signature_12">Signature<a class="headerlink" href="#signature_12" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_distribution_type</span><span class="p">(</span>
@@ -7226,11 +7235,11 @@ distribution, before returning the ParticleRepresentation object.</p>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="presetparticleradiusbuilderset_radius_bins">PresetParticleRadiusBuilder().set_radius_bins<a class="headerlink" href="#presetparticleradiusbuilderset_radius_bins" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L316">Show source in representation_builders.py:316</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L319">Show source in representation_builders.py:319</a></p>
 <p>Set the radius bins for the distribution</p>
 <h4 id="arguments_4">Arguments<a class="headerlink" href="#arguments_4" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>radius_bins</code> - The radius bins for the distribution.</li>
+<li>radius_bins : The radius bins for the distribution.</li>
 </ul>
 <h4 id="signature_13">Signature<a class="headerlink" href="#signature_13" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_radius_bins</span><span class="p">(</span>
@@ -7238,29 +7247,29 @@ distribution, before returning the ParticleRepresentation object.</p>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="presetresolvedparticlemassbuilder">PresetResolvedParticleMassBuilder<a class="headerlink" href="#presetresolvedparticlemassbuilder" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L468">Show source in representation_builders.py:468</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L472">Show source in representation_builders.py:472</a></p>
 <p>General ParticleRepresentation objects with particle resolved masses.</p>
 <p>This class has preset values for all the attributes, and allows you to
 override them as needed. This is useful when you want to quickly
 particle representation object with resolved masses.</p>
 <h4 id="attributes_3">Attributes<a class="headerlink" href="#attributes_3" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>distribution_strategy</code> - Set the DistributionStrategy.</li>
-<li><code>activity_strategy</code> - Set the ActivityStrategy.</li>
-<li><code>surface_strategy</code> - Set the SurfaceStrategy.</li>
-<li><code>mass</code> - Set the mass of the particles Default
+<li>distribution_strategy : Set the DistributionStrategy.</li>
+<li>activity_strategy : Set the ActivityStrategy.</li>
+<li>surface_strategy : Set the SurfaceStrategy.</li>
+<li>mass : Set the mass of the particles Default
     units are 'kg'.</li>
-<li><code>density</code> - Set the density of the particles.
+<li>density : Set the density of the particles.
     Default units are 'kg/m^3'.</li>
-<li><code>charge</code> - Set the number of charges.</li>
-<li><code>mode</code> - Set the mode(s) of the distribution.
+<li>charge : Set the number of charges.</li>
+<li>mode : Set the mode(s) of the distribution.
     Default is np.array([100e-9, 1e-6]) meters.</li>
-<li><code>geometric_standard_deviation</code> - Set the geometric standard
+<li>geometric_standard_deviation : Set the geometric standard
     deviation(s) of the distribution. Default is np.array([1.2, 1.4]).</li>
-<li><code>number_concentration</code> - Set the number concentration of the
+<li>number_concentration : Set the number concentration of the
     distribution. Default is np.array([1e4 1e6, 1e3 1e6])
     particles/m^3.</li>
-<li><code>particle_resolved_count</code> - Set the number of resolved particles.</li>
+<li>particle_resolved_count : Set the number of resolved particles.</li>
 </ul>
 <h4 id="signature_14">Signature<a class="headerlink" href="#signature_14" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PresetResolvedParticleMassBuilder</span><span class="p">(</span>
@@ -7289,12 +7298,14 @@ particle representation object with resolved masses.</p>
 <li><a href="../../builder_mixin/#buildervolumemixin">BuilderVolumeMixin</a></li>
 </ul>
 <h3 id="presetresolvedparticlemassbuilderbuild">PresetResolvedParticleMassBuilder().build<a class="headerlink" href="#presetresolvedparticlemassbuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L536">Show source in representation_builders.py:536</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L540">Show source in representation_builders.py:540</a></p>
 <p>Validate and return the ParticleRepresentation object.</p>
 <p>This will build a distribution of particles with a lognormal size
 distribution, before returning the ParticleRepresentation object.</p>
 <h4 id="returns_3">Returns<a class="headerlink" href="#returns_3" title="Permanent link">&para;</a></h4>
-<p>The validated ParticleRepresentation object.</p>
+<ul>
+<li>The validated ParticleRepresentation object.</li>
+</ul>
 <h4 id="signature_15">Signature<a class="headerlink" href="#signature_15" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
@@ -7303,7 +7314,7 @@ distribution, before returning the ParticleRepresentation object.</p>
 <li><a href="../representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h2 id="resolvedparticlemassrepresentationbuilder">ResolvedParticleMassRepresentationBuilder<a class="headerlink" href="#resolvedparticlemassrepresentationbuilder" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L392">Show source in representation_builders.py:392</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L395">Show source in representation_builders.py:395</a></p>
 <p>Builder class for constructing ParticleRepresentation objects with
 resolved masses.</p>
 <p>This class allows you to set various attributes for a particle
@@ -7311,13 +7322,13 @@ representation, such as distribution strategy, mass, density, charge,
 volume, and more. These attributes are validated and there a no presets.</p>
 <h4 id="attributes_4">Attributes<a class="headerlink" href="#attributes_4" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>distribution_strategy</code> - Set the distribution strategy for particles.</li>
-<li><code>activity_strategy</code> - Set the activity strategy for the particles.</li>
-<li><code>surface_strategy</code> - Set the surface strategy for the particles.</li>
-<li><code>mass</code> - Set the particle mass. Defaults to 'kg'.</li>
-<li><code>density</code> - Set the particle density. Defaults to 'kg/m^3'.</li>
-<li><code>charge</code> - Set the particle charge.</li>
-<li><code>volume</code> - Set the particle volume. Defaults to 'm^3'.</li>
+<li>distribution_strategy : Set the distribution strategy for particles.</li>
+<li>activity_strategy : Set the activity strategy for the particles.</li>
+<li>surface_strategy : Set the surface strategy for the particles.</li>
+<li>mass : Set the particle mass. Defaults to 'kg'.</li>
+<li>density : Set the particle density. Defaults to 'kg/m^3'.</li>
+<li>charge : Set the particle charge.</li>
+<li>volume : Set the particle volume. Defaults to 'm^3'.</li>
 </ul>
 <h4 id="signature_16">Signature<a class="headerlink" href="#signature_16" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ResolvedParticleMassRepresentationBuilder</span><span class="p">(</span>
@@ -7344,13 +7355,14 @@ volume, and more. These attributes are validated and there a no presets.</p>
 <li><a href="../../builder_mixin/#buildervolumemixin">BuilderVolumeMixin</a></li>
 </ul>
 <h3 id="resolvedparticlemassrepresentationbuilderbuild">ResolvedParticleMassRepresentationBuilder().build<a class="headerlink" href="#resolvedparticlemassrepresentationbuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L439">Show source in representation_builders.py:439</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L442">Show source in representation_builders.py:442</a></p>
 <p>Validate and return a ParticleRepresentation object.</p>
 <p>This method validates all the required attributes and builds a particle
 representation with a lognormal size distribution.</p>
 <h4 id="returns_4">Returns<a class="headerlink" href="#returns_4" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>ParticleRepresentation</code> - A validated particle representation object.</li>
+<li>ParticleRepresentation : A validated particle representation
+    object.</li>
 </ul>
 <h4 id="signature_17">Signature<a class="headerlink" href="#signature_17" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
