@@ -15,7 +15,7 @@ StrategyT = TypeVar('StrategyT')
 
 class StrategyFactory(ABC, Generic[BuilderT, StrategyT]):
     """
-    Abstract base class for factories.
+    Abstract base class for strategy factories.
     """
 
     @abstractmethod
