@@ -180,7 +180,7 @@ class ParticleRepresentation:
 
         Returns:
             - The name of the surface strategy used for surface tension and
-              Kelvin effect.
+                Kelvin effect.
 
         Example:
             ``` py title="Get Surface Strategy Name"
