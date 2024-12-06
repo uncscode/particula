@@ -58,7 +58,14 @@ def test_particle_aerodynamic_length_array_input():
     ("sphere", 1.0),
     ("cube", 1.08),
     ("cylinder_avg_aspect_2", 1.1),
-    ("cylinder_avg_aspect_5", 1.35)
+    ("cylinder_avg_aspect_5", 1.35),
+    ("cylinder_avg_aspect_10", 1.68),
+    ("spheres_cluster_3", 1.15),
+    ("spheres_cluster_4", 1.17),
+    ("bituminous_coal", 1.08),
+    ("quartz", 1.36),
+    ("sand", 1.57),
+    ("talc", 1.88)
 ])
 def test_get_aerodynamic_shape_factor(shape_key, expected_factor):
     """Test the get_aerodynamic_shape_factor function."""
