@@ -1,9 +1,9 @@
 """Tests for the aerodynamic_mobility module."""
 
+from contextlib import nullcontext
 import numpy as np
 import pytest
 from particula.particles.properties import particle_aerodynamic_mobility
-from contextlib import nullcontext
 
 
 def test_particle_aerodynamic_mobility_single_value():
