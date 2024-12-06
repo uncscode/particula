@@ -54,13 +54,13 @@ def test_particle_aerodynamic_length_array_input():
     assert np.allclose(actual_length, expected_length)
 
 
-def test_get_aerodynamic_shape_factor():
-    """
-    Test that the get_aerodynamic_shape_factor function retrieves the correct
-    shape factor for known shapes.
-    """
-    shape_key = "sphere"
-    expected_factor = 1.0
+@pytest.mark.parametrize("shape_key, expected_factor", [
+    ("sphere", 1.0),
+    ("cube", 1.08),
+    ("cylinder_avg_aspect_2", 1.15),
+    ("cylinder_avg_aspect_5", 1.25)
+])
+def test_get_aerodynamic_shape_factor(shape_key, expected_factor):
     actual_factor = get_aerodynamic_shape_factor(shape_key)
     assert actual_factor == expected_factor, "The shape factor does not match."
 
