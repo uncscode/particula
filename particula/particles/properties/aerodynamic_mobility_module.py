@@ -1,9 +1,12 @@
 """Module for aerodynamic mobility of a particle in a fluid.
 """
 
+import logging
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
+
+logger = logging.getLogger("particula")
 
 
 def particle_aerodynamic_mobility(
@@ -37,4 +40,14 @@ def particle_aerodynamic_mobility(
         )
         ```
     """
+    # Validate radius
+    if (
+        np.any(radius <= 0)
+        or np.any(np.isnan(radius))
+        or np.any(np.isinf(radius))
+    ):
+        message = "The radius must be a positive, finite number."
+        logger.error(message)
+        raise ValueError(message)
+
     return slip_correction_factor / (6 * np.pi * dynamic_viscosity * radius)
