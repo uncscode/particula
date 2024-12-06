@@ -9,6 +9,7 @@ from particula.particles.surface_strategies import SurfaceStrategyVolume
 from particula.particles.activity_strategies import ActivityIdealMass
 
 
+# pylint: disable=too-many-arguments, too-many-positional-arguments
 def setup_particle(
     strategy: RadiiBasedMovingBin = RadiiBasedMovingBin(),
     activity: ActivityIdealMass = ActivityIdealMass(),
