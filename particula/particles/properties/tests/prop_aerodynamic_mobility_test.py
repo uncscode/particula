@@ -57,9 +57,6 @@ def test_particle_aerodynamic_mobility_extreme_values(radius: float) -> None:
     """
     Verify that the particle_aerodynamic_mobility function calculates the
     correct aerodynamic mobility value for extreme particle radii.
-
-    - radius : 
-        1 nanometer and 1 millimeter
     """
     slip_correction_factor = 1.1
     dynamic_viscosity = 0.0000181  # Pa.s for air at room temperature
