@@ -1,10 +1,10 @@
 """Module for aerodynamic mobility of a particle in a fluid.
 """
 
-import logging
 from typing import Union
-from numpy.typing import NDArray
+import logging
 import numpy as np
+from numpy.typing import NDArray
 
 logger = logging.getLogger("particula")
 
