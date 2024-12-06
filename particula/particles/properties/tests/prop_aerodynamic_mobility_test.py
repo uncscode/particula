@@ -1,5 +1,6 @@
 """Tests for the aerodynamic_mobility module."""
 
+from contextlib import nullcontext
 import numpy as np
 import pytest
 from particula.particles.properties import particle_aerodynamic_mobility
@@ -50,3 +51,31 @@ def test_particle_aerodynamic_mobility_type_error():
         particle_aerodynamic_mobility(
             "not a number", "also not a number", "still not a number"
         )
+
+
+@pytest.mark.parametrize(
+    "radius", [0, -1e-6, 1e-12, 1e-3, float("inf"), float("nan")]
+)
+def test_particle_aerodynamic_mobility_extreme_values(radius: float) -> None:
+    """
+    Verify that the particle_aerodynamic_mobility function handles extreme
+    values correctly.
+    - radius : The radius of the particle
+    """
+    slip_correction_factor = 1.1
+    dynamic_viscosity = 0.0000181  # Pa.s for air at room temperature
+    with (
+        pytest.raises(ValueError)
+        if (radius <= 0 or np.isnan(radius) or np.isinf(radius))
+        else nullcontext()
+    ):
+        actual_mobility = particle_aerodynamic_mobility(
+            radius, slip_correction_factor, dynamic_viscosity
+        )
+        if radius > 0:
+            expected_mobility = slip_correction_factor / (
+                6 * np.pi * dynamic_viscosity * radius
+            )
+            assert np.isclose(
+                actual_mobility, expected_mobility
+            ), f"The value does not match for radius {radius}."
