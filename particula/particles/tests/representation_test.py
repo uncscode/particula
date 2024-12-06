@@ -9,24 +9,33 @@ from particula.particles.surface_strategies import SurfaceStrategyVolume
 from particula.particles.activity_strategies import ActivityIdealMass
 
 
-def setup_particle() -> ParticleRepresentation:
-    """Setup ParticleRepresentation for testing."""
-    set_strategy = RadiiBasedMovingBin()
-    set_activity = ActivityIdealMass()
-    set_surface = SurfaceStrategyVolume()
-    set_distribution = np.array([1.0, 2.0, 3.0])
-    set_density = 1.0
-    set_concentration = np.array([10, 20, 30])
-    set_charge = 1.0
-
+def setup_particle(
+    strategy: RadiiBasedMovingBin = RadiiBasedMovingBin(),
+    activity: ActivityIdealMass = ActivityIdealMass(),
+    surface: SurfaceStrategyVolume = SurfaceStrategyVolume(),
+    distribution: np.ndarray = np.array([1.0, 2.0, 3.0]),
+    density: float = 1.0,
+    concentration: np.ndarray = np.array([10, 20, 30]),
+    charge: float = 1.0,
+) -> ParticleRepresentation:
+    """Setup ParticleRepresentation for testing with configurable parameters.
+    
+    - strategy : Strategy for particle distribution
+    - activity : Activity strategy for particles
+    - surface : Surface strategy for particles
+    - distribution : Distribution array for particles
+    - density : Density of particles
+    - concentration : Concentration array for particles
+    - charge : Charge of particles
+    """
     return ParticleRepresentation(
-        strategy=set_strategy,
-        activity=set_activity,
-        surface=set_surface,
-        distribution=set_distribution,
-        density=set_density,
-        concentration=set_concentration,
-        charge=set_charge,
+        strategy=strategy,
+        activity=activity,
+        surface=surface,
+        distribution=distribution,
+        density=density,
+        concentration=concentration,
+        charge=charge,
     )
 
 
@@ -55,12 +64,15 @@ def test_get_radius():
 def test_get_mass_concentration():
     """Test get_mass_concentration method."""
     particle = setup_particle()
+    mass = particle.get_mass()
+    expected_mass_concentration = np.sum(mass*particle.get_concentration())
     total_mass = particle.get_mass_concentration()
     total_mass_clone = particle.get_mass_concentration(clone=True)
 
     assert isinstance(total_mass, np.float64)
     assert isinstance(total_mass_clone, np.float64)
     assert total_mass == total_mass_clone
+    assert total_mass == expected_mass_concentration
 
 
 def test_get_strategy():
@@ -150,7 +162,10 @@ def test_get_species_mass():
 def test_get_total_concentration():
     """Test get_total_concentration method."""
     particle = setup_particle()
+    conc = particle.get_concentration()
+    expected_total_concentration = np.sum(conc)
     total_concentration = particle.get_total_concentration()
     total_concentration_clone = particle.get_total_concentration(clone=True)
 
     assert total_concentration == total_concentration_clone
+    assert total_concentration == expected_total_concentration
