@@ -61,6 +61,7 @@ def test_particle_aerodynamic_length_array_input():
     ("cylinder_avg_aspect_5", 1.35)
 ])
 def test_get_aerodynamic_shape_factor(shape_key, expected_factor):
+    """Test the get_aerodynamic_shape_factor function."""
     actual_factor = get_aerodynamic_shape_factor(shape_key)
     assert actual_factor == expected_factor, "The shape factor does not match."
 
