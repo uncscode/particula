@@ -39,20 +39,32 @@ def particle_aerodynamic_length(
     diameter or radius, depending on length scale input.
 
     Args:
-        physical_length: Physical length scale of the particle (m).
-        physical_slip_correction_factor: Slip correction factor for the
-            particle's physical radius in the fluid (dimensionless).
-        aerodynamic_slip_correction_factor: Slip correction factor for the
-            particle's aerodynamic radius in the fluid (dimensionless).
-        density: Density of the particle (kg/m^3).
-        reference_density: Reference density for the particle, typically the
-            density of water (1000 kg/m^3 by default).
-        aerodynamic_shape_factor: Shape factor of the particle, accounting for
-            non-sphericity (dimensionless, default is 1.0 for spherical
-            particles).
+        - physical_length : Physical length scale of the particle (m).
+        - physical_slip_correction_factor : Slip correction factor for the
+             particle's physical radius in the fluid (dimensionless).
+        - aerodynamic_slip_correction_factor : Slip correction factor for the
+             particle's aerodynamic radius in the fluid (dimensionless).
+        - density : Density of the particle (kg/m^3).
+        - reference_density : Reference density for the particle, typically
+             the density of water (1000 kg/m^3 by default).
+        - aerodynamic_shape_factor : Shape factor of the particle, accounting
+             for non-sphericity (dimensionless, default is 1.0 for spherical
+             particles).
 
     Returns:
         Aerodynamic radius of the particle (m).
+
+    Example:
+        ``` py title="Example"
+        aerodynamic_length = particle_aerodynamic_length(
+            physical_length=0.00005,
+            physical_slip_correction_factor=1.1,
+            aerodynamic_slip_correction_factor=1.0,
+            density=1000,
+            reference_density=1000,
+            aerodynamic_shape_factor=1.0,
+        )
+        ```
 
     References:
         - https://en.wikipedia.org/wiki/Aerosol#Aerodynamic_diameter
@@ -70,13 +82,30 @@ def get_aerodynamic_shape_factor(shape_key: str) -> float:
     """Retrieve the aerodynamic shape factor for a given particle shape.
 
     Args:
-        shape_key: The shape of the particle as a string.
+        - shape_key : The shape of the particle as a string. Options include:
+            - "sphere"
+            - "cube"
+            - "cylinder_avg_aspect_2"
+            - "cylinder_avg_aspect_5"
+            - "cylinder_avg_aspect_10"
+            - "spheres_cluster_3"
+            - "spheres_cluster_4"
+            - "bituminous_coal"
+            - "quartz"
+            - "sand"
+            - "talc"
 
     Returns:
         The shape factor of the particle as a float.
 
+    Example:
+        ``` py title="Example"
+        shape_factor = get_aerodynamic_shape_factor("sand")
+        # shape_factor = 1.57
+        ```
+
     Raises:
-        ValueError: If the shape is not found in the predefined shape
+        - ValueError : If the shape is not found in the predefined shape
             factor dictionary.
     """
     shape_key = shape_key.strip().lower()  # Clean up the input
