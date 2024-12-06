@@ -83,17 +83,9 @@ def get_aerodynamic_shape_factor(shape_key: str) -> float:
 
     Args:
         - shape_key : The shape of the particle as a string. Options include:
-            - "sphere"
-            - "cube"
-            - "cylinder_avg_aspect_2"
-            - "cylinder_avg_aspect_5"
-            - "cylinder_avg_aspect_10"
-            - "spheres_cluster_3"
-            - "spheres_cluster_4"
-            - "bituminous_coal"
-            - "quartz"
-            - "sand"
-            - "talc"
+            sphere, cube, cylinder_avg_aspect_2, cylinder_avg_aspect_5,
+            cylinder_avg_aspect_10, spheres_cluster_3, spheres_cluster_4,
+            bituminous_coal, quartz, sand, talc
 
     Returns:
         The shape factor of the particle as a float.
