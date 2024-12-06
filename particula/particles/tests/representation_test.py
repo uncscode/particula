@@ -19,7 +19,7 @@ def setup_particle(
     charge: float = 1.0,
 ) -> ParticleRepresentation:
     """Setup ParticleRepresentation for testing with configurable parameters.
-    
+
     - strategy : Strategy for particle distribution
     - activity : Activity strategy for particles
     - surface : Surface strategy for particles
