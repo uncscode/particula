@@ -50,3 +50,23 @@ def test_particle_aerodynamic_mobility_type_error():
         particle_aerodynamic_mobility(
             "not a number", "also not a number", "still not a number"
         )
+
+
+def test_particle_aerodynamic_mobility_extreme_values():
+    """
+    Verify that the particle_aerodynamic_mobility function calculates the
+    correct aerodynamic mobility value for extreme particle radii.
+    """
+    radii = [1e-12, 1e-3]  # 1 nanometer and 1 millimeter
+    slip_correction_factor = 1.1
+    dynamic_viscosity = 0.0000181  # Pa.s for air at room temperature
+    for radius in radii:
+        expected_mobility = slip_correction_factor / (
+            6 * np.pi * dynamic_viscosity * radius
+        )
+        actual_mobility = particle_aerodynamic_mobility(
+            radius, slip_correction_factor, dynamic_viscosity
+        )
+        assert np.isclose(
+            actual_mobility, expected_mobility
+        ), f"The value does not match for radius {radius}."
