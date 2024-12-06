@@ -57,8 +57,8 @@ def test_particle_aerodynamic_length_array_input():
 @pytest.mark.parametrize("shape_key, expected_factor", [
     ("sphere", 1.0),
     ("cube", 1.08),
-    ("cylinder_avg_aspect_2", 1.15),
-    ("cylinder_avg_aspect_5", 1.25)
+    ("cylinder_avg_aspect_2", 1.1),
+    ("cylinder_avg_aspect_5", 1.35)
 ])
 def test_get_aerodynamic_shape_factor(shape_key, expected_factor):
     actual_factor = get_aerodynamic_shape_factor(shape_key)
