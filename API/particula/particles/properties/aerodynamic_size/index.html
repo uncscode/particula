@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.47">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.48">
     
     
       
@@ -2555,6 +2555,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#raises" class="md-nav__link">
     <span class="md-ellipsis">
       Raises
@@ -2600,6 +2609,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -5659,6 +5677,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#raises" class="md-nav__link">
     <span class="md-ellipsis">
       Raises
@@ -5704,6 +5731,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -5756,24 +5792,31 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_size.py">particula.particles.properties.aerodynamic_size</a> module.</p>
 </blockquote>
 <h2 id="get_aerodynamic_shape_factor">get_aerodynamic_shape_factor<a class="headerlink" href="#get_aerodynamic_shape_factor" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_size.py#L68">Show source in aerodynamic_size.py:68</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_size.py#L81">Show source in aerodynamic_size.py:81</a></p>
 <p>Retrieve the aerodynamic shape factor for a given particle shape.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>shape_key</code> - The shape of the particle as a string.</li>
+<li>shape_key : The shape of the particle as a string. Options include:
+    sphere, cube, cylinder_avg_aspect_2, cylinder_avg_aspect_5,
+    cylinder_avg_aspect_10, spheres_cluster_3, spheres_cluster_4,
+    bituminous_coal, quartz, sand, talc</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <p>The shape factor of the particle as a float.</p>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="n">shape_factor</span> <span class="o">=</span> <span class="n">get_aerodynamic_shape_factor</span><span class="p">(</span><span class="s2">&quot;sand&quot;</span><span class="p">)</span>
+<span class="c1"># shape_factor = 1.57</span>
+</code></pre></div>
 <h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>ValueError</code> - If the shape is not found in the predefined shape
+<li>ValueError : If the shape is not found in the predefined shape
     factor dictionary.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_aerodynamic_shape_factor</span><span class="p">(</span><span class="n">shape_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="particle_aerodynamic_length">particle_aerodynamic_length<a class="headerlink" href="#particle_aerodynamic_length" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_size.py#L24">Show source in aerodynamic_size.py:24</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_size.py#L25">Show source in aerodynamic_size.py:25</a></p>
 <p>Calculate the aerodynamic length scale of a particle.</p>
 <p>The aerodynamic size is used to compare the aerodynamic properties of
 particles with their physical properties, particularly when interpreting
@@ -5781,20 +5824,30 @@ aerodynamic particle sizer measurements. This is either the aerodynamic
 diameter or radius, depending on length scale input.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>physical_length</code> - Physical length scale of the particle (m).</li>
-<li><code>physical_slip_correction_factor</code> - Slip correction factor for the
-    particle's physical radius in the fluid (dimensionless).</li>
-<li><code>aerodynamic_slip_correction_factor</code> - Slip correction factor for the
-    particle's aerodynamic radius in the fluid (dimensionless).</li>
-<li><code>density</code> - Density of the particle (kg/m^3).</li>
-<li><code>reference_density</code> - Reference density for the particle, typically the
-    density of water (1000 kg/m^3 by default).</li>
-<li><code>aerodynamic_shape_factor</code> - Shape factor of the particle, accounting for
-    non-sphericity (dimensionless, default is 1.0 for spherical
-    particles).</li>
+<li>physical_length : Physical length scale of the particle (m).</li>
+<li>physical_slip_correction_factor : Slip correction factor for the
+     particle's physical radius in the fluid (dimensionless).</li>
+<li>aerodynamic_slip_correction_factor : Slip correction factor for the
+     particle's aerodynamic radius in the fluid (dimensionless).</li>
+<li>density : Density of the particle (kg/m^3).</li>
+<li>reference_density : Reference density for the particle, typically
+     the density of water (1000 kg/m^3 by default).</li>
+<li>aerodynamic_shape_factor : Shape factor of the particle, accounting
+     for non-sphericity (dimensionless, default is 1.0 for spherical
+     particles).</li>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <p>Aerodynamic radius of the particle (m).</p>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="n">aerodynamic_length</span> <span class="o">=</span> <span class="n">particle_aerodynamic_length</span><span class="p">(</span>
+    <span class="n">physical_length</span><span class="o">=</span><span class="mf">0.00005</span><span class="p">,</span>
+    <span class="n">physical_slip_correction_factor</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span>
+    <span class="n">aerodynamic_slip_correction_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">density</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">reference_density</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">aerodynamic_shape_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
 <ul>
 <li>https://en.wikipedia.org/wiki/Aerosol#Aerodynamic_diameter</li>
