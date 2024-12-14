@@ -102,3 +102,13 @@ def test_coulomb_chahl2019():
         DIFFUSIVE_KNUDSEN_ARRAY, COULOMB_POTENTIAL_RATIO_ARRAY
     )
     np.testing.assert_almost_equal(result, expected, decimal=4)
+
+
+def test_transition_regime_coagulation_edge_cases():
+    """
+    Test the transition_regime_coagulation function with edge case values.
+    """
+    edge_case_input = np.array([0.1, 0.0])
+    edge_case_result = transition_regime.hard_sphere(edge_case_input)
+    edge_case_expected = np.array([0.10960430161885967, 0.0])
+    np.testing.assert_almost_equal(edge_case_result, edge_case_expected, decimal=4)
