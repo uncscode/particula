@@ -22,6 +22,10 @@ def hard_sphere(
     --------
     The dimensionless coagulation kernel (H) [dimensionless].
 
+    Raises:
+    -------
+    ValueError: If diffusive_knudsen contains negative values, NaN, or infinity.
+
     References:
     -----------
     Equations X in:
@@ -30,6 +34,13 @@ def hard_sphere(
     Journal of Chemical Physics, 126(12).
     https://doi.org/10.1063/1.2713719
     """
+    if np.any(diffusive_knudsen < 0):
+        raise ValueError("Particle sizes must be non-negative")
+    if np.any(np.isnan(diffusive_knudsen)):
+        raise ValueError("Invalid particle sizes")
+    if np.any(np.isinf(diffusive_knudsen)):
+        raise ValueError("Invalid particle sizes")
+
     continuum_limit = 4 * np.pi * diffusive_knudsen**2
 
     fit_constants = [25.836, 11.211, 3.502, 7.211]

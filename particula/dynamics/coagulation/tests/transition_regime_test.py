@@ -1,6 +1,7 @@
 """Test for transition_regime calculation functions."""
 
 import numpy as np
+import pytest
 
 from particula.dynamics.coagulation import transition_regime
 
@@ -107,8 +108,37 @@ def test_coulomb_chahl2019():
 def test_transition_regime_coagulation_edge_cases():
     """
     Test the transition_regime_coagulation function with edge case values.
+
+    Edge cases tested:
+    - Zero values: Should handle zero particle sizes correctly
+    - Small values (0.1): Should compute valid coagulation rates
+    - Negative values: Should raise ValueError (physically impossible)
+    - Very large values: Should compute without numerical overflow
+    - NaN: Should raise ValueError (invalid input)
+    - Infinity: Should raise ValueError (invalid input)
     """
-    edge_case_input = np.array([0.1, 0.0])
-    edge_case_result = transition_regime.hard_sphere(edge_case_input)
-    edge_case_expected = np.array([0.10960430161885967, 0.0])
-    np.testing.assert_almost_equal(edge_case_result, edge_case_expected, decimal=4)
+    # Test zero and small values
+    small_zero_input = np.array([0.1, 0.0])
+    small_zero_result = transition_regime.hard_sphere(small_zero_input)
+    small_zero_expected = np.array([0.10960430161885967, 0.0])
+    np.testing.assert_almost_equal(small_zero_result, small_zero_expected, decimal=4)
+
+    # Test very large values (using realistic upper bound for particle sizes)
+    large_input = np.array([1e5, 1e5])  # 100mm particles
+    large_result = transition_regime.hard_sphere(large_input)
+    assert np.isfinite(large_result).all(), "Should handle large values without overflow"
+
+    # Test negative values
+    negative_input = np.array([-1.0, 1.0])
+    with pytest.raises(ValueError, match="Particle sizes must be non-negative"):
+        transition_regime.hard_sphere(negative_input)
+
+    # Test NaN values
+    nan_input = np.array([np.nan, 1.0])
+    with pytest.raises(ValueError, match="Invalid particle sizes"):
+        transition_regime.hard_sphere(nan_input)
+
+    # Test infinity values
+    inf_input = np.array([np.inf, 1.0])
+    with pytest.raises(ValueError, match="Invalid particle sizes"):
+        transition_regime.hard_sphere(inf_input)
