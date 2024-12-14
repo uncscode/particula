@@ -50,5 +50,9 @@ def test_calculate_partial_pressure_edge_cases():
         (1.0, 0.029, 1e4),  # Very high temperature
     ]
     for concentration, molar_mass, temperature in test_cases:
-        expected_pressure = (concentration * GAS_CONSTANT.m * temperature) / molar_mass
-        assert calculate_partial_pressure(concentration, molar_mass, temperature) == pytest.approx(expected_pressure)
+        expected_pressure = (
+            concentration * GAS_CONSTANT.m * temperature
+        ) / molar_mass
+        assert calculate_partial_pressure(
+            concentration, molar_mass, temperature
+        ) == pytest.approx(expected_pressure)
