@@ -36,6 +36,10 @@ def test_gas_builder_with_species():
     assert atmo.temperature == 298.15
     assert atmo.total_pressure == 101325
     assert len(atmo.species) == 1
+    assert np.array_equal(atmo.species[0].name, names_atmo)
+    assert np.array_equal(atmo.species[0].molar_mass, molar_masses_atmo)
+    assert np.array_equal(atmo.species[0].condensable, condensables_atmo)
+    assert np.array_equal(atmo.species[0].concentration, concentrations_atmo)
 
 
 def test_gas_builder_without_species_raises_error():
