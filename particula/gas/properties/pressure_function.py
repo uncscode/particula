@@ -25,7 +25,7 @@ def calculate_partial_pressure(
     - float: Partial pressure of the gas in Pascals (Pa).
     """
     # Input validation
-    if np.any(concentration <= 0):
+    if np.any(concentration < 0):
         raise ValueError("Concentration must be positive")
     if np.any(molar_mass <= 0):
         raise ValueError("Molar mass must be positive")
