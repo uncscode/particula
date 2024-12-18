@@ -86,7 +86,7 @@ def discrete_gain(
     dpi = (np.transpose(radius) ** 3 - dpd**3) ** (1 / 3)
 
     # Compute gain using numerical integration
-    gain = radius**2 * np.trapz(
+    gain = radius**2 * np.trapezoid(
         interp.ev(dpd, dpi) / dpi**2, dpd, axis=0)  # type: ignore
 
     # Convert back to original scale (from PDF to PMF)
@@ -114,7 +114,7 @@ def continuous_loss(
         physics, Chapter 13 Equations 13.61
     """
     # concentration (n,) and kernel (n,n)
-    return concentration * np.trapz(y=kernel * concentration, x=radius)
+    return concentration * np.trapezoid(y=kernel * concentration, x=radius)
 
 
 def continuous_gain(
@@ -154,7 +154,7 @@ def continuous_gain(
     dpd = np.linspace(0, radius / 2 ** (1 / 3), radius.size)  # type: ignore
     dpi = (np.transpose(radius) ** 3 - dpd**3) ** (1 / 3)
 
-    return radius**2 * np.trapz(
+    return radius**2 * np.trapezoid(
         interp.ev(dpd, dpi) / dpi**2,  # type: ignore
         dpd,
         axis=0  # type: ignore

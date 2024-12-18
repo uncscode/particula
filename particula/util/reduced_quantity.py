@@ -24,17 +24,17 @@ def reduced_value(
     allowing two-body problems to be solved as if they were one-body problems.
 
     Args:
-    - alpha: The first parameter (scalar or array).
-    - beta: The second parameter (scalar or array).
+        - alpha : The first parameter (scalar or array).
+        - beta : The second parameter (scalar or array).
 
     Returns:
-    -------
-    - A value or array of the same dimension as the input parameters. Returns
-      zero where alpha + beta equals zero to handle division by zero
-      gracefully.
+        - A value or array of the same dimension as the input parameters.
+            Returns zero where alpha + beta equals zero to handle division
+            by zero gracefully.
 
     Raises:
-    - ValueError: If alpha and beta are arrays and their shapes do not match.
+        - ValueError : If alpha and beta are arrays and their shapes do
+            not match.
     """
     # Ensure input compatibility, especially when both are arrays
     if (
@@ -47,8 +47,10 @@ def reduced_value(
 
     # Calculation of the reduced value, with safety against division by zero
     denominator = alpha + beta
-    # Using np.where to avoid division by zero
-    return np.where(denominator != 0, alpha * beta / denominator, 0)
+    # Using np.errstate to suppress divide by zero warnings
+    with np.errstate(divide="ignore", invalid="ignore"):
+        result = np.where(denominator != 0, alpha * beta / denominator, 0)
+    return result
 
 
 def reduced_self_broadcast(
@@ -61,19 +63,20 @@ def reduced_self_broadcast(
                     / (alpha_matrix + alpha_matrix_Transpose)
 
     Args:
-    - alpha_array: The array to be broadcast and reduced.
+        - alpha_array : The array to be broadcast and reduced.
 
     Returns:
-    -------
-    - A square matrix of the reduced values.
+        - A square matrix of the reduced values.
     """
     # Use broadcasting to create matrix and its transpose
     alpha_matrix = alpha_array[:, np.newaxis]
     alpha_matrix_transpose = alpha_array[np.newaxis, :]
     denominator = alpha_matrix + alpha_matrix_transpose
-    # Perform element-wise multiplication and division
-    return np.where(
-        denominator != 0,
-        alpha_matrix * alpha_matrix_transpose / denominator,
-        0,
-    )
+    # Perform element-wise multiplication and division with np.errstate
+    with np.errstate(divide="ignore", invalid="ignore"):
+        result = np.where(
+            denominator != 0,
+            alpha_matrix * alpha_matrix_transpose / denominator,
+            0,
+        )
+    return result
