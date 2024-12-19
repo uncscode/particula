@@ -213,7 +213,7 @@ def kappa_activity(
 
     # Replace water activity with kappa activity
     if expanded:
-        activity[water_index] = water_activity
+        activity[water_index] = water_activity[0]
         return activity
 
     activity[:, water_index] = water_activity
