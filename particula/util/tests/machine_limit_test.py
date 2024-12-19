@@ -1,7 +1,7 @@
 """Test of overflow and underflow safe functions."""
 
-import numpy as np
 import warnings
+import numpy as np
 from particula.util.machine_limit import safe_exp, safe_log, safe_log10
 
 
