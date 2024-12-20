@@ -48,6 +48,7 @@ def test_resolve_final_coagulation_state():
     )
     assert len(updated_small_indices) == len(small_indices)
     assert len(updated_large_indices) == len(large_indices)
+    assert np.all(updated_large_indices >= updated_small_indices)
 
 
 def test_resolve_final_coagulation_state_large():
@@ -84,6 +85,7 @@ def test_resolve_final_coagulation_state_large():
 
     assert len(updated_small_indices) == len(small_indices)
     assert len(updated_large_indices) == len(large_indices)
+    assert np.all(updated_large_indices >= updated_small_indices)
 
 
 def test_particle_resolved_update_step():
@@ -119,3 +121,45 @@ def test_particle_resolved_coagulation_step():
         random_generator,
     )
     assert loss_gain_index.shape[1] == 2
+    assert np.all(loss_gain_index[:, 0] < loss_gain_index[:, 1])
+
+
+def test_particle_resolved_coagulation_step_empty_array():
+    """Test the particle_resolved_coagulation_step function with an empty array."""
+    particle_radius = np.array([], dtype=np.float64)
+    kernel = np.random.rand(10, 10)
+    kernel_radius = np.linspace(0, 1, 10)
+    volume = 100.0
+    time_step = 1.0
+    random_generator = np.random.default_rng(seed=42)
+    loss_gain_index = particle_resolved_coagulation_step(
+        particle_radius,
+        kernel,
+        kernel_radius,
+        volume,
+        time_step,
+        random_generator,
+    )
+    assert loss_gain_index.size == 0
+
+
+def test_particle_resolved_coagulation_step_duplicate_collisions():
+    """Test the particle_resolved_coagulation_step function with all duplicate collisions."""
+    particle_radius = np.array([1.0, 1.0, 1.0], dtype=np.float64)
+    kernel = np.random.rand(10, 10)
+    kernel_radius = np.linspace(0, 1, 10)
+    volume = 100.0
+    time_step = 1.0
+    random_generator = np.random.default_rng(seed=42)
+    loss_gain_index = particle_resolved_coagulation_step(
+        particle_radius,
+        kernel,
+        kernel_radius,
+        volume,
+        time_step,
+        random_generator,
+    )
+    assert loss_gain_index.shape[1] == 2
+    assert np.all(loss_gain_index[:, 0] < loss_gain_index[:, 1])
+    assert np.all(particle_radius[loss_gain_index[:, 0]] == 0)
+    assert np.all(particle_radius[loss_gain_index[:, 1]] > 1.0)
