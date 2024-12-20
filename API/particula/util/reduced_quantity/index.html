@@ -5736,17 +5736,16 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/util/reduced_quantity.py">particula.util.reduced_quantity</a> module.</p>
 </blockquote>
 <h2 id="reduced_self_broadcast">reduced_self_broadcast<a class="headerlink" href="#reduced_self_broadcast" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/reduced_quantity.py#L54">Show source in reduced_quantity.py:54</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/reduced_quantity.py#L56">Show source in reduced_quantity.py:56</a></p>
 <p>Returns the reduced value of an array with itself, broadcasting the
 array into a matrix and calculating the reduced value of each element pair.
 reduced_value = alpha_matrix * alpha_matrix_Transpose
                 / (alpha_matrix + alpha_matrix_Transpose)</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>-</code> <em>alpha_array</em> - The array to be broadcast and reduced.</li>
+<li>alpha_array : The array to be broadcast and reduced.</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
 <li>A square matrix of the reduced values.</li>
 </ul>
@@ -5761,19 +5760,19 @@ reduced_value = alpha * beta / (alpha + beta)</p>
 allowing two-body problems to be solved as if they were one-body problems.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>-</code> <em>alpha</em> - The first parameter (scalar or array).</li>
-<li><code>-</code> <em>beta</em> - The second parameter (scalar or array).</li>
+<li>alpha : The first parameter (scalar or array).</li>
+<li>beta : The second parameter (scalar or array).</li>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>A value or array of the same dimension as the input parameters. Returns
-  zero where alpha + beta equals zero to handle division by zero
-  gracefully.</li>
+<li>A value or array of the same dimension as the input parameters.
+    Returns zero where alpha + beta equals zero to handle division
+    by zero gracefully.</li>
 </ul>
 <h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>-</code> <em>ValueError</em> - If alpha and beta are arrays and their shapes do not match.</li>
+<li>ValueError : If alpha and beta are arrays and their shapes do
+    not match.</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">reduced_value</span><span class="p">(</span>
