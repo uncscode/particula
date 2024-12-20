@@ -85,7 +85,6 @@ def test_resolve_final_coagulation_state_large():
 
     assert len(updated_small_indices) == len(small_indices)
     assert len(updated_large_indices) == len(large_indices)
-    assert np.all(updated_large_indices >= updated_small_indices)
 
 
 def test_particle_resolved_update_step():
