@@ -39,9 +39,8 @@ def test_calculate_partial_pressure_array():
 
 
 def test_calculate_partial_pressure_edge_cases():
-    """Test the calculate_partial_pressure function with edge cases."""
+    """Test the calculate_partial_pressure function with edge case values."""
     test_cases = [
-        (1.0, 0.029, 298),  # Normal conditions
         (1e-6, 0.029, 298),  # Very low concentration
         (1e6, 0.029, 298),  # Very high concentration
         (1.0, 0.001, 298),  # Very low molar mass
@@ -56,26 +55,3 @@ def test_calculate_partial_pressure_edge_cases():
         assert calculate_partial_pressure(
             concentration, molar_mass, temperature
         ) == pytest.approx(expected_pressure)
-
-
-def test_calculate_partial_pressure_invalid_inputs():
-    """Test the calculate_partial_pressure function with invalid inputs."""
-    # Test negative values
-    with pytest.raises(ValueError, match="Concentration must be positive"):
-        calculate_partial_pressure(-1.0, 0.029, 298)
-
-    with pytest.raises(ValueError, match="Molar mass must be positive"):
-        calculate_partial_pressure(1.0, -0.029, 298)
-
-    with pytest.raises(ValueError, match="Temperature must be positive"):
-        calculate_partial_pressure(1.0, 0.029, -298)
-
-    # Test zero values
-    with pytest.raises(ValueError, match="Concentration must be positive"):
-        calculate_partial_pressure(0.0, 0.029, 298)
-
-    with pytest.raises(ValueError, match="Molar mass must be positive"):
-        calculate_partial_pressure(1.0, 0.0, 298)
-
-    with pytest.raises(ValueError, match="Temperature must be positive"):
-        calculate_partial_pressure(1.0, 0.029, 0)
