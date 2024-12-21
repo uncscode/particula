@@ -69,8 +69,9 @@ def validate_inputs(dict_args):
                 elif comp == "nonzero":
                     validate_nonzero(value, name)
                 else:
-                    raise ValueError(f"Unknown validation type '{
-                                     comp}' for argument '{name}'.")
+                    raise ValueError(
+                        f"Unknown validation '{comp}' for argument '{name}'."
+                    )
             return func(*args, **kwargs)
         return wrapper
     return decorator
