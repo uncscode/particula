@@ -28,5 +28,5 @@ def calculate_concentration(
     in kg/m^3.
     """
     return (partial_pressure * molar_mass) / (
-        float(GAS_CONSTANT.m) * temperature
+        float(GAS_CONSTANT) * temperature
     )

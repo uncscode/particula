@@ -149,7 +149,7 @@ def mass_transfer_rate(
         first_order_mass_transport
         * pressure_delta
         * molar_mass
-        / (GAS_CONSTANT.m * temperature),
+        / (GAS_CONSTANT * temperature),
         dtype=np.float64,
     )
 

@@ -16,7 +16,7 @@ def test_calculate_concentration_scalar():
     molar_mass = 0.029  # kg/mol (approx. for air)
     temperature = 298  # K (approx. 25 degrees Celsius)
     expected_concentration = (partial_pressure * molar_mass) / (
-        GAS_CONSTANT.m * temperature
+        GAS_CONSTANT * temperature
     )
     assert calculate_concentration(
         partial_pressure, molar_mass, temperature
@@ -30,7 +30,7 @@ def test_calculate_concentration_array():
     molar_mass = np.array([0.029, 0.032])  # kg/mol (approx. for air and O2)
     temperature = np.array([298, 310])  # K
     expected_concentration = (partial_pressure * molar_mass) / (
-        GAS_CONSTANT.m * temperature
+        GAS_CONSTANT * temperature
     )
     np.testing.assert_array_almost_equal(
         calculate_concentration(partial_pressure, molar_mass, temperature),

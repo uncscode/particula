@@ -1,23 +1,20 @@
-""" a centralized location for important, unchanged physics parameters.
+""" A centralized location for important, unchanged physics parameters.
 
-    This file contains constants that are used in multiple modules. Each
-    constant has its own units and exported with them. The constants are
-    mostly related to atmospheric aerosol particles in usual conditions.
 
+    All constants are given in their base units. We use scipy constants.
 """
 
-from particula import u
+import scipy
 
-BOLTZMANN_CONSTANT = (1*u.k_B).to_base_units()
+BOLTZMANN_CONSTANT = scipy.constants.k
 
-AVOGADRO_NUMBER = (1*u.avogadro_constant).to_base_units()
+AVOGADRO_NUMBER = scipy.constants.Avogadro
 
 # Gas constant in J mol^-1 K^-1 = m^2 kg mol^-1 s^-2 K^-1
 # J = kg m^2 s^-2
-# or (1*u.molar_gas_constant).to_base_units()
 GAS_CONSTANT = BOLTZMANN_CONSTANT * AVOGADRO_NUMBER
 
-ELEMENTARY_CHARGE_VALUE = (1*u.elementary_charge).to_base_units()
+ELEMENTARY_CHARGE_VALUE = scipy.constants.elementary_charge
 
 # Relative permittivity of air at approx.
 # 296.15 K and 101325 Pa and 40% RH
@@ -35,16 +32,16 @@ RELATIVE_PERMITTIVITY_AIR = RELATIVE_PERMITTIVITY_AIR_ROOM
 # Permittivity of free space in F/m
 # Also known as the electric constant, permittivity of free space
 # Often denoted by epsilon_0
-VACUUM_PERMITTIVITY = (1*u.vacuum_permittivity).to_base_units()
+VACUUM_PERMITTIVITY = scipy.constants.epsilon_0
 
 ELECTRIC_PERMITTIVITY = RELATIVE_PERMITTIVITY_AIR * VACUUM_PERMITTIVITY
 
 # These values are used to calculate the dynamic viscosity of air
 # Here, REF temperature and viscosity are at STP:
 # Standard temperature and pressure (273.15 K and 101325 Pa)
-REF_VISCOSITY_AIR_STP = 1.716e-5 * u.Pa * u.s
-REF_TEMPERATURE_STP = 273.15 * u.K
-SUTHERLAND_CONSTANT = 110.4 * u.K
-MOLECULAR_WEIGHT_AIR = (28.9644 * u.g / u.mol).to_base_units()
+REF_VISCOSITY_AIR_STP = 1.716e-5  # Pa*s
+REF_TEMPERATURE_STP = 273.15  # K
+SUTHERLAND_CONSTANT = 110.4  # K
+MOLECULAR_WEIGHT_AIR = 0.0289644  # kg/mol
 
-STANDARD_GRAVITY = (1*u.gravity).to_base_units()
+STANDARD_GRAVITY = scipy.constants.g

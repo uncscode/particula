@@ -73,7 +73,7 @@ def diffusive_knudsen_number(
 
     # Final calculation of diffusive Knudsen number
     numerator = (
-        np.sqrt(temperature * BOLTZMANN_CONSTANT.m * reduced_mass)
+        np.sqrt(temperature * BOLTZMANN_CONSTANT * reduced_mass)
         / reduced_friction_factor
     )
     denominator = sum_of_radii * continuum_enhance / kinetic_enhance

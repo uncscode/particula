@@ -112,7 +112,7 @@ def test_brownian_diffusivity_single_value():
     temperature = 298  # example temperature in Kelvin
     aerodynamic_mobility = 1.5e-9  # example mobility in m^2/s
     expected_diffusivity = (
-        float(BOLTZMANN_CONSTANT.m) * temperature * aerodynamic_mobility
+        float(BOLTZMANN_CONSTANT) * temperature * aerodynamic_mobility
     )
     value = brownian_kernel.brownian_diffusivity(
         temperature, aerodynamic_mobility
@@ -128,7 +128,7 @@ def test_brownian_diffusivity_array_input():
     temperature = np.array([298, 300])
     aerodynamic_mobility = np.array([1.5e-9, 2.0e-9])
     expected_diffusivity = (
-        float(BOLTZMANN_CONSTANT.m) * temperature * aerodynamic_mobility
+        float(BOLTZMANN_CONSTANT) * temperature * aerodynamic_mobility
     )
     value = brownian_kernel.brownian_diffusivity(
         temperature, aerodynamic_mobility

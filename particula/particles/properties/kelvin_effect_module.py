@@ -38,7 +38,7 @@ def kelvin_radius(
     See more: https://en.wikipedia.org/wiki/Kelvin_equation
     """
     return (2 * effective_surface_tension * molar_mass) / (
-        GAS_CONSTANT.m * temperature * effective_density
+        GAS_CONSTANT * temperature * effective_density
     )
 
 

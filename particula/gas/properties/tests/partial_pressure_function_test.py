@@ -16,7 +16,7 @@ def test_calculate_partial_pressure_scalar():
     molar_mass = 0.029  # kg/mol (approx. for air)
     temperature = 298  # K (approx. 25 degrees Celsius)
     expected_pressure = (
-        concentration * GAS_CONSTANT.m * temperature
+        concentration * GAS_CONSTANT * temperature
     ) / molar_mass
     assert calculate_partial_pressure(
         concentration, molar_mass, temperature
@@ -30,7 +30,7 @@ def test_calculate_partial_pressure_array():
     molar_mass = np.array([0.029, 0.032])  # kg/mol (approx. for air and O2)
     temperature = np.array([298, 310])  # K
     expected_pressure = (
-        concentration * GAS_CONSTANT.m * temperature
+        concentration * GAS_CONSTANT * temperature
     ) / molar_mass
     np.testing.assert_array_almost_equal(
         calculate_partial_pressure(concentration, molar_mass, temperature),
@@ -50,7 +50,7 @@ def test_calculate_partial_pressure_edge_cases():
     ]
     for concentration, molar_mass, temperature in test_cases:
         expected_pressure = (
-            concentration * GAS_CONSTANT.m * temperature
+            concentration * GAS_CONSTANT * temperature
         ) / molar_mass
         assert calculate_partial_pressure(
             concentration, molar_mass, temperature

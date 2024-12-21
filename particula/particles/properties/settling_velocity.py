@@ -24,7 +24,7 @@ def particle_settling_velocity(
     particle_density: Union[float, NDArray[np.float64]],
     slip_correction_factor: Union[float, NDArray[np.float64]],
     dynamic_viscosity: float,
-    gravitational_acceleration: float = STANDARD_GRAVITY.m,
+    gravitational_acceleration: float = STANDARD_GRAVITY,
 ) -> Union[float, NDArray[np.float64]]:
     """
     Calculate the settling velocity of a particle in a fluid.

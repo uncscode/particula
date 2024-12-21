@@ -33,7 +33,7 @@ def calculate_partial_pressure(
         raise ValueError("Temperature must be positive")
 
     # Calculate the partial pressure
-    return (concentration * float(GAS_CONSTANT.m) * temperature) / molar_mass
+    return (concentration * float(GAS_CONSTANT) * temperature) / molar_mass
 
 
 def calculate_saturation_ratio(

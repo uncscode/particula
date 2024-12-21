@@ -50,12 +50,12 @@ def ratio(
         charge = np.tile(charge, (len(charge), 1))
 
     numerator = (
-        -1 * charge * np.transpose(charge) * (ELEMENTARY_CHARGE_VALUE.m**2)
+        -1 * charge * np.transpose(charge) * (ELEMENTARY_CHARGE_VALUE**2)
     )
     denominator = (
-        4 * np.pi * ELECTRIC_PERMITTIVITY.m * (radius + np.transpose(radius))
+        4 * np.pi * ELECTRIC_PERMITTIVITY * (radius + np.transpose(radius))
     )
-    return numerator / (denominator * BOLTZMANN_CONSTANT.m * temperature)
+    return numerator / (denominator * BOLTZMANN_CONSTANT * temperature)
 
 
 def kinetic(

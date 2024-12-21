@@ -21,7 +21,7 @@ from particula.particles.properties.knudsen_number_module import (
 def particle_diffusion_coefficient(
     temperature: Union[float, NDArray[np.float64]],
     aerodynamic_mobility: Union[float, NDArray[np.float64]],
-    boltzmann_constant: float = BOLTZMANN_CONSTANT.m,
+    boltzmann_constant: float = BOLTZMANN_CONSTANT,
 ) -> Union[float, NDArray[np.float64]]:
     """
     Calculate the diffusion coefficient of a particle.
