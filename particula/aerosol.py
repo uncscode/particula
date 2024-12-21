@@ -17,6 +17,31 @@ class Aerosol:
     A class for interacting with collections of Gas and Particle objects.
     Allows for the representation and manipulation of an aerosol, which
     is composed of various gases and particles.
+
+    Attributes:
+        - atmosphere : The atmosphere containing the gases.
+        - particles : A list of particles in the aerosol.
+
+    Methods:
+        - iterate_gas : Returns an iterator for atmosphere species.
+        - iterate_particle : Returns an iterator for particle.
+        - replace_atmosphere : Replaces the current Atmosphere instance
+            with a new one.
+        - add_particle : Adds a Particle instance to the aerosol.
+
+    Examples:
+        ``` py title="Creating an Aerosol"
+        aerosol_instance = Aerosol(atmosphere, particles)
+        print(aerosol_instance)
+        ```
+
+        ``` py title="Iterating over the Aerosol"
+        aerosol_instance = Aerosol(atmosphere, particles)
+        for gas in aerosol_instance.iterate_gas():
+            print(gas)
+        for particle in aerosol_instance.iterate_particle():
+            print(particle)
+        ```
     """
 
     def __init__(
@@ -26,8 +51,8 @@ class Aerosol:
     ):
         """
         Parameters:
-            atmosphere: Atmosphere with many GasSpeices possible.
-            particles: One or more Particle instances.
+            - atmosphere : Atmosphere with many GasSpeices possible.
+            - particles : One or more Particle instances.
         """
         self.atmosphere = atmosphere
         self.particles: List[ParticleRepresentation] = (
@@ -40,7 +65,13 @@ class Aerosol:
         """Returns a string representation of the aerosol.
 
         Returns:
-            str: A string representation of the aerosol.
+            - str : A string representation of the aerosol.
+
+        Examples:
+            ``` py
+            aerosol_instance = Aerosol(atmosphere, particles)
+            print(aerosol_instance)
+            ```
         """
         message = str(self.atmosphere)
         for index, particle in enumerate(self.particles):
@@ -52,7 +83,14 @@ class Aerosol:
         """Returns an iterator for atmosphere species.
 
         Returns:
-            Iterator[GasSpecies]: An iterator over the gas species type.
+            - Iterator : An iterator over the gas species type.
+
+        Examples:
+            ``` py title="Iterating over the Aerosol gas"
+            aerosol_instance = Aerosol(atmosphere, particles)
+            for gas in aerosol_instance.iterate_gas():
+                print(gas)
+            ```
         """
         return iter(self.atmosphere)
 
@@ -60,7 +98,14 @@ class Aerosol:
         """Returns an iterator for particle.
 
         Returns:
-            Iterator[Particle]: An iterator over the particle type.
+            - Iterator : An iterator over the particle type.
+
+        Examples:
+            ``` py title="Iterating over the Aerosol particle"
+            aerosol_instance = Aerosol(atmosphere, particles)
+            for particle in aerosol_instance.iterate_particle():
+                print(particle)
+            ```
         """
         return iter(self.particles)
 
@@ -68,7 +113,14 @@ class Aerosol:
         """Replaces the current Atmosphere instance with a new one.
 
         Parameters:
-            atmosphere: The instance to replace the current one.
+            - atmosphere : The instance to replace the current one.
+
+        Examples:
+            ``` py title="Replacing the Atmosphere in the Aerosol"
+            aerosol_instance = Aerosol(atmosphere, particles)
+            new_atmosphere = Atmosphere()
+            aerosol_instance.replace_atmosphere(new_atmosphere)
+            ```
         """
         self.atmosphere = atmosphere
 
@@ -76,6 +128,13 @@ class Aerosol:
         """Adds a Particle instance to the aerosol.
 
         Parameters:
-            particle: The Particle instance to add.
+            - particle : The Particle instance to add.
+
+        Examples:
+            ``` py title="Adding a Particle to the Aerosol"
+            aerosol_instance = Aerosol(atmosphere, particles)
+            new_particle = ParticleRepresentation()
+            aerosol_instance.add_particle(new_particle)
+            ```
         """
         self.particles.append(particle)
