@@ -25,7 +25,7 @@ def test_build_ideal_activity_molar_parameter():
     builder = ActivityIdealMolarBuilder()
     with pytest.raises(ValueError) as excinfo:
         builder.set_molar_mass(-1)
-    assert "Molar mass must be a positive value." in str(excinfo.value)
+    assert "Argument 'molar_mass' must be positive." in str(excinfo.value)
 
     # test positive molar mass
     builder.set_molar_mass(1)
@@ -109,7 +109,7 @@ def test_build_kappa_parameter_activity_set_density():
     # test negative density
     with pytest.raises(ValueError) as excinfo:
         builder.set_density(-1)
-    assert "Density must be a positive value." in str(excinfo.value)
+    assert "Argument 'density' must be positive." in str(excinfo.value)
 
 
 def test_build_kappa_parameter_activity_set_molar_mass():
@@ -131,7 +131,7 @@ def test_build_kappa_parameter_activity_set_molar_mass():
     # test negative molar mass
     with pytest.raises(ValueError) as excinfo:
         builder.set_molar_mass(-1)
-    assert "Molar mass must be a positive value." in str(excinfo.value)
+    assert "Argument 'molar_mass' must be positive." in str(excinfo.value)
 
 
 def test_build_kappa_parameter_activity_set_water_index():

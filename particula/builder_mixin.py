@@ -9,6 +9,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.util.input_handling import convert_units  # type: ignore
+from particula.validate_inputs import validate_inputs  # type: ignore
 
 logger = logging.getLogger("particula")
 
@@ -23,6 +24,7 @@ class BuilderDensityMixin:
     def __init__(self):
         self.density = None
 
+    @validate_inputs({"density": "positive"})
     def set_density(
         self,
         density: Union[float, NDArray[np.float64]],
@@ -34,10 +36,6 @@ class BuilderDensityMixin:
             density: Density of the particle.
             density_units: Units of the density. Default is *kg/m^3*
         """
-        if np.any(density < 0):
-            error_message = "Density must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
         self.density = density * convert_units(density_units, "kg/m^3")
         return self
 
@@ -53,6 +51,7 @@ class BuilderSurfaceTensionMixin:
     def __init__(self):
         self.surface_tension = None
 
+    @validate_inputs({"surface_tension": "positive"})
     def set_surface_tension(
         self,
         surface_tension: Union[float, NDArray[np.float64]],
@@ -64,10 +63,6 @@ class BuilderSurfaceTensionMixin:
             surface_tension: Surface tension of the particle.
             surface_tension_units: Surface tension units. Default is *N/m*.
         """
-        if np.any(surface_tension < 0):
-            error_message = "Surface tension must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
         self.surface_tension = surface_tension * convert_units(
             surface_tension_units, "N/m"
         )
@@ -84,6 +79,7 @@ class BuilderMolarMassMixin:
     def __init__(self):
         self.molar_mass = None
 
+    @validate_inputs({"molar_mass": "positive"})
     def set_molar_mass(
         self,
         molar_mass: Union[float, NDArray[np.float64]],
@@ -96,10 +92,6 @@ class BuilderMolarMassMixin:
         - molar_mass: Molar mass of the particle.
         - molar_mass_units: Units of the molar mass. Default is *kg/mol*.
         """
-        if np.any(molar_mass < 0):
-            error_message = "Molar mass must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
         self.molar_mass = molar_mass * convert_units(
             molar_mass_units, "kg/mol"
         )
@@ -121,6 +113,7 @@ class BuilderConcentrationMixin:
         self.concentration = None
         self.default_units = default_units if default_units else "kg/m^3"
 
+    @validate_inputs({"concentration": "positive"})
     def set_concentration(
         self,
         concentration: Union[float, NDArray[np.float64]],
@@ -135,10 +128,6 @@ class BuilderConcentrationMixin:
         """
         if concentration_units is None:
             concentration_units = self.default_units
-        if np.any(concentration < 0):
-            error_message = "Concentration must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
         self.concentration = concentration * convert_units(
             concentration_units, self.default_units
         )
@@ -182,6 +171,7 @@ class BuilderMassMixin:
     def __init__(self):
         self.mass = None
 
+    @validate_inputs({"mass": "positive"})
     def set_mass(
         self,
         mass: Union[float, NDArray[np.float64]],
@@ -196,10 +186,6 @@ class BuilderMassMixin:
         Raises:
             ValueError: If mass is negative
         """
-        if np.any(mass < 0):
-            error_message = "Mass must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
         self.mass = mass * convert_units(mass_units, "kg")
         return self
 
@@ -214,6 +200,7 @@ class BuilderVolumeMixin:
     def __init__(self):
         self.volume = None
 
+    @validate_inputs({"volume": "positive"})
     def set_volume(
         self,
         volume: Union[float, NDArray[np.float64]],
@@ -228,10 +215,6 @@ class BuilderVolumeMixin:
         Raises:
             ValueError: If volume is negative
         """
-        if np.any(volume < 0):
-            error_message = "Volume must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
         self.volume = volume * convert_units(volume_units, "m^3")
         return self
 
@@ -246,6 +229,7 @@ class BuilderRadiusMixin:
     def __init__(self):
         self.radius = None
 
+    @validate_inputs({"radius": "positive"})
     def set_radius(
         self,
         radius: Union[float, NDArray[np.float64]],
@@ -260,10 +244,6 @@ class BuilderRadiusMixin:
         Raises:
             ValueError: If radius is negative
         """
-        if np.any(radius < 0):
-            error_message = "Radius must be a positive value."
-            logger.error(error_message)
-            raise ValueError(error_message)
         self.radius = radius * convert_units(radius_units, "m")
         return self
 
@@ -299,8 +279,8 @@ class BuilderTemperatureMixin:
             temperature_units, "K", value=temperature
         )  # temperature is a non-multiplicative conversion
         if self.temperature < 0:
-            logger.error("Temperature must be above zero Kelvin.")
-            raise ValueError("Temperature must be above zero Kelvin.")
+            logger.error("Argument 'temperature' must be positive.")
+            raise ValueError("Argument 'temperature' must be positive.")
         return self
 
 
@@ -314,6 +294,7 @@ class BuilderPressureMixin:
     def __init__(self):
         self.pressure = None
 
+    @validate_inputs({"pressure": "positive"})
     def set_pressure(
         self,
         pressure: Union[float, NDArray[np.float64]],
@@ -332,9 +313,6 @@ class BuilderPressureMixin:
         Raises:
             ValueError: If the total pressure is below zero.
         """
-        if np.any(pressure < 0):
-            logger.error("Pressure must be a positive value.")
-            raise ValueError("Pressure must be a positive value.")
         self.pressure = pressure * convert_units(pressure_units, "Pa")
         return self
 
@@ -355,6 +333,7 @@ class BuilderLognormalMixin:
         self.number_concentration = None
         self.geometric_standard_deviation = None
 
+    @validate_inputs({"mode": "positive"})
     def set_mode(
         self,
         mode: NDArray[np.float64],
@@ -369,13 +348,10 @@ class BuilderLognormalMixin:
         Raises:
             ValueError: If mode is negative.
         """
-        if np.any(mode < 0):
-            message = "The mode must be positive."
-            logger.error(message)
-            raise ValueError(message)
         self.mode = mode * convert_units(mode_units, "m")
         return self
 
+    @validate_inputs({"geometric_standard_deviation": "positive"})
     def set_geometric_standard_deviation(
         self,
         geometric_standard_deviation: NDArray[np.float64],
@@ -392,15 +368,12 @@ class BuilderLognormalMixin:
         Raises:
             ValueError: If geometric standard deviation is negative.
         """
-        if np.any(geometric_standard_deviation < 0):
-            message = "The geometric standard deviation must be positive."
-            logger.error(message)
-            raise ValueError(message)
         if geometric_standard_deviation_units is not None:
             logger.warning("Ignoring units for surface strategy parameter.")
         self.geometric_standard_deviation = geometric_standard_deviation
         return self
 
+    @validate_inputs({"number_concentration": "positive"})
     def set_number_concentration(
         self,
         number_concentration: NDArray[np.float64],
@@ -416,10 +389,6 @@ class BuilderLognormalMixin:
         Raises:
             ValueError: If number concentration is negative.
         """
-        if np.any(number_concentration < 0):
-            message = "The number concentration must be positive."
-            logger.error(message)
-            raise ValueError(message)
         self.number_concentration = number_concentration * convert_units(
             number_concentration_units, "1/m^3"
         )
@@ -436,6 +405,7 @@ class BuilderParticleResolvedCountMixin:
     def __init__(self):
         self.particle_resolved_count = None
 
+    @validate_inputs({"particle_resolved_count": "positive"})
     def set_particle_resolved_count(
         self,
         particle_resolved_count: int,
@@ -450,10 +420,6 @@ class BuilderParticleResolvedCountMixin:
         Raises:
             ValueError: If particle_resolved_count is negative.
         """
-        if particle_resolved_count < 0:
-            message = "The number of particles must be positive."
-            logger.error(message)
-            raise ValueError(message)
         if particle_resolved_count_units is not None:
             logger.warning("Ignoring units for particle resolved count.")
         self.particle_resolved_count = particle_resolved_count
