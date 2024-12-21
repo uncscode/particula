@@ -5652,11 +5652,11 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/util/input_handling.py">particula.util.input_handling</a> module.</p>
 </blockquote>
 <h2 id="convert_units">convert_units<a class="headerlink" href="#convert_units" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/input_handling.py#L7">Show source in input_handling.py:7</a></p>
-<p>generic function to convert units</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/input_handling.py#L8">Show source in input_handling.py:8</a></p>
+<p>generic pint function to convert units</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<p>old     [str | float]
-new     [str | float]
+<p>old     [str | u.Quantity]
+new     [str | u.Quantity]
 value   (float) [optional]</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <p>multiplier     (float)</p>
@@ -5668,7 +5668,9 @@ value   (float) [optional]</p>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">convert_units</span><span class="p">(</span>
-    <span class="n">old</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">new</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">old</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">],</span>
+    <span class="n">new</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">],</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 
