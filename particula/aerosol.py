@@ -68,7 +68,7 @@ class Aerosol:
         """Replaces the current Atmosphere instance with a new one.
 
         Parameters:
-            gas: The instance to replace the current one.
+            atmosphere: The instance to replace the current one.
         """
         self.atmosphere = atmosphere
 
