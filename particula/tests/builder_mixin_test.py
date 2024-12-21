@@ -24,7 +24,7 @@ def test_density_mixin():
     # test setting density
     with pytest.raises(ValueError) as excinfo:
         builder_mixin.set_density(-1)
-    assert "Density must be a positive value." in str(excinfo.value)
+    assert "Argument 'density' must be positive." in str(excinfo.value)
 
     # test positive density
     builder_mixin.set_density(1)
@@ -52,7 +52,7 @@ def test_surface_tension_mixin():
     # test setting surface tension
     with pytest.raises(ValueError) as excinfo:
         builder_mixin.set_surface_tension(-1)
-    assert "Surface tension must be a positive value." in str(excinfo.value)
+    assert "Argument 'surface_tension' must be positive." in str(excinfo.value)
 
     # test positive surface tension
     builder_mixin.set_surface_tension(1)
@@ -107,7 +107,7 @@ def test_concentration_mixin():
     # test setting concentration
     with pytest.raises(ValueError) as excinfo:
         builder_mixin.set_concentration(-1)
-    assert "Concentration must be a positive value." in str(excinfo.value)
+    assert "Argument 'concentration' must be positive." in str(excinfo.value)
 
     # test positive concentration
     builder_mixin.set_concentration(1)
@@ -136,22 +136,27 @@ def test_temperature_mixin():
     """Test the BuilderTemperatureMixin class."""
     builder_mixin = BuilderTemperatureMixin()
 
-    # test setting temperature
+    # test setting temperature in Kelvin
     with pytest.raises(ValueError) as excinfo:
         builder_mixin.set_temperature(-1)
-    assert "Temperature must be above zero Kelvin." in str(excinfo.value)
+    assert "Argument 'temperature' must be positive." in str(excinfo.value)
 
-    # test positive temperature
-    builder_mixin.set_temperature(1)
-    assert builder_mixin.temperature == 1
+    # test positive temperature in Kelvin
+    builder_mixin.set_temperature(300)
+    assert builder_mixin.temperature == 300
 
-    # test setting temperature units
-    builder_mixin.set_temperature(1, temperature_units="degC")
-    assert builder_mixin.temperature == pytest.approx(274.15, 1e-6)
+    # test valid Celsius temperature conversion
+    builder_mixin.set_temperature(25, temperature_units="degC")
+    assert builder_mixin.temperature == pytest.approx(298.15, 1e-6)
 
-    # negative degC
+    # test valid negative Celsius temperature
     builder_mixin.set_temperature(-10, temperature_units="degC")
     assert builder_mixin.temperature == pytest.approx(263.15, 1e-6)
+
+    # test temperature below absolute zero
+    with pytest.raises(ValueError) as excinfo:
+        builder_mixin.set_temperature(-274, temperature_units="degC")
+    assert "Argument 'temperature' must be positive." in str(excinfo.value)
 
 
 def test_pressure_mixin():
@@ -161,7 +166,7 @@ def test_pressure_mixin():
     # test setting pressure
     with pytest.raises(ValueError) as excinfo:
         builder_mixin.set_pressure(-1)
-    assert "Pressure must be a positive value." in str(excinfo.value)
+    assert "Argument 'pressure' must be positive." in str(excinfo.value)
 
     # test positive pressure
     builder_mixin.set_pressure(102000)
@@ -185,7 +190,7 @@ def test_mass_mixin():
     # test setting mass
     with pytest.raises(ValueError) as excinfo:
         builder_mixin.set_mass(-1)
-    assert "Mass must be a positive value." in str(excinfo.value)
+    assert "Argument 'mass' must be positive." in str(excinfo.value)
 
     # test positive mass
     builder_mixin.set_mass(1)
@@ -213,7 +218,7 @@ def test_radius_mixin():
     # test setting radius
     with pytest.raises(ValueError) as excinfo:
         builder_mixin.set_radius(-1)
-    assert "Radius must be a positive value." in str(excinfo.value)
+    assert "Argument 'radius' must be positive." in str(excinfo.value)
 
     # test positive radius
     builder_mixin.set_radius(1)
