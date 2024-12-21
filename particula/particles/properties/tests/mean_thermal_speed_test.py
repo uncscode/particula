@@ -13,7 +13,7 @@ def test_mean_thermal_speed_single_value():
     mass = 4.188790204786391e-12  # Example mass in kg
     temperature = 300  # Temperature in Kelvin
     expected_speed = np.sqrt(
-        (8 * BOLTZMANN_CONSTANT.m * temperature) / (np.pi * mass)
+        (8 * BOLTZMANN_CONSTANT * temperature) / (np.pi * mass)
     )
     assert np.isclose(mean_thermal_speed(mass, temperature), expected_speed)
 
@@ -25,7 +25,7 @@ def test_mean_thermal_speed_array_input():
     mass = np.array([2.18e-25, 2.18e-25])
     temperature = np.array([300, 350])
     expected_speed = np.sqrt(
-        (8 * BOLTZMANN_CONSTANT.m * temperature) / (np.pi * mass)
+        (8 * BOLTZMANN_CONSTANT * temperature) / (np.pi * mass)
     )
     assert np.allclose(
         mean_thermal_speed(mass, temperature), expected_speed, rtol=1e-6

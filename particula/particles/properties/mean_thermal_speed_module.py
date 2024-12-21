@@ -30,4 +30,4 @@ def mean_thermal_speed(
     Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Section 9.5.3 Mean Free Path of an Aerosol Particle Equation 9.87.
     """
-    return np.sqrt((8 * BOLTZMANN_CONSTANT.m * temperature) / (np.pi * mass))
+    return np.sqrt((8 * BOLTZMANN_CONSTANT * temperature) / (np.pi * mass))

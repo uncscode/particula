@@ -27,7 +27,7 @@ logger = logging.getLogger("particula")  # get instance of logger
 def molecule_mean_free_path(
     molar_mass: Union[
         float, NDArray[np.float64]
-    ] = MOLECULAR_WEIGHT_AIR.m,  # type: ignore
+    ] = MOLECULAR_WEIGHT_AIR,  # type: ignore
     temperature: float = 298.15,
     pressure: float = 101325,
     dynamic_viscosity: Optional[float] = None,
@@ -68,7 +68,7 @@ def molecule_mean_free_path(
         raise ValueError("Molar mass must be positive [kg/mol]")
     if dynamic_viscosity is None:
         dynamic_viscosity = get_dynamic_viscosity(temperature)
-    gas_constant = float(GAS_CONSTANT.m)
+    gas_constant = float(GAS_CONSTANT)
 
     return (2 * dynamic_viscosity / pressure) / (
         8 * molar_mass / (np.pi * gas_constant * temperature)

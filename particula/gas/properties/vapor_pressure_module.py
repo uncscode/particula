@@ -44,7 +44,7 @@ def clausius_clapeyron_vapor_pressure(
     temperature_initial: Union[float, NDArray[np.float64]],
     pressure_initial: Union[float, NDArray[np.float64]],
     temperature: Union[float, NDArray[np.float64]],
-    gas_constant: float = GAS_CONSTANT.m,
+    gas_constant: float = GAS_CONSTANT,
 ) -> Union[float, NDArray[np.float64]]:
     """
     Calculate vapor pressure using Clausius-Clapeyron equation.

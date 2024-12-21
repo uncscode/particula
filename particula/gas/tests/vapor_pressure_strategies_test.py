@@ -46,7 +46,7 @@ def test_clausius_clapeyron_strategy():
     temperature_final = 373.15 + 10  # K
     expected_pressure = pressure_initial * np.exp(
         latent_heat
-        / GAS_CONSTANT.m
+        / GAS_CONSTANT
         * (1 / temp_initial - 1 / temperature_final)
     )
     assert strategy.pure_vapor_pressure(temperature_final) == pytest.approx(

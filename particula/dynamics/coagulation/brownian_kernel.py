@@ -103,7 +103,7 @@ def brownian_diffusivity(
     physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
     Coefficient K12
     """
-    return float(BOLTZMANN_CONSTANT.m) * temperature * aerodynamic_mobility
+    return float(BOLTZMANN_CONSTANT) * temperature * aerodynamic_mobility
 
 
 def brownian_coagulation_kernel(

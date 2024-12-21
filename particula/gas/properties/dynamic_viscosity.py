@@ -21,8 +21,8 @@ logger = logging.getLogger("particula")  # get instance of logger
 
 def get_dynamic_viscosity(
     temperature: float,
-    reference_viscosity: float = REF_VISCOSITY_AIR_STP.m,
-    reference_temperature: float = REF_TEMPERATURE_STP.m
+    reference_viscosity: float = REF_VISCOSITY_AIR_STP,
+    reference_temperature: float = REF_TEMPERATURE_STP
 ) -> float:
     """
     Calculates the dynamic viscosity of air via Sutherland's formula, which is
@@ -54,6 +54,6 @@ def get_dynamic_viscosity(
         raise ValueError("Temperature must be greater than 0 Kelvin.")
     return (
         reference_viscosity * (temperature / reference_temperature)**1.5 *
-        (reference_temperature + SUTHERLAND_CONSTANT.m) /
-        (temperature + SUTHERLAND_CONSTANT.m)
+        (reference_temperature + SUTHERLAND_CONSTANT) /
+        (temperature + SUTHERLAND_CONSTANT)
     )
