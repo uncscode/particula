@@ -5,7 +5,7 @@ Vapor pressure modules for calculating the vapor pressure of a gas.
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
-from particula.constants import GAS_CONSTANT
+from particula.util.constants import GAS_CONSTANT
 
 
 # Antoine equation function

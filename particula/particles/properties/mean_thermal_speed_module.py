@@ -5,7 +5,7 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.constants import BOLTZMANN_CONSTANT
+from particula.util.constants import BOLTZMANN_CONSTANT
 
 
 def mean_thermal_speed(

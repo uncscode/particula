@@ -40,7 +40,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 # particula imports
-from particula.constants import GAS_CONSTANT  # type: ignore
+from particula.util.constants import GAS_CONSTANT  # type: ignore
 
 
 def first_order_mass_transport_k(

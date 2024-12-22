@@ -13,7 +13,7 @@ import logging
 from typing import Union, Optional
 from numpy.typing import NDArray
 import numpy as np
-from particula.constants import (
+from particula.util.constants import (
     GAS_CONSTANT,
     MOLECULAR_WEIGHT_AIR,
 )  # type: ignore
