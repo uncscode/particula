@@ -2,7 +2,8 @@
 """
 
 import pytest
-from particula.validate_inputs import validate_inputs
+
+from particula.util.validate_inputs import validate_inputs
 
 # Define a sample function to test the decorator
 some_dict = {

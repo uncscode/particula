@@ -1,7 +1,8 @@
 """Builders to create vapor pressure models for gas species."""
 
-from typing import Optional
 import logging
+from typing import Optional
+
 from particula.abc_builder import BuilderABC
 from particula.gas.vapor_pressure_strategies import (
     AntoineVaporPressureStrategy,
@@ -9,7 +10,7 @@ from particula.gas.vapor_pressure_strategies import (
     WaterBuckStrategy,
     ConstantVaporPressureStrategy,
 )
-from particula.validate_inputs import validate_inputs  # type: ignore
+from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")
 
