@@ -12,11 +12,11 @@ https://doi.org/10.5194/acp-19-13383-2019
 from typing import Union, Optional, Tuple
 import numpy as np
 from numpy.typing import NDArray
-from particula.activity.bat_coefficents import (
-    INTERPOLATE_WATER_FIT,
+from particula.activity.bat_coefficients import (
     LOWEST_ORGANIC_MOLE_FRACTION,
+    INTERPOLATE_WATER_FIT,
 )
-from particula.activity.activity_coefficients import activity_coefficients
+from particula.activity.activity_coefficients import bat_activity_coefficients
 from particula.activity.species_density import organic_density_estimate
 from particula.activity import phase_separation
 
@@ -64,7 +64,7 @@ def biphasic_water_activity_point(
             hydrogen2carbon[i],
             mass_ratio_convert=True,
         )
-        activities = activity_coefficients(
+        activities = bat_activity_coefficients(
             molar_mass_ratio=molar_mass_ratio[i],
             organic_mole_fraction=mole_frac,
             oxygen2carbon=oxygen2carbon[i],
@@ -143,7 +143,7 @@ def fixed_water_activity(
     )
 
     # activity calculation
-    activities = activity_coefficients(
+    activities = bat_activity_coefficients(
         molar_mass_ratio=molar_mass_ratio,
         organic_mole_fraction=organic_mole_fraction_array,
         oxygen2carbon=oxygen2carbon,
@@ -164,7 +164,7 @@ def fixed_water_activity(
             right=LOWEST_ORGANIC_MOLE_FRACTION,
         )
         # activity calculation for alpha phase
-        activities_alpha = activity_coefficients(
+        activities_alpha = bat_activity_coefficients(
             molar_mass_ratio=molar_mass_ratio,
             organic_mole_fraction=alpha_organic_mole_fraction,
             oxygen2carbon=oxygen2carbon,
@@ -213,14 +213,14 @@ def fixed_water_activity(
         right=np.nan,
     )
     # calculate the activity coefficients for the alpha phase
-    activities_alpha = activity_coefficients(
+    activities_alpha = bat_activity_coefficients(
         molar_mass_ratio=molar_mass_ratio,
         organic_mole_fraction=alpha_organic_mole_fraction_interp,
         oxygen2carbon=oxygen2carbon,
         density=density,
     )
     # calculate the activity coefficients for the beta phase
-    activities_beta = activity_coefficients(
+    activities_beta = bat_activity_coefficients(
         molar_mass_ratio=molar_mass_ratio,
         organic_mole_fraction=beta_organic_mole_fraction_interp,
         oxygen2carbon=oxygen2carbon,

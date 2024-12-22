@@ -28,7 +28,7 @@ from particula.activity.convert_functional_group import (
         "density": "positive",
     }
 )
-def activity_coefficients(
+def bat_activity_coefficients(
     molar_mass_ratio: Union[float, NDArray[np.float64]],
     organic_mole_fraction: Union[float, NDArray[np.float64]],
     oxygen2carbon: Union[float, NDArray[np.float64]],
