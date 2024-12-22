@@ -7,7 +7,7 @@ Atmospheric Chemistry and Physics
 https://doi.org/10.5194/acp-19-13383-2019
 """
 
-from typing import Optional, Union, Tuple
+from typing import Optional, Union, Tuple, Dict, List
 import numpy as np
 from numpy.typing import NDArray
 
@@ -51,7 +51,7 @@ def activity_coefficients(
     organic_mole_fraction: Union[float, NDArray[np.float64]],
     oxygen2carbon: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
-    functional_group=None,
+    functional_group=Optional[Union[str, List[str]]],
 ) -> Tuple[
     Union[float, NDArray[np.float64]],
     Union[float, NDArray[np.float64]],
@@ -134,7 +134,7 @@ def gibbs_of_mixing(
     organic_mole_fraction: Union[float, NDArray[np.float64]],
     oxygen2carbon: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
-    fit_dict: dict,
+    fit_dict: Dict[str, List[float]],
 ) -> Tuple[
     Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
 ]:
@@ -196,10 +196,10 @@ def gibbs_of_mixing(
 
 
 def gibbs_mix_weight(
-    molar_mass_ratio: ArrayLike,
-    organic_mole_fraction: ArrayLike,
-    oxygen2carbon: ArrayLike,
-    density: ArrayLike,
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
+    organic_mole_fraction: Union[float, NDArray[np.float64]],
+    oxygen2carbon: Union[float, NDArray[np.float64]],
+    density: Union[float, NDArray[np.float64]],
     functional_group: Optional[str] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -220,7 +220,6 @@ def gibbs_mix_weight(
         - derivative_gibbs : derivative of Gibbs energy with respect to
           mole fraction of organics (includes 1/RT)
     """
-    # check types
     density = np.asarray(density, dtype=np.float64)
 
     oxygen2carbon, molar_mass_ratio = convert_to_oh_equivalent(
@@ -282,9 +281,9 @@ def gibbs_mix_weight(
 
 
 def biphasic_water_activity_point(
-    oxygen2carbon: ArrayLike,
-    hydrogen2carbon: ArrayLike,
-    molar_mass_ratio: ArrayLike,
+    oxygen2carbon: Union[float, NDArray[np.float64]],
+    hydrogen2carbon: Union[float, NDArray[np.float64]],
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
     functional_group: Optional[Union[list[str], str]] = None,
 ) -> np.ndarray:
     """
@@ -357,8 +356,8 @@ def biphasic_water_activity_point(
 
 
 def convert_to_oh_equivalent(
-    oxygen2carbon: ArrayLike,
-    molar_mass_ratio: ArrayLike,
+    oxygen2carbon: Union[float, NDArray[np.float64]],
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
     functional_group: Optional[Union[list[str], str]] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -389,7 +388,8 @@ def convert_to_oh_equivalent(
 
 
 def bat_blending_weights(
-    molar_mass_ratio: ArrayLike, oxygen2carbon: ArrayLike
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
+    oxygen2carbon: Union[float, NDArray[np.float64]],
 ) -> np.ndarray:
     """
     Function to estimate the blending weights for the BAT model.
@@ -450,10 +450,10 @@ def bat_blending_weights(
 
 
 def coefficients_c(
-    molar_mass_ratio: ArrayLike,
-    oxygen2carbon: ArrayLike,
-    fit_values: ArrayLike,
-) -> np.ndarray:
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
+    oxygen2carbon: Union[float, NDArray[np.float64]],
+    fit_values: Dict[str, List[float]],
+) -> Union[float, NDArray[np.float64]]:
     """
     Coefficients for activity model, see Gorkowski (2019). equation S1 S2.
 
@@ -477,11 +477,15 @@ def coefficients_c(
 
 
 def fixed_water_activity(
-    water_activity: ArrayLike,
-    molar_mass_ratio: ArrayLike,
-    oxygen2carbon: ArrayLike,
-    density: ArrayLike,
-) -> Tuple:
+    water_activity: Union[float, NDArray[np.float64]],
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
+    oxygen2carbon: Union[float, NDArray[np.float64]],
+    density: Union[float, NDArray[np.float64]],
+) -> Tuple[
+    Union[float, NDArray[np.float64]],
+    Union[float, NDArray[np.float64]],
+    Union[float, NDArray[np.float64]],
+]:
     """
     Calculate the activity coefficients of water and organic matter in
     organic-water mixtures.
@@ -499,7 +503,7 @@ def fixed_water_activity(
 
     Returns:
         - A tuple containing the activity coefficients for alpha and beta
-          phases, and the alpha phase mole fraction.
+          phases, and the q_alpha (phase separation) value.
           If no phase separation occurs, the beta phase values are None.
     """
     # pylint: disable=too-many-locals
