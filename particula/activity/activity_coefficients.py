@@ -85,9 +85,9 @@ def bat_activity_coefficients(
     mass_water = (
         (1.0 - organic_mole_fraction)
         * molar_mass_ratio
-        / ((1.0 - organic_mole_fraction) * (molar_mass_ratio - 1) + 1)
+        / ((1.0 - organic_mole_fraction) * (molar_mass_ratio - 1.0) + 1.0)
     )
-    mass_organic = 1 - mass_water
+    mass_organic = 1.0 - mass_water
 
     return (
         activity_water,
