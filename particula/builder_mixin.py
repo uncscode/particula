@@ -3,12 +3,13 @@
 
 # pylint: disable=too-few-public-methods
 
-from typing import Optional, Union
 import logging
-from numpy.typing import NDArray
-import numpy as np
+from typing import Optional, Union
 
-from particula.validate_inputs import validate_inputs  # type: ignore
+import numpy as np
+from numpy.typing import NDArray
+
+from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")
 

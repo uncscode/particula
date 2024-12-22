@@ -12,7 +12,7 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.constants import (
+from particula.util.constants import (
     BOLTZMANN_CONSTANT,
     ELECTRIC_PERMITTIVITY,
     ELEMENTARY_CHARGE_VALUE,

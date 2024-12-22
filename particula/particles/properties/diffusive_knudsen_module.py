@@ -4,7 +4,7 @@
 from typing import Union
 from numpy.typing import NDArray
 import numpy as np
-from particula.constants import BOLTZMANN_CONSTANT
+from particula.util.constants import BOLTZMANN_CONSTANT
 
 from particula.particles.properties import coulomb_enhancement
 from particula.util.reduced_quantity import reduced_self_broadcast

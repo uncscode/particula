@@ -7,7 +7,7 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.constants import BOLTZMANN_CONSTANT
+from particula.util.constants import BOLTZMANN_CONSTANT
 from particula.particles import properties
 from particula.gas.properties import (
     get_dynamic_viscosity,

@@ -4,7 +4,7 @@
 import pytest
 import numpy as np
 from particula.dynamics.coagulation import brownian_kernel
-from particula.constants import BOLTZMANN_CONSTANT
+from particula.util.constants import BOLTZMANN_CONSTANT
 
 
 def test_mean_free_path_l_single_value():

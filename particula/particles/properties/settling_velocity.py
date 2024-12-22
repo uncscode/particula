@@ -4,7 +4,7 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.constants import STANDARD_GRAVITY
+from particula.util.constants import STANDARD_GRAVITY
 from particula.gas.properties.dynamic_viscosity import (
     get_dynamic_viscosity,
 )

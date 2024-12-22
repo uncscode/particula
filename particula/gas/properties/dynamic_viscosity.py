@@ -13,8 +13,10 @@
 """
 
 import logging
-from particula.constants import (REF_TEMPERATURE_STP, REF_VISCOSITY_AIR_STP,
-                                 SUTHERLAND_CONSTANT)
+
+from particula.util.constants import (REF_TEMPERATURE_STP,
+                                      REF_VISCOSITY_AIR_STP,
+                                      SUTHERLAND_CONSTANT)
 
 logger = logging.getLogger("particula")  # get instance of logger
 
