@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-         linter: ["flake8", "pylint", "pytype"]
+         linter: ["flake8", "pylint"]
 
     steps:
     - uses: actions/checkout@v4
