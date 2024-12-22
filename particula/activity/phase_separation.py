@@ -50,9 +50,7 @@ def organic_water_single_phase(
 
 
 # pylint: disable=too-many-locals
-def find_phase_sep_index(
-    activity_data: NDArray[np.float64]
-) -> dict:
+def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
     """
     This function finds phase separation using activity>1 and
     inflections in the activity curve data.
@@ -143,8 +141,7 @@ def find_phase_sep_index(
 
 
 def find_phase_separation(
-    activity_water: NDArray[np.float64],
-    activity_org: NDArray[np.float64]
+    activity_water: NDArray[np.float64], activity_org: NDArray[np.float64]
 ) -> dict:
     """
     This function checks for phase separation in each activity curve.
@@ -273,7 +270,7 @@ def q_alpha(
     above_min_delta_seperation_value = delta_seperation > MIN_SPREAD_IN_AW
     delta_seperation = (
         delta_seperation * above_min_delta_seperation_value
-        + ~above_min_delta_seperation_value * MIN_SPREAD_IN_AW
+        + (not above_min_delta_seperation_value) * MIN_SPREAD_IN_AW
     )
 
     # calculate curve parameter of sigmoid
