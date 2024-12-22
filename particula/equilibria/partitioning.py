@@ -3,7 +3,7 @@
 from scipy.optimize import minimize, Bounds
 import numpy as np
 
-from particula.activity import binary_activity
+from particula.activity import phase_separation
 
 
 def liquid_vapor_obj_function(
@@ -15,8 +15,7 @@ def liquid_vapor_obj_function(
     q_ab,
     molar_mass,
     error_only=True,
-):  # pylint: disable=too-many-positional-arguments, too-many-arguments
-    # pylint: disable=too-many-locals
+):  # pylint: disable=too-many-locals, too-many-arguments
     """Objective function for liquid-vapor partitioning."""
     # objective function
 
@@ -229,7 +228,7 @@ def get_properties_for_liquid_vapor_partitioning(
 
     for i, oxy in enumerate(oxygen2carbon):
 
-        alpha, beta, q_alpha = binary_activity.fixed_water_activity(
+        alpha, beta, q_alpha = phase_separation.fixed_water_activity(
             water_activity=water_activity_desired,
             molar_mass_ratio=molar_mass_ratio[i],
             oxygen2carbon=oxy,

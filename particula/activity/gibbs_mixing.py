@@ -1,8 +1,24 @@
-from typing import Union, Tuple, Dict, List, Optional
+"""
+Gibbs free energy of mixing for a binary mixture.
+
+Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
+Relative-humidity-dependent organic aerosol thermodynamics
+Via an efficient reduced-complexity model.
+Atmospheric Chemistry and Physics
+https://doi.org/10.5194/acp-19-13383-2019
+"""
+
+from typing import Union, List, Dict, Optional, Tuple
 import numpy as np
 from numpy.typing import NDArray
-from particula.activity.bat_coefficents import FIT_LOW, FIT_MID, FIT_HIGH
-from particula.activity.utils import coefficients_c, bat_blending_weights
+from particula.util.validate_inputs import validate_inputs
+from particula.activity.bat_coefficents import (
+    FIT_LOW, FIT_MID, FIT_HIGH, coefficients_c
+)
+from particula.activity.bat_weights import bat_blending_weights
+from particula.activity.convert_functional_group import (
+    convert_to_oh_equivalent
+)
 
 
 @validate_inputs(
@@ -31,7 +47,8 @@ def gibbs_of_mixing(
         - organic_mole_fraction : The fraction of organic matter.
         - oxygen2carbon : The oxygen to carbon ratio.
         - density : The density of the mixture, in kg/m^3.
-        - fit_dict : A dictionary of fit values for the low oxygen2carbon region
+        - fit_dict : A dictionary of fit values for the low oxygen2carbon
+            region
 
     Returns:
         - A tuple containing the Gibbs free energy of mixing and its

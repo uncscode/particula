@@ -1,3 +1,18 @@
+"""
+Fit coefficients for the Binary Activity Coefficient
+model for organic-water mixtures.
+
+Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
+Relative-humidity-dependent organic aerosol thermodynamics
+Via an efficient reduced-complexity model.
+Atmospheric Chemistry and Physics
+https://doi.org/10.5194/acp-19-13383-2019
+"""
+
+from typing import Union, List
+import numpy as np
+from numpy.typing import NDArray
+
 FIT_LOW = {
     "a1": [7.089476e00, -7.711860e00, -3.885941e01, -1.000000e02],
     "a2": [-6.226781e-01, -1.000000e02, 3.081244e-09, 6.188812e01],
@@ -15,3 +30,30 @@ FIT_HIGH = {
 }
 INTERPOLATE_WATER_FIT = 500
 LOWEST_ORGANIC_MOLE_FRACTION = 1e-12
+
+
+def coefficients_c(
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
+    oxygen2carbon: Union[float, NDArray[np.float64]],
+    fit_values: List[float],
+) -> NDArray[np.float64]:
+    """
+    Coefficients for activity model, see Gorkowski (2019). equation S1 S2.
+
+    Args:
+        - molar_mass_ratio : The molar mass ratio of water to organic
+          matter.
+        - oxygen2carbon : The oxygen to carbon ratio.
+        - fit_values : The fit values for the activity model.
+
+    Returns:
+        - The coefficients for the activity model.
+    """
+    # check types
+    molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
+    oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)
+    fit_values = np.asarray(fit_values, dtype=np.float64)
+
+    return fit_values[0] * np.exp(fit_values[1] * oxygen2carbon) + fit_values[
+        2
+    ] * np.exp(fit_values[3] * molar_mass_ratio)
