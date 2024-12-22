@@ -9,6 +9,7 @@ https://doi.org/10.5194/acp-19-13383-2019
 """
 
 from typing import Union
+
 from numpy.typing import NDArray
 import numpy as np
 

@@ -8,14 +8,14 @@ Atmospheric Chemistry and Physics
 https://doi.org/10.5194/acp-19-13383-2019
 """
 
-from typing import Union, List, Dict, Optional, Tuple
+from typing import Union, List, Optional, Tuple
 import numpy as np
 from numpy.typing import NDArray
 from particula.util.validate_inputs import validate_inputs
 from particula.activity.bat_coefficients import (
-    FIT_LOW,
-    FIT_MID,
-    FIT_HIGH,
+    G19_FIT_LOW,
+    G19_FIT_MID,
+    G19_FIT_HIGH,
     coefficients_c,
 )
 from particula.activity.bat_blending import bat_blending_weights
@@ -37,7 +37,7 @@ def gibbs_of_mixing(
     organic_mole_fraction: Union[float, NDArray[np.float64]],
     oxygen2carbon: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
-    fit_dict: Dict[str, List[float]],
+    fit_dict: Tuple[str, List[float]],
 ) -> Tuple[
     Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
 ]:
@@ -62,15 +62,15 @@ def gibbs_of_mixing(
     oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)
     density = np.asarray(density, dtype=np.float64)
 
-    c1 = coefficients_c(molar_mass_ratio, oxygen2carbon, fit_dict["a1"])
-    c2 = coefficients_c(molar_mass_ratio, oxygen2carbon, fit_dict["a2"])
+    c1 = coefficients_c(molar_mass_ratio, oxygen2carbon, fit_dict.a1)
+    c2 = coefficients_c(molar_mass_ratio, oxygen2carbon, fit_dict.a2)
 
     rhor = 997.0 / density  # assumes water is the other fluid
 
     scaled_molar_mass_ratio = (
         molar_mass_ratio
-        * fit_dict["s"][1]
-        * (1.0 + oxygen2carbon) ** fit_dict["s"][0]
+        * fit_dict.s[1]
+        * (1.0 + oxygen2carbon) ** fit_dict.s[0]
     )
 
     phi2 = organic_mole_fraction / (
@@ -187,7 +187,7 @@ def _calculate_gibbs_mix_single(
             organic_mole_fraction=organic_mole_fraction,
             oxygen2carbon=oxygen2carbon,
             density=density,
-            fit_dict=FIT_MID,
+            fit_dict=G19_FIT_MID,
         )
 
         if weights[0] > 0:  # if paired with low oxygen2carbon region
@@ -196,7 +196,7 @@ def _calculate_gibbs_mix_single(
                 organic_mole_fraction=organic_mole_fraction,
                 oxygen2carbon=oxygen2carbon,
                 density=density,
-                fit_dict=FIT_LOW,
+                fit_dict=G19_FIT_LOW,
             )
             gibbs_mix = weights[0] * gibbs_mix_low + weights[1] * gibbs_mix_mid
             derivative_gibbs = (
@@ -209,7 +209,7 @@ def _calculate_gibbs_mix_single(
                 organic_mole_fraction=organic_mole_fraction,
                 oxygen2carbon=oxygen2carbon,
                 density=density,
-                fit_dict=FIT_HIGH,
+                fit_dict=G19_FIT_HIGH,
             )
             gibbs_mix = (
                 weights[2] * gibbs_mix_high + weights[1] * gibbs_mix_mid
@@ -224,6 +224,6 @@ def _calculate_gibbs_mix_single(
             organic_mole_fraction=organic_mole_fraction,
             oxygen2carbon=oxygen2carbon,
             density=density,
-            fit_dict=FIT_HIGH,
+            fit_dict=G19_FIT_HIGH,
         )
     return gibbs_mix, derivative_gibbs

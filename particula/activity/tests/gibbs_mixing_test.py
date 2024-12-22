@@ -9,9 +9,9 @@ from particula.activity.gibbs_mixing import (
     gibbs_mix_weight,
 )
 from particula.activity.bat_coefficients import (
-    FIT_HIGH,
-    FIT_LOW,
-    FIT_MID,
+    G19_FIT_HIGH,
+    G19_FIT_LOW,
+    G19_FIT_MID,
 )
 
 
@@ -32,7 +32,7 @@ class TestGibbsMixing(unittest.TestCase):
 
     def test_gibbs_of_mixing(self) -> None:
         """Test for gibbs_of_mixing function."""
-        for fit_dict in [FIT_LOW, FIT_MID, FIT_HIGH]:
+        for fit_dict in [G19_FIT_LOW, G19_FIT_MID, G19_FIT_HIGH]:
             gibbs_mix, derivative_gibbs = gibbs_of_mixing(
                 molar_mass_ratio=self.molar_mass_ratio,
                 organic_mole_fraction=self.organic_mole_fraction,
@@ -48,7 +48,7 @@ class TestGibbsMixing(unittest.TestCase):
             organic_mole_fraction=self.organic_mole_fraction_array,
             oxygen2carbon=self.oxygen2carbon_array,
             density=self.density_array,
-            fit_dict=FIT_LOW,
+            fit_dict=G19_FIT_LOW,
         )
         self.assertTrue(np.all(gibbs_mix >= 0))
         self.assertTrue(np.all(derivative_gibbs**2 >= 0))
