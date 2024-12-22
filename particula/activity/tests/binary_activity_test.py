@@ -68,7 +68,7 @@ def test_gibbs_of_mixing():
     molar_mass_ratio = 18.016 / 250
     organic_mole_fraction = np.linspace(0.1, 1, 10)
     oxygen2carbon = 0.3
-    density = 2.5
+    density = 2500
 
     gibbs_mix, dervative_gibbs = binary_activity.gibbs_of_mixing(
         molar_mass_ratio=molar_mass_ratio,
@@ -108,7 +108,7 @@ def test_activity_coefficents():
     molar_mass_ratio = 18.016 / 250
     organic_mole_fraction = np.linspace(0.1, 1, 10)
     oxygen2carbon = 0.3
-    density = 2.5
+    density = 2500
 
     activity_coefficients = binary_activity.activity_coefficients(
         molar_mass_ratio=molar_mass_ratio,
@@ -128,7 +128,7 @@ def test_fixed_water_activity():
     molar_mass_ratio = 18.016 / 250
     water_activity_desired = np.linspace(0.001, 0.9999, 1000)
     oxygen2carbon = 0.3
-    density = 1.5
+    density = 1500
 
     _ = binary_activity.fixed_water_activity(
         water_activity=water_activity_desired,

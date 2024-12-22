@@ -10,9 +10,13 @@ Atmospheric Chemistry and Physics
 https://doi.org/10.5194/acp-19-13383-2019
 """
 
-from typing import Union
-from numpy.typing import ArrayLike
+from typing import Union, Optional, List
 import numpy as np
+from numpy.typing import NDArray
+from particula.activity.bat_coefficents import INTERPOLATE_WATER_FIT, LOWEST_ORGANIC_MOLE_FRACTION
+from particula.activity.activity_coefficients import activity_coefficients
+from particula.activity.species_density import organic_density_estimate
+from particula.activity import phase_separation
 
 from particula.util.machine_limit import safe_exp, safe_log
 
@@ -278,3 +282,136 @@ def q_alpha(
             (activities - seperation_activity + delta_seperation)
         )
     )
+
+
+def biphasic_water_activity_point(
+    oxygen2carbon: Union[float, NDArray[np.float64]],
+    hydrogen2carbon: Union[float, NDArray[np.float64]],
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
+    functional_group: Optional[Union[list[str], str]] = None,
+) -> np.ndarray:
+    """
+    This function computes the biphasic to single phase
+    water activity (RH*100).
+
+    Args:
+        - oxygen2carbon : The oxygen to carbon ratio.
+        - hydrogen2carbon : The hydrogen to carbon ratio.
+        - molar_mass_ratio : The molar mass ratio of water to organic
+          matter.
+        - functional_group : Optional functional group(s) of the organic
+          compound, if applicable.
+
+    Returns:
+        - The RH cross point array.
+    """
+    oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)
+    hydrogen2carbon = np.asarray(hydrogen2carbon, dtype=np.float64)
+    molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
+    if oxygen2carbon.ndim == 0:
+        oxygen2carbon = np.expand_dims(oxygen2carbon, axis=0)
+    if hydrogen2carbon.ndim == 0:
+        hydrogen2carbon = np.expand_dims(hydrogen2carbon, axis=0)
+    if molar_mass_ratio.ndim == 0:
+        molar_mass_ratio = np.expand_dims(molar_mass_ratio, axis=0)
+
+    water_activity_cross_point = np.zeros_like(oxygen2carbon)
+
+    interpolate_step_numb = 200
+    mole_frac = np.logspace(-6, 0, interpolate_step_numb + 1)
+
+    for i, _ in enumerate(oxygen2carbon):
+        density = organic_density_estimate(
+            molar_mass_ratio[i],
+            oxygen2carbon[i],
+            hydrogen2carbon[i],
+            mass_ratio_convert=True,
+        )
+        activities = activity_coefficients(
+            molar_mass_ratio=molar_mass_ratio[i],
+            organic_mole_fraction=mole_frac,
+            oxygen2carbon=oxygen2carbon[i],
+            density=density,
+            functional_group=functional_group,
+        )
+
+        if np.isnan(activities[0]).any():
+            raise ValueError("water activity is NaN, check inputs")
+
+        phase_check = phase_separation.find_phase_separation(
+            activities[0], activities[1]
+        )
+
+        if phase_check["phase_sep_check"] == 1:
+            water_activity_cross_point[i] = phase_check["upper_seperation"]
+        else:
+            water_activity_cross_point[i] = 0
+
+    water_activity_cross_point[water_activity_cross_point < 0] = 0
+    water_activity_cross_point[water_activity_cross_point > 1] = 1
+
+    return water_activity_cross_point
+
+
+def fixed_water_activity(
+    water_activity: Union[float, NDArray[np.float64]],
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
+    oxygen2carbon: Union[float, NDArray[np.float64]],
+    density: Union[float, NDArray[np.float64]],
+) -> Tuple[
+    Union[float, NDArray[np.float64]],
+    Union[float, NDArray[np.float64]],
+    Union[float, NDArray[np.float64]],
+]:
+    """
+    Calculate the activity coefficients of water and organic matter in
+    organic-water mixtures.
+
+    This function assumes a fixed water activity value (e.g., RH = 75%
+    corresponds to 0.75 water activity in equilibrium).
+    It calculates the activity coefficients for different phases and
+    determines phase separations if they occur.
+
+    Args:
+        - water_activity : An array of water activity values.
+        - molar_mass_ratio : Array of molar mass ratios of the components.
+        - oxygen2carbon : Array of oxygen-to-carbon ratios.
+        - density : Array of densities of the mixture, in kg/m^3.
+
+    Returns:
+        - A tuple containing the activity coefficients for alpha and beta
+          phases, and the q_alpha (phase separation) value.
+          If no phase separation occurs, the beta phase values are None.
+    """
+    water_activity = np.asarray(water_activity, dtype=np.float64)
+    molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
+    oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)
+    density = np.asarray(density, dtype=np.float64)
+
+    if water_activity.size > 1 and water_activity[0] > water_activity[-1]:
+        water_activity = np.flip(water_activity)
+        flip = True
+    else:
+        flip = False
+
+    organic_mole_fraction_array = np.linspace(
+        1,
+        LOWEST_ORGANIC_MOLE_FRACTION,
+        INTERPOLATE_WATER_FIT,
+        dtype=np.float64,
+    )
+
+    activities = activity_coefficients(
+        molar_mass_ratio=molar_mass_ratio,
+        organic_mole_fraction=organic_mole_fraction_array,
+        oxygen2carbon=oxygen2carbon,
+        density=density,
+    )
+    phase_check = phase_separation.find_phase_separation(
+        activities[0], activities[1]
+    )
+    activities_water = np.asarray(activities[0], dtype=np.float64)
+    if phase_check["phase_sep_check"] == 0:
+        alpha_organic_mole_fraction = np.interp(
+            xp=activities_water,
+            fp=organic_mole_fraction_array,

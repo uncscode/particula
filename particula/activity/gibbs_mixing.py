@@ -1,0 +1,157 @@
+from typing import Union, Tuple, Dict, List, Optional
+import numpy as np
+from numpy.typing import NDArray
+from particula.activity.bat_coefficents import FIT_LOW, FIT_MID, FIT_HIGH
+from particula.activity.utils import coefficients_c, bat_blending_weights
+
+
+@validate_inputs(
+    {
+        "molar_mass_ratio": "positive",
+        "organic_mole_fraction": "nonnegative",
+        "oxygen2carbon": "nonnegative",
+        "density": "positive",
+    }
+)
+def gibbs_of_mixing(
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
+    organic_mole_fraction: Union[float, NDArray[np.float64]],
+    oxygen2carbon: Union[float, NDArray[np.float64]],
+    density: Union[float, NDArray[np.float64]],
+    fit_dict: Dict[str, List[float]],
+) -> Tuple[
+    Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
+]:
+    """
+    Calculate the Gibbs free energy of mixing for a binary mixture.
+
+    Args:
+        - molar_mass_ratio : The molar mass ratio of water to organic
+          matter.
+        - organic_mole_fraction : The fraction of organic matter.
+        - oxygen2carbon : The oxygen to carbon ratio.
+        - density : The density of the mixture, in kg/m^3.
+        - fit_dict : A dictionary of fit values for the low oxygen2carbon region
+
+    Returns:
+        - A tuple containing the Gibbs free energy of mixing and its
+          derivative.
+    """
+    molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
+    organic_mole_fraction = np.asarray(organic_mole_fraction, dtype=np.float64)
+    oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)
+    density = np.asarray(density, dtype=np.float64)
+
+    c1 = coefficients_c(molar_mass_ratio, oxygen2carbon, fit_dict["a1"])
+    c2 = coefficients_c(molar_mass_ratio, oxygen2carbon, fit_dict["a2"])
+
+    rhor = 997.0 / density  # assumes water is the other fluid
+
+    scaled_molar_mass_ratio = (
+        molar_mass_ratio
+        * fit_dict["s"][1]
+        * (1.0 + oxygen2carbon) ** fit_dict["s"][0]
+    )
+
+    phi2 = organic_mole_fraction / (
+        organic_mole_fraction
+        + (1.0 - organic_mole_fraction) * scaled_molar_mass_ratio / rhor
+    )
+
+    sum1 = c1 + c2 * (1 - 2 * phi2)
+    gibbs_mix = phi2 * (1.0 - phi2) * sum1
+
+    dphi2dx2 = (scaled_molar_mass_ratio / rhor) * (
+        phi2 / organic_mole_fraction
+    ) ** 2
+
+    derivative_gibbs_mix = (
+        (1.0 - 2.0 * phi2) * sum1 - 2 * c2 * phi2 * (1.0 - phi2)
+    ) * dphi2dx2
+
+    return gibbs_mix, derivative_gibbs_mix
+
+
+def gibbs_mix_weight(
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
+    organic_mole_fraction: Union[float, NDArray[np.float64]],
+    oxygen2carbon: Union[float, NDArray[np.float64]],
+    density: Union[float, NDArray[np.float64]],
+    functional_group: Optional[str] = None,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Gibbs free energy of mixing, see Gorkowski (2019), with weighted
+    oxygen2carbon regions. Only can run one compound at a time.
+
+    Args:
+        - molar_mass_ratio : The molar mass ratio of water to organic
+          matter.
+        - organic_mole_fraction : The fraction of organic matter.
+        - oxygen2carbon : The oxygen to carbon ratio.
+        - density : The density of the mixture, in kg/m^3.
+        - functional_group : Optional functional group(s) of the organic
+          compound, if applicable.
+
+    Returns:
+        - gibbs_mix : Gibbs energy of mixing (including 1/RT)
+        - derivative_gibbs : derivative of Gibbs energy with respect to
+          mole fraction of organics (includes 1/RT)
+    """
+    density = np.asarray(density, dtype=np.float64)
+
+    oxygen2carbon, molar_mass_ratio = convert_to_oh_equivalent(
+        oxygen2carbon=oxygen2carbon,
+        molar_mass_ratio=molar_mass_ratio,
+        functional_group=functional_group,
+    )
+
+    weights = bat_blending_weights(
+        molar_mass_ratio=molar_mass_ratio, oxygen2carbon=oxygen2carbon
+    )
+
+    if weights[1] > 0:  # if mid region is used
+        gibbs_mix_mid, derivative_gibbs_mid = gibbs_of_mixing(
+            molar_mass_ratio=molar_mass_ratio,
+            organic_mole_fraction=organic_mole_fraction,
+            oxygen2carbon=oxygen2carbon,
+            density=density,
+            fit_dict=FIT_MID,
+        )
+
+        if weights[0] > 0:  # if paired with low oxygen2carbon region
+            gibbs_mix_low, derivative_gibbs_low = gibbs_of_mixing(
+                molar_mass_ratio=molar_mass_ratio,
+                organic_mole_fraction=organic_mole_fraction,
+                oxygen2carbon=oxygen2carbon,
+                density=density,
+                fit_dict=FIT_LOW,
+            )
+            gibbs_mix = weights[0] * gibbs_mix_low + weights[1] * gibbs_mix_mid
+            derivative_gibbs = (
+                weights[0] * derivative_gibbs_low
+                + weights[1] * derivative_gibbs_mid
+            )
+        else:  # else paired with high oxygen2carbon region
+            gibbs_mix_high, derivative_gibbs_high = gibbs_of_mixing(
+                molar_mass_ratio=molar_mass_ratio,
+                organic_mole_fraction=organic_mole_fraction,
+                oxygen2carbon=oxygen2carbon,
+                density=density,
+                fit_dict=FIT_HIGH,
+            )
+            gibbs_mix = (
+                weights[2] * gibbs_mix_high + weights[1] * gibbs_mix_mid
+            )
+            derivative_gibbs = (
+                weights[2] * derivative_gibbs_high
+                + weights[1] * derivative_gibbs_mid
+            )
+    else:  # when only high 2OC region is used
+        gibbs_mix, derivative_gibbs = gibbs_of_mixing(
+            molar_mass_ratio=molar_mass_ratio,
+            organic_mole_fraction=organic_mole_fraction,
+            oxygen2carbon=oxygen2carbon,
+            density=density,
+            fit_dict=FIT_HIGH,
+        )
+    return gibbs_mix, derivative_gibbs
