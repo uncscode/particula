@@ -22,7 +22,7 @@ keywords = [
 ]
 
 dependencies = [
-    "numpy", "scipy", "hypersolver==0.0.8",
+    "numpy", "scipy",
 ]
 
 # This is set automatically by flit using `particula.__version__`
