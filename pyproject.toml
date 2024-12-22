@@ -5,10 +5,7 @@ readme = "readme.md"
 requires-python = ">=3.9"
 license = {file = "license"}
 authors = [
-    {name = "aktwo", email="aktwo@users.noreply.github.com"},
-    {name = "Gorkowski", email="Gorkowski@users.noreply.github.com"},
-    {name = "ngam", email="ngam@users.noreply.github.com"},
-    {name = "wkchuang", email="wkchuang@users.noreply.github.com"},
+    {name = "Particula developers", email = "uncscode@users.noreply.github.com"},
 ]
 classifiers = [
     "Programming Language :: Python :: 3",

@@ -1,6 +1,6 @@
 site_name: Particula
 repo_url: https://github.com/uncscode/particula
-repo_name: particula-main
+repo_name: particula
 edit_uri: edit/main/docs/_builds
 
 theme:
@@ -110,4 +110,3 @@ extra_css:
 
 copyright: |
   &copy; 2024 By particula contributors
-

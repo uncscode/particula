@@ -20,7 +20,7 @@ pip install particula
 ## Contributing to `Particula`
 
 We are open to and we welcome contributions from anyone who wants to contribute to this project.
-We have a short [contributing document](Contribute/index.md) in the root of the repository, which you can read.
+We have a short [contributing document](contribute/CONTRIBUTING.md) in the root of the repository, which you can read.
 However, feel free to reach out with any questions or comments!
 
 ## Citation

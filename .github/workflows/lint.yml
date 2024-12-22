@@ -43,9 +43,3 @@ jobs:
       name: Lint with pylint
       run: |
         pylint $(find particula/ -name "*.py" | xargs)
-    
-    - 
-      if: ${{ matrix.linter == 'pytype' }}
-      name: Lint with pytype
-      run: |
-        pytype -k .
