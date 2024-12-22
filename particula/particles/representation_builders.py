@@ -15,8 +15,6 @@ import logging
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.util.input_handling import convert_units  # type: ignore
-
 from particula.abc_builder import (
     BuilderABC,
 )
@@ -330,8 +328,10 @@ class PresetParticleRadiusBuilder(
             message = "The radius bins must be positive."
             logger.error(message)
             raise ValueError(message)
-        self.radius_bins = radius_bins * convert_units(radius_bins_units, "m")
-        return self
+        if radius_bins_units == "m":
+            self.radius_bins = radius_bins
+            return self
+        raise ValueError("Only meters are supported for radius bins.")
 
     def set_distribution_type(
         self,

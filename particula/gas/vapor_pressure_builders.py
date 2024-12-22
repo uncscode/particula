@@ -9,7 +9,7 @@ from particula.gas.vapor_pressure_strategies import (
     WaterBuckStrategy,
     ConstantVaporPressureStrategy,
 )
-from particula.util.input_handling import convert_units  # type: ignore
+from particula.validate_inputs import validate_inputs  # type: ignore
 
 logger = logging.getLogger("particula")
 
@@ -65,21 +65,21 @@ class AntoineBuilder(BuilderABC):
         self.a = a
         return self
 
+    @validate_inputs({"b": "positive"})
     def set_b(self, b: float, b_units: str = "K") -> "AntoineBuilder":
         """Set the coefficient 'b' of the Antoine equation."""
-        if b < 0:
-            logger.error("Coefficient 'b' must be a positive value.")
-            raise ValueError("Coefficient 'b' must be a positive value.")
-        self.b = convert_units(b_units, "K", b)
-        return self
+        if b_units == "K":
+            self.b = b
+            return self
+        raise ValueError("Only K units are supported for coefficient 'b'.")
 
+    @validate_inputs({"c": "positive"})
     def set_c(self, c: float, c_units: str = "K") -> "AntoineBuilder":
         """Set the coefficient 'c' of the Antoine equation."""
-        if c < 0:
-            logger.error("Coefficient 'c' must be a positive value.")
-            raise ValueError("Coefficient 'c' must be a positive value.")
-        self.c = convert_units(c_units, "K", c)
-        return self
+        if c_units == "K":
+            self.c = c
+            return self
+        raise ValueError("Only K units are supported for coefficient 'c'.")
 
     def build(self) -> AntoineVaporPressureStrategy:
         """Build the AntoineVaporPressureStrategy object with the set
@@ -132,42 +132,35 @@ class ClausiusClapeyronBuilder(BuilderABC):
         self.temperature_initial = None
         self.pressure_initial = None
 
+    @validate_inputs({"latent_heat": "positive"})
     def set_latent_heat(
         self, latent_heat: float, latent_heat_units: str = "J/kg"
     ) -> "ClausiusClapeyronBuilder":
         """Set the latent heat of vaporization: Default units J/kg."""
-        if latent_heat < 0:
-            raise ValueError("Latent heat must be a positive numeric value.")
-        self.latent_heat = latent_heat * convert_units(
-            latent_heat_units, "J/kg"
-        )
-        return self
+        if latent_heat_units == "J/kg":
+            self.latent_heat = latent_heat
+            return self
+        raise ValueError("Only J/kg units are supported for latent heat.")
 
+    @validate_inputs({"temperature_initial": "positive"})
     def set_temperature_initial(
         self, temperature_initial: float, temperature_initial_units: str = "K"
     ) -> "ClausiusClapeyronBuilder":
         """Set the initial temperature. Default units: K."""
-        if temperature_initial < 0:
-            raise ValueError(
-                "Initial temperature must be a positive numeric value."
-            )
-        self.temperature_initial = convert_units(
-            temperature_initial_units, "K", temperature_initial
-        )
-        return self
+        if temperature_initial_units == "K":
+            self.temperature_initial = temperature_initial
+            return self
+        raise ValueError("Only K units are supported for initial temperature.")
 
+    @validate_inputs({"pressure_initial": "positive"})
     def set_pressure_initial(
         self, pressure_initial: float, pressure_initial_units: str = "Pa"
     ) -> "ClausiusClapeyronBuilder":
         """Set the initial pressure. Default units: Pa."""
-        if pressure_initial < 0:
-            raise ValueError(
-                "Initial pressure must be a positive numeric value."
-            )
-        self.pressure_initial = pressure_initial * convert_units(
-            pressure_initial_units, "Pa"
-        )
-        return self
+        if pressure_initial_units == "Pa":
+            self.pressure_initial = pressure_initial
+            return self
+        raise ValueError("Only Pa units are supported for initial pressure.")
 
     def build(self) -> ClausiusClapeyronStrategy:
         """Build and return a ClausiusClapeyronStrategy object with the set
@@ -211,16 +204,15 @@ class ConstantBuilder(BuilderABC):
         super().__init__(required_keys)
         self.vapor_pressure = None
 
+    @validate_inputs({"vapor_pressure": "positive"})
     def set_vapor_pressure(
         self, vapor_pressure: float, vapor_pressure_units: str = "Pa"
     ) -> "ConstantBuilder":
         """Set the constant vapor pressure."""
-        if vapor_pressure < 0:
-            raise ValueError("Vapor pressure must be a positive value.")
-        self.vapor_pressure = vapor_pressure * convert_units(
-            vapor_pressure_units, "Pa"
-        )
-        return self
+        if vapor_pressure_units == "Pa":
+            self.vapor_pressure = vapor_pressure
+            return self
+        raise ValueError("Only Pa units are supported for vapor pressure.")
 
     def build(self) -> ConstantVaporPressureStrategy:
         """Build and return a ConstantVaporPressureStrategy object with the set

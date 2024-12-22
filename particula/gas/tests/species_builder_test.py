@@ -57,7 +57,7 @@ def test_set_concentration():
     with pytest.raises(ValueError):
         builder.set_concentration(-1.0)
 
-    builder.set_concentration(1.0, concentration_units="g/m^3")
+    builder.set_concentration(1e-3, concentration_units="kg/m^3")
     assert builder.concentration == 1.0e-3
 
 

@@ -7,8 +7,6 @@ import numpy as np
 from numpy.typing import NDArray
 from particula.constants import GAS_CONSTANT
 
-from particula.util.input_handling import convert_units  # type: ignore
-
 
 # Antoine equation function
 def antoine_vapor_pressure(
@@ -35,7 +33,7 @@ def antoine_vapor_pressure(
     """
     vapor_pressure_log = a - (b / (temperature - c))
     vapor_pressure = 10**vapor_pressure_log
-    return vapor_pressure * convert_units("mmHg", "Pa")  # Convert mmHg to Pa
+    return vapor_pressure * 133.32238741499998  # Convert mmHg to Pa
 
 
 # Clausius-Clapeyron equation function
