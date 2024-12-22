@@ -13,11 +13,14 @@ import numpy as np
 from numpy.typing import NDArray
 from particula.util.validate_inputs import validate_inputs
 from particula.activity.bat_coefficients import (
-    FIT_LOW, FIT_MID, FIT_HIGH, coefficients_c
+    FIT_LOW,
+    FIT_MID,
+    FIT_HIGH,
+    coefficients_c,
 )
 from particula.activity.bat_blending import bat_blending_weights
 from particula.activity.convert_functional_group import (
-    convert_to_oh_equivalent
+    convert_to_oh_equivalent,
 )
 
 
@@ -89,6 +92,7 @@ def gibbs_of_mixing(
     return gibbs_mix, derivative_gibbs_mix
 
 
+# pylint: disable=too-many-locals
 def gibbs_mix_weight(
     molar_mass_ratio: Union[float, NDArray[np.float64]],
     organic_mole_fraction: Union[float, NDArray[np.float64]],
@@ -126,6 +130,57 @@ def gibbs_mix_weight(
         molar_mass_ratio=molar_mass_ratio, oxygen2carbon=oxygen2carbon
     )
 
+    if np.size(oxygen2carbon) == 1:
+        return _calculate_gibbs_mix_single(
+            molar_mass_ratio,
+            organic_mole_fraction,
+            oxygen2carbon,
+            density,
+            weights,
+        )
+
+    gibbs_mix = np.zeros((len(oxygen2carbon)))
+    derivative_gibbs = np.zeros((len(oxygen2carbon)))
+
+    for i, (mmr, omf, o2c, d, w) in enumerate(
+        zip(
+            molar_mass_ratio,
+            organic_mole_fraction,
+            oxygen2carbon,
+            density,
+            weights,
+        )
+    ):
+        gm, dg = _calculate_gibbs_mix_single(mmr, omf, o2c, d, w)
+        gibbs_mix[i] = gm
+        derivative_gibbs[i] = dg
+
+    return gibbs_mix, derivative_gibbs
+
+
+def _calculate_gibbs_mix_single(
+    molar_mass_ratio: float,
+    organic_mole_fraction: float,
+    oxygen2carbon: float,
+    density: float,
+    weights: NDArray[np.float64],
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Calculate Gibbs free energy of mixing for a single set of inputs.
+
+    Args:
+        - molar_mass_ratio : The molar mass ratio of water to organic
+          matter.
+        - organic_mole_fraction : The fraction of organic matter.
+        - oxygen2carbon : The oxygen to carbon ratio.
+        - density : The density of the mixture, in kg/m^3.
+        - weights : Blending weights for the BAT model.
+
+    Returns:
+        - gibbs_mix : Gibbs energy of mixing (including 1/RT)
+        - derivative_gibbs : derivative of Gibbs energy with respect to
+          mole fraction of organics (includes 1/RT)
+    """
     if weights[1] > 0:  # if mid region is used
         gibbs_mix_mid, derivative_gibbs_mid = gibbs_of_mixing(
             molar_mass_ratio=molar_mass_ratio,
