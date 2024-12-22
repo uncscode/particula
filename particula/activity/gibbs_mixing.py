@@ -12,7 +12,7 @@ from typing import Union, List, Dict, Optional, Tuple
 import numpy as np
 from numpy.typing import NDArray
 from particula.util.validate_inputs import validate_inputs
-from particula.activity.bat_coefficents import (
+from particula.activity.bat_coefficients import (
     FIT_LOW, FIT_MID, FIT_HIGH, coefficients_c
 )
 from particula.activity.bat_blending import bat_blending_weights

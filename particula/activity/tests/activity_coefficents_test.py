@@ -3,7 +3,7 @@ Test for activity_coefficents function.
 """
 
 import numpy as np
-from particula.activity.activity_coefficients import activity_coefficients
+from particula.activity.activity_coefficients import bat_activity_coefficients
 
 
 def test_activity_coefficents():
@@ -13,7 +13,7 @@ def test_activity_coefficents():
     oxygen2carbon = 0.3
     density = 2500
 
-    activity_coefficients = activity_coefficients(
+    activity_coefficients = bat_activity_coefficients(
         molar_mass_ratio=molar_mass_ratio,
         organic_mole_fraction=organic_mole_fraction,
         oxygen2carbon=oxygen2carbon,

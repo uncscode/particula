@@ -49,8 +49,8 @@ def test_find_phase_separation():
     """Test for find_phase_separation function."""
     # Test with positive values
 
-    activity_water = [.2, .3, .4, .35, .5, .6, .9]
-    activity_org = [.8, .7, .6, .65, .5, .4, .1]
+    activity_water = np.array([.2, .3, .4, .35, .5, .6, .9])
+    activity_org = np.array([.8, .7, .6, .65, .5, .4, .1])
     sep_dic = find_phase_separation(
         activity_water=activity_water,
         activity_org=activity_org

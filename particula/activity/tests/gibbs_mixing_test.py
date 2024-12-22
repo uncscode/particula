@@ -4,7 +4,7 @@ Gibbs mixing test
 
 import numpy as np
 from particula.activity.gibbs_mixing import gibbs_of_mixing
-from particula.activity.bat_coefficents import (
+from particula.activity.bat_coefficients import (
     FIT_HIGH,
     FIT_LOW,
     FIT_MID,

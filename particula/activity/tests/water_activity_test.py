@@ -43,7 +43,7 @@ def test_biphasic_water_activity_point():
     oxygen2carbon_array = np.linspace(0, 0.6, 10)
     hydrogen2carbon_array = np.linspace(0, 0.6, 10)
     molar_mass_ratio_array = 18 / np.linspace(200, 500, 10)
-    activity_point = binary_activity.biphasic_water_activity_point(
+    activity_point = biphasic_water_activity_point(
         oxygen2carbon=oxygen2carbon_array,
         hydrogen2carbon=hydrogen2carbon_array,
         molar_mass_ratio=molar_mass_ratio_array,

@@ -3,7 +3,7 @@
 from scipy.optimize import minimize, Bounds
 import numpy as np
 
-from particula.activity import phase_separation
+from particula.activity.water_activity import fixed_water_activity
 
 
 def liquid_vapor_obj_function(
@@ -162,7 +162,7 @@ def liquid_vapor_partitioning(
     mass_fraction_water_ab,
     q_ab,
     partition_coefficient_guess=None,
-):  # pylint: disable=too-many-positional-arguments, too-many-arguments
+):  # pylint: disable=too-many-arguments
     # pylint: disable=too-many-locals
     """Thermodynamic equilibrium between liquid and vapor phase.
     with activity coefficients,"""
@@ -228,7 +228,7 @@ def get_properties_for_liquid_vapor_partitioning(
 
     for i, oxy in enumerate(oxygen2carbon):
 
-        alpha, beta, q_alpha = phase_separation.fixed_water_activity(
+        alpha, beta, q_alpha = fixed_water_activity(
             water_activity=water_activity_desired,
             molar_mass_ratio=molar_mass_ratio[i],
             oxygen2carbon=oxy,
