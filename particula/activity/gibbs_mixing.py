@@ -142,18 +142,14 @@ def gibbs_mix_weight(
     gibbs_mix = np.zeros((len(oxygen2carbon)))
     derivative_gibbs = np.zeros((len(oxygen2carbon)))
 
-    for i, (mmr, omf, o2c, d, w) in enumerate(
-        zip(
-            molar_mass_ratio,
-            organic_mole_fraction,
-            oxygen2carbon,
-            density,
-            weights,
+    for i, o2c in enumerate(oxygen2carbon):
+        gibbs_mix[i], derivative_gibbs[i] = _calculate_gibbs_mix_single(
+            molar_mass_ratio=molar_mass_ratio[i],
+            organic_mole_fraction=organic_mole_fraction[i],
+            oxygen2carbon=o2c,
+            density=density[i],
+            weights=weights[i],
         )
-    ):
-        gm, dg = _calculate_gibbs_mix_single(mmr, omf, o2c, d, w)
-        gibbs_mix[i] = gm
-        derivative_gibbs[i] = dg
 
     return gibbs_mix, derivative_gibbs
 
