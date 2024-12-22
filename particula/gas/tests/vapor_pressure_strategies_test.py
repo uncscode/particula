@@ -2,7 +2,7 @@
 
 import numpy as np
 import pytest
-from particula.constants import GAS_CONSTANT
+from particula.util.constants import GAS_CONSTANT
 from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
     AntoineVaporPressureStrategy,

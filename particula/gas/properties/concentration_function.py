@@ -5,7 +5,7 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.constants import GAS_CONSTANT  # pyright: ignore
+from particula.util.constants import GAS_CONSTANT  # pyright: ignore
 
 
 def calculate_concentration(

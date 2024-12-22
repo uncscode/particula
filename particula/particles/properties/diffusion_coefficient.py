@@ -4,7 +4,7 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.constants import BOLTZMANN_CONSTANT
+from particula.util.constants import BOLTZMANN_CONSTANT
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
 from particula.gas.properties.mean_free_path import molecule_mean_free_path
 from particula.particles.properties.aerodynamic_mobility_module import (
