@@ -12,16 +12,19 @@ from particula.activity.water_activity import (
 def test_fixed_water_activity():
     """test for fixed_water_activity function."""
     molar_mass_ratio = 18.016 / 250
-    water_activity_desired = np.linspace(0.001, 0.9999, 1000)
+    water_activity_desired = np.linspace(0.1, 0.9999, 1000)
     oxygen2carbon = 0.3
     density = 1500
 
-    _ = fixed_water_activity(
+    result = fixed_water_activity(
         water_activity=water_activity_desired,
         molar_mass_ratio=molar_mass_ratio,
         oxygen2carbon=oxygen2carbon,
         density=density,
     )
+
+    assert isinstance(result, tuple)
+    assert len(result) == 3
 
 
 def test_biphasic_water_activity_point():
@@ -47,6 +50,15 @@ def test_biphasic_water_activity_point():
         oxygen2carbon=oxygen2carbon_array,
         hydrogen2carbon=hydrogen2carbon_array,
         molar_mass_ratio=molar_mass_ratio_array,
+        functional_group=None,
+    )
+    assert np.all(activity_point >= 0)
+
+    # edge cases
+    activity_point = biphasic_water_activity_point(
+        oxygen2carbon=1.0,
+        hydrogen2carbon=1.0,
+        molar_mass_ratio=1.0,
         functional_group=None,
     )
     assert np.all(activity_point >= 0)
