@@ -9,8 +9,8 @@ https://doi.org/10.5194/acp-19-13383-2019
 """
 
 from typing import Union
-import numpy as np
 from numpy.typing import NDArray
+import numpy as np
 
 from particula.util.validate_inputs import validate_inputs
 from particula.activity import phase_separation
@@ -35,8 +35,10 @@ def bat_blending_weights(
         - oxygen2carbon : The oxygen to carbon ratio.
 
     Returns:
-        - blending_weights : List of blending weights for the BAT model
-            in the low, mid, and high oxygen2carbon regions.
+        - blending_weights : Array of blending weights for the BAT model
+            in the low, mid, and high oxygen2carbon regions. The weights
+            size is (3,) if oxygen2carbon is a single value, or (n, 3)
+            if oxygen2carbon is an array of size n.
     """
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
     oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)

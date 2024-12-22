@@ -33,7 +33,7 @@ class TestGibbsMixing(unittest.TestCase):
     def test_gibbs_of_mixing(self) -> None:
         """Test for gibbs_of_mixing function."""
         for fit_dict in [FIT_LOW, FIT_MID, FIT_HIGH]:
-            gibbs_mix, dervative_gibbs = gibbs_of_mixing(
+            gibbs_mix, derivative_gibbs = gibbs_of_mixing(
                 molar_mass_ratio=self.molar_mass_ratio,
                 organic_mole_fraction=self.organic_mole_fraction,
                 oxygen2carbon=self.oxygen2carbon,
@@ -41,9 +41,9 @@ class TestGibbsMixing(unittest.TestCase):
                 fit_dict=fit_dict,
             )
             self.assertTrue(np.all(gibbs_mix >= 0))
-            self.assertTrue(np.all(dervative_gibbs**2 >= 0))
+            self.assertTrue(np.all(derivative_gibbs**2 >= 0))
 
-        gibbs_mix, dervative_gibbs = gibbs_of_mixing(
+        gibbs_mix, derivative_gibbs = gibbs_of_mixing(
             molar_mass_ratio=self.molar_mass_ratio_array,
             organic_mole_fraction=self.organic_mole_fraction_array,
             oxygen2carbon=self.oxygen2carbon_array,
@@ -51,20 +51,20 @@ class TestGibbsMixing(unittest.TestCase):
             fit_dict=FIT_LOW,
         )
         self.assertTrue(np.all(gibbs_mix >= 0))
-        self.assertTrue(np.all(dervative_gibbs**2 >= 0))
+        self.assertTrue(np.all(derivative_gibbs**2 >= 0))
 
     def test_gibbs_mix_weight(self) -> None:
         """Test for gibbs_mix_weight function."""
-        gibbs_mix, dervative_gibbs = gibbs_mix_weight(
+        gibbs_mix, derivative_gibbs = gibbs_mix_weight(
             molar_mass_ratio=self.molar_mass_ratio,
             organic_mole_fraction=self.organic_mole_fraction,
             oxygen2carbon=self.oxygen2carbon,
             density=self.density,
         )
         self.assertTrue(np.all(gibbs_mix >= 0))
-        self.assertTrue(np.all(dervative_gibbs**2 >= 0))
+        self.assertTrue(np.all(derivative_gibbs**2 >= 0))
 
-        gibbs_mix, dervative_gibbs = gibbs_mix_weight(
+        gibbs_mix, derivative_gibbs = gibbs_mix_weight(
             molar_mass_ratio=self.molar_mass_ratio,
             organic_mole_fraction=self.organic_mole_fraction,
             oxygen2carbon=self.oxygen2carbon,
@@ -72,13 +72,13 @@ class TestGibbsMixing(unittest.TestCase):
             functional_group="alcohol",
         )
         self.assertTrue(np.all(gibbs_mix >= 0))
-        self.assertTrue(np.all(dervative_gibbs**2 >= 0))
+        self.assertTrue(np.all(derivative_gibbs**2 >= 0))
 
-        gibbs_mix, dervative_gibbs = gibbs_mix_weight(
+        gibbs_mix, derivative_gibbs = gibbs_mix_weight(
             molar_mass_ratio=self.molar_mass_ratio_array,
             organic_mole_fraction=self.organic_mole_fraction_array,
             oxygen2carbon=self.oxygen2carbon_array,
             density=self.density_array,
         )
         self.assertTrue(np.all(gibbs_mix >= 0))
-        self.assertTrue(np.all(dervative_gibbs**2 >= 0))
+        self.assertTrue(np.all(derivative_gibbs**2 >= 0))
