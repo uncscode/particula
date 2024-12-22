@@ -8,7 +8,6 @@ import logging
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.util.input_handling import convert_units  # type: ignore
 from particula.validate_inputs import validate_inputs  # type: ignore
 
 logger = logging.getLogger("particula")
@@ -36,8 +35,10 @@ class BuilderDensityMixin:
             density: Density of the particle.
             density_units: Units of the density. Default is *kg/m^3*
         """
-        self.density = density * convert_units(density_units, "kg/m^3")
-        return self
+        if density_units == "kg/m^3":
+            self.density = density
+            return self
+        raise ValueError("Density units must be in kg/m^3")
 
 
 class BuilderSurfaceTensionMixin:
@@ -63,10 +64,10 @@ class BuilderSurfaceTensionMixin:
             surface_tension: Surface tension of the particle.
             surface_tension_units: Surface tension units. Default is *N/m*.
         """
-        self.surface_tension = surface_tension * convert_units(
-            surface_tension_units, "N/m"
-        )
-        return self
+        if surface_tension_units == "N/m":
+            self.surface_tension = surface_tension
+            return self
+        raise ValueError("Surface tension units must be in N/m")
 
 
 class BuilderMolarMassMixin:
@@ -92,10 +93,10 @@ class BuilderMolarMassMixin:
         - molar_mass: Molar mass of the particle.
         - molar_mass_units: Units of the molar mass. Default is *kg/mol*.
         """
-        self.molar_mass = molar_mass * convert_units(
-            molar_mass_units, "kg/mol"
-        )
-        return self
+        if molar_mass_units == "kg/mol":
+            self.molar_mass = molar_mass
+            return self
+        raise ValueError("Molar mass units must be in kg/mol")
 
 
 class BuilderConcentrationMixin:
@@ -128,10 +129,12 @@ class BuilderConcentrationMixin:
         """
         if concentration_units is None:
             concentration_units = self.default_units
-        self.concentration = concentration * convert_units(
-            concentration_units, self.default_units
+        if concentration_units == self.default_units:
+            self.concentration = concentration
+            return self
+        raise ValueError(
+            f"Concentration units must be in {self.default_units}"
         )
-        return self
 
 
 class BuilderChargeMixin:
@@ -186,8 +189,10 @@ class BuilderMassMixin:
         Raises:
             ValueError: If mass is negative
         """
-        self.mass = mass * convert_units(mass_units, "kg")
-        return self
+        if mass_units == "kg":
+            self.mass = mass
+            return self
+        raise ValueError("Mass units must be in kg")
 
 
 class BuilderVolumeMixin:
@@ -215,8 +220,10 @@ class BuilderVolumeMixin:
         Raises:
             ValueError: If volume is negative
         """
-        self.volume = volume * convert_units(volume_units, "m^3")
-        return self
+        if volume_units == "m^3":
+            self.volume = volume
+            return self
+        raise ValueError("Volume units must be in m^3")
 
 
 class BuilderRadiusMixin:
@@ -244,8 +251,10 @@ class BuilderRadiusMixin:
         Raises:
             ValueError: If radius is negative
         """
-        self.radius = radius * convert_units(radius_units, "m")
-        return self
+        if radius_units == "m":
+            self.radius = radius
+            return self
+        raise ValueError("Radius units must be in meters")
 
 
 class BuilderTemperatureMixin:
@@ -258,6 +267,7 @@ class BuilderTemperatureMixin:
     def __init__(self):
         self.temperature = None
 
+    @validate_inputs({"temperature": "positive"})
     def set_temperature(
         self, temperature: float, temperature_units: str = "K"
     ):
@@ -275,13 +285,10 @@ class BuilderTemperatureMixin:
         Raises:
             ValueError: If the converted temperature is below absolute zero.
         """
-        self.temperature = convert_units(
-            temperature_units, "K", value=temperature
-        )  # temperature is a non-multiplicative conversion
-        if self.temperature < 0:
-            logger.error("Argument 'temperature' must be positive.")
-            raise ValueError("Argument 'temperature' must be positive.")
-        return self
+        if temperature_units == "K":
+            self.temperature = temperature
+            return self
+        raise ValueError("Temperature units must be in K")
 
 
 class BuilderPressureMixin:
@@ -313,8 +320,10 @@ class BuilderPressureMixin:
         Raises:
             ValueError: If the total pressure is below zero.
         """
-        self.pressure = pressure * convert_units(pressure_units, "Pa")
-        return self
+        if pressure_units == "Pa":
+            self.pressure = pressure
+            return self
+        raise ValueError("Pressure units must be in Pa")
 
 
 class BuilderLognormalMixin:
@@ -348,8 +357,10 @@ class BuilderLognormalMixin:
         Raises:
             ValueError: If mode is negative.
         """
-        self.mode = mode * convert_units(mode_units, "m")
-        return self
+        if mode_units == "m":
+            self.mode = mode
+            return self
+        raise ValueError("Mode units must be in meters")
 
     @validate_inputs({"geometric_standard_deviation": "positive"})
     def set_geometric_standard_deviation(
@@ -389,10 +400,10 @@ class BuilderLognormalMixin:
         Raises:
             ValueError: If number concentration is negative.
         """
-        self.number_concentration = number_concentration * convert_units(
-            number_concentration_units, "1/m^3"
-        )
-        return self
+        if number_concentration_units == "1/m^3":
+            self.number_concentration = number_concentration
+            return self
+        raise ValueError("Number concentration units must be in 1/m^3")
 
 
 class BuilderParticleResolvedCountMixin:

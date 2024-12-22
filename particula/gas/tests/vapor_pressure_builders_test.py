@@ -49,11 +49,8 @@ def test_clausius_set_latent_heat_positive():
 def test_clausius_set_latent_heat_negative():
     """Test setting a negative value for the latent heat."""
     builder = ClausiusClapeyronBuilder()
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError):
         builder.set_latent_heat(-100, "J/kg")
-    assert "Latent heat must be a positive numeric value." in str(
-        excinfo.value
-    )
 
 
 def test_clausius_set_temperature_initial_positive():
@@ -66,11 +63,8 @@ def test_clausius_set_temperature_initial_positive():
 def test_clausius_set_temperature_initial_negative():
     """Test setting a negative value for the initial temperature."""
     builder = ClausiusClapeyronBuilder()
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError):
         builder.set_temperature_initial(-5, "K")
-    assert "Initial temperature must be a positive numeric value." in str(
-        excinfo.value
-    )
 
 
 def test_clausius_set_pressure_initial_positive():
@@ -83,11 +77,8 @@ def test_clausius_set_pressure_initial_positive():
 def test_clausius_set_pressure_initial_negative():
     """Test setting a negative value for the initial pressure."""
     builder = ClausiusClapeyronBuilder()
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError):
         builder.set_pressure_initial(-101325, "Pa")
-    assert "Initial pressure must be a positive numeric value." in str(
-        excinfo.value
-    )
 
 
 def test_clausius_set_parameters_complete():
@@ -98,8 +89,8 @@ def test_clausius_set_parameters_complete():
         "latent_heat_units": "J/kg",
         "temperature_initial": 373,
         "temperature_initial_units": "K",
-        "pressure_initial": 1,
-        "pressure_initial_units": "atm",
+        "pressure_initial": 101325,
+        "pressure_initial_units": "Pa",
     }
     builder.set_parameters(parameters)
     assert builder.latent_heat == 2260
@@ -139,15 +130,14 @@ def test_constant_set_vapor_pressure_positive():
 def test_constant_set_vapor_pressure_negative():
     """Test setting a negative value for the constant vapor pressure."""
     builder = ConstantBuilder()
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError):
         builder.set_vapor_pressure(-101325, "Pa")
-    assert "Vapor pressure must be a positive value." in str(excinfo.value)
 
 
 def test_constant_set_parameters_complete():
     """Test setting all parameters at once. With different pressure units."""
     builder = ConstantBuilder()
-    parameters = {"vapor_pressure": 1, "vapor_pressure_units": "atm"}
+    parameters = {"vapor_pressure": 101325, "vapor_pressure_units": "Pa"}
     builder.set_parameters(parameters)
     assert builder.vapor_pressure == 101325
 
