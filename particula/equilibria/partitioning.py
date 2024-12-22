@@ -16,6 +16,7 @@ def liquid_vapor_obj_function(
     molar_mass,
     error_only=True,
 ):  # pylint: disable=too-many-locals, too-many-arguments
+    # pylint: disable=too-many-positional-arguments
     """Objective function for liquid-vapor partitioning."""
     # objective function
 
@@ -162,7 +163,7 @@ def liquid_vapor_partitioning(
     mass_fraction_water_ab,
     q_ab,
     partition_coefficient_guess=None,
-):  # pylint: disable=too-many-arguments
+):  # pylint: disable=too-many-arguments, too-many-positional-arguments
     # pylint: disable=too-many-locals
     """Thermodynamic equilibrium between liquid and vapor phase.
     with activity coefficients,"""
