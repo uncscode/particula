@@ -8,64 +8,82 @@ https://doi.org/10.5194/acp-19-13383-2019
 """
 
 from typing import Optional, Union, Tuple
-from numpy.typing import ArrayLike
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.util.machine_limit import safe_exp
+from particula.util.validate_inputs import validate_inputs
 from particula.activity import phase_separation
 from particula.activity.species_density import organic_density_estimate
 
 
 # the fit values for the activity model
-FIT_LOW = {'a1': [7.089476E+00, -7.711860E+00, -3.885941E+01, -1.000000E+02],
-           'a2': [-6.226781E-01, -1.000000E+02, 3.081244E-09, 6.188812E+01],
-           's': [-5.988895E+00, 6.940689E+00]}
-FIT_MID = {'a1': [5.872214E+00, -4.535007E+00, -5.129327E+00, -2.809232E+01],
-           'a2': [-9.740486E-01, -1.000000E+02, 2.109751E+00, -2.367683E+01],
-           's': [-1.219164E+00, 4.742729E+00]}
-FIT_HIGH = {'a1': [5.921550E+00, -2.528295E+00, -3.883017E+00, -7.898128E+00],
-            'a2': [-1.000000E+02, -1.000000E+02, 1.353916E+00, -1.160145E+01],
-            's': [-7.868187E-02, 3.650860E+00]}
+FIT_LOW = {
+    "a1": [7.089476e00, -7.711860e00, -3.885941e01, -1.000000e02],
+    "a2": [-6.226781e-01, -1.000000e02, 3.081244e-09, 6.188812e01],
+    "s": [-5.988895e00, 6.940689e00],
+}
+FIT_MID = {
+    "a1": [5.872214e00, -4.535007e00, -5.129327e00, -2.809232e01],
+    "a2": [-9.740486e-01, -1.000000e02, 2.109751e00, -2.367683e01],
+    "s": [-1.219164e00, 4.742729e00],
+}
+FIT_HIGH = {
+    "a1": [5.921550e00, -2.528295e00, -3.883017e00, -7.898128e00],
+    "a2": [-1.000000e02, -1.000000e02, 1.353916e00, -1.160145e01],
+    "s": [-7.868187e-02, 3.650860e00],
+}
 # interpolation points, could be done smarter
 INTERPOLATE_WATER_FIT = 500
 LOWEST_ORGANIC_MOLE_FRACTION = 1e-12
 
 
+@validate_inputs(
+    {
+        "molar_mass_ratio": "positive",
+        "organic_mole_fraction": "nonnegative",
+        "oxygen2carbon": "nonnegative",
+        "density": "positive",
+    }
+)
 def activity_coefficients(
-    molar_mass_ratio: ArrayLike,
-    organic_mole_fraction: ArrayLike,
-    oxygen2carbon: ArrayLike,
-    density: ArrayLike,
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
+    organic_mole_fraction: Union[float, NDArray[np.float64]],
+    oxygen2carbon: Union[float, NDArray[np.float64]],
+    density: Union[float, NDArray[np.float64]],
     functional_group=None,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray,
-           np.ndarray, np.ndarray, np.ndarray]:
+) -> Tuple[
+    Union[float, NDArray[np.float64]],
+    Union[float, NDArray[np.float64]],
+    Union[float, NDArray[np.float64]],
+    Union[float, NDArray[np.float64]],
+    Union[float, NDArray[np.float64]],
+    Union[float, NDArray[np.float64]],
+]:
     """
     Calculate the activity coefficients for water and organic matter in
     organic-water mixtures.
 
     Args:
-        - molar_mass_ratio: Ratio of the molecular weight of water to the
-            molecular weight of organic matter.
-        - organic_mole_fraction: Molar fraction of organic matter in the
-            mixture.
-        - oxygen2carbon: Oxygen to carbon ratio in the organic compound.
-        - density: Density of the mixture.
-        - functional_group: Optional functional group(s) of the organic
-            compound, if applicable.
+        - molar_mass_ratio : Ratio of the molecular weight of water to the
+          molecular weight of organic matter.
+        - organic_mole_fraction : Molar fraction of organic matter in the
+          mixture.
+        - oxygen2carbon : Oxygen to carbon ratio in the organic compound.
+        - density : Density of the mixture, in kg/m^3.
+        - functional_group : Optional functional group(s) of the organic
+          compound, if applicable.
 
     Returns:
-        A tuple containing the activity of water, activity
-        of organic matter, mass fraction of water, and mass
-        fraction of organic matter, gamma_water (activity coefficient),
-        and gamma_organic (activity coefficient).
+        - A tuple containing the activity of water, activity
+          of organic matter, mass fraction of water, and mass
+          fraction of organic matter, gamma_water (activity coefficient),
+          and gamma_organic (activity coefficient).
     """
-    # check types
-    organic_mole_fraction = np.asarray(organic_mole_fraction, dtype=np.float64)
-
     oxygen2carbon, molar_mass_ratio = convert_to_oh_equivalent(
         oxygen2carbon=oxygen2carbon,
         molar_mass_ratio=molar_mass_ratio,
-        functional_group=functional_group
+        functional_group=functional_group,
     )
     gibbs_mix, derivative_gibbs = gibbs_mix_weight(
         molar_mass_ratio=molar_mass_ratio,
@@ -86,36 +104,54 @@ def activity_coefficients(
     activity_water = gamma_water * (1.0 - organic_mole_fraction)
     activity_organic = gamma_organic * organic_mole_fraction
 
-    mass_water = (1.0 - organic_mole_fraction) * molar_mass_ratio / (
-        (1.0 - organic_mole_fraction) * (molar_mass_ratio - 1) + 1
+    mass_water = (
+        (1.0 - organic_mole_fraction)
+        * molar_mass_ratio
+        / ((1.0 - organic_mole_fraction) * (molar_mass_ratio - 1) + 1)
     )
     mass_organic = 1 - mass_water
 
-    return activity_water, activity_organic, mass_water, mass_organic, \
-        gamma_water, gamma_organic
+    return (
+        activity_water,
+        activity_organic,
+        mass_water,
+        mass_organic,
+        gamma_water,
+        gamma_organic,
+    )
 
 
+@validate_inputs(
+    {
+        "molar_mass_ratio": "positive",
+        "organic_mole_fraction": "nonnegative",
+        "oxygen2carbon": "nonnegative",
+        "density": "positive",
+    }
+)
 def gibbs_of_mixing(
-    molar_mass_ratio: ArrayLike,
-    organic_mole_fraction: ArrayLike,
-    oxygen2carbon: ArrayLike,
-    density: ArrayLike,
-    fit_dict: dict
-) -> Tuple[np.ndarray, np.ndarray]:
+    molar_mass_ratio: Union[float, NDArray[np.float64]],
+    organic_mole_fraction: Union[float, NDArray[np.float64]],
+    oxygen2carbon: Union[float, NDArray[np.float64]],
+    density: Union[float, NDArray[np.float64]],
+    fit_dict: dict,
+) -> Tuple[
+    Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
+]:
     """
     Calculate the Gibbs free energy of mixing for a binary mixture.
 
     Args:
-        - molar_mass_ratio: The molar mass ratio of water to organic
-            matter.
-        - organic_mole_fraction: The fraction of organic matter.
-        - oxygen2carbon: The oxygen to carbon ratio.
-        - density: The density of the mixture.
-        - fit_dict: A dictionary of fit values for the low oxygen2carbon region
+        - molar_mass_ratio : The molar mass ratio of water to organic
+          matter.
+        - organic_mole_fraction : The fraction of organic matter.
+        - oxygen2carbon : The oxygen to carbon ratio.
+        - density : The density of the mixture, in kg/m^3.
+        - fit_dict : A dictionary of fit values for the low oxygen2carbon region
 
     Returns:
-        Tuple[np.ndarray, np.ndarray]: A tuple containing the Gibbs free
-        energy of mixing and its derivative.
+        - A tuple containing the Gibbs free energy of mixing and its
+          derivative.
     """
     # check types
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
@@ -123,20 +159,23 @@ def gibbs_of_mixing(
     oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)
     density = np.asarray(density, dtype=np.float64)
 
-    c1 = coefficients_c(molar_mass_ratio, oxygen2carbon, fit_dict['a1'])
-    c2 = coefficients_c(molar_mass_ratio, oxygen2carbon, fit_dict['a2'])
+    c1 = coefficients_c(molar_mass_ratio, oxygen2carbon, fit_dict["a1"])
+    c2 = coefficients_c(molar_mass_ratio, oxygen2carbon, fit_dict["a2"])
 
-    rhor = 0.997 / density  # assumes water is the other fluid
+    rhor = 997.0 / density  # assumes water is the other fluid
 
     # equation S3
     # the scaled molar mass ratio of this mixture's components.
-    scaled_molar_mass_ratio = molar_mass_ratio * fit_dict['s'][1] \
-        * (1.0 + oxygen2carbon) ** fit_dict['s'][0]
+    scaled_molar_mass_ratio = (
+        molar_mass_ratio
+        * fit_dict["s"][1]
+        * (1.0 + oxygen2carbon) ** fit_dict["s"][0]
+    )
 
     # phi2 is a scaled volume fraction
     phi2 = organic_mole_fraction / (
-        organic_mole_fraction + (1.0 - organic_mole_fraction)
-        * scaled_molar_mass_ratio / rhor
+        organic_mole_fraction
+        + (1.0 - organic_mole_fraction) * scaled_molar_mass_ratio / rhor
     )
 
     # equation S4
@@ -144,8 +183,9 @@ def gibbs_of_mixing(
     gibbs_mix = phi2 * (1.0 - phi2) * sum1
 
     # equation s6 the derivative of phi2 with respect to organic x2
-    dphi2dx2 = (scaled_molar_mass_ratio / rhor) \
-        * (phi2 / organic_mole_fraction)**2
+    dphi2dx2 = (scaled_molar_mass_ratio / rhor) * (
+        phi2 / organic_mole_fraction
+    ) ** 2
 
     # equation S7
     derivative_gibbs_mix = (
@@ -167,18 +207,18 @@ def gibbs_mix_weight(
     oxygen2carbon regions. Only can run one compound at a time.
 
     Args:
-        - molar_mass_ratio: The molar mass ratio of water to organic
-            matter.
-        - organic_mole_fraction: The fraction of organic matter.
-        - oxygen2carbon: The oxygen to carbon ratio.
-        - density: The density of the mixture.
-        - functional_group: Optional functional group(s) of the organic
-            compound, if applicable.
+        - molar_mass_ratio : The molar mass ratio of water to organic
+          matter.
+        - organic_mole_fraction : The fraction of organic matter.
+        - oxygen2carbon : The oxygen to carbon ratio.
+        - density : The density of the mixture, in kg/m^3.
+        - functional_group : Optional functional group(s) of the organic
+          compound, if applicable.
 
     Returns:
         - gibbs_mix : Gibbs energy of mixing (including 1/RT)
         - derivative_gibbs : derivative of Gibbs energy with respect to
-        - mole fraction of organics (includes 1/RT)
+          mole fraction of organics (includes 1/RT)
     """
     # check types
     density = np.asarray(density, dtype=np.float64)
@@ -186,12 +226,11 @@ def gibbs_mix_weight(
     oxygen2carbon, molar_mass_ratio = convert_to_oh_equivalent(
         oxygen2carbon=oxygen2carbon,
         molar_mass_ratio=molar_mass_ratio,
-        functional_group=functional_group
+        functional_group=functional_group,
     )
 
     weights = bat_blending_weights(
-        molar_mass_ratio=molar_mass_ratio,
-        oxygen2carbon=oxygen2carbon
+        molar_mass_ratio=molar_mass_ratio, oxygen2carbon=oxygen2carbon
     )
 
     if weights[1] > 0:  # if mid region is used
@@ -200,7 +239,7 @@ def gibbs_mix_weight(
             organic_mole_fraction=organic_mole_fraction,
             oxygen2carbon=oxygen2carbon,
             density=density,
-            fit_dict=FIT_MID
+            fit_dict=FIT_MID,
         )
 
         if weights[0] > 0:  # if paired with low oxygen2carbon region
@@ -209,30 +248,35 @@ def gibbs_mix_weight(
                 organic_mole_fraction=organic_mole_fraction,
                 oxygen2carbon=oxygen2carbon,
                 density=density,
-                fit_dict=FIT_LOW
+                fit_dict=FIT_LOW,
             )
             gibbs_mix = weights[0] * gibbs_mix_low + weights[1] * gibbs_mix_mid
-            derivative_gibbs = weights[0] * derivative_gibbs_low \
+            derivative_gibbs = (
+                weights[0] * derivative_gibbs_low
                 + weights[1] * derivative_gibbs_mid
+            )
         else:  # else paired with high oxygen2carbon region
             gibbs_mix_high, derivative_gibbs_high = gibbs_of_mixing(
                 molar_mass_ratio=molar_mass_ratio,
                 organic_mole_fraction=organic_mole_fraction,
                 oxygen2carbon=oxygen2carbon,
                 density=density,
-                fit_dict=FIT_HIGH
+                fit_dict=FIT_HIGH,
             )
-            gibbs_mix = weights[2] * gibbs_mix_high + \
-                weights[1] * gibbs_mix_mid
-            derivative_gibbs = weights[2] * derivative_gibbs_high \
+            gibbs_mix = (
+                weights[2] * gibbs_mix_high + weights[1] * gibbs_mix_mid
+            )
+            derivative_gibbs = (
+                weights[2] * derivative_gibbs_high
                 + weights[1] * derivative_gibbs_mid
+            )
     else:  # when only high 2OC region is used
         gibbs_mix, derivative_gibbs = gibbs_of_mixing(
             molar_mass_ratio=molar_mass_ratio,
             organic_mole_fraction=organic_mole_fraction,
             oxygen2carbon=oxygen2carbon,
             density=density,
-            fit_dict=FIT_HIGH
+            fit_dict=FIT_HIGH,
         )
     return gibbs_mix, derivative_gibbs
 
@@ -241,22 +285,22 @@ def biphasic_water_activity_point(
     oxygen2carbon: ArrayLike,
     hydrogen2carbon: ArrayLike,
     molar_mass_ratio: ArrayLike,
-    functional_group: Optional[Union[list[str], str]] = None
+    functional_group: Optional[Union[list[str], str]] = None,
 ) -> np.ndarray:
     """
     This function computes the biphasic to single phase
     water activity (RH*100).
 
     Args:
-        - oxygen2carbon: The oxygen to carbon ratio.
-        - hydrogen2carbon: The hydrogen to carbon ratio.
-        - molar_mass_ratio: The molar mass ratio of water to organic
-            matter.
-        - functional_group: Optional functional group(s) of the organic
-            compound, if applicable.
+        - oxygen2carbon : The oxygen to carbon ratio.
+        - hydrogen2carbon : The hydrogen to carbon ratio.
+        - molar_mass_ratio : The molar mass ratio of water to organic
+          matter.
+        - functional_group : Optional functional group(s) of the organic
+          compound, if applicable.
 
     Returns:
-        - np.array: The RH cross point array.
+        - The RH cross point array.
     """
     # check types
     oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)
@@ -281,24 +325,25 @@ def biphasic_water_activity_point(
             molar_mass_ratio[i],
             oxygen2carbon[i],
             hydrogen2carbon[i],
-            mass_ratio_convert=True)
+            mass_ratio_convert=True,
+        )
         activities = activity_coefficients(
             molar_mass_ratio=molar_mass_ratio[i],
             organic_mole_fraction=mole_frac,
             oxygen2carbon=oxygen2carbon[i],
             density=density,
-            functional_group=functional_group
+            functional_group=functional_group,
         )
 
         if np.isnan(activities[0]).any():
-            raise ValueError('water activity is NaN, check inputs')
+            raise ValueError("water activity is NaN, check inputs")
 
         phase_check = phase_separation.find_phase_separation(
-            activities[0],
-            activities[1])
+            activities[0], activities[1]
+        )
 
-        if phase_check['phase_sep_check'] == 1:
-            water_activity_cross_point[i] = phase_check['upper_seperation']
+        if phase_check["phase_sep_check"] == 1:
+            water_activity_cross_point[i] = phase_check["upper_seperation"]
         else:
             water_activity_cross_point[i] = 0  # no phase separation
 
@@ -314,11 +359,22 @@ def biphasic_water_activity_point(
 def convert_to_oh_equivalent(
     oxygen2carbon: ArrayLike,
     molar_mass_ratio: ArrayLike,
-    functional_group: Optional[Union[list[str], str]] = None
+    functional_group: Optional[Union[list[str], str]] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
-    just a pass through now, but will
-    add the oh equivalent conversion
+    Just a pass through now, but will
+    add the oh equivalent conversion.
+
+    Args:
+        - oxygen2carbon : The oxygen to carbon ratio.
+        - molar_mass_ratio : The molar mass ratio of water to organic
+          matter.
+        - functional_group : Optional functional group(s) of the organic
+          compound, if applicable.
+
+    Returns:
+        - A tuple containing the converted oxygen to carbon ratio and
+          molar mass ratio.
     """
     # check types
     oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)
@@ -327,33 +383,33 @@ def convert_to_oh_equivalent(
     # sourcery skip
     if functional_group is None:
         return oxygen2carbon, molar_mass_ratio
-    if functional_group == 'alcohol':
+    if functional_group == "alcohol":
         return oxygen2carbon + 1, molar_mass_ratio + 16  # fix this from SI
-    raise ValueError('BAT functional group not recognized')
+    raise ValueError("BAT functional group not recognized")
 
 
 def bat_blending_weights(
-        molar_mass_ratio: ArrayLike,
-        oxygen2carbon: ArrayLike
+    molar_mass_ratio: ArrayLike, oxygen2carbon: ArrayLike
 ) -> np.ndarray:
     """
     Function to estimate the blending weights for the BAT model.
 
     Args:
-        - molar_mass_ratio: The molar mass ratio of water to organic
-            matter.
-        - oxygen2carbon: The oxygen to carbon ratio.
+        - molar_mass_ratio : The molar mass ratio of water to organic
+          matter.
+        - oxygen2carbon : The oxygen to carbon ratio.
 
     Returns:
         - blending_weights : List of blending weights for the BAT model
-        in the low, mid, and high oxygen2carbon regions.
+          in the low, mid, and high oxygen2carbon regions.
     """
     # check types
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
     oxygen2carbon = np.asarray(oxygen2carbon, dtype=np.float64)
 
     oxygen2carbon_ml = phase_separation.organic_water_single_phase(
-        molar_mass_ratio=molar_mass_ratio)
+        molar_mass_ratio=molar_mass_ratio
+    )
 
     blending_weights = np.zeros(3)  # [low, mid, high] oxygen2carbon regions
 
@@ -364,15 +420,13 @@ def bat_blending_weights(
         b_2 = 0.0604293454322489
 
         oxygen2carbon_b = oxygen2carbon - oxygen2carbon_ml * b_ml
-        weight_b = 1 / (1 + np.exp(
-            - b_1 * (oxygen2carbon_b - b_2)
-        ))  # logistic transfer function
+        weight_b = 1 / (
+            1 + np.exp(-b_1 * (oxygen2carbon_b - b_2))
+        )  # logistic transfer function
 
         oxygen2carbon_b_norm = oxygen2carbon - (0.75 * oxygen2carbon_ml * b_ml)
 
-        weight_norm = 1 / (1 + np.exp(
-            - b_1 * (oxygen2carbon_b_norm - b_2)
-        ))
+        weight_norm = 1 / (1 + np.exp(-b_1 * (oxygen2carbon_b_norm - b_2)))
 
         blending_weights[1] = weight_b / weight_norm
         blending_weights[0] = 1 - blending_weights[1]
@@ -383,9 +437,9 @@ def bat_blending_weights(
         b_2 = 0.000947111285750515
 
         oxygen2carbon_b = oxygen2carbon - oxygen2carbon_ml
-        blending_weights[2] = 1 / (1 + np.exp(
-            - b_1 * (oxygen2carbon_b - b_2)
-        ))  # logistic transfer function
+        blending_weights[2] = 1 / (
+            1 + np.exp(-b_1 * (oxygen2carbon_b - b_2))
+        )  # logistic transfer function
 
         blending_weights[1] = 1 - blending_weights[2]
 
@@ -398,19 +452,19 @@ def bat_blending_weights(
 def coefficients_c(
     molar_mass_ratio: ArrayLike,
     oxygen2carbon: ArrayLike,
-    fit_values: ArrayLike
+    fit_values: ArrayLike,
 ) -> np.ndarray:
     """
     Coefficients for activity model, see Gorkowski (2019). equation S1 S2.
 
     Args:
-        - molar_mass_ratio: The molar mass ratio of water to organic
-            matter.
-        - oxygen2carbon: The oxygen to carbon ratio.
-        - fit_values: The fit values for the activity model.
+        - molar_mass_ratio : The molar mass ratio of water to organic
+          matter.
+        - oxygen2carbon : The oxygen to carbon ratio.
+        - fit_values : The fit values for the activity model.
 
     Returns:
-        - np.ndarray: The coefficients for the activity model.
+        - The coefficients for the activity model.
     """
     # check types
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
@@ -423,12 +477,11 @@ def coefficients_c(
 
 
 def fixed_water_activity(
-        water_activity: ArrayLike,
-        molar_mass_ratio: ArrayLike,
-        oxygen2carbon: ArrayLike,
-        density: ArrayLike,
+    water_activity: ArrayLike,
+    molar_mass_ratio: ArrayLike,
+    oxygen2carbon: ArrayLike,
+    density: ArrayLike,
 ) -> Tuple:
-    # pylint: disable=too-many-locals
     """
     Calculate the activity coefficients of water and organic matter in
     organic-water mixtures.
@@ -438,17 +491,18 @@ def fixed_water_activity(
     It calculates the activity coefficients for different phases and
     determines phase separations if they occur.
 
-    Parameters:
-    water_activity (ArrayLike): An array of water activity values.
-    molar_mass_ratio (ArrayLike): Array of molar mass ratios of the components.
-    oxygen2carbon (ArrayLike): Array of oxygen-to-carbon ratios.
-    density (ArrayLike): Array of densities of the mixture.
+    Args:
+        - water_activity : An array of water activity values.
+        - molar_mass_ratio : Array of molar mass ratios of the components.
+        - oxygen2carbon : Array of oxygen-to-carbon ratios.
+        - density : Array of densities of the mixture, in kg/m^3.
 
     Returns:
-    Tuple: A tuple containing the activity coefficients for alpha and beta
-            phases, and the alpha phase mole fraction.
-           If no phase separation occurs, the beta phase values are None.
+        - A tuple containing the activity coefficients for alpha and beta
+          phases, and the alpha phase mole fraction.
+          If no phase separation occurs, the beta phase values are None.
     """
+    # pylint: disable=too-many-locals
 
     # check types
     water_activity = np.asarray(water_activity, dtype=np.float64)
@@ -467,7 +521,7 @@ def fixed_water_activity(
         1,
         LOWEST_ORGANIC_MOLE_FRACTION,
         INTERPOLATE_WATER_FIT,
-        dtype=np.float64
+        dtype=np.float64,
     )
 
     # activity calculation
@@ -475,16 +529,15 @@ def fixed_water_activity(
         molar_mass_ratio=molar_mass_ratio,
         organic_mole_fraction=organic_mole_fraction_array,
         oxygen2carbon=oxygen2carbon,
-        density=density
+        density=density,
     )
     # find phase separation
     phase_check = phase_separation.find_phase_separation(
-        activities[0],
-        activities[1]
+        activities[0], activities[1]
     )
     # ensure water activity type is float
     activities_water = np.asarray(activities[0], dtype=np.float64)
-    if phase_check['phase_sep_check'] == 0:
+    if phase_check["phase_sep_check"] == 0:
         alpha_organic_mole_fraction = np.interp(
             xp=activities_water,
             fp=organic_mole_fraction_array,
@@ -497,7 +550,7 @@ def fixed_water_activity(
             molar_mass_ratio=molar_mass_ratio,
             organic_mole_fraction=alpha_organic_mole_fraction,
             oxygen2carbon=oxygen2carbon,
-            density=density
+            density=density,
         )
         activities_beta = None
         q_alpha = np.ones(water_activity.size)
@@ -512,15 +565,17 @@ def fixed_water_activity(
 
     # alpha water rich phase
     alpha_water_activity = activities_water[
-        phase_check['upper_seperation_index']:]
+        phase_check["upper_seperation_index"] :
+    ]
     alpha_organic_mole_fraction = organic_mole_fraction_array[
-        phase_check['upper_seperation_index']:]
+        phase_check["upper_seperation_index"] :
+    ]
     # beta organic rich phase
     beta_water_activity = activities_water[
-        : phase_check['matching_upper_seperation_index']
+        : phase_check["matching_upper_seperation_index"]
     ]
     beta_organic_mole_fraction = organic_mole_fraction_array[
-        : phase_check['matching_upper_seperation_index']
+        : phase_check["matching_upper_seperation_index"]
     ]
 
     # find the water activity of the alpha phase
@@ -544,17 +599,17 @@ def fixed_water_activity(
         molar_mass_ratio=molar_mass_ratio,
         organic_mole_fraction=alpha_organic_mole_fraction_interp,
         oxygen2carbon=oxygen2carbon,
-        density=density
+        density=density,
     )
     # calculate the activity coefficients for the beta phase
     activities_beta = activity_coefficients(
         molar_mass_ratio=molar_mass_ratio,
         organic_mole_fraction=beta_organic_mole_fraction_interp,
         oxygen2carbon=oxygen2carbon,
-        density=density
+        density=density,
     )
     q_alpha = phase_separation.q_alpha(
-        seperation_activity=phase_check['upper_seperation'],
+        seperation_activity=phase_check["upper_seperation"],
         activities=water_activity,
     )
     # change back to original order
