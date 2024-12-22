@@ -1,14 +1,23 @@
+"""
+Activity coefficients for organic-water mixtures.
+
+Gorkowski, K., Preston, T. C., &#38; Zuend, A. (2019).
+Relative-humidity-dependent organic aerosol thermodynamics
+Via an efficient reduced-complexity model.
+Atmospheric Chemistry and Physics
+https://doi.org/10.5194/acp-19-13383-2019
+"""
+
 from typing import Optional, Union, Tuple, List
 import numpy as np
 from numpy.typing import NDArray
 from particula.util.machine_limit import safe_exp
 from particula.util.validate_inputs import validate_inputs
-from particula.activity.bat_coefficents import (
-    INTERPOLATE_WATER_FIT,
-    LOWEST_ORGANIC_MOLE_FRACTION,
-)
+
 from particula.activity.gibbs_mixing import gibbs_mix_weight
-from particula.activity.utils import convert_to_oh_equivalent
+from particula.activity.convert_functional_group import (
+    convert_to_oh_equivalent
+)
 
 
 @validate_inputs(

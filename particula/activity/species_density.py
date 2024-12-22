@@ -97,7 +97,6 @@ def organic_array(
     nitrogen2carbon=None,
     mass_ratio_convert=False,
 ):
-    # pylint: disable=too-many-positional-arguments, too-many-arguments
     """Get densities for an array."""
     density = np.empty([len(molar_mass), 1], dtype=float)
     for i, molar in enumerate(molar_mass):
