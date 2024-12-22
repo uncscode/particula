@@ -15,7 +15,7 @@ from particula.util.validate_inputs import validate_inputs
 from particula.activity.bat_coefficents import (
     FIT_LOW, FIT_MID, FIT_HIGH, coefficients_c
 )
-from particula.activity.bat_weights import bat_blending_weights
+from particula.activity.bat_blending import bat_blending_weights
 from particula.activity.convert_functional_group import (
     convert_to_oh_equivalent
 )
