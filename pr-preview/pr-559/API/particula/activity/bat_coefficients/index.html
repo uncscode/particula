@@ -875,6 +875,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#fitvalues" class="md-nav__link">
+    <span class="md-ellipsis">
+      FitValues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FitValues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#signature" class="md-nav__link">
+    <span class="md-ellipsis">
+      Signature
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#coefficients_c" class="md-nav__link">
     <span class="md-ellipsis">
       coefficients_c
@@ -903,7 +927,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#signature" class="md-nav__link">
+  <a href="#signature_1" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
     </span>
@@ -5661,6 +5685,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#fitvalues" class="md-nav__link">
+    <span class="md-ellipsis">
+      FitValues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FitValues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#signature" class="md-nav__link">
+    <span class="md-ellipsis">
+      Signature
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#coefficients_c" class="md-nav__link">
     <span class="md-ellipsis">
       coefficients_c
@@ -5689,7 +5737,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#signature" class="md-nav__link">
+  <a href="#signature_1" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
     </span>
@@ -5725,8 +5773,14 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/activity/bat_coefficients.py">particula.activity.bat_coefficients</a> module.</p>
 </blockquote>
+<h2 id="fitvalues">FitValues<a class="headerlink" href="#fitvalues" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/activity/bat_coefficients.py#L17">Show source in bat_coefficients.py:17</a></p>
+<p>Named tuple for the fit values for the activity model.</p>
+<h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">FitValues</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span> <span class="o">...</span>
+</code></pre></div>
 <h2 id="coefficients_c">coefficients_c<a class="headerlink" href="#coefficients_c" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/activity/bat_coefficients.py#L35">Show source in bat_coefficients.py:35</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/activity/bat_coefficients.py#L45">Show source in bat_coefficients.py:45</a></p>
 <p>Coefficients for activity model, see Gorkowski (2019). equation S1 S2.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
@@ -5739,7 +5793,7 @@
 <ul>
 <li>The coefficients for the activity model.</li>
 </ul>
-<h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
+<h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">coefficients_c</span><span class="p">(</span>
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">oxygen2carbon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
