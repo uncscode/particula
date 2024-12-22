@@ -5810,7 +5810,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/activity/bat_blending.py">particula.activity.bat_blending</a> module.</p>
 </blockquote>
 <h2 id="_calculate_blending_weights">_calculate_blending_weights<a class="headerlink" href="#_calculate_blending_weights" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/activity/bat_blending.py#L59">Show source in bat_blending.py:59</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/activity/bat_blending.py#L61">Show source in bat_blending.py:61</a></p>
 <p>Helper function to calculate blending weights for a single value of
 oxygen2carbon.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
@@ -5839,8 +5839,10 @@ oxygen2carbon.</p>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li>blending_weights : List of blending weights for the BAT model
-    in the low, mid, and high oxygen2carbon regions.</li>
+<li>blending_weights : Array of blending weights for the BAT model
+    in the low, mid, and high oxygen2carbon regions. The weights
+    size is (3,) if oxygen2carbon is a single value, or (n, 3)
+    if oxygen2carbon is an array of size n.</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;molar_mass_ratio&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;oxygen2carbon&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
