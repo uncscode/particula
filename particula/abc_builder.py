@@ -5,8 +5,6 @@ References:
 
 """
 
-# pylint: disable=too-few-public-methods
-
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 import logging
@@ -19,7 +17,7 @@ class BuilderABC(ABC):
     set parameters from a dictionary.
 
     Args:
-        - required_parameters: List of required parameters for the builder.
+        - required_parameters : List of required parameters for the builder.
 
     Raises:
         - ValueError : If any required key is missing during check_keys or

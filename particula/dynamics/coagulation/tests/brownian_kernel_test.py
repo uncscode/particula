@@ -242,4 +242,4 @@ def test_brownian_coagulation_kernel_via_system_state_input_validation():
             temperature="not a number",
             pressure="not a number",
             alpha_collision_efficiency="not a number",
-        )  # pytype: disable=wrong-arg-types
+        )
