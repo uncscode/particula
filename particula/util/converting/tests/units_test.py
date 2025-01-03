@@ -3,6 +3,7 @@ Tests for Converting Units
 """
 import unittest
 from particula.util.converting.units import convert_units
+# flake8: noqa
 try:
     import pint  # pylint: disable=unused-import
 except ImportError:
