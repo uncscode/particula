@@ -3,6 +3,12 @@ Tests for Converting Units
 """
 import unittest
 from particula.util.converting.units import convert_units
+try:
+    import pint  # pylint: disable=unused-import
+except ImportError:
+    IS_PINT_AVAILABE = False
+else:
+    IS_PINT_AVAILABE = True
 
 
 class TestUnitConversion(unittest.TestCase):
@@ -14,18 +20,12 @@ class TestUnitConversion(unittest.TestCase):
         """
         Setup the test environment
         """
-        try:
-            import pint  # noqa
-        except ImportError:
-            self.pint_installed = False
-        else:
-            self.pint_installed = True
 
     def test_import_warning(self) -> None:
         """
         Test for import warning if pint is not installed
         """
-        if not self.pint_installed:
+        if not IS_PINT_AVAILABE:
             with self.assertRaises(ImportError):
                 convert_units("degC", "degF")
         else:
@@ -35,7 +35,7 @@ class TestUnitConversion(unittest.TestCase):
         """
         Test for example conversion when pint is installed
         """
-        if self.pint_installed:
+        if IS_PINT_AVAILABE:
             result = convert_units("ug/m^3", "kg/m^3")
             self.assertAlmostEqual(result, 1e-9)
         else:
