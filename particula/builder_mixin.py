@@ -10,6 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
+from particula.util.converting.units import convert_units
 
 logger = logging.getLogger("particula")
 
@@ -39,7 +40,8 @@ class BuilderDensityMixin:
         if density_units == "kg/m^3":
             self.density = density
             return self
-        raise ValueError("Density units must be in kg/m^3")
+        self.density = density * convert_units(density_units, "kg/m^3")
+        return self
 
 
 class BuilderSurfaceTensionMixin:
