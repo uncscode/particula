@@ -36,7 +36,7 @@ dev = [
     "mkdocs-material", "handsdown", "mkdocs-jupyter",
 ]
 extra = [
-    "matplotlib", "pandas", "tqdm",
+    "matplotlib", "pandas", "tqdm", "pint",
 ]
 
 [build-system]
