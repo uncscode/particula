@@ -68,7 +68,7 @@ def get_kinematic_viscosity_via_system_state(
     Args:
     -----
     - temperature: Desired air temperature [K]. Must be greater than 0.
-    - pressure: Pressure of the system [Pa]. Must be greater than 0.
+    - fluid_density: Density of the fluid [kg/m³].
     - reference_viscosity: Gas viscosity [Pa*s] at the reference temperature
     (default is STP).
     - reference_temperature: Gas temperature [K] for the reference viscosity
