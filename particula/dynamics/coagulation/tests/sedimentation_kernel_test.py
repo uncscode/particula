@@ -26,7 +26,7 @@ def test_sedimentation_kernel():
         calculate_collision_efficiency=False,
     )
 
-    assert np.allclose(kernel, expected_kernel, atol=1e-6)
+    assert np.allclose(kernel, expected_kernel, rtol=1e-6)
 
 
 def test_sedimentation_kernel_via_system_state():
@@ -50,4 +50,4 @@ def test_sedimentation_kernel_via_system_state():
         calculate_collision_efficiency=False,
     )
 
-    assert np.allclose(kernel, expected_kernel, atol=1e-6)
+    assert np.allclose(kernel, expected_kernel, rtol=1e-6)
