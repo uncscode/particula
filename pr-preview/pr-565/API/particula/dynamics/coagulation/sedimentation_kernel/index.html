@@ -5937,7 +5937,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py">particula.dynamics.coagulation.sedimentation_kernel</a> module.</p>
 </blockquote>
 <h2 id="calculate_collision_efficiency_function">calculate_collision_efficiency_function<a class="headerlink" href="#calculate_collision_efficiency_function" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L15">Show source in sedimentation_kernel.py:15</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L16">Show source in sedimentation_kernel.py:16</a></p>
 <p>Placeholder function to calculate collision efficiency.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <hr />
@@ -5952,7 +5952,7 @@
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">calculate_collision_efficiency_function</span><span class="p">(</span><span class="n">radius1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">radius2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="sedimentation_kernel">sedimentation_kernel<a class="headerlink" href="#sedimentation_kernel" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L36">Show source in sedimentation_kernel.py:36</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L37">Show source in sedimentation_kernel.py:37</a></p>
 <p>Calculate the sedimentation kernel for aerosol particles.</p>
 <p>Coagulation occurring due to gravitational settling when heavier particles
 settle faster than lighter ones, catching up and colliding with them. The
@@ -5983,7 +5983,7 @@ collision efficiency</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="sedimentation_kernel_via_system_state">sedimentation_kernel_via_system_state<a class="headerlink" href="#sedimentation_kernel_via_system_state" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L87">Show source in sedimentation_kernel.py:87</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L86">Show source in sedimentation_kernel.py:86</a></p>
 <p>Calculate the sedimentation kernel for aerosol particles via system state.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <hr />
@@ -5999,7 +5999,8 @@ collision efficiency</p>
 <div class="highlight"><pre><span></span><code>- Sedimentation kernel matrix for aerosol particles [m^3/s].
 </code></pre></div>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">sedimentation_kernel_via_system_state</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="k">def</span> <span class="nf">sedimentation_kernel_via_system_state</span><span class="p">(</span>
     <span class="n">radius_particle</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">density_particle</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>

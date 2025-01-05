@@ -5993,7 +5993,12 @@
 <p>A decorator to validate that specified arguments meet certain constraints.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>dict_args</code> - Dictionary of argument names and their constraints.</li>
+<li>dict_args : Dictionary of argument names and their constraints.<ul>
+<li><code>{"arg1"</code> - "positive", "arg2": "negative", ...}</li>
+<li><code>-</code> <em>Options</em> - "positive", "negative", "nonpositive", "nonnegative",
+    "nonzero".</li>
+</ul>
+</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <p>A decorator for input validation.</p>
