@@ -5950,15 +5950,14 @@ under the influence of gravity.</p>
 <li>Equation : v = mu / rho
         - v : Kinematic viscosity [m^2/s].
         - mu : Dynamic viscosity [Pa*s].
-        - rho : Density of the fluid [kg/m^3].</li>
-<li>https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula</li>
-<li>https://en.wikipedia.org/wiki/Viscosity</li>
+        - rho : Density of the fluid [kg/m^3].
+https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_kinematic_viscosity</span><span class="p">(</span><span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_kinematic_viscosity_via_system_state">get_kinematic_viscosity_via_system_state<a class="headerlink" href="#get_kinematic_viscosity_via_system_state" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kinematic_viscosity.py#L58">Show source in kinematic_viscosity.py:58</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kinematic_viscosity.py#L57">Show source in kinematic_viscosity.py:57</a></p>
 <p>Calculate the kinematic viscosity of air by calculating dynamic viscosity
 of air.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
@@ -5983,9 +5982,7 @@ of air.</p>
 </ul>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
 <hr />
-<ul>
-<li>https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula</li>
-</ul>
+<p>https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula</p>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kinematic_viscosity_via_system_state</span><span class="p">(</span>
