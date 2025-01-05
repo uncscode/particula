@@ -40,8 +40,8 @@ def turbulent_shear_kernel(
     References:
     ----------
     - Equation 13A.2 : K(D1, D2) = (pi * e_k / 120 * v)**1/2 * (D1 + D2)**3
-        - K(D1, D2) : Turblent shear kernel for coagulation [m^3/s].
-        - e_k : Turblent kinetic energy [m^2/s^2].
+        - K(D1, D2) : Turbulent shear kernel for coagulation [m^3/s].
+        - e_k : Turbulent kinetic energy [m^2/s^2].
         - v : Kinematic viscosity [m^2/s].
         - D1, D2 : Particle diameters [m].
     - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
