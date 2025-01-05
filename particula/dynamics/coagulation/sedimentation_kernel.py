@@ -10,6 +10,7 @@ import numpy as np
 from particula.particles.properties.settling_velocity import (
     particle_settling_velocity_via_system_state,
 )
+from particula.util.validate_inputs import validate_inputs
 
 
 def calculate_collision_efficiency_function(
@@ -76,14 +77,13 @@ def sedimentation_kernel(
     else:
         collision_efficiency_matrix = np.ones_like(diameter_matrix)
 
-    kernel_matrix = (
+    return (
         np.pi / 4 * diameter_matrix**2 * velocity_diff_matrix
         * collision_efficiency_matrix
     )
 
-    return kernel_matrix
 
-
+@validate_inputs({"temperature": "positive", "pressure": "positive"})
 def sedimentation_kernel_via_system_state(
     radius_particle: NDArray[np.float64],
     density_particle: NDArray[np.float64],
