@@ -81,7 +81,7 @@ def turbulent_shear_kernel_via_system_state(
         fluid_density=fluid_density
     )
     return turbulent_shear_kernel(
-        diameter_particle=diameter_particle, 
+        diameter_particle=diameter_particle,
         turbulent_kinetic_energy=turbulent_kinetic_energy,
         kinematic_viscosity=kinematic_viscosity
     )

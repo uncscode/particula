@@ -13,8 +13,8 @@ Where:
     - rho : Density of the fluid [kg/m^3].
 
 References:
-- https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
-- https://en.wikipedia.org/wiki/Viscosity#Kinematic_viscosity
+https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
+https://en.wikipedia.org/wiki/Viscosity#Kinematic_viscosity
 """
 
 from particula.util.validate_inputs import validate_inputs
@@ -28,29 +28,28 @@ def get_kinematic_viscosity(
     fluid_density: float,
 ) -> float:
     """
-        Calculate the kinematic viscosity of a fluid.
+    Calculate the kinematic viscosity of a fluid.
 
-        The kinematic viscosity is the ratio of the dynamic viscosity to the
-        density of a fluid. It is a measure of the fluid's resistance to flow
-        under the influence of gravity.
+    The kinematic viscosity is the ratio of the dynamic viscosity to the
+    density of a fluid. It is a measure of the fluid's resistance to flow
+    under the influence of gravity.
 
-        Args:
-        -----
-            - dynamic_viscosity : Dynamic viscosity of the fluid [Pa*s].
-            - fluid_density : Density of the fluid [kg/m³].
+    Args:
+    -----
+        - dynamic_viscosity : Dynamic viscosity of the fluid [Pa*s].
+        - fluid_density : Density of the fluid [kg/m³].
 
-        Returns:
-        --------
-            - Kinematic viscosity of the fluid [m^2/s].
+    Returns:
+    --------
+        - Kinematic viscosity of the fluid [m^2/s].
 
-        References:
-        ----------
-        - Equation : v = mu / rho
-                - v : Kinematic viscosity [m^2/s].
-                - mu : Dynamic viscosity [Pa*s].
-                - rho : Density of the fluid [kg/m^3].
-        - https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
-        - https://en.wikipedia.org/wiki/Viscosity
+    References:
+    ----------
+    - Equation : v = mu / rho
+            - v : Kinematic viscosity [m^2/s].
+            - mu : Dynamic viscosity [Pa*s].
+            - rho : Density of the fluid [kg/m^3].
+    https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
     """
     return dynamic_viscosity / fluid_density
 
@@ -85,7 +84,7 @@ def get_kinematic_viscosity_via_system_state(
 
     References:
     ----------
-    - https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
+    https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
     """
     dynamic_viscosity = get_dynamic_viscosity(
         temperature=temperature,
