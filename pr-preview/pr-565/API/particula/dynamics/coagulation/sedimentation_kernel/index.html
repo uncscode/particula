@@ -1382,13 +1382,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sedimentation_kernel" class="md-nav__link">
+  <a href="#sedimentation_sp2016" class="md-nav__link">
     <span class="md-ellipsis">
-      sedimentation_kernel
+      sedimentation_sp2016
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="sedimentation_kernel">
+    <nav class="md-nav" aria-label="sedimentation_sp2016">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1433,13 +1433,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sedimentation_kernel_via_system_state" class="md-nav__link">
+  <a href="#sedimentation_sp2016_via_system_state" class="md-nav__link">
     <span class="md-ellipsis">
-      sedimentation_kernel_via_system_state
+      sedimentation_sp2016_via_system_state
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="sedimentation_kernel_via_system_state">
+    <nav class="md-nav" aria-label="sedimentation_sp2016_via_system_state">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -5821,13 +5821,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sedimentation_kernel" class="md-nav__link">
+  <a href="#sedimentation_sp2016" class="md-nav__link">
     <span class="md-ellipsis">
-      sedimentation_kernel
+      sedimentation_sp2016
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="sedimentation_kernel">
+    <nav class="md-nav" aria-label="sedimentation_sp2016">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -5872,13 +5872,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sedimentation_kernel_via_system_state" class="md-nav__link">
+  <a href="#sedimentation_sp2016_via_system_state" class="md-nav__link">
     <span class="md-ellipsis">
-      sedimentation_kernel_via_system_state
+      sedimentation_sp2016_via_system_state
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="sedimentation_kernel_via_system_state">
+    <nav class="md-nav" aria-label="sedimentation_sp2016_via_system_state">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -5949,9 +5949,9 @@
 <div class="highlight"><pre><span></span><code>- Collision efficiency [dimensionless].
 </code></pre></div>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">calculate_collision_efficiency_function</span><span class="p">(</span><span class="n">radius1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">radius2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">calculate_collision_efficiency_function</span><span class="p">(</span><span class="n">radius1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">radius2</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
-<h2 id="sedimentation_kernel">sedimentation_kernel<a class="headerlink" href="#sedimentation_kernel" title="Permanent link">&para;</a></h2>
+<h2 id="sedimentation_sp2016">sedimentation_sp2016<a class="headerlink" href="#sedimentation_sp2016" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L37">Show source in sedimentation_kernel.py:37</a></p>
 <p>Calculate the sedimentation kernel for aerosol particles.</p>
 <p>Coagulation occurring due to gravitational settling when heavier particles
@@ -5976,14 +5976,14 @@ collision efficiency</p>
     physics, Chapter 13, Equation 13A.4.</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">sedimentation_kernel</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sedimentation_sp2016</span><span class="p">(</span>
     <span class="n">radius_particle</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">settling_velocities</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">calculate_collision_efficiency</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
-<h2 id="sedimentation_kernel_via_system_state">sedimentation_kernel_via_system_state<a class="headerlink" href="#sedimentation_kernel_via_system_state" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L86">Show source in sedimentation_kernel.py:86</a></p>
+<h2 id="sedimentation_sp2016_via_system_state">sedimentation_sp2016_via_system_state<a class="headerlink" href="#sedimentation_sp2016_via_system_state" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L89">Show source in sedimentation_kernel.py:89</a></p>
 <p>Calculate the sedimentation kernel for aerosol particles via system state.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <hr />
@@ -6000,7 +6000,7 @@ collision efficiency</p>
 </code></pre></div>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">sedimentation_kernel_via_system_state</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sedimentation_sp2016_via_system_state</span><span class="p">(</span>
     <span class="n">radius_particle</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">density_particle</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>

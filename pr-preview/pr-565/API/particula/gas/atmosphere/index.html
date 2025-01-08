@@ -6237,7 +6237,7 @@ present.</p>
     Removes a GasSpecies object from the mixture based on its index.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Atmosphere</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Atmosphere</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="atmospheregetitem">Atmosphere().<strong>getitem</strong><a class="headerlink" href="#atmospheregetitem" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L64">Show source in atmosphere.py:64</a></p>
@@ -6251,7 +6251,7 @@ present.</p>
 <li><code>GasSpecies</code> - The gas species at the specified index.</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GasSpecies</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GasSpecies</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6265,7 +6265,7 @@ present.</p>
 <li><code>Iterator[GasSpecies]</code> - An iterator over the gas species objects.</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="atmospherelen">Atmosphere().<strong>len</strong><a class="headerlink" href="#atmospherelen" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L75">Show source in atmosphere.py:75</a></p>
@@ -6275,7 +6275,7 @@ present.</p>
 <li><code>int</code> - The number of gas species in the mixture.</li>
 </ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="atmospherestr">Atmosphere().<strong>str</strong><a class="headerlink" href="#atmospherestr" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L83">Show source in atmosphere.py:83</a></p>
@@ -6286,7 +6286,7 @@ present.</p>
     list of species in the mixture.</li>
 </ul>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="atmosphereadd_species">Atmosphere().add_species<a class="headerlink" href="#atmosphereadd_species" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L32">Show source in atmosphere.py:32</a></p>
@@ -6296,7 +6296,7 @@ present.</p>
 <li><code>gas_species</code> - The gas species to be added.</li>
 </ul>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_species</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_species</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_1">See also<a class="headerlink" href="#see-also_1" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6315,7 +6315,7 @@ present.</p>
 <li><code>IndexError</code> - If the provided index is out of bounds.</li>
 </ul>
 <h4 id="signature_6">Signature<a class="headerlink" href="#signature_6" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">remove_species</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">remove_species</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 
 

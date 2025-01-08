@@ -6254,8 +6254,8 @@
 <li><code>rate</code> - Calculate the rate of coagulation for each particle.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Coagulation</span><span class="p">(</span><span class="n">Runnable</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coagulation_strategy</span><span class="p">:</span> <span class="n">CoagulationStrategy</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Coagulation</span><span class="p">(</span><span class="n">Runnable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coagulation_strategy</span><span class="p">:</span> <span class="n">CoagulationStrategy</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6270,7 +6270,7 @@
 <li><code>aerosol</code> <em>Aerosol</em> - The aerosol instance to modify.</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_1">See also<a class="headerlink" href="#see-also_1" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6288,7 +6288,7 @@
 <li><code>np.ndarray</code> - An array of coagulation rates for each particle.</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_2">See also<a class="headerlink" href="#see-also_2" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6309,8 +6309,8 @@
     each condensable gas species.</li>
 </ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">MassCondensation</span><span class="p">(</span><span class="n">Runnable</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condensation_strategy</span><span class="p">:</span> <span class="n">CondensationStrategy</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MassCondensation</span><span class="p">(</span><span class="n">Runnable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condensation_strategy</span><span class="p">:</span> <span class="n">CondensationStrategy</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_3">See also<a class="headerlink" href="#see-also_3" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6325,7 +6325,7 @@
 <li><code>aerosol</code> <em>Aerosol</em> - The aerosol instance to modify.</li>
 </ul>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_4">See also<a class="headerlink" href="#see-also_4" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6344,7 +6344,7 @@ each condensable gas species.</p>
 <li><code>np.ndarray</code> - An array of condensation rates for each particle.</li>
 </ul>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_5">See also<a class="headerlink" href="#see-also_5" title="Permanent link">&para;</a></h4>
 <ul>
