@@ -34,7 +34,7 @@ def calculate_collision_efficiency_function(
     )
 
 
-def sedimentation_kernel(
+def sedimentation_sp2016(
     radius_particle: NDArray[np.float64],
     settling_velocities: NDArray[np.float64],
     calculate_collision_efficiency: bool = True,
@@ -78,13 +78,16 @@ def sedimentation_kernel(
         collision_efficiency_matrix = np.ones_like(diameter_matrix)
 
     return (
-        np.pi / 4 * diameter_matrix**2 * velocity_diff_matrix
+        np.pi
+        / 4
+        * diameter_matrix**2
+        * velocity_diff_matrix
         * collision_efficiency_matrix
     )
 
 
 @validate_inputs({"temperature": "positive", "pressure": "positive"})
-def sedimentation_kernel_via_system_state(
+def sedimentation_sp2016_via_system_state(
     radius_particle: NDArray[np.float64],
     density_particle: NDArray[np.float64],
     temperature: float,
@@ -114,7 +117,7 @@ def sedimentation_kernel_via_system_state(
         pressure=pressure,
     )
 
-    return sedimentation_kernel(
+    return sedimentation_sp2016(
         radius_particle=radius_particle,
         settling_velocities=settling_velocities,
         calculate_collision_efficiency=calculate_collision_efficiency,
