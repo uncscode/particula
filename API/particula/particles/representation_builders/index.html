@@ -1154,6 +1154,8 @@
       
         
       
+        
+      
     
     
       
@@ -1335,6 +1337,27 @@
   
   <span class="md-ellipsis">
     Transition Regime
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dynamics/coagulation/turbulent_shear_kernel/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Turbulent Shear Kernel
   </span>
   
 
@@ -1911,6 +1934,8 @@
       
         
       
+        
+      
     
     
       
@@ -1987,6 +2012,27 @@
   
   <span class="md-ellipsis">
     Dynamic Viscosity
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gas/properties/kinematic_viscosity/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kinematic Viscosity
   </span>
   
 
@@ -7071,8 +7117,8 @@
 <li>set_activity_strategy : Set the activity_strategy attribute.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderActivityStrategyMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderActivityStrategyMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderactivitystrategymixinset_activity_strategy">BuilderActivityStrategyMixin().set_activity_strategy<a class="headerlink" href="#builderactivitystrategymixinset_activity_strategy" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L123">Show source in representation_builders.py:123</a></p>
@@ -7083,7 +7129,7 @@
 <li>activity_strategy_units : Not used. (for interface consistency)</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_activity_strategy</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_activity_strategy</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">activity_strategy</span><span class="p">:</span> <span class="n">ActivityStrategy</span><span class="p">,</span>
     <span class="n">activity_strategy_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -7101,8 +7147,8 @@
 <li>set_distribution_strategy : Set the distribution_strategy attribute.</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderDistributionStrategyMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderDistributionStrategyMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderdistributionstrategymixinset_distribution_strategy">BuilderDistributionStrategyMixin().set_distribution_strategy<a class="headerlink" href="#builderdistributionstrategymixinset_distribution_strategy" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L93">Show source in representation_builders.py:93</a></p>
@@ -7113,7 +7159,7 @@
 <li>distribution_strategy_units : Not used. (for interface)</li>
 </ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_distribution_strategy</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_distribution_strategy</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">distribution_strategy</span><span class="p">:</span> <span class="n">DistributionStrategy</span><span class="p">,</span>
     <span class="n">distribution_strategy_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -7131,8 +7177,8 @@
 <li>set_surface_strategy : Set the surface_strategy attribute.</li>
 </ul>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderSurfaceStrategyMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderSurfaceStrategyMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="buildersurfacestrategymixinset_surface_strategy">BuilderSurfaceStrategyMixin().set_surface_strategy<a class="headerlink" href="#buildersurfacestrategymixinset_surface_strategy" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L65">Show source in representation_builders.py:65</a></p>
@@ -7143,7 +7189,7 @@
 <li>surface_strategy_units : Not used. (for interface consistency)</li>
 </ul>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_surface_strategy</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_surface_strategy</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">surface_strategy</span><span class="p">:</span> <span class="n">SurfaceStrategy</span><span class="p">,</span> <span class="n">surface_strategy_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
@@ -7167,7 +7213,7 @@
 <li>charge : Set the number of charges.</li>
 </ul>
 <h4 id="signature_6">Signature<a class="headerlink" href="#signature_6" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ParticleMassRepresentationBuilder</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParticleMassRepresentationBuilder</span><span class="p">(</span>
     <span class="n">BuilderABC</span><span class="p">,</span>
     <span class="n">BuilderDistributionStrategyMixin</span><span class="p">,</span>
     <span class="n">BuilderActivityStrategyMixin</span><span class="p">,</span>
@@ -7177,7 +7223,7 @@
     <span class="n">BuilderConcentrationMixin</span><span class="p">,</span>
     <span class="n">BuilderChargeMixin</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_3">See also<a class="headerlink" href="#see-also_3" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7198,7 +7244,7 @@
 <li>The validated ParticleRepresentation object.</li>
 </ul>
 <h4 id="signature_7">Signature<a class="headerlink" href="#signature_7" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_4">See also<a class="headerlink" href="#see-also_4" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7220,7 +7266,7 @@
 <li>charge : Set the number of charges.</li>
 </ul>
 <h4 id="signature_8">Signature<a class="headerlink" href="#signature_8" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ParticleRadiusRepresentationBuilder</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParticleRadiusRepresentationBuilder</span><span class="p">(</span>
     <span class="n">BuilderABC</span><span class="p">,</span>
     <span class="n">BuilderDistributionStrategyMixin</span><span class="p">,</span>
     <span class="n">BuilderActivityStrategyMixin</span><span class="p">,</span>
@@ -7230,7 +7276,7 @@
     <span class="n">BuilderConcentrationMixin</span><span class="p">,</span>
     <span class="n">BuilderChargeMixin</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_5">See also<a class="headerlink" href="#see-also_5" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7251,7 +7297,7 @@
 <li>The validated ParticleRepresentation object.</li>
 </ul>
 <h4 id="signature_9">Signature<a class="headerlink" href="#signature_9" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_6">See also<a class="headerlink" href="#see-also_6" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7273,7 +7319,7 @@
     np.logspace(-9, -4, 250), meters.</li>
 </ul>
 <h4 id="signature_10">Signature<a class="headerlink" href="#signature_10" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PresetParticleRadiusBuilder</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">PresetParticleRadiusBuilder</span><span class="p">(</span>
     <span class="n">BuilderABC</span><span class="p">,</span>
     <span class="n">BuilderDistributionStrategyMixin</span><span class="p">,</span>
     <span class="n">BuilderActivityStrategyMixin</span><span class="p">,</span>
@@ -7284,7 +7330,7 @@
     <span class="n">BuilderChargeMixin</span><span class="p">,</span>
     <span class="n">BuilderLognormalMixin</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_7">See also<a class="headerlink" href="#see-also_7" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7308,7 +7354,7 @@ distribution, before returning the ParticleRepresentation object.</p>
 <li>The validated ParticleRepresentation object.</li>
 </ul>
 <h4 id="signature_11">Signature<a class="headerlink" href="#signature_11" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_8">See also<a class="headerlink" href="#see-also_8" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7322,7 +7368,7 @@ distribution, before returning the ParticleRepresentation object.</p>
 <li>distribution_type : The type of distribution to use.</li>
 </ul>
 <h4 id="signature_12">Signature<a class="headerlink" href="#signature_12" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_distribution_type</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_distribution_type</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">distribution_type_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
@@ -7334,7 +7380,7 @@ distribution, before returning the ParticleRepresentation object.</p>
 <li>radius_bins : The radius bins for the distribution.</li>
 </ul>
 <h4 id="signature_13">Signature<a class="headerlink" href="#signature_13" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_radius_bins</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_radius_bins</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">radius_bins</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">radius_bins_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;m&quot;</span>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
@@ -7364,7 +7410,7 @@ particle representation object with resolved masses.</p>
 <li>particle_resolved_count : Set the number of resolved particles.</li>
 </ul>
 <h4 id="signature_14">Signature<a class="headerlink" href="#signature_14" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PresetResolvedParticleMassBuilder</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">PresetResolvedParticleMassBuilder</span><span class="p">(</span>
     <span class="n">BuilderABC</span><span class="p">,</span>
     <span class="n">BuilderDistributionStrategyMixin</span><span class="p">,</span>
     <span class="n">BuilderActivityStrategyMixin</span><span class="p">,</span>
@@ -7375,7 +7421,7 @@ particle representation object with resolved masses.</p>
     <span class="n">BuilderVolumeMixin</span><span class="p">,</span>
     <span class="n">BuilderParticleResolvedCountMixin</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_9">See also<a class="headerlink" href="#see-also_9" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7399,7 +7445,7 @@ distribution, before returning the ParticleRepresentation object.</p>
 <li>The validated ParticleRepresentation object.</li>
 </ul>
 <h4 id="signature_15">Signature<a class="headerlink" href="#signature_15" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_10">See also<a class="headerlink" href="#see-also_10" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7423,7 +7469,7 @@ volume, and more. These attributes are validated and there a no presets.</p>
 <li>volume : Set the particle volume. Defaults to 'm^3'.</li>
 </ul>
 <h4 id="signature_16">Signature<a class="headerlink" href="#signature_16" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ResolvedParticleMassRepresentationBuilder</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ResolvedParticleMassRepresentationBuilder</span><span class="p">(</span>
     <span class="n">BuilderABC</span><span class="p">,</span>
     <span class="n">BuilderDistributionStrategyMixin</span><span class="p">,</span>
     <span class="n">BuilderActivityStrategyMixin</span><span class="p">,</span>
@@ -7433,7 +7479,7 @@ volume, and more. These attributes are validated and there a no presets.</p>
     <span class="n">BuilderVolumeMixin</span><span class="p">,</span>
     <span class="n">BuilderMassMixin</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_11">See also<a class="headerlink" href="#see-also_11" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7457,7 +7503,7 @@ representation with a lognormal size distribution.</p>
     object.</li>
 </ul>
 <h4 id="signature_17">Signature<a class="headerlink" href="#signature_17" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParticleRepresentation</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_12">See also<a class="headerlink" href="#see-also_12" title="Permanent link">&para;</a></h4>
 <ul>

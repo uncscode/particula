@@ -1322,6 +1322,8 @@
       
         
       
+        
+      
     
     
       
@@ -1503,6 +1505,27 @@
   
   <span class="md-ellipsis">
     Transition Regime
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dynamics/coagulation/turbulent_shear_kernel/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Turbulent Shear Kernel
   </span>
   
 
@@ -2079,6 +2102,8 @@
       
         
       
+        
+      
     
     
       
@@ -2155,6 +2180,27 @@
   
   <span class="md-ellipsis">
     Dynamic Viscosity
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gas/properties/kinematic_viscosity/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kinematic Viscosity
   </span>
   
 
@@ -5912,7 +5958,7 @@
   mole fraction of organics (includes 1/RT)</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_calculate_gibbs_mix_single</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_calculate_gibbs_mix_single</span><span class="p">(</span>
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">organic_mole_fraction</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">oxygen2carbon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -5941,7 +5987,7 @@ oxygen2carbon regions. Only can run one compound at a time.</p>
   mole fraction of organics (includes 1/RT)</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">gibbs_mix_weight</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">gibbs_mix_weight</span><span class="p">(</span>
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">organic_mole_fraction</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">oxygen2carbon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
@@ -5976,7 +6022,7 @@ oxygen2carbon regions. Only can run one compound at a time.</p>
         <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
-<span class="k">def</span> <span class="nf">gibbs_of_mixing</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gibbs_of_mixing</span><span class="p">(</span>
     <span class="n">molar_mass_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">organic_mole_fraction</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">oxygen2carbon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>

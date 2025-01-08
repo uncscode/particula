@@ -1154,6 +1154,8 @@
       
         
       
+        
+      
     
     
       
@@ -1335,6 +1337,27 @@
   
   <span class="md-ellipsis">
     Transition Regime
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dynamics/coagulation/turbulent_shear_kernel/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Turbulent Shear Kernel
   </span>
   
 
@@ -1911,6 +1934,8 @@
       
         
       
+        
+      
     
     
       
@@ -1987,6 +2012,27 @@
   
   <span class="md-ellipsis">
     Dynamic Viscosity
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gas/properties/kinematic_viscosity/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kinematic Viscosity
   </span>
   
 
@@ -6542,7 +6588,7 @@ distribution formats.</p>
 <p>Subclasses must implement the convert method to perform specific
 conversion logic.</p>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ConversionStrategy</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ConversionStrategy</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="conversionstrategyconvert">ConversionStrategy().convert<a class="headerlink" href="#conversionstrategyconvert" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L31">Show source in size_distribution_convert.py:31</a></p>
@@ -6562,7 +6608,7 @@ conversion logic.</p>
 <li><code>NotImplementedError</code> - If the subclass does not implement this.</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">convert</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">diameters</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
@@ -6571,7 +6617,7 @@ conversion logic.</p>
 <p>Implements conversion between dn/dlogdp and PDF formats through an
 intermediate PMS format.</p>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">DNdlogDPtoPDFConversionStrategy</span><span class="p">(</span><span class="n">ConversionStrategy</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DNdlogDPtoPDFConversionStrategy</span><span class="p">(</span><span class="n">ConversionStrategy</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6580,7 +6626,7 @@ intermediate PMS format.</p>
 <h3 id="dndlogdptopdfconversionstrategyconvert">DNdlogDPtoPDFConversionStrategy().convert<a class="headerlink" href="#dndlogdptopdfconversionstrategyconvert" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L87">Show source in size_distribution_convert.py:87</a></p>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">convert</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">diameters</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
@@ -6589,7 +6635,7 @@ intermediate PMS format.</p>
 <p>Implements conversion between dn/dlogdp and PMS formats using the
 convert_sizer_dn method.</p>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">DNdlogDPtoPMSConversionStrategy</span><span class="p">(</span><span class="n">ConversionStrategy</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DNdlogDPtoPMSConversionStrategy</span><span class="p">(</span><span class="n">ConversionStrategy</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_1">See also<a class="headerlink" href="#see-also_1" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6598,7 +6644,7 @@ convert_sizer_dn method.</p>
 <h3 id="dndlogdptopmsconversionstrategyconvert">DNdlogDPtoPMSConversionStrategy().convert<a class="headerlink" href="#dndlogdptopmsconversionstrategyconvert" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L65">Show source in size_distribution_convert.py:65</a></p>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">convert</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">diameters</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
@@ -6606,7 +6652,7 @@ convert_sizer_dn method.</p>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L73">Show source in size_distribution_convert.py:73</a></p>
 <p>Implements conversion between PMS and PDF formats.</p>
 <h4 id="signature_6">Signature<a class="headerlink" href="#signature_6" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">PMStoPDFConversionStrategy</span><span class="p">(</span><span class="n">ConversionStrategy</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">PMStoPDFConversionStrategy</span><span class="p">(</span><span class="n">ConversionStrategy</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_2">See also<a class="headerlink" href="#see-also_2" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6615,7 +6661,7 @@ convert_sizer_dn method.</p>
 <h3 id="pmstopdfconversionstrategyconvert">PMStoPDFConversionStrategy().convert<a class="headerlink" href="#pmstopdfconversionstrategyconvert" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L76">Show source in size_distribution_convert.py:76</a></p>
 <h4 id="signature_7">Signature<a class="headerlink" href="#signature_7" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">convert</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">diameters</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
@@ -6623,7 +6669,7 @@ convert_sizer_dn method.</p>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L52">Show source in size_distribution_convert.py:52</a></p>
 <p>Implements conversion between the same scales, which is a no-op.</p>
 <h4 id="signature_8">Signature<a class="headerlink" href="#signature_8" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">SameScaleConversionStrategy</span><span class="p">(</span><span class="n">ConversionStrategy</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SameScaleConversionStrategy</span><span class="p">(</span><span class="n">ConversionStrategy</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_3">See also<a class="headerlink" href="#see-also_3" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6632,7 +6678,7 @@ convert_sizer_dn method.</p>
 <h3 id="samescaleconversionstrategyconvert">SameScaleConversionStrategy().convert<a class="headerlink" href="#samescaleconversionstrategyconvert" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L55">Show source in size_distribution_convert.py:55</a></p>
 <h4 id="signature_9">Signature<a class="headerlink" href="#signature_9" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">convert</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">diameters</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
@@ -6641,8 +6687,8 @@ convert_sizer_dn method.</p>
 <p>A converter that uses a specified ConversionStrategy to convert
 particle size distribution data between different formats.</p>
 <h4 id="signature_10">Signature<a class="headerlink" href="#signature_10" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">SizerConverter</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">ConversionStrategy</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SizerConverter</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">ConversionStrategy</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also_4">See also<a class="headerlink" href="#see-also_4" title="Permanent link">&para;</a></h4>
 <ul>
@@ -6663,7 +6709,7 @@ strategy.</p>
 <li><code>np.ndarray</code> - The converted concentration values.</li>
 </ul>
 <h4 id="signature_11">Signature<a class="headerlink" href="#signature_11" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">convert</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">diameters</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
@@ -6697,7 +6743,7 @@ converter to invert the directions of the input and output scales.</p>
     <span class="n">diameters</span><span class="p">,</span> <span class="n">concentration</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="signature_12">Signature<a class="headerlink" href="#signature_12" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_conversion_strategy</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_conversion_strategy</span><span class="p">(</span>
     <span class="n">input_scale</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_scale</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConversionStrategy</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>

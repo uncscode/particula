@@ -1144,6 +1144,8 @@
       
         
       
+        
+      
     
     
       
@@ -1325,6 +1327,27 @@
   
   <span class="md-ellipsis">
     Transition Regime
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../API/particula/dynamics/coagulation/turbulent_shear_kernel/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Turbulent Shear Kernel
   </span>
   
 
@@ -1901,6 +1924,8 @@
       
         
       
+        
+      
     
     
       
@@ -1977,6 +2002,27 @@
   
   <span class="md-ellipsis">
     Dynamic Viscosity
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../API/particula/gas/properties/kinematic_viscosity/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kinematic Viscosity
   </span>
   
 
@@ -6209,14 +6255,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %% particle resolved coagulation example</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>  <span class="c1"># For numerical operations and array manipulations</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>  <span class="c1"># For plotting graphs and visualizations</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>  <span class="c1"># For numerical operations and array manipulations</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>  <span class="c1"># For plotting graphs and visualizations</span>
 
 <span class="c1"># Import specific modules from the particula package</span>
-<span class="kn">from</span> <span class="nn">particula.dynamics.coagulation</span> <span class="kn">import</span> <span class="n">brownian_kernel</span>
-<span class="kn">from</span> <span class="nn">particula.dynamics.coagulation</span> <span class="kn">import</span> <span class="n">particle_resolved_method</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">brownian_kernel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">particle_resolved_method</span>
 
-<span class="kn">from</span> <span class="nn">particula.particles.properties.lognormal_size_distribution</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties.lognormal_size_distribution</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">lognormal_sample_distribution</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
@@ -6962,16 +7008,16 @@ plt.show()</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="sd">"""coagulation rewirte"""</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">particula</span> <span class="kn">import</span> <span class="n">particles</span>
-<span class="kn">from</span> <span class="nn">particula.dynamics</span> <span class="kn">import</span> <span class="n">coagulation</span>
-<span class="kn">from</span> <span class="nn">particula.dynamics.coagulation</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="kn">import</span> <span class="n">particles</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics</span><span class="w"> </span><span class="kn">import</span> <span class="n">coagulation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">particle_resolved_method</span><span class="p">,</span>
     <span class="n">super_droplet_method</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">RectBivariateSpline</span>
-<span class="kn">from</span> <span class="nn">particula.util.input_handling</span> <span class="kn">import</span> <span class="n">convert_units</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">RectBivariateSpline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.input_handling</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert_units</span>
 
 <span class="c1"># %%</span>
 

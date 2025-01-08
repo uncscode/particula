@@ -2160,6 +2160,8 @@
       
         
       
+        
+      
     
     
       
@@ -2341,6 +2343,27 @@
   
   <span class="md-ellipsis">
     Transition Regime
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dynamics/coagulation/turbulent_shear_kernel/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Turbulent Shear Kernel
   </span>
   
 
@@ -2917,6 +2940,8 @@
       
         
       
+        
+      
     
     
       
@@ -2993,6 +3018,27 @@
   
   <span class="md-ellipsis">
     Dynamic Viscosity
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gas/properties/kinematic_viscosity/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kinematic Viscosity
   </span>
   
 
@@ -7579,8 +7625,8 @@
 <li><code>set_charge</code> - Set the charge attribute and units.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderChargeMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderChargeMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderchargemixinset_charge">BuilderChargeMixin().set_charge<a class="headerlink" href="#builderchargemixinset_charge" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L151">Show source in builder_mixin.py:151</a></p>
@@ -7591,7 +7637,7 @@
 <li><code>charge_units</code> - Not used. (for interface consistency)</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_charge</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_charge</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">charge</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">charge_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
@@ -7608,8 +7654,8 @@ concentration_units.</p>
 <li><code>set_concentration</code> - Set the concentration attribute and units.</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderConcentrationMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderConcentrationMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderconcentrationmixinset_concentration">BuilderConcentrationMixin().set_concentration<a class="headerlink" href="#builderconcentrationmixinset_concentration" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L118">Show source in builder_mixin.py:118</a></p>
@@ -7622,7 +7668,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_concentration</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_concentration</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">concentration_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -7636,8 +7682,8 @@ Default is <em>kg/m^3</em>.</li>
 <li><code>set_density</code> - Set the density attribute and units.</li>
 </ul>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderDensityMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderDensityMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderdensitymixinset_density">BuilderDensityMixin().set_density<a class="headerlink" href="#builderdensitymixinset_density" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L27">Show source in builder_mixin.py:27</a></p>
@@ -7649,7 +7695,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_density</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_density</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">density_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">,</span>
@@ -7667,8 +7713,8 @@ Default is <em>kg/m^3</em>.</li>
     units.</li>
 </ul>
 <h4 id="signature_6">Signature<a class="headerlink" href="#signature_6" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderLognormalMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderLognormalMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderlognormalmixinset_geometric_standard_deviation">BuilderLognormalMixin().set_geometric_standard_deviation<a class="headerlink" href="#builderlognormalmixinset_geometric_standard_deviation" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L366">Show source in builder_mixin.py:366</a></p>
@@ -7686,7 +7732,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_7">Signature<a class="headerlink" href="#signature_7" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;geometric_standard_deviation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_geometric_standard_deviation</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_geometric_standard_deviation</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">geometric_standard_deviation</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">geometric_standard_deviation_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -7706,7 +7752,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_8">Signature<a class="headerlink" href="#signature_8" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">mode_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;m&quot;</span><span class="p">):</span> <span class="o">...</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">mode_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;m&quot;</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderlognormalmixinset_number_concentration">BuilderLognormalMixin().set_number_concentration<a class="headerlink" href="#builderlognormalmixinset_number_concentration" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L388">Show source in builder_mixin.py:388</a></p>
@@ -7723,7 +7769,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_9">Signature<a class="headerlink" href="#signature_9" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;number_concentration&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_number_concentration</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_number_concentration</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">number_concentration</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">number_concentration_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1/m^3&quot;</span><span class="p">,</span>
@@ -7737,8 +7783,8 @@ Default is <em>kg/m^3</em>.</li>
 <li><code>set_mass</code> - Set the mass attribute and units.</li>
 </ul>
 <h4 id="signature_10">Signature<a class="headerlink" href="#signature_10" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderMassMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderMassMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="buildermassmixinset_mass">BuilderMassMixin().set_mass<a class="headerlink" href="#buildermassmixinset_mass" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L178">Show source in builder_mixin.py:178</a></p>
@@ -7754,7 +7800,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_11">Signature<a class="headerlink" href="#signature_11" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_mass</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_mass</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">mass_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;kg&quot;</span>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
@@ -7766,8 +7812,8 @@ Default is <em>kg/m^3</em>.</li>
 <li><code>set_molar_mass</code> - Set the molar_mass attribute and units.</li>
 </ul>
 <h4 id="signature_12">Signature<a class="headerlink" href="#signature_12" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderMolarMassMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderMolarMassMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="buildermolarmassmixinset_molar_mass">BuilderMolarMassMixin().set_molar_mass<a class="headerlink" href="#buildermolarmassmixinset_molar_mass" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L84">Show source in builder_mixin.py:84</a></p>
@@ -7780,7 +7826,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_13">Signature<a class="headerlink" href="#signature_13" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_molar_mass</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_molar_mass</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">molar_mass_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;kg/mol&quot;</span><span class="p">,</span>
@@ -7794,8 +7840,8 @@ Default is <em>kg/m^3</em>.</li>
 <li><code>set_particle_resolved_count</code> - Set the number of particles to resolve.</li>
 </ul>
 <h4 id="signature_14">Signature<a class="headerlink" href="#signature_14" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderParticleResolvedCountMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderParticleResolvedCountMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderparticleresolvedcountmixinset_particle_resolved_count">BuilderParticleResolvedCountMixin().set_particle_resolved_count<a class="headerlink" href="#builderparticleresolvedcountmixinset_particle_resolved_count" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L420">Show source in builder_mixin.py:420</a></p>
@@ -7811,7 +7857,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_15">Signature<a class="headerlink" href="#signature_15" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;particle_resolved_count&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_particle_resolved_count</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_particle_resolved_count</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">particle_resolved_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">particle_resolved_count_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -7825,8 +7871,8 @@ Default is <em>kg/m^3</em>.</li>
 <li><code>set_pressure</code> - Set the total pressure attribute and units.</li>
 </ul>
 <h4 id="signature_16">Signature<a class="headerlink" href="#signature_16" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderPressureMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderPressureMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderpressuremixinset_pressure">BuilderPressureMixin().set_pressure<a class="headerlink" href="#builderpressuremixinset_pressure" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L305">Show source in builder_mixin.py:305</a></p>
@@ -7847,7 +7893,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_17">Signature<a class="headerlink" href="#signature_17" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_pressure</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_pressure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">pressure_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Pa&quot;</span>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
@@ -7859,8 +7905,8 @@ Default is <em>kg/m^3</em>.</li>
 <li><code>set_radius</code> - Set the radius attribute and units.</li>
 </ul>
 <h4 id="signature_18">Signature<a class="headerlink" href="#signature_18" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderRadiusMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderRadiusMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="builderradiusmixinset_radius">BuilderRadiusMixin().set_radius<a class="headerlink" href="#builderradiusmixinset_radius" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L240">Show source in builder_mixin.py:240</a></p>
@@ -7876,7 +7922,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_19">Signature<a class="headerlink" href="#signature_19" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_radius</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_radius</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">radius_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;m&quot;</span>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
@@ -7888,8 +7934,8 @@ Default is <em>kg/m^3</em>.</li>
 <div class="highlight"><pre><span></span><code>- `set_surface_tension` - Set the surface_tension attribute and units.
 </code></pre></div>
 <h4 id="signature_20">Signature<a class="headerlink" href="#signature_20" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderSurfaceTensionMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderSurfaceTensionMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="buildersurfacetensionmixinset_surface_tension">BuilderSurfaceTensionMixin().set_surface_tension<a class="headerlink" href="#buildersurfacetensionmixinset_surface_tension" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L56">Show source in builder_mixin.py:56</a></p>
@@ -7901,7 +7947,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_21">Signature<a class="headerlink" href="#signature_21" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;surface_tension&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_surface_tension</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_surface_tension</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">surface_tension</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">surface_tension_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;N/m&quot;</span><span class="p">,</span>
@@ -7915,8 +7961,8 @@ Default is <em>kg/m^3</em>.</li>
 <li><code>set_temperature</code> - Set the temperature attribute and units.</li>
 </ul>
 <h4 id="signature_22">Signature<a class="headerlink" href="#signature_22" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderTemperatureMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderTemperatureMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="buildertemperaturemixinset_temperature">BuilderTemperatureMixin().set_temperature<a class="headerlink" href="#buildertemperaturemixinset_temperature" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L271">Show source in builder_mixin.py:271</a></p>
@@ -7938,7 +7984,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_23">Signature<a class="headerlink" href="#signature_23" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">temperature_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;K&quot;</span><span class="p">):</span> <span class="o">...</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">temperature_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;K&quot;</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="buildervolumemixin">BuilderVolumeMixin<a class="headerlink" href="#buildervolumemixin" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L199">Show source in builder_mixin.py:199</a></p>
@@ -7948,8 +7994,8 @@ Default is <em>kg/m^3</em>.</li>
 <li><code>set_volume</code> - Set the volume attribute and units.</li>
 </ul>
 <h4 id="signature_24">Signature<a class="headerlink" href="#signature_24" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BuilderVolumeMixin</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BuilderVolumeMixin</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="buildervolumemixinset_volume">BuilderVolumeMixin().set_volume<a class="headerlink" href="#buildervolumemixinset_volume" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L209">Show source in builder_mixin.py:209</a></p>
@@ -7965,7 +8011,7 @@ Default is <em>kg/m^3</em>.</li>
 </ul>
 <h4 id="signature_25">Signature<a class="headerlink" href="#signature_25" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">set_volume</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_volume</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">volume</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">volume_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;m^3&quot;</span>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
