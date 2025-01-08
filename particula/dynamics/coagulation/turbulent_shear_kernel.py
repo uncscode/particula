@@ -50,7 +50,7 @@ def saffman_turner_1956(
         - D1, D2 : Particle diameters [m].
     - Saffman, P. G., & Turner, J. S. (1956). On the collision of drops in
         turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
-        https://doi.org/10.1017/S002
+        https://doi.org/10.1017/S0022112056000020
     - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
         physics, Chapter 13, Equation 13A.2.
     """
@@ -86,7 +86,7 @@ def saffman_turner_1956_via_system_state(
     ----------
     - Saffman, P. G., & Turner, J. S. (1956). On the collision of drops in
         turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
-        https://doi.org/10.1017/S002
+        https://doi.org/10.1017/S0022112056000020
     """
     kinematic_viscosity = get_kinematic_viscosity_via_system_state(
         temperature=temperature, fluid_density=fluid_density
