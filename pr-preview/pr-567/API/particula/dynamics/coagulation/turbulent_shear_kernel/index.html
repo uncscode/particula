@@ -1403,13 +1403,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#turbulent_shear_kernel" class="md-nav__link">
+  <a href="#saffman_turner_1956" class="md-nav__link">
     <span class="md-ellipsis">
-      turbulent_shear_kernel
+      saffman_turner_1956
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="turbulent_shear_kernel">
+    <nav class="md-nav" aria-label="saffman_turner_1956">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1454,13 +1454,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#turbulent_shear_kernel_via_system_state" class="md-nav__link">
+  <a href="#saffman_turner_1956_via_system_state" class="md-nav__link">
     <span class="md-ellipsis">
-      turbulent_shear_kernel_via_system_state
+      saffman_turner_1956_via_system_state
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="turbulent_shear_kernel_via_system_state">
+    <nav class="md-nav" aria-label="saffman_turner_1956_via_system_state">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1476,6 +1476,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
     </span>
   </a>
   
@@ -5760,13 +5769,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#turbulent_shear_kernel" class="md-nav__link">
+  <a href="#saffman_turner_1956" class="md-nav__link">
     <span class="md-ellipsis">
-      turbulent_shear_kernel
+      saffman_turner_1956
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="turbulent_shear_kernel">
+    <nav class="md-nav" aria-label="saffman_turner_1956">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -5811,13 +5820,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#turbulent_shear_kernel_via_system_state" class="md-nav__link">
+  <a href="#saffman_turner_1956_via_system_state" class="md-nav__link">
     <span class="md-ellipsis">
-      turbulent_shear_kernel_via_system_state
+      saffman_turner_1956_via_system_state
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="turbulent_shear_kernel_via_system_state">
+    <nav class="md-nav" aria-label="saffman_turner_1956_via_system_state">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -5833,6 +5842,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
     </span>
   </a>
   
@@ -5875,8 +5893,8 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_shear_kernel.py">particula.dynamics.coagulation.turbulent_shear_kernel</a> module.</p>
 </blockquote>
-<h2 id="turbulent_shear_kernel">turbulent_shear_kernel<a class="headerlink" href="#turbulent_shear_kernel" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_shear_kernel.py#L22">Show source in turbulent_shear_kernel.py:22</a></p>
+<h2 id="saffman_turner_1956">saffman_turner_1956<a class="headerlink" href="#saffman_turner_1956" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_shear_kernel.py#L26">Show source in turbulent_shear_kernel.py:26</a></p>
 <p>Calculate the turbulent shear kernel for coagulation.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <hr />
@@ -5898,18 +5916,21 @@
 <li>D1, D2 : Particle diameters [m].</li>
 </ul>
 </li>
+<li>Saffman, P. G., &amp; Turner, J. S. (1956). On the collision of drops in
+    turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
+    https://doi.org/10.1017/S002</li>
 <li>Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry and
     physics, Chapter 13, Equation 13A.2.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">turbulent_shear_kernel</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">saffman_turner_1956</span><span class="p">(</span>
     <span class="n">diameter_particle</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">turbulent_kinetic_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
-<h2 id="turbulent_shear_kernel_via_system_state">turbulent_shear_kernel_via_system_state<a class="headerlink" href="#turbulent_shear_kernel_via_system_state" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_shear_kernel.py#L59">Show source in turbulent_shear_kernel.py:59</a></p>
+<h2 id="saffman_turner_1956_via_system_state">saffman_turner_1956_via_system_state<a class="headerlink" href="#saffman_turner_1956_via_system_state" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_shear_kernel.py#L65">Show source in turbulent_shear_kernel.py:65</a></p>
 <p>Calculate the turbulent shear kernel for coagulation via system state.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <hr />
@@ -5922,8 +5943,15 @@
 <hr />
 <div class="highlight"><pre><span></span><code>- Turbulent shear kernel matrix for coagulation [m^3/s].
 </code></pre></div>
+<h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
+<hr />
+<ul>
+<li>Saffman, P. G., &amp; Turner, J. S. (1956). On the collision of drops in
+    turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
+    https://doi.org/10.1017/S002</li>
+</ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">turbulent_shear_kernel_via_system_state</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">saffman_turner_1956_via_system_state</span><span class="p">(</span>
     <span class="n">diameter_particle</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">turbulent_kinetic_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
