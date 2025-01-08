@@ -9,17 +9,21 @@ Where:
     - e_k : Turbulent kinetic energy [m^2/s^2].
     - v : Kinematic viscosity [m^2/s].
     - D1, D2 : Particle diameters [m].
+
+Saffman, P. G., & Turner, J. S. (1956). On the collision of drops in turbulent
+clouds. Journal of Fluid Mechanics, 1(1), 16-30.
+https://doi.org/10.1017/S0022112056000020
 """
 
 from numpy.typing import NDArray
 import numpy as np
 
 from particula.gas.properties.kinematic_viscosity import (
-    get_kinematic_viscosity_via_system_state
+    get_kinematic_viscosity_via_system_state,
 )
 
 
-def turbulent_shear_kernel(
+def saffman_turner_1956(
     diameter_particle: NDArray[np.float64],
     turbulent_kinetic_energy: float,
     kinematic_viscosity: float,
@@ -44,6 +48,9 @@ def turbulent_shear_kernel(
         - e_k : Turbulent kinetic energy [m^2/s^2].
         - v : Kinematic viscosity [m^2/s].
         - D1, D2 : Particle diameters [m].
+    - Saffman, P. G., & Turner, J. S. (1956). On the collision of drops in
+        turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
+        https://doi.org/10.1017/S002
     - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
         physics, Chapter 13, Equation 13A.2.
     """
@@ -51,12 +58,11 @@ def turbulent_shear_kernel(
         diameter_particle[:, np.newaxis] + diameter_particle[np.newaxis, :]
     )
     return (
-        (np.pi * turbulent_kinetic_energy / (120 * kinematic_viscosity)) ** 0.5
-        * diameter_sum_matrix**3
-    )
+        np.pi * turbulent_kinetic_energy / (120 * kinematic_viscosity)
+    ) ** 0.5 * diameter_sum_matrix**3
 
 
-def turbulent_shear_kernel_via_system_state(
+def saffman_turner_1956_via_system_state(
     diameter_particle: NDArray[np.float64],
     turbulent_kinetic_energy: float,
     temperature: float,
@@ -75,13 +81,18 @@ def turbulent_shear_kernel_via_system_state(
     Returns:
     --------
         - Turbulent shear kernel matrix for coagulation [m^3/s].
+
+    References:
+    ----------
+    - Saffman, P. G., & Turner, J. S. (1956). On the collision of drops in
+        turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
+        https://doi.org/10.1017/S002
     """
     kinematic_viscosity = get_kinematic_viscosity_via_system_state(
-        temperature=temperature,
-        fluid_density=fluid_density
+        temperature=temperature, fluid_density=fluid_density
     )
-    return turbulent_shear_kernel(
+    return saffman_turner_1956(
         diameter_particle=diameter_particle,
         turbulent_kinetic_energy=turbulent_kinetic_energy,
-        kinematic_viscosity=kinematic_viscosity
+        kinematic_viscosity=kinematic_viscosity,
     )
