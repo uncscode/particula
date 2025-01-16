@@ -42,7 +42,11 @@ def validate_inputs(dict_args):
     A decorator to validate that specified arguments meet certain constraints.
 
     Arguments:
-        dict_args: Dictionary of argument names and their constraints.
+        - dict_args : Dictionary of argument names and their constraints.
+            {"arg1": "positive", "arg2": "negative", ...}
+            - Options: "positive", "negative", "nonpositive", "nonnegative",
+                "nonzero".
+
 
     Returns:
         A decorator for input validation.
