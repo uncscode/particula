@@ -108,7 +108,7 @@ def test_build_kappa_parameter_activity_set_density():
 
     # test negative density
     with pytest.raises(ValueError) as excinfo:
-        builder.set_density(-1)
+        builder.set_density(-1, "kg/m^3")
     assert "Argument 'density' must be positive." in str(excinfo.value)
 
 
