@@ -23,7 +23,7 @@ def test_density_mixin():
 
     # test setting density
     with pytest.raises(ValueError) as excinfo:
-        builder_mixin.set_density(-1)
+        builder_mixin.set_density(-1, "kg/m^3")
     assert "Argument 'density' must be positive." in str(excinfo.value)
 
     # test positive density
@@ -88,7 +88,7 @@ def test_molar_mass_mixin():
     assert builder_mixin.molar_mass == pytest.approx(1e-3, 1e-6)
 
     # test setting molar mass units for array
-    builder_mixin.set_molar_mass(np.array([1, 2, 3])*1e-3, molar_mass_units="kg/mol")
+    builder_mixin.set_molar_mass(np.array([1, 2, 3])*1e-3, "kg/mol")
     np.testing.assert_allclose(
         builder_mixin.molar_mass, np.array([1e-3, 2e-3, 3e-3]), atol=1e-6
     )

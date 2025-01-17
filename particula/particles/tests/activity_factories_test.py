@@ -33,7 +33,9 @@ def test_molar_ideal_strategy_with_parameters():
 
 
 def test_kappa_parameter_strategy_with_parameters():
-    """Test factory function for kappa_parameter strategy with full parameters."""
+    """
+    Test factory function for kappa_parameter strategy with full parameters.
+    """
     parameters = {
         "kappa": np.array([0.1, 0.2, 0.3]),
         "density": np.array([1000.0, 2000.0, 3000.0]),
