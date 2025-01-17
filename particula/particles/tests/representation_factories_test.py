@@ -26,6 +26,7 @@ def test_mass_based_build():
         "surface_strategy": SurfaceStrategyVolume(),
         "mass": np.array([1.0, 2.0, 3.0]),
         "density": np.array([1.0, 2.0, 3.0]),
+        "density_units": "kg/m^3",
         "concentration": np.array([10, 20, 30]),
         "charge": 1.0,
     }
@@ -49,6 +50,7 @@ def test_radii_based_build():
         "surface_strategy": SurfaceStrategyVolume(),
         "radius": np.array([1.0, 2.0, 3.0]),
         "density": np.array([1.0, 2.0, 3.0]),
+        "density_units": "kg/m^3",
         "concentration": np.array([10, 20, 30]),
         "charge": np.array([1.0, 2.0, 3.0]),
     }
@@ -92,6 +94,7 @@ def test_resolved_mass_build():
         "surface_strategy": SurfaceStrategyVolume(),
         "mass": np.array([1.0, 2.0, 3.0]),
         "density": np.array([1.0, 2.0, 3.0]),
+        "density_units": "kg/m^3",
         "charge": 1.0,
         "volume": 1,
     }

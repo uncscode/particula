@@ -22,6 +22,7 @@ def test_surface_molar_with_parameters():
     parameters = {
         "molar_mass": np.array([100.0, 200.0, 300.0]),
         "density": np.array([1000.0, 2000.0, 3000.0]),
+        "density_units": "kg/m^3",
         "surface_tension": np.array([0.1, 0.2, 0.3]),
     }
     strategy = SurfaceFactory().get_strategy("molar", parameters)
@@ -41,6 +42,7 @@ def test_surface_mass_with_parameters():
     """Test factory function for surface mass strategy with parameters."""
     parameters = {
         "density": np.array([1000.0, 2000.0, 3000.0]),
+        "density_units": "kg/m^3",
         "surface_tension": np.array([0.1, 0.2, 0.3]),
     }
     strategy = SurfaceFactory().get_strategy("mass", parameters)
@@ -57,6 +59,7 @@ def test_surface_volume_with_parameters():
     """Test factory function for surface volume strategy with parameters."""
     parameters = {
         "density": np.array([1000.0, 2000.0, 3000.0]),
+        "density_units": "kg/m^3",
         "surface_tension": np.array([0.1, 0.2, 0.3]),
     }
     strategy = SurfaceFactory().get_strategy("volume", parameters)

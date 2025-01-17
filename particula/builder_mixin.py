@@ -29,7 +29,7 @@ class BuilderDensityMixin:
     def set_density(
         self,
         density: Union[float, NDArray[np.float64]],
-        density_units: Optional[str] = "kg/m^3",
+        density_units: str,
     ):
         """Set the density of the particle in kg/m^3.
 

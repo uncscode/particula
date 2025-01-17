@@ -27,22 +27,16 @@ def test_density_mixin():
     assert "Argument 'density' must be positive." in str(excinfo.value)
 
     # test positive density
-    builder_mixin.set_density(1)
+    builder_mixin.set_density(1, "kg/m^3")
     assert builder_mixin.density == 1
 
     # test array of densities
-    builder_mixin.set_density(np.array([1, 2, 3]))
+    builder_mixin.set_density(np.array([1, 2, 3]), "kg/m^3")
     np.testing.assert_allclose(builder_mixin.density, np.array([1, 2, 3]))
 
     # test setting density units
     builder_mixin.set_density(1e3, density_units="kg/m^3")
     assert builder_mixin.density == pytest.approx(1e3, 1e-6)
-
-    # test setting density units for array
-    builder_mixin.set_density(np.array([1, 2, 3])*1e3, density_units="kg/m^3")
-    np.testing.assert_allclose(
-        builder_mixin.density, np.array([1e3, 2e3, 3e3]), atol=1e-6
-    )
 
 
 def test_surface_tension_mixin():

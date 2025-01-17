@@ -37,6 +37,7 @@ def test_kappa_parameter_strategy_with_parameters():
     parameters = {
         "kappa": np.array([0.1, 0.2, 0.3]),
         "density": np.array([1000.0, 2000.0, 3000.0]),
+        "density_units": "kg/m^3",
         "molar_mass": np.array([1.0, 2.0, 3.0]),
         "water_index": 0,
     }

@@ -93,7 +93,7 @@ def test_build_kappa_parameter_activity_set_kappa():
 def test_build_kappa_parameter_activity_set_density():
     """Testing setting density parameter."""
     builder = ActivityKappaParameterBuilder()
-    builder.set_density(1)
+    builder.set_density(1, "kg/m^3")
     assert builder.density == pytest.approx(1, rel=1e-5)
 
     # test setting density units
@@ -151,6 +151,7 @@ def test_build_kappa_parameter_activity_dict():
     parameters = {
         "kappa": np.array([1, 2, 3]),
         "density": np.array([1, 2, 3]),
+        "density_units": "kg/m^3",
         "molar_mass": np.array([1, 2, 3]),
         "water_index": 1,
     }
