@@ -7765,9 +7765,7 @@ Default is <em>kg/m^3</em>.</li>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_density</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">density_units</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;kg/m^3&quot;</span><span class="p">,</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">density_units</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="builderlognormalmixin">BuilderLognormalMixin<a class="headerlink" href="#builderlognormalmixin" title="Permanent link">&para;</a></h2>
