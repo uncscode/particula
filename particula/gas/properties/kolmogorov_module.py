@@ -51,7 +51,6 @@ def get_kolmogorov_time(
     return np.sqrt(kinematic_viscosity / turbulent_dissipation)
 
 
-
 @validate_inputs(
     {"kinematic_viscosity": "positive", "turbulent_dissipation": "positive"}
 )
