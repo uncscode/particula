@@ -29,6 +29,7 @@ def get_kolmogorov_time(
     where viscous forces dominate over inertial effects. This timescale
     characterizes the turnover time of the smallest turbulent
     eddies. It is given by:
+
         τ_K = (v / ε)^(1/2)
 
     Arguments:
