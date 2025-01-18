@@ -26,6 +26,6 @@ from particula.gas.properties.vapor_pressure_module import (
     clausius_clapeyron_vapor_pressure,
     buck_vapor_pressure,
 )
-from particula.gas.properties.kolmogorov_time import (
+from particula.gas.properties.kolmogorov_module import (
     get_kolmogorov_time
 )

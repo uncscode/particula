@@ -2,7 +2,7 @@
 
 import numpy as np
 import pytest
-from particula.gas.properties.kolmogorov_time import get_kolmogorov_time
+from particula.gas.properties.kolmogorov_module import get_kolmogorov_time
 
 
 def test_kolmogorov_time_float():
