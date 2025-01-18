@@ -67,7 +67,7 @@ def test_kolmogorov_velocity_float():
     """
     assert np.isclose(get_kolmogorov_velocity(1.0, 1.0), 1.0)
     assert np.isclose(get_kolmogorov_velocity(0.01, 0.01), 0.1)
-    assert np.isclose(get_kolmogorov_velocity(0.1, 0.01), 0.31622776601683794)
+    assert np.isclose(get_kolmogorov_velocity(0.1, 0.01), 0.1778279410038923)
 
 
 def test_kolmogorov_velocity_array():
@@ -76,7 +76,7 @@ def test_kolmogorov_velocity_array():
     """
     kinematic_viscosity = np.array([1.0, 0.01, 0.1])
     turbulent_dissipation = np.array([1.0, 0.01, 0.01])
-    expected = np.array([1.0, 0.1, 0.31622776601683794])
+    expected = np.array([1.0, 0.1, 0.1778279410038923])
     result = get_kolmogorov_velocity(
         kinematic_viscosity, turbulent_dissipation
     )
