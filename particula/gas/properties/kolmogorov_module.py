@@ -84,7 +84,7 @@ def get_kolmogorov_length(
         and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
     """
-    return (kinematic_viscosity**3 / turbulent_dissipation) ** 0.25
+    return np.sqrt(np.sqrt(kinematic_viscosity**3 / turbulent_dissipation))
 
 
 @validate_inputs(
