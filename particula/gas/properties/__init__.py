@@ -35,3 +35,6 @@ from particula.gas.properties.integral_scale_module import (
     get_lagrangian_integral_scale,
     get_eulerian_integral_scale,
 )
+from particula.gas.properties.fluid_rms_velocity import (
+    get_fluid_rms_velocity
+)
