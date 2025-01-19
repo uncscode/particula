@@ -75,12 +75,11 @@ def get_taylor_microscale(
 
         λ = u' * (15 ν² / ε)^(1/2)
 
-    where:
-        - λ : Taylor microscale [m]
-        - u' (rms_velocity) : Fluid RMS fluctuation velocity [m/s]
-        - v (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]
-        - ε (turbulent_dissipation) : Turbulent kinetic energy dissipation
-            rate [m²/s³]
+    - λ : Taylor microscale [m]
+    - u' (rms_velocity) : Fluid RMS fluctuation velocity [m/s]
+    - v (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]
+    - ε (turbulent_dissipation) : Turbulent kinetic energy dissipation
+        rate [m²/s³]
 
     Arguments:
     ----------
@@ -92,6 +91,10 @@ def get_taylor_microscale(
     Returns:
     --------
         - Taylor microscale [m]
+
+    References:
+    -----------
+        - https://en.wikipedia.org/wiki/Taylor_microscale
     """
     return rms_velocity * np.sqrt(
         (15 * kinematic_viscosity**2) / turbulent_dissipation
