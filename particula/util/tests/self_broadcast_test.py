@@ -2,7 +2,6 @@
 Test of the self_broadcast module in the util package.
 """
 
-import pytest
 import numpy as np
 
 from particula.util.self_broadcast import (
