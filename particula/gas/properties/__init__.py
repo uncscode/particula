@@ -26,8 +26,17 @@ from particula.gas.properties.vapor_pressure_module import (
     clausius_clapeyron_vapor_pressure,
     buck_vapor_pressure,
 )
-from particula.gas.properties.kolmogorov_time import (
-    get_kolmogorov_time
+from particula.gas.properties.kolmogorov_module import (
+    get_kolmogorov_time,
+    get_kolmogorov_length,
+    get_kolmogorov_velocity,
+)
+from particula.gas.properties.integral_scale_module import (
+    get_lagrangian_integral_scale,
+    get_eulerian_integral_scale,
+)
+from particula.gas.properties.fluid_rms_velocity import (
+    get_fluid_rms_velocity
 )
 from particula.gas.properties.fluid_rms_velocity import (
     get_fluid_rms_velocity
