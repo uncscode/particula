@@ -31,3 +31,7 @@ from particula.gas.properties.kolmogorov_module import (
     get_kolmogorov_length,
     get_kolmogorov_velocity,
 )
+from particula.gas.properties.integral_scale_module import (
+    get_lagrangian_integral_scale,
+    get_eulerian_integral_scale,
+)
