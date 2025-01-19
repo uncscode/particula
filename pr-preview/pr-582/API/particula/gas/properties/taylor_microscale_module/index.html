@@ -2259,6 +2259,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature_1" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -5936,6 +5945,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature_1" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -5983,8 +6001,8 @@ into the memory of turbulent fluid elements. It is given by:</p>
 <li>τ_T : Lagrangian Taylor microscale time [s]</li>
 <li>τ_k (kolmogorov_time) : Kolmogorov time scale [s]</li>
 <li>R_λ (re_lambda) : Taylor-microscale Reynolds number [-]</li>
-<li>a_o (ao) : Normalized acceleration variance in isotropic turbulence
-    [-]</li>
+<li>a_o (accel_variance) : Normalized acceleration variance in isotropic
+    turbulence [-]</li>
 </ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <hr />
@@ -6019,12 +6037,13 @@ turbulence, linking the dissipative and energy-containing ranges of
 turbulence. It characterizes the smoothness of velocity fluctuations
 in turbulent flows. It is given by:</p>
 <p>λ = u' * (15 ν² / ε)^(&frac12;)</p>
-<p>where:
-    - λ : Taylor microscale [m]
-    - u' (rms_velocity) : Fluid RMS fluctuation velocity [m/s]
-    - v (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]
-    - ε (turbulent_dissipation) : Turbulent kinetic energy dissipation
-        rate [m²/s³]</p>
+<ul>
+<li>λ : Taylor microscale [m]</li>
+<li>u' (rms_velocity) : Fluid RMS fluctuation velocity [m/s]</li>
+<li>v (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]</li>
+<li>ε (turbulent_dissipation) : Turbulent kinetic energy dissipation
+    rate [m²/s³]</li>
+</ul>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <hr />
 <div class="highlight"><pre><span></span><code>- rms_velocity : Fluid RMS fluctuation velocity [m/s]
@@ -6035,6 +6054,10 @@ in turbulent flows. It is given by:</p>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <hr />
 <div class="highlight"><pre><span></span><code>- Taylor microscale [m]
+</code></pre></div>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
+<hr />
+<div class="highlight"><pre><span></span><code>- https://en.wikipedia.org/wiki/Taylor_microscale
 </code></pre></div>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
