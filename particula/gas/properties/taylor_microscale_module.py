@@ -34,8 +34,8 @@ def get_lagrangian_taylor_microscale_time(
     - τ_T : Lagrangian Taylor microscale time [s]
     - τ_k (kolmogorov_time) : Kolmogorov time scale [s]
     - R_λ (re_lambda) : Taylor-microscale Reynolds number [-]
-    - a_o (ao) : Normalized acceleration variance in isotropic turbulence
-        [-]
+    - a_o (accel_variance) : Normalized acceleration variance in isotropic
+        turbulence [-]
 
     Arguments:
     ----------
