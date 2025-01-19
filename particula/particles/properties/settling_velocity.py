@@ -5,6 +5,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from particula.util.constants import STANDARD_GRAVITY
+from particula.util.validate_inputs import validate_inputs
 from particula.gas.properties.dynamic_viscosity import (
     get_dynamic_viscosity,
 )
@@ -53,6 +54,48 @@ def particle_settling_velocity(
     )
 
     return settling_velocity
+
+
+@validate_inputs(
+    {
+        "particle_inertia_time": "positive",
+        "gravitational_acceleration": "positive",
+        "slip_correction_factor": "positive",
+    }
+)
+def get_particle_settling_velocity_via_inertia(
+    particle_inertia_time: Union[float, NDArray[np.float64]],
+    gravitational_acceleration: float,
+    slip_correction_factor: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """
+    Calculate the gravitational settling velocity from the particle inertia
+    time.
+
+    The settling velocity (v_s) is given by:
+
+        v_s = g * τ_p * C_c
+
+    - v_s : Settling velocity [m/s]
+    - g (gravitational_acceleration) : Gravitational acceleration [m/s²]
+    - τ_p (particle_inertia_time) : Particle inertia time [s]
+    - C_c (slip_correction_factor) : Cunningham slip correction factor [-]
+
+    Arguments:
+    ----------
+        - particle_inertia_time : Particle inertia time [s]
+        - gravitational_acceleration : Gravitational acceleration [m/s²]
+        - slip_correction_factor : Cunningham slip correction factor [-]
+
+    Returns:
+    --------
+        - Particle settling velocity [m/s]
+    """
+    return (
+        gravitational_acceleration
+        * particle_inertia_time
+        * slip_correction_factor
+    )
 
 
 def particle_settling_velocity_via_system_state(
