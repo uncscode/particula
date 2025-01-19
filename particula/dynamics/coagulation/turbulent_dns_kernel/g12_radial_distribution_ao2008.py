@@ -35,7 +35,7 @@ def get_g12_radial_distribution_ao2008(
     kolmogorov_velocity: float,
     kolmogorov_time: float,
 ) -> NDArray[np.float64]:
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     """
     Compute the radial distribution function g_{12}.
 
@@ -159,6 +159,7 @@ def _calculate_rc(
     kolmogorov_velocity: float,
     kolmogorov_time: float,
 ) -> NDArray[np.float64]:
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     """
     Compute r_c, the turbulence-driven correction to the collision kernel.
 
