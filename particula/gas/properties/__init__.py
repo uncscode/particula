@@ -38,3 +38,7 @@ from particula.gas.properties.integral_scale_module import (
 from particula.gas.properties.fluid_rms_velocity import (
     get_fluid_rms_velocity
 )
+from particula.gas.properties.taylor_microscale_module import (
+    get_lagrangian_taylor_microscale_time,
+    get_taylor_microscale,
+)
