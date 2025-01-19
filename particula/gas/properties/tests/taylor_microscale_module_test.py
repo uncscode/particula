@@ -116,12 +116,12 @@ def test_taylor_scales_edge_case():
     re_lambda = 1.0
     ao = 1.0
 
-    expected_TT = kolmogorov_time * np.sqrt((2 * re_lambda) / (15**0.5 * ao))
-    result_TT = get_lagrangian_taylor_microscale_time(
+    expected_tt = kolmogorov_time * np.sqrt((2 * re_lambda) / (15**0.5 * ao))
+    result_tt = get_lagrangian_taylor_microscale_time(
         kolmogorov_time, re_lambda, ao
     )
 
-    assert np.isclose(result_TT, expected_TT, atol=1e-10)
+    assert np.isclose(result_tt, expected_tt, atol=1e-10)
 
     rms_velocity = 1e-10
     kinematic_viscosity = 1e-10
