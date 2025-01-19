@@ -29,3 +29,7 @@ from particula.gas.properties.vapor_pressure_module import (
 from particula.gas.properties.kolmogorov_time import (
     get_kolmogorov_time
 )
+from particula.gas.properties.taylor_microscale_module import (
+    get_lagrangian_taylor_microscale_time,
+    get_taylor_microscale,
+)
