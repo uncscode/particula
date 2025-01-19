@@ -31,13 +31,11 @@ def get_lagrangian_taylor_microscale_time(
 
         τ_T = τ_k * (2 R_λ / (15^(1/2) a_o))^(1/2)
 
-    where:
-
-        - τ_T : Lagrangian Taylor microscale time [s]
-        - τ_k (kolmogorov_time) : Kolmogorov time scale [s]
-        - R_λ (re_lambda) : Taylor-microscale Reynolds number [-]
-        - a_o (ao) : Normalized acceleration variance in isotropic turbulence
-            [-]
+    - τ_T : Lagrangian Taylor microscale time [s]
+    - τ_k (kolmogorov_time) : Kolmogorov time scale [s]
+    - R_λ (re_lambda) : Taylor-microscale Reynolds number [-]
+    - a_o (ao) : Normalized acceleration variance in isotropic turbulence
+        [-]
 
     Arguments:
     ----------
