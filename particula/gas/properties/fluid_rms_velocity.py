@@ -7,6 +7,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.util.validate_inputs import validate_inputs
+from particula.gas.properties.kolmogorov_module import get_kolmogorov_velocity
 
 
 @validate_inputs(
@@ -48,6 +49,7 @@ def get_fluid_rms_velocity(
     --------
         - Fluid RMS fluctuation velocity [m/s]
     """
-    # replace K_v with module on rebase of #579
-    kolmogorov_velocity = (kinematic_viscosity * turbulent_dissipation) ** 0.25
+    kolmogorov_velocity = get_kolmogorov_velocity(
+        kinematic_viscosity, turbulent_dissipation
+    )
     return (re_lambda**0.5 * kolmogorov_velocity) / (15**0.25)
