@@ -5,7 +5,7 @@ from scipy.special import erf
 
 from particula.util.validate_inputs import validate_inputs
 from particula.util.constants import STANDARD_GRAVITY
-
+from particula.util.self_broadcast import get_pairwise_diff_matrix
 
 @validate_inputs(
     {
@@ -16,7 +16,7 @@ from particula.util.constants import STANDARD_GRAVITY
 )
 def get_radial_relative_velocity_dz2002(
     velocity_dispersion: Union[float, NDArray[np.float64]],
-    particle_inertia_time_1: NDArray[np.float64],
+    particle_inertia_time: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Compute the radial relative velocity based on the Dodin and Elperin (2002)
@@ -45,7 +45,7 @@ def get_radial_relative_velocity_dz2002(
     -----------
     - Dodin, Z., & Elperin, T. (2002). Phys. Fluids, 14, 2921-24.
     """
-    tau_diff = np.abs(particle_inertia_time_1 - particle_inertia_time_2)
+    tau_diff = np.abs(get_pairwise_diff_matrix(particle_inertia_time))
     b = (STANDARD_GRAVITY * tau_diff) / (
         np.sqrt(2) * velocity_dispersion
     )
