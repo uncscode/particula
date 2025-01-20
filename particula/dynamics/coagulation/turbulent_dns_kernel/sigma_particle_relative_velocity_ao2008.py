@@ -40,6 +40,7 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_f2
         "turbulence_intensity": "positive",
         "collisional_radius": "positive",
         "particle_inertia_time": "positive",
+        "particle_velocity": "positive",
     }
 )
 def get_relative_velocity_variance(
@@ -66,10 +67,15 @@ def get_relative_velocity_variance(
         - turbulence_intensity : Fluid RMS fluctuation velocity [m/s].
         - collisional_radius : Distance between two colliding droplets [m].
         - particle_inertia_time : Inertia timescale of droplet 1 [s].
+        - particle_velocity : Droplet velocity [m/s].
+        - taylor_microscale : Taylor microscale [m].
+        - eulerian_integral_length : Eulerian integral length scale [m].
+        - lagrangian_integral_time : Lagrangian integral time scale [s].
 
     Returns:
     --------
-        - σ² : Variance of particle relative-velocity fluctuation [m²/s²].
+        - σ² : Variance of particle relative-velocity fluctuation,
+            (n, n) matrix where n is number of particles [m²/s²],
 
     References:
     -----------
