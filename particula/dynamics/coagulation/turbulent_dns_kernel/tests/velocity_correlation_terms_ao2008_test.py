@@ -22,11 +22,11 @@ def test_compute_z():
     """
     Test compute_z with scalar and array inputs.
     """
-    tau_taylor = np.array([1.0, 2.0, 3.0])  # [s]
+    lagrangian_integral_time = np.array([1.0, 2.0, 3.0])  # [s]
     eulerian_integral_length = np.array([10.0, 20.0, 30.0])  # [m]
 
-    expected = tau_taylor / eulerian_integral_length
-    result = compute_z(tau_taylor, eulerian_integral_length)
+    expected = lagrangian_integral_time / eulerian_integral_length
+    result = compute_z(lagrangian_integral_time, eulerian_integral_length)
 
     assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 
@@ -147,7 +147,7 @@ def test_invalid_inputs():
     Ensure validation errors are raised for invalid inputs.
     """
     with pytest.raises(ValueError):
-        compute_z(-1, 10)  # Negative tau_taylor
+        compute_z(-1, 10)  # Negative lagrangian_integral_time
 
     with pytest.raises(ValueError):
         compute_beta(1, -10)  # Negative length scale
@@ -166,15 +166,15 @@ def test_edge_cases():
     """
     Test edge cases such as very small and very large values.
     """
-    tau_taylor = np.array(
+    lagrangian_integral_time = np.array(
         [1e-6, 1e-3, 10.0]
     )  # Very small and large inertia values
     eulerian_integral_length = np.array(
         [1e-6, 1e-3, 10.0]
     )  # Very small and large values
 
-    z_values = compute_z(tau_taylor, eulerian_integral_length)
-    beta_values = compute_beta(tau_taylor, eulerian_integral_length)
+    z_values = compute_z(lagrangian_integral_time, eulerian_integral_length)
+    beta_values = compute_beta(lagrangian_integral_time, eulerian_integral_length)
 
     assert np.all(np.isfinite(z_values)), "Expected all z values to be finite"
     assert np.all(

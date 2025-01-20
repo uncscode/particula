@@ -92,8 +92,7 @@ def get_radial_relative_velocity_ao2008(
     Arguments:
     ----------
         - velocity_dispersion : Turbulence velocity dispersion (σ) [m/s].
-        - particle_inertia_time_1 : Inertia timescale of particle 1 (τ_p1) [s].
-        - particle_inertia_time_2 : Inertia timescale of particle 2 (τ_p2) [s].
+        - particle_inertia_time : Inertia timescale of particle 1 (τ_p1) [s].
 
     Returns:
     --------
