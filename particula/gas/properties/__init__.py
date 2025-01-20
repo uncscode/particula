@@ -35,3 +35,6 @@ from particula.gas.properties.integral_scale_module import (
     get_lagrangian_integral_scale,
     get_eulerian_integral_scale,
 )
+from particula.gas.properties.normalize_accel_variance import (
+    get_normalized_accel_variance
+)
