@@ -1,6 +1,7 @@
 """
 Radial relative velocity calculation module.
 """
+
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
@@ -52,9 +53,7 @@ def get_radial_relative_velocity_dz2002(
     - Dodin, Z., & Elperin, T. (2002). Phys. Fluids, 14, 2921-24.
     """
     tau_diff = np.abs(get_pairwise_diff_matrix(particle_inertia_time))
-    b = (STANDARD_GRAVITY * tau_diff) / (
-        np.sqrt(2) * velocity_dispersion
-    )
+    b = (STANDARD_GRAVITY * tau_diff) / (np.sqrt(2) * velocity_dispersion)
 
     # Compute f(b)
     sqrt_pi = np.sqrt(np.pi)

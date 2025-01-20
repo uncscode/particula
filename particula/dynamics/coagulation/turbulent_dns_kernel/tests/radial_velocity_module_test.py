@@ -4,7 +4,6 @@ Test the radial relative velocity formulations.
 
 import pytest
 import numpy as np
-from particula.util.constants import STANDARD_GRAVITY
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
     get_radial_relative_velocity_dz2002,
     get_radial_relative_velocity_ao2008,
