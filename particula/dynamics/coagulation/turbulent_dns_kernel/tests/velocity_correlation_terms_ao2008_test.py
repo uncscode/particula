@@ -14,6 +14,7 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_te
     compute_d1,
     compute_d2,
     compute_e1,
+    compute_e2,
 )
 
 
@@ -124,6 +125,19 @@ def test_compute_e1():
 
     expected = ((1 + np.sqrt(1 - 2 * beta**2)) * eulerian_integral_length) / 2
     result = compute_e1(beta, eulerian_integral_length)
+
+    assert np.allclose(result, expected), f"Expected {expected}, got {result}"
+
+
+def test_compute_e2():
+    """
+    Test compute_e2 with valid inputs.
+    """
+    beta = np.array([0.1, 0.2, 0.3])  # [-]
+    eulerian_integral_length = np.array([10.0, 20.0, 30.0])  # [m]
+
+    expected = ((1 - np.sqrt(1 - 2 * beta**2)) * eulerian_integral_length) / 2
+    result = compute_e2(beta, eulerian_integral_length)
 
     assert np.allclose(result, expected), f"Expected {expected}, got {result}"
 

@@ -20,7 +20,7 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_te
         "eulerian_integral_length": "positive",
     }
 )
-def compute_f2_longitudinal_velocity_correlation(
+def get_f2_longitudinal_velocity_correlation(
     collisional_radius: Union[float, NDArray[np.float64]],
     taylor_microscale: Union[float, NDArray[np.float64]],
     eulerian_integral_length: Union[float, NDArray[np.float64]],

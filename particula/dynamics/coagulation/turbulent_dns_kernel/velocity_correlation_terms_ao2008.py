@@ -240,3 +240,28 @@ def compute_e1(
         - e₁ value [-].
     """
     return ((1 + np.sqrt(1 - 2 * beta**2)) * eulerian_integral_length) / 2
+
+
+@validate_inputs({"beta": "positive", "eulerian_integral_length": "positive"})
+def compute_e2(
+    beta: Union[float, NDArray[np.float64]],
+    eulerian_integral_length: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """
+    Compute e₂, which is defined as:
+
+        e₂ = ((1 - sqrt(1 - 2β²)) * L_e) / 2
+
+    - β : Defined as β = (sqrt(2) * λ) / L_e.
+    - L_e (eulerian_integral_length) : Eulerian integral length scale [m].
+
+    Arguments:
+    ----------
+        - beta : A dimensionless parameter related to turbulence [-].
+        - eulerian_integral_length : Eulerian integral length scale [m].
+
+    Returns:
+    --------
+        - e₂ value [-].
+    """
+    return ((1 - np.sqrt(1 - 2 * beta**2)) * eulerian_integral_length) / 2

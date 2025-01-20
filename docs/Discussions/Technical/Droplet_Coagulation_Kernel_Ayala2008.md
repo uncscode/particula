@@ -62,6 +62,8 @@ $$
 
 ### $\sigma^2$ Direct Numerical Simulation Fit
 
+This is the variance of particle relative-velocity ﬂuctuation.
+
 $$
 \sigma^2 = \langle (v'^{(2)})^2 \rangle + \langle (v'^{(1)})^2 \rangle - 2 \langle v'^{(1)} v'^{(2)} \rangle
 $$

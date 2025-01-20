@@ -5,7 +5,7 @@ Velocity correlation f2 test module.
 import pytest
 import numpy as np
 from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_f2_ao2008 import (
-    compute_f2_longitudinal_velocity_correlation,
+    get_f2_longitudinal_velocity_correlation,
 )
 
 
@@ -33,7 +33,7 @@ def test_compute_f2_longitudinal_velocity_correlation_scalar():
         (1 + sqrt_term) * exp_term_1 - (1 - sqrt_term) * exp_term_2
     )
 
-    result = compute_f2_longitudinal_velocity_correlation(
+    result = get_f2_longitudinal_velocity_correlation(
         collisional_radius, taylor_microscale, eulerian_integral_length
     )
 
@@ -65,7 +65,7 @@ def test_compute_f2_longitudinal_velocity_correlation_array():
         (1 + sqrt_term) * exp_term_1 - (1 - sqrt_term) * exp_term_2
     )
 
-    result = compute_f2_longitudinal_velocity_correlation(
+    result = get_f2_longitudinal_velocity_correlation(
         collisional_radius, taylor_microscale, eulerian_integral_length
     )
 
@@ -82,17 +82,17 @@ def test_invalid_inputs():
     Ensure validation errors are raised for invalid inputs.
     """
     with pytest.raises(ValueError):
-        compute_f2_longitudinal_velocity_correlation(
+        get_f2_longitudinal_velocity_correlation(
             -0.1, 0.05, 1.0
         )  # Negative collisional_radius
 
     with pytest.raises(ValueError):
-        compute_f2_longitudinal_velocity_correlation(
+        get_f2_longitudinal_velocity_correlation(
             0.1, -0.05, 1.0
         )  # Negative taylor_microscale
 
     with pytest.raises(ValueError):
-        compute_f2_longitudinal_velocity_correlation(
+        get_f2_longitudinal_velocity_correlation(
             0.1, 0.05, -1.0
         )  # Negative eulerian_integral_length
 
@@ -107,7 +107,7 @@ def test_edge_cases():
     taylor_microscale = 0.05  # [m]
     eulerian_integral_length = 1.0  # [m]
 
-    result = compute_f2_longitudinal_velocity_correlation(
+    result = get_f2_longitudinal_velocity_correlation(
         collisional_radius, taylor_microscale, eulerian_integral_length
     )
 
