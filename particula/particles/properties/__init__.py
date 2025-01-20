@@ -67,3 +67,9 @@ from particula.particles.properties.activity_module import (
     kappa_activity,
     calculate_partial_pressure,
 )
+from particula.particles.properties.reynolds_number import (
+    get_particle_reynolds_number,
+)
+from particula.particles.properties.stokes_number import (
+    get_stokes_number,
+)
