@@ -49,6 +49,7 @@ from particula.particles.properties.special_functions import (
 )
 from particula.particles.properties.settling_velocity import (
     particle_settling_velocity,
+    get_particle_settling_velocity_via_inertia,
     particle_settling_velocity_via_system_state,
 )
 from particula.particles.properties.diffusion_coefficient import (
@@ -66,4 +67,7 @@ from particula.particles.properties.activity_module import (
     ideal_activity_volume,
     kappa_activity,
     calculate_partial_pressure,
+)
+from particula.particles.properties.inertia_time import (
+    get_particle_inertia_time,
 )

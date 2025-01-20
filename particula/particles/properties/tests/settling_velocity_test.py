@@ -1,9 +1,13 @@
-"""Tests for the settling velocity property calculation."""
+"""
+Tests for the settling velocity property calculation.
+"""
 
 import numpy as np
 import pytest
+
 from particula.particles.properties.settling_velocity import (
     particle_settling_velocity,
+    get_particle_settling_velocity_via_inertia,
 )
 
 
@@ -76,3 +80,70 @@ def test_calculate_settling_velocity_with_invalid_inputs():
             dynamic_viscosity,
             gravitational_acceleration,
         )
+
+
+def test_get_particle_settling_velocity_via_inertia_scalar():
+    """
+    Test get_particle_settling_velocity_via_inertia with scalar inputs.
+    """
+    particle_inertia_time = 0.02  # s
+    gravitational_acceleration = 9.81  # m/s²
+    slip_correction_factor = 1.0  # Default (no slip correction)
+
+    expected = (
+        gravitational_acceleration
+        * particle_inertia_time
+        * slip_correction_factor
+    )
+    result = get_particle_settling_velocity_via_inertia(
+        particle_inertia_time,
+        gravitational_acceleration,
+        slip_correction_factor,
+    )
+
+    assert np.isclose(result, expected, atol=1e-10)
+
+
+def test_get_particle_settling_velocity_via_inertia_array():
+    """
+    Test get_particle_settling_velocity_via_inertia with NumPy array inputs.
+    """
+    particle_inertia_time = np.array([0.02, 0.03])
+    gravitational_acceleration = 9.81  # m/s²
+    slip_correction_factor = np.array(
+        [1.0, 1.1]
+    )  # Some slip correction for small particles
+
+    expected = (
+        gravitational_acceleration
+        * particle_inertia_time
+        * slip_correction_factor
+    )
+    result = get_particle_settling_velocity_via_inertia(
+        particle_inertia_time,
+        gravitational_acceleration,
+        slip_correction_factor,
+    )
+
+    assert np.allclose(result, expected, atol=1e-10)
+
+
+def test_get_particle_settling_velocity_via_inertia_invalid():
+    """
+    Test that get_particle_settling_velocity_via_inertia raises errors for
+    invalid inputs.
+    """
+    with pytest.raises(ValueError):
+        get_particle_settling_velocity_via_inertia(
+            -0.02, 9.81, 1.0
+        )  # Negative inertia time
+
+    with pytest.raises(ValueError):
+        get_particle_settling_velocity_via_inertia(
+            0.02, -9.81, 1.0
+        )  # Negative gravity
+
+    with pytest.raises(ValueError):
+        get_particle_settling_velocity_via_inertia(
+            0.02, 9.81, -1.0
+        )  # Negative slip correction
