@@ -1,21 +1,24 @@
 """
 Compute the function Φ(α, φ) for the given particle properties.
 """
+
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
+from particula.util.self_broadcast import (
+    get_pairwise_max_matrix,
+    get_pairwise_min_matrix,
+)
 
 
 @validate_inputs(
     {
         "alpha": "positive",
         "phi": "positive",
-        "particle_inertia_time_1": "positive",
-        "particle_inertia_time_2": "positive",
-        "particle_velocity_1": "positive",
-        "particle_velocity_2": "positive",
+        "particle_inertia_time": "positive",
+        "particle_velocity": "positive",
     }
 )
 def get_phi_ao2008(
@@ -27,32 +30,34 @@ def get_phi_ao2008(
     """
     Compute the function Φ(α, φ) for the given particle properties.
 
-    The function Φ(α, φ) is defined as:
+    The function Φ(α, φ), when vₚ₁>vₚ₂, is defined as:
 
         Φ(α, φ) =
-        {  1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )
-        -  1 / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) ) }
+        {  1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )\
+        -  1 / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) ) }\
         ×  ( vₚ₁ - vₚ₂ ) / ( 2 φ ( (vₚ₁ - vₚ₂) / φ + (1 / τₚ₁) + (1 / τₚ₂) )² )
 
-        + {  4 / ( (vₚ₂ / φ)² - ( (1 / τₚ₂) + (1 / α) )² )
-        -  1 / ( (vₚ₂ / φ) + (1 / τₚ₂) + (1 / α) )²
-        -  1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )²  }
-        ×  ( vₚ₂ / ( 2 φ ( (1 / τₚ₁) - (1 / α) + ( (1 / τₚ₂) + (1 / α) ) (vₚ₁ / vₚ₂) ) ) )
+        + {  4 / ( (vₚ₂ / φ)² - ( (1 / τₚ₂) + (1 / α) )² )\
+        -  1 / ( (vₚ₂ / φ) + (1 / τₚ₂) + (1 / α) )²\
+        -  1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )²  }\
+        ×  ( vₚ₂ / ( 2 φ ( (1 / τₚ₁) - (1 / α) \
+        + ( (1 / τₚ₂) + (1 / α) ) (vₚ₁ / vₚ₂) ) ) )
 
-        + {  2φ / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )
-        -  2φ / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )
-        -  vₚ₁ / ( ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )² )
-        +  vₚ₂ / ( ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )² )  }
+        + {  2φ / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )\
+        -  2φ / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )\
+        -  vₚ₁ / ( ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )² )\
+        +  vₚ₂ / ( ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )² )  }\
         ×  1 / ( 2φ ( (vₚ₁ - vₚ₂) / φ + (1 / τₚ₁) + (1 / τₚ₂) ) )
 
     Arguments:
     ----------
-        - alpha : A parameter related to turbulence and droplet interactions [-].
+        - alpha : A parameter related to turbulence and droplet interactions
+            [-].
         - phi : A characteristic velocity or timescale parameter [m/s].
-        - particle_inertia_time_1 : Inertia timescale of particle 1 τₚ₁ [s].
-        - particle_inertia_time_2 : Inertia timescale of particle 2 τₚ₂ [s].
-        - particle_velocity_1 : Velocity of particle 1 vₚ₁ [m/s].
-        - particle_velocity_2 : Velocity of particle 2 vₚ₂ [m/s].
+        - particle_inertia_time : Inertia timescale of particle 1 τₚ₁,
+            particle 2 τₚ₂ [s].
+        - particle_velocity : Velocity of particle 1 vₚ₁,
+            particle 2 vₚ₂ [m/s].
 
     Returns:
     --------
@@ -65,10 +70,14 @@ def get_phi_ao2008(
         Theory and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
     """
-    v1, v2 = np.maximum(particle_velocity_1, particle_velocity_2), np.minimum(
-        particle_velocity_1, particle_velocity_2
-    )
-    tau1, tau2 = particle_inertia_time_1, particle_inertia_time_2
+    # valid for v1 > v2
+    v1, v2 = get_pairwise_max_matrix(
+        particle_velocity
+    ), get_pairwise_min_matrix(particle_velocity)
+    # tau1 > tau2 due to v1=tau1*gravity and v2=tau2*gravity
+    tau1, tau2 = get_pairwise_max_matrix(
+        particle_inertia_time
+    ), get_pairwise_min_matrix(particle_inertia_time)
 
     term1 = _compute_phi_term1(v1, v2, tau1, tau2, alpha, phi)
     term2 = _compute_phi_term2(v1, v2, tau1, tau2, alpha, phi)
@@ -85,6 +94,7 @@ def _compute_phi_term1(
     alpha: NDArray[np.float64],
     phi: NDArray[np.float64],
 ) -> NDArray[np.float64]:
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     """Compute the first term of the Φ function."""
     denominator1 = v2 / phi - (1 / tau2) - (1 / alpha)
     denominator2 = v1 / phi + (1 / tau1) + (1 / alpha)
@@ -105,6 +115,7 @@ def _compute_phi_term2(
     alpha: NDArray[np.float64],
     phi: NDArray[np.float64],
 ) -> NDArray[np.float64]:
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     """Compute the second term of the Φ function."""
     denominator1 = (v2 / phi + (1 / tau2) + (1 / alpha)) ** 2
     denominator2 = (v2 / phi - (1 / tau2) - (1 / alpha)) ** 2
@@ -127,6 +138,7 @@ def _compute_phi_term3(
     alpha: NDArray[np.float64],
     phi: NDArray[np.float64],
 ) -> NDArray[np.float64]:
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     """Compute the third term of the Φ function."""
     denominator1 = (v1 / phi) + (1 / tau1) + (1 / alpha)
     denominator2 = (v2 / phi) - (1 / tau2) - (1 / alpha)
