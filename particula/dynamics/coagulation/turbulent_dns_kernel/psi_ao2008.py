@@ -27,12 +27,11 @@ def get_psi_ao2008(
         Ψ(α, φ) = 1 / ((1/τ_pk) + (1/α) + (v_pk/φ))
                 - (v_pk / (2φ ((1/τ_pk) + (1/α) + (v_pk/φ))^2))
 
-    where:
-        - τ_pk (particle_inertia_time) : Inertia timescale of the k-th droplet
-            [s].
-        - α : A parameter related to turbulence and droplet interactions [-].
-        - φ : A characteristic velocity or timescale parameter [m/s].
-        - v_pk (particle_velocity) : Velocity of the k-th droplet [m/s].
+    - τ_pk (particle_inertia_time) : Inertia timescale of the k-th droplet
+        [s].
+    - α : A parameter related to turbulence and droplet interactions [-].
+    - φ : A characteristic velocity or timescale parameter [m/s].
+    - v_pk (particle_velocity) : Velocity of the k-th droplet [m/s].
 
     Arguments:
     ----------
