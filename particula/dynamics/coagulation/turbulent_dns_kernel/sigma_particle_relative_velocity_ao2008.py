@@ -44,13 +44,13 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_f2
     }
 )
 def get_relative_velocity_variance(
-    turbulence_intensity: Union[float, NDArray[np.float64]],
-    collisional_radius: Union[float, NDArray[np.float64]],
-    particle_inertia_time: Union[float, NDArray[np.float64]],
-    particle_velocity: Union[float, NDArray[np.float64]],
-    taylor_microscale: Union[float, NDArray[np.float64]],
-    eulerian_integral_length: Union[float, NDArray[np.float64]],
-    lagrangian_integral_time: Union[float, NDArray[np.float64]],
+    turbulence_intensity: float,
+    collisional_radius: NDArray[np.float64],
+    particle_inertia_time: NDArray[np.float64],
+    particle_velocity: NDArray[np.float64],
+    taylor_microscale: float,
+    eulerian_integral_length: float,
+    lagrangian_integral_time: float,
 ) -> Union[float, NDArray[np.float64]]:
     """
     Compute the variance of particle relative-velocity fluctuation.
@@ -136,16 +136,16 @@ def get_relative_velocity_variance(
     }
 )
 def compute_rms_fluctuation_velocity(
-    turbulence_intensity: Union[float, NDArray[np.float64]],
+    turbulence_intensity: float,
     particle_inertia_time: Union[float, NDArray[np.float64]],
-    b1: Union[float, NDArray[np.float64]],
-    b2: Union[float, NDArray[np.float64]],
-    d1: Union[float, NDArray[np.float64]],
-    d2: Union[float, NDArray[np.float64]],
-    c1: Union[float, NDArray[np.float64]],
-    c2: Union[float, NDArray[np.float64]],
-    e1: Union[float, NDArray[np.float64]],
-    e2: Union[float, NDArray[np.float64]],
+    b1: float,
+    b2: float,
+    d1: float,
+    d2: float,
+    c1: float,
+    c2: float,
+    e1: float,
+    e2: float,
 ) -> Union[float, NDArray[np.float64]]:
     """
     Compute the square of the RMS fluctuation velocity for the k-th droplet.
@@ -198,25 +198,27 @@ def compute_rms_fluctuation_velocity(
     {
         "turbulence_intensity": "positive",
         "collisional_radius": "positive",
-        "particle_inertia_time_1": "positive",
-        "particle_inertia_time_2": "positive",
+        "particle_inertia_time": "positive",
+        "particle_velocity": "positive",
+        "taylor_microscale": "positive",
+        "eulerian_integral_length": "positive",
     }
 )
 def compute_cross_correlation_velocity(
-    turbulence_intensity: Union[float, NDArray[np.float64]],
+    turbulence_intensity: float,
     collisional_radius: Union[float, NDArray[np.float64]],
     particle_inertia_time: Union[float, NDArray[np.float64]],
     particle_velocity: Union[float, NDArray[np.float64]],
-    taylor_microscale: Union[float, NDArray[np.float64]],
-    eulerian_integral_length: Union[float, NDArray[np.float64]],
-    b1: Union[float, NDArray[np.float64]],
-    b2: Union[float, NDArray[np.float64]],
-    d1: Union[float, NDArray[np.float64]],
-    d2: Union[float, NDArray[np.float64]],
-    c1: Union[float, NDArray[np.float64]],
-    c2: Union[float, NDArray[np.float64]],
-    e1: Union[float, NDArray[np.float64]],
-    e2: Union[float, NDArray[np.float64]],
+    taylor_microscale: float,
+    eulerian_integral_length: float,
+    b1: float,
+    b2: float,
+    d1: float,
+    d2: float,
+    c1: float,
+    c2: float,
+    e1: float,
+    e2: float,
 ) -> Union[float, NDArray[np.float64]]:
     """
     Compute the cross-correlation of the fluctuating velocities of droplets
