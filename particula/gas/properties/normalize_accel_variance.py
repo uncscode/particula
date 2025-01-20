@@ -12,6 +12,7 @@ from particula.util.validate_inputs import validate_inputs
 @validate_inputs({"re_lambda": "positive"})
 def get_normalized_accel_variance(
     re_lambda: Union[float, NDArray[np.float64]],
+    numerical_stability_epsilon: float = 1e-14,
 ) -> Union[float, NDArray[np.float64]]:
     """
     Calculate the normalized acceleration variance in isotropic turbulence.
@@ -32,5 +33,13 @@ def get_normalized_accel_variance(
     Returns:
     --------
         - accel_variance : Normalized acceleration variance [-]
+
+    References:
+    -----------
+    - The equivalent numerically stable version used is this.
+        (7 + 11 / (R_λ + ε)) / (1 + 205 / (R_λ + ε))
     """
-    return (11 + 7 * re_lambda) / (205 + re_lambda)
+    return (
+        (7 + 11 / (re_lambda + numerical_stability_epsilon))
+        / (1 + 205 / (re_lambda + numerical_stability_epsilon))
+    )
