@@ -24,7 +24,7 @@ from particula.gas.properties.kinematic_viscosity import (
 
 
 def saffman_turner_1956(
-    diameter_particle: NDArray[np.float64],
+    particle_radius: NDArray[np.float64],
     turbulent_kinetic_energy: float,
     kinematic_viscosity: float,
 ) -> NDArray[np.float64]:
@@ -33,7 +33,7 @@ def saffman_turner_1956(
 
     Args:
     -----
-        - diameter_particle : Array of particle diameters [m].
+        - particle_radius : Array of particle diameters [m].
         - turbulent_kinetic_energy : Turbulent kinetic energy [m^2/s^2].
         - kinematic_viscosity : Kinematic viscosity [m^2/s].
 
@@ -55,15 +55,16 @@ def saffman_turner_1956(
         physics, Chapter 13, Equation 13A.2.
     """
     diameter_sum_matrix = (
-        diameter_particle[:, np.newaxis] + diameter_particle[np.newaxis, :]
-    )
+        particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
+    ) * 2  # Convert from radius to diameter sum
+
     return (
         np.pi * turbulent_kinetic_energy / (120 * kinematic_viscosity)
     ) ** 0.5 * diameter_sum_matrix**3
 
 
 def saffman_turner_1956_via_system_state(
-    diameter_particle: NDArray[np.float64],
+    particle_radius: NDArray[np.float64],
     turbulent_kinetic_energy: float,
     temperature: float,
     fluid_density: float,
@@ -73,7 +74,7 @@ def saffman_turner_1956_via_system_state(
 
     Args:
     -----
-        - diameter_particle : Array of particle diameters [m].
+        - particle_radius : Array of particle diameters [m].
         - turbulent_kinetic_energy : Turbulent kinetic energy [m^2/s^2].
         - temperature : Temperature of the system [K].
         - fluid_density : Density of the fluid [kg/m^3].
@@ -92,7 +93,7 @@ def saffman_turner_1956_via_system_state(
         temperature=temperature, fluid_density=fluid_density
     )
     return saffman_turner_1956(
-        diameter_particle=diameter_particle,
+        particle_radius=particle_radius,
         turbulent_kinetic_energy=turbulent_kinetic_energy,
         kinematic_viscosity=kinematic_viscosity,
     )
