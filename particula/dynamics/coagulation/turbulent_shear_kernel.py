@@ -33,7 +33,7 @@ def saffman_turner_1956(
 
     Args:
     -----
-        - particle_radius : Array of particle diameters [m].
+        - particle_radius : Array of particle radii [m].
         - turbulent_kinetic_energy : Turbulent kinetic energy [m^2/s^2].
         - kinematic_viscosity : Kinematic viscosity [m^2/s].
 
@@ -74,7 +74,7 @@ def saffman_turner_1956_via_system_state(
 
     Args:
     -----
-        - particle_radius : Array of particle diameters [m].
+        - particle_radius : Array of particle radii [m].
         - turbulent_kinetic_energy : Turbulent kinetic energy [m^2/s^2].
         - temperature : Temperature of the system [K].
         - fluid_density : Density of the fluid [kg/m^3].
