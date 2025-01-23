@@ -64,6 +64,13 @@ def get_particle_inertia_time(
     Returns:
     --------
         - Particle inertia time [s]
+
+    References:
+    ----------
+        - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
+        the geometric collision rate of sedimenting droplets. Part 2. Theory
+        and parameterization. New Journal of Physics, 10.
+        https://doi.org/10.1088/1367-2630/10/7/075016
     """
     re_p = (2 * particle_radius * relative_velocity) / kinematic_viscosity
     drag_correction = 1 + 0.15 * re_p**0.687
