@@ -43,5 +43,5 @@ from particula.gas.properties.taylor_microscale_module import (
     get_taylor_microscale,
 )
 from particula.gas.properties.normalize_accel_variance import (
-    get_normalized_accel_variance
+    get_normalized_accel_variance_ao2008,
 )
