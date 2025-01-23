@@ -29,11 +29,11 @@ def get_particle_reynolds_number(
 
         Re_p = (2 a v_p) / ν
 
-        - Re_p : Particle Reynolds number [-]
-        - a (particle_radius) : Particle radius [m]
-        - v_p (particle_velocity) : Particle velocity relative to the fluid
-            [m/s]
-        - ν (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]
+    - Re_p : Particle Reynolds number [-]
+    - a (particle_radius) : Particle radius [m]
+    - v_p (particle_velocity) : Particle velocity relative to the fluid
+        [m/s]
+    - ν (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]
 
 
 
