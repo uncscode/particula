@@ -28,6 +28,7 @@ from particula.gas.properties.vapor_pressure_module import (
 )
 from particula.gas.properties.normalize_accel_variance import (
     get_normalized_accel_variance_ao2008,
+)
 from particula.gas.properties.kolmogorov_module import (
     get_kolmogorov_time,
     get_kolmogorov_length,
