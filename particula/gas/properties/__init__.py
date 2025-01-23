@@ -26,6 +26,9 @@ from particula.gas.properties.vapor_pressure_module import (
     clausius_clapeyron_vapor_pressure,
     buck_vapor_pressure,
 )
+from particula.gas.properties.normalize_accel_variance import (
+    get_normalized_accel_variance_ao2008,
+)
 from particula.gas.properties.kolmogorov_module import (
     get_kolmogorov_time,
     get_kolmogorov_length,
@@ -34,4 +37,11 @@ from particula.gas.properties.kolmogorov_module import (
 from particula.gas.properties.integral_scale_module import (
     get_lagrangian_integral_scale,
     get_eulerian_integral_scale,
+)
+from particula.gas.properties.fluid_rms_velocity import (
+    get_fluid_rms_velocity
+)
+from particula.gas.properties.taylor_microscale_module import (
+    get_lagrangian_taylor_microscale_time,
+    get_taylor_microscale,
 )
