@@ -77,3 +77,9 @@ from particula.particles.properties.stokes_number import (
 from particula.particles.properties.inertia_time import (
     get_particle_inertia_time,
 )
+from particula.particles.properties.reynolds_number import (
+    get_particle_reynolds_number,
+)
+from particula.particles.properties.stokes_number import (
+    get_stokes_number,
+)
