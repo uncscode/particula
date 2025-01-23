@@ -41,7 +41,8 @@ def get_particle_reynolds_number(
     ----------
         - particle_radius : Radius of the particle [m]
         - particle_velocity : Particle velocity relative to the fluid [m/s]
-        - kinematic_viscosity : Kinematic viscosity of the surrounding fluid [m²/s]
+        - kinematic_viscosity : Kinematic viscosity of the surrounding fluid
+            [m²/s]
 
     Returns:
     --------
