@@ -26,9 +26,7 @@ from particula.gas.properties.vapor_pressure_module import (
     clausius_clapeyron_vapor_pressure,
     buck_vapor_pressure,
 )
-from particula.gas.properties.kolmogorov_time import (
-    get_kolmogorov_time
-)
+from particula.gas.properties.kolmogorov_time import get_kolmogorov_time
 from particula.gas.properties.normalize_accel_variance import (
-    get_normalized_accel_variance
+    get_normalized_accel_variance_ao2008,
 )
