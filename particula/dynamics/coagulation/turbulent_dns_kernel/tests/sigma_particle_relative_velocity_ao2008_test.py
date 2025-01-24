@@ -79,18 +79,15 @@ def test_edge_cases():
     particle_velocity = np.array(
         [1e-6, 1e-3, 10.0]
     )  # Very small and large values
-    taylor_microscale = 0.05  # [m]
-    eulerian_integral_length = 1.0  # [m]
-    lagrangian_integral_time = 0.2  # [s]
 
     result = get_relative_velocity_variance(
         turbulence_intensity,
         collisional_radius,
         particle_inertia_time,
         particle_velocity,
-        taylor_microscale,
-        eulerian_integral_length,
-        lagrangian_integral_time,
+        taylor_microscale=0.05,
+        eulerian_integral_length=1.0,
+        lagrangian_integral_time=0.2,
     )
 
     assert np.all(np.isfinite(result)), "Expected all values to be finite"
