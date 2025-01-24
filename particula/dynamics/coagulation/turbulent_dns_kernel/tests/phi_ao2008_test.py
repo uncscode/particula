@@ -56,8 +56,8 @@ def test_get_phi_ao2008_invalid_inputs():
     """
     alpha = 2.0  # [-]
     phi = 1.0  # [m/s]
-    particle_inertia_time = np.array([0.05, 0.1, 0.2])  # [s]
-    particle_velocity = np.array([0.1, 0.2, 0.3])  # [m/s]
+    particle_inertia_time = np.array([0.05, 0.1, 0.5])  # [s]
+    particle_velocity = np.array([0.1, 0.2, 0.6])  # [m/s]
 
     with pytest.raises(ValueError):
         get_phi_ao2008(
@@ -88,10 +88,10 @@ def test_get_phi_ao2008_edge_cases():
     alpha = 2.0  # [-]
     phi = 1.0  # [m/s]
     particle_inertia_time = np.array(
-        [1e-6, 1e-3, 10.0]
+        [5e-6, 1e-3, 20.0]
     )  # Very small and large inertia values
     particle_velocity = np.array(
-        [1e-6, 1e-3, 10.0]
+        [2e-6, 1e-3, 20.0]
     )  # Very small and large velocities
 
     result = get_phi_ao2008(
