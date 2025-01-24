@@ -81,10 +81,10 @@ def test_edge_cases():
     )  # Very small and large values
 
     result = get_relative_velocity_variance(
-        turbulence_intensity,
-        collisional_radius,
-        particle_inertia_time,
-        particle_velocity,
+        turbulence_intensity=turbulence_intensity,
+        collisional_radius=collisional_radius,
+        particle_inertia_time=particle_inertia_time,
+        particle_velocity=particle_velocity,
         taylor_microscale=0.05,
         eulerian_integral_length=1.0,
         lagrangian_integral_time=0.2,
