@@ -58,15 +58,15 @@ def test_compute_f2_longitudinal_velocity_correlation_array():
     sqrt_term = np.sqrt(1 - 2 * beta**2)
     denominator = 2 * sqrt_term
 
-    exp_term_1 = np.exp(
+    exp_term_1a = np.exp(
         -2 * collisional_radius / ((1 + sqrt_term) * eulerian_integral_length)
     )
-    exp_term_2 = np.exp(
+    exp_term_2b = np.exp(
         -2 * collisional_radius / ((1 - sqrt_term) * eulerian_integral_length)
     )
 
     expected = (1 / denominator) * (
-        (1 + sqrt_term) * exp_term_1 - (1 - sqrt_term) * exp_term_2
+        (1 + sqrt_term) * exp_term_1a - (1 - sqrt_term) * exp_term_2b
     )
 
     result = get_f2_longitudinal_velocity_correlation(
@@ -75,10 +75,10 @@ def test_compute_f2_longitudinal_velocity_correlation_array():
 
     assert (
         result.shape == expected.shape
-    ), f"Expected shape {expected.shape}, but got {result.shape}"
+    )
     assert np.allclose(
         result, expected, atol=1e-10
-    ), f"Expected {expected}, but got {result}"
+    )
 
 
 def test_invalid_inputs():
