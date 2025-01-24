@@ -7,8 +7,6 @@ import numpy as np
 
 from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_particle_relative_velocity_ao2008 import (
     get_relative_velocity_variance,
-    _compute_rms_fluctuation_velocity,
-    _compute_cross_correlation_velocity,
 )
 
 
