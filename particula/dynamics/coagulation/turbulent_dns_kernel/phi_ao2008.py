@@ -2,11 +2,22 @@
 Compute the function Φ(α, φ) for the given particle properties.
 """
 
-from typing import Union
+from typing import Union, NamedTuple
 import numpy as np
 from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
+
+
+class PhiComputeTerms(NamedTuple):
+    """Parameters for computing Φ function terms."""
+
+    v1: Union[float, NDArray[np.float64]]
+    v2: Union[float, NDArray[np.float64]]
+    tau1: Union[float, NDArray[np.float64]]
+    tau2: Union[float, NDArray[np.float64]]
+    alpha: Union[float, NDArray[np.float64]]
+    phi: Union[float, NDArray[np.float64]]
 
 
 @validate_inputs(
@@ -83,75 +94,83 @@ def get_phi_ao2008(
         particle_inertia_time[np.newaxis, :],
     )
 
-    term1 = _compute_phi_term1(v1, v2, tau1, tau2, alpha, phi)
-    term2 = _compute_phi_term2(v1, v2, tau1, tau2, alpha, phi)
-    term3 = _compute_phi_term3(v1, v2, tau1, tau2, alpha, phi)
+    phi_compute_terms = PhiComputeTerms(v1, v2, tau1, tau2, alpha, phi)
+
+    term1 = _compute_phi_term1(phi_compute_terms)
+    term2 = _compute_phi_term2(phi_compute_terms)
+    term3 = _compute_phi_term3(phi_compute_terms)
 
     return term1 + term2 + term3
 
 
 def _compute_phi_term1(
-    v1: NDArray[np.float64],
-    v2: NDArray[np.float64],
-    tau1: NDArray[np.float64],
-    tau2: NDArray[np.float64],
-    alpha: NDArray[np.float64],
-    phi: NDArray[np.float64],
+    terms: PhiComputeTerms,
 ) -> NDArray[np.float64]:
-    # pylint: disable=too-many-arguments, too-many-positional-arguments
     """Compute the first term of the Φ function."""
-    denominator1 = v2 / phi - (1 / tau2) - (1 / alpha)
-    denominator2 = v1 / phi + (1 / tau1) + (1 / alpha)
+    denominator1 = terms.v2 / terms.phi - (1 / terms.tau2) - (1 / terms.alpha)
+    denominator2 = terms.v1 / terms.phi + (1 / terms.tau1) + (1 / terms.alpha)
 
     first_term = (1 / denominator1) - (1 / denominator2)
 
-    common_denominator = (v1 - v2) / phi + (1 / tau1) + (1 / tau2)
+    common_denominator = (
+        (terms.v1 - terms.v2) / terms.phi + (1 / terms.tau1) + (1 / terms.tau2)
+    )
     common_denominator_sq = common_denominator**2
 
-    return first_term * ((v1 - v2) / (2 * phi * common_denominator_sq))
+    return first_term * (
+        (terms.v1 - terms.v2) / (2 * terms.phi * common_denominator_sq)
+    )
 
 
 def _compute_phi_term2(
-    v1: NDArray[np.float64],
-    v2: NDArray[np.float64],
-    tau1: NDArray[np.float64],
-    tau2: NDArray[np.float64],
-    alpha: NDArray[np.float64],
-    phi: NDArray[np.float64],
+    terms: PhiComputeTerms,
 ) -> NDArray[np.float64]:
-    # pylint: disable=too-many-arguments, too-many-positional-arguments
     """Compute the second term of the Φ function."""
-    denominator1 = (v2 / phi + (1 / tau2) + (1 / alpha)) ** 2
-    denominator2 = (v2 / phi - (1 / tau2) - (1 / alpha)) ** 2
-    denominator3 = (v2 / phi) ** 2 - ((1 / tau2) + (1 / alpha)) ** 2
+    denominator1 = (
+        terms.v2 / terms.phi + (1 / terms.tau2) + (1 / terms.alpha)
+    ) ** 2
+    denominator2 = (
+        terms.v2 / terms.phi - (1 / terms.tau2) - (1 / terms.alpha)
+    ) ** 2
+    denominator3 = (terms.v2 / terms.phi) ** 2 - (
+        (1 / terms.tau2) + (1 / terms.alpha)
+    ) ** 2
 
     second_term = (4 / denominator3) - (1 / denominator1) - (1 / denominator2)
 
     shared_denominator = (
-        (1 / tau1) - (1 / alpha) + ((1 / tau2) + (1 / alpha)) * (v1 / v2)
+        (1 / terms.tau1)
+        - (1 / terms.alpha)
+        + ((1 / terms.tau2) + (1 / terms.alpha)) * (terms.v1 / terms.v2)
     )
 
-    return second_term * (v2 / (2 * phi * shared_denominator))
+    return second_term * (terms.v2 / (2 * terms.phi * shared_denominator))
 
 
 def _compute_phi_term3(
-    v1: NDArray[np.float64],
-    v2: NDArray[np.float64],
-    tau1: NDArray[np.float64],
-    tau2: NDArray[np.float64],
-    alpha: NDArray[np.float64],
-    phi: NDArray[np.float64],
+    terms: PhiComputeTerms,
 ) -> NDArray[np.float64]:
-    # pylint: disable=too-many-arguments, too-many-positional-arguments
     """Compute the third term of the Φ function."""
-    denominator1 = (v1 / phi) + (1 / tau1) + (1 / alpha)
-    denominator2 = (v2 / phi) - (1 / tau2) - (1 / alpha)
+    denominator1 = (
+        (terms.v1 / terms.phi) + (1 / terms.tau1) + (1 / terms.alpha)
+    )
+    denominator2 = (
+        (terms.v2 / terms.phi) - (1 / terms.tau2) - (1 / terms.alpha)
+    )
 
-    first_component = (2 * phi / denominator1) - (2 * phi / denominator2)
-    second_component = -(v1 / denominator1**2) + (v2 / denominator2**2)
+    first_component = (2 * terms.phi / denominator1) - (
+        2 * terms.phi / denominator2
+    )
+    second_component = -(terms.v1 / denominator1**2) + (
+        terms.v2 / denominator2**2
+    )
 
-    shared_denominator = ((v1 - v2) / phi) + (1 / tau1) + (1 / tau2)
+    shared_denominator = (
+        ((terms.v1 - terms.v2) / terms.phi)
+        + (1 / terms.tau1)
+        + (1 / terms.tau2)
+    )
 
     return (first_component + second_component) / (
-        2 * phi * shared_denominator
+        2 * terms.phi * shared_denominator
     )
