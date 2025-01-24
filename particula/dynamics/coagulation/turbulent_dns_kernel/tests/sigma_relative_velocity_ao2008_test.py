@@ -5,7 +5,7 @@ Tests for the sigma_relative_velocity_variance module.
 import pytest
 import numpy as np
 
-from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_particle_relative_velocity_ao2008 import (
+from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
     get_relative_velocity_variance,
 )
 
