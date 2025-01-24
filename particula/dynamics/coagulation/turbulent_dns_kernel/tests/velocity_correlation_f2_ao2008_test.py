@@ -19,18 +19,22 @@ def test_compute_f2_longitudinal_velocity_correlation_scalar():
 
     # Compute expected values using explicit computation
     beta = (np.sqrt(2) * taylor_microscale) / eulerian_integral_length
-    sqrt_term = np.sqrt(1 - 2 * beta**2)
-    denominator = 2 * sqrt_term
+    sqrt_term_t = np.sqrt(1 - 2 * beta**2)
+    denominator = 2 * sqrt_term_t
 
     exp_term_1 = np.exp(
-        -2 * collisional_radius / ((1 + sqrt_term) * eulerian_integral_length)
+        -2
+        * collisional_radius
+        / ((1 + sqrt_term_t) * eulerian_integral_length)
     )
     exp_term_2 = np.exp(
-        -2 * collisional_radius / ((1 - sqrt_term) * eulerian_integral_length)
+        -2
+        * collisional_radius
+        / ((1 - sqrt_term_t) * eulerian_integral_length)
     )
 
     expected = (1 / denominator) * (
-        (1 + sqrt_term) * exp_term_1 - (1 - sqrt_term) * exp_term_2
+        (1 + sqrt_term_t) * exp_term_1 - (1 - sqrt_term_t) * exp_term_2
     )
 
     result = get_f2_longitudinal_velocity_correlation(
