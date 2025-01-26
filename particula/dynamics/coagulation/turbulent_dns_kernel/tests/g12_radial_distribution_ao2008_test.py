@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 """
 Test the radial distribution of the coagulation kernel g12 using the
 AO2008 DNS model.
@@ -38,7 +39,7 @@ def test_get_g12_radial_distribution_ao2008_scalar():
         normalized_accel_variance,
         kolmogorov_velocity,
         kolmogorov_time,
-    )  # pylint: disable=duplicate-code
+    )
 
     # Check the shape
     assert g12_matrix.shape == (
@@ -72,7 +73,7 @@ def test_get_g12_radial_distribution_ao2008_invalid_inputs():
             normalized_accel_variance,
             kolmogorov_velocity,
             kolmogorov_time,
-        )  # pylint: disable=duplicate-code
+        )
 
     with pytest.raises(ValueError):
         get_g12_radial_distribution_ao2008(
@@ -83,7 +84,7 @@ def test_get_g12_radial_distribution_ao2008_invalid_inputs():
             normalized_accel_variance,
             kolmogorov_velocity,
             kolmogorov_time,
-        )  # pylint: disable=duplicate-code
+        )
 
     with pytest.raises(ValueError):
         get_g12_radial_distribution_ao2008(
@@ -94,7 +95,7 @@ def test_get_g12_radial_distribution_ao2008_invalid_inputs():
             normalized_accel_variance,
             kolmogorov_velocity,
             kolmogorov_time,
-        )  # pylint: disable=duplicate-code
+        )
 
     with pytest.raises(ValueError):
         get_g12_radial_distribution_ao2008(
@@ -105,7 +106,7 @@ def test_get_g12_radial_distribution_ao2008_invalid_inputs():
             normalized_accel_variance,
             kolmogorov_velocity,
             kolmogorov_time,
-        )  # pylint: disable=duplicate-code
+        )
 
 
 def test_get_g12_radial_distribution_ao2008_edge_cases():
@@ -131,7 +132,7 @@ def test_get_g12_radial_distribution_ao2008_edge_cases():
         normalized_accel_variance,
         kolmogorov_velocity,
         kolmogorov_time,
-    )  # pylint: disable=duplicate-code
+    )
 
     assert g12_matrix.shape == (
         3,
