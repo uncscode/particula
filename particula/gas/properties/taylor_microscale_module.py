@@ -55,13 +55,13 @@ def get_lagrangian_taylor_microscale_time(
 
 @validate_inputs(
     {
-        "rms_velocity": "positive",
+        "fluid_rms_velocity": "positive",
         "kinematic_viscosity": "positive",
         "turbulent_dissipation": "positive",
     }
 )
 def get_taylor_microscale(
-    rms_velocity: Union[float, NDArray[np.float64]],
+    fluid_rms_velocity: Union[float, NDArray[np.float64]],
     kinematic_viscosity: Union[float, NDArray[np.float64]],
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -83,7 +83,7 @@ def get_taylor_microscale(
 
     Arguments:
     ----------
-        - rms_velocity : Fluid RMS fluctuation velocity [m/s]
+        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]
         - kinematic_viscosity : Kinematic viscosity of the fluid [m²/s]
         - turbulent_dissipation : Turbulent kinetic energy dissipation rate
             [m²/s³]
@@ -96,6 +96,50 @@ def get_taylor_microscale(
     -----------
         - https://en.wikipedia.org/wiki/Taylor_microscale
     """
-    return rms_velocity * np.sqrt(
+    return fluid_rms_velocity * np.sqrt(
         (15 * kinematic_viscosity**2) / turbulent_dissipation
     )
+
+
+@validate_inputs(
+    {
+        "fluid_rms_velocity": "positive",
+        "taylor_microscale": "positive",
+        "kinematic_viscosity": "positive",
+    }
+)
+def get_taylor_microscale_reynolds_number(
+    fluid_rms_velocity: Union[float, NDArray[np.float64]],
+    taylor_microscale: Union[float, NDArray[np.float64]],
+    kinematic_viscosity: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """
+    Compute the Taylor-microscale Reynolds number (Re_λ).
+
+    The Taylor-scale micro Reynolds number is a dimensionless quantity used in
+    turbulence studies to characterize the relative importance of inertial and
+    viscous forces at the Taylor microscale.
+
+    The function is given by:
+
+        Re_λ = (u' λ) / ν
+
+    - u' (fluid_rms_velocity) : Fluid (RMS) velocity fluctuation [m/s].
+    - λ (taylor_microscale) : Taylor microscale [m].
+    - ν (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s].
+
+    Arguments:
+    ----------
+        - fluid_rms_velocity : Fluid RMS velocity fluctuation [m/s].
+        - taylor_microscale : Taylor microscale [m].
+        - kinematic_viscosity : Kinematic viscosity of the fluid [m²/s].
+
+    Returns:
+    --------
+        - Re_λ : Taylor-microscale Reynolds number [-].
+
+    References:
+    -----------
+        - https://en.wikipedia.org/wiki/Taylor_microscale
+    """
+    return (fluid_rms_velocity * taylor_microscale) / kinematic_viscosity

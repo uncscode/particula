@@ -10,10 +10,10 @@ from particula.util.validate_inputs import validate_inputs
 
 
 @validate_inputs(
-    {"rms_velocity": "positive", "turbulent_dissipation": "positive"}
+    {"fluid_rms_velocity": "positive", "turbulent_dissipation": "positive"}
 )
-def get_lagrangian_integral_scale(
-    rms_velocity: Union[float, NDArray[np.float64]],
+def get_lagrangian_integral_time(
+    fluid_rms_velocity: Union[float, NDArray[np.float64]],
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
@@ -27,12 +27,12 @@ def get_lagrangian_integral_scale(
 
     where:
         - T_L : Lagrangian integral timescale [s]
-        - u' (rms_velocity) : Fluid RMS fluctuation velocity [m/s]
+        - u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s]
         - ε (turbulent_dissipation) : Turbulent energy dissipation rate [m²/s³]
 
     Arguments:
     ----------
-        - rms_velocity : Fluid RMS fluctuation velocity [m/s]
+        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]
         - turbulent_dissipation : Turbulent kinetic energy dissipation rate
             [m²/s³]
 
@@ -40,14 +40,14 @@ def get_lagrangian_integral_scale(
     --------
         - Lagrangian integral timescale [s]
     """
-    return (rms_velocity**2) / turbulent_dissipation
+    return (fluid_rms_velocity**2) / turbulent_dissipation
 
 
 @validate_inputs(
-    {"rms_velocity": "positive", "turbulent_dissipation": "positive"}
+    {"fluid_rms_velocity": "positive", "turbulent_dissipation": "positive"}
 )
-def get_eulerian_integral_scale(
-    rms_velocity: Union[float, NDArray[np.float64]],
+def get_eulerian_integral_length(
+    fluid_rms_velocity: Union[float, NDArray[np.float64]],
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
@@ -61,12 +61,12 @@ def get_eulerian_integral_scale(
 
     where:
         - L_e : Eulerian integral length scale [m]
-        - u' (rms_velocity) : Fluid RMS fluctuation velocity [m/s]
+        - u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s]
         - ε (turbulent_dissipation) : Turbulent energy dissipation rate [m²/s³]
 
     Arguments:
     ----------
-        - rms_velocity : Fluid RMS fluctuation velocity [m/s]
+        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]
         - turbulent_dissipation : Turbulent kinetic energy dissipation rate
             [m²/s³]
 
@@ -74,4 +74,4 @@ def get_eulerian_integral_scale(
     --------
         - Eulerian integral length scale [m]
     """
-    return 0.5 * (rms_velocity**3) / turbulent_dissipation
+    return 0.5 * (fluid_rms_velocity**3) / turbulent_dissipation
