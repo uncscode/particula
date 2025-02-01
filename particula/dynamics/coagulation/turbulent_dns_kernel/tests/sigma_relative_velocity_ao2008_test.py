@@ -17,7 +17,7 @@ def test_get_relative_velocity_variance_array():
 
     expected_shape = (3, 3)
     result = get_relative_velocity_variance(
-        turbulence_intensity=0.05,
+        fluid_rms_velocity=0.05,
         collisional_radius=np.array([0.05, 0.1, 0.2]),
         particle_inertia_time=np.array([2, 3, 5]) * 1e-6,
         particle_velocity=np.array([0.3, 0.4, 0.5]),
@@ -38,7 +38,7 @@ def test_invalid_inputs():
     with pytest.raises(ValueError):
         get_relative_velocity_variance(
             -0.5, 0.05, 0.02, 0.3, 0.05, 1.0, 0.2
-        )  # Negative turbulence_intensity
+        )  # Negative fluid_rms_velocity
 
     with pytest.raises(ValueError):
         get_relative_velocity_variance(
@@ -60,7 +60,7 @@ def test_edge_cases():
     """
     Test compute_relative_velocity_variance with extreme values.
     """
-    turbulence_intensity = np.array(
+    fluid_rms_velocity = np.array(
         [1e-6, 1e-3, 10.0]
     )  # Very small and large values
     collisional_radius = np.array(
@@ -74,7 +74,7 @@ def test_edge_cases():
     )  # Very small and large values
 
     result = get_relative_velocity_variance(
-        turbulence_intensity=turbulence_intensity,
+        fluid_rms_velocity=fluid_rms_velocity,
         collisional_radius=collisional_radius,
         particle_inertia_time=particle_inertia_time,
         particle_velocity=particle_velocity,

@@ -47,14 +47,14 @@ class VelocityCorrelationTerms(NamedTuple):
 
 @validate_inputs(
     {
-        "turbulence_intensity": "positive",
+        "fluid_rms_velocity": "positive",
         "collisional_radius": "positive",
         "particle_inertia_time": "positive",
         "particle_velocity": "positive",
     }
 )
 def get_relative_velocity_variance(
-    turbulence_intensity: float,
+    fluid_rms_velocity: float,
     collisional_radius: NDArray[np.float64],
     particle_inertia_time: NDArray[np.float64],
     particle_velocity: NDArray[np.float64],
@@ -75,7 +75,7 @@ def get_relative_velocity_variance(
 
     Arguments:
     ----------
-        - turbulence_intensity : Fluid RMS fluctuation velocity [m/s].
+        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
         - collisional_radius : Distance between two colliding droplets [m].
         - particle_inertia_time : Inertia timescale of droplet 1 [s].
         - particle_velocity : Droplet velocity [m/s].
@@ -111,11 +111,11 @@ def get_relative_velocity_variance(
     )
 
     rms_velocity = _compute_rms_fluctuation_velocity(
-        turbulence_intensity, particle_inertia_time, vel_corr_terms
+        fluid_rms_velocity, particle_inertia_time, vel_corr_terms
     )
 
     cross_correlation = _compute_cross_correlation_velocity(
-        turbulence_intensity,
+        fluid_rms_velocity,
         collisional_radius,
         particle_inertia_time,
         particle_velocity,
@@ -131,12 +131,12 @@ def get_relative_velocity_variance(
 
 @validate_inputs(
     {
-        "turbulence_intensity": "positive",
+        "fluid_rms_velocity": "positive",
         "particle_inertia_time": "positive",
     }
 )
 def _compute_rms_fluctuation_velocity(
-    turbulence_intensity: float,
+    fluid_rms_velocity: float,
     particle_inertia_time: Union[float, NDArray[np.float64]],
     velocity_correlation_terms: VelocityCorrelationTerms,
 ) -> Union[float, NDArray[np.float64]]:
@@ -149,13 +149,13 @@ def _compute_rms_fluctuation_velocity(
                         [b₁ d₁ Ψ(c₁, e₁) - b₁ d₂ Ψ(c₁, e₂)\
                          - b₂ d₁ Ψ(c₂, e₁) + b₂ d₂ Ψ(c₂, e₂)]
 
-    - u' (turbulence_intensity) : Fluid RMS fluctuation velocity [m/s].
+    - u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s].
     - τ_pk (particle_inertia_time) : Inertia timescale of the droplet k [s].
     - Ψ(c, e) : Function Ψ computed using `get_psi_ao2008`.
 
     Arguments:
     ----------
-        - turbulence_intensity : Fluid RMS fluctuation velocity [m/s].
+        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
         - particle_inertia_time : Inertia timescale of the droplet k [s].
         - velocity_correlation_terms : Velocity correlation coefficients [-].
 
@@ -174,28 +174,28 @@ def _compute_rms_fluctuation_velocity(
         velocity_correlation_terms.c1,
         velocity_correlation_terms.e1,
         particle_inertia_time,
-        turbulence_intensity,
+        fluid_rms_velocity,
     )
     psi_c1_e2 = get_psi_ao2008(
         velocity_correlation_terms.c1,
         velocity_correlation_terms.e2,
         particle_inertia_time,
-        turbulence_intensity,
+        fluid_rms_velocity,
     )
     psi_c2_e1 = get_psi_ao2008(
         velocity_correlation_terms.c2,
         velocity_correlation_terms.e1,
         particle_inertia_time,
-        turbulence_intensity,
+        fluid_rms_velocity,
     )
     psi_c2_e2 = get_psi_ao2008(
         velocity_correlation_terms.c2,
         velocity_correlation_terms.e2,
         particle_inertia_time,
-        turbulence_intensity,
+        fluid_rms_velocity,
     )
 
-    return (turbulence_intensity**2 / particle_inertia_time) * (
+    return (fluid_rms_velocity**2 / particle_inertia_time) * (
         velocity_correlation_terms.b1
         * velocity_correlation_terms.d1
         * psi_c1_e1
@@ -213,7 +213,7 @@ def _compute_rms_fluctuation_velocity(
 
 @validate_inputs(
     {
-        "turbulence_intensity": "positive",
+        "fluid_rms_velocity": "positive",
         "collisional_radius": "positive",
         "particle_inertia_time": "positive",
         "particle_velocity": "positive",
@@ -222,7 +222,7 @@ def _compute_rms_fluctuation_velocity(
     }
 )
 def _compute_cross_correlation_velocity(
-    turbulence_intensity: float,
+    fluid_rms_velocity: float,
     collisional_radius: Union[float, NDArray[np.float64]],
     particle_inertia_time: Union[float, NDArray[np.float64]],
     particle_velocity: Union[float, NDArray[np.float64]],
@@ -240,14 +240,14 @@ def _compute_cross_correlation_velocity(
                             [b₁ d₁ Φ(c₁, e₁) - b₁ d₂ Φ(c₁, e₂)\
                              - b₂ d₁ Φ(c₂, e₁) + b₂ d₂ Φ(c₂, e₂)]
 
-    - u' (turbulence_intensity) : Fluid RMS fluctuation velocity [m/s].
+    - u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s].
     - τ_p1, τ_p2 : Inertia timescales of droplets 1 and 2 [s].
     - f₂(R) : Longitudinal velocity correlation function.
     - Φ(c, e) : Function Φ computed using `get_phi_ao2008`.
 
     Arguments:
     ----------
-        - turbulence_intensity : Fluid RMS fluctuation velocity [m/s].
+        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
         - collisional_radius : Distance between two colliding droplets [m].
         - particle_inertia_time: Inertia timescale of droplet 1 [s].
         - particle_velocity: Droplet velocity [m/s].
@@ -301,7 +301,7 @@ def _compute_cross_correlation_velocity(
     )
 
     return (
-        (turbulence_intensity**2 * f2_r)
+        (fluid_rms_velocity**2 * f2_r)
         / (particle_inertia_time_pairwise_product)
         * (
             velocity_correlation_terms.b1
