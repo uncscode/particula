@@ -1,4 +1,25 @@
-""" A dimensionless coagulation strategies and builders
+"""
+A dimensionless coagulation strategies and builders
+
+This module provides a set of classes and functions to calculate the
+dimensionless coagulation kernel for particles in the transition regime.
+
+Classes:
+--------
+- KernelStrategy: Abstract class for dimensionless coagulation strategies.
+- HardSphere: Hard sphere dimensionless coagulation strategy.
+- CoulombDyachkov2007: Dyachkov et al. (2007) approximation for the
+dimensionless coagulation kernel. Accounts for the Coulomb potential between
+particles.
+- CoulombGatti2008: Gatti and Kortshagen (2008) approximation for the
+dimensionless coagulation kernel. Accounts for the Coulomb potential
+between particles.
+- CoulombGopalakrishnan2012: Gopalakrishnan and Hogan (2012) approximation for
+the dimensionless coagulation kernel. Accounts for the Coulomb potential
+between particles.
+- CoulumbChahl2019: Chahl and Gopalakrishnan (2019) approximation for the
+dimensionless coagulation kernel. Accounts for the Coulomb potential between
+particles.
 """
 
 from abc import ABC, abstractmethod

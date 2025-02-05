@@ -30,7 +30,7 @@ from particula.particles.properties.lognormal_size_distribution import lognormal
 # Create a size distribution for aerosol particles
 
 # Define the bins for particle radius using a logarithmic scale
-radius_bins = np.logspace(start=-9, stop=-5, num=250)  # m (1 nm to 10 μm)
+radius_bins = np.logspace(start=-9, stop=-5, num=5)  # m (1 nm to 10 μm)
 
 # Calculate the mass of particles for each size bin
 # The mass is calculated using the formula for the volume of a sphere (4/3 * π * r^3)
@@ -41,7 +41,7 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 
 # %%
 
-charge_array = radius_bins * 0 + 2 # change me Ian
+charge_array = radius_bins * 0 +  # change me Ian
 temperature = 298.15
 
 coulomb_potential_ratio = coulomb_enhancement.ratio(
@@ -97,11 +97,22 @@ dimensional_kernel = (
     / (reduced_mass * coulomb_continuum_limit)
 )
 
+log_kernel = (
+    np.log(non_dimensional_kernel)
+    + np.log(friction_factor_value)
+    + 3 * np.log(sum_of_radii)
+    + 2 * np.log(coulomb_kinetic_limit)
+    - (np.log(reduced_mass) + np.log(coulomb_continuum_limit))
+)
+
+# Convert back to real space while handling underflow
+dimensional_kernel_logcalc = np.exp(log_kernel)
 
 # %% plot the kernel
 
 fig, ax = plt.subplots()
 ax.plot(radius_bins, dimensional_kernel[:, :])
+ax.plot(radius_bins, dimensional_kernel_logcalc[:, :], linestyle="--")
 ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel("Particle radius (m)")

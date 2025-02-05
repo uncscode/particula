@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.particles.properties import coulomb_enhancement
-
+from particula.util.machine_limit import safe_log, safe_exp
 
 def hard_sphere(
     diffusive_knudsen: Union[float, NDArray[np.float64]]
@@ -267,6 +267,6 @@ def coulomb_chahl2019(
     )
     return np.where(
         coulomb_potential_ratio > 0,
-        np.exp(correction_mu) * hard_sphere(diffusive_knudsen),
+        safe_exp(correction_mu) * hard_sphere(diffusive_knudsen),
         hard_sphere(diffusive_knudsen),
     )

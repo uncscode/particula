@@ -27,10 +27,11 @@ from particula.dynamics.coagulation import kernel
 from particula.dynamics.coagulation import rate
 from particula.particles.properties.lognormal_size_distribution import lognormal_pmf_distribution
 
+from particula.util.machine_limit import safe_exp, safe_log
 # Create a size distribution for aerosol particles
 
 # Define the bins for particle radius using a logarithmic scale
-radius_bins = np.logspace(start=-6, stop=-3, num=12)  # m (1 nm to 10 μm)
+radius_bins = np.logspace(start=-9, stop=1, num=350)  # m (1 nm to 10 μm)
 
 # Calculate the mass of particles for each size bin
 # The mass is calculated using the formula for the volume of a sphere (4/3 * π * r^3)
@@ -40,12 +41,17 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 
 # %
 
-charge_array = radius_bins * 0 + -10 # change me Ian
-charge_array[5:] = 1000
+charge_array = radius_bins * 0 + 10000 # change me Ian
+# charge_array[5:] = -5000
 temperature = 298.15
 
 coulomb_potential_ratio = coulomb_enhancement.ratio(
     radius_bins, charge_array, temperature=temperature
+)
+print(coulomb_potential_ratio)
+coulomb_kinetic_limit = coulomb_enhancement.kinetic(coulomb_potential_ratio)
+coulomb_continuum_limit = coulomb_enhancement.continuum(
+    coulomb_potential_ratio
 )
 dynamic_viscosity = get_dynamic_viscosity(temperature=temperature)
 mol_free_path = molecule_mean_free_path(
@@ -56,6 +62,7 @@ knudsen_number = calculate_knudsen_number(
 )
 slip_correction = cunningham_slip_correction(knudsen_number=knudsen_number)
 
+coulomb_potential_ratio = np.clip(coulomb_potential_ratio, -200, np.finfo(np.float64).max)
 fig, ax = plt.subplots()
 ax.plot(radius_bins, coulomb_potential_ratio)
 ax.set_xscale("log")
@@ -78,9 +85,6 @@ diffusive_knudsen_values = diffusive_knudsen_number(
     temperature=temperature,
 )
 
-coulomb_potential_ratio = coulomb_enhancement.ratio(
-    radius=radius_bins, charge=charge_array, temperature=temperature
-)
 
 fig, ax = plt.subplots()
 ax.plot(radius_bins, diffusive_knudsen_values)
@@ -110,15 +114,24 @@ kernel_dimensional = kernel_object.kernel(
     reduced_friction_factor=friction_factor_value,
 )
 
+# find any nan value or zeros
+print(np.isnan(kernel_dimensional).any())
+print(np.isinf(kernel_dimensional).any())
+print(np.isneginf(kernel_dimensional).any())
+print(np.isneginf(kernel_dimensional).any())
+
+
 fig, ax = plt.subplots()
 ax.plot(radius_bins, kernel_dimensional[:,:])
 ax.plot(radius_bins, kernel_dimensional[0,:], label="small particle", marker="o")
 ax.plot(radius_bins, kernel_dimensional[-1,:], label="large particle", marker="s")
+# ax.plot(radius_bins, dimensional_kernel_logcalc[:, :], linestyle="--")
 ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel("Coagulation kernel (m^3/s)")
-ax.set_title("Coagulation kernel vs particle radius")
+ax.legend()
+ax.set_title(f"Coagulation kernel vs particle radius, all charge = {charge_array[0]}")
 plt.show()
 
 
