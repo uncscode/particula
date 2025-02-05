@@ -17,6 +17,7 @@ from particula.util.constants import (
     ELECTRIC_PERMITTIVITY,
     ELEMENTARY_CHARGE_VALUE,
 )
+from particula.util.machine_limit import safe_exp
 
 
 def ratio(
@@ -82,7 +83,7 @@ def kinetic(
     return np.where(
         coulomb_potential >= 0,
         1 + coulomb_potential,
-        np.exp(coulomb_potential),
+        safe_exp(coulomb_potential),
     )
 
 
@@ -107,7 +108,7 @@ def continuum(
     """
     # return coulomb_potential/(1-np.exp(-1*coulomb_potential)) if ratio != 0,
     # otherwise 1
-    denominator = 1 - np.exp(-1 * coulomb_potential)
+    denominator = 1 - safe_exp(-1 * coulomb_potential)
     return np.divide(
         coulomb_potential,
         denominator,
