@@ -24,6 +24,7 @@ def ratio(
     radius: Union[float, NDArray[np.float64]],
     charge: Union[int, NDArray[np.float64]] = 0,
     temperature: float = 298.15,
+    lower_limit_ratio: Union[float, NDArray[np.float64]] = -200,
 ) -> Union[float, NDArray[np.float64]]:
     """Calculates the Coulomb potential ratio, phi_E. For all particle-
     particle interactions.
@@ -57,7 +58,9 @@ def ratio(
         4 * np.pi * ELECTRIC_PERMITTIVITY * (radius + np.transpose(radius))
     )
     coulomb_potential_ratio = numerator / (denominator * BOLTZMANN_CONSTANT * temperature)
-    coulomb_potential_ratio = np.clip(coulomb_potential_ratio, -200, np.finfo(np.float64).max)
+    coulomb_potential_ratio = np.clip(
+        coulomb_potential_ratio, lower_limit_ratio, np.finfo(np.float64).max
+    )
     return coulomb_potential_ratio
 
 
