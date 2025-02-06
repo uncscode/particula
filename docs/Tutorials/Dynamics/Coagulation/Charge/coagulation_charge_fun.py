@@ -7,7 +7,6 @@
 # %% 
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 
 # particula imports
 from particula.dynamics.coagulation import brownian_kernel, rate
@@ -32,7 +31,12 @@ from particula.dynamics.coagulation import kernel
 from particula.dynamics.coagulation import rate
 from particula.particles.properties.lognormal_size_distribution import lognormal_pmf_distribution
 
-# Create a size distribution for aerosol particles
+# %% [markdown]
+"""
+## Define the Particle Size Distribution
+
+We create a size distribution for aerosol particles using a logarithmic scale for particle radius, ranging from 1 nm to 10 μm. We calculate the mass of particles in each size bin assuming they are spherical and have a standard density.
+"""
 
 # Define the bins for particle radius using a logarithmic scale
 radius_bins = np.logspace(start=-9, stop=-5, num=5)  # m (1 nm to 10 μm)
@@ -46,10 +50,29 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 
 # %%
 
-charge_array = radius_bins * 0 +  # change me Ian
+# %% [markdown]
+"""
+## Define Particle Charges
+
+We assign charges to the particles. In this example, we assume that the charge on a particle increases with its size. For instance, particles gain one elementary charge for every nanometer of radius. This is a simplification for illustrative purposes.
+"""
+charge_array = np.floor(radius_bins / (1e-9))  # Example: charge increases with size
 temperature = 298.15
 
-coulomb_potential_ratio = coulomb_enhancement.ratio(
+# %% [markdown]
+"""
+## Calculate Coulomb Potential Ratio and Related Properties
+
+In this section, we compute several properties necessary for calculating the coagulation kernel with charge effects:
+
+- **Coulomb Potential Ratio**: Using `coulomb_enhancement.ratio`, we calculate the dimensionless Coulomb potential ratio, which quantifies the electrostatic interaction between charged particles.
+- **Dynamic Viscosity**: Obtained from `get_dynamic_viscosity`, needed for calculating friction factors.
+- **Mean Free Path**: Calculated using `molecule_mean_free_path`, important for determining the Knudsen number.
+- **Knudsen Number**: Computed with `calculate_knudsen_number`, it characterizes the flow regime of the particles.
+- **Slip Correction Factor**: Using `cunningham_slip_correction`, accounts for non-continuum effects at small particle sizes.
+- **Friction Factor**: Calculated with `friction_factor`, needed for determining particle mobility.
+- **Diffusive Knudsen Number**: Using `diffusive_knudsen_number`, combines the effects of particle diffusion and electrostatic interactions.
+"""
     radius_bins, charge_array, temperature=temperature
 )
 dynamic_viscosity = get_dynamic_viscosity(temperature=temperature)
@@ -76,13 +99,26 @@ diffusive_knudsen_values = diffusive_knudsen_number(
     temperature=temperature,
 )
 
-non_dimensional_kernel = coulomb_chahl2019(
+# %% [markdown]
+"""
+## Compute the Non-Dimensional Coagulation Kernel
+
+The non-dimensional coagulation kernel is calculated using `coulomb_chahl2019`, which incorporates charge effects into the rate at which particles collide.
+"""
     diffusive_knudsen=diffusive_knudsen_values,
     coulomb_potential_ratio=coulomb_potential_ratio,
 )
 
 
-coulomb_kinetic_limit = coulomb_enhancement.kinetic(coulomb_potential_ratio)
+# %% [markdown]
+"""
+## Calculate Coulomb Enhancement Factors
+
+We compute the Coulomb enhancement factors in both the kinetic and continuum limits:
+
+- **Kinetic Limit**: Using `coulomb_enhancement.kinetic`, applicable when particle motions are dominated by random thermal motion.
+- **Continuum Limit**: Using `coulomb_enhancement.continuum`, applicable when particles are larger and motions are influenced by continuous fluid flow.
+"""
 coulomb_continuum_limit = coulomb_enhancement.continuum(
     coulomb_potential_ratio
 )
@@ -90,7 +126,12 @@ coulomb_continuum_limit = coulomb_enhancement.continuum(
 sum_of_radii = radius_bins[:, np.newaxis] + radius_bins[np.newaxis, :]
 reduced_mass = reduced_self_broadcast(mass_bins)
 
-dimensional_kernel = (
+# %% [markdown]
+"""
+## Compute the Dimensional Coagulation Kernel
+
+The dimensional coagulation kernel combines all the previously calculated factors and gives the actual rate at which particles of different sizes collide and stick together due to coagulation, considering charge effects.
+"""
     non_dimensional_kernel
     * friction_factor_value
     * sum_of_radii**3
@@ -98,11 +139,15 @@ dimensional_kernel = (
     / (reduced_mass * coulomb_continuum_limit)
 )
 
-# %% plot the kernel
+# %% [markdown]
+"""
+## Plot the Coagulation Kernel
+
+We plot the coagulation kernel as a function of particle radius to visualize how charge affects the coagulation rates across different particle sizes.
+"""
 
 fig, ax = plt.subplots()
 ax.plot(radius_bins, dimensional_kernel[:, :])
-ax.plot(radius_bins, dimensional_kernel_logcalc[:, :], linestyle="--")
 ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel("Particle radius (m)")
@@ -112,7 +157,12 @@ plt.show()
 
 
 
-# %% making a time step
+# %% [markdown]
+"""
+## Simulate Coagulation Over a Time Step
+
+We calculate the gain and loss rates of particle concentrations due to coagulation using the previously computed kernel. The net rate of change in particle concentration is obtained by subtracting the loss rate from the gain rate.
+"""
 # get rates of coagulation dn/dt
 
 # make a number concentration distribution
@@ -136,7 +186,15 @@ loss_rate = rate.discrete_loss(
 net_rate = gain_rate - loss_rate
 
 # %% 
-# plot distribution
+# %% [markdown]
+"""
+## Plot Particle Concentration and Coagulation Rates
+
+We visualize the initial particle concentration distribution and the coagulation rates to understand how charge effects influence the coagulation process over time.
+
+- **Particle Concentration**: Shows the number concentration of particles across different sizes.
+- **Coagulation Rates**: Displays the gain, loss, and net rates of coagulation, highlighting how particles of different sizes contribute to the overall process.
+"""
 fig, ax = plt.subplots()
 ax.plot(radius_bins, number_concentration)
 ax.set_xscale("log")
