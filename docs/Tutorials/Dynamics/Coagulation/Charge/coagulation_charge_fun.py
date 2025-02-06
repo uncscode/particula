@@ -51,7 +51,7 @@ We create a size distribution for aerosol particles using a logarithmic scale fo
 """
 
 # Define the bins for particle radius using a logarithmic scale
-radius_bins = np.logspace(start=-9, stop=-5, num=5)  # m (1 nm to 10 μm)
+radius_bins = np.logspace(start=-9, stop=-4, num=250)  # m (1 nm to 10 μm)
 
 # Calculate the mass of particles for each size bin
 # The mass is calculated using the formula for the volume of a sphere (4/3 * π * r^3)
@@ -68,7 +68,7 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 
 We assign charges to the particles. In this example, we assume that the charge on a particle increases with its size. For instance, particles gain one elementary charge for every nanometer of radius. This is a simplification for illustrative purposes.
 """
-charge_array = np.floor(radius_bins / (1e-9))  # Example: charge increases with size
+charge_array = np.floor(radius_bins / (1e-10))  # Example: charge increases with size
 temperature = 298.15
 
 # %% [markdown]
