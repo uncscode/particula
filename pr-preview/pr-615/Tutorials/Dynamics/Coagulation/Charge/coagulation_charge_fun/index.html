@@ -20,7 +20,7 @@
     
     
       
-        <title>Coagulation charge fun - Particula</title>
+        <title>Coagulation with Charge Effects - Particula</title>
       
     
     
@@ -73,6 +73,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#coagulation-with-charge-effects" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -105,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Coagulation charge fun
+              Coagulation with Charge Effects
             
           </span>
         </div>
@@ -5322,12 +5327,14 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
-    Coagulation charge fun
+    Coagulation with Charge Effects
     
   </span>
   
@@ -6460,6 +6467,8 @@
   
   
   
+    
+  
   
 </nav>
                   </div>
@@ -6477,8 +6486,6 @@
   
   
 
-
-  <h1>Coagulation charge fun</h1>
 
 <script>
 (function (global, factory) {
@@ -6916,8 +6923,283 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a111bfbc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e107a1aa">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h1 id="coagulation-with-charge-effects">Coagulation with Charge Effects<a class="anchor-link" href="#coagulation-with-charge-effects">¶</a></h1><p>In this tutorial, we explore how electrical charge influences the coagulation (collisions and coalescence) of aerosol particles. We will:</p>
+<ul>
+<li>Create a size distribution for aerosol particles.</li>
+<li>Calculate the Coulomb potential ratio and related properties.</li>
+<li>Compute the coagulation kernel considering charge effects.</li>
+<li>Plot the coagulation kernel.</li>
+<li>Simulate the time evolution of the particle size distribution due to coagulation.</li>
+<li>Plot the particle concentration and coagulation rates.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bf52164b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>"""</p>
+<h1 id="import-necessary-libraries">Import Necessary Libraries<a class="anchor-link" href="#import-necessary-libraries">¶</a></h1><p>We import standard libraries like <code>numpy</code> and <code>matplotlib</code> for numerical computations and plotting. We also import specific functions from the <code>particula</code> package, which is used for aerosol dynamics simulations.
+"""
+import numpy as np
+import matplotlib.pyplot as plt</p>
+<p>particula imports
+from particula.dynamics.coagulation import brownian_kernel, rate
+from particula.particles.properties.lognormal_size_distribution import (
+lognormal_pmf_distribution,
+)
+from particula.dynamics.coagulation.transition_regime import coulomb_chahl2019
+from particula.particles.properties import (
+coulomb_enhancement,
+diffusive_knudsen_number,
+friction_factor,
+cunningham_slip_correction,
+calculate_knudsen_number,
+)
+from particula.gas.properties import (
+get_dynamic_viscosity,
+molecule_mean_free_path,
+)
+from particula.util.reduced_quantity import reduced_self_broadcast</p>
+<p>from particula.dynamics.coagulation import kernel
+from particula.dynamics.coagulation import rate
+from particula.particles.properties.lognormal_size_distribution import lognormal_pmf_distribution</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=aa779945">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>"""</p>
+<h1 id="define-the-particle-size-distribution">Define the Particle Size Distribution<a class="anchor-link" href="#define-the-particle-size-distribution">¶</a></h1><p>We create a size distribution for aerosol particles using a logarithmic scale for particle radius, ranging from 1 nm to 10 μm. We calculate the mass of particles in each size bin assuming they are spherical and have a standard density.
+"""</p>
+<p>Define the bins for particle radius using a logarithmic scale
+radius_bins = np.logspace(start=-9, stop=-4, num=250)  # m (1 nm to 10 μm)</p>
+<p>Calculate the mass of particles for each size bin
+The mass is calculated using the formula for the volume of a sphere (4/3 * π * r^3)
+and assuming a particle density of 1 g/cm^3 (which is 1000 kg/m^3 in SI units).
+mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=adda92dd">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>"""</p>
+<h1 id="define-particle-charges">Define Particle Charges<a class="anchor-link" href="#define-particle-charges">¶</a></h1><p>We assign charges to the particles. In this example, we assign negative charges to the first 33% of particles and positive charges to the remaining 66% of particles. The charges are assigned based on the particle radius, with negative charges ranging from 10 to 1 and positive charges ranging from 1 to 500. We then plot the charge distribution against the particle radius.
+"""
+Determine the number of radius bins
+n_bins = len(radius_bins)</p>
+<p>Define the split index where charges transition from negative to positive
+split_index = n_bins // 3  # Assign the first 25% of particles negative charges</p>
+<p>Generate logarithmically spaced magnitudes for negative charges from 10 to 1
+neg_magnitudes = np.logspace(np.log10(10), np.log10(1), num=split_index)
+neg_charges = -neg_magnitudes  # Assign negative sign</p>
+<p>Generate logarithmically spaced magnitudes for positive charges from 1 to 500
+pos_magnitudes = np.logspace(np.log10(1), np.log10(500), num=n_bins - split_index)
+pos_charges = pos_magnitudes  # Positive charges</p>
+<p>Combine the negative and positive charges into one array
+charge_array = np.concatenate((neg_charges, pos_charges))</p>
+<p>Plot charge vs. radius
+fig, ax = plt.subplots()
+ax.plot(radius_bins, charge_array, marker='o', linestyle='none')
+ax.set_xscale("log")
+ax.set_yscale("symlog", linthresh=1)
+ax.set_xlabel("Particle radius (m)")
+ax.set_ylabel("Particle charge (elementary charges)")
+ax.set_title("Particle Charge vs. Radius")
+ax.grid(True, which="both", ls="--")
+plt.show()</p>
+<p>temperature = 298.15</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=56abb0bd">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>"""</p>
+<h1 id="calculate-coulomb-potential-ratio-and-related-properties">Calculate Coulomb Potential Ratio and Related Properties<a class="anchor-link" href="#calculate-coulomb-potential-ratio-and-related-properties">¶</a></h1><p>In this section, we compute several properties necessary for calculating the coagulation kernel with charge effects:</p>
+<ul>
+<li><strong>Coulomb Potential Ratio</strong>: Using <code>coulomb_enhancement.ratio</code>, we calculate the dimensionless Coulomb potential ratio, which quantifies the electrostatic interaction between charged particles.</li>
+<li><strong>Dynamic Viscosity</strong>: Obtained from <code>get_dynamic_viscosity</code>, needed for calculating friction factors.</li>
+<li><strong>Mean Free Path</strong>: Calculated using <code>molecule_mean_free_path</code>, important for determining the Knudsen number.</li>
+<li><strong>Knudsen Number</strong>: Computed with <code>calculate_knudsen_number</code>, it characterizes the flow regime of the particles.</li>
+<li><strong>Slip Correction Factor</strong>: Using <code>cunningham_slip_correction</code>, accounts for non-continuum effects at small particle sizes.</li>
+<li><strong>Friction Factor</strong>: Calculated with <code>friction_factor</code>, needed for determining particle mobility.</li>
+<li><strong>Diffusive Knudsen Number</strong>: Using <code>diffusive_knudsen_number</code>, combines the effects of particle diffusion and electrostatic interactions.
+"""
+coulomb_potential_ratio = coulomb_enhancement.ratio(
+radius_bins, charge_array, temperature=temperature
+)
+dynamic_viscosity = get_dynamic_viscosity(temperature=temperature)
+mol_free_path = molecule_mean_free_path(
+temperature=temperature, dynamic_viscosity=dynamic_viscosity
+)
+knudsen_number = calculate_knudsen_number(
+mean_free_path=mol_free_path, particle_radius=radius_bins
+)
+slip_correction = cunningham_slip_correction(knudsen_number=knudsen_number)</li>
+</ul>
+<p>friction_factor_value = friction_factor(
+radius=radius_bins,
+dynamic_viscosity=dynamic_viscosity,
+slip_correction=slip_correction,
+)</p>
+<p>diffusive_knudsen_values = diffusive_knudsen_number(
+radius=radius_bins,
+mass_particle=mass_bins,
+friction_factor=friction_factor_value,
+coulomb_potential_ratio=coulomb_potential_ratio,
+temperature=temperature,
+)</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e7b928e5">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>"""</p>
+<h1 id="compute-the-non-dimensional-coagulation-kernel">Compute the Non-Dimensional Coagulation Kernel<a class="anchor-link" href="#compute-the-non-dimensional-coagulation-kernel">¶</a></h1><p>The non-dimensional coagulation kernel is calculated using <code>coulomb_chahl2019</code>, which incorporates charge effects into the rate at which particles collide.
+"""
+non_dimensional_kernel = coulomb_chahl2019(
+diffusive_knudsen=diffusive_knudsen_values,
+coulomb_potential_ratio=coulomb_potential_ratio,
+)</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=edd95480">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>"""</p>
+<h1 id="calculate-coulomb-enhancement-factors">Calculate Coulomb Enhancement Factors<a class="anchor-link" href="#calculate-coulomb-enhancement-factors">¶</a></h1><p>We compute the Coulomb enhancement factors in both the kinetic and continuum limits:</p>
+<ul>
+<li><strong>Kinetic Limit</strong>: Using <code>coulomb_enhancement.kinetic</code>, applicable when particle motions are dominated by random thermal motion.</li>
+<li><strong>Continuum Limit</strong>: Using <code>coulomb_enhancement.continuum</code>, applicable when particles are larger and motions are influenced by continuous fluid flow.
+"""
+coulomb_kinetic_limit = coulomb_enhancement.kinetic(
+coulomb_potential_ratio
+)
+coulomb_continuum_limit = coulomb_enhancement.continuum(
+coulomb_potential_ratio
+)</li>
+</ul>
+<p>sum_of_radii = radius_bins[:, np.newaxis] + radius_bins[np.newaxis, :]
+reduced_mass = reduced_self_broadcast(mass_bins)</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=63db12ce">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>"""</p>
+<h1 id="compute-the-dimensional-coagulation-kernel">Compute the Dimensional Coagulation Kernel<a class="anchor-link" href="#compute-the-dimensional-coagulation-kernel">¶</a></h1><p>The dimensional coagulation kernel combines all the previously calculated factors and gives the actual rate at which particles of different sizes collide and stick together due to coagulation, considering charge effects.
+"""
+dimensional_kernel = (
+non_dimensional_kernel
+* friction_factor_value
+* sum_of_radii<strong>3
+* coulomb_kinetic_limit</strong>2
+/ (reduced_mass * coulomb_continuum_limit)
+)</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=615b152f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>"""</p>
+<h1 id="plot-the-coagulation-kernel">Plot the Coagulation Kernel<a class="anchor-link" href="#plot-the-coagulation-kernel">¶</a></h1><p>We plot the coagulation kernel as a function of particle radius to visualize how charge affects the coagulation rates across different particle sizes.
+"""</p>
+<p>fig, ax = plt.subplots()</p>
+<p>Plot negative charges in blue
+ax.plot(radius_bins, dimensional_kernel[:, :split_index], linewidth=0.2, color='blue', label='Negative Charges')</p>
+<p>Plot positive charges in red
+ax.plot(radius_bins, dimensional_kernel[:, split_index:], linewidth=0.2, color='red', label='Positive Charges')</p>
+<p>ax.legend()
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.set_ylim(1e-30, 1e4)
+ax.set_xlabel("Particle radius (m)")
+ax.set_ylabel("Coagulation kernel (m^3/s)")
+ax.set_title("Coagulation kernel vs particle radius")
+ax.text(1e-9, 1e-22, "Negative Charges", color='blue')
+ax.text(1e-6, 1e-6, "Positive Charges", color='red')
+plt.show()</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f79b0613">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>"""</p>
+<h1 id="simulate-coagulation-over-a-time-step">Simulate Coagulation Over a Time Step<a class="anchor-link" href="#simulate-coagulation-over-a-time-step">¶</a></h1><p>We calculate the gain and loss rates of particle concentrations due to coagulation using the previously computed kernel. The net rate of change in particle concentration is obtained by subtracting the loss rate from the gain rate.
+"""
+get rates of coagulation dn/dt</p>
+<p>make a number concentration distribution
+number_concentration = lognormal_pmf_distribution(
+x_values=radius_bins,
+mode=np.array([10e-9, 200e-9, 1000e-9]),  # m
+geometric_standard_deviation=np.array([1.4, 1.5, 1.8]),
+number_of_particles=np.array([1e12, 1e12, 1e12]),  # per m^3
+)</p>
+<p>gain_rate = rate.discrete_gain(
+radius=radius_bins,
+concentration=number_concentration,
+kernel=dimensional_kernel,
+)
+loss_rate = rate.discrete_loss(
+concentration=number_concentration,
+kernel=dimensional_kernel,
+)</p>
+<p>net_rate = gain_rate - loss_rate</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b6e6e543">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6935,89 +7217,53 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-
-<span class="c1"># particula imports</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">brownian_kernel</span><span class="p">,</span> <span class="n">rate</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties.lognormal_size_distribution</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">lognormal_pmf_distribution</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation.transition_regime</span><span class="w"> </span><span class="kn">import</span> <span class="n">coulomb_chahl2019</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">coulomb_enhancement</span><span class="p">,</span>
-    <span class="n">diffusive_knudsen_number</span><span class="p">,</span>
-    <span class="n">friction_factor</span><span class="p">,</span>
-    <span class="n">cunningham_slip_correction</span><span class="p">,</span>
-    <span class="n">calculate_knudsen_number</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.properties</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">get_dynamic_viscosity</span><span class="p">,</span>
-    <span class="n">molecule_mean_free_path</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.reduced_quantity</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduced_self_broadcast</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">kernel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">rate</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties.lognormal_size_distribution</span><span class="w"> </span><span class="kn">import</span> <span class="n">lognormal_pmf_distribution</span>
-
-<span class="c1"># Create a size distribution for aerosol particles</span>
-
-<span class="c1"># Define the bins for particle radius using a logarithmic scale</span>
-<span class="n">radius_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">start</span><span class="o">=-</span><span class="mi">9</span><span class="p">,</span> <span class="n">stop</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># m (1 nm to 10 μm)</span>
-
-<span class="c1"># Calculate the mass of particles for each size bin</span>
-<span class="c1"># The mass is calculated using the formula for the volume of a sphere (4/3 * π * r^3)</span>
-<span class="c1"># and assuming a particle density of 1 g/cm^3 (which is 1000 kg/m^3 in SI units).</span>
-<span class="n">mass_bins</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_bins</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mf">1e3</span>  <span class="c1"># kg</span>
+<div class="highlight-ipynb hl-python"><pre><span></span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-
-# particula imports
-from particula.dynamics.coagulation import brownian_kernel, rate
-from particula.particles.properties.lognormal_size_distribution import (
-    lognormal_pmf_distribution,
-)
-from particula.dynamics.coagulation.transition_regime import coulomb_chahl2019
-from particula.particles.properties import (
-    coulomb_enhancement,
-    diffusive_knudsen_number,
-    friction_factor,
-    cunningham_slip_correction,
-    calculate_knudsen_number,
-)
-from particula.gas.properties import (
-    get_dynamic_viscosity,
-    molecule_mean_free_path,
-)
-from particula.util.reduced_quantity import reduced_self_broadcast
-
-from particula.dynamics.coagulation import kernel
-from particula.dynamics.coagulation import rate
-from particula.particles.properties.lognormal_size_distribution import lognormal_pmf_distribution
-
-# Create a size distribution for aerosol particles
-
-# Define the bins for particle radius using a logarithmic scale
-radius_bins = np.logspace(start=-9, stop=-5, num=5)  # m (1 nm to 10 μm)
-
-# Calculate the mass of particles for each size bin
-# The mass is calculated using the formula for the volume of a sphere (4/3 * π * r^3)
-# and assuming a particle density of 1 g/cm^3 (which is 1000 kg/m^3 in SI units).
-mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
-
+<div class="clipboard-copy-txt" id="cell-1"></div>
 </div>
 </div>
 </div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=daffd447">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>"""</p>
+<h1 id="plot-particle-concentration-and-coagulation-rates">Plot Particle Concentration and Coagulation Rates<a class="anchor-link" href="#plot-particle-concentration-and-coagulation-rates">¶</a></h1><p>We visualize the initial particle concentration distribution and the coagulation rates to understand how charge effects influence the coagulation process over time.</p>
+<ul>
+<li><strong>Particle Concentration</strong>: Shows the number concentration of particles across different sizes.</li>
+<li><strong>Coagulation Rates</strong>: Displays the gain, loss, and net rates of coagulation, highlighting how particles of different sizes contribute to the overall process.
+"""
+fig, ax = plt.subplots()
+ax.plot(radius_bins, number_concentration)
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.set_xlabel("Particle radius (m)")
+ax.set_ylabel("Number concentration (1/m^3)")
+ax.set_title("Number concentration vs particle radius")
+plt.show()</li>
+</ul>
+<p>plot the rates
+fig, ax = plt.subplots()
+ax.plot(radius_bins, gain_rate, label="Gain rate")
+ax.plot(radius_bins, -1*loss_rate, label="Loss rate")
+ax.plot(radius_bins, net_rate, label="Net rate", linestyle="--")
+ax.set_xscale("log")
+ax.set_yscale("log")
+ax.set_xlabel("Particle radius (m)")
+ax.set_ylabel("Coagulation rate 1/ (m^3 s)")
+ax.set_title("Coagulation rate vs particle radius")
+ax.legend()
+plt.show()</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8ba1376f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f8c94271">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7035,417 +7281,9 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">charge_array</span> <span class="o">=</span> <span class="n">radius_bins</span> <span class="o">*</span> <span class="mi">0</span> <span class="o">+</span>  <span class="c1"># change me Ian</span>
-<span class="n">temperature</span> <span class="o">=</span> <span class="mf">298.15</span>
-
-<span class="n">coulomb_potential_ratio</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">ratio</span><span class="p">(</span>
-    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">charge_array</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span>
-<span class="p">)</span>
-<span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
-<span class="n">mol_free_path</span> <span class="o">=</span> <span class="n">molecule_mean_free_path</span><span class="p">(</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span>
-<span class="p">)</span>
-<span class="n">knudsen_number</span> <span class="o">=</span> <span class="n">calculate_knudsen_number</span><span class="p">(</span>
-    <span class="n">mean_free_path</span><span class="o">=</span><span class="n">mol_free_path</span><span class="p">,</span> <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span>
-<span class="p">)</span>
-<span class="n">slip_correction</span> <span class="o">=</span> <span class="n">cunningham_slip_correction</span><span class="p">(</span><span class="n">knudsen_number</span><span class="o">=</span><span class="n">knudsen_number</span><span class="p">)</span>
-
-
-<span class="n">friction_factor_value</span> <span class="o">=</span> <span class="n">friction_factor</span><span class="p">(</span>
-    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
-    <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span><span class="p">,</span>
-    <span class="n">slip_correction</span><span class="o">=</span><span class="n">slip_correction</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">diffusive_knudsen_values</span> <span class="o">=</span> <span class="n">diffusive_knudsen_number</span><span class="p">(</span>
-    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
-    <span class="n">mass_particle</span><span class="o">=</span><span class="n">mass_bins</span><span class="p">,</span>
-    <span class="n">friction_factor</span><span class="o">=</span><span class="n">friction_factor_value</span><span class="p">,</span>
-    <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">non_dimensional_kernel</span> <span class="o">=</span> <span class="n">coulomb_chahl2019</span><span class="p">(</span>
-    <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen_values</span><span class="p">,</span>
-    <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
-<span class="p">)</span>
-
-
-<span class="n">coulomb_potential_ratio</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">ratio</span><span class="p">(</span>
-    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">charge_array</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span>
-<span class="p">)</span>
-
-<span class="n">coulomb_kinetic_limit</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">kinetic</span><span class="p">(</span><span class="n">coulomb_potential_ratio</span><span class="p">)</span>
-<span class="n">coulomb_continuum_limit</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">continuum</span><span class="p">(</span>
-    <span class="n">coulomb_potential_ratio</span>
-<span class="p">)</span>
-
-<span class="n">sum_of_radii</span> <span class="o">=</span> <span class="n">radius_bins</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">radius_bins</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
-<span class="n">reduced_mass</span> <span class="o">=</span> <span class="n">reduced_self_broadcast</span><span class="p">(</span><span class="n">mass_bins</span><span class="p">)</span>
-
-<span class="n">dimensional_kernel</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">non_dimensional_kernel</span>
-    <span class="o">*</span> <span class="n">friction_factor_value</span>
-    <span class="o">*</span> <span class="n">sum_of_radii</span><span class="o">**</span><span class="mi">3</span>
-    <span class="o">*</span> <span class="n">coulomb_kinetic_limit</span><span class="o">**</span><span class="mi">2</span>
-    <span class="o">/</span> <span class="p">(</span><span class="n">reduced_mass</span> <span class="o">*</span> <span class="n">coulomb_continuum_limit</span><span class="p">)</span>
-<span class="p">)</span>
-
-<span class="n">log_kernel</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">non_dimensional_kernel</span><span class="p">)</span>
-    <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">friction_factor_value</span><span class="p">)</span>
-    <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sum_of_radii</span><span class="p">)</span>
-    <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">coulomb_kinetic_limit</span><span class="p">)</span>
-    <span class="o">-</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">reduced_mass</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">coulomb_continuum_limit</span><span class="p">))</span>
-<span class="p">)</span>
-
-<span class="c1"># Convert back to real space while handling underflow</span>
-<span class="n">dimensional_kernel_logcalc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_kernel</span><span class="p">)</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-2">
-charge_array = radius_bins * 0 +  # change me Ian
-temperature = 298.15
-
-coulomb_potential_ratio = coulomb_enhancement.ratio(
-    radius_bins, charge_array, temperature=temperature
-)
-dynamic_viscosity = get_dynamic_viscosity(temperature=temperature)
-mol_free_path = molecule_mean_free_path(
-    temperature=temperature, dynamic_viscosity=dynamic_viscosity
-)
-knudsen_number = calculate_knudsen_number(
-    mean_free_path=mol_free_path, particle_radius=radius_bins
-)
-slip_correction = cunningham_slip_correction(knudsen_number=knudsen_number)
-
-
-friction_factor_value = friction_factor(
-    radius=radius_bins,
-    dynamic_viscosity=dynamic_viscosity,
-    slip_correction=slip_correction,
-)
-
-diffusive_knudsen_values = diffusive_knudsen_number(
-    radius=radius_bins,
-    mass_particle=mass_bins,
-    friction_factor=friction_factor_value,
-    coulomb_potential_ratio=coulomb_potential_ratio,
-    temperature=temperature,
-)
-
-non_dimensional_kernel = coulomb_chahl2019(
-    diffusive_knudsen=diffusive_knudsen_values,
-    coulomb_potential_ratio=coulomb_potential_ratio,
-)
-
-
-coulomb_potential_ratio = coulomb_enhancement.ratio(
-    radius=radius_bins, charge=charge_array, temperature=temperature
-)
-
-coulomb_kinetic_limit = coulomb_enhancement.kinetic(coulomb_potential_ratio)
-coulomb_continuum_limit = coulomb_enhancement.continuum(
-    coulomb_potential_ratio
-)
-
-sum_of_radii = radius_bins[:, np.newaxis] + radius_bins[np.newaxis, :]
-reduced_mass = reduced_self_broadcast(mass_bins)
-
-dimensional_kernel = (
-    non_dimensional_kernel
-    * friction_factor_value
-    * sum_of_radii**3
-    * coulomb_kinetic_limit**2
-    / (reduced_mass * coulomb_continuum_limit)
-)
-
-log_kernel = (
-    np.log(non_dimensional_kernel)
-    + np.log(friction_factor_value)
-    + 3 * np.log(sum_of_radii)
-    + 2 * np.log(coulomb_kinetic_limit)
-    - (np.log(reduced_mass) + np.log(coulomb_continuum_limit))
-)
-
-# Convert back to real space while handling underflow
-dimensional_kernel_logcalc = np.exp(log_kernel)</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fab54865">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">dimensional_kernel</span><span class="p">[:,</span> <span class="p">:])</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">dimensional_kernel_logcalc</span><span class="p">[:,</span> <span class="p">:],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particle radius (m)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Coagulation kernel (m^3/s)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Coagulation kernel vs particle radius"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-3">
-fig, ax = plt.subplots()
-ax.plot(radius_bins, dimensional_kernel[:, :])
-ax.plot(radius_bins, dimensional_kernel_logcalc[:, :], linestyle="--")
-ax.set_xscale("log")
-ax.set_yscale("log")
-ax.set_xlabel("Particle radius (m)")
-ax.set_ylabel("Coagulation kernel (m^3/s)")
-ax.set_title("Coagulation kernel vs particle radius")
-plt.show()</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=195bfd79">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">kernel_object</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">CoulumbChahl2019</span><span class="p">()</span>
-
-<span class="n">kernel_dimensionless</span> <span class="o">=</span> <span class="n">kernel_object</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">(</span>
-    <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen_values</span><span class="p">,</span>
-    <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">kernel_dimensional</span> <span class="o">=</span> <span class="n">kernel_object</span><span class="o">.</span><span class="n">kernel</span><span class="p">(</span>
-    <span class="n">dimensionless_kernel</span><span class="o">=</span><span class="n">kernel_dimensionless</span><span class="p">,</span>
-    <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
-    <span class="n">sum_of_radii</span><span class="o">=</span><span class="n">sum_of_radii</span><span class="p">,</span>
-    <span class="n">reduced_mass</span><span class="o">=</span><span class="n">reduced_mass</span><span class="p">,</span>
-    <span class="n">reduced_friction_factor</span><span class="o">=</span><span class="n">friction_factor_value</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">kernel_dimensional</span><span class="p">[:,</span> <span class="p">:])</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particle radius (m)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Coagulation kernel (m^3/s)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Coagulation kernel vs particle radius"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-4">
-kernel_object = kernel.CoulumbChahl2019()
-
-kernel_dimensionless = kernel_object.dimensionless(
-    diffusive_knudsen=diffusive_knudsen_values,
-    coulomb_potential_ratio=coulomb_potential_ratio,
-)
-kernel_dimensional = kernel_object.kernel(
-    dimensionless_kernel=kernel_dimensionless,
-    coulomb_potential_ratio=coulomb_potential_ratio,
-    sum_of_radii=sum_of_radii,
-    reduced_mass=reduced_mass,
-    reduced_friction_factor=friction_factor_value,
-)
-
-fig, ax = plt.subplots()
-ax.plot(radius_bins, kernel_dimensional[:, :])
-ax.set_xscale("log")
-ax.set_yscale("log")
-ax.set_xlabel("Particle radius (m)")
-ax.set_ylabel("Coagulation kernel (m^3/s)")
-ax.set_title("Coagulation kernel vs particle radius")
-plt.show()</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c558a261">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># get rates of coagulation dn/dt</span>
-
-<span class="c1"># make a number concentration distribution</span>
-<span class="n">number_concentration</span> <span class="o">=</span> <span class="n">lognormal_pmf_distribution</span><span class="p">(</span>
-    <span class="n">x_values</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
-    <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">200e-9</span><span class="p">]),</span>  <span class="c1"># m</span>
-    <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">]),</span>
-    <span class="n">number_of_particles</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e12</span><span class="p">]),</span>  <span class="c1"># per m^3</span>
-<span class="p">)</span>
-
-<span class="n">gain_rate</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span>
-    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
-    <span class="n">concentration</span><span class="o">=</span><span class="n">number_concentration</span><span class="p">,</span>
-    <span class="n">kernel</span><span class="o">=</span><span class="n">kernel_dimensional</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">loss_rate</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span>
-    <span class="n">concentration</span><span class="o">=</span><span class="n">number_concentration</span><span class="p">,</span>
-    <span class="n">kernel</span><span class="o">=</span><span class="n">kernel_dimensional</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">net_rate</span> <span class="o">=</span> <span class="n">gain_rate</span> <span class="o">-</span> <span class="n">loss_rate</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-5"># get rates of coagulation dn/dt
-
-# make a number concentration distribution
-number_concentration = lognormal_pmf_distribution(
-    x_values=radius_bins,
-    mode=np.array([200e-9]),  # m
-    geometric_standard_deviation=np.array([1.5]),
-    number_of_particles=np.array([1e12]),  # per m^3
-)
-
-gain_rate = rate.discrete_gain(
-    radius=radius_bins,
-    concentration=number_concentration,
-    kernel=kernel_dimensional,
-)
-loss_rate = rate.discrete_loss(
-    concentration=number_concentration,
-    kernel=kernel_dimensional,
-)
-
-net_rate = gain_rate - loss_rate</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=53ba4b4c">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># plot distribution</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">number_concentration</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
-<span class="c1"># ax.set_yscale("log")</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particle radius (m)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Number concentration (1/m^3)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Number concentration vs particle radius"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-<span class="c1"># plot the rates</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">gain_rate</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Gain rate"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">loss_rate</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Loss rate"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">net_rate</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Net rate"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
-<span class="c1"># ax.set_yscale("log")</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particle radius (m)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Coagulation rate 1/ (m^3 s)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Coagulation rate vs particle radius"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-6"># plot distribution
-fig, ax = plt.subplots()
-ax.plot(radius_bins, number_concentration)
-ax.set_xscale("log")
-# ax.set_yscale("log")
-ax.set_xlabel("Particle radius (m)")
-ax.set_ylabel("Number concentration (1/m^3)")
-ax.set_title("Number concentration vs particle radius")
-plt.show()
-
-# plot the rates
-fig, ax = plt.subplots()
-ax.plot(radius_bins, gain_rate, label="Gain rate")
-ax.plot(radius_bins, -1*loss_rate, label="Loss rate")
-ax.plot(radius_bins, net_rate, label="Net rate", linestyle="--")
-ax.set_xscale("log")
-# ax.set_yscale("log")
-ax.set_xlabel("Particle radius (m)")
-ax.set_ylabel("Coagulation rate 1/ (m^3 s)")
-ax.set_title("Coagulation rate vs particle radius")
-ax.legend()
-plt.show()</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8f441e04">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
 <div class="highlight-ipynb hl-python"><pre><span></span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7"></div>
+<div class="clipboard-copy-txt" id="cell-2"></div>
 </div>
 </div>
 </div>
