@@ -20,7 +20,7 @@
     
     
       
-        <title>%% [markdown] - Particula</title>
+        <title>Coagulation with Charge Effects - Particula</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#markdown" class="md-skip">
+        <a href="#coagulation-with-charge-effects" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              %% [markdown]
+              Coagulation with Charge Effects
             
           </span>
         </div>
@@ -5310,16 +5310,128 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Coagulation with Charge Effects
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
-    %% [markdown]
+    Coagulation with Charge Effects
     
   </span>
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#define-the-particle-size-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Define the Particle Size Distribution
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#define-particle-charges" class="md-nav__link">
+    <span class="md-ellipsis">
+      Define Particle Charges
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calculate-coulomb-potential-ratio-and-related-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculate Coulomb Potential Ratio and Related Properties
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compute-the-non-dimensional-coagulation-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compute the Non-Dimensional Coagulation Kernel
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calculate-coulomb-enhancement-factors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculate Coulomb Enhancement Factors
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compute-the-dimensional-coagulation-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compute the Dimensional Coagulation Kernel
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plot-the-coagulation-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plot the Coagulation Kernel
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#simulate-coagulation-over-a-time-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simulate Coagulation Over a Time Step
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plot-particle-concentration-and-coagulation-rates" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plot Particle Concentration and Coagulation Rates
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -6494,6 +6606,95 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#define-the-particle-size-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Define the Particle Size Distribution
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#define-particle-charges" class="md-nav__link">
+    <span class="md-ellipsis">
+      Define Particle Charges
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calculate-coulomb-potential-ratio-and-related-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculate Coulomb Potential Ratio and Related Properties
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compute-the-non-dimensional-coagulation-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compute the Non-Dimensional Coagulation Kernel
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calculate-coulomb-enhancement-factors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Calculate Coulomb Enhancement Factors
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compute-the-dimensional-coagulation-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compute the Dimensional Coagulation Kernel
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plot-the-coagulation-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plot the Coagulation Kernel
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#simulate-coagulation-over-a-time-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simulate Coagulation Over a Time Step
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plot-particle-concentration-and-coagulation-rates" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plot Particle Concentration and Coagulation Rates
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -6953,7 +7154,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="markdown">%% [markdown]<a class="anchor-link" href="#markdown">¶</a></h1><h1 id="coagulation-with-charge-effects">Coagulation with Charge Effects<a class="anchor-link" href="#coagulation-with-charge-effects">¶</a></h1><p>In this tutorial, we explore how electrical charge influences the coagulation (collisions and coalescence) of aerosol particles. We will:</p>
+<h1 id="coagulation-with-charge-effects">Coagulation with Charge Effects<a class="anchor-link" href="#coagulation-with-charge-effects">¶</a></h1><p>In this tutorial, we explore how electrical charge influences the coagulation (collisions and coalescence) of aerosol particles. We will:</p>
 <ul>
 <li>Create a size distribution for aerosol particles.</li>
 <li>Calculate the Coulomb potential ratio and related properties.</li>
@@ -6972,7 +7173,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="markdown">%% [markdown]<a class="anchor-link" href="#markdown">¶</a></h1><h2 id="import-necessary-libraries">Import Necessary Libraries<a class="anchor-link" href="#import-necessary-libraries">¶</a></h2><p>We import standard libraries like <code>numpy</code> and <code>matplotlib</code> for numerical computations and plotting. We also import specific functions from the <code>particula</code> package, which is used for aerosol dynamics simulations.</p>
+<p><em>Import Necessary Libraries</em>
+We import standard libraries like <code>numpy</code> and <code>matplotlib</code> for numerical computations and plotting. We also import specific functions from the <code>particula</code> package, which is used for aerosol dynamics simulations.</p>
 </div>
 </div>
 </div>
@@ -7058,7 +7260,7 @@ from particula.particles.properties.lognormal_size_distribution import lognormal
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="markdown">%% [markdown]<a class="anchor-link" href="#markdown">¶</a></h1><h2 id="define-the-particle-size-distribution">Define the Particle Size Distribution<a class="anchor-link" href="#define-the-particle-size-distribution">¶</a></h2><p>We create a size distribution for aerosol particles using a logarithmic scale for particle radius, ranging from 1 nm to 10 μm. We calculate the mass of particles in each size bin assuming they are spherical and have a standard density.
+<h2 id="define-the-particle-size-distribution">Define the Particle Size Distribution<a class="anchor-link" href="#define-the-particle-size-distribution">¶</a></h2><p>We create a size distribution for aerosol particles using a logarithmic scale for particle radius, ranging from 1 nm to 10 μm. We calculate the mass of particles in each size bin assuming they are spherical and have a standard density.
 Define the bins for particle radius using a logarithmic scale</p>
 </div>
 </div>
@@ -7107,7 +7309,7 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="markdown">%% [markdown]<a class="anchor-link" href="#markdown">¶</a></h1><h2 id="define-particle-charges">Define Particle Charges<a class="anchor-link" href="#define-particle-charges">¶</a></h2><p>We assign charges to the particles. In this example, we assign negative charges to the first 33% of particles and positive charges to the remaining 66% of particles. The charges are assigned based on the particle radius, with negative charges ranging from 10 to 1 and positive charges ranging from 1 to 500. We then plot the charge distribution against the particle radius.
+<h2 id="define-particle-charges">Define Particle Charges<a class="anchor-link" href="#define-particle-charges">¶</a></h2><p>We assign charges to the particles. In this example, we assign negative charges to the first 33% of particles and positive charges to the remaining 66% of particles. The charges are assigned based on the particle radius, with negative charges ranging from 10 to 1 and positive charges ranging from 1 to 500. We then plot the charge distribution against the particle radius.
 Determine the number of radius bins</p>
 </div>
 </div>
@@ -7212,7 +7414,7 @@ temperature = 298.15</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="markdown">%% [markdown]<a class="anchor-link" href="#markdown">¶</a></h1><h2 id="calculate-coulomb-potential-ratio-and-related-properties">Calculate Coulomb Potential Ratio and Related Properties<a class="anchor-link" href="#calculate-coulomb-potential-ratio-and-related-properties">¶</a></h2><p>In this section, we compute several properties necessary for calculating the coagulation kernel with charge effects:</p>
+<h2 id="calculate-coulomb-potential-ratio-and-related-properties">Calculate Coulomb Potential Ratio and Related Properties<a class="anchor-link" href="#calculate-coulomb-potential-ratio-and-related-properties">¶</a></h2><p>In this section, we compute several properties necessary for calculating the coagulation kernel with charge effects:</p>
 <ul>
 <li><strong>Coulomb Potential Ratio</strong>: Using <code>coulomb_enhancement.ratio</code>, we calculate the dimensionless Coulomb potential ratio, which quantifies the electrostatic interaction between charged particles.</li>
 <li><strong>Dynamic Viscosity</strong>: Obtained from <code>get_dynamic_viscosity</code>, needed for calculating friction factors.</li>
@@ -7309,7 +7511,7 @@ diffusive_knudsen_values = diffusive_knudsen_number(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="markdown">%% [markdown]<a class="anchor-link" href="#markdown">¶</a></h1><h2 id="compute-the-non-dimensional-coagulation-kernel">Compute the Non-Dimensional Coagulation Kernel<a class="anchor-link" href="#compute-the-non-dimensional-coagulation-kernel">¶</a></h2><p>The non-dimensional coagulation kernel is calculated using <code>coulomb_chahl2019</code>, which incorporates charge effects into the rate at which particles collide.</p>
+<h2 id="compute-the-non-dimensional-coagulation-kernel">Compute the Non-Dimensional Coagulation Kernel<a class="anchor-link" href="#compute-the-non-dimensional-coagulation-kernel">¶</a></h2><p>The non-dimensional coagulation kernel is calculated using <code>coulomb_chahl2019</code>, which incorporates charge effects into the rate at which particles collide.</p>
 </div>
 </div>
 </div>
@@ -7353,7 +7555,7 @@ diffusive_knudsen_values = diffusive_knudsen_number(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="markdown">%% [markdown]<a class="anchor-link" href="#markdown">¶</a></h1><h2 id="calculate-coulomb-enhancement-factors">Calculate Coulomb Enhancement Factors<a class="anchor-link" href="#calculate-coulomb-enhancement-factors">¶</a></h2><p>We compute the Coulomb enhancement factors in both the kinetic and continuum limits:</p>
+<h2 id="calculate-coulomb-enhancement-factors">Calculate Coulomb Enhancement Factors<a class="anchor-link" href="#calculate-coulomb-enhancement-factors">¶</a></h2><p>We compute the Coulomb enhancement factors in both the kinetic and continuum limits:</p>
 <ul>
 <li><strong>Kinetic Limit</strong>: Using <code>coulomb_enhancement.kinetic</code>, applicable when particle motions are dominated by random thermal motion.</li>
 <li><strong>Continuum Limit</strong>: Using <code>coulomb_enhancement.continuum</code>, applicable when particles are larger and motions are influenced by continuous fluid flow.</li>
@@ -7411,7 +7613,7 @@ reduced_mass = reduced_self_broadcast(mass_bins)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="markdown">%% [markdown]<a class="anchor-link" href="#markdown">¶</a></h1><h2 id="compute-the-dimensional-coagulation-kernel">Compute the Dimensional Coagulation Kernel<a class="anchor-link" href="#compute-the-dimensional-coagulation-kernel">¶</a></h2><p>The dimensional coagulation kernel combines all the previously calculated factors and gives the actual rate at which particles of different sizes collide and stick together due to coagulation, considering charge effects.</p>
+<h2 id="compute-the-dimensional-coagulation-kernel">Compute the Dimensional Coagulation Kernel<a class="anchor-link" href="#compute-the-dimensional-coagulation-kernel">¶</a></h2><p>The dimensional coagulation kernel combines all the previously calculated factors and gives the actual rate at which particles of different sizes collide and stick together due to coagulation, considering charge effects.</p>
 </div>
 </div>
 </div>
@@ -7461,7 +7663,7 @@ reduced_mass = reduced_self_broadcast(mass_bins)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="markdown">%% [markdown]<a class="anchor-link" href="#markdown">¶</a></h1><h2 id="plot-the-coagulation-kernel">Plot the Coagulation Kernel<a class="anchor-link" href="#plot-the-coagulation-kernel">¶</a></h2><p>We plot the coagulation kernel as a function of particle radius to visualize how charge affects the coagulation rates across different particle sizes.</p>
+<h2 id="plot-the-coagulation-kernel">Plot the Coagulation Kernel<a class="anchor-link" href="#plot-the-coagulation-kernel">¶</a></h2><p>We plot the coagulation kernel as a function of particle radius to visualize how charge affects the coagulation rates across different particle sizes.</p>
 </div>
 </div>
 </div>
@@ -7545,7 +7747,7 @@ plt.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="markdown">%% [markdown]<a class="anchor-link" href="#markdown">¶</a></h1><h2 id="simulate-coagulation-over-a-time-step">Simulate Coagulation Over a Time Step<a class="anchor-link" href="#simulate-coagulation-over-a-time-step">¶</a></h2><p>We calculate the gain and loss rates of particle concentrations due to coagulation using the previously computed kernel. The net rate of change in particle concentration is obtained by subtracting the loss rate from the gain rate.
+<h2 id="simulate-coagulation-over-a-time-step">Simulate Coagulation Over a Time Step<a class="anchor-link" href="#simulate-coagulation-over-a-time-step">¶</a></h2><p>We calculate the gain and loss rates of particle concentrations due to coagulation using the previously computed kernel. The net rate of change in particle concentration is obtained by subtracting the loss rate from the gain rate.
 get rates of coagulation dn/dt
 make a number concentration distribution</p>
 </div>
@@ -7619,7 +7821,7 @@ net_rate = gain_rate - loss_rate</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="markdown">%% [markdown]<a class="anchor-link" href="#markdown">¶</a></h1><h2 id="plot-particle-concentration-and-coagulation-rates">Plot Particle Concentration and Coagulation Rates<a class="anchor-link" href="#plot-particle-concentration-and-coagulation-rates">¶</a></h2><p>We visualize the initial particle concentration distribution and the coagulation rates to understand how charge effects influence the coagulation process over time.</p>
+<h2 id="plot-particle-concentration-and-coagulation-rates">Plot Particle Concentration and Coagulation Rates<a class="anchor-link" href="#plot-particle-concentration-and-coagulation-rates">¶</a></h2><p>We visualize the initial particle concentration distribution and the coagulation rates to understand how charge effects influence the coagulation process over time.</p>
 <ul>
 <li><strong>Particle Concentration</strong>: Shows the number concentration of particles across different sizes.</li>
 <li><strong>Coagulation Rates</strong>: Displays the gain, loss, and net rates of coagulation, highlighting how particles of different sizes contribute to the overall process.</li>
