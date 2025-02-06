@@ -364,7 +364,7 @@ dimensional_kernel_chahl = kernel_strategy_chahl.kernel(
 # Plot the Coulomb Chahl 2019 kernel
 fig, ax = plt.subplots()
 c = ax.pcolormesh(
-    radius_bins, radius_bins, dimensional_kernel_chahl, shading="auto", norm=plt.LogNorm()
+    radius_bins, radius_bins, dimensional_kernel_chahl, shading="auto"
 )
 ax.set_xscale("log")
 ax.set_yscale("log")
@@ -488,3 +488,5 @@ ax2.set_title("Coagulation Rates vs. Particle Radius")
 ax2.legend()
 ax2.grid(True, which="both", ls="--")
 plt.show()
+
+# %% [markdown]
