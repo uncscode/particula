@@ -191,7 +191,14 @@ We plot the coagulation kernel as a function of particle radius to visualize how
 """
 
 fig, ax = plt.subplots()
-ax.plot(radius_bins, dimensional_kernel[:, :])
+
+# Plot negative charges in blue
+ax.plot(radius_bins[:split_index], dimensional_kernel[:split_index, :], color='blue', label='Negative Charges')
+
+# Plot positive charges in red
+ax.plot(radius_bins[split_index:], dimensional_kernel[split_index:, :], color='red', label='Positive Charges')
+
+ax.legend()
 ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel("Particle radius (m)")
