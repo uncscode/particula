@@ -7,7 +7,8 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.particles.properties import coulomb_enhancement
-from particula.util.machine_limit import safe_log, safe_exp
+from particula.util.machine_limit import safe_exp
+
 
 def hard_sphere(
     diffusive_knudsen: Union[float, NDArray[np.float64]]
@@ -24,7 +25,8 @@ def hard_sphere(
 
     Raises:
     -------
-    ValueError: If diffusive_knudsen contains negative values, NaN, or infinity.
+    - ValueError: If diffusive_knudsen contains negative values, NaN, or
+        infinity.
 
     References:
     -----------
@@ -208,6 +210,8 @@ def coulomb_gopalakrishnan2012(
         diffusive_knudsen,
         3 * diffusive_knudsen / (2 * coulomb_potential_ratio),
     )
+    # Ensure min_fxn does not contain invalid values
+    min_fxn = np.maximum(min_fxn, 1e-16)
     # Condition for the transition regime
     condition = (coulomb_potential_ratio > 0.5) & (min_fxn < 2.5)
     return np.where(

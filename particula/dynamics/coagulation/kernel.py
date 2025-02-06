@@ -86,7 +86,7 @@ class KernelStrategy(ABC):
         https://doi.org/10.1080/02786826.2019.1614522
         """
 
-    def kernel(  # pylint: disable=too-many-positional-arguments, too-many-arguments
+    def kernel(
         self,
         dimensionless_kernel: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
@@ -94,6 +94,7 @@ class KernelStrategy(ABC):
         reduced_mass: NDArray[np.float64],
         reduced_friction_factor: NDArray[np.float64],
     ) -> NDArray[np.float64]:
+        # pylint: disable=too-many-positional-arguments, too-many-arguments
         """
         The dimensioned coagulation kernel for each particle pair, calculated
         from the dimensionless coagulation kernel and the reduced quantities.
@@ -118,6 +119,10 @@ class KernelStrategy(ABC):
 
         References:
         -----------
+        - Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
+        molecular regime Coulombic collisions in aerosols and dusty plasmas.
+        Aerosol Science and Technology, 53(8), 933-957.
+        https://doi.org/10.1080/02786826.2019.1614522
         """
         coulomb_kinetic_limit = coulomb_enhancement.kinetic(
             coulomb_potential_ratio
