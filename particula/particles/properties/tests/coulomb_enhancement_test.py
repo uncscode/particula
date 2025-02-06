@@ -34,6 +34,9 @@ def test_ratio():
     value = coulomb_enhancement.ratio(radius, charge, temperature)
     assert np.isclose(value, expected_result)
 
+    # Ensure existing test cases do not trigger the ratio_lower_limit
+    # so they test the normal functionality of the ratio function.
+
     # Test case 2: Array of radii and charges
     radius = np.array([1.0, 2.0, 3.0])
     charge = np.array([-2, 3, 4])
