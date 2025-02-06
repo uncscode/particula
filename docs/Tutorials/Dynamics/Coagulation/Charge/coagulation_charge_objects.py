@@ -41,8 +41,7 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 
 # %
 
-charge_array = radius_bins * 0 + 10000 # change me Ian
-# charge_array[5:] = -5000
+charge_array = 0 # change me
 temperature = 298.15
 
 coulomb_potential_ratio = coulomb_enhancement.ratio(
@@ -62,15 +61,6 @@ knudsen_number = calculate_knudsen_number(
 )
 slip_correction = cunningham_slip_correction(knudsen_number=knudsen_number)
 
-coulomb_potential_ratio = np.clip(coulomb_potential_ratio, -200, np.finfo(np.float64).max)
-fig, ax = plt.subplots()
-ax.plot(radius_bins, coulomb_potential_ratio)
-ax.set_xscale("log")
-ax.set_xlabel("Particle radius (m)")
-ax.set_ylabel("Coulomb potential ratio")
-ax.set_title("Coulomb potential ratio vs particle radius")
-plt.show()
-
 friction_factor_value = friction_factor(
     radius=radius_bins,
     dynamic_viscosity=dynamic_viscosity,
@@ -84,15 +74,6 @@ diffusive_knudsen_values = diffusive_knudsen_number(
     coulomb_potential_ratio=coulomb_potential_ratio,
     temperature=temperature,
 )
-
-
-fig, ax = plt.subplots()
-ax.plot(radius_bins, diffusive_knudsen_values)
-ax.set_xscale("log")
-ax.set_xlabel("Particle radius (m)")
-ax.set_ylabel("Diffusive Knudsen number")
-ax.set_title("Diffusive Knudsen number vs particle radius")
-plt.show()
 
 sum_of_radii = radius_bins[:, np.newaxis] + radius_bins[np.newaxis, :]
 reduced_mass = reduced_self_broadcast(mass_bins)
@@ -114,18 +95,8 @@ kernel_dimensional = kernel_object.kernel(
     reduced_friction_factor=friction_factor_value,
 )
 
-# find any nan value or zeros
-print(np.isnan(kernel_dimensional).any())
-print(np.isinf(kernel_dimensional).any())
-print(np.isneginf(kernel_dimensional).any())
-print(np.isneginf(kernel_dimensional).any())
-
-
 fig, ax = plt.subplots()
 ax.plot(radius_bins, kernel_dimensional[:,:])
-ax.plot(radius_bins, kernel_dimensional[0,:], label="small particle", marker="o")
-ax.plot(radius_bins, kernel_dimensional[-1,:], label="large particle", marker="s")
-# ax.plot(radius_bins, dimensional_kernel_logcalc[:, :], linestyle="--")
 ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel("Particle radius (m)")
