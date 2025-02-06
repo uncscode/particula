@@ -1,5 +1,10 @@
-# %%
+# %% [markdown]
 
+# # Coagulation with charge effects
+
+
+
+# %% 
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -77,10 +82,6 @@ non_dimensional_kernel = coulomb_chahl2019(
 )
 
 
-coulomb_potential_ratio = coulomb_enhancement.ratio(
-    radius=radius_bins, charge=charge_array, temperature=temperature
-)
-
 coulomb_kinetic_limit = coulomb_enhancement.kinetic(coulomb_potential_ratio)
 coulomb_continuum_limit = coulomb_enhancement.continuum(
     coulomb_potential_ratio
@@ -97,17 +98,6 @@ dimensional_kernel = (
     / (reduced_mass * coulomb_continuum_limit)
 )
 
-log_kernel = (
-    np.log(non_dimensional_kernel)
-    + np.log(friction_factor_value)
-    + 3 * np.log(sum_of_radii)
-    + 2 * np.log(coulomb_kinetic_limit)
-    - (np.log(reduced_mass) + np.log(coulomb_continuum_limit))
-)
-
-# Convert back to real space while handling underflow
-dimensional_kernel_logcalc = np.exp(log_kernel)
-
 # %% plot the kernel
 
 fig, ax = plt.subplots()
@@ -120,30 +110,7 @@ ax.set_ylabel("Coagulation kernel (m^3/s)")
 ax.set_title("Coagulation kernel vs particle radius")
 plt.show()
 
-# %% Using strategies on just the kernel so it is easier to swap out
 
-kernel_object = kernel.CoulumbChahl2019()
-
-kernel_dimensionless = kernel_object.dimensionless(
-    diffusive_knudsen=diffusive_knudsen_values,
-    coulomb_potential_ratio=coulomb_potential_ratio,
-)
-kernel_dimensional = kernel_object.kernel(
-    dimensionless_kernel=kernel_dimensionless,
-    coulomb_potential_ratio=coulomb_potential_ratio,
-    sum_of_radii=sum_of_radii,
-    reduced_mass=reduced_mass,
-    reduced_friction_factor=friction_factor_value,
-)
-
-fig, ax = plt.subplots()
-ax.plot(radius_bins, kernel_dimensional[:, :])
-ax.set_xscale("log")
-ax.set_yscale("log")
-ax.set_xlabel("Particle radius (m)")
-ax.set_ylabel("Coagulation kernel (m^3/s)")
-ax.set_title("Coagulation kernel vs particle radius")
-plt.show()
 
 # %% making a time step
 # get rates of coagulation dn/dt
@@ -159,11 +126,11 @@ number_concentration = lognormal_pmf_distribution(
 gain_rate = rate.discrete_gain(
     radius=radius_bins,
     concentration=number_concentration,
-    kernel=kernel_dimensional,
+    kernel=dimensional_kernel,
 )
 loss_rate = rate.discrete_loss(
     concentration=number_concentration,
-    kernel=kernel_dimensional,
+    kernel=dimensional_kernel,
 )
 
 net_rate = gain_rate - loss_rate
