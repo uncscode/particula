@@ -30,10 +30,10 @@ def ratio(
     particle interactions.
 
     Args:
-        radius: The radius of the particle [m].
-        charge: The number of charges on the particle [dimensionless].
-        temperature: The temperature of the system [K].
-        ratio_lower_limit: The lower limit for the Coulomb potential ratio.
+        radius : The radius of the particle [m].
+        charge : The number of charges on the particle [dimensionless].
+        temperature : The temperature of the system [K].
+        ratio_lower_limit : The lower limit for the Coulomb potential ratio.
 
     Returns:
         The Coulomb potential ratio [dimensionless].
@@ -73,7 +73,7 @@ def kinetic(
     particle interactions.
 
     Args:
-        coulomb_potential: The Coulomb potential ratio [dimensionless].
+        coulomb_potential : The Coulomb potential ratio [dimensionless].
 
     Returns:
         The Coulomb enhancement for the kinetic limit [dimensionless].
@@ -101,7 +101,7 @@ def continuum(
     particle interactions.
 
     Args:
-        coulomb_potential: The Coulomb potential ratio [dimensionless].
+        coulomb_potential : The Coulomb potential ratio [dimensionless].
 
     Returns:
         The Coulomb enhancement for the continuum limit [dimensionless].
@@ -113,8 +113,8 @@ def continuum(
         and Soft Matter Physics, 85(2).
         (https://doi.org/10.1103/PhysRevE.85.026410)
     """
-    # # return coulomb_potential/(1-np.exp(-1*coulomb_potential)) if ratio != 0,
-    # # otherwise 1
+    # return coulomb_potential/(1-np.exp(-1*coulomb_potential)) if ratio != 0,
+    # otherwise 1
     denominator = 1 - safe_exp(-1 * coulomb_potential)
     return np.divide(
         coulomb_potential,
@@ -122,25 +122,3 @@ def continuum(
         out=np.ones_like(denominator),
         where=denominator != 0,
     )
-
-    # # Use expm1 for better precision: expm1(x) = exp(x) - 1
-    # denominator = -np.expm1(-coulomb_potential)
-
-    # # Create result array
-    # result = np.empty_like(coulomb_potential)
-
-    # # For small x (x ≈ 0), use the Taylor series approximation: f(x) ≈ 1
-    # small_x_mask = np.abs(coulomb_potential) < 1e-10
-    # result[small_x_mask] = 1.0
-
-    # # For large x (x > 700), avoid underflow and directly use x
-    # large_x_mask = coulomb_potential > 700
-    # result[large_x_mask] = coulomb_potential[large_x_mask]
-
-    # # Compute for normal values where x is neither too large nor too small
-    # normal_mask = ~(small_x_mask | large_x_mask)
-    # result[normal_mask] = (
-    #     coulomb_potential[normal_mask] / denominator[normal_mask]
-    # )
-
-    # return result
