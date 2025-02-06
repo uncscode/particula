@@ -27,7 +27,8 @@ def ratio(
     ratio_lower_limit: float = -200,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the Coulomb potential ratio, ϕ_E, for particle-particle interactions.
+    Calculate the Coulomb potential ratio, ϕ_E, for particle-particle
+    interactions.
 
     The function is given by:
 
@@ -48,10 +49,14 @@ def ratio(
         - charge : Number of charges on the particles [dimensionless].
         - temperature : Temperature of the system [K].
         - ratio_lower_limit : Lower limit for the Coulomb potential ratio.
+            This is used to clip the ratio to avoid numerical issues, in
+            subsequent kernel calculations. This only applies to highly
+            negative values of the ratio, which are high repulsion cases.
 
     Returns:
     --------
-        - coulomb_potential_ratio : The Coulomb potential ratio ϕ_E [dimensionless].
+        - coulomb_potential_ratio : The Coulomb potential ratio ϕ_E
+            [dimensionless].
 
     References:
     -----------
@@ -89,7 +94,7 @@ def kinetic(
 
     The function is given by:
 
-        Γ_kinetic = 
+        Γ_kinetic =
             1 + ϕ_E          if ϕ_E ≥ 0
             exp(ϕ_E)         if ϕ_E < 0
 
@@ -99,7 +104,8 @@ def kinetic(
 
     Returns:
     --------
-        - gamma_kinetic : Coulomb enhancement factor in the kinetic limit [dimensionless].
+        - gamma_kinetic : Coulomb enhancement factor in the kinetic limit
+            [dimensionless].
 
     References:
     -----------
@@ -124,7 +130,7 @@ def continuum(
 
     The function is given by:
 
-        Γ_continuum = 
+        Γ_continuum =
             ϕ_E / [1 - exp(-ϕ_E)]    if ϕ_E ≠ 0
             1                         if ϕ_E = 0
 
@@ -134,7 +140,8 @@ def continuum(
 
     Returns:
     --------
-        - gamma_continuum : Coulomb enhancement factor in the continuum limit [dimensionless].
+        - gamma_continuum : Coulomb enhancement factor in the continuum limit
+            [dimensionless].
 
     References:
     -----------
