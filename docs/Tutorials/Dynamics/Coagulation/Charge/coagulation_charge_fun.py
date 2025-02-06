@@ -65,13 +65,13 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 """
 ## Define Particle Charges
 
-We assign charges to the particles. In this example, we assume that the charge on a particle increases with its size. For instance, particles gain one elementary charge for every nanometer of radius. This is a simplification for illustrative purposes.
+We assign charges to the particles. In this example, we assign negative charges to the first 33% of particles and positive charges to the remaining 66% of particles. The charges are assigned based on the particle radius, with negative charges ranging from 10 to 1 and positive charges ranging from 1 to 500. We then plot the charge distribution against the particle radius.
 """
 # Determine the number of radius bins
 n_bins = len(radius_bins)
 
 # Define the split index where charges transition from negative to positive
-split_index = n_bins // 4  # Assign the first 25% of particles negative charges
+split_index = n_bins // 3  # Assign the first 25% of particles negative charges
 
 # Generate logarithmically spaced magnitudes for negative charges from 10 to 1
 neg_magnitudes = np.logspace(np.log10(10), np.log10(1), num=split_index)
@@ -83,6 +83,7 @@ pos_charges = pos_magnitudes  # Positive charges
 
 # Combine the negative and positive charges into one array
 charge_array = np.concatenate((neg_charges, pos_charges))
+
 # Plot charge vs. radius
 fig, ax = plt.subplots()
 ax.plot(radius_bins, charge_array, marker='o', linestyle='none')
@@ -211,9 +212,9 @@ We calculate the gain and loss rates of particle concentrations due to coagulati
 # make a number concentration distribution
 number_concentration = lognormal_pmf_distribution(
     x_values=radius_bins,
-    mode=np.array([200e-9]),  # m
-    geometric_standard_deviation=np.array([1.5]),
-    number_of_particles=np.array([1e12]),  # per m^3
+    mode=np.array([10e-9, 200e-9, 1000e-9]),  # m
+    geometric_standard_deviation=np.array([1.4, 1.5, 1.8]),
+    number_of_particles=np.array([1e12, 1e12, 1e12]),  # per m^3
 )
 
 gain_rate = rate.discrete_gain(
