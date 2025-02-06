@@ -60,16 +60,6 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 
 
 
-# Plot charge vs. radius
-fig, ax = plt.subplots()
-ax.plot(radius_bins, charge_array, marker='o', linestyle='none')
-ax.set_xscale("log")
-ax.set_yscale("symlog", linthresh=1)
-ax.set_xlabel("Particle radius (m)")
-ax.set_ylabel("Particle charge (elementary charges)")
-ax.set_title("Particle Charge vs. Radius")
-ax.grid(True, which="both", ls="--")
-plt.show()
 
 # %% [markdown]
 """
@@ -93,6 +83,17 @@ pos_charges = pos_magnitudes  # Positive charges
 
 # Combine the negative and positive charges into one array
 charge_array = np.concatenate((neg_charges, pos_charges))
+# Plot charge vs. radius
+fig, ax = plt.subplots()
+ax.plot(radius_bins, charge_array, marker='o', linestyle='none')
+ax.set_xscale("log")
+ax.set_yscale("symlog", linthresh=1)
+ax.set_xlabel("Particle radius (m)")
+ax.set_ylabel("Particle charge (elementary charges)")
+ax.set_title("Particle Charge vs. Radius")
+ax.grid(True, which="both", ls="--")
+plt.show()
+
 temperature = 298.15
 
 # %% [markdown]
