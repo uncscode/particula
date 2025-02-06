@@ -13,7 +13,7 @@ def test_ratio_lower_limit():
     expected_result = -200  # Default ratio_lower_limit
 
     value = coulomb_enhancement.ratio(radius, charge, temperature)
-    assert np.isclose(value, expected_result), "The ratio should be clipped to the lower limit."
+    assert np.isclose(value, expected_result)
 
     # Test with a custom ratio_lower_limit
     custom_limit = -100
@@ -21,7 +21,7 @@ def test_ratio_lower_limit():
     value_custom = coulomb_enhancement.ratio(
         radius, charge, temperature, ratio_lower_limit=custom_limit
     )
-    assert np.isclose(value_custom, expected_custom_result), "The ratio should be clipped to the custom lower limit."
+    assert np.isclose(value_custom, expected_custom_result)
 
 
 def test_ratio():
