@@ -6829,13 +6829,11 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/coulomb_enhancement.py">particula.particles.properties.coulomb_enhancement</a> module.</p>
 </blockquote>
 <h2 id="continuum">continuum<a class="headerlink" href="#continuum" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/coulomb_enhancement.py#L90">Show source in coulomb_enhancement.py:90</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/coulomb_enhancement.py#L97">Show source in coulomb_enhancement.py:97</a></p>
 <p>Calculates the Coulombic enhancement continuum limit. For all particle-
 particle interactions.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<ul>
-<li><code>coulomb_potential</code> - The Coulomb potential ratio [dimensionless].</li>
-</ul>
+<p>coulomb_potential : The Coulomb potential ratio [dimensionless].</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <p>The Coulomb enhancement for the continuum limit [dimensionless].</p>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
@@ -6850,13 +6848,11 @@ and Soft Matter Physics, 85(2).
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="kinetic">kinetic<a class="headerlink" href="#kinetic" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/coulomb_enhancement.py#L62">Show source in coulomb_enhancement.py:62</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/coulomb_enhancement.py#L69">Show source in coulomb_enhancement.py:69</a></p>
 <p>Calculates the Coulombic enhancement kinetic limit. For all particle-
 particle interactions.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<ul>
-<li><code>coulomb_potential</code> - The Coulomb potential ratio [dimensionless].</li>
-</ul>
+<p>coulomb_potential : The Coulomb potential ratio [dimensionless].</p>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <p>The Coulomb enhancement for the kinetic limit [dimensionless].</p>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
@@ -6875,11 +6871,10 @@ and Soft Matter Physics, 85(2).
 <p>Calculates the Coulomb potential ratio, phi_E. For all particle-
 particle interactions.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
-<ul>
-<li><code>radius</code> - The radius of the particle [m].</li>
-<li><code>charge</code> - The number of charges on the particle [dimensionless].</li>
-<li><code>temperature</code> - The temperature of the system [K].</li>
-</ul>
+<p>radius : The radius of the particle [m].
+charge : The number of charges on the particle [dimensionless].
+temperature : The temperature of the system [K].
+ratio_lower_limit : The lower limit for the Coulomb potential ratio.</p>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
 <p>The Coulomb potential ratio [dimensionless].</p>
 <h4 id="references_2">References<a class="headerlink" href="#references_2" title="Permanent link">&para;</a></h4>
@@ -6894,6 +6889,7 @@ particle interactions.</p>
     <span class="n">radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">charge</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">298.15</span><span class="p">,</span>
+    <span class="n">ratio_lower_limit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">200</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 
