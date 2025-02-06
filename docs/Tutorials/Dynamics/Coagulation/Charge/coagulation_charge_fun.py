@@ -1,10 +1,22 @@
 # %% [markdown]
+"""
+# Coagulation with Charge Effects
 
-# # Coagulation with charge effects
+In this tutorial, we explore how electrical charge influences the coagulation (collisions and coalescence) of aerosol particles. We will:
 
+- Create a size distribution for aerosol particles.
+- Calculate the Coulomb potential ratio and related properties.
+- Compute the coagulation kernel considering charge effects.
+- Plot the coagulation kernel.
+- Simulate the time evolution of the particle size distribution due to coagulation.
+- Plot the particle concentration and coagulation rates.
+"""
+# %% [markdown]
+"""
+## Import Necessary Libraries
 
-
-# %% 
+We import standard libraries like `numpy` and `matplotlib` for numerical computations and plotting. We also import specific functions from the `particula` package, which is used for aerosol dynamics simulations.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 
