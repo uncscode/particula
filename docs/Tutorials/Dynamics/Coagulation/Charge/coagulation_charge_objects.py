@@ -200,7 +200,7 @@ ax.set_yscale("log")
 ax.set_xlabel("Particle radius r_i (m)")
 ax.set_ylabel("Particle radius r_j (m)")
 ax.set_title("Hard Sphere Coagulation Kernel")
-fig.colorbar(c, ax=ax, label="Kernel (m³/s)")
+fig.colorbar(c, ax=ax, label="log10(Kernel) (m³/s)")
 plt.show()
 
 # %% [markdown]
