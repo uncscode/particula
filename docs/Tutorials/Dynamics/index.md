@@ -22,6 +22,12 @@
 - [Coagulation Tutorial: Basic 4-Particle Resolved](Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.ipynb)
 - [Coagulation Tutorial: Basic 5-Super Droplet Method](Coagulation/Functional/Coagulation_Basic_5_SDM.ipynb)
 
+### Charge
+
+How to get the charge dependent coagulation kernel.
+
+- [Coagulation Charge via functions](Coagulation/Charge/Coagulation_Charge_functional.ipynb)
+
 ## Customization
 
 - [Adding Particles During Simulation](Customization/Adding_Particles_During_Simulation.ipynb)
