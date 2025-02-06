@@ -56,7 +56,9 @@ def ratio(
     denominator = (
         4 * np.pi * ELECTRIC_PERMITTIVITY * (radius + np.transpose(radius))
     )
-    return numerator / (denominator * BOLTZMANN_CONSTANT * temperature)
+    coulomb_potential_ratio = numerator / (denominator * BOLTZMANN_CONSTANT * temperature)
+    coulomb_potential_ratio = np.clip(coulomb_potential_ratio, -200, np.finfo(np.float64).max)
+    return coulomb_potential_ratio
 
 
 def kinetic(
