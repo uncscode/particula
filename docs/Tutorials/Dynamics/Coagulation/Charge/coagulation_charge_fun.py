@@ -85,6 +85,7 @@ In this section, we compute several properties necessary for calculating the coa
 - **Friction Factor**: Calculated with `friction_factor`, needed for determining particle mobility.
 - **Diffusive Knudsen Number**: Using `diffusive_knudsen_number`, combines the effects of particle diffusion and electrostatic interactions.
 """
+coulomb_potential_ratio = coulomb_enhancement.ratio(
     radius_bins, charge_array, temperature=temperature
 )
 dynamic_viscosity = get_dynamic_viscosity(temperature=temperature)
@@ -117,6 +118,7 @@ diffusive_knudsen_values = diffusive_knudsen_number(
 
 The non-dimensional coagulation kernel is calculated using `coulomb_chahl2019`, which incorporates charge effects into the rate at which particles collide.
 """
+non_dimensional_kernel = coulomb_chahl2019(
     diffusive_knudsen=diffusive_knudsen_values,
     coulomb_potential_ratio=coulomb_potential_ratio,
 )
@@ -144,6 +146,7 @@ reduced_mass = reduced_self_broadcast(mass_bins)
 
 The dimensional coagulation kernel combines all the previously calculated factors and gives the actual rate at which particles of different sizes collide and stick together due to coagulation, considering charge effects.
 """
+dimensional_kernel = (
     non_dimensional_kernel
     * friction_factor_value
     * sum_of_radii**3
