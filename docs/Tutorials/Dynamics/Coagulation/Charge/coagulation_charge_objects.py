@@ -193,7 +193,7 @@ dimensional_kernel_hs = kernel_strategy_hs.kernel(
 # Plot the Hard Sphere kernel
 fig, ax = plt.subplots()
 c = ax.pcolormesh(
-    radius_bins, radius_bins, dimensional_kernel_hs, shading="auto"
+    radius_bins, radius_bins, np.log10(dimensional_kernel_hs), shading="auto"
 )
 ax.set_xscale("log")
 ax.set_yscale("log")
@@ -235,7 +235,7 @@ dimensional_kernel_dyachkov = kernel_strategy_dyachkov.kernel(
 # Plot the Coulomb Dyachkov 2007 kernel
 fig, ax = plt.subplots()
 c = ax.pcolormesh(
-    radius_bins, radius_bins, dimensional_kernel_dyachkov, shading="auto"
+    radius_bins, radius_bins, np.log10(dimensional_kernel_dyachkov), shading="auto"
 )
 ax.set_xscale("log")
 ax.set_yscale("log")
@@ -277,7 +277,7 @@ dimensional_kernel_gatti = kernel_strategy_gatti.kernel(
 # Plot the Coulomb Gatti 2008 kernel
 fig, ax = plt.subplots()
 c = ax.pcolormesh(
-    radius_bins, radius_bins, dimensional_kernel_gatti, shading="auto"
+    radius_bins, radius_bins, np.log10(dimensional_kernel_gatti), shading="auto"
 )
 ax.set_xscale("log")
 ax.set_yscale("log")
@@ -321,7 +321,7 @@ dimensional_kernel_gopalakrishnan = kernel_strategy_gopalakrishnan.kernel(
 # Plot the Coulomb Gopalakrishnan 2012 kernel
 fig, ax = plt.subplots()
 c = ax.pcolormesh(
-    radius_bins, radius_bins, dimensional_kernel_gopalakrishnan, shading="auto"
+    radius_bins, radius_bins, np.log10(dimensional_kernel_gopalakrishnan), shading="auto"
 )
 ax.set_xscale("log")
 ax.set_yscale("log")
@@ -364,7 +364,7 @@ dimensional_kernel_chahl = kernel_strategy_chahl.kernel(
 # Plot the Coulomb Chahl 2019 kernel
 fig, ax = plt.subplots()
 c = ax.pcolormesh(
-    radius_bins, radius_bins, dimensional_kernel_chahl, shading="auto"
+    radius_bins, radius_bins, np.log10(dimensional_kernel_chahl), shading="auto"
 )
 ax.set_xscale("log")
 ax.set_yscale("log")
