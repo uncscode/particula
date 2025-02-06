@@ -60,7 +60,16 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 
 
 
-# %%
+# Plot charge vs. radius
+fig, ax = plt.subplots()
+ax.plot(radius_bins, charge_array, marker='o', linestyle='none')
+ax.set_xscale("log")
+ax.set_yscale("symlog", linthresh=1)
+ax.set_xlabel("Particle radius (m)")
+ax.set_ylabel("Particle charge (elementary charges)")
+ax.set_title("Particle Charge vs. Radius")
+ax.grid(True, which="both", ls="--")
+plt.show()
 
 # %% [markdown]
 """
@@ -68,7 +77,22 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 
 We assign charges to the particles. In this example, we assume that the charge on a particle increases with its size. For instance, particles gain one elementary charge for every nanometer of radius. This is a simplification for illustrative purposes.
 """
-charge_array = np.floor(radius_bins / (1e-10))  # Example: charge increases with size
+# Determine the number of radius bins
+n_bins = len(radius_bins)
+
+# Define the split index where charges transition from negative to positive
+split_index = n_bins // 4  # Assign the first 25% of particles negative charges
+
+# Generate logarithmically spaced magnitudes for negative charges from 10 to 1
+neg_magnitudes = np.logspace(np.log10(10), np.log10(1), num=split_index)
+neg_charges = -neg_magnitudes  # Assign negative sign
+
+# Generate logarithmically spaced magnitudes for positive charges from 1 to 500
+pos_magnitudes = np.logspace(np.log10(1), np.log10(500), num=n_bins - split_index)
+pos_charges = pos_magnitudes  # Positive charges
+
+# Combine the negative and positive charges into one array
+charge_array = np.concatenate((neg_charges, pos_charges))
 temperature = 298.15
 
 # %% [markdown]
