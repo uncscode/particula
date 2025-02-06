@@ -364,7 +364,7 @@ dimensional_kernel_chahl = kernel_strategy_chahl.kernel(
 # Plot the Coulomb Chahl 2019 kernel
 fig, ax = plt.subplots()
 c = ax.pcolormesh(
-    radius_bins, radius_bins, dimensional_kernel_chahl, shading="auto"
+    radius_bins, radius_bins, dimensional_kernel_chahl, shading="auto", norm=plt.LogNorm()
 )
 ax.set_xscale("log")
 ax.set_yscale("log")
