@@ -24,7 +24,7 @@ def ratio(
     radius: Union[float, NDArray[np.float64]],
     charge: Union[int, NDArray[np.float64]] = 0,
     temperature: float = 298.15,
-    ratio_lower_limit: Union[float, NDArray[np.float64]] = -200,
+    ratio_lower_limit: float = -200,
 ) -> Union[float, NDArray[np.float64]]:
     """Calculates the Coulomb potential ratio, phi_E. For all particle-
     particle interactions.
