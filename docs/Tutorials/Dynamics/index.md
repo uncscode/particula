@@ -26,7 +26,8 @@
 
 How to get the charge dependent coagulation kernel.
 
-- [Coagulation Charge via functions](Coagulation/Charge/Coagulation_Charge_functional.ipynb)
+- [Coagulation Charges via functions](Coagulation/Charge/Coagulation_with_Charge_functional.ipynb)
+- [Coagulation Charges via objects](Coagulation/Charge/Coagulation_with_Charge_objects.ipynb)
 
 ## Customization
 
