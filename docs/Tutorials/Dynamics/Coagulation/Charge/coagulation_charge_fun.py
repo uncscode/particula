@@ -133,6 +133,9 @@ We compute the Coulomb enhancement factors in both the kinetic and continuum lim
 - **Kinetic Limit**: Using `coulomb_enhancement.kinetic`, applicable when particle motions are dominated by random thermal motion.
 - **Continuum Limit**: Using `coulomb_enhancement.continuum`, applicable when particles are larger and motions are influenced by continuous fluid flow.
 """
+coulomb_kinetic_limit = coulomb_enhancement.kinetic(
+    coulomb_potential_ratio
+)
 coulomb_continuum_limit = coulomb_enhancement.continuum(
     coulomb_potential_ratio
 )
