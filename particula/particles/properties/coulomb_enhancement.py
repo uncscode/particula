@@ -61,10 +61,9 @@ def ratio(
     coulomb_potential_ratio = numerator / (
         denominator * BOLTZMANN_CONSTANT * temperature
     )
-    coulomb_potential_ratio = np.clip(
+    return np.clip(
         coulomb_potential_ratio, ratio_lower_limit, np.finfo(np.float64).max
     )
-    return coulomb_potential_ratio
 
 
 def kinetic(
