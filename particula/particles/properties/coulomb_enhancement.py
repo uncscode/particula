@@ -58,7 +58,9 @@ def ratio(
     denominator = (
         4 * np.pi * ELECTRIC_PERMITTIVITY * (radius + np.transpose(radius))
     )
-    coulomb_potential_ratio = numerator / (denominator * BOLTZMANN_CONSTANT * temperature)
+    coulomb_potential_ratio = numerator / (
+        denominator * BOLTZMANN_CONSTANT * temperature
+    )
     coulomb_potential_ratio = np.clip(
         coulomb_potential_ratio, ratio_lower_limit, np.finfo(np.float64).max
     )
