@@ -113,8 +113,6 @@ def kinetic(
           Coulomb-influenced collisions in aerosols and dusty plasmas.
           Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410
     """
-    # return 1 + coulumb_potential if ratio >=0,
-    # otherwise np.exp(coulomb_potential)
     return np.where(
         coulomb_potential >= 0,
         1 + coulomb_potential,
@@ -149,8 +147,6 @@ def continuum(
           Coulomb-influenced collisions in aerosols and dusty plasmas.
           Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410
     """
-    # return coulomb_potential/(1-np.exp(-1*coulomb_potential)) if ratio != 0,
-    # otherwise 1
     denominator = 1 - safe_exp(-1 * coulomb_potential)
     return np.divide(
         coulomb_potential,
