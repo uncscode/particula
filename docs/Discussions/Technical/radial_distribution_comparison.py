@@ -215,10 +215,10 @@ r72_4_e400 = np.array(
 
 
 # Plot the Comparison Graph for all cases
-plt.figure(figsize=(10, 6))
+fig, ax = plt.subplots(figsize=(10, 6))
 
 # Plot DNS data
-plt.scatter(
+ax.scatter(
     r23_e100[:, 0],
     r23_e100[:, 1],
     label=r"DNS: $R_\lambda=23$, $\varepsilon=100$",
@@ -248,7 +248,7 @@ plt.scatter(
 )
 
 # Plot model predictions
-plt.plot(
+ax.plot(
     particle_radius * 1e6,
     np.diagonal(g12_values_re23_e100),
     label=r"Model: $R_\lambda=23$, $\varepsilon=100$",
@@ -273,11 +273,11 @@ plt.plot(
     color="purple",
 )
 
-plt.xlabel("Particle Radius (µm)")
-plt.ylabel("Radial Distribution Function $g_{12}$")
-plt.title("Radial Distribution Function Comparison")
-plt.legend()
-plt.grid(True)
-plt.ylim(0, 30)
+ax.set_xlabel("Particle Radius (µm)")
+ax.set_ylabel("Radial Distribution Function $g_{12}$")
+ax.set_title("Radial Distribution Function Comparison")
+ax.legend(loc='upper left')
+ax.grid(True)
+ax.set_ylim(0, 30)
 plt.show()
 # %%
