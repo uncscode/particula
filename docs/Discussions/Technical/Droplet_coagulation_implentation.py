@@ -2,7 +2,9 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import get_g12_radial_distribution_ao2008
+from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import (
+    get_g12_radial_distribution_ao2008,
+)
 
 """
     - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
@@ -16,8 +18,9 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution
 # Figure 11: Radial distribution function g12 for different Stokes numbers
 
 # Comparison of the predicted and simulated radial relative velocities
-# of nonsedimenting particles in a turbulent ﬂow. The particle radius is equal to
-# half the Kolmogorov length scale (a = η/2). (a) Bidisperse system (similar to
+# of nonsedimenting particles in a turbulent ﬂow. The particle radius is
+# equal to half the Kolmogorov length scale (a = η/2). (a) Bidisperse
+# system (similar to
 # ﬁgure 12
 
 # ploting tp2/Te vs radial relative velocity abs(wr)/u'
@@ -102,26 +105,27 @@ zhou01te = np.array(
 
 # %% Collision Kernel Comparison
 
-from particula.dynamics.coagulation.turbulent_dns_kernel.kernel_ao2008 import get_kernel_ao2008
+import numpy as np
+import matplotlib.pyplot as plt
+from particula.dynamics.coagulation.turbulent_dns_kernel.kernel_ao2008 import (
+    get_kernel_ao2008,
+)
 
 # Define necessary parameters
 kernel_values = get_kernel_ao2008(
-    particle_radius,
-    velocity_dispersion,
-    particle_inertia_time,
-    stokes_number,
-    kolmogorov_length_scale,
-    reynolds_lambda,
-    normalized_accel_variance,
-    kolmogorov_velocity,
-    kolmogorov_time,
+    particle_radius, velocity_dispersion, particle_inertia_time,
+    stokes_number, kolmogorov_length_scale, reynolds_lambda,
+    normalized_accel_variance, kolmogorov_velocity, kolmogorov_time,
 )
 
 # Using the provided kernel data
-plt.scatter(data[:, 0], data[:, 1], label='DNS Data', color='cyan')
+plt.scatter(r23_e100[:, 0], r23_e100[:, 1], label='DNS Data', color='cyan')
 
 # Plot calculated kernel values
-plt.plot(particle_radius * 1e6, kernel_values, label='Model Prediction', color='magenta')
+plt.plot(
+    particle_radius * 1e6, kernel_values, label='Model Prediction',
+    color='magenta'
+)
 
 plt.xlabel('Particle Radius (µm)')
 plt.ylabel('Collision Kernel (cm³/s)')
@@ -132,7 +136,9 @@ plt.show()
 
 # Comparison of collision kernel Γ₁₂ between DNS data and model prediction
 
-from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import get_radial_relative_velocity_ao2008
+from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
+    get_radial_relative_velocity_ao2008,
+)
 
 # Define necessary parameters
 velocity_dispersion = 0.1  # Example value
@@ -144,10 +150,13 @@ radial_relative_velocity = get_radial_relative_velocity_ao2008(
 )
 
 # Example using data from figure 13
-plt.scatter(data[:, 0], data[:, 1], label='DNS Data', color='purple')
+plt.scatter(r23_e100[:, 0], r23_e100[:, 1], label='DNS Data', color='purple')
 
 # Plot calculated radial relative velocities
-plt.plot(particle_radius * 1e6, radial_relative_velocity, label='Model Prediction', color='brown')
+plt.plot(
+    particle_radius * 1e6, radial_relative_velocity,
+    label='Model Prediction', color='brown'
+)
 
 plt.xlabel('Particle Radius (µm)')
 plt.ylabel('Radial Relative Velocity (m/s)')
@@ -158,7 +167,9 @@ plt.show()
 
 # Comparison of radial relative velocities between DNS data and model prediction
 
-from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import get_relative_velocity_variance
+from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
+    get_relative_velocity_variance,
+)
 
 # Define necessary parameters
 fluid_rms_velocity = 0.2  # Example value
@@ -180,10 +191,16 @@ sigma_squared = get_relative_velocity_variance(
 )
 
 # Plot DNS data
-plt.scatter(dns_400_cm2_s3[:, 0], dns_400_cm2_s3[:, 1], label='DNS Data', color='green')
+plt.scatter(
+    dns_400_cm2_s3[:, 0], dns_400_cm2_s3[:, 1], label='DNS Data',
+    color='green'
+)
 
 # Plot calculated mean-square velocities
-plt.plot(particle_radius * 1e6, sigma_squared, label='Model Prediction', color='orange')
+plt.plot(
+    particle_radius * 1e6, sigma_squared, label='Model Prediction',
+    color='orange'
+)
 
 plt.xlabel('Particle Radius (µm)')
 plt.ylabel('Mean-Square Horizontal Velocity (cm²/s²)')
@@ -195,7 +212,9 @@ plt.show()
 # Comparison of mean-square horizontal velocities between DNS data and model prediction
 
 # Using the DNS datasets provided, e.g., r23_e100
-particle_radius = np.linspace(1e-6, 60e-6, 100)  # Example radii from 1 µm to 60 µm
+particle_radius = np.linspace(
+    1e-6, 60e-6, 100
+)  # Example radii from 1 µm to 60 µm
 stokes_number = np.linspace(0.1, 1.0, 100)  # Example Stokes numbers
 kolmogorov_length_scale = 1e-3  # Example value
 reynolds_lambda = 23  # Example value from the provided dataset
@@ -217,7 +236,9 @@ g12_values = get_g12_radial_distribution_ao2008(
 plt.scatter(r23_e100[:, 0], r23_e100[:, 1], label='DNS Data', color='blue')
 
 # Plot calculated g12 values
-plt.plot(particle_radius * 1e6, g12_values, label='Model Prediction', color='red')
+plt.plot(
+    particle_radius * 1e6, g12_values, label='Model Prediction', color='red'
+)
 
 plt.xlabel('Particle Radius (µm)')
 plt.ylabel('Radial Distribution Function g₁₂')
