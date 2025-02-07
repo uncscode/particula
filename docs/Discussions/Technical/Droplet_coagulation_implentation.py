@@ -18,7 +18,7 @@ import numpy as np
 # half the Kolmogorov length scale (a = η/2). (a) Bidisperse system (similar to
 # ﬁgure 12
 
-# ploting tp2/Te vs radial relative velocity
+# ploting tp2/Te vs radial relative velocity abs(wr)/u'
 
 # tp1 = 1.0 Te
 zhou_10te = np.array(
@@ -104,7 +104,7 @@ zhou01te = np.array(
 # particle velocities for droplets falling in a turbulent ﬂow of Rλ = 72.41 and
 # turbulent_dissipation = 400 cm2 s−3
 
-# droplet radius vs rms_velocity
+# droplet radius (a2, microns) vs rms_velocity (cm2/s2)
 
 # dns_10cm2/s3: 6 rows, 2 columns (X, Y)
 dns_10cm2_s3 = np.array(
@@ -146,4 +146,103 @@ dns_400_cm2_s3 = np.array(
 
 # Figure 13. Comparison of the predicted and simulated radial relative velocity of
 # sedimenting droplets in a turbulent ﬂow. (a) a1 = 30µm and the turbulent ﬂow
-# parameters are: Rλ = 72.41 and eddy_dissipation = 400 cm2 s−3.
+# parameters are: Rλ = 72.41 and turbulent_dissipation = 400 cm2 s−3.
+
+# plot of radius (a2, microns) vs radial relative velocity
+
+data = np.array(
+    [
+        [10.06195787, 5.602409639],
+        [15.01858736, 5.13253012],
+        [19.97521685, 3.506024096],
+        [25.11771995, 2.096385542],
+        [27.53407683, 1.265060241],
+        [30.01239157, 0.108433735],
+        [32.49070632, 1.518072289],
+        [40.04956629, 5.746987952],
+        [49.96282528, 11.85542169],
+        [60, 19.37349398],
+    ]
+)
+
+# %% radial distribution function g12
+
+# DNS results and the modeled RDF of sedimenting droplets in a
+# turbulent ﬂow. (a) Monodisperse case
+
+# plot of radius 'a' (microns) vs g12 (r=2a)
+
+# case: R_lambda = 23, turbulent_dissipation = 100 cm2 s−3
+# r23_e100: 6 rows, 2 columns (X, Y)
+r23_e100 = np.array(
+    [
+        [9.937578027, 1.532846715],
+        [19.98751561, 1.094890511],
+        [29.91260924, 2.299270073],
+        [40.02496879, 3.686131387],
+        [49.95006242, 2.919708029],
+        [60, 2.737226277],
+    ]
+)
+
+# case: R_lambda = 23, turbulent_dissipation = 400 cm2 s−3
+# r23_e400: 6 rows, 2 columns (X, Y)
+r23_e400 = np.array(
+    [
+        [10.18726592, 1.094890511],
+        [20.17478152, 3.248175182],
+        [30.09987516, 8.175182482],
+        [40.14981273, 8.686131387],
+        [50.13732834, 7.226277372],
+        [60.24968789, 5.620437956],
+    ]
+)
+
+# case: R_lambda = 72.4, turbulent_dissipation = 100 cm2 s−3
+# r72.4_e100: 6 rows, 2 columns (X, Y)
+r72_4_e100 = np.array(
+    [
+        [10.12484395, 1.204379562],
+        [19.92509363, 1.788321168],
+        [29.97503121, 3.211678832],
+        [40.08739076, 7.919708029],
+        [50.01248439, 10.76642336],
+        [59.93757803, 9.525547445],
+    ]
+)
+
+# case: R_lambda = 72.4, turbulent_dissipation = 400 cm2 s−3
+# r72.4_e400: 6 rows, 2 columns (X, Y)
+r72_4_e400 = np.array(
+    [
+        [10, 0.875912409],
+        [20.11235955, 5.145985401],
+        [30.03745318, 16.82481752],
+        [40.08739076, 15.72992701],
+        [50.01248439, 14.48905109],
+        [60, 13.72262774],
+    ]
+)
+
+# %% Comparison of the Kernel
+
+# DNS dynamic collision kernel and predicted collision kernel of
+# sedimenting droplets in a turbulent ﬂow. (a) a1 = 30µm, Rλ = 72.41 and  =
+# 400 cm2 s−3
+
+# plot of radius (microns) vs kernel (cm3/s)
+
+data = np.array(
+    [
+        [10.06067961, 0.000581818],
+        [14.97572816, 0.000654545],
+        [19.8907767, 0.000642424],
+        [25.1092233, 0.000581818],
+        [27.53640777, 0.000484848],
+        [29.96359223, 0.000315152],
+        [32.51213592, 0.000666667],
+        [40.03640777, 0.001963636],
+        [50.04854369, 0.004618182],
+        [60, 0.009127273],
+    ]
+)
