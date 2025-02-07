@@ -225,7 +225,7 @@ ax.scatter(
     color="blue",
     marker="o",
 )
-plt.scatter(
+ax.scatter(
     r23_e400[:, 0],
     r23_e400[:, 1],
     label=r"DNS: $R_\lambda=23$, $\varepsilon=400$",
