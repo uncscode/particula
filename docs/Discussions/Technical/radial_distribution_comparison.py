@@ -215,7 +215,7 @@ r72_4_e400 = np.array(
 
 
 # Plot the Comparison Graph for all cases
-fig, ax = plt.subplots(figsize=(10, 6))
+fig, ax = plt.subplots(figsize=(6, 6))
 
 # Plot DNS data
 ax.scatter(
@@ -278,6 +278,6 @@ ax.set_ylabel("Radial Distribution Function $g_{12}$")
 ax.set_title("Radial Distribution Function Comparison")
 ax.legend(loc='upper left')
 ax.grid(True)
-ax.set_ylim(0, 30)
+ax.set_ylim(0, 40)
 plt.show()
 # %%
