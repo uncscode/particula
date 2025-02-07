@@ -1,3 +1,14 @@
+"""
+This script compares the radial distribution function g₁₂ between DNS data and the model prediction.
+
+It uses the function `get_g12_radial_distribution_ao2008` from the `particula` library to compute g₁₂ values over a range of particle radii.
+
+The script then plots these computed values against the DNS dataset `r23_e100` for visual comparison.
+
+Usage:
+- Run this script to generate and display the comparison graph.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import (
@@ -44,6 +55,3 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-"""
-This script compares the radial distribution function g₁₂ between DNS data and the model prediction.
-"""
