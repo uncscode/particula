@@ -20,8 +20,65 @@ from particula.gas import properties as gas_properties
 from particula.util.converting.units import convert_units
 
 
-# DNS results and the modeled RDF of sedimenting droplets in a
-# turbulent ﬂow. (a) Monodisperse case
+def g12_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
+    # Define constants and parameters
+    temperature = 300  # Temperature in Kelvin
+    particle_density = 1000  # Particle density in kg/m³
+    fluid_density = 1.225  # Fluid (air) density in kg/m³
+    relative_velocity = 1e-6  # Relative velocity in m/s
+
+    # Basic fluid properties
+    dynamic_viscosity = gas_properties.get_dynamic_viscosity(temperature)
+    kinematic_viscosity = gas_properties.get_kinematic_viscosity(
+        dynamic_viscosity=dynamic_viscosity, fluid_density=fluid_density
+    )
+    mean_free_path = gas_properties.molecule_mean_free_path(
+        temperature=temperature, dynamic_viscosity=dynamic_viscosity
+    )
+
+    # Particle inertia and settling velocity
+    particle_inertia_time = properties.get_particle_inertia_time(
+        particle_radius=particle_radius,
+        particle_density=particle_density,
+        fluid_density=fluid_density,
+        kinematic_viscosity=kinematic_viscosity,
+        relative_velocity=relative_velocity,
+    )
+
+    # Kolmogorov parameters
+    kolmogorov_time = gas_properties.get_kolmogorov_time(
+        kinematic_viscosity=kinematic_viscosity,
+        turbulent_dissipation=turbulent_dissipation,
+    )
+    kolmogorov_length_scale = gas_properties.get_kolmogorov_length(
+        kinematic_viscosity=kinematic_viscosity,
+        turbulent_dissipation=turbulent_dissipation,
+    )
+    normalized_accel_variance = gas_properties.get_normalized_accel_variance_ao2008(
+        re_lambda=reynolds_lambda,
+    )
+    kolmogorov_velocity = gas_properties.get_kolmogorov_velocity(
+        kinematic_viscosity=kinematic_viscosity,
+        turbulent_dissipation=turbulent_dissipation,
+    )
+
+    stokes_number = properties.get_stokes_number(
+        particle_inertia_time=particle_inertia_time,
+        kolmogorov_time=kolmogorov_time,
+    )
+
+    # Compute g₁₂ Values
+    g12_values = get_g12_radial_distribution_ao2008(
+        particle_radius,
+        stokes_number,
+        kolmogorov_length_scale,
+        reynolds_lambda,
+        normalized_accel_variance,
+        kolmogorov_velocity,
+        kolmogorov_time,
+    )
+
+    return g12_values
 
 # plot of radius 'a' (microns) vs g12 (r=2a)
 
@@ -88,16 +145,15 @@ stokes_number = properties.get_stokes_number(
     kolmogorov_time=kolmogorov_time,
 )
 
-# Compute g₁₂ Values
-g12_values_re23_e100 = get_g12_radial_distribution_ao2008(
-    particle_radius,
-    stokes_number,
-    kolmogorov_length_scale,
-    reynolds_lambda,
-    normalized_accel_variance,
-    kolmogorov_velocity,
-    kolmogorov_time,
-)
+# Convert turbulent dissipation from cm²/s³ to m²/s³
+turbulent_dissipation_100 = 100 * convert_units("cm^2/s^3", "m^2/s^3")
+turbulent_dissipation_400 = 400 * convert_units("cm^2/s^3", "m^2/s^3")
+
+# Compute g₁₂ values for each case
+g12_values_re23_e100 = g12_calc(particle_radius, turbulent_dissipation_100, reynolds_lambda=23)
+g12_values_re23_e400 = g12_calc(particle_radius, turbulent_dissipation_400, reynolds_lambda=23)
+g12_values_re72_4_e100 = g12_calc(particle_radius, turbulent_dissipation_100, reynolds_lambda=72.4)
+g12_values_re72_4_e400 = g12_calc(particle_radius, turbulent_dissipation_400, reynolds_lambda=72.4)
 
 # R_lambda = 23, turbulent_dissipation = 100 cm2/s3
 
@@ -146,13 +202,25 @@ r72_4_e400 = np.array(
 
 
 # Plot the Comparison Graph for all cases
-plt.scatter(r23_e100[:, 0], r23_e100[:, 1], label=r"DNS: R_\lambda=23, \eta=100", color='blue')
-plt.plot(particle_radius * 1e6, np.diagonal(g12_values_re23_e100), label="Kernel: R_\lambda=23, \eta=100", color='blue')
-plt.ylim(0, 30)
+plt.figure(figsize=(10, 6))
+
+# Plot DNS data
+plt.scatter(r23_e100[:, 0], r23_e100[:, 1], label=r"DNS: $R_\lambda=23$, $\varepsilon=100$", color='blue', marker='o')
+plt.scatter(r23_e400[:, 0], r23_e400[:, 1], label=r"DNS: $R_\lambda=23$, $\varepsilon=400$", color='green', marker='^')
+plt.scatter(r72_4_e100[:, 0], r72_4_e100[:, 1], label=r"DNS: $R_\lambda=72.4$, $\varepsilon=100$", color='red', marker='s')
+plt.scatter(r72_4_e400[:, 0], r72_4_e400[:, 1], label=r"DNS: $R_\lambda=72.4$, $\varepsilon=400$", color='purple', marker='d')
+
+# Plot model predictions
+plt.plot(particle_radius * 1e6, np.diagonal(g12_values_re23_e100), label=r"Model: $R_\lambda=23$, $\varepsilon=100$", color='blue')
+plt.plot(particle_radius * 1e6, np.diagonal(g12_values_re23_e400), label=r"Model: $R_\lambda=23$, $\varepsilon=400$", color='green')
+plt.plot(particle_radius * 1e6, np.diagonal(g12_values_re72_4_e100), label=r"Model: $R_\lambda=72.4$, $\varepsilon=100$", color='red')
+plt.plot(particle_radius * 1e6, np.diagonal(g12_values_re72_4_e400), label=r"Model: $R_\lambda=72.4$, $\varepsilon=400$", color='purple')
+
 plt.xlabel('Particle Radius (µm)')
-plt.ylabel('Radial Distribution Function g₁₂')
+plt.ylabel('Radial Distribution Function $g_{12}$')
 plt.title('Radial Distribution Function Comparison')
 plt.legend()
 plt.grid(True)
+plt.ylim(0, 30)
 plt.show()
 # %%
