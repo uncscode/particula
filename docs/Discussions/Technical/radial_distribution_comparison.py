@@ -187,8 +187,6 @@ r23_e400 = np.array(
     ]
 )
 
-g12_values_re23_400 = ...
-
 # case: R_lambda = 72.4, turbulent_dissipation = 100 cm2 s−3
 # r72.4_e100: 6 rows, 2 columns (X, Y)
 r72_4_e100 = np.array(
@@ -201,8 +199,6 @@ r72_4_e100 = np.array(
         [59.93757803, 9.525547445],
     ]
 )
-
-g12_values_re72_4_e100 = ...
 
 # case: R_lambda = 72.4, turbulent_dissipation = 400 cm2 s−3
 # r72.4_e400: 6 rows, 2 columns (X, Y)
