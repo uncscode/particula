@@ -86,6 +86,7 @@ def coulomb_dyachkov2007(
     Journal of Chemical Physics, 126(12).
     https://doi.org/10.1063/1.2713719
     """
+
     coulomb_potential_ratio = np.maximum(
         coulomb_potential_ratio, 1e-16
     )  # Avoid division by zero
@@ -141,6 +142,7 @@ def coulomb_gatti2008(
     E - Statistical, Nonlinear, and Soft Matter Physics, 78(4).
     https://doi.org/10.1103/PhysRevE.78.046402
     """
+    bool_mask = coulomb_potential_ratio >= 0
     # Ensure no division by zero
     coulomb_potential_ratio = np.maximum(coulomb_potential_ratio, 1e-16)
 
@@ -153,7 +155,7 @@ def coulomb_gatti2008(
     factored_term = (pi_sqrt * continuum * coulomb_potential_ratio * 1.22) / (
         2 * kinetic * diffusive_knudsen
     )
-    exponential_decay = np.exp(-factored_term)
+    exponential_decay = safe_exp(-factored_term)
 
     term1 = continuum_limit * (1 - (1 + factored_term) * exponential_decay)
     term2 = (
@@ -174,7 +176,7 @@ def coulomb_gatti2008(
     )
     # coulomb_potential_ratio is below 0 returns hard sphere
     return np.where(
-        coulomb_potential_ratio > 0,
+        bool_mask,
         term1 + term2,
         hard_sphere(diffusive_knudsen),
     )
@@ -246,6 +248,7 @@ def coulomb_chahl2019(
     Aerosol Science and Technology, 53(8), 933-957.
     https://doi.org/10.1080/02786826.2019.1614522
     """
+    bool_mask = coulomb_potential_ratio > 0
     # Ensure no division by zero
     coulomb_potential_ratio = np.maximum(coulomb_potential_ratio, 1e-12)
 
@@ -270,7 +273,7 @@ def coulomb_chahl2019(
         )
     )
     return np.where(
-        coulomb_potential_ratio > 0,
+        bool_mask,
         safe_exp(correction_mu) * hard_sphere(diffusive_knudsen),
         hard_sphere(diffusive_knudsen),
     )
