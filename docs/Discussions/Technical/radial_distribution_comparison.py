@@ -15,7 +15,9 @@ Usage:
 
 import numpy as np
 import matplotlib.pyplot as plt
-from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import get_g12_radial_distribution_ao2008
+from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import (
+    get_g12_radial_distribution_ao2008,
+)
 from particula.particles import properties
 from particula.gas import properties as gas_properties
 from particula.util.converting.units import convert_units
@@ -52,7 +54,11 @@ def g12_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    normalized_accel_variance = gas_properties.get_normalized_accel_variance_ao2008(re_lambda=reynolds_lambda)
+    normalized_accel_variance = (
+        gas_properties.get_normalized_accel_variance_ao2008(
+            re_lambda=reynolds_lambda
+        )
+    )
     kolmogorov_velocity = gas_properties.get_kolmogorov_velocity(
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
@@ -76,6 +82,7 @@ def g12_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
 
     return g12_values
 
+
 # plot of radius 'a' (microns) vs g12 (r=2a)
 
 # DNS datasets for radial distribution function
@@ -92,10 +99,10 @@ r23_e100 = np.array(
 
 # Define the particle radii and other required parameters
 particle_radius = np.linspace(1e-6, 60e-6, 100)  # From 1 µm to 60 µm
-temperature = 300                                # Example value
-particle_density = 1000                          # Example value
-fluid_density = 1.225                            # Example value
-relative_velocity = 1e-6                          # Example value
+temperature = 300  # Example value
+particle_density = 1000  # Example value
+fluid_density = 1.225  # Example value
+relative_velocity = 1e-6  # Example value
 
 # 1. Basic fluid properties
 dynamic_viscosity = gas_properties.get_dynamic_viscosity(temperature)
@@ -117,8 +124,10 @@ particle_inertia_time = properties.get_particle_inertia_time(
 
 # R_lambda = 23, turbulent_dissipation = 100 cm2/s3
 
-reynolds_lambda = 23                             # From the dataset
-turbulent_dissipation = 100 * convert_units("cm^2/s^3", "m^2/s^3")  # Example value
+reynolds_lambda = 23  # From the dataset
+turbulent_dissipation = 100 * convert_units(
+    "cm^2/s^3", "m^2/s^3"
+)  # Example value
 
 # encapsolate the following in a function:
 kolmogorov_time = gas_properties.get_kolmogorov_time(
@@ -129,7 +138,11 @@ kolmogorov_length_scale = gas_properties.get_kolmogorov_length(
     kinematic_viscosity=kinematic_viscosity,
     turbulent_dissipation=turbulent_dissipation,
 )
-normalized_accel_variance = gas_properties.get_normalized_accel_variance_ao2008(re_lambda=reynolds_lambda)
+normalized_accel_variance = (
+    gas_properties.get_normalized_accel_variance_ao2008(
+        re_lambda=reynolds_lambda
+    )
+)
 kolmogorov_velocity = gas_properties.get_kolmogorov_velocity(
     kinematic_viscosity=kinematic_viscosity,
     turbulent_dissipation=turbulent_dissipation,
@@ -264,9 +277,9 @@ plt.plot(
     color="purple",
 )
 
-plt.xlabel('Particle Radius (µm)')
-plt.ylabel('Radial Distribution Function $g_{12}$')
-plt.title('Radial Distribution Function Comparison')
+plt.xlabel("Particle Radius (µm)")
+plt.ylabel("Radial Distribution Function $g_{12}$")
+plt.title("Radial Distribution Function Comparison")
 plt.legend()
 plt.grid(True)
 plt.ylim(0, 30)
