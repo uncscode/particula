@@ -83,7 +83,17 @@ def g12_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
     return g12_values
 
 
-# plot of radius 'a' (microns) vs g12 (r=2a)
+# %% [markdown]
+"""
+## DNS Datasets
+
+We have the following DNS datasets for the radial distribution function $g_{12}$:
+
+- **Case 1**: $R_\\lambda = 23$, $\\varepsilon = 100$ cm²/s³
+- **Case 2**: $R_\\lambda = 23$, $\\varepsilon = 400$ cm²/s³
+- **Case 3**: $R_\\lambda = 72.4$, $\\varepsilon = 100$ cm²/s³
+- **Case 4**: $R_\\lambda = 72.4$, $\\varepsilon = 400$ cm²/s³
+"""
 
 # DNS datasets for radial distribution function
 r23_e100 = np.array(
@@ -97,7 +107,16 @@ r23_e100 = np.array(
     ]
 )
 
-# Define the particle radii and other required parameters
+# %% [markdown]
+"""
+## Define Particle Radii and Parameters
+
+We define the particle radii range and other necessary parameters for the calculations.
+
+- **Particle Radii**: Ranging from 1 µm to 60 µm.
+- **Turbulent Dissipation Rates**: 100 cm²/s³ and 400 cm²/s³ converted to m²/s³.
+- **Reynolds Lambda Numbers**: 23 and 72.4.
+"""
 particle_radius = np.linspace(1e-6, 60e-6, 100)  # From 1 µm to 60 µm
 temperature = 300  # Example value
 particle_density = 1000  # Example value
@@ -158,7 +177,17 @@ stokes_number = properties.get_stokes_number(
 turbulent_dissipation_100 = 100 * convert_units("cm^2/s^3", "m^2/s^3")
 turbulent_dissipation_400 = 400 * convert_units("cm^2/s^3", "m^2/s^3")
 
-# Compute g₁₂ values for each case
+# %% [markdown]
+"""
+## Compute $g_{12}$ Values for Each Case
+
+Using the `g12_calc` function, we compute the radial distribution function for each case:
+
+- **Case 1**: $R_\\lambda = 23$, $\\varepsilon = 100$ cm²/s³
+- **Case 2**: $R_\\lambda = 23$, $\\varepsilon = 400$ cm²/s³
+- **Case 3**: $R_\\lambda = 72.4$, $\\varepsilon = 100$ cm²/s³
+- **Case 4**: $R_\\lambda = 72.4$, $\\varepsilon = 400$ cm²/s³
+"""
 g12_values_re23_e100 = g12_calc(
     particle_radius, turbulent_dissipation_100, reynolds_lambda=23
 )
@@ -214,7 +243,15 @@ r72_4_e400 = np.array(
 )
 
 
-# Plot the Comparison Graph for all cases
+# %% [markdown]
+"""
+## Plot the Comparison Graph
+
+We plot the DNS data and their corresponding model predictions on the same graph for easy comparison.
+
+- Each DNS dataset and its model prediction are plotted sequentially with the same color.
+- The legend entries follow the order of DNS data and model prediction for each case.
+"""
 fig, ax = plt.subplots(figsize=(6, 6))
 
 # case 1: R_lambda = 23, epsilon = 100
