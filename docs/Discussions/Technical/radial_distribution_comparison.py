@@ -225,6 +225,7 @@ ax.scatter(
     color="blue",
     marker="o",
 )
+# Case 2: R_lambda = 23, epsilon = 400
 ax.scatter(
     r23_e400[:, 0],
     r23_e400[:, 1],
@@ -232,51 +233,48 @@ ax.scatter(
     color="green",
     marker="^",
 )
-plt.scatter(
+ax.plot(
+    particle_radius * 1e6,
+    np.diagonal(g12_values_re23_e400),
+    label=r"Model: $R_\lambda=23$, $\varepsilon=400$",
+    color="green",
+)
+
+# Case 3: R_lambda = 72.4, epsilon = 100
+ax.scatter(
     r72_4_e100[:, 0],
     r72_4_e100[:, 1],
     label=r"DNS: $R_\lambda=72.4$, $\varepsilon=100$",
     color="red",
     marker="s",
 )
-plt.scatter(
+ax.plot(
+    particle_radius * 1e6,
+    np.diagonal(g12_values_re72_4_e100),
+    label=r"Model: $R_\lambda=72.4$, $\varepsilon=100$",
+    color="red",
+)
+
+# Case 4: R_lambda = 72.4, epsilon = 400
+ax.scatter(
     r72_4_e400[:, 0],
     r72_4_e400[:, 1],
     label=r"DNS: $R_\lambda=72.4$, $\varepsilon=400$",
     color="purple",
     marker="d",
 )
-
-# Plot model predictions
 ax.plot(
-    particle_radius * 1e6,
-    np.diagonal(g12_values_re23_e100),
-    label=r"Model: $R_\lambda=23$, $\varepsilon=100$",
-    color="blue",
-)
-plt.plot(
-    particle_radius * 1e6,
-    np.diagonal(g12_values_re23_e400),
-    label=r"Model: $R_\lambda=23$, $\varepsilon=400$",
-    color="green",
-)
-plt.plot(
-    particle_radius * 1e6,
-    np.diagonal(g12_values_re72_4_e100),
-    label=r"Model: $R_\lambda=72.4$, $\varepsilon=100$",
-    color="red",
-)
-plt.plot(
     particle_radius * 1e6,
     np.diagonal(g12_values_re72_4_e400),
     label=r"Model: $R_\lambda=72.4$, $\varepsilon=400$",
     color="purple",
 )
 
+# Set labels, title, legend, etc.
 ax.set_xlabel("Particle Radius (µm)")
 ax.set_ylabel("Radial Distribution Function $g_{12}$")
 ax.set_title("Radial Distribution Function Comparison")
-ax.legend(loc='upper left')
+ax.legend(loc="upper left")
 ax.grid(True)
 ax.set_ylim(0, 40)
 plt.show()
