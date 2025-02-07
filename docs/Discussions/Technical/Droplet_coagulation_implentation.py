@@ -1,6 +1,8 @@
 # %% Comparison of DNS with the implementation in particula
 
 import numpy as np
+import matplotlib.pyplot as plt
+from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import get_g12_radial_distribution_ao2008
 
 """
     - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
@@ -98,7 +100,41 @@ zhou01te = np.array(
     ]
 )
 
-# %%
+# %% Radial Distribution Function Comparison
+
+# Using the DNS datasets provided, e.g., r23_e100
+particle_radius = np.linspace(1e-6, 60e-6, 100)  # Example radii from 1 µm to 60 µm
+stokes_number = np.linspace(0.1, 1.0, 100)  # Example Stokes numbers
+kolmogorov_length_scale = 1e-3  # Example value
+reynolds_lambda = 23  # Example value from the provided dataset
+normalized_accel_variance = 0.5  # Example value
+kolmogorov_velocity = 0.1  # Example value
+kolmogorov_time = 0.01  # Example value
+
+g12_values = get_g12_radial_distribution_ao2008(
+    particle_radius,
+    stokes_number,
+    kolmogorov_length_scale,
+    reynolds_lambda,
+    normalized_accel_variance,
+    kolmogorov_velocity,
+    kolmogorov_time,
+)
+
+# Plot DNS data
+plt.scatter(r23_e100[:, 0], r23_e100[:, 1], label='DNS Data', color='blue')
+
+# Plot calculated g12 values
+plt.plot(particle_radius * 1e6, g12_values, label='Model Prediction', color='red')
+
+plt.xlabel('Particle Radius (µm)')
+plt.ylabel('Radial Distribution Function g₁₂')
+plt.title('Radial Distribution Function Comparison')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Comparison of the radial distribution function g₁₂ between DNS data and model prediction
 
 # Figure 12: Comparison of the predicted and simulated mean-square horizontal
 # particle velocities for droplets falling in a turbulent ﬂow of Rλ = 72.41 and
