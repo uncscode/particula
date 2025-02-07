@@ -217,7 +217,7 @@ r72_4_e400 = np.array(
 # Plot the Comparison Graph for all cases
 fig, ax = plt.subplots(figsize=(6, 6))
 
-# Plot DNS data
+# case 1: R_lambda = 23, epsilon = 100
 ax.scatter(
     r23_e100[:, 0],
     r23_e100[:, 1],
@@ -225,6 +225,13 @@ ax.scatter(
     color="blue",
     marker="o",
 )
+ax.plot(
+    particle_radius * 1e6,
+    np.diagonal(g12_values_re23_e100),
+    label=r"Model: $R_\lambda=23$, $\varepsilon=100$",
+    color="blue",
+)
+
 # Case 2: R_lambda = 23, epsilon = 400
 ax.scatter(
     r23_e400[:, 0],
