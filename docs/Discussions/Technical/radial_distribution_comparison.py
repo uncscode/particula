@@ -1,5 +1,8 @@
-# %%
+# %% [markdown]
 """
+
+# Radial Distribution Function Comparison
+
 This script compares the radial distribution function g₁₂ between DNS data
 and the model prediction.
 
@@ -89,10 +92,10 @@ def g12_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
 
 We have the following DNS datasets for the radial distribution function $g_{12}$:
 
-- **Case 1**: $R_\\lambda = 23$, $\\varepsilon = 100$ cm²/s³
-- **Case 2**: $R_\\lambda = 23$, $\\varepsilon = 400$ cm²/s³
-- **Case 3**: $R_\\lambda = 72.4$, $\\varepsilon = 100$ cm²/s³
-- **Case 4**: $R_\\lambda = 72.4$, $\\varepsilon = 400$ cm²/s³
+- **Case 1**: $R_\lambda = 23$, $\varepsilon = 100$ cm²/s³
+- **Case 2**: $R_\lambda = 23$, $\varepsilon = 400$ cm²/s³
+- **Case 3**: $R_\lambda = 72.4$, $\varepsilon = 100$ cm²/s³
+- **Case 4**: $R_\lambda = 72.4$, $\varepsilon = 400$ cm²/s³
 """
 
 # DNS datasets for radial distribution function
@@ -183,10 +186,10 @@ turbulent_dissipation_400 = 400 * convert_units("cm^2/s^3", "m^2/s^3")
 
 Using the `g12_calc` function, we compute the radial distribution function for each case:
 
-- **Case 1**: $R_\\lambda = 23$, $\\varepsilon = 100$ cm²/s³
-- **Case 2**: $R_\\lambda = 23$, $\\varepsilon = 400$ cm²/s³
-- **Case 3**: $R_\\lambda = 72.4$, $\\varepsilon = 100$ cm²/s³
-- **Case 4**: $R_\\lambda = 72.4$, $\\varepsilon = 400$ cm²/s³
+- **Case 1**: $R_\lambda = 23$, $\varepsilon = 100$ cm²/s³
+- **Case 2**: $R_\lambda = 23$, $\varepsilon = 400$ cm²/s³
+- **Case 3**: $R_\lambda = 72.4$, $\varepsilon = 100$ cm²/s³
+- **Case 4**: $R_\lambda = 72.4$, $\varepsilon = 400$ cm²/s³
 """
 g12_values_re23_e100 = g12_calc(
     particle_radius, turbulent_dissipation_100, reynolds_lambda=23
