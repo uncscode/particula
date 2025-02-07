@@ -6,7 +6,7 @@ and the model prediction.
 It uses the function `get_g12_radial_distribution_ao2008` from the `particula`
 library to compute g₁₂ values over a range of particle radii.
 
-The script then plots these computed values against the DNS dataset `r23_e100`
+The script then plots these computed values against the DNS datasets
 for visual comparison.
 
 Usage:
