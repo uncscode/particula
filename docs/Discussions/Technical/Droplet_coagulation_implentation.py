@@ -100,7 +100,99 @@ zhou01te = np.array(
     ]
 )
 
-# %% Radial Distribution Function Comparison
+# %% Collision Kernel Comparison
+
+from particula.dynamics.coagulation.turbulent_dns_kernel.kernel_ao2008 import get_kernel_ao2008
+
+# Define necessary parameters
+kernel_values = get_kernel_ao2008(
+    particle_radius,
+    velocity_dispersion,
+    particle_inertia_time,
+    stokes_number,
+    kolmogorov_length_scale,
+    reynolds_lambda,
+    normalized_accel_variance,
+    kolmogorov_velocity,
+    kolmogorov_time,
+)
+
+# Using the provided kernel data
+plt.scatter(data[:, 0], data[:, 1], label='DNS Data', color='cyan')
+
+# Plot calculated kernel values
+plt.plot(particle_radius * 1e6, kernel_values, label='Model Prediction', color='magenta')
+
+plt.xlabel('Particle Radius (µm)')
+plt.ylabel('Collision Kernel (cm³/s)')
+plt.title('Collision Kernel Comparison')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Comparison of collision kernel Γ₁₂ between DNS data and model prediction
+
+from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import get_radial_relative_velocity_ao2008
+
+# Define necessary parameters
+velocity_dispersion = 0.1  # Example value
+particle_inertia_time = np.linspace(0.01, 0.1, 100)  # Example values
+
+radial_relative_velocity = get_radial_relative_velocity_ao2008(
+    velocity_dispersion,
+    particle_inertia_time,
+)
+
+# Example using data from figure 13
+plt.scatter(data[:, 0], data[:, 1], label='DNS Data', color='purple')
+
+# Plot calculated radial relative velocities
+plt.plot(particle_radius * 1e6, radial_relative_velocity, label='Model Prediction', color='brown')
+
+plt.xlabel('Particle Radius (µm)')
+plt.ylabel('Radial Relative Velocity (m/s)')
+plt.title('Radial Relative Velocity Comparison')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Comparison of radial relative velocities between DNS data and model prediction
+
+from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import get_relative_velocity_variance
+
+# Define necessary parameters
+fluid_rms_velocity = 0.2  # Example value
+collisional_radius = np.linspace(1e-6, 60e-6, 100)  # Example values
+particle_inertia_time = np.linspace(0.01, 0.1, 100)  # Example values
+particle_velocity = np.linspace(0.1, 1.0, 100)  # Example values
+taylor_microscale = 1e-3  # Example value
+eulerian_integral_length = 1e-2  # Example value
+lagrangian_integral_time = 0.1  # Example value
+
+sigma_squared = get_relative_velocity_variance(
+    fluid_rms_velocity,
+    collisional_radius,
+    particle_inertia_time,
+    particle_velocity,
+    taylor_microscale,
+    eulerian_integral_length,
+    lagrangian_integral_time,
+)
+
+# Plot DNS data
+plt.scatter(dns_400_cm2_s3[:, 0], dns_400_cm2_s3[:, 1], label='DNS Data', color='green')
+
+# Plot calculated mean-square velocities
+plt.plot(particle_radius * 1e6, sigma_squared, label='Model Prediction', color='orange')
+
+plt.xlabel('Particle Radius (µm)')
+plt.ylabel('Mean-Square Horizontal Velocity (cm²/s²)')
+plt.title('Mean-Square Horizontal Velocity Comparison')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Comparison of mean-square horizontal velocities between DNS data and model prediction
 
 # Using the DNS datasets provided, e.g., r23_e100
 particle_radius = np.linspace(1e-6, 60e-6, 100)  # Example radii from 1 µm to 60 µm
