@@ -6,7 +6,7 @@ import pytest
 import numpy as np
 
 from particula.particles.properties.reynolds_number import (
-    get_particle_reynolds_number
+    get_particle_reynolds_number,
 )
 
 
@@ -70,12 +70,6 @@ def test_get_particle_reynolds_number_regime_classification():
         500e-6, 50.0, 1.5e-5
     )  # Should be > 1000
 
-    assert (
-        re_p_stokes < 1
-    )
-    assert (
-        1 <= re_p_transitional < 1000
-    )
-    assert (
-        re_p_turbulent > 1000
-    )
+    assert re_p_stokes < 1
+    assert 1 <= re_p_transitional < 1000
+    assert re_p_turbulent > 1000

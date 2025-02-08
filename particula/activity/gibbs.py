@@ -13,10 +13,7 @@ from particula.util.machine_limit import safe_log
 def gibbs_free_engery(
     organic_mole_fraction: NDArray[np.float64],
     gibbs_mix: NDArray[np.float64],
-) -> Tuple[
-    NDArray[np.float64],
-    NDArray[np.float64]
-]:
+) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
     """
     Calculate the gibbs free energy of the mixture. Ideal and non-ideal.
 
@@ -30,9 +27,8 @@ def gibbs_free_engery(
         - gibbs_real : The real gibbs free energy of mixing.
     """
 
-    gibbs_ideal = (1 - organic_mole_fraction) \
-        * safe_log(1 - organic_mole_fraction) \
-        + organic_mole_fraction \
-        * safe_log(organic_mole_fraction)
+    gibbs_ideal = (1 - organic_mole_fraction) * safe_log(
+        1 - organic_mole_fraction
+    ) + organic_mole_fraction * safe_log(organic_mole_fraction)
     gibbs_real = gibbs_ideal + gibbs_mix
     return gibbs_ideal, gibbs_real

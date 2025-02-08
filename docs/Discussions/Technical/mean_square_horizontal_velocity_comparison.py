@@ -5,14 +5,16 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity
 )
 
 # DNS dataset for mean-square horizontal velocities
-dns_400_cm2_s3 = np.array([
-    [9.876237624, 166.9135802],
-    [20.08663366, 163.9506173],
-    [30.11138614, 150.1234568],
-    [40.07425743, 129.1358025],
-    [50.03712871, 100.4938272],
-    [60.06188119, 69.62962963],
-])
+dns_400_cm2_s3 = np.array(
+    [
+        [9.876237624, 166.9135802],
+        [20.08663366, 163.9506173],
+        [30.11138614, 150.1234568],
+        [40.07425743, 129.1358025],
+        [50.03712871, 100.4938272],
+        [60.06188119, 69.62962963],
+    ]
+)
 
 # Define Parameters
 particle_radius = np.linspace(1e-6, 60e-6, 100)
@@ -36,11 +38,18 @@ sigma_squared = get_relative_velocity_variance(
 )
 
 # Plot the Comparison Graph
-plt.scatter(dns_400_cm2_s3[:, 0], dns_400_cm2_s3[:, 1], label='DNS Data', color='green')
-plt.plot(particle_radius * 1e6, sigma_squared, label='Model Prediction', color='orange')
-plt.xlabel('Particle Radius (µm)')
-plt.ylabel('Mean-Square Horizontal Velocity (cm²/s²)')
-plt.title('Mean-Square Horizontal Velocity Comparison')
+plt.scatter(
+    dns_400_cm2_s3[:, 0], dns_400_cm2_s3[:, 1], label="DNS Data", color="green"
+)
+plt.plot(
+    particle_radius * 1e6,
+    sigma_squared,
+    label="Model Prediction",
+    color="orange",
+)
+plt.xlabel("Particle Radius (µm)")
+plt.ylabel("Mean-Square Horizontal Velocity (cm²/s²)")
+plt.title("Mean-Square Horizontal Velocity Comparison")
 plt.legend()
 plt.grid(True)
 plt.show()

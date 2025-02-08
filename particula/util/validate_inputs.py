@@ -8,31 +8,31 @@ import numpy as np
 
 
 def validate_positive(value, name):
-    """ validate positive """
+    """validate positive"""
     if np.any(value <= 0):
         raise ValueError(f"Argument '{name}' must be positive.")
 
 
 def validate_negative(value, name):
-    """ validate negative """
+    """validate negative"""
     if np.any(value >= 0):
         raise ValueError(f"Argument '{name}' must be negative.")
 
 
 def validate_nonpositive(value, name):
-    """ validate nonpositive """
+    """validate nonpositive"""
     if np.any(value > 0):
         raise ValueError(f"Argument '{name}' must be nonpositive.")
 
 
 def validate_nonnegative(value, name):
-    """ validate nonnegative """
+    """validate nonnegative"""
     if np.any(value < 0):
         raise ValueError(f"Argument '{name}' must be nonnegative.")
 
 
 def validate_nonzero(value, name):
-    """ validate nonzero """
+    """validate nonzero"""
     if np.any(value == 0):
         raise ValueError(f"Argument '{name}' must be nonzero.")
 
@@ -51,6 +51,7 @@ def validate_inputs(dict_args):
     Returns:
         A decorator for input validation.
     """
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -59,9 +60,12 @@ def validate_inputs(dict_args):
             params = list(sig.parameters.keys())
             for name, comp in dict_args.items():
                 value = kwargs.get(
-                    name, args[params.index(name)]
-                    if name in params and params.index(name) < len(args)
-                    else None
+                    name,
+                    (
+                        args[params.index(name)]
+                        if name in params and params.index(name) < len(args)
+                        else None
+                    ),
                 )
                 if comp == "positive":
                     validate_positive(value, name)
@@ -78,5 +82,7 @@ def validate_inputs(dict_args):
                         f"Unknown validation '{comp}' for argument '{name}'."
                     )
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator

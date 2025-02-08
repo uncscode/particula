@@ -310,7 +310,8 @@ class GasSpecies:
             ```
         """
         new_concentration = self._check_if_negative_concentration(
-            new_concentration)
+            new_concentration
+        )
         self.concentration = new_concentration
 
     def _check_if_negative_concentration(

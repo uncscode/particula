@@ -67,7 +67,8 @@ def discrete_gain(
     """
     # Calculate bin widths (delta_x_array)
     delta_x_array = np.diff(
-        radius, append=2 * radius[-1] - radius[-2])  # type: ignore
+        radius, append=2 * radius[-1] - radius[-2]
+    )  # type: ignore
 
     # Convert concentration to a probability density function (PDF)
     concentration_pdf = concentration / delta_x_array
@@ -87,7 +88,8 @@ def discrete_gain(
 
     # Compute gain using numerical integration
     gain = radius**2 * np.trapezoid(
-        interp.ev(dpd, dpi) / dpi**2, dpd, axis=0)  # type: ignore
+        interp.ev(dpd, dpi) / dpi**2, dpd, axis=0
+    )  # type: ignore
 
     # Convert back to original scale (from PDF to PMF)
     return gain * delta_x_array
@@ -157,5 +159,5 @@ def continuous_gain(
     return radius**2 * np.trapezoid(
         interp.ev(dpd, dpi) / dpi**2,  # type: ignore
         dpd,
-        axis=0  # type: ignore
+        axis=0,  # type: ignore
     )

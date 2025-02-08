@@ -1,10 +1,11 @@
 """
 Tests for the get_particle_inertia_time function.
 """
+
 import pytest
 import numpy as np
 from particula.particles.properties.inertia_time import (
-    get_particle_inertia_time
+    get_particle_inertia_time,
 )
 
 

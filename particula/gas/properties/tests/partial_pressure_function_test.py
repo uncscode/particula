@@ -44,8 +44,8 @@ def test_calculate_partial_pressure_edge_cases():
         (1e-6, 0.029, 298),  # Very low concentration
         (1e6, 0.029, 298),  # Very high concentration
         (1.0, 0.001, 298),  # Very low molar mass
-        (1.0, 1.0, 298),    # High molar mass
-        (1.0, 0.029, 1),    # Very low temperature
+        (1.0, 1.0, 298),  # High molar mass
+        (1.0, 0.029, 1),  # Very low temperature
         (1.0, 0.029, 1e4),  # Very high temperature
     ]
     for concentration, molar_mass, temperature in test_cases:

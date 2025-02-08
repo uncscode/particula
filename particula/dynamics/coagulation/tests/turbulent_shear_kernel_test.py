@@ -29,7 +29,7 @@ def test_turbulent_shear_kernel_single_value():
         diameter_particle[:, np.newaxis] + diameter_particle[np.newaxis, :]
     ) ** 3
     value = saffman_turner_1956(
-        diameter_particle/2, turbulent_kinetic_energy, kinematic_viscosity
+        diameter_particle / 2, turbulent_kinetic_energy, kinematic_viscosity
     )
     np.testing.assert_allclose(value, expected_kernel, rtol=1e-6)
 

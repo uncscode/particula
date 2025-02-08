@@ -9,8 +9,8 @@ import logging
 logger = logging.getLogger("particula")
 
 # Define a generic type variable for the strategy type, to get good type hints
-BuilderT = TypeVar('BuilderT')
-StrategyT = TypeVar('StrategyT')
+BuilderT = TypeVar("BuilderT")
+StrategyT = TypeVar("StrategyT")
 
 
 class StrategyFactory(ABC, Generic[BuilderT, StrategyT]):
@@ -25,8 +25,7 @@ class StrategyFactory(ABC, Generic[BuilderT, StrategyT]):
         """
 
     def get_strategy(
-        self, strategy_type: str,
-        parameters: Optional[Dict[str, Any]] = None
+        self, strategy_type: str, parameters: Optional[Dict[str, Any]] = None
     ) -> StrategyT:
         """
         Generic factory method to create objects instances.
@@ -47,7 +46,7 @@ class StrategyFactory(ABC, Generic[BuilderT, StrategyT]):
             logger.error(message)
             raise ValueError(message)
 
-        if parameters and hasattr(builder, 'set_parameters'):
+        if parameters and hasattr(builder, "set_parameters"):
             builder.set_parameters(parameters)  # type: ignore
 
         return builder.build()  # type: ignore

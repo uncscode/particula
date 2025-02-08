@@ -24,17 +24,16 @@ config = {
             "format": "[%(levelname)s|%(module)s|L%(lineno)d]: %(message)s"
         },
         "detailed": {
-            "format":
-            "[%(levelname)s|%(module)s|L%(lineno)d] %(asctime)s: %(message)s",
-            "datefmt": "%Y-%m-%dT%H:%M:%S%z"
-        }
+            "format": "[%(levelname)s|%(module)s|L%(lineno)d] %(asctime)s: %(message)s",
+            "datefmt": "%Y-%m-%dT%H:%M:%S%z",
+        },
     },
     "handlers": {
         "stderr": {
             "class": "logging.StreamHandler",
             "level": "ERROR",
             "formatter": "simple",
-            "stream": "ext://sys.stderr"
+            "stream": "ext://sys.stderr",
         },
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
@@ -42,23 +41,17 @@ config = {
             "formatter": "detailed",
             "filename": os.path.join(log_dir, "particula.log"),
             "maxBytes": 25_000_000,
-            "backupCount": 3
-        }
+            "backupCount": 3,
+        },
     },
     "loggers": {
         "particula": {
             "level": "DEBUG",
             "handlers": ["file", "stderr"],
-            "propagate": False
+            "propagate": False,
         },
-        "root": {
-            "level": "ERROR",
-            "handlers": [
-                "stderr",
-                "file"
-            ]
-        }
-    }
+        "root": {"level": "ERROR", "handlers": ["stderr", "file"]},
+    },
 }
 
 
