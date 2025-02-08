@@ -3,13 +3,20 @@ import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
     get_radial_relative_velocity_ao2008,
 )
-from particula.particles.properties.inertia_time import (
-    get_particle_inertia_time,
+from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
+    get_relative_velocity_variance,
 )
-from particula.gas.properties.kinematic_viscosity import (
-    get_kinematic_viscosity,
-)
+from particula.particles.properties.inertia_time import get_particle_inertia_time
+from particula.particles.properties.settling_velocity import get_particle_settling_velocity_via_inertia
+from particula.gas.properties.kinematic_viscosity import get_kinematic_viscosity
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
+from particula.gas.properties.fluid_rms_velocity import get_fluid_rms_velocity
+from particula.gas.properties.taylor_microscale_module import get_taylor_microscale
+from particula.gas.properties.integral_scale_module import (
+    get_eulerian_integral_length,
+    get_lagrangian_integral_time,
+)
+from particula.util.constants import STANDARD_GRAVITY
 
 # DNS Data from Figure 13
 data = np.array(
@@ -46,7 +53,65 @@ particle_inertia_time = get_particle_inertia_time(
     kinematic_viscosity=kinematic_viscosity,
     relative_velocity=relative_velocity,
 )
-velocity_dispersion = 0.1  # Example value
+turbulent_dissipation = 400 * 1e-4  # Example value in m²/s³
+reynolds_lambda = 72.41  # Example value
+
+# Calculate dynamic and kinematic viscosity
+dynamic_viscosity = get_dynamic_viscosity(temperature)
+kinematic_viscosity = get_kinematic_viscosity(dynamic_viscosity, fluid_density)
+
+# Calculate Particle Inertia Time
+particle_inertia_time = get_particle_inertia_time(
+    particle_radius=particle_radius,
+    particle_density=particle_density,
+    fluid_density=fluid_density,
+    kinematic_viscosity=kinematic_viscosity,
+    relative_velocity=relative_velocity,
+)
+
+# Calculate Particle Settling Velocity
+slip_correction_factor = 1.0  # Assuming no slip correction for simplicity
+particle_settling_velocity = get_particle_settling_velocity_via_inertia(
+    particle_inertia_time=particle_inertia_time,
+    gravitational_acceleration=STANDARD_GRAVITY,
+    slip_correction_factor=slip_correction_factor,
+)
+
+# Calculate Fluid RMS Velocity
+fluid_rms_velocity = get_fluid_rms_velocity(
+    re_lambda=reynolds_lambda,
+    kinematic_viscosity=kinematic_viscosity,
+    turbulent_dissipation=turbulent_dissipation,
+)
+
+# Calculate Turbulence Scales
+taylor_microscale = get_taylor_microscale(
+    fluid_rms_velocity=fluid_rms_velocity,
+    kinematic_viscosity=kinematic_viscosity,
+    turbulent_dissipation=turbulent_dissipation,
+)
+eulerian_integral_length = get_eulerian_integral_length(
+    fluid_rms_velocity=fluid_rms_velocity,
+    turbulent_dissipation=turbulent_dissipation,
+)
+lagrangian_integral_time = get_lagrangian_integral_time(
+    fluid_rms_velocity=fluid_rms_velocity,
+    turbulent_dissipation=turbulent_dissipation,
+)
+
+# Calculate Collisional Radius
+collisional_radius = particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
+
+# Calculate Velocity Dispersion
+velocity_dispersion = get_relative_velocity_variance(
+    fluid_rms_velocity=fluid_rms_velocity,
+    collisional_radius=collisional_radius,
+    particle_inertia_time=particle_inertia_time,
+    particle_velocity=particle_settling_velocity,
+    taylor_microscale=taylor_microscale,
+    eulerian_integral_length=eulerian_integral_length,
+    lagrangian_integral_time=lagrangian_integral_time,
+)
 
 
 def radial_velocity_calc(velocity_dispersion, particle_inertia_time):
