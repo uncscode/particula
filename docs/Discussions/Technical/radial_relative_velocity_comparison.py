@@ -125,11 +125,26 @@ velocity_dispersion = get_relative_velocity_variance(
 
 
 def radial_velocity_calc(velocity_dispersion, particle_inertia_time):
+    # Debugging: Print the value of velocity_dispersion
+    print(f"radial_velocity_calc - velocity_dispersion: {velocity_dispersion}")
+
+    # Check if velocity_dispersion contains NaN
+    if np.isnan(velocity_dispersion).any():
+        print("Warning: velocity_dispersion contains NaN")
+
     # Compute Radial Relative Velocities
     radial_relative_velocity = get_radial_relative_velocity_ao2008(
         velocity_dispersion,
         particle_inertia_time,
     )
+
+    # Debugging: Print the value of radial_relative_velocity
+    print(f"radial_velocity_calc - radial_relative_velocity: {radial_relative_velocity}")
+
+    # Check if radial_relative_velocity contains NaN
+    if np.isnan(radial_relative_velocity).any():
+        print("Warning: radial_relative_velocity contains NaN")
+
     return radial_relative_velocity
 
 
