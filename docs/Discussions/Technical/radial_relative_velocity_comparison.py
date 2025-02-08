@@ -139,7 +139,9 @@ def radial_velocity_calc(velocity_dispersion, particle_inertia_time):
     )
 
     # Debugging: Print the value of radial_relative_velocity
-    print(f"radial_velocity_calc - radial_relative_velocity: {radial_relative_velocity}")
+    print(
+        f"radial_velocity_calc - radial_relative_velocity: {radial_relative_velocity}"
+    )
 
     # Check if radial_relative_velocity contains NaN
     if np.isnan(radial_relative_velocity).any():
