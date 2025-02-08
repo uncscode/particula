@@ -4,6 +4,15 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.kernel_ao2008 import (
     get_kernel_ao2008,
 )
 
+
+# Case 1: Comparison of Collision Kernel
+
+# DNS dynamic collision kernel and predicted collision kernel of
+# sedimenting droplets in a turbulent ﬂow. (a) a1 = 30µm, Rλ = 72.41 and  =
+# 400 cm2 s−3
+
+# plot of radius (microns) vs kernel (cm3/s)
+
 # Dataset for kernel comparison
 data = np.array([
     [10.06067961, 0.000581818],
@@ -23,11 +32,9 @@ particle_radius = np.linspace(1e-6, 60e-6, 100)
 particle_inertia_time = np.linspace(0.01, 0.1, 100)
 stokes_number = np.linspace(0.1, 1.0, 100)
 velocity_dispersion = 0.1
-kolmogorov_length_scale = 1e-3
 reynolds_lambda = 72.41  # Example value
-normalized_accel_variance = 0.5
-kolmogorov_velocity = 0.1
-kolmogorov_time = 0.01
+turbulent_dissipation = 400  # cm²/s³
+
 
 # Compute Kernel Values
 kernel_values = get_kernel_ao2008(
