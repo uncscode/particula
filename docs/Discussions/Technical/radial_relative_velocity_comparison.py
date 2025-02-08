@@ -25,6 +25,7 @@ particle_radius = np.linspace(1e-6, 60e-6, 100)
 particle_inertia_time = np.linspace(0.01, 0.1, 100)
 velocity_dispersion = 0.1  # Example value
 
+
 def radial_velocity_calc(velocity_dispersion, particle_inertia_time):
     # Compute Radial Relative Velocities
     radial_relative_velocity = get_radial_relative_velocity_ao2008(
@@ -32,6 +33,7 @@ def radial_velocity_calc(velocity_dispersion, particle_inertia_time):
         particle_inertia_time,
     )
     return radial_relative_velocity
+
 
 # Compute Radial Relative Velocities
 radial_relative_velocity = radial_velocity_calc(
