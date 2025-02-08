@@ -3,8 +3,12 @@ import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
     get_radial_relative_velocity_ao2008,
 )
-from particula.particles.properties.inertia_time import get_particle_inertia_time
-from particula.gas.properties.kinematic_viscosity import get_kinematic_viscosity
+from particula.particles.properties.inertia_time import (
+    get_particle_inertia_time,
+)
+from particula.gas.properties.kinematic_viscosity import (
+    get_kinematic_viscosity,
+)
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
 
 # DNS Data from Figure 13
