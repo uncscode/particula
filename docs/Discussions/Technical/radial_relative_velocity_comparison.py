@@ -4,7 +4,7 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module 
     get_radial_relative_velocity_ao2008,
 )
 
-# Data from Figure 13
+# DNS Data from Figure 13
 data = np.array(
     [
         [10.06195787, 5.602409639],
@@ -20,15 +20,22 @@ data = np.array(
     ]
 )
 
-# Define Parameters
+# Define Particle Radii and Parameters
 particle_radius = np.linspace(1e-6, 60e-6, 100)
 particle_inertia_time = np.linspace(0.01, 0.1, 100)
 velocity_dispersion = 0.1  # Example value
 
+def radial_velocity_calc(velocity_dispersion, particle_inertia_time):
+    # Compute Radial Relative Velocities
+    radial_relative_velocity = get_radial_relative_velocity_ao2008(
+        velocity_dispersion,
+        particle_inertia_time,
+    )
+    return radial_relative_velocity
+
 # Compute Radial Relative Velocities
-radial_relative_velocity = get_radial_relative_velocity_ao2008(
-    velocity_dispersion,
-    particle_inertia_time,
+radial_relative_velocity = radial_velocity_calc(
+    velocity_dispersion, particle_inertia_time
 )
 
 # Plot the Comparison Graph
