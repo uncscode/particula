@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.kernel_ao2008 import (
     get_kernel_ao2008,
     get_relative_velocity_variance,
-    get_radial_relative_velocity_ao2008,
-    get_relat,
 )
-from particula.particles import properties
+from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
+    get_radial_relative_velocity_ao2008,
+)
 from particula.gas import properties as gas_properties
 from particula.util.converting.units import convert_units
 
