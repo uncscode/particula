@@ -56,19 +56,19 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
     relative_velocity = 1e-6  # Relative velocity in m/s
 
     # 1. Basic fluid properties
-    dynamic_viscosity = get_dynamic_viscosity(temperature)
-    kinematic_viscosity = get_kinematic_viscosity(
+    dynamic_viscosity = gas_properties.get_dynamic_viscosity(temperature)
+    kinematic_viscosity = gas_properties.get_kinematic_viscosity(
         dynamic_viscosity=dynamic_viscosity, fluid_density=fluid_density
     )
-    mean_free_path = molecule_mean_free_path(
+    mean_free_path = gas_properties.molecule_mean_free_path(
         temperature=temperature, dynamic_viscosity=dynamic_viscosity
     )
 
     # 2. Slip correction factors
-    knudsen_number = calculate_knudsen_number(
+    knudsen_number = properties.calculate_knudsen_number(
         mean_free_path=mean_free_path, particle_radius=particle_radius
     )
-    slip_correction_factor = cunningham_slip_correction(knudsen_number)
+    slip_correction_factor = properties.cunningham_slip_correction(knudsen_number)
 
     # Handle radius addition properly for arrays
     collisional_radius = (
@@ -78,41 +78,41 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
     )
 
     # 3. Particle inertia and settling velocity
-    particle_inertia_time = get_particle_inertia_time(
+    particle_inertia_time = properties.get_particle_inertia_time(
         particle_radius=particle_radius,
         particle_density=particle_density,
         fluid_density=fluid_density,
         kinematic_viscosity=kinematic_viscosity,
         relative_velocity=relative_velocity,
     )
-    particle_settling_velocity = get_particle_settling_velocity_via_inertia(
+    particle_settling_velocity = properties.get_particle_settling_velocity_via_inertia(
         particle_inertia_time=particle_inertia_time,
-        gravitational_acceleration=STANDARD_GRAVITY,
+        gravitational_acceleration=properties.STANDARD_GRAVITY,
         slip_correction_factor=slip_correction_factor,
     )
 
     # 4. Turbulence scales
-    fluid_rms_velocity = get_fluid_rms_velocity(
+    fluid_rms_velocity = gas_properties.get_fluid_rms_velocity(
         re_lambda=re_lambda,
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    taylor_microscale = get_taylor_microscale(
+    taylor_microscale = gas_properties.get_taylor_microscale(
         fluid_rms_velocity=fluid_rms_velocity,
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    eulerian_integral_length = get_eulerian_integral_length(
+    eulerian_integral_length = gas_properties.get_eulerian_integral_length(
         fluid_rms_velocity=fluid_rms_velocity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    lagrangian_integral_time = get_lagrangian_integral_time(
+    lagrangian_integral_time = gas_properties.get_lagrangian_integral_time(
         fluid_rms_velocity=fluid_rms_velocity,
         turbulent_dissipation=turbulent_dissipation,
     )
 
     # 5. Relative velocity variance
-    velocity_dispersion = get_relative_velocity_variance(
+    velocity_dispersion = gas_properties.get_relative_velocity_variance(
         fluid_rms_velocity=fluid_rms_velocity,
         collisional_radius=collisional_radius,
         particle_inertia_time=particle_inertia_time,
@@ -123,27 +123,27 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
     )
 
     # 6. Additional turbulence-based quantities
-    kolmogorov_time = get_kolmogorov_time(
+    kolmogorov_time = gas_properties.get_kolmogorov_time(
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    stokes_number = get_stokes_number(
+    stokes_number = properties.get_stokes_number(
         particle_inertia_time=particle_inertia_time,
         kolmogorov_time=kolmogorov_time,
     )
-    kolmogorov_length_scale = get_kolmogorov_length(
+    kolmogorov_length_scale = gas_properties.get_kolmogorov_length(
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    reynolds_lambda = get_particle_reynolds_number(
+    reynolds_lambda = properties.get_particle_reynolds_number(
         particle_radius=particle_radius,
         particle_velocity=particle_settling_velocity,
         kinematic_viscosity=kinematic_viscosity,
     )
-    normalized_accel_variance = get_normalized_accel_variance_ao2008(
+    normalized_accel_variance = gas_properties.get_normalized_accel_variance_ao2008(
         re_lambda=reynolds_lambda,
     )
-    kolmogorov_velocity = get_kolmogorov_velocity(
+    kolmogorov_velocity = gas_properties.get_kolmogorov_velocity(
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
