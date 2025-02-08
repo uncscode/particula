@@ -1,3 +1,4 @@
+# %%
 import numpy as np
 import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
@@ -17,8 +18,13 @@ from particula.gas.properties.kinematic_viscosity import (
 )
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
 from particula.gas.properties.fluid_rms_velocity import get_fluid_rms_velocity
+from particula.gas.properties.normalize_accel_variance import (
+    get_normalized_accel_variance_ao2008,
+)
+from particula.gas.properties.kolmogorov_module import get_kolmogorov_time
 from particula.gas.properties.taylor_microscale_module import (
     get_taylor_microscale,
+    get_lagrangian_taylor_microscale_time,
 )
 from particula.gas.properties.integral_scale_module import (
     get_eulerian_integral_length,
@@ -26,6 +32,22 @@ from particula.gas.properties.integral_scale_module import (
 )
 from particula.util.constants import STANDARD_GRAVITY
 
+
+from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008 import (
+    compute_b1,
+    compute_b2,
+    compute_c1,
+    compute_c2,
+    compute_d1,
+    compute_d2,
+    compute_e1,
+    compute_e2,
+    compute_z,
+    compute_beta,
+)
+
+
+# %%
 # DNS Data from Figure 13
 data = np.array(
     [
@@ -49,10 +71,17 @@ particle_density = 1000  # Particle density in kg/m³
 fluid_density = 1.225  # Fluid (air) density in kg/m³
 relative_velocity = 1e-6  # Relative velocity in m/s
 
+turbulent_dissipation = 400 * 1e-4  # Example value in m²/s³
+reynolds_lambda = 72.41  # Example value
+
+
 # Calculate dynamic and kinematic viscosity
 dynamic_viscosity = get_dynamic_viscosity(temperature)
 kinematic_viscosity = get_kinematic_viscosity(dynamic_viscosity, fluid_density)
-
+kolmogorov_time = get_kolmogorov_time(
+    kinematic_viscosity=kinematic_viscosity,
+    turbulent_dissipation=turbulent_dissipation,
+)
 # Calculate Particle Inertia Time
 particle_inertia_time = get_particle_inertia_time(
     particle_radius=particle_radius,
@@ -61,8 +90,6 @@ particle_inertia_time = get_particle_inertia_time(
     kinematic_viscosity=kinematic_viscosity,
     relative_velocity=relative_velocity,
 )
-turbulent_dissipation = 400 * 1e-4  # Example value in m²/s³
-reynolds_lambda = 72.41  # Example value
 
 # Calculate dynamic and kinematic viscosity
 dynamic_viscosity = get_dynamic_viscosity(temperature)
@@ -106,12 +133,35 @@ lagrangian_integral_time = get_lagrangian_integral_time(
     fluid_rms_velocity=fluid_rms_velocity,
     turbulent_dissipation=turbulent_dissipation,
 )
+normalized_accel_variance = get_normalized_accel_variance_ao2008(
+    re_lambda=reynolds_lambda
+)
+lagrangian_taylor_microscale_time = get_lagrangian_taylor_microscale_time(
+    kolmogorov_time=kolmogorov_time,
+    re_lambda=reynolds_lambda,
+    accel_variance=normalized_accel_variance,
+)
 
 # Calculate Collisional Radius
 collisional_radius = (
     particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
 )
+z = compute_z(lagrangian_taylor_microscale_time, eulerian_integral_length)
+beta = compute_beta(taylor_microscale, eulerian_integral_length)
 
+b1=compute_b1(z)
+array_b = np.linspace(1e-6, 0.75, 100)
+
+
+b2=compute_b2(z)
+d1=compute_d1(beta)
+d2=compute_d2(beta)
+c1=compute_c1(z, lagrangian_integral_time)
+c2=compute_c2(z, lagrangian_integral_time)
+e1=compute_e1(z, eulerian_integral_length)
+e2=compute_e2(z, eulerian_integral_length)
+
+# %%
 # Calculate Velocity Dispersion
 velocity_dispersion = get_relative_velocity_variance(
     fluid_rms_velocity=fluid_rms_velocity,
@@ -155,6 +205,7 @@ radial_relative_velocity = radial_velocity_calc(
     velocity_dispersion, particle_inertia_time
 )
 
+# %%
 # Plot the Comparison Graph
 plt.scatter(data[:, 0], data[:, 1], label="DNS Data", color="purple")
 plt.plot(

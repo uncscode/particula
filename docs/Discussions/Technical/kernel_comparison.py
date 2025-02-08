@@ -2,14 +2,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.kernel_ao2008 import (
     get_kernel_ao2008,
-    get_relative_velocity_variance,
 )
+
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
     get_radial_relative_velocity_ao2008,
 )
+from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import (
+    get_g12_radial_distribution_ao2008,
+)
+from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
+    get_relative_velocity_variance,
+)
+
+from particula.particles import properties
 from particula.gas import properties as gas_properties
 from particula.util.converting.units import convert_units
-
+from particula.util.constants import STANDARD_GRAVITY
 
 # Case 1: Comparison of Collision Kernel
 
@@ -90,14 +98,14 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
     particle_settling_velocity = (
         properties.get_particle_settling_velocity_via_inertia(
             particle_inertia_time=particle_inertia_time,
-            gravitational_acceleration=properties.STANDARD_GRAVITY,
+            gravitational_acceleration=STANDARD_GRAVITY,
             slip_correction_factor=slip_correction_factor,
         )
     )
 
     # 4. Turbulence scales
     fluid_rms_velocity = gas_properties.get_fluid_rms_velocity(
-        re_lambda=re_lambda,
+        re_lambda=reynolds_lambda,
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
@@ -115,8 +123,10 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
         turbulent_dissipation=turbulent_dissipation,
     )
 
+
+    
     # 5. Relative velocity variance
-    velocity_dispersion = gas_properties.get_relative_velocity_variance(
+    velocity_dispersion = get_relative_velocity_variance(
         fluid_rms_velocity=fluid_rms_velocity,
         collisional_radius=collisional_radius,
         particle_inertia_time=particle_inertia_time,
@@ -175,12 +185,14 @@ kernel_values = kernel_calc(
     particle_radius, turbulent_dissipation, reynolds_lambda
 )
 
+print(kernel_values)
 # %% [markdown]
 """
 ## Plot the Comparison Graph
 
 We plot the DNS data and their corresponding model predictions on the same graph for easy comparison.
 """
+
 plt.scatter(data[:, 0], data[:, 1], label="DNS Data", color="cyan")
 plt.plot(
     particle_radius * 1e6,

@@ -17,12 +17,12 @@ from particula.util.validate_inputs import validate_inputs
 
 @validate_inputs(
     {
-        "lagrangian_integral_time": "positive",
+        "lagrangian_taylor_microscale_time": "positive",
         "eulerian_integral_length": "positive",
     }
 )
 def compute_z(
-    lagrangian_integral_time: Union[float, NDArray[np.float64]],
+    lagrangian_taylor_microscale_time: Union[float, NDArray[np.float64]],
     eulerian_integral_length: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
@@ -30,19 +30,21 @@ def compute_z(
 
         z = τ_T / L_e
 
-    - τ_T (lagrangian_integral_time) : Lagrangian Taylor microscale time [s].
+    - τ_T (lagrangian_taylor_microscale_time) : Lagrangian Taylor
+        microscale time [s].
     - L_e (eulerian_integral_length) : Eulerian integral length scale [m].
 
     Arguments:
     ----------
-        - lagrangian_integral_time : Lagrangian Taylor microscale time [s].
+        - lagrangian_taylor_microscale_time : Lagrangian Taylor microscale
+            time [s].
         - eulerian_integral_length : Eulerian integral length scale [m].
 
     Returns:
     --------
         - z value [-].
     """
-    return lagrangian_integral_time / eulerian_integral_length
+    return lagrangian_taylor_microscale_time / eulerian_integral_length
 
 
 @validate_inputs(
