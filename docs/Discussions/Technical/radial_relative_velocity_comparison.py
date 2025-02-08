@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
     get_radial_relative_velocity_ao2008,
 )
+from particula.particles.properties.inertia_time import get_particle_inertia_time
+from particula.gas.properties.kinematic_viscosity import get_kinematic_viscosity
+from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
 
 # DNS Data from Figure 13
 data = np.array(
@@ -22,7 +25,23 @@ data = np.array(
 
 # Define Particle Radii and Parameters
 particle_radius = np.linspace(1e-6, 60e-6, 100)
-particle_inertia_time = np.linspace(0.01, 0.1, 100)
+temperature = 300  # Temperature in Kelvin
+particle_density = 1000  # Particle density in kg/m³
+fluid_density = 1.225  # Fluid (air) density in kg/m³
+relative_velocity = 1e-6  # Relative velocity in m/s
+
+# Calculate dynamic and kinematic viscosity
+dynamic_viscosity = get_dynamic_viscosity(temperature)
+kinematic_viscosity = get_kinematic_viscosity(dynamic_viscosity, fluid_density)
+
+# Calculate Particle Inertia Time
+particle_inertia_time = get_particle_inertia_time(
+    particle_radius=particle_radius,
+    particle_density=particle_density,
+    fluid_density=fluid_density,
+    kinematic_viscosity=kinematic_viscosity,
+    relative_velocity=relative_velocity,
+)
 velocity_dispersion = 0.1  # Example value
 
 
