@@ -6,12 +6,20 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module 
 from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
     get_relative_velocity_variance,
 )
-from particula.particles.properties.inertia_time import get_particle_inertia_time
-from particula.particles.properties.settling_velocity import get_particle_settling_velocity_via_inertia
-from particula.gas.properties.kinematic_viscosity import get_kinematic_viscosity
+from particula.particles.properties.inertia_time import (
+    get_particle_inertia_time,
+)
+from particula.particles.properties.settling_velocity import (
+    get_particle_settling_velocity_via_inertia,
+)
+from particula.gas.properties.kinematic_viscosity import (
+    get_kinematic_viscosity,
+)
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
 from particula.gas.properties.fluid_rms_velocity import get_fluid_rms_velocity
-from particula.gas.properties.taylor_microscale_module import get_taylor_microscale
+from particula.gas.properties.taylor_microscale_module import (
+    get_taylor_microscale,
+)
 from particula.gas.properties.integral_scale_module import (
     get_eulerian_integral_length,
     get_lagrangian_integral_time,
@@ -100,7 +108,9 @@ lagrangian_integral_time = get_lagrangian_integral_time(
 )
 
 # Calculate Collisional Radius
-collisional_radius = particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
+collisional_radius = (
+    particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
+)
 
 # Calculate Velocity Dispersion
 velocity_dispersion = get_relative_velocity_variance(
