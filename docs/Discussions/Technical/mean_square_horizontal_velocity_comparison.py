@@ -103,7 +103,7 @@ dns_400_cm2_s3 = np.array(
 # %% Model equations
 # Define Particle Radii and Parameters
 particle_radius = np.linspace(10e-6, 60e-6, 6)
-temperature = 300  # Temperature in Kelvin
+temperature = 273  # Temperature in Kelvin
 particle_density = 1000  # Particle density in kg/m³
 fluid_density = 1.0  # Fluid (air) density in kg/m³
 air_velocity = 1e-9  # Relative velocity in m/s
@@ -134,13 +134,6 @@ iterative_settling_velocity = get_particle_settling_velocity_with_drag(
     slip_correction_factor=slip_correction_factor,
     gravitational_acceleration=STANDARD_GRAVITY,
 )
-settling_velocity = properties.particle_settling_velocity(
-    particle_radius=particle_radius,
-    particle_density=particle_density,
-    slip_correction_factor=slip_correction_factor,
-    dynamic_viscosity=dynamic_viscosity,
-)
-relative_velocity = iterative_settling_velocity - air_velocity
 # Calculate Particle Inertia Time
 particle_inertia_time = get_particle_inertia_time(
     particle_radius=particle_radius,
@@ -294,7 +287,7 @@ ax.plot(
 
 # Set labels, title, legend, etc.
 ax.set_xlabel("Particle Radius (µm)")
-ax.set_ylabel("Mean-Square Horizontal Velocity (cm²/s²)")
+ax.set_ylabel(r"$<(v'_x)^2>$ (cm²/s²)")
 ax.set_ylim(0, 180)
 ax.set_xlim(5, 65)
 ax.set_title("Mean-Square Horizontal Velocity Comparison")
