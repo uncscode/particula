@@ -148,9 +148,7 @@ mean_free_path = gas_properties.molecule_mean_free_path(
 knudsen_number = properties.calculate_knudsen_number(
     mean_free_path=mean_free_path, particle_radius=particle_radius
 )
-slip_correction_factor = properties.cunningham_slip_correction(
-    knudsen_number
-)
+slip_correction_factor = properties.cunningham_slip_correction(knudsen_number)
 particle_settling_velocity = get_particle_settling_velocity_via_inertia(
     particle_inertia_time=particle_inertia_time,
     gravitational_acceleration=STANDARD_GRAVITY,
@@ -192,7 +190,6 @@ def calculate_horizontal_velocity(turbulent_dissipation, reynolds_lambda):
         re_lambda=reynolds_lambda,
         accel_variance=normalized_accel_variance,
     )
-
 
     z = compute_z(lagrangian_taylor_microscale_time, lagrangian_integral_time)
     beta = compute_beta(taylor_microscale, eulerian_integral_length)
