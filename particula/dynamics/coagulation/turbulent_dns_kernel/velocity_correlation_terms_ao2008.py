@@ -28,7 +28,7 @@ def compute_z(
     """
     Compute z, which is defined as:
 
-        z = τ_T / T_L L_e
+        z = τ_T / T_L
 
     - τ_T (lagrangian_taylor_microscale_time) : Lagrangian Taylor
         microscale time [s].
