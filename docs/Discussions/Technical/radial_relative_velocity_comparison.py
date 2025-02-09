@@ -31,7 +31,7 @@ from particula.gas.properties.integral_scale_module import (
     get_lagrangian_integral_time,
 )
 from particula.util.constants import STANDARD_GRAVITY
-
+from particula.util.converting.units import convert_units
 
 from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008 import (
     compute_b1,
@@ -66,12 +66,14 @@ data = np.array(
 
 # Define Particle Radii and Parameters
 particle_radius = np.linspace(1e-6, 60e-6, 100)
-temperature = 300  # Temperature in Kelvin
+temperature = 293  # Temperature in Kelvin
 particle_density = 1000  # Particle density in kg/m³
 fluid_density = 1.225  # Fluid (air) density in kg/m³
-relative_velocity = 1e-6  # Relative velocity in m/s
+relative_velocity = 1e-2  # Relative velocity in m/s
 
-turbulent_dissipation = 400 * 1e-4  # Example value in m²/s³
+turbulent_dissipation = 400 * convert_units(
+    "cm^2/s^3", "m^2/s^3"
+)  # Example value in m²/s³
 reynolds_lambda = 72.41  # Example value
 
 
@@ -142,24 +144,25 @@ lagrangian_taylor_microscale_time = get_lagrangian_taylor_microscale_time(
     accel_variance=normalized_accel_variance,
 )
 
+
 # Calculate Collisional Radius
 collisional_radius = (
     particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
 )
-z = compute_z(lagrangian_taylor_microscale_time, eulerian_integral_length)
+z = compute_z(lagrangian_taylor_microscale_time, lagrangian_integral_time)
 beta = compute_beta(taylor_microscale, eulerian_integral_length)
 
-b1=compute_b1(z)
+b1 = compute_b1(z)
 array_b = np.linspace(1e-6, 0.75, 100)
 
 
-b2=compute_b2(z)
-d1=compute_d1(beta)
-d2=compute_d2(beta)
-c1=compute_c1(z, lagrangian_integral_time)
-c2=compute_c2(z, lagrangian_integral_time)
-e1=compute_e1(z, eulerian_integral_length)
-e2=compute_e2(z, eulerian_integral_length)
+b2 = compute_b2(z)
+d1 = compute_d1(beta)
+d2 = compute_d2(beta)
+c1 = compute_c1(z, lagrangian_integral_time)
+c2 = compute_c2(z, lagrangian_integral_time)
+e1 = compute_e1(z, eulerian_integral_length)
+e2 = compute_e2(z, eulerian_integral_length)
 
 # %%
 # Calculate Velocity Dispersion
@@ -171,9 +174,11 @@ velocity_dispersion = get_relative_velocity_variance(
     taylor_microscale=taylor_microscale,
     eulerian_integral_length=eulerian_integral_length,
     lagrangian_integral_time=lagrangian_integral_time,
+    lagrangian_taylor_microscale_time=lagrangian_taylor_microscale_time,
 )
 
 
+# %%
 def radial_velocity_calc(velocity_dispersion, particle_inertia_time):
     # Debugging: Print the value of velocity_dispersion
     print(f"radial_velocity_calc - velocity_dispersion: {velocity_dispersion}")
@@ -202,15 +207,16 @@ def radial_velocity_calc(velocity_dispersion, particle_inertia_time):
 
 # Compute Radial Relative Velocities
 radial_relative_velocity = radial_velocity_calc(
-    velocity_dispersion, particle_inertia_time
+    np.abs(velocity_dispersion), particle_inertia_time
 )
 
 # %%
+index = np.argmin(np.abs(particle_radius - 30e-6))
 # Plot the Comparison Graph
 plt.scatter(data[:, 0], data[:, 1], label="DNS Data", color="purple")
 plt.plot(
     particle_radius * 1e6,
-    radial_relative_velocity,
+    radial_relative_velocity[index, :],
     label="Model Prediction",
     color="brown",
 )
@@ -224,3 +230,5 @@ plt.show()
 """
 This script compares the radial relative velocities between DNS data and the model prediction.
 """
+
+# %%

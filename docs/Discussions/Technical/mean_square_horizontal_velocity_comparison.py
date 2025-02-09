@@ -4,7 +4,39 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity
     get_relative_velocity_variance,
 )
 
-# DNS dataset for mean-square horizontal velocities
+ Comparison of the radial distribution function g₁₂ between DNS data and model prediction
+
+# Figure 12: Comparison of the predicted and simulated mean-square horizontal
+# particle velocities for droplets falling in a turbulent ﬂow of Rλ = 72.41 and
+# turbulent_dissipation = 400 cm2 s−3
+
+# droplet radius (a2, microns) vs rms_velocity (cm2/s2)
+
+# dns_10cm2/s3: 6 rows, 2 columns (X, Y)
+dns_10cm2_s3 = np.array(
+    [
+        [9.938118812, 26.66666667],
+        [20.02475248, 26.41975309],
+        [30.04950495, 26.41975309],
+        [40.01237624, 24.69135802],
+        [50.16089109, 22.71604938],
+        [60.06188119, 18.51851852],
+    ]
+)
+
+# dns_100_cm2/s3: 6 rows, 2 columns (X, Y)
+dns_100_cm2_s3 = np.array(
+    [
+        [9.938118812, 84.44444444],
+        [20.02475248, 80.98765432],
+        [29.98762376, 77.03703704],
+        [39.95049505, 71.11111111],
+        [49.97524752, 59.25925926],
+        [60.06188119, 44.19753086],
+    ]
+)
+
+# dns_400_cm2/s3: 6 rows, 2 columns (X, Y)
 dns_400_cm2_s3 = np.array(
     [
         [9.876237624, 166.9135802],
@@ -15,6 +47,7 @@ dns_400_cm2_s3 = np.array(
         [60.06188119, 69.62962963],
     ]
 )
+
 
 # Define Parameters
 particle_radius = np.linspace(1e-6, 60e-6, 100)

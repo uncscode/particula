@@ -123,8 +123,6 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
         turbulent_dissipation=turbulent_dissipation,
     )
 
-
-    
     # 5. Relative velocity variance
     velocity_dispersion = get_relative_velocity_variance(
         fluid_rms_velocity=fluid_rms_velocity,
