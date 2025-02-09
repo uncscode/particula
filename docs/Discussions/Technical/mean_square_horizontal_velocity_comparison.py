@@ -281,11 +281,7 @@ ax.plot(
 ax.set_xlabel("Particle Radius (µm)")
 ax.set_ylabel("Mean-Square Horizontal Velocity (cm²/s²)")
 ax.set_title("Mean-Square Horizontal Velocity Comparison")
-ax.legend(
-    loc='upper center',
-    bbox_to_anchor=(0.5, -0.1),
-    ncol=2
-)
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.1), ncol=2)
 ax.grid(True)
 plt.subplots_adjust(bottom=0.2)
 plt.show()
