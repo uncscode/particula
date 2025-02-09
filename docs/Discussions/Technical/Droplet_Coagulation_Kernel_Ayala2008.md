@@ -182,10 +182,10 @@ $$
 
 Where $C_1$ and $r_c$ are derived based on droplet and turbulence properties.
 
-##### $C_1$: Calculation
+##### C₁: Calculation
 
 $$
-C_1 = \frac{y(St)}{\left(|\mathbf{g}| / (v_k / \tau_k)\right)^{f_3(R_\lambda)}}
+C₁ = y(St) ⁄ \[|g| ⁄ (v_k ⁄ τ_k)\]^{f₃(R_λ)}
 $$
 
 $$
@@ -347,7 +347,7 @@ Here are the variables, their definitions.
 
 ### Droplet (Particle) Properties
 
-- $a_1, a_2$: Radii of the droplets. These determine size-dependent properties such as droplet inertia and terminal velocity. 
+- a₁, a₂: Radii of the droplets. These determine size-dependent properties such as droplet inertia and terminal velocity. 
 
 - ρ_w: Density of water. The mass per unit volume of water, typically 1000 kg/m³. It is essential for calculating droplet inertia and terminal velocity.
 
