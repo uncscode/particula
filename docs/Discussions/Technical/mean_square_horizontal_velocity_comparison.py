@@ -230,7 +230,7 @@ model_rms_400cm2_s3 = calculate_horizontal_velocity(
 
 
 # Plot the Comparison Graph
-fig, ax = plt.subplots(figsize=(6, 6))
+fig, ax = plt.subplots(figsize=(6, 8))
 
 # Case 1: R_lambda = 72.41, epsilon = 10 cm²/s³
 ax.scatter(
@@ -281,8 +281,13 @@ ax.plot(
 ax.set_xlabel("Particle Radius (µm)")
 ax.set_ylabel("Mean-Square Horizontal Velocity (cm²/s²)")
 ax.set_title("Mean-Square Horizontal Velocity Comparison")
-ax.legend(loc="outside right")
+ax.legend(
+    loc='upper center',
+    bbox_to_anchor=(0.5, -0.1),
+    ncol=2
+)
 ax.grid(True)
+plt.subplots_adjust(bottom=0.2)
 plt.show()
 
 """
