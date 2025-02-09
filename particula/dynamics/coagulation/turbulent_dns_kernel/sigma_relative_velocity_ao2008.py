@@ -140,6 +140,7 @@ def get_relative_velocity_variance(
 def _compute_rms_fluctuation_velocity(
     fluid_rms_velocity: float,
     particle_inertia_time: Union[float, NDArray[np.float64]],
+    particle_velocity: Union[float, NDArray[np.float64]],
     velocity_correlation_terms: VelocityCorrelationTerms,
 ) -> Union[float, NDArray[np.float64]]:
     """
@@ -160,6 +161,7 @@ def _compute_rms_fluctuation_velocity(
         - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
         - particle_inertia_time : Inertia timescale of the droplet k [s].
         - velocity_correlation_terms : Velocity correlation coefficients [-].
+        - particle_velocity : Droplet velocity [m/s].
 
     Returns:
     --------
@@ -176,40 +178,48 @@ def _compute_rms_fluctuation_velocity(
         velocity_correlation_terms.c1,
         velocity_correlation_terms.e1,
         particle_inertia_time,
-        fluid_rms_velocity,
+        particle_velocity,
     )
     psi_c1_e2 = get_psi_ao2008(
         velocity_correlation_terms.c1,
         velocity_correlation_terms.e2,
         particle_inertia_time,
-        fluid_rms_velocity,
+        particle_velocity,
     )
     psi_c2_e1 = get_psi_ao2008(
         velocity_correlation_terms.c2,
         velocity_correlation_terms.e1,
         particle_inertia_time,
-        fluid_rms_velocity,
+        particle_velocity,
     )
     psi_c2_e2 = get_psi_ao2008(
         velocity_correlation_terms.c2,
         velocity_correlation_terms.e2,
         particle_inertia_time,
-        fluid_rms_velocity,
+        particle_velocity,
     )
 
     return (fluid_rms_velocity**2 / particle_inertia_time) * (
-        velocity_correlation_terms.b1
-        * velocity_correlation_terms.d1
-        * psi_c1_e1
-        - velocity_correlation_terms.b1
-        * velocity_correlation_terms.d2
-        * psi_c1_e2
-        - velocity_correlation_terms.b2
-        * velocity_correlation_terms.d1
-        * psi_c2_e1
-        + velocity_correlation_terms.b2
-        * velocity_correlation_terms.d2
-        * psi_c2_e2
+        (
+            velocity_correlation_terms.b1
+            * velocity_correlation_terms.d1
+            * psi_c1_e1
+        )
+        - (
+            velocity_correlation_terms.b1
+            * velocity_correlation_terms.d2
+            * psi_c1_e2
+        )
+        - (
+            velocity_correlation_terms.b2
+            * velocity_correlation_terms.d1
+            * psi_c2_e1
+        )
+        + (
+            velocity_correlation_terms.b2
+            * velocity_correlation_terms.d2
+            * psi_c2_e2
+        )
     )
 
 
