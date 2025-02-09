@@ -6,7 +6,7 @@ Ayala, O., Rosa, B., Wang, L. P., & Grabowski, W. W. (2008). Effects of turbulen
 
 Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on the geometric collision rate of sedimenting droplets. Part 2. Theory and parameterization. New Journal of Physics, 10. https://doi.org/10.1088/1367-2630/10/7/075016
 
-## $\Gamma_{12}$: Kernel Description
+## Γ₁₂: Kernel Description
 
 In the parameterization below, the input parameters are:
 
@@ -80,17 +80,18 @@ $$
 ⟨v′^{(1)} v′^{(2)}⟩ = [u′² f₂(R)]⁄[τₚ₁ τₚ₂] × [b₁ d₁ Φ(c₁, e₁) − b₁ d₂ Φ(c₁, e₂) − b₂ d₁ Φ(c₂, e₁) + b₂ d₂ Φ(c₂, e₂)].
 $$
 
-### $f_2(R)$ Longitudinal velocity correlation
+### f₂(R): Longitudinal velocity correlation
 
 This is the longitudinal two-point velocity correlation function, which is a function of the separation distance R between two points in the flow. The function evaluated at r = R is given by:
 
 $$
-f_2(R) = \frac{1}{2(1 - 2\beta^2)^{1/2}} 
-\Bigg\{
-\left(1 + \sqrt{1 - 2\beta^2}\right) \\
-\times \exp\left[-\frac{2R}{(1 + \sqrt{1 - 2\beta^2})L_e}\right] \quad - \left(1 - \sqrt{1 - 2\beta^2}\right) \\
-\times \exp\left[-\frac{2R}{(1 - \sqrt{1 - 2\beta^2})L_e}\right]
-\Bigg\}
+f₂(R) = [1 ⁄ 2√(1 − 2β²)] 
+\Big\{
+[1 + √(1 − 2β²)] 
+e^{[-2R⁄((1 + √(1 − 2β²)) Lₑ)]} 
+− [1 − √(1 − 2β²)] 
+e^{[-2R⁄((1 − √(1 − 2β²)) Lₑ)]}
+\Big\}
 $$
 
 #### $b_1, b_2, c_1, c_2, d_1, d_2, e_1, e_2$: Definitions
