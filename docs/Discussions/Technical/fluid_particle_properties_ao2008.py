@@ -55,7 +55,6 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_te
 )
 
 
-
 # %% DNS values
 
 
@@ -159,22 +158,6 @@ particle_inertia_time = get_particle_inertia_time(
 
 print(f"v: {kinematic_viscosity}")
 
-velocity_kolmogorov = gas_properties.get_kolmogorov_velocity(
-    kinematic_viscosity=kinematic_viscosity,
-    turbulent_dissipation=turbulent_dissipation,
-)
-length_kolmogorov = gas_properties.get_kolmogorov_length(
-    kinematic_viscosity=kinematic_viscosity,
-    turbulent_dissipation=turbulent_dissipation,
-)
-timescale_kolmogorov = gas_properties.get_kolmogorov_time(
-    kinematic_viscosity=kinematic_viscosity,
-    turbulent_dissipation=turbulent_dissipation,
-)
-print(f"τ_k: {timescale_kolmogorov} s")
-print(f"η: {length_kolmogorov * 100} cm")
-print(f"v_k: {velocity_kolmogorov * 100} cm/s")
-
 
 re_p = 2 * particle_radius * relative_velocity / kinematic_viscosity
 f_re_p = 1 + 0.15 * re_p**0.687
@@ -187,40 +170,6 @@ v_p = particle_inertia_time * STANDARD_GRAVITY / manual_f_re_p
 # calculate relative velocity from re_p
 manual_velocity = manual_re_p * kinematic_viscosity / (2 * particle_radius)
 
-
-# print relative velocity in a table format
-print(
-    "Particle Radius (µm) | Relative Velocity (cm/s)| Manual Relative Velocity (cm/s)"
-)
-print("-" * 50)
-for radius, velocity, manual_v, i_v in zip(
-    particle_radius,
-    relative_velocity,
-    manual_velocity,
-    iterative_settling_velocity,
-):
-    print(
-        f"{radius * 1e6:.3f} \t\t | {velocity * 100:.3f} \t\t | {manual_v * 100:.3f} | {i_v * 100:.3f}"
-    )
-
-
-# print settling velocity in a table format
-print("Particle Radius (µm) | Manual Settling Velocity (cm/s)| Re_p | f(Re_p)")
-print("-" * 50)
-for radius, v_index, re, f_re in zip(particle_radius, v_p, re_p, f_re_p):
-    print(
-        f"{radius * 1e6:.3f} \t\t | {v_index * 100:.2f} | {re:.3f} | {f_re:.3f}"
-    )
-
-# print manual re_p f_re_p in a table format vs calculated re_p f_re_p
-print("Particle Radius (µm) | Re_p | f(Re_p) | Manual Re_p | Manual f(Re_p)")
-print("-" * 50)
-for radius, re, f_re, manual_re, manual_f_re in zip(
-    particle_radius, re_p, f_re_p, manual_re_p, manual_f_re_p
-):
-    print(
-        f"{radius * 1e6:.3f} \t\t | {re:.3f} | {f_re:.3f} | {manual_re:.3f} | {manual_f_re:.3f}"
-    )
 
 particle_settling_velocity = (
     properties.get_particle_settling_velocity_via_inertia(
@@ -253,165 +202,82 @@ for radius, tp, settling_velocity, re, f_re in zip(
         f"{radius * 1e6:.1f} \t | {tp:.4f} | {settling_velocity * 100:.2f} \t\t | {re:.3f} | {f_re:.3f}"
     )
 
-# get stokes number
-
-stokes_number = properties.get_stokes_number(
-    particle_inertia_time=particle_inertia_time,
-    kolmogorov_time=timescale_kolmogorov,
+# get stokes number table
+length_kolmogorov = gas_properties.get_kolmogorov_length(
+    kinematic_viscosity=kinematic_viscosity,
+    turbulent_dissipation=turbulent_dissipation,
 )
-stokes_velocity = particle_settling_velocity / velocity_kolmogorov
+
+timescale_kolmogorov_10 = gas_properties.get_kolmogorov_time(
+    kinematic_viscosity=kinematic_viscosity,
+    turbulent_dissipation=10 * convert_units("cm^2/s^3", "m^2/s^3"),
+)
+velocity_kolmogorov_10 = gas_properties.get_kolmogorov_velocity(
+    kinematic_viscosity=kinematic_viscosity,
+    turbulent_dissipation=10 * convert_units("cm^2/s^3", "m^2/s^3"),
+)
+stokes_number_10 = properties.get_stokes_number(
+    particle_inertia_time=particle_inertia_time,
+    kolmogorov_time=timescale_kolmogorov_10,
+)
+stokes_velocity_10 = particle_settling_velocity / velocity_kolmogorov_10
+
+# 100 cm^2/s^3
+timescale_kolmogorov_100 = gas_properties.get_kolmogorov_time(
+    kinematic_viscosity=kinematic_viscosity,
+    turbulent_dissipation=100 * convert_units("cm^2/s^3", "m^2/s^3"),
+)
+velocity_kolmogorov_100 = gas_properties.get_kolmogorov_velocity(
+    kinematic_viscosity=kinematic_viscosity,
+    turbulent_dissipation=100 * convert_units("cm^2/s^3", "m^2/s^3"),
+)
+stokes_number_100 = properties.get_stokes_number(
+    particle_inertia_time=particle_inertia_time,
+    kolmogorov_time=timescale_kolmogorov_100,
+)
+stokes_velocity_100 = particle_settling_velocity / velocity_kolmogorov_100
+
+# 400 cm^2/s^3
+timescale_kolmogorov_400 = gas_properties.get_kolmogorov_time(
+    kinematic_viscosity=kinematic_viscosity,
+    turbulent_dissipation=400 * convert_units("cm^2/s^3", "m^2/s^3"),
+)
+velocity_kolmogorov_400 = gas_properties.get_kolmogorov_velocity(
+    kinematic_viscosity=kinematic_viscosity,
+    turbulent_dissipation=400 * convert_units("cm^2/s^3", "m^2/s^3"),
+)
+stokes_number_400 = properties.get_stokes_number(
+    particle_inertia_time=particle_inertia_time,
+    kolmogorov_time=timescale_kolmogorov_400,
+)
+stokes_velocity_400 = particle_settling_velocity / velocity_kolmogorov_400
+
 
 # print stokes number in a table format
-print("Particle Radius (µm) | Stokes Number | Stokes Velocity")
-print("-" * 50)
-for radius, stokes, stokes_v in zip(
-    particle_radius, stokes_number, stokes_velocity
+
+print("Radius (µm) | St (10 cm^2/s^3) | St (100 cm^2/s^3) | St (400 cm^2/s^3)")
+print("-" * 80)
+for radius, st_10, st_100, st_400 in zip(
+    particle_radius,
+    stokes_number_10,
+    stokes_number_100,
+    stokes_number_400,
 ):
-    print(f"{radius * 1e6:.2f} \t\t | {stokes:.2f} | {stokes_v:.2f}")
-
-
-def calculate_horizontal_velocity(turbulent_dissipation, reynolds_lambda):
-    """
-    Helper function to calculate the mean-square horizontal velocity of particles
-    for these specific cases.
-    """
-    # Calculate Fluid RMS Velocity
-    fluid_rms_velocity = get_fluid_rms_velocity(
-        re_lambda=reynolds_lambda,
-        kinematic_viscosity=kinematic_viscosity,
-        turbulent_dissipation=turbulent_dissipation,
-    )
-
-    # Calculate Turbulence Scales
-    taylor_microscale = get_taylor_microscale(
-        fluid_rms_velocity=fluid_rms_velocity,
-        kinematic_viscosity=kinematic_viscosity,
-        turbulent_dissipation=turbulent_dissipation,
-    )
-    eulerian_integral_length = get_eulerian_integral_length(
-        fluid_rms_velocity=fluid_rms_velocity,
-        turbulent_dissipation=turbulent_dissipation,
-    )
-    lagrangian_integral_time = get_lagrangian_integral_time(
-        fluid_rms_velocity=fluid_rms_velocity,
-        turbulent_dissipation=turbulent_dissipation,
-    )
-    normalized_accel_variance = get_normalized_accel_variance_ao2008(
-        re_lambda=reynolds_lambda
-    )
-    lagrangian_taylor_microscale_time = get_lagrangian_taylor_microscale_time(
-        kolmogorov_time=kolmogorov_time,
-        re_lambda=reynolds_lambda,
-        accel_variance=normalized_accel_variance,
-    )
-
-    print(f"Fluid RMS Velocity: {fluid_rms_velocity * 100} cm/s")
-    print(f"Taylor Microscale: {taylor_microscale * 100} cm")
-    print(f"Eulerian Integral Length: {eulerian_integral_length * 100} cm")
-    print(f"Lagrangian Integral Time: {lagrangian_integral_time} s")
     print(
-        f"Lagrangian Taylor Microscale Time: {lagrangian_taylor_microscale_time} s"
+        f"{radius * 1e6:.1f} \t | {st_10:.4f} \t\t | {st_100:.4f} \t\t | {st_400:.4f}"
     )
 
-    z = compute_z(lagrangian_taylor_microscale_time, lagrangian_integral_time)
-    beta = compute_beta(taylor_microscale, eulerian_integral_length)
-
-    # Calculate v'² Values
-    vel_corr_terms = VelocityCorrelationTerms(
-        b1=compute_b1(z),
-        b2=compute_b2(z),
-        d1=compute_d1(beta),
-        d2=compute_d2(beta),
-        c1=compute_c1(z, lagrangian_integral_time),
-        c2=compute_c2(z, lagrangian_integral_time),
-        e1=compute_e1(z, eulerian_integral_length),
-        e2=compute_e2(z, eulerian_integral_length),
+# print stokes velocity in a table format
+print(
+    "Radius (µm)  | St (10 cm^2/s^3) | St (100 cm^2/s^3) | St (400 cm^2/s^3)"
+)
+print("-" * 80)
+for radius, st_10, st_100, st_400 in zip(
+    particle_radius,
+    stokes_velocity_10,
+    stokes_velocity_100,
+    stokes_velocity_400,
+):
+    print(
+        f"{radius * 1e6:.1f} \t | {st_10:.4f} \t\t | {st_100:.4f} \t\t | {st_400:.4f}"
     )
-
-    return _compute_rms_fluctuation_velocity(
-        fluid_rms_velocity, particle_inertia_time, vel_corr_terms
-    )
-
-
-# %%
-
-
-model_rms_10cm2_s3 = calculate_horizontal_velocity(
-    turbulent_dissipation=10 * convert_units("cm^2/s^3", "m^2/s^3"),
-    reynolds_lambda=reynolds_lambda,
-)
-
-# %%
-model_rms_100cm2_s3 = calculate_horizontal_velocity(
-    turbulent_dissipation=100 * convert_units("cm^2/s^3", "m^2/s^3"),
-    reynolds_lambda=reynolds_lambda,
-)
-
-model_rms_400cm2_s3 = calculate_horizontal_velocity(
-    turbulent_dissipation=400 * convert_units("cm^2/s^3", "m^2/s^3"),
-    reynolds_lambda=reynolds_lambda,
-)
-
-
-# # Plot the Comparison Graph
-fig, ax = plt.subplots(figsize=(6, 8))
-
-# Case 1: R_lambda = 72.41, epsilon = 10 cm²/s³
-ax.scatter(
-    dns_10cm2_s3[:, 0],
-    dns_10cm2_s3[:, 1],
-    label=r"DNS: $R_\lambda=72.41$, $\varepsilon=10$",
-    color="blue",
-    marker="o",
-)
-ax.plot(
-    particle_radius * 1e6,
-    model_rms_10cm2_s3 * 1e4,
-    label=r"Model: $R_\lambda=72.41$, $\varepsilon=10$",
-    color="blue",
-)
-
-# Case 2: R_lambda = 72.41, epsilon = 100 cm²/s³
-ax.scatter(
-    dns_100_cm2_s3[:, 0],
-    dns_100_cm2_s3[:, 1],
-    label=r"DNS: $R_\lambda=72.41$, $\varepsilon=100$",
-    color="green",
-    marker="^",
-)
-ax.plot(
-    particle_radius * 1e6,
-    model_rms_100cm2_s3 * 1e4,
-    label=r"Model: $R_\lambda=72.41$, $\varepsilon=100$",
-    color="green",
-)
-
-# Case 3: R_lambda = 72.41, epsilon = 400 cm²/s³
-ax.scatter(
-    dns_400_cm2_s3[:, 0],
-    dns_400_cm2_s3[:, 1],
-    label=r"DNS: $R_\lambda=72.41$, $\varepsilon=400$",
-    color="red",
-    marker="s",
-)
-ax.plot(
-    particle_radius * 1e6,
-    model_rms_400cm2_s3 * 1e4,
-    label=r"Model: $R_\lambda=72.41$, $\varepsilon=400$",
-    color="red",
-)
-
-# Set labels, title, legend, etc.
-ax.set_xlabel("Particle Radius (µm)")
-ax.set_ylabel("Mean-Square Horizontal Velocity (cm²/s²)")
-ax.set_title("Mean-Square Horizontal Velocity Comparison")
-ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.1), ncol=2)
-ax.grid(True)
-plt.subplots_adjust(bottom=0.2)
-plt.show()
-
-"""
-This script compares the mean-square horizontal velocities between DNS data and the model prediction.
-"""
-
-# %%
