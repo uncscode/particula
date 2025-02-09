@@ -132,7 +132,7 @@ $$
 #### $z$ and $\beta$: Definitions
 
 $$
-z = \frac{\tau_T}{L_e}
+z = \frac{\tau_T}{T_L}
 $$
 
 $$
