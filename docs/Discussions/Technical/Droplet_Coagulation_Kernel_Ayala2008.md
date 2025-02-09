@@ -25,45 +25,45 @@ This is valid under the conditions when $a_k << \eta$, $\rho_w >> \rho$, and $Sv
 geometric collision kernel can be calculated as follows:
 
 $$
-\Gamma_{12} = 2\pi R^2 \langle |w_r| \rangle g_{12}
+Γ₁₂ = 2πR² ⟨|wᵣ|⟩ g₁₂
 $$
 
-## $\langle |w_r| \rangle$: Radial Relative Velocity
+## ⟨|wᵣ|⟩: Radial Relative Velocity
 
 There are two options for calculating the radial relative velocity:
 
-### $\langle |w_r| \rangle$ Dodin 2002:
+### ⟨|wᵣ|⟩ Dodin 2002:
 
 Using the spherical formulation, Dodin and Elperin (2002), decomposed the relative velocity into turbulent and gravity-induced components and assumed that the turbulent component is normally distributed.
 
 Dodin Z and Elperin T 2002 Phys. Fluids 14 2921–24
 
 $$
-\langle |w_r| \rangle = \sqrt{\frac{2}{\pi}} \sigma f(b)
+⟨|wᵣ|⟩ = √(2⁄π) σ f(b)
 $$
 
 where:
 
 $$
-f(b) = \frac{1}{2}\sqrt{\pi}\left(b + \frac{0.5}{b}\right)\text{erf}(b) + \frac{1}{2}\exp(-b^2)
+f(b) = (½)√π (b + 0.5⁄b) erf(b) + (½) exp(−b²)
 $$
 
 $$
-b = \frac{g|\tau_{p1} - \tau_{p2}|}{\sqrt{2} \sigma}
+b = [g |τₚ₁ − τₚ₂|]⁄[√2 σ]
 $$
 
-### $\langle |w_r| \rangle$ Ayala 2008:
+### ⟨|wᵣ|⟩ Ayala 2008:
 
 Here both particle inertia and gravitational effects are accounted for in the relative velocity calculation. Derived by Ayala et al. (2008) based on DNS results.
 
 $$
-\langle |w_r| \rangle = \sqrt{\frac{2}{\pi}} \left(\sigma^2 + \pi/8 (\tau_{p1} + \tau_{p2})^2 |g|^2\right)^{1/2}
+⟨|wᵣ|⟩ = √(2⁄π) √[σ² + (π⁄8)(τₚ₁ + τₚ₂)² |g|²]
 $$
 
 ### $\sigma^2$ Direct Numerical Simulation Fit
 
 $$
-\sigma^2 = \langle (v'^{(2)})^2 \rangle + \langle (v'^{(1)})^2 \rangle - 2 \langle v'^{(1)} v'^{(2)} \rangle
+σ² = ⟨(v′^{(2)})²⟩ + ⟨(v′^{(1)})²⟩ − 2 ⟨v′^{(1)} v′^{(2)}⟩
 $$
 
 The term $\langle (v'^{(2)})^2 \rangle$ is the square of the RMS fluctuation velocity of droplet 2, and $\langle v'^{(1)} v'^{(2)} \rangle$ is the cross-correlation of the fluctuating velocities of droplets 1 and 2.
@@ -71,15 +71,13 @@ The term $\langle (v'^{(2)})^2 \rangle$ is the square of the RMS fluctuation vel
 The square of the RMS fluctuation velocity is given by, for k-th droplet:
 
 $$
-\left\langle \left(v'^{(k)}\right)^2 \right\rangle = \frac{u'^2}{\tau_{pk}}
-\left[b_1 d_1 \Psi(c_1, e_1) - b_1 d_2 \Psi(c_1, e_2) - b_2 d_1 \Psi(c_2, e_1) + b_2 d_2 \Psi(c_2, e_2)\right],
+⟨(v′^{(k)})²⟩ = [u′² ⁄ τₚₖ] [b₁ d₁ Ψ(c₁, e₁) − b₁ d₂ Ψ(c₁, e₂) − b₂ d₁ Ψ(c₂, e₁) + b₂ d₂ Ψ(c₂, e₂)],
 $$
 
 Cross terms is defined as:
 
 $$
-\left\langle v'^{(1)} v'^{(2)} \right\rangle = \frac{u'^2 f_2(R)}{\tau_{p1} \tau_{p2}}\\
-\times \left[b_1 d_1 \Phi(c_1, e_1) - b_1 d_2 \Phi(c_1, e_2) - b_2 d_1 \Phi(c_2, e_1) + b_2 d_2 \Phi(c_2, e_2)\right].
+⟨v′^{(1)} v′^{(2)}⟩ = [u′² f₂(R)]⁄[τₚ₁ τₚ₂] × [b₁ d₁ Φ(c₁, e₁) − b₁ d₂ Φ(c₁, e₂) − b₂ d₁ Φ(c₂, e₁) + b₂ d₂ Φ(c₂, e₂)].
 $$
 
 ### $f_2(R)$ Longitudinal velocity correlation
@@ -129,14 +127,14 @@ $$
 e_2 = \frac{(1 - \sqrt{1 - 2\beta^2})L_e}{2}
 $$
 
-#### $z$ and $\beta$: Definitions
+#### z and β: Definitions
 
 $$
-z = \frac{\tau_T}{T_L}
+z = τ_T ⁄ T_L
 $$
 
 $$
-\beta = \frac{\sqrt{2} \lambda}{L_e}
+β = [√2 λ]⁄Lₑ
 $$
 
 #### $\Phi(\alpha, \phi)$: Definitions
@@ -230,36 +228,36 @@ $$
 
 ## Derived Parameters
 
-### $\tau_k$: Kolmogorov Time
+### τ_k: Kolmogorov Time
 
 The smallest timescale in turbulence where viscous forces dominate:
 
 $$
-\tau_k = \left(\frac{\nu}{\varepsilon}\right)^{1/2}
+τ_k = √(ν⁄ε)
 $$
 
-### $\eta$: Kolmogorov Length Scale
+### η: Kolmogorov Length Scale
 
 The smallest scale in turbulence:
 
 $$
-\eta = \left(\frac{\nu^3}{\varepsilon}\right)^{1/4}
+η = [ν³⁄ε]^{¼}
 $$
 
-### $v_k$: Kolmogorov Velocity Scale
+### v_k: Kolmogorov Velocity Scale
 
 A velocity scale related to the smallest turbulent eddies:
 
 $$
-v_k = (\nu \varepsilon)^{1/4}
+v_k = [ν ε]^{¼}
 $$
 
-### $u'$: Fluid RMS Fluctuation Velocity
+### u′: Fluid RMS Fluctuation Velocity
 
 Quantifies turbulence intensity:
 
 $$
-u' = \frac{R_\lambda^{1/2} v_k}{15^{1/4}} 
+u′ = [R_λ^{½} v_k]⁄[15^{¼}]
 $$
 
 ### $T_L$: Lagrangian Integral Scale
@@ -302,12 +300,12 @@ $$
 \lambda = u' \left(\frac{15 \nu^2}{\epsilon}\right)^{1/2}
 $$
 
-### $\tau_p$: Droplet Inertia Time
+### τ_p: Droplet Inertia Time
 
 Adjusts droplet inertia:
 
 $$
-\tau_p = \frac{2}{9} \frac{\rho_w}{\rho} \frac{a^2}{\nu f(Re_p)}
+τ_p = [2⁄9] [ρ_w⁄ρ] [a²⁄(ν f(Re_p))]
 $$
 
 with:
@@ -316,12 +314,12 @@ $$
 f(Re_p) = 1 + 0.15 Re_p^{0.687}
 $$
 
-### $v_p$: Droplet Settling Velocity
+### v_p: Droplet Settling Velocity
 
 The settling velocity under gravity:
 
 $$
-v_p = \tau_p |g|
+v_p = τ_p |g|
 $$
 
 ### $Re_p$: Particle Reynolds Number
@@ -332,12 +330,12 @@ $$
 Re_p = \frac{2 a v_p}{\nu}
 $$
 
-### $St$: Stokes Number
+### St: Stokes Number
 
 Non-dimensional inertia parameter:
 
 $$
-St = \frac{\tau_p}{\tau_k}
+St = τ_p⁄τ_k
 $$
 
 ---
