@@ -18,12 +18,12 @@ from particula.util.validate_inputs import validate_inputs
 @validate_inputs(
     {
         "lagrangian_taylor_microscale_time": "positive",
-        "lagrangian_integral_scale": "positive",
+        "lagrangian_integral_time": "positive",
     }
 )
 def compute_z(
     lagrangian_taylor_microscale_time: Union[float, NDArray[np.float64]],
-    lagrangian_integral_scale: Union[float, NDArray[np.float64]],
+    lagrangian_integral_time: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Compute z, which is defined as:
@@ -32,13 +32,13 @@ def compute_z(
 
     - τ_T (lagrangian_taylor_microscale_time) : Lagrangian Taylor
         microscale time [s].
-    - L_e (Lagrangian integral scale) : Lagrangian integral scale [s].
+    - T_L (lagrangian_integral_time) : Lagrangian integral timescale [s].
 
     Arguments:
     ----------
         - lagrangian_taylor_microscale_time : Lagrangian Taylor microscale
             time [s].
-        - Lagrangian integral scale : Lagrangian integral scale [s].
+        - lagrangian_integral_time : Lagrangian integral timescale [s].
 
     Returns:
     --------
@@ -93,7 +93,7 @@ def compute_b1(
 
         b₁ = (1 + sqrt(1 - 2z²)) / (2 sqrt(1 - 2z²))
 
-    - z : Defined as z = τ_T / L_e.
+    - z : Defined as z = τ_T / T_L.
 
     Arguments:
     ----------
@@ -123,7 +123,7 @@ def compute_b2(
 
         b₂ = (1 - sqrt(1 - 2z²)) / (2 sqrt(1 - 2z²))
 
-    - z : Defined as z = τ_T / L_e.
+    - z : Defined as z = τ_T / T_L.
 
     Arguments:
     ----------
@@ -154,7 +154,7 @@ def compute_c1(
 
         c₁ = ((1 + sqrt(1 - 2z²)) * T_L) / 2
 
-    - z : Defined as z = τ_T / L_e.
+    - z : Defined as z = τ_T / T_L.
     - T_L (lagrangian_integral_time) : Lagrangian integral timescale [s].
 
     Arguments:
@@ -186,7 +186,7 @@ def compute_c2(
 
         c₂ = ((1 - sqrt(1 - 2z²)) * T_L) / 2
 
-    - z : Defined as z = τ_T / L_e.
+    - z : Defined as z = τ_T / T_L.
     - T_L (lagrangian_integral_time) : Lagrangian integral timescale [s].
 
     Arguments:
