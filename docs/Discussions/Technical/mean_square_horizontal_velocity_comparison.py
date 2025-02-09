@@ -233,20 +233,59 @@ model_rms_400cm2_s3 = calculate_horizontal_velocity(
 
 
 # Plot the Comparison Graph
-plt.scatter(
-    dns_400_cm2_s3[:, 0], dns_400_cm2_s3[:, 1], label="DNS Data", color="green"
+fig, ax = plt.subplots(figsize=(6, 6))
+
+# Case 1: R_lambda = 72.41, epsilon = 10 cm²/s³
+ax.scatter(
+    dns_10cm2_s3[:, 0],
+    dns_10cm2_s3[:, 1],
+    label=r"DNS: $R_\lambda=72.41$, $\varepsilon=10$",
+    color="blue",
+    marker="o",
 )
-plt.plot(
+ax.plot(
+    particle_radius * 1e6,
+    model_rms_10cm2_s3 * 1e4,
+    label=r"Model: $R_\lambda=72.41$, $\varepsilon=10$",
+    color="blue",
+)
+
+# Case 2: R_lambda = 72.41, epsilon = 100 cm²/s³
+ax.scatter(
+    dns_100_cm2_s3[:, 0],
+    dns_100_cm2_s3[:, 1],
+    label=r"DNS: $R_\lambda=72.41$, $\varepsilon=100$",
+    color="green",
+    marker="^",
+)
+ax.plot(
+    particle_radius * 1e6,
+    model_rms_100cm2_s3 * 1e4,
+    label=r"Model: $R_\lambda=72.41$, $\varepsilon=100$",
+    color="green",
+)
+
+# Case 3: R_lambda = 72.41, epsilon = 400 cm²/s³
+ax.scatter(
+    dns_400_cm2_s3[:, 0],
+    dns_400_cm2_s3[:, 1],
+    label=r"DNS: $R_\lambda=72.41$, $\varepsilon=400$",
+    color="red",
+    marker="s",
+)
+ax.plot(
     particle_radius * 1e6,
     model_rms_400cm2_s3 * 1e4,
-    label="Model Prediction",
-    color="orange",
+    label=r"Model: $R_\lambda=72.41$, $\varepsilon=400$",
+    color="red",
 )
-plt.xlabel("Particle Radius (µm)")
-plt.ylabel("Mean-Square Horizontal Velocity (cm²/s²)")
-plt.title("Mean-Square Horizontal Velocity Comparison")
-plt.legend()
-plt.grid(True)
+
+# Set labels, title, legend, etc.
+ax.set_xlabel("Particle Radius (µm)")
+ax.set_ylabel("Mean-Square Horizontal Velocity (cm²/s²)")
+ax.set_title("Mean-Square Horizontal Velocity Comparison")
+ax.legend(loc="upper right")
+ax.grid(True)
 plt.show()
 
 """
