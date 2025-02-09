@@ -61,6 +61,7 @@ def get_relative_velocity_variance(
     taylor_microscale: float,
     eulerian_integral_length: float,
     lagrangian_integral_time: float,
+    lagrangian_taylor_microscale_time: float,
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, disable=too-many-positional-arguments
     """
@@ -96,7 +97,7 @@ def get_relative_velocity_variance(
         https://doi.org/10.1088/1367-2630/10/7/075016
     """
 
-    z = compute_z(lagrangian_integral_time, eulerian_integral_length)
+    z = compute_z(lagrangian_taylor_microscale_time, lagrangian_integral_time)
     beta = compute_beta(taylor_microscale, eulerian_integral_length)
 
     vel_corr_terms = VelocityCorrelationTerms(
