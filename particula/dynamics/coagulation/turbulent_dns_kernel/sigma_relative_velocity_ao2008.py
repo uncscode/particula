@@ -124,7 +124,11 @@ def get_relative_velocity_variance(
         eulerian_integral_length,
         vel_corr_terms,
     )
-    return rms_velocity[:, np.newaxis]**2 + rms_velocity[np.newaxis, :]**2 - 2 * cross_correlation
+    return (
+        rms_velocity[:, np.newaxis] ** 2
+        + rms_velocity[np.newaxis, :] ** 2
+        - 2 * cross_correlation
+    )
 
 
 @validate_inputs(
