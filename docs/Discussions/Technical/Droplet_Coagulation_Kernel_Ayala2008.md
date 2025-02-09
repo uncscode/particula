@@ -10,18 +10,18 @@ Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on the geometri
 
 In the parameterization below, the input parameters are:
 
-- The radii $a_1$ and $a_2$ of the droplets
-- The water density $\rho_w$
+- The radii a₁ and a₂ of the droplets
+- The water density ρ_w
 - Turbulent air flow requires:
-    - The density $\rho$
-    - The viscosity $\nu$
-    - The turbulence dissipation rate $\varepsilon$
-    - The Taylor-microscale Reynolds number $R_\lambda$
-- The gravitational acceleration $|g|$
+    - The density ρ
+    - The viscosity ν
+    - The turbulence dissipation rate ε
+    - The Taylor-microscale Reynolds number R_λ
+- The gravitational acceleration |g|
 
-The output is the collision kernel $\Gamma_{12}$
+The output is the collision kernel Γ₁₂
 
-This is valid under the conditions when $a_k << \eta$, $\rho_w >> \rho$, and $Sv > 1$ , the
+This is valid under the conditions when a_k ≪ η, ρ_w ≫ ρ, and Sv > 1, the
 geometric collision kernel can be calculated as follows:
 
 $$
@@ -60,7 +60,7 @@ $$
 ⟨|wᵣ|⟩ = √(2⁄π) √[σ² + (π⁄8)(τₚ₁ + τₚ₂)² |g|²]
 $$
 
-### $\sigma^2$ Direct Numerical Simulation Fit
+### σ²: Direct Numerical Simulation Fit
 
 $$
 σ² = ⟨(v′^{(2)})²⟩ + ⟨(v′^{(1)})²⟩ − 2 ⟨v′^{(1)} v′^{(2)}⟩
@@ -198,7 +198,7 @@ $$
 
 Where:
 
-$$ St = max(St_1, St_2) $$
+$$ St = \max(St₁, St₂) $$
 
 Since the fitting for $y(St)$ was done for a limited range of St in DNS,
 it should be set to zero for large $St$ when the function $y(St)$ becomes negative.
@@ -261,7 +261,7 @@ $$
 u′ = [R_λ^{½} v_k]⁄[15^{¼}]
 $$
 
-### $T_L$: Lagrangian Integral Scale
+### T_L: Lagrangian Integral Scale
 
 Describes large-scale turbulence:
 
@@ -269,7 +269,7 @@ $$
 T_L = \frac{u'^2}{\epsilon}
 $$
 
-### $L_e$: Eulerian Integral Scale
+### Lₑ: Eulerian Integral Scale
 
 Length scale for large eddies:
 
@@ -277,12 +277,12 @@ $$
 L_e = 0.5 \frac{u'^3}{\epsilon}
 $$
 
-### $a_o$: Coefficient
+### aₒ: Coefficient
 
 A Reynolds-dependent parameter:
 
 $$
-a_o = \frac{11+7 R_\lambda}{205 + R_\lambda}
+aₒ = [11 + 7 R_λ] ⁄ [205 + R_λ]
 $$
 
 ### $\tau_T$: Lagrangian Taylor Microscale Time
@@ -290,7 +290,7 @@ $$
 Time correlation decay for turbulent trajectories:
 
 $$
-\tau_T = \tau_k \left(\frac{2 R_\lambda}{15^{1/2} a_o}\right)^{1/2}
+τ_T = τ_k √[2 R_λ ⁄ (15^{½} aₒ)]
 $$
 
 ### $\lambda$: Taylor Microscale
@@ -298,7 +298,7 @@ $$
 Length scale linked to fluid flow:
 
 $$
-\lambda = u' \left(\frac{15 \nu^2}{\epsilon}\right)^{1/2}
+λ = u′ √[15 ν² ⁄ ε]
 $$
 
 ### τ_p: Droplet Inertia Time
@@ -312,7 +312,7 @@ $$
 with:
 
 $$
-f(Re_p) = 1 + 0.15 Re_p^{0.687}
+f(Re_p) = 1 + 0.15 Re_p^{0.687}
 $$
 
 ### v_p: Droplet Settling Velocity
@@ -323,7 +323,7 @@ $$
 v_p = τ_p |g|
 $$
 
-### $Re_p$: Particle Reynolds Number
+### Re_p: Particle Reynolds Number
 
 Characterizes droplet flow:
 
@@ -349,35 +349,35 @@ Here are the variables, their definitions.
 
 - $a_1, a_2$: Radii of the droplets. These determine size-dependent properties such as droplet inertia and terminal velocity. 
 
-- $\rho_w$: Density of water. The mass per unit volume of water, typically $1000 \, \text{kg/m}^3$. It is essential for calculating droplet inertia and terminal velocity.
+- ρ_w: Density of water. The mass per unit volume of water, typically 1000 kg/m³. It is essential for calculating droplet inertia and terminal velocity.
 
-- $\rho$: Density of air. The mass per unit volume of air, affecting drag and settling velocity. Typical sea-level values are around $1.225 \, \text{kg/m}^3$.
+- ρ: Density of air. The mass per unit volume of air, affecting drag and settling velocity. Typical sea-level values are around 1.225 kg/m³.
 
-- $\nu$: Kinematic viscosity. The ratio of dynamic viscosity to fluid density, quantifying resistance to flow.
+- ν: Kinematic viscosity. The ratio of dynamic viscosity to fluid density, quantifying resistance to flow.
 
-- $\tau_p$: Droplet inertial response time. The characteristic time it takes for a droplet to adjust to changes in the surrounding airflow, critical for droplet motion analysis.
+- τ_p: Droplet inertial response time. The characteristic time it takes for a droplet to adjust to changes in the surrounding airflow, critical for droplet motion analysis.
 
-- $v'^{(i)}_p$: Particle RMS fluctuation velocity. The root mean square of the fluctuating velocity component, representing variability in turbulent flow.
+- v′^{(i)}_p: Particle RMS fluctuation velocity. The root mean square of the fluctuating velocity component, representing variability in turbulent flow.
 
 - $f_u$: Particle response coefficient. Measures how particles respond to fluid velocity fluctuations, helping quantify their turbulent motion.
 
-- $f(R)$: Spatial correlation coefficient. Describes the correlation of fluid velocities at two points separated by a distance $R$, influencing droplet interactions.
+- f(R): Spatial correlation coefficient. Describes the correlation of fluid velocities at two points separated by a distance R, influencing droplet interactions.
 
-- $g_{12}$: Radial distribution function (RDF). A measure of how particle pairs are spatially distributed due to turbulence and gravity.
+- g₁₂: Radial distribution function (RDF). A measure of how particle pairs are spatially distributed due to turbulence and gravity.
 
 ### Turbulent Flow Properties
 
 - $u$: Local air velocity. The instantaneous velocity of air at a given point. Turbulence causes $u$ to vary in space and time.
 
-- $\varepsilon$: Turbulence dissipation rate. The rate at which turbulent kinetic energy is converted into thermal energy per unit mass.
+- ε: Turbulence dissipation rate. The rate at which turbulent kinetic energy is converted into thermal energy per unit mass.
 
-- $R_\lambda$: Reynolds number. A dimensionless number that characterizes the flow regime, depending on turbulence intensity and scale.
+- R_λ: Reynolds number. A dimensionless number that characterizes the flow regime, depending on turbulence intensity and scale.
 
-- $\lambda_D$: Longitudinal Taylor-type microscale. A characteristic length scale of fluid acceleration in turbulence, related to energy dissipation and viscosity.
+- λ_D: Longitudinal Taylor-type microscale. A characteristic length scale of fluid acceleration in turbulence, related to energy dissipation and viscosity.
 
-- $T_L$: Lagrangian integral scale. The timescale over which fluid particles maintain velocity correlations, describing large-scale turbulence behavior.
+- T_L: Lagrangian integral scale. The timescale over which fluid particles maintain velocity correlations, describing large-scale turbulence behavior.
 
-- $u'$: Fluid RMS fluctuation velocity. The root mean square of fluid velocity fluctuations, characterizing turbulence intensity.
+- u′: Fluid RMS fluctuation velocity. The root mean square of fluid velocity fluctuations, characterizing turbulence intensity.
 
 - $S$: Skewness of longitudinal velocity gradient. A measure of asymmetry in velocity gradient fluctuations, significant for small-scale turbulence analysis.
 
