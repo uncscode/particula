@@ -31,7 +31,6 @@ def g12_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
     temperature = 300  # Temperature in Kelvin
     particle_density = 1000  # Particle density in kg/m³
     fluid_density = 1.225  # Fluid (air) density in kg/m³
-    relative_velocity = 1e-6  # Relative velocity in m/s
 
     # Basic fluid properties
     dynamic_viscosity = gas_properties.get_dynamic_viscosity(temperature)
@@ -45,7 +44,6 @@ def g12_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
         particle_density=particle_density,
         fluid_density=fluid_density,
         kinematic_viscosity=kinematic_viscosity,
-        relative_velocity=relative_velocity,
     )
 
     # Kolmogorov parameters
@@ -96,6 +94,7 @@ We have the following DNS datasets for the radial distribution function $g_{12}$
 - **Case 2**: $R_\lambda = 23$, $\varepsilon = 400$ cm²/s³
 - **Case 3**: $R_\lambda = 72.4$, $\varepsilon = 100$ cm²/s³
 - **Case 4**: $R_\lambda = 72.4$, $\varepsilon = 400$ cm²/s³
+
 """
 
 # DNS datasets for radial distribution function
