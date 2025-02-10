@@ -3,12 +3,23 @@
 """
 # Fluid and Particle Properties for Cloud Droplet Coagulation
 
-This notebook checks the `Particula` caculated values against the values from the paper "Aerosol Science and Technology" by Ayala and Rosa (2008).
+This notebook verifies the computations performed by the `Particula` library by comparing its results with those presented in the paper by Ayala et al. (2008). The comparisons focus on key parameters that influence cloud droplet coagulation processes, such as Reynolds number, inertia time, settling velocity, Stokes number, and scaled velocities.
 
-Reference: Table 2 and Table 3
+**Objective:**
 
-Ayala, O., Rosa, B., Wang, L. P., & Grabowski, W. W. (2008). Effects of turbulence on the geometric collision rate of sedimenting droplets. Part 1. Results from direct numerical simulation. New Journal of Physics, 10. https://doi.org/10.1088/1367-2630/10/7/075015
+- To validate the accuracy of the `Particula` library in computing fluid and particle properties relevant to cloud droplet coagulation.
 
+**Reference Tables:**
+
+- **Table 2:** Provides values for Reynolds number, inertia time, settling velocity, and correction factors for different particle sizes.
+
+- **Table 3:** Includes characteristic scales for cloud droplets, such as Stokes numbers and scaled velocities at various turbulent dissipation rates.
+
+**Reference Paper:**
+
+Ayala, O., Rosa, B., Wang, L. P., & Grabowski, W. W. (2008). Effects of turbulence on the geometric collision rate of sedimenting droplets. Part 1. Results from direct numerical simulation. *New Journal of Physics*, 10. https://doi.org/10.1088/1367-2630/10/7/075015
+
+By conducting this comparison, we aim to ensure that the `Particula` library produces reliable results that align with established literature, which is crucial for accurate simulations in aerosol science and cloud physics.
 """
 
 
@@ -132,6 +143,18 @@ particle_settling_velocity = (
 ### Comparison of Paper Values and Computed Values
 
 We compare the values from the paper with the computed values from the Particula library. This includes the Reynolds number, inertia time, and settling velocity.
+
+#### Analysis
+
+The plots below show the comparison between the values reported in Ayala et al. (2008) and the values computed using the `Particula` library. The percent errors are also calculated to quantify the discrepancies.
+
+- **Reynolds Number (Re_p):** The Reynolds number is a dimensionless quantity representing the ratio of inertial forces to viscous forces acting on the particles. The comparison shows that the computed Reynolds numbers closely match the paper values, with minimal percent errors (typically less than a few percent), indicating accurate modeling of particle-fluid interactions.
+
+- **Inertia Time (t_p):** The inertia time signifies how quickly a particle adjusts its velocity relative to the surrounding fluid. The computed inertia times align well with the paper values, validating the correctness of particle inertia calculations in `Particula`.
+
+- **Settling Velocity:** This is the terminal velocity at which particles settle under gravity in a quiescent fluid. The computed settling velocities are in good agreement with the paper values, demonstrating accurate calculations of gravitational settling influenced by particle size and fluid properties.
+
+Overall, the `Particula` library provides results consistent with established literature, affirming its reliability for simulating particle dynamics in atmospheric studies.
 """
 # %%
 import matplotlib.pyplot as plt
@@ -248,6 +271,22 @@ for radius, tp, settling_velocity, re, f_re in zip(
 ### Stokes Number and Velocity Comparison
 
 We calculate and compare the Stokes number and velocity for different turbulent dissipation rates.
+
+#### Significance
+
+The **Stokes number** (St) is a dimensionless parameter that characterizes the behavior of particles suspended in a fluid flow, defined as the ratio of the particle's response time to a characteristic time scale of the flow (e.g., the Kolmogorov time scale in turbulence). It indicates how much the particle's motion is influenced by the fluid's turbulence. A small Stokes number implies that the particle closely follows the fluid motion, while a large Stokes number suggests that the particle's inertia dominates, and it is less affected by the fluid fluctuations.
+
+By comparing the computed Stokes numbers and scaled velocities with the values from Ayala et al. (2008), we can assess the accuracy of the `Particula` library in capturing particle dynamics within turbulent flows at different intensities (represented by different turbulent dissipation rates).
+
+The plots below illustrate these comparisons for three turbulent dissipation rates: 10 cm²/s³ (weak turbulence), 100 cm²/s³ (moderate turbulence), and 400 cm²/s³ (strong turbulence).
+
+#### Analysis
+
+- **Stokes Number (St):** The computed Stokes numbers show excellent agreement with the paper values across all particle sizes and turbulence levels. This consistency confirms that `Particula` accurately models the interplay between particle inertia and turbulent flow scales.
+
+- **Scaled Velocity (Sv):** The scaled settling velocities (particle settling velocity normalized by the Kolmogorov velocity scale) also match closely with the paper values. This indicates that `Particula` effectively captures how turbulence modulates particle settling rates.
+
+These results validate the `Particula` library's capability to simulate particle-turbulence interactions, which are critical for understanding processes like cloud droplet collision-coalescence in atmospheric physics.
 """
 # %%
 length_kolmogorov = gas_properties.get_kolmogorov_length(
