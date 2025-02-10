@@ -22,8 +22,13 @@ from particula.util.constants import STANDARD_GRAVITY
 from particula.util.converting.units import convert_units
 
 
-# %% Model equations
-# Define Particle Radii and Parameters
+# %% [markdown]
+"""
+## Model Equations and Parameters
+
+In this section, we define the particle radii and other parameters needed for the calculations. These include temperature, particle density, fluid density, and air velocity.
+"""
+# %%
 particle_radius = np.linspace(10e-6, 60e-6, 6)
 temperature = 273  # Temperature in Kelvin
 particle_density = 1000  # Particle density in kg/m³
@@ -36,7 +41,13 @@ turbulent_dissipation = 400 * convert_units(
 reynolds_lambda = 72.41  # Example value
 
 
-# Calculate dynamic and kinematic viscosity
+# %% [markdown]
+"""
+### Calculate Dynamic and Kinematic Viscosity
+
+We calculate the dynamic and kinematic viscosity of the fluid using the temperature and fluid density.
+"""
+# %%
 dynamic_viscosity = gas_properties.get_dynamic_viscosity(temperature)
 kinematic_viscosity = gas_properties.get_kinematic_viscosity(dynamic_viscosity, fluid_density)
 kolmogorov_time = gas_properties.get_kolmogorov_time(
@@ -44,7 +55,13 @@ kolmogorov_time = gas_properties.get_kolmogorov_time(
     turbulent_dissipation=turbulent_dissipation,
 )
 
-# Calculate Particle Settling Velocity
+# %% [markdown]
+"""
+### Calculate Particle Settling Velocity
+
+This section calculates the particle settling velocity using the slip correction factor and other parameters.
+"""
+# %%
 mean_free_path = gas_properties.molecule_mean_free_path(
     temperature=temperature, dynamic_viscosity=dynamic_viscosity
 )
@@ -70,7 +87,13 @@ settling_velocity = properties.particle_settling_velocity(
     dynamic_viscosity=dynamic_viscosity,
 )
 relative_velocity = iterative_settling_velocity - air_velocity
-# Calculate Particle Inertia Time
+# %% [markdown]
+"""
+### Calculate Particle Inertia Time
+
+We calculate the particle inertia time, which is a measure of how quickly a particle responds to changes in the surrounding fluid.
+"""
+# %%
 particle_inertia_time = properties.get_particle_inertia_time(
     particle_radius=particle_radius,
     particle_density=particle_density,
@@ -100,7 +123,51 @@ particle_settling_velocity = (
     )
 )
 
-# print paper values
+# %% [markdown]
+"""
+### Comparison of Paper Values and Computed Values
+
+We compare the values from the paper with the computed values from the Particula library. This includes the Reynolds number, inertia time, and settling velocity.
+"""
+# %%
+import matplotlib.pyplot as plt
+
+# Calculate percent error
+percent_error_re_p = 100 * (re_p - ao2008_re_p) / ao2008_re_p
+percent_error_tp = 100 * (particle_inertia_time - ao2008_t_p) / ao2008_t_p
+percent_error_velocity = 100 * (particle_settling_velocity - ao2008_velocity) / ao2008_velocity
+
+# Plot comparison
+fig, ax = plt.subplots(3, 1, figsize=(10, 15))
+
+ax[0].plot(particle_radius * 1e6, ao2008_re_p, 'o-', label='ao2008 Re_p')
+ax[0].plot(particle_radius * 1e6, re_p, 's-', label='Particula Re_p')
+ax[0].set_title('Reynolds Number Comparison')
+ax[0].set_xlabel('Radius (µm)')
+ax[0].set_ylabel('Re_p')
+ax[0].legend()
+
+ax[1].plot(particle_radius * 1e6, ao2008_t_p, 'o-', label='ao2008 t_p')
+ax[1].plot(particle_radius * 1e6, particle_inertia_time, 's-', label='Particula t_p')
+ax[1].set_title('Inertia Time Comparison')
+ax[1].set_xlabel('Radius (µm)')
+ax[1].set_ylabel('t_p (s)')
+ax[1].legend()
+
+ax[2].plot(particle_radius * 1e6, ao2008_velocity * 100, 'o-', label='ao2008 Velocity')
+ax[2].plot(particle_radius * 1e6, particle_settling_velocity * 100, 's-', label='Particula Velocity')
+ax[2].set_title('Settling Velocity Comparison')
+ax[2].set_xlabel('Radius (µm)')
+ax[2].set_ylabel('Velocity (cm/s)')
+ax[2].legend()
+
+plt.tight_layout()
+plt.show()
+
+# Print percent error
+print("Percent Error in Re_p:", percent_error_re_p)
+print("Percent Error in t_p:", percent_error_tp)
+print("Percent Error in Settling Velocity:", percent_error_velocity)
 print("Paper Values From Table 2")
 print("Radius (µm) | tp | Settling Velocity (cm/s)| Re_p | f(Re_p)")
 print("-" * 50)
@@ -135,7 +202,13 @@ for radius, tp, settling_velocity, re, f_re in zip(
 # Characteristic scales of cloud droplets.
 
 
-# get stokes number table
+# %% [markdown]
+"""
+### Stokes Number and Velocity Comparison
+
+We calculate and compare the Stokes number and velocity for different turbulent dissipation rates.
+"""
+# %%
 length_kolmogorov = gas_properties.get_kolmogorov_length(
     kinematic_viscosity=kinematic_viscosity,
     turbulent_dissipation=turbulent_dissipation,
@@ -209,7 +282,13 @@ sv_ao2008 = np.array(
     ]
 )
 
-# print paper values
+# %% [markdown]
+"""
+### Comparison of Stokes Number and Velocity
+
+We compare the Stokes number and velocity from the paper with the computed values for different turbulent dissipation rates.
+"""
+# %%
 print("Paper Values From Table 3")
 print("-" * 80)
 print("Radius (µm) | St (10 cm^2/s^3) | St (100 cm^2/s^3) | St (400 cm^2/s^3)")
