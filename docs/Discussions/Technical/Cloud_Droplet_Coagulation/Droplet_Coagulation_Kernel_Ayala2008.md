@@ -21,12 +21,9 @@ In the parameterization below, the input parameters are:
 
 The output is the collision kernel Γ₁₂
 
-This is valid under the conditions when a_k ≪ η, ρ_w ≫ ρ, and Sv > 1, the
-geometric collision kernel can be calculated as follows:
+This is valid under the conditions when a_k ≪ η, ρ_w ≫ ρ, and Sv > 1, the geometric collision kernel can be calculated as follows:
 
-$$
 Γ₁₂ = 2πR² ⟨|wᵣ|⟩ g₁₂
-$$
 
 ## ⟨|wᵣ|⟩: Radial Relative Velocity
 
@@ -38,192 +35,130 @@ Using the spherical formulation, Dodin and Elperin (2002), decomposed the relati
 
 Dodin Z and Elperin T 2002 Phys. Fluids 14 2921–24
 
-$$
 ⟨|wᵣ|⟩ = √(2⁄π) σ f(b)
-$$
 
 where:
 
-$$
 f(b) = (½)√π (b + 0.5⁄b) erf(b) + (½) exp(−b²)
-$$
 
-$$
 b = [g |τₚ₁ − τₚ₂|]⁄[√2 σ]
-$$
 
 ### ⟨|wᵣ|⟩ Ayala 2008:
 
 Here both particle inertia and gravitational effects are accounted for in the relative velocity calculation. Derived by Ayala et al. (2008) based on DNS results.
 
-$$
 ⟨|wᵣ|⟩ = √(2⁄π) √[σ² + (π⁄8)(τₚ₁ + τₚ₂)² |g|²]
-$$
 
 ### σ²: Direct Numerical Simulation Fit
 
-$$
-σ² = ⟨(v′^{(2)})²⟩ + ⟨(v′^{(1)})²⟩ − 2 ⟨v′^{(1)} v′^{(2)}⟩
-$$
+σ² = ⟨(v′^(2))²⟩ + ⟨(v′^(1))²⟩ − 2 ⟨v′^(1) v′^(2)⟩
 
-The term $\langle (v'^{(2)})^2 \rangle$ is the square of the RMS fluctuation velocity of droplet 2, and $\langle v'^{(1)} v'^{(2)} \rangle$ is the cross-correlation of the fluctuating velocities of droplets 1 and 2.
+The term ⟨(v′^(2))²⟩ is the square of the RMS fluctuation velocity of droplet 2, and ⟨v′^(1) v′^(2)⟩ is the cross-correlation of the fluctuating velocities of droplets 1 and 2.
 
 The square of the RMS fluctuation velocity is given by, for k-th droplet:
 
-$$
-⟨(v′^{(k)})²⟩ = [u′² ⁄ τₚₖ] [b₁ d₁ Ψ(c₁, e₁) − b₁ d₂ Ψ(c₁, e₂) − b₂ d₁ Ψ(c₂, e₁) + b₂ d₂ Ψ(c₂, e₂)],
-$$
+⟨(v′^(k))²⟩ = [u′² ⁄ τₚₖ] [b₁ d₁ Ψ(c₁, e₁) − b₁ d₂ Ψ(c₁, e₂) − b₂ d₁ Ψ(c₂, e₁) + b₂ d₂ Ψ(c₂, e₂)],
 
-Cross terms is defined as:
+Cross term is defined as:
 
-$$
-⟨v′^{(1)} v′^{(2)}⟩ = [u′² f₂(R)]⁄[τₚ₁ τₚ₂] × [b₁ d₁ Φ(c₁, e₁) − b₁ d₂ Φ(c₁, e₂) − b₂ d₁ Φ(c₂, e₁) + b₂ d₂ Φ(c₂, e₂)].
-$$
+⟨v′^(1) v′^(2)⟩ = [u′² f₂(R)]⁄[τₚ₁ τₚ₂] × [b₁ d₁ Φ(c₁, e₁) − b₁ d₂ Φ(c₁, e₂) − b₂ d₁ Φ(c₂, e₁) + b₂ d₂ Φ(c₂, e₂)].
 
 ### f₂(R): Longitudinal velocity correlation
 
-This is the longitudinal two-point velocity correlation function, which is a function of the separation distance R between two points in the flow. The function evaluated at r = R is given by:
+f₂(R) = [1 ⁄ 2√(1 − 2β²)]  
+{  
+ [1 + √(1 − 2β²)]  
+ e^[-2R⁄((1 + √(1 − 2β²)) Lₑ)]  
+ − [1 − √(1 − 2β²)]  
+ e^[-2R⁄((1 − √(1 − 2β²)) Lₑ)]  
+}
 
-$$
-f₂(R) = [1 ⁄ 2√(1 − 2β²)] 
-\Big\{
-[1 + √(1 − 2β²)] 
-e^{[-2R⁄((1 + √(1 − 2β²)) Lₑ)]} 
-− [1 − √(1 − 2β²)] 
-e^{[-2R⁄((1 − √(1 − 2β²)) Lₑ)]}
-\Big\}
-$$
+#### b₁, b₂, c₁, c₂, d₁, d₂, e₁, e₂: Definitions
 
-#### $b_1, b_2, c_1, c_2, d_1, d_2, e_1, e_2$: Definitions
+b₁ = (1 + √(1 − 2z²)) / (2√(1 − 2z²))
 
-$$
-b_1 = \frac{1 + \sqrt{1 - 2z^2}}{2\sqrt{1 - 2z^2}}
-$$
+b₂ = (1 − √(1 − 2z²)) / (2√(1 − 2z²))
 
-$$
-b_2 = \frac{1 - \sqrt{1 - 2z^2}}{2\sqrt{1 - 2z^2}}
-$$
+c₁ = ((1 + √(1 − 2z²))T_L) / 2
 
-$$
-c_1 = \frac{(1 + \sqrt{1 - 2z^2})T_L}{2}
-$$
+c₂ = ((1 − √(1 − 2z²))T_L) / 2
 
-$$
-c_2 = \frac{(1 - \sqrt{1 - 2z^2})T_L}{2}
-$$
+d₁ = (1 + √(1 − 2β²)) / (2√(1 − 2β²))
 
-$$
-d_1 = \frac{1 + \sqrt{1 - 2\beta^2}}{2\sqrt{1 - 2\beta^2}}
-$$
+d₂ = (1 − √(1 − 2β²)) / (2√(1 − 2β²))
 
-$$
-d_2 = \frac{1 - \sqrt{1 - 2\beta^2}}{2\sqrt{1 - 2\beta^2}}
-$$
+e₁ = ((1 + √(1 − 2β²))L_e) / 2
 
-$$
-e_1 = \frac{(1 + \sqrt{1 - 2\beta^2})L_e}{2}
-$$
-
-$$
-e_2 = \frac{(1 - \sqrt{1 - 2\beta^2})L_e}{2}
-$$
+e₂ = ((1 − √(1 − 2β²))L_e) / 2
 
 #### z and β: Definitions
 
-$$
-z = τ_T ⁄ T_L
-$$
+z = τ_T ⁄ T_L
 
-$$
-β = [√2 λ]⁄Lₑ
-$$
+β = (√2 λ) ⁄ L_e
 
-#### $\Phi(\alpha, \phi)$: Definitions
+#### Φ(α, φ): Definitions
 
-For the case when taking $v_{p1}>v_{p2}$.
+For the case when taking vₚ₁ > vₚ₂.
 
-$$
-\Phi(\alpha, \phi) =
-\Bigg\{
-\frac{1}{\left(v_{p2}/\phi - (1/\tau_{p2}) - (1/\alpha)\right)} 
-- \frac{1}{\left(v_{p1}/\phi + (1/\tau_{p1}) + (1/\alpha)\right)} \Bigg\} \\
-\quad \times \frac{v_{p1} - v_{p2}}{2\phi \left((v_{p1} - v_{p2}/\phi) + (1/\tau_{p1}) + (1/\tau_{p2})\right)^2} 
-+ \Bigg\{
-\frac{4}{\left(v_{p2}/\phi\right)^2 - \left((1/\tau_{p2}) + (1/\alpha)\right)^2} \\
-\quad -
-\frac{1}{\left(v_{p2}/\phi + (1/\tau_{p2}) + (1/\alpha)\right)^2} 
-- \frac{1}{\left(v_{p2}/\phi - (1/\tau_{p2}) - (1/\alpha)\right)^2} \Bigg\} \\
-\quad \times \frac{v_{p2}}{2\phi \left((1/\tau_{p1}) - (1/\alpha) + ((1/\tau_{p2}) + (1/\alpha))(v_{p1}/v_{p2})\right)} \\
-\quad + \Bigg\{
-\frac{2\phi}{\left((v_{p1}/\phi) + (1/\tau_{p1}) + (1/\alpha)\right)} 
-- \frac{2\phi}{\left((v_{p2}/\phi) - (1/\tau_{p2}) - (1/\alpha)\right)} \\
-\quad -
-\frac{v_{p1}}{\left((v_{p1}/\phi) + (1/\tau_{p1}) + (1/\alpha)\right)^2} 
-+ \frac{v_{p2}}{\left((v_{p2}/\phi) - (1/\tau_{p2}) - (1/\alpha)\right)^2} \Bigg\} \\
-\quad \times \frac{1}{2\phi \left((v_{p1} - v_{p2}/\phi) + (1/\tau_{p1}) + (1/\tau_{p2})\right)}
-$$
+Φ(α, φ) = term_1 + term_2 + term_3
 
-#### $\Psi(\alpha, \phi)$: Definitions
+term_1 = { 
+ 1 / ( (vₚ2/φ) − (1/τₚ2) − (1/α) ) − 
+ 1 / ( (vₚ1/φ) + (1/τₚ1) + (1/α) ) 
+} × [ (vₚ1 − vₚ2) / (2φ ((vₚ1 − (vₚ2/φ)) + (1/τₚ1) + (1/τₚ2))² ) ]
+
+term_2 = { 
+ 4 / [ ( (vₚ2/φ) + (1/τₚ2) + (1/α) )² − ( (vₚ2/φ) − (1/τₚ2) − (1/α) )² ] 
+} × [ (vₚ2) / (2φ ((1/τₚ1) − (1/α) + ((1/τₚ2) + (1/α))(vₚ1/vₚ2)) ) ]
+
+term_3 = { 
+ 2φ / ( (vₚ1/φ) + (1/τₚ1) + (1/α) ) − 
+ 2φ / ( (vₚ2/φ) − (1/τₚ2) − (1/α) ) 
+} × [ 1 / (2φ ((vₚ1 − (vₚ2/φ)) + (1/τₚ1) + (1/τₚ2)) ) ]
+
+#### Ψ(α, φ): Definitions
 
 For the case when taking for the k-th droplet:
 
-$$
-\Psi(\alpha, \phi) = \frac{1}{(1/\tau_{pk}) + (1/\alpha) + (v_{pk}/\phi)} 
-- \frac{v_{pk}}{2\phi \left((1/\tau_{pk}) + (1/\alpha) + (v_{pk}/\phi)\right)^2}
-$$
+Ψ(α, φ) = 1 / ( (1/τₚₖ) + (1/α) + (vₚₖ/φ) ) − 
+ (vₚₖ) / (2φ ((1/τₚₖ) + (1/α) + (vₚₖ/φ))²)
 
-#### $g_{12}$: Radial Distribution Function
+#### g₁₂: Radial Distribution Function
 
 The radial distribution function is given by:
 
-$$
-g_{12} = \left(\frac{\eta^2 + r_c^2}{R^2 + r_c^2}\right)^{C_1/2}
-$$
+g₁₂ = ( (η² + r_c²) / (R² + r_c²) )^(C₁/2)
 
-Where $C_1$ and $r_c$ are derived based on droplet and turbulence properties.
+Where C₁ and r_c are derived based on droplet and turbulence properties.
 
 ##### C₁: Calculation
 
-$$
-C₁ = y(St) ⁄ \[|g| ⁄ (v_k ⁄ τ_k)\]^{f₃(R_λ)}
-$$
+C₁ = y(St) ⁄ [|g| ⁄ (v_k ⁄ τ_k)]^(f₃(R_λ))
 
-$$
 y(St) = -0.1988 St^4 + 1.5275 St^3 - 4.2942 St^2 + 5.3406 St
-$$
 
-$$
-f_3(R_\lambda) = 0.1886 \exp\left(\frac{20.306}{R_\lambda}\right)
-$$
+f₃(R_λ) = 0.1886 exp(20.306 / R_λ)
 
 Where:
 
-$$ St = \max(St₁, St₂) $$
+St = max(St₁, St₂)
 
-Since the fitting for $y(St)$ was done for a limited range of St in DNS,
-it should be set to zero for large $St$ when the function $y(St)$ becomes negative.
+Since the fitting for y(St) was done for a limited range of St in DNS, it should be set to zero for large St when the function y(St) becomes negative.
 
-##### $r_c$: Expression
+##### r_c: Expression
 
-$$
-\left(\frac{r_c}{\eta}\right)^2 = |St_2 - St_1| F(a_o, R_\lambda)
-$$
+(r_c / η)² = |St₂ - St₁| F(aₒ, R_λ)
 
-solving for $r_c$:
+solving for r_c:
 
-$$
-r_c = \eta \sqrt{|St_2 - St_1| F(a_o, R_\lambda)}
-$$
+r_c = η √(|St₂ - St₁| F(aₒ, R_λ))
 
 where:
 
-$$
-a_{Og} = a_o + \frac{\pi}{8} \left(\frac{|\mathbf{g}|}{v_k / \tau_k}\right)^2
-$$
+aₒ = aₒ + (π / 8) (|g| / (v_k / τ_k))²
 
-$$
-F(a_{Og}, R_\lambda) = 20.115 \left(\frac{a_{Og}}{R_\lambda}\right)^{1/2}
-$$
+F(aₒ, R_λ) = 20.115 (aₒ / R_λ)^(1/2)
 
 ---
 
@@ -233,111 +168,83 @@ $$
 
 The smallest timescale in turbulence where viscous forces dominate:
 
-$$
 τ_k = √(ν⁄ε)
-$$
 
 ### η: Kolmogorov Length Scale
 
 The smallest scale in turbulence:
 
-$$
-η = [ν³⁄ε]^{¼}
-$$
+η = [ν³⁄ε]^(¼)
 
 ### v_k: Kolmogorov Velocity Scale
 
 A velocity scale related to the smallest turbulent eddies:
 
-$$
-v_k = [ν ε]^{¼}
-$$
+v_k = [ν ε]^(¼)
 
 ### u′: Fluid RMS Fluctuation Velocity
 
 Quantifies turbulence intensity:
 
-$$
-u′ = [R_λ^{½} v_k]⁄[15^{¼}]
-$$
+u′ = [R_λ^(½) v_k]⁄[15^(¼)]
 
 ### T_L: Lagrangian Integral Scale
 
 Describes large-scale turbulence:
 
-$$
-T_L = \frac{u'^2}{\epsilon}
-$$
+T_L = u'² / ε
 
 ### Lₑ: Eulerian Integral Scale
 
 Length scale for large eddies:
 
-$$
-L_e = 0.5 \frac{u'^3}{\epsilon}
-$$
+Lₑ = 0.5 u'³ / ε
 
 ### aₒ: Coefficient
 
 A Reynolds-dependent parameter:
 
-$$
 aₒ = [11 + 7 R_λ] ⁄ [205 + R_λ]
-$$
 
-### $\tau_T$: Lagrangian Taylor Microscale Time
+### τ_T: Lagrangian Taylor Microscale Time
 
 Time correlation decay for turbulent trajectories:
 
-$$
-τ_T = τ_k √[2 R_λ ⁄ (15^{½} aₒ)]
-$$
+τ_T = τ_k √[2 R_λ ⁄ (15^(½) aₒ)]
 
-### $\lambda$: Taylor Microscale
+### λ: Taylor Microscale
 
 Length scale linked to fluid flow:
 
-$$
-λ = u′ √[15 ν² ⁄ ε]
-$$
+λ = u' √[15 ν² ⁄ ε]
 
 ### τ_p: Droplet Inertia Time
 
 Adjusts droplet inertia:
 
-$$
 τ_p = [2⁄9] [ρ_w⁄ρ] [a²⁄(ν f(Re_p))]
-$$
 
 with:
 
-$$
-f(Re_p) = 1 + 0.15 Re_p^{0.687}
-$$
+f(Re_p) = 1 + 0.15 Re_p^(0.687)
 
 ### v_p: Droplet Settling Velocity
 
 The settling velocity under gravity:
 
-$$
 v_p = τ_p |g|
-$$
 
 ### Re_p: Particle Reynolds Number
 
 Characterizes droplet flow:
 
-$$
-Re_p = \frac{2 a v_p}{\nu}
-$$
+Re_p = 2 a v_p / ν
 
 ### St: Stokes Number
 
 Non-dimensional inertia parameter:
 
-$$
 St = τ_p⁄τ_k
-$$
 
 ---
 
@@ -367,7 +274,7 @@ Here are the variables, their definitions.
 
 ### Turbulent Flow Properties
 
-- $u$: Local air velocity. The instantaneous velocity of air at a given point. Turbulence causes $u$ to vary in space and time.
+- Yᶠ(t): Fluid Lagrangian trajectory. The path traced by a fluid particle as it moves through turbulence.
 
 - ε: Turbulence dissipation rate. The rate at which turbulent kinetic energy is converted into thermal energy per unit mass.
 
@@ -379,14 +286,14 @@ Here are the variables, their definitions.
 
 - u′: Fluid RMS fluctuation velocity. The root mean square of fluid velocity fluctuations, characterizing turbulence intensity.
 
-- $S$: Skewness of longitudinal velocity gradient. A measure of asymmetry in velocity gradient fluctuations, significant for small-scale turbulence analysis.
+- *S*: Skewness of longitudinal velocity gradient. A measure of asymmetry in velocity gradient fluctuations, significant for small-scale turbulence analysis.
 
-- $Y^f(t)$: Fluid Lagrangian trajectory. The path traced by a fluid particle as it moves through turbulence.
+- Yᶠ(t): Fluid Lagrangian trajectory. The path traced by a fluid particle as it moves through turbulence.
 
-- $\tau_T$: Lagrangian Taylor microscale time. A timescale describing the decay of velocity correlation along a fluid particle trajectory.
+- τₜ: Lagrangian Taylor microscale time. A timescale describing the decay of velocity correlation along a fluid particle trajectory.
 
-### $g$: Gravitational Acceleration
+### g: Gravitational Acceleration
 
-The acceleration due to gravity, approximately 9.81 $\text{m/s}^2$ on Earth's surface. This force drives droplet sedimentation in turbulent air.
+The acceleration due to gravity, approximately 9.81 m/s² on Earth's surface. This force drives droplet sedimentation in turbulent air.
 
 
