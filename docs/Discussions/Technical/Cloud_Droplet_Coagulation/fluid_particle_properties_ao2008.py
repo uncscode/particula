@@ -49,7 +49,9 @@ We calculate the dynamic and kinematic viscosity of the fluid using the temperat
 """
 # %%
 dynamic_viscosity = gas_properties.get_dynamic_viscosity(temperature)
-kinematic_viscosity = gas_properties.get_kinematic_viscosity(dynamic_viscosity, fluid_density)
+kinematic_viscosity = gas_properties.get_kinematic_viscosity(
+    dynamic_viscosity, fluid_density
+)
 kolmogorov_time = gas_properties.get_kolmogorov_time(
     kinematic_viscosity=kinematic_viscosity,
     turbulent_dissipation=turbulent_dissipation,
@@ -72,13 +74,15 @@ knudsen_number = properties.calculate_knudsen_number(
 )
 slip_correction_factor = properties.cunningham_slip_correction(knudsen_number)
 # iterative terminal settling velocity
-iterative_settling_velocity = properties.get_particle_settling_velocity_with_drag(
-    particle_radius=particle_radius,
-    particle_density=particle_density,
-    fluid_density=fluid_density,
-    dynamic_viscosity=dynamic_viscosity,
-    slip_correction_factor=slip_correction_factor,
-    gravitational_acceleration=STANDARD_GRAVITY,
+iterative_settling_velocity = (
+    properties.get_particle_settling_velocity_with_drag(
+        particle_radius=particle_radius,
+        particle_density=particle_density,
+        fluid_density=fluid_density,
+        dynamic_viscosity=dynamic_viscosity,
+        slip_correction_factor=slip_correction_factor,
+        gravitational_acceleration=STANDARD_GRAVITY,
+    )
 )
 settling_velocity = properties.particle_settling_velocity(
     particle_radius=particle_radius,
@@ -135,30 +139,41 @@ import matplotlib.pyplot as plt
 # Calculate percent error
 percent_error_re_p = 100 * (re_p - ao2008_re_p) / ao2008_re_p
 percent_error_tp = 100 * (particle_inertia_time - ao2008_t_p) / ao2008_t_p
-percent_error_velocity = 100 * (particle_settling_velocity - ao2008_velocity) / ao2008_velocity
+percent_error_velocity = (
+    100 * (particle_settling_velocity - ao2008_velocity) / ao2008_velocity
+)
 
 # Plot comparison
 fig, ax = plt.subplots(3, 1, figsize=(10, 15))
 
-ax[0].plot(particle_radius * 1e6, ao2008_re_p, 'o-', label='ao2008 Re_p')
-ax[0].plot(particle_radius * 1e6, re_p, 's-', label='Particula Re_p')
-ax[0].set_title('Reynolds Number Comparison')
-ax[0].set_xlabel('Radius (µm)')
-ax[0].set_ylabel('Re_p')
+ax[0].plot(particle_radius * 1e6, ao2008_re_p, "o-", label="ao2008 Re_p")
+ax[0].plot(particle_radius * 1e6, re_p, "s-", label="Particula Re_p")
+ax[0].set_title("Reynolds Number Comparison")
+ax[0].set_xlabel("Radius (µm)")
+ax[0].set_ylabel("Re_p")
 ax[0].legend()
 
-ax[1].plot(particle_radius * 1e6, ao2008_t_p, 'o-', label='ao2008 t_p')
-ax[1].plot(particle_radius * 1e6, particle_inertia_time, 's-', label='Particula t_p')
-ax[1].set_title('Inertia Time Comparison')
-ax[1].set_xlabel('Radius (µm)')
-ax[1].set_ylabel('t_p (s)')
+ax[1].plot(particle_radius * 1e6, ao2008_t_p, "o-", label="ao2008 t_p")
+ax[1].plot(
+    particle_radius * 1e6, particle_inertia_time, "s-", label="Particula t_p"
+)
+ax[1].set_title("Inertia Time Comparison")
+ax[1].set_xlabel("Radius (µm)")
+ax[1].set_ylabel("t_p (s)")
 ax[1].legend()
 
-ax[2].plot(particle_radius * 1e6, ao2008_velocity * 100, 'o-', label='ao2008 Velocity')
-ax[2].plot(particle_radius * 1e6, particle_settling_velocity * 100, 's-', label='Particula Velocity')
-ax[2].set_title('Settling Velocity Comparison')
-ax[2].set_xlabel('Radius (µm)')
-ax[2].set_ylabel('Velocity (cm/s)')
+ax[2].plot(
+    particle_radius * 1e6, ao2008_velocity * 100, "o-", label="ao2008 Velocity"
+)
+ax[2].plot(
+    particle_radius * 1e6,
+    particle_settling_velocity * 100,
+    "s-",
+    label="Particula Velocity",
+)
+ax[2].set_title("Settling Velocity Comparison")
+ax[2].set_xlabel("Radius (µm)")
+ax[2].set_ylabel("Velocity (cm/s)")
 ax[2].legend()
 
 plt.tight_layout()
