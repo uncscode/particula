@@ -5,6 +5,7 @@ from numpy.typing import NDArray
 import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
     get_radial_relative_velocity_ao2008,
+    get_radial_relative_velocity_dz2002,
 )
 from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
     get_relative_velocity_variance,
@@ -69,7 +70,7 @@ data = np.array(
 )
 
 # Define Particle Radii and Parameters
-particle_radius = np.linspace(10e-6, 60e-6, 60)
+particle_radius = np.linspace(10e-6, 60e-6, 50)
 temperature = 273  # Temperature in Kelvin
 particle_density = 1000  # Particle density in kg/m³
 fluid_density = 1.0  # Fluid (air) density in kg/m³
@@ -110,6 +111,7 @@ particle_settling_velocity = get_particle_settling_velocity_with_drag(
     fluid_density=fluid_density,
     dynamic_viscosity=dynamic_viscosity,
     slip_correction_factor=slip_correction_factor,
+    re_threshold=0.1,
 )
 
 # Calculate Fluid RMS Velocity
@@ -173,20 +175,18 @@ plt.show()
 # %%
 def radial_velocity_calc(velocity_dispersion, particle_inertia_time):
     # Debugging: Print the value of velocity_dispersion
-    print(f"radial_velocity_calc - velocity_dispersion: {velocity_dispersion}")
 
     # Check if velocity_dispersion contains NaN
     if np.isnan(velocity_dispersion).any():
         print("Warning: velocity_dispersion contains NaN")
 
     # Compute Radial Relative Velocities
-    radial_relative_velocity = get_radial_relative_velocity_ao2008(
+    radial_relative_velocity = get_radial_relative_velocity_dz2002(
         velocity_dispersion,
         particle_inertia_time,
     )
 
     return radial_relative_velocity
-
 
 
 # Compute Radial Relative Velocities
@@ -203,6 +203,13 @@ plt.plot(
     label="Model Prediction",
     color="brown",
     alpha=0.5,
+)
+plt.plot(
+    particle_radius * 1e6,
+    radial_relative_velocity[:, index] * 100,
+    label="Model Prediction at 30 µm",
+    color="blue",
+    linestyle="--",
 )
 plt.scatter(data[:, 0], data[:, 1], label="DNS Data", color="purple")
 plt.xlabel("Particle Radius (µm)")

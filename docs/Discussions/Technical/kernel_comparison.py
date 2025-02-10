@@ -5,7 +5,7 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.kernel_ao2008 import (
 )
 
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
-    get_radial_relative_velocity_ao2008,
+    get_radial_relative_velocity_dz2002,
 )
 from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import (
     get_g12_radial_distribution_ao2008,
@@ -58,9 +58,9 @@ reynolds_lambda = 72.41  # Example value
 
 def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
     # Define constants and parameters
-    temperature = 300  # Temperature in Kelvin
+    temperature = 273  # Temperature in Kelvin
     particle_density = 1000  # Particle density in kg/m³
-    fluid_density = 1.225  # Fluid (air) density in kg/m³
+    fluid_density = 1.0  # Fluid (air) density in kg/m³
     relative_velocity = 1e-6  # Relative velocity in m/s
 
     # 1. Basic fluid properties
@@ -93,13 +93,15 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
         particle_density=particle_density,
         fluid_density=fluid_density,
         kinematic_viscosity=kinematic_viscosity,
-        relative_velocity=relative_velocity,
     )
     particle_settling_velocity = (
-        properties.get_particle_settling_velocity_via_inertia(
-            particle_inertia_time=particle_inertia_time,
-            gravitational_acceleration=STANDARD_GRAVITY,
+        properties.get_particle_settling_velocity_with_drag(
+            particle_radius=particle_radius,
+            particle_density=particle_density,
+            fluid_density=fluid_density,
+            dynamic_viscosity=dynamic_viscosity,
             slip_correction_factor=slip_correction_factor,
+            re_threshold=0.1,
         )
     )
 
@@ -121,17 +123,6 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
     lagrangian_integral_time = gas_properties.get_lagrangian_integral_time(
         fluid_rms_velocity=fluid_rms_velocity,
         turbulent_dissipation=turbulent_dissipation,
-    )
-
-    # 5. Relative velocity variance
-    velocity_dispersion = get_relative_velocity_variance(
-        fluid_rms_velocity=fluid_rms_velocity,
-        collisional_radius=collisional_radius,
-        particle_inertia_time=particle_inertia_time,
-        particle_velocity=particle_settling_velocity,
-        taylor_microscale=taylor_microscale,
-        eulerian_integral_length=eulerian_integral_length,
-        lagrangian_integral_time=lagrangian_integral_time,
     )
 
     # 6. Additional turbulence-based quantities
@@ -161,11 +152,30 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
+    lagrangian_taylor_microscale_time = (
+        gas_properties.get_lagrangian_taylor_microscale_time(
+            kolmogorov_time=kolmogorov_time,
+            re_lambda=reynolds_lambda,
+            accel_variance=normalized_accel_variance,
+        )
+    )
+
+    # 5. Relative velocity variance
+    velocity_dispersion = get_relative_velocity_variance(
+        fluid_rms_velocity=fluid_rms_velocity,
+        collisional_radius=collisional_radius,
+        particle_inertia_time=particle_inertia_time,
+        particle_velocity=particle_settling_velocity,
+        taylor_microscale=taylor_microscale,
+        eulerian_integral_length=eulerian_integral_length,
+        lagrangian_integral_time=lagrangian_integral_time,
+        lagrangian_taylor_microscale_time=lagrangian_taylor_microscale_time,
+    )
 
     # Compute Kernel Values
     kernel_values = get_kernel_ao2008(
         particle_radius,
-        velocity_dispersion,
+        np.abs(velocity_dispersion),
         particle_inertia_time,
         stokes_number,
         kolmogorov_length_scale,
@@ -191,17 +201,20 @@ print(kernel_values)
 We plot the DNS data and their corresponding model predictions on the same graph for easy comparison.
 """
 
+index = np.argmin(np.abs(particle_radius - 30e-6))
+
 plt.scatter(data[:, 0], data[:, 1], label="DNS Data", color="cyan")
 plt.plot(
     particle_radius * 1e6,
-    kernel_values,
+    kernel_values[:, index] * convert_units("m^3/s", "cm^3/s"),
     label="Model Prediction",
     color="magenta",
+    alpha=0.5,
 )
 plt.xlabel("Particle Radius (µm)")
 plt.ylabel("Collision Kernel (cm³/s)")
 plt.title("Collision Kernel Comparison")
-plt.legend()
+# plt.legend()
 plt.grid(True)
 plt.show()
 

@@ -14,7 +14,7 @@ from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
-    get_radial_relative_velocity_ao2008,
+    get_radial_relative_velocity_dz2002,
 )
 from particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008 import (
     get_g12_radial_distribution_ao2008,
@@ -25,6 +25,7 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity
 from particula.particles.properties import (
     get_particle_inertia_time,
     get_particle_settling_velocity_via_inertia,
+    get_particle_settling_velocity_with_drag,
     get_particle_reynolds_number,
     get_stokes_number,
     cunningham_slip_correction,
@@ -36,6 +37,7 @@ from particula.gas.properties import (
     get_kinematic_viscosity,
     get_eulerian_integral_length,
     get_lagrangian_integral_time,
+    get_lagrangian_taylor_microscale_time,
     get_taylor_microscale,
     get_fluid_rms_velocity,
     get_normalized_accel_variance_ao2008,
@@ -107,7 +109,7 @@ def get_kernel_ao2008(
     )
 
     # Compute radial relative velocity ⟨ |w_r| ⟩
-    wr = get_radial_relative_velocity_ao2008(
+    wr = get_radial_relative_velocity_dz2002(
         velocity_dispersion, particle_inertia_time
     )
 
@@ -214,10 +216,14 @@ def get_kernel_ao2008_via_system_state(
         kinematic_viscosity=kinematic_viscosity,
         relative_velocity=relative_velocity,
     )
-    particle_settling_velocity = get_particle_settling_velocity_via_inertia(
-        particle_inertia_time=particle_inertia_time,
-        gravitational_acceleration=STANDARD_GRAVITY,
+    particle_settling_velocity = get_particle_settling_velocity_with_drag(
+        particle_radius=particle_radius,
+        particle_density=particle_density,
+        fluid_density=fluid_density,
+        dynamic_viscosity=dynamic_viscosity,
         slip_correction_factor=slip_correction_factor,
+        gravitational_acceleration=STANDARD_GRAVITY,
+        re_threshold=0.1,
     )
 
     # 4. Turbulence scales
@@ -240,18 +246,7 @@ def get_kernel_ao2008_via_system_state(
         turbulent_dissipation=turbulent_dissipation,
     )
 
-    # 5. Relative velocity variance
-    velocity_dispersion = get_relative_velocity_variance(
-        fluid_rms_velocity=fluid_rms_velocity,
-        collisional_radius=collisional_radius,
-        particle_inertia_time=particle_inertia_time,
-        particle_velocity=particle_settling_velocity,
-        taylor_microscale=taylor_microscale,
-        eulerian_integral_length=eulerian_integral_length,
-        lagrangian_integral_time=lagrangian_integral_time,
-    )
-
-    # 6. Additional turbulence-based quantities
+    # 5. Additional turbulence-based quantities
     kolmogorov_time = get_kolmogorov_time(
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
@@ -276,11 +271,28 @@ def get_kernel_ao2008_via_system_state(
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
+    lagrangian_taylor_microscale_time = get_lagrangian_taylor_microscale_time(
+        kolmogorov_time=kolmogorov_time,
+        re_lambda=re_lambda,
+        accel_variance=normalized_accel_variance,
+    )
+
+    # 6. Relative velocity variance
+    velocity_dispersion = get_relative_velocity_variance(
+        fluid_rms_velocity=fluid_rms_velocity,
+        collisional_radius=collisional_radius,
+        particle_inertia_time=particle_inertia_time,
+        particle_velocity=particle_settling_velocity,
+        taylor_microscale=taylor_microscale,
+        eulerian_integral_length=eulerian_integral_length,
+        lagrangian_integral_time=lagrangian_integral_time,
+        lagrangian_taylor_microscale_time=lagrangian_taylor_microscale_time,
+    )
 
     # 7. Final collision kernel
     return get_kernel_ao2008(
         particle_radius=particle_radius,
-        velocity_dispersion=velocity_dispersion,
+        velocity_dispersion=np.abs(velocity_dispersion),
         particle_inertia_time=particle_inertia_time,
         stokes_number=stokes_number,
         kolmogorov_length_scale=kolmogorov_length_scale,

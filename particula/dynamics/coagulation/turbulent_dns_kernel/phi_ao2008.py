@@ -84,7 +84,7 @@ def get_phi_ao2008(
     v2 = np.minimum(
         particle_velocity[:, np.newaxis], particle_velocity[np.newaxis, :]
     )
-    # tau1 > tau2 due to v1=tau1*gravity and v2=tau2*gravity
+    # tau1 > tau2 due to v1~=tau1*gravity and v2~=tau2*gravity
     tau1 = np.maximum(
         particle_inertia_time[:, np.newaxis],
         particle_inertia_time[np.newaxis, :],
