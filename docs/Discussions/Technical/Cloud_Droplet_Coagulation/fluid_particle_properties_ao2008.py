@@ -147,7 +147,12 @@ percent_error_velocity = (
 fig, ax = plt.subplots(3, 1, figsize=(10, 15))
 
 ax[0].plot(
-    particle_radius * 1e6, ao2008_re_p, "o-", color="blue", alpha=0.6, label="ao2008 Re_p"
+    particle_radius * 1e6,
+    ao2008_re_p,
+    "o-",
+    color="blue",
+    alpha=0.6,
+    label="ao2008 Re_p",
 )
 ax[0].plot(
     particle_radius * 1e6, re_p, "x--", color="blue", label="Particula Re_p"
@@ -158,7 +163,12 @@ ax[0].set_ylabel("Re_p")
 ax[0].legend()
 
 ax[1].plot(
-    particle_radius * 1e6, ao2008_t_p, "o-", color="green", alpha=0.6, label="ao2008 t_p"
+    particle_radius * 1e6,
+    ao2008_t_p,
+    "o-",
+    color="green",
+    alpha=0.6,
+    label="ao2008 t_p",
 )
 ax[1].plot(
     particle_radius * 1e6,
