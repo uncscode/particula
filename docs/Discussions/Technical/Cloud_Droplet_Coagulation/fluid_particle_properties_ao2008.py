@@ -147,7 +147,7 @@ percent_error_velocity = (
 fig, ax = plt.subplots(3, 1, figsize=(10, 15))
 
 ax[0].plot(
-    particle_radius * 1e6, ao2008_re_p, "o-", color="blue", label="ao2008 Re_p"
+    particle_radius * 1e6, ao2008_re_p, "o-", color="blue", alpha=0.6, label="ao2008 Re_p"
 )
 ax[0].plot(
     particle_radius * 1e6, re_p, "x--", color="blue", label="Particula Re_p"
@@ -158,7 +158,7 @@ ax[0].set_ylabel("Re_p")
 ax[0].legend()
 
 ax[1].plot(
-    particle_radius * 1e6, ao2008_t_p, "o-", color="green", label="ao2008 t_p"
+    particle_radius * 1e6, ao2008_t_p, "o-", color="green", alpha=0.6, label="ao2008 t_p"
 )
 ax[1].plot(
     particle_radius * 1e6,
@@ -177,6 +177,7 @@ ax[2].plot(
     ao2008_velocity * 100,
     "o-",
     color="red",
+    alpha=0.6,
     label="ao2008 Velocity",
 )
 ax[2].plot(
@@ -341,6 +342,7 @@ ax[0].plot(
     st_ao2008[:, 0],
     "o-",
     color="blue",
+    alpha=0.6,
     label="ao2008 St (10 cm^2/s^3)",
 )
 ax[0].plot(
@@ -355,6 +357,7 @@ ax[0].plot(
     st_ao2008[:, 1],
     "o-",
     color="green",
+    alpha=0.6,
     label="ao2008 St (100 cm^2/s^3)",
 )
 ax[0].plot(
@@ -369,6 +372,7 @@ ax[0].plot(
     st_ao2008[:, 2],
     "o-",
     color="red",
+    alpha=0.6,
     label="ao2008 St (400 cm^2/s^3)",
 )
 ax[0].plot(
@@ -389,6 +393,7 @@ ax[1].plot(
     sv_ao2008[:, 0],
     "o-",
     color="blue",
+    alpha=0.6,
     label="ao2008 Sv (10 cm^2/s^3)",
 )
 ax[1].plot(
@@ -403,6 +408,7 @@ ax[1].plot(
     sv_ao2008[:, 1],
     "o-",
     color="green",
+    alpha=0.6,
     label="ao2008 Sv (100 cm^2/s^3)",
 )
 ax[1].plot(
@@ -417,6 +423,7 @@ ax[1].plot(
     sv_ao2008[:, 2],
     "o-",
     color="red",
+    alpha=0.6,
     label="ao2008 Sv (400 cm^2/s^3)",
 )
 ax[1].plot(
