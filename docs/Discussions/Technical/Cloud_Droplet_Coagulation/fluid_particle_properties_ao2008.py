@@ -318,7 +318,34 @@ for radius, st_10, st_100, st_400 in zip(
         f"{radius * 1e6:.1f} \t | {st_10:.4f} \t\t | {st_100:.4f} \t\t | {st_400:.4f}"
     )
 
-# print stokes number in a table format
+# Plot Stokes number comparison
+fig, ax = plt.subplots(2, 1, figsize=(10, 10))
+
+ax[0].plot(particle_radius * 1e6, st_ao2008[:, 0], 'o-', label='ao2008 St (10 cm^2/s^3)')
+ax[0].plot(particle_radius * 1e6, stokes_number_10, 's-', label='Particula St (10 cm^2/s^3)')
+ax[0].plot(particle_radius * 1e6, st_ao2008[:, 1], 'o-', label='ao2008 St (100 cm^2/s^3)')
+ax[0].plot(particle_radius * 1e6, stokes_number_100, 's-', label='Particula St (100 cm^2/s^3)')
+ax[0].plot(particle_radius * 1e6, st_ao2008[:, 2], 'o-', label='ao2008 St (400 cm^2/s^3)')
+ax[0].plot(particle_radius * 1e6, stokes_number_400, 's-', label='Particula St (400 cm^2/s^3)')
+ax[0].set_title('Stokes Number Comparison')
+ax[0].set_xlabel('Radius (µm)')
+ax[0].set_ylabel('Stokes Number')
+ax[0].legend()
+
+# Plot Stokes velocity comparison
+ax[1].plot(particle_radius * 1e6, sv_ao2008[:, 0], 'o-', label='ao2008 Sv (10 cm^2/s^3)')
+ax[1].plot(particle_radius * 1e6, stokes_velocity_10, 's-', label='Particula Sv (10 cm^2/s^3)')
+ax[1].plot(particle_radius * 1e6, sv_ao2008[:, 1], 'o-', label='ao2008 Sv (100 cm^2/s^3)')
+ax[1].plot(particle_radius * 1e6, stokes_velocity_100, 's-', label='Particula Sv (100 cm^2/s^3)')
+ax[1].plot(particle_radius * 1e6, sv_ao2008[:, 2], 'o-', label='ao2008 Sv (400 cm^2/s^3)')
+ax[1].plot(particle_radius * 1e6, stokes_velocity_400, 's-', label='Particula Sv (400 cm^2/s^3)')
+ax[1].set_title('Stokes Velocity Comparison')
+ax[1].set_xlabel('Radius (µm)')
+ax[1].set_ylabel('Stokes Velocity')
+ax[1].legend()
+
+plt.tight_layout()
+plt.show()
 
 print("Particula Computed Values")
 print("Radius (µm) | St (10 cm^2/s^3) | St (100 cm^2/s^3) | St (400 cm^2/s^3)")
