@@ -485,7 +485,7 @@ ax[1].set_title("Stokes Velocity Comparison")
 ax[1].set_xlabel("Particle Radius (micrometers)")
 ax[1].set_ylabel("Stokes Velocity (dimensionless)")
 
-ax[1].legend(loc="lower center", ncol=1, bbox_to_anchor=(0.5, -0.7))
+ax[1].legend(loc="lower center", ncol=1, bbox_to_anchor=(0.5, -1.0))
 plt.tight_layout()
 plt.show()
 
