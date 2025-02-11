@@ -506,6 +506,20 @@ stokes_number_particula_df = pd.DataFrame(
 print("Particula Computed Stokes Numbers")
 display(stokes_number_particula_df)
 
+# Calculate percent errors for Stokes Numbers
+percent_error_stokes_number_10 = 100 * (stokes_number_10 - st_ao2008[:, 0]) / st_ao2008[:, 0]
+percent_error_stokes_number_100 = 100 * (stokes_number_100 - st_ao2008[:, 1]) / st_ao2008[:, 1]
+percent_error_stokes_number_400 = 100 * (stokes_number_400 - st_ao2008[:, 2]) / st_ao2008[:, 2]
+
+percent_errors_stokes_df = pd.DataFrame({
+    'Radius (µm)': particle_radius * 1e6,
+    'Percent Error in St (10 cm^2/s^3)': percent_error_stokes_number_10,
+    'Percent Error in St (100 cm^2/s^3)': percent_error_stokes_number_100,
+    'Percent Error in St (400 cm^2/s^3)': percent_error_stokes_number_400
+})
+print("Percent Errors for Stokes Numbers")
+display(percent_errors_stokes_df)
+
 
 # print ao2008 values
 # Create DataFrame for Paper Values From Table 3 (Scaled Velocities)
