@@ -31,6 +31,7 @@ from particula.gas import properties as gas_properties
 
 from particula.util.constants import STANDARD_GRAVITY
 from particula.util.converting.units import convert_units
+import pandas as pd
 
 
 # %% [markdown]
