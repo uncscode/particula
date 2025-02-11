@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.kernel_ao2008 import (
     get_kernel_ao2008,
+    get_kernel_ao2008_via_system_state,
 )
 
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
@@ -61,7 +62,6 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
     temperature = 273  # Temperature in Kelvin
     particle_density = 1000  # Particle density in kg/m³
     fluid_density = 1.0  # Fluid (air) density in kg/m³
-    relative_velocity = 1e-6  # Relative velocity in m/s
 
     # 1. Basic fluid properties
     dynamic_viscosity = gas_properties.get_dynamic_viscosity(temperature)
@@ -193,7 +193,18 @@ kernel_values = kernel_calc(
     particle_radius, turbulent_dissipation, reynolds_lambda
 )
 
-print(kernel_values)
+# %% alternative method to compute kernel function using system state
+
+kernel_via_system_state = get_kernel_ao2008_via_system_state(
+    particle_radius=particle_radius,
+    particle_density=1000,
+    fluid_density=1.0,
+    temperature=273,
+    turbulent_dissipation=400 * convert_units("cm^2/s^3", "m^2/s^3"),
+    re_lambda=72.41,
+    relative_velocity=0.0,
+)
+
 # %% [markdown]
 """
 ## Plot the Comparison Graph
@@ -210,6 +221,14 @@ plt.plot(
     label="Model Prediction",
     color="magenta",
     alpha=0.5,
+    linewidth=5,
+)
+plt.plot(
+    particle_radius * 1e6,
+    kernel_via_system_state[:, index] * convert_units("m^3/s", "cm^3/s"),
+    label="Model Prediction via System State",
+    color="green",
+    alpha=0.5,
 )
 plt.xlabel("Particle Radius (µm)")
 plt.ylabel("Collision Kernel (cm³/s)")
@@ -221,3 +240,5 @@ plt.show()
 """
 This script compares the collision kernel Γ₁₂ between DNS data and the model prediction.
 """
+
+# %%
