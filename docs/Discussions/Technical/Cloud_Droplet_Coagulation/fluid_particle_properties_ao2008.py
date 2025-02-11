@@ -239,6 +239,7 @@ percent_errors_df = pd.DataFrame(
         "Percent Error in Settling Velocity (%)": percent_error_velocity,
     }
 )
+print("Percent Errors for Re_p, t_p, and Settling Velocity")
 display(percent_errors_df)
 # Create DataFrame for Paper Values From Table 2
 paper_values_df = pd.DataFrame(
@@ -250,6 +251,7 @@ paper_values_df = pd.DataFrame(
         "f(Re_p)": ao2008_f_re_p,
     }
 )
+print("Paper Values From Table 2")
 display(paper_values_df)
 
 # print settling velocity in a table format
@@ -263,6 +265,7 @@ computed_values_df = pd.DataFrame(
         "f(Re_p)": f_re_p,
     }
 )
+print("Particula Computed Values")
 display(computed_values_df)
 
 
@@ -382,6 +385,7 @@ stokes_number_paper_df = pd.DataFrame(
         "St (400 cm^2/s^3)": st_ao2008[:, 2],
     }
 )
+print("Paper Values From Table 3 (Stokes Numbers)")
 display(stokes_number_paper_df)
 
 # Plot Stokes number comparison
@@ -499,6 +503,7 @@ stokes_number_particula_df = pd.DataFrame(
         "St (400 cm^2/s^3)": stokes_number_400,
     }
 )
+print("Particula Computed Stokes Numbers")
 display(stokes_number_particula_df)
 
 
@@ -512,6 +517,7 @@ sv_paper_df = pd.DataFrame(
         "Sv (400 cm^2/s^3)": sv_ao2008[:, 2],
     }
 )
+print("Paper Values From Table 3 (Scaled Velocities)")
 display(sv_paper_df)
 
 # print stokes velocity in a table format
@@ -524,6 +530,21 @@ sv_particula_df = pd.DataFrame(
         "Sv (400 cm^2/s^3)": stokes_velocity_400,
     }
 )
+print("Particula Computed Scaled Velocities")
 display(sv_particula_df)
+
+# Calculate percent errors for Scaled Velocities
+percent_error_sv_10 = 100 * (stokes_velocity_10 - sv_ao2008[:, 0]) / sv_ao2008[:, 0]
+percent_error_sv_100 = 100 * (stokes_velocity_100 - sv_ao2008[:, 1]) / sv_ao2008[:, 1]
+percent_error_sv_400 = 100 * (stokes_velocity_400 - sv_ao2008[:, 2]) / sv_ao2008[:, 2]
+
+percent_errors_sv_df = pd.DataFrame({
+    'Radius (µm)': particle_radius * 1e6,
+    'Percent Error in Sv (10 cm^2/s^3)': percent_error_sv_10,
+    'Percent Error in Sv (100 cm^2/s^3)': percent_error_sv_100,
+    'Percent Error in Sv (400 cm^2/s^3)': percent_error_sv_400
+})
+print("Percent Errors for Scaled Velocities")
+display(percent_errors_sv_df)
 
 # %%
