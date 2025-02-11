@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../fluid_particle_properties_ao2008/">
+        <link rel="prev" href="../Droplet_Coagulation_Kernel_Ayala2008/">
       
       
         <link rel="next" href="../mean_square_horizontal_velocity_comparison/">
@@ -4350,6 +4350,28 @@
   
   
     <li class="md-nav__item">
+      <a href="../DNS_Fluid_and_Particle_Properties_Comparison/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fluid and Particle Properties for Cloud Droplet Coagulation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../DNS_Radial_Distribution_Comparison/" class="md-nav__link">
         
   
@@ -4377,28 +4399,6 @@
   
   <span class="md-ellipsis">
     Droplet Coagulation Kernel Ayala 2008
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../fluid_particle_properties_ao2008/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Fluid particle properties ao2008
     
   </span>
   
@@ -7045,7 +7045,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ba14023f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dfaf7e07">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7067,6 +7067,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation.turbulent_dns_kernel.kernel_ao2008</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_kernel_ao2008</span><span class="p">,</span>
+    <span class="n">get_kernel_ao2008_via_system_state</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -7112,6 +7113,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.kernel_ao2008 import (
     get_kernel_ao2008,
+    get_kernel_ao2008_via_system_state,
 )
 
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
@@ -7158,7 +7160,7 @@ data = np.array(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=225ab394">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2f78d04f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7175,8 +7177,7 @@ reynolds_lambda = 72.41  # Example value</p>
 # Define constants and parameters
 temperature = 273  # Temperature in Kelvin
 particle_density = 1000  # Particle density in kg/m³
-fluid_density = 1.0  # Fluid (air) density in kg/m³
-relative_velocity = 1e-6  # Relative velocity in m/s</p>
+fluid_density = 1.0  # Fluid (air) density in kg/m³</p>
 <pre><code># 1. Basic fluid properties
 dynamic_viscosity = gas_properties.get_dynamic_viscosity(temperature)
 kinematic_viscosity = gas_properties.get_kinematic_viscosity(
@@ -7304,12 +7305,55 @@ return kernel_values</code></pre>
 kernel_values = kernel_calc(
 particle_radius, turbulent_dissipation, reynolds_lambda
 )</p>
-<p>print(kernel_values)</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f943b0de">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">kernel_via_system_state</span> <span class="o">=</span> <span class="n">get_kernel_ao2008_via_system_state</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">particle_density</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">fluid_density</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">273</span><span class="p">,</span>
+    <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="mi">400</span> <span class="o">*</span> <span class="n">convert_units</span><span class="p">(</span><span class="s2">"cm^2/s^3"</span><span class="p">,</span> <span class="s2">"m^2/s^3"</span><span class="p">),</span>
+    <span class="n">re_lambda</span><span class="o">=</span><span class="mf">72.41</span><span class="p">,</span>
+    <span class="n">relative_velocity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-2">
+kernel_via_system_state = get_kernel_ao2008_via_system_state(
+    particle_radius=particle_radius,
+    particle_density=1000,
+    fluid_density=1.0,
+    temperature=273,
+    turbulent_dissipation=400 * convert_units("cm^2/s^3", "m^2/s^3"),
+    re_lambda=72.41,
+    relative_velocity=0.0,
+)</div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8dc08765">
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b9d7d530">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7325,6 +7369,14 @@ kernel_values[:, index] * convert_units("m^3/s", "cm^3/s"),
 label="Model Prediction",
 color="magenta",
 alpha=0.5,
+linewidth=5,
+)
+plt.plot(
+particle_radius * 1e6,
+kernel_via_system_state[:, index] * convert_units("m^3/s", "cm^3/s"),
+label="Model Prediction via System State",
+color="green",
+alpha=0.5,
 )
 plt.xlabel("Particle Radius (µm)")
 plt.ylabel("Collision Kernel (cm³/s)")
@@ -7333,6 +7385,33 @@ plt.title("Collision Kernel Comparison")</p>
 plt.show()</p>
 <p>"""
 This script compares the collision kernel Γ₁₂ between DNS data and the model prediction.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e9606cf7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-3"></div>
+</div>
+</div>
 </div>
 </div>
 </div>
