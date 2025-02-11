@@ -226,7 +226,6 @@ ax[2].set_ylabel("Settling Velocity (centimeters per second)")
 ax[2].legend()
 
 plt.tight_layout()
-fig.legend(loc="lower center", ncol=3, bbox_to_anchor=(0.5, -0.2))
 plt.show()
 
 # Print percent error
@@ -385,7 +384,7 @@ for radius, st_10, st_100, st_400 in zip(
     )
 
 # Plot Stokes number comparison
-fig, ax = plt.subplots(2, 1, figsize=(4, 4))
+fig, ax = plt.subplots(2, 1, figsize=(4, 7))
 
 ax[0].plot(
     particle_radius * 1e6,
@@ -435,7 +434,6 @@ ax[0].plot(
 ax[0].set_title("Stokes Number Comparison")
 ax[0].set_xlabel("Particle Radius (micrometers)")
 ax[0].set_ylabel("Stokes Number (St)")
-ax[0].legend()
 
 # Plot Stokes velocity comparison
 ax[1].plot(
@@ -486,8 +484,8 @@ ax[1].plot(
 ax[1].set_title("Stokes Velocity Comparison")
 ax[1].set_xlabel("Particle Radius (micrometers)")
 ax[1].set_ylabel("Stokes Velocity (dimensionless)")
-ax[1].legend()
 
+ax[1].legend(loc="lower center", ncol=1, bbox_to_anchor=(0.5, -0.7))
 plt.tight_layout()
 plt.show()
 
