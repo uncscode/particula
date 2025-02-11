@@ -34,10 +34,12 @@ from particula.util.converting import convert_mass_concentration
     ],
 )
 def test_mass_concentration_to_mole_fraction(
-        mass_concentrations, molar_masses, expected):
+    mass_concentrations, molar_masses, expected
+):
     """Test mass_concentration_to_mole_fraction function"""
     mole_fractions = convert_mass_concentration.to_mole_fraction(
-        mass_concentrations, molar_masses)
+        mass_concentrations, molar_masses
+    )
     np.testing.assert_allclose(mole_fractions, expected, rtol=1e-5)
 
 
@@ -59,31 +61,49 @@ def test_mass_concentration_to_mole_fraction(
     ],
 )
 def test_mass_concentration_to_volume_fraction(
-        mass_concentrations, densities, expected):
+    mass_concentrations, densities, expected
+):
     """Test mass_concentration_to_volume_fraction function"""
     volume_fractions = convert_mass_concentration.to_volume_fraction(
-        mass_concentrations, densities)
+        mass_concentrations, densities
+    )
     np.testing.assert_allclose(volume_fractions, expected, rtol=1e-5)
 
 
-@pytest.mark.parametrize("mass_concentrations, molar_masses", [
-    (np.array([100, 0]), np.array([10, 0])),  # Test zero molar mass
-    (np.array([100, -100]), np.array([10, 20])),  # Negative mass concentration
-    (np.array([100, 200]), np.array([-10, 20]))  # Negative molar mass
-])
+@pytest.mark.parametrize(
+    "mass_concentrations, molar_masses",
+    [
+        (np.array([100, 0]), np.array([10, 0])),  # Test zero molar mass
+        (
+            np.array([100, -100]),
+            np.array([10, 20]),
+        ),  # Negative mass concentration
+        (np.array([100, 200]), np.array([-10, 20])),  # Negative molar mass
+    ],
+)
 def test_error_handling_mass_to_mole(mass_concentrations, molar_masses):
     """Test error handling for mass_concentration_to_mole_fraction function"""
     with pytest.raises(Exception):
-        convert_mass_concentration.to_mole_fraction(mass_concentrations, molar_masses)
+        convert_mass_concentration.to_mole_fraction(
+            mass_concentrations, molar_masses
+        )
 
 
-@pytest.mark.parametrize("mass_concentrations, densities", [
-    (np.array([100, 200]), np.array([0, 20])),  # Zero density
-    (np.array([100, -200]), np.array([10, 20])),  # Negative mass concentration
-    (np.array([100, 200]), np.array([10, -20]))  # Negative density
-])
+@pytest.mark.parametrize(
+    "mass_concentrations, densities",
+    [
+        (np.array([100, 200]), np.array([0, 20])),  # Zero density
+        (
+            np.array([100, -200]),
+            np.array([10, 20]),
+        ),  # Negative mass concentration
+        (np.array([100, 200]), np.array([10, -20])),  # Negative density
+    ],
+)
 def test_error_handling_mass_to_volume(mass_concentrations, densities):
     """Test error handling for mass_concentration_to_volume_fraction
     function"""
     with pytest.raises(Exception):
-        convert_mass_concentration.to_volume_fraction(mass_concentrations, densities)
+        convert_mass_concentration.to_volume_fraction(
+            mass_concentrations, densities
+        )

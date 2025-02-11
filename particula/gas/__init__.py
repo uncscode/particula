@@ -23,7 +23,8 @@ from particula.gas.vapor_pressure_factories import VaporPressureFactory
 from particula.gas.species import GasSpecies
 
 from particula.gas.species_builders import (
-    GasSpeciesBuilder, PresetGasSpeciesBuilder,
+    GasSpeciesBuilder,
+    PresetGasSpeciesBuilder,
 )
 from particula.gas.species_factories import GasSpeciesFactory
 from particula.gas.atmosphere import Atmosphere

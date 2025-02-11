@@ -1,4 +1,5 @@
 """Tests for the size_distribution_convert module."""
+
 import numpy as np
 
 
@@ -7,7 +8,7 @@ from particula.util.size_distribution_convert import (
     get_conversion_strategy,
     DNdlogDPtoPMSConversionStrategy,
     PMStoPDFConversionStrategy,
-    DNdlogDPtoPDFConversionStrategy
+    DNdlogDPtoPDFConversionStrategy,
 )
 
 
@@ -22,7 +23,8 @@ def test_dndlogdp_to_pms_conversion_strategy():
     assert np.allclose(converted_concentration, expected, atol=1e-6)
     # call inverse function
     converted_inverse = strategy.convert(
-        diameters, converted_concentration, inverse=True)
+        diameters, converted_concentration, inverse=True
+    )
     assert np.allclose(converted_inverse, concentration, atol=1e-6)
 
 
@@ -37,7 +39,8 @@ def test_pms_to_pdf_conversion_strategy():
     assert np.allclose(converted_concentration, expected, atol=1e-6)
     # call inverse function
     converted_inverse = strategy.convert(
-        diameters, converted_concentration, inverse=True)
+        diameters, converted_concentration, inverse=True
+    )
     assert np.allclose(converted_inverse, concentration, atol=1e-6)
 
 
@@ -52,7 +55,8 @@ def test_dndlogdp_to_pdf_conversion_strategy():
     assert np.allclose(converted_concentration, expected, atol=1e-6)
     # call inverse function
     converted_inverse = strategy.convert(
-        diameters, converted_concentration, inverse=True)
+        diameters, converted_concentration, inverse=True
+    )
     assert np.allclose(converted_inverse, concentration, atol=1e-6)
 
 
@@ -68,29 +72,30 @@ def test_converter():
     assert np.allclose(converted_concentration, expected, atol=1e-6)
     # call inverse function
     converted_inverse = converter.convert(
-        diameters, converted_concentration, inverse=True)
+        diameters, converted_concentration, inverse=True
+    )
     assert np.allclose(converted_inverse, concentration, atol=1e-6)
 
 
 def test_get_conversion_strategy():
     """Test the get_conversion_strategy function."""
-    strategy = get_conversion_strategy('dn/dlogdp', 'pms')
+    strategy = get_conversion_strategy("dn/dlogdp", "pms")
     assert isinstance(strategy, DNdlogDPtoPMSConversionStrategy)
 
-    strategy = get_conversion_strategy('pms', 'pdf')
+    strategy = get_conversion_strategy("pms", "pdf")
     assert isinstance(strategy, PMStoPDFConversionStrategy)
 
-    strategy = get_conversion_strategy('dn/dlogdp', 'pdf')
+    strategy = get_conversion_strategy("dn/dlogdp", "pdf")
     assert isinstance(strategy, DNdlogDPtoPDFConversionStrategy)
 
     try:
-        strategy = get_conversion_strategy('invalid', 'pms')
+        strategy = get_conversion_strategy("invalid", "pms")
         assert False  # Should raise a ValueError
     except ValueError:
         assert True
 
     try:
-        strategy = get_conversion_strategy('dn/dlogdp', 'invalid')
+        strategy = get_conversion_strategy("dn/dlogdp", "invalid")
         assert False  # Should raise a ValueError
     except ValueError:
         assert True

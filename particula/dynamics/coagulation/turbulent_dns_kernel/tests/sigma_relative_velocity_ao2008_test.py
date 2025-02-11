@@ -26,9 +26,7 @@ def test_get_relative_velocity_variance_array():
         lagrangian_integral_time=0.3,
     )
 
-    assert (
-        result.shape == expected_shape
-    )
+    assert result.shape == expected_shape
 
 
 def test_invalid_inputs():

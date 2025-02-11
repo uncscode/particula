@@ -40,7 +40,9 @@ def test_build_ideal_activity_molar_parameter():
     assert builder.molar_mass == 1e-3
 
     # test setting molar mass units for array
-    builder.set_molar_mass(np.array([1, 2, 3])/1000, molar_mass_units="kg/mol")
+    builder.set_molar_mass(
+        np.array([1, 2, 3]) / 1000, molar_mass_units="kg/mol"
+    )
     np.testing.assert_array_equal(
         builder.molar_mass, np.array([1e-3, 2e-3, 3e-3])
     )
@@ -101,7 +103,7 @@ def test_build_kappa_parameter_activity_set_density():
     assert builder.density == pytest.approx(1e3, rel=1e-5)
 
     # test setting density units for array
-    builder.set_density(np.array([1, 2, 3])*1e3, density_units="kg/m^3")
+    builder.set_density(np.array([1, 2, 3]) * 1e3, density_units="kg/m^3")
     np.testing.assert_allclose(
         builder.density, np.array([1e3, 2e3, 3e3]), atol=1e-5
     )
@@ -123,7 +125,9 @@ def test_build_kappa_parameter_activity_set_molar_mass():
     assert builder.molar_mass == pytest.approx(1e-3, rel=1e-5)
 
     # test setting molar mass units for array
-    builder.set_molar_mass(np.array([1, 2, 3])/1000, molar_mass_units="kg/mol")
+    builder.set_molar_mass(
+        np.array([1, 2, 3]) / 1000, molar_mass_units="kg/mol"
+    )
     np.testing.assert_allclose(
         builder.molar_mass, np.array([1e-3, 2e-3, 3e-3]), atol=1e-5
     )

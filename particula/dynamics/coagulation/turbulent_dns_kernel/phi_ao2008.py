@@ -42,7 +42,7 @@ def get_phi_ao2008(
         Φ(α, φ) =
         {  1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )\
         -  1 / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) ) }\
-        ×  ( vₚ₁ - vₚ₂ ) / ( 2 φ ( (vₚ₁ - vₚ₂) / φ + (1 / τₚ₁) + (1 / τₚ₂) )² )
+        ×  ( vₚ₁ - vₚ₂ ) / ( 2 φ ( (vₚ₁ - vₚ₂ / φ) + (1 / τₚ₁) + (1 / τₚ₂) )² )
 
         + {  4 / ( (vₚ₂ / φ)² - ( (1 / τₚ₂) + (1 / α) )² )\
         -  1 / ( (vₚ₂ / φ) + (1 / τₚ₂) + (1 / α) )²\
@@ -54,7 +54,7 @@ def get_phi_ao2008(
         -  2φ / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )\
         -  vₚ₁ / ( ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )² )\
         +  vₚ₂ / ( ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )² )  }\
-        ×  1 / ( 2φ ( (vₚ₁ - vₚ₂) / φ + (1 / τₚ₁) + (1 / τₚ₂) ) )
+        ×  1 / ( 2φ ( (vₚ₁ - vₚ₂ / φ) + (1 / τₚ₁) + (1 / τₚ₂) ) )
 
     Arguments:
     ----------
@@ -84,7 +84,7 @@ def get_phi_ao2008(
     v2 = np.minimum(
         particle_velocity[:, np.newaxis], particle_velocity[np.newaxis, :]
     )
-    # tau1 > tau2 due to v1=tau1*gravity and v2=tau2*gravity
+    # tau1 > tau2 due to v1~=tau1*gravity and v2~=tau2*gravity
     tau1 = np.maximum(
         particle_inertia_time[:, np.newaxis],
         particle_inertia_time[np.newaxis, :],
@@ -106,37 +106,53 @@ def get_phi_ao2008(
 def _compute_phi_term1(
     terms: PhiComputeTerms,
 ) -> NDArray[np.float64]:
-    """Compute the first term of the Φ function."""
+    """Compute the first term of the Φ function.
+
+     term_1 = {
+        1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )\
+        -  1 / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )
+    }\
+        ×  ( vₚ₁ - vₚ₂ ) / ( 2 φ ( (vₚ₁ - vₚ₂ / φ) + (1 / τₚ₁) + (1 / τₚ₂) )² )
+    """
     denominator1 = terms.v2 / terms.phi - (1 / terms.tau2) - (1 / terms.alpha)
     denominator2 = terms.v1 / terms.phi + (1 / terms.tau1) + (1 / terms.alpha)
 
     first_term = (1 / denominator1) - (1 / denominator2)
 
     common_denominator = (
-        (terms.v1 - terms.v2) / terms.phi + (1 / terms.tau1) + (1 / terms.tau2)
+        (terms.v1 - terms.v2 / terms.phi) + (1 / terms.tau1) + (1 / terms.tau2)
     )
-    common_denominator_sq = common_denominator**2
 
     return first_term * (
-        (terms.v1 - terms.v2) / (2 * terms.phi * common_denominator_sq)
+        (terms.v1 - terms.v2) / (2 * terms.phi * common_denominator**2)
     )
 
 
 def _compute_phi_term2(
     terms: PhiComputeTerms,
 ) -> NDArray[np.float64]:
-    """Compute the second term of the Φ function."""
-    denominator1 = (
-        terms.v2 / terms.phi + (1 / terms.tau2) + (1 / terms.alpha)
-    ) ** 2
-    denominator2 = (
-        terms.v2 / terms.phi - (1 / terms.tau2) - (1 / terms.alpha)
-    ) ** 2
-    denominator3 = (terms.v2 / terms.phi) ** 2 - (
+    """Compute the second term of the Φ function.
+
+    term₂ =
+    {
+      4 / [ (v₂ / φ)² − ( (1 / τ₂) + (1 / α) )² ] \
+      − 1 / [ (v₂ / φ) + (1 / τ₂) + (1 / α) ]² \
+      − 1 / [ (v₂ / φ) − (1 / τ₂) − (1 / α) ]² \
+    }
+    × v₂ / \
+      [ 2 φ ( (1 / τ₁) − (1 / α) + ( (1 / τ₂) + (1 / α) ) × (v₁ / v₂) ) ]
+    """
+    denominator1 = (terms.v2 / terms.phi) ** 2 - (
         (1 / terms.tau2) + (1 / terms.alpha)
     ) ** 2
+    denominator2 = (
+        terms.v2 / terms.phi + (1 / terms.tau2) + (1 / terms.alpha)
+    ) ** 2
+    denominator3 = (
+        terms.v2 / terms.phi - (1 / terms.tau2) - (1 / terms.alpha)
+    ) ** 2
 
-    second_term = (4 / denominator3) - (1 / denominator1) - (1 / denominator2)
+    second_term = (4 / denominator1) - (1 / denominator2) - (1 / denominator3)
 
     shared_denominator = (
         (1 / terms.tau1)
@@ -150,7 +166,17 @@ def _compute_phi_term2(
 def _compute_phi_term3(
     terms: PhiComputeTerms,
 ) -> NDArray[np.float64]:
-    """Compute the third term of the Φ function."""
+    """Compute the third term of the Φ function.
+
+    term_3 =
+    {
+        2φ / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )\
+        -  2φ / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )\
+        -  vₚ₁ / ( ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )² )\
+        +  vₚ₂ / ( ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )² )
+    }
+        ×  1 / ( 2φ ( (vₚ₁ - vₚ₂/φ ) + (1 / τₚ₁) + (1 / τₚ₂) ) )
+    """
     denominator1 = (
         (terms.v1 / terms.phi) + (1 / terms.tau1) + (1 / terms.alpha)
     )
@@ -166,9 +192,7 @@ def _compute_phi_term3(
     )
 
     shared_denominator = (
-        ((terms.v1 - terms.v2) / terms.phi)
-        + (1 / terms.tau1)
-        + (1 / terms.tau2)
+        (terms.v1 - terms.v2 / terms.phi) + (1 / terms.tau1) + (1 / terms.tau2)
     )
 
     return (first_component + second_component) / (

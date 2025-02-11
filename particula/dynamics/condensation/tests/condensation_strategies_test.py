@@ -5,7 +5,7 @@ Test module for the condensation strategies.
 import unittest
 from unittest.mock import MagicMock
 from particula.dynamics.condensation.condensation_strategies import (
-    CondensationIsothermal
+    CondensationIsothermal,
 )
 from particula.particles.representation import ParticleRepresentation
 from particula.gas.species import GasSpecies
@@ -24,7 +24,7 @@ class TestCondensationIsothermal(unittest.TestCase):
         self.strategy = CondensationIsothermal(
             molar_mass=self.molar_mass,
             diffusion_coefficient=self.diffusion_coefficient,
-            accommodation_coefficient=self.accommodation_coefficient
+            accommodation_coefficient=self.accommodation_coefficient,
         )
 
         self.particle = MagicMock(spec=ParticleRepresentation)
@@ -36,8 +36,7 @@ class TestCondensationIsothermal(unittest.TestCase):
     def test_mean_free_path(self):
         """Test the mean free path call."""
         result = self.strategy.mean_free_path(
-            temperature=self.temperature,
-            pressure=self.pressure
+            temperature=self.temperature, pressure=self.pressure
         )
         self.assertIsNotNone(result)
 
@@ -45,9 +44,7 @@ class TestCondensationIsothermal(unittest.TestCase):
         """Test the Knudsen number call"""
         radius = 1e-9  # m
         result = self.strategy.knudsen_number(
-            radius=radius,
-            temperature=self.temperature,
-            pressure=self.pressure
+            radius=radius, temperature=self.temperature, pressure=self.pressure
         )
         self.assertIsNotNone(result)
 
@@ -55,8 +52,6 @@ class TestCondensationIsothermal(unittest.TestCase):
         """Test the first order mass transport call."""
         radius = 1e-9  # m
         result = self.strategy.first_order_mass_transport(
-            radius=radius,
-            temperature=self.temperature,
-            pressure=self.pressure
+            radius=radius, temperature=self.temperature, pressure=self.pressure
         )
         self.assertIsNotNone(result)

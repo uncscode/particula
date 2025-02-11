@@ -121,16 +121,22 @@ def test_transition_regime_coagulation_edge_cases():
     small_zero_input = np.array([0.1, 0.0])
     small_zero_result = transition_regime.hard_sphere(small_zero_input)
     small_zero_expected = np.array([0.10960430161885967, 0.0])
-    np.testing.assert_almost_equal(small_zero_result, small_zero_expected, decimal=4)
+    np.testing.assert_almost_equal(
+        small_zero_result, small_zero_expected, decimal=4
+    )
 
     # Test very large values (using realistic upper bound for particle sizes)
     large_input = np.array([1e5, 1e5])  # 100mm particles
     large_result = transition_regime.hard_sphere(large_input)
-    assert np.isfinite(large_result).all(), "Should handle large values without overflow"
+    assert np.isfinite(
+        large_result
+    ).all(), "Should handle large values without overflow"
 
     # Test negative values
     negative_input = np.array([-1.0, 1.0])
-    with pytest.raises(ValueError, match="Particle sizes must be non-negative"):
+    with pytest.raises(
+        ValueError, match="Particle sizes must be non-negative"
+    ):
         transition_regime.hard_sphere(negative_input)
 
     # Test NaN values

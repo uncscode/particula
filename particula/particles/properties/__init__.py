@@ -51,6 +51,7 @@ from particula.particles.properties.settling_velocity import (
     particle_settling_velocity,
     get_particle_settling_velocity_via_inertia,
     particle_settling_velocity_via_system_state,
+    get_particle_settling_velocity_with_drag,
 )
 from particula.particles.properties.diffusion_coefficient import (
     particle_diffusion_coefficient,

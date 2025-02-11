@@ -54,5 +54,7 @@ def test_safe_log10():
     # Test with negative values
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
-        assert not np.allclose(safe_log10([-1, -2, -3]), np.log10([-1, -2, -3]))
+        assert not np.allclose(
+            safe_log10([-1, -2, -3]), np.log10([-1, -2, -3])
+        )
         assert any(item.category == RuntimeWarning for item in w)

@@ -64,7 +64,7 @@ def test_surface_tension_mixin():
 
     # test setting surface tension units for array
     builder_mixin.set_surface_tension(
-        np.array([1, 2, 3])/1000, surface_tension_units="N/m"
+        np.array([1, 2, 3]) / 1000, surface_tension_units="N/m"
     )
     np.testing.assert_allclose(
         builder_mixin.surface_tension, np.array([1e-3, 2e-3, 3e-3]), atol=1e-6
@@ -88,7 +88,7 @@ def test_molar_mass_mixin():
     assert builder_mixin.molar_mass == pytest.approx(1e-3, 1e-6)
 
     # test setting molar mass units for array
-    builder_mixin.set_molar_mass(np.array([1, 2, 3])*1e-3, "kg/mol")
+    builder_mixin.set_molar_mass(np.array([1, 2, 3]) * 1e-3, "kg/mol")
     np.testing.assert_allclose(
         builder_mixin.molar_mass, np.array([1e-3, 2e-3, 3e-3]), atol=1e-6
     )
@@ -114,12 +114,12 @@ def test_concentration_mixin():
     )
 
     # test setting concentration units
-    builder_mixin.set_concentration(1/1000, concentration_units="kg/m^3")
+    builder_mixin.set_concentration(1 / 1000, concentration_units="kg/m^3")
     assert builder_mixin.concentration == pytest.approx(1e-3, 1e-6)
 
     # test setting concentration units for array
     builder_mixin.set_concentration(
-        np.array([1, 2, 3])/1000, concentration_units="kg/m^3"
+        np.array([1, 2, 3]) / 1000, concentration_units="kg/m^3"
     )
     np.testing.assert_allclose(
         builder_mixin.concentration, np.array([1e-3, 2e-3, 3e-3]), atol=1e-6
@@ -158,7 +158,7 @@ def test_pressure_mixin():
     assert builder_mixin.pressure == pytest.approx(1e3, 1e-6)
 
     # test setting pressure units for array
-    builder_mixin.set_pressure(np.array([1, 2, 3])*1e3, pressure_units="Pa")
+    builder_mixin.set_pressure(np.array([1, 2, 3]) * 1e3, pressure_units="Pa")
     np.testing.assert_allclose(
         builder_mixin.pressure, np.array([1e3, 2e3, 3e3]), atol=1e-6
     )
@@ -186,7 +186,7 @@ def test_mass_mixin():
     assert builder_mixin.mass == pytest.approx(1e-3, 1e-6)
 
     # test setting mass units for array
-    builder_mixin.set_mass(np.array([1, 2, 3])/1000, mass_units="kg")
+    builder_mixin.set_mass(np.array([1, 2, 3]) / 1000, mass_units="kg")
     np.testing.assert_allclose(
         builder_mixin.mass, np.array([1e-3, 2e-3, 3e-3]), atol=1e-6
     )
@@ -210,11 +210,11 @@ def test_radius_mixin():
     np.testing.assert_allclose(builder_mixin.radius, np.array([1, 2, 3]))
 
     # test setting radius units
-    builder_mixin.set_radius(1/100, radius_units="m")
+    builder_mixin.set_radius(1 / 100, radius_units="m")
     assert builder_mixin.radius == pytest.approx(1e-2, 1e-6)
 
     # test setting radius units for array
-    builder_mixin.set_radius(np.array([1, 2, 3])/100, radius_units="m")
+    builder_mixin.set_radius(np.array([1, 2, 3]) / 100, radius_units="m")
     np.testing.assert_allclose(
         builder_mixin.radius, np.array([1e-2, 2e-2, 3e-2]), atol=1e-6
     )

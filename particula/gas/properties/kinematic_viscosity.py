@@ -19,8 +19,10 @@ https://en.wikipedia.org/wiki/Viscosity#Kinematic_viscosity
 
 from particula.util.validate_inputs import validate_inputs
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
-from particula.util.constants import (REF_TEMPERATURE_STP,
-                                      REF_VISCOSITY_AIR_STP,)
+from particula.util.constants import (
+    REF_TEMPERATURE_STP,
+    REF_VISCOSITY_AIR_STP,
+)
 
 
 def get_kinematic_viscosity(
@@ -59,7 +61,7 @@ def get_kinematic_viscosity_via_system_state(
     temperature: float,
     fluid_density: float,
     reference_viscosity: float = REF_VISCOSITY_AIR_STP,
-    reference_temperature: float = REF_TEMPERATURE_STP
+    reference_temperature: float = REF_TEMPERATURE_STP,
 ) -> float:
     """
     Calculate the kinematic viscosity of air by calculating dynamic viscosity
@@ -89,9 +91,8 @@ def get_kinematic_viscosity_via_system_state(
     dynamic_viscosity = get_dynamic_viscosity(
         temperature=temperature,
         reference_viscosity=reference_viscosity,
-        reference_temperature=reference_temperature
+        reference_temperature=reference_temperature,
     )
     return get_kinematic_viscosity(
-        dynamic_viscosity=dynamic_viscosity,
-        fluid_density=fluid_density
-        )
+        dynamic_viscosity=dynamic_viscosity, fluid_density=fluid_density
+    )

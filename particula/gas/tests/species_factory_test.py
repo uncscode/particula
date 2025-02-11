@@ -14,6 +14,7 @@ from particula.gas.vapor_pressure_strategies import (
 
 class TestGasSpeciesFactory(unittest.TestCase):
     """Test the GasSpeciesFactory class."""
+
     def setUp(self):
         """Set up the test case."""
         self.factory = GasSpeciesFactory()
@@ -44,7 +45,9 @@ class TestGasSpeciesFactory(unittest.TestCase):
             parameters["vapor_pressure_strategy"],
         )
         self.assertEqual(gas_species.condensable, parameters["condensable"])
-        self.assertEqual(gas_species.concentration, parameters["concentration"])
+        self.assertEqual(
+            gas_species.concentration, parameters["concentration"]
+        )
         self.assertIsInstance(gas_species, GasSpecies)
 
     def test_get_strategy_preset_gas_species(self):

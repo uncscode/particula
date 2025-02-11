@@ -183,10 +183,10 @@ def fixed_water_activity(
 
     # alpha water rich phase
     alpha_water_activity = activities_water[
-        phase_check["upper_seperation_index"]:
+        phase_check["upper_seperation_index"] :
     ]
     alpha_organic_mole_fraction = organic_mole_fraction_array[
-        phase_check["upper_seperation_index"]:
+        phase_check["upper_seperation_index"] :
     ]
     # beta organic rich phase
     beta_water_activity = activities_water[

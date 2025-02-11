@@ -8,6 +8,7 @@ from typing import Optional
 
 try:
     import pint
+
     UNIT_REGISTRY = pint.UnitRegistry()
 except ImportError:
     UNIT_REGISTRY = None

@@ -117,14 +117,14 @@ class BuilderABC(ABC):
     def pre_build_check(self):
         """Check if all required attribute parameters are set before building.
 
-            Raises:
-                - ValueError : If any required parameter is missing.
+        Raises:
+            - ValueError : If any required parameter is missing.
 
-            Example:
-                ``` py
-                builder = Builder()
-                builder.pre_build_check()
-                ```
+        Example:
+            ``` py
+            builder = Builder()
+            builder.pre_build_check()
+            ```
         """
         if missing := [
             p for p in self.required_parameters if getattr(self, p) is None
