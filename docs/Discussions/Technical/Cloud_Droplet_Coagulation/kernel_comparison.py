@@ -209,7 +209,12 @@ kernel_values = kernel_calc(
     particle_radius, turbulent_dissipation, reynolds_lambda
 )
 
-# %% alternative method to compute kernel function using system state
+# %% [markdown]
+"""
+## Compute Kernel via System State
+
+We compute the kernel using an alternative method that utilizes the system state directly.
+"""
 
 kernel_via_system_state = get_kernel_ao2008_via_system_state(
     particle_radius=particle_radius,
@@ -253,6 +258,47 @@ plt.title("Collision Kernel Comparison")
 # plt.legend()
 plt.grid(True)
 plt.show()
+
+# %% [markdown]
+"""
+## Calculate Percent Error
+
+We calculate the percent error between the model predictions and the DNS data to assess the accuracy of our implementation.
+"""
+
+# Extract DNS data
+dns_radii = data[:, 0] * 1e-6  # Convert from µm to meters
+dns_kernels = data[:, 1] * convert_units("cm^3/s", "m^3/s")
+
+# Interpolate model predictions at DNS radii
+from scipy.interpolate import interp1d
+
+interpolator = interp1d(
+    particle_radius, kernel_values[:, np.argmin(np.abs(particle_radius - 30e-6))],
+    kind='linear', fill_value='extrapolate'
+)
+model_kernels_at_dns = interpolator(dns_radii)
+
+# Calculate percent error
+percent_errors = (model_kernels_at_dns - dns_kernels) / dns_kernels * 100
+
+# %% [markdown]
+"""
+## Display Comparison Table
+
+We display the DNS data, model predictions, and percent errors in a table for comparison.
+"""
+
+import pandas as pd
+
+results_df = pd.DataFrame({
+    'Radius (µm)': data[:, 0],
+    'DNS Kernel (cm³/s)': data[:, 1],
+    'Model Kernel (cm³/s)': model_kernels_at_dns * convert_units("m^3/s", "cm^3/s"),
+    'Percent Error (%)': percent_errors,
+})
+
+print(results_df)
 
 """
 This script compares the collision kernel Γ₁₂ between DNS data and the model prediction.
