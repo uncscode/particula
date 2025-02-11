@@ -552,10 +552,10 @@ sv_particula_df = pd.DataFrame(
         "Sv (400 cm^2/s^3)": stokes_velocity_400,
     }
 )
-print("Particula Computed Scaled Velocities")
+print("Particula Computed Stokes Velocities")
 display(sv_particula_df)
 
-# Calculate percent errors for Scaled Velocities
+# Calculate percent errors for Stokes Velocities
 percent_error_sv_10 = (
     100 * (stokes_velocity_10 - sv_ao2008[:, 0]) / sv_ao2008[:, 0]
 )
