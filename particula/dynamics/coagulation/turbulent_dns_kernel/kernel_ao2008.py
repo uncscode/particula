@@ -214,7 +214,6 @@ def get_kernel_ao2008_via_system_state(
         particle_density=particle_density,
         fluid_density=fluid_density,
         kinematic_viscosity=kinematic_viscosity,
-        relative_velocity=relative_velocity,
     )
     particle_settling_velocity = get_particle_settling_velocity_with_drag(
         particle_radius=particle_radius,
@@ -225,6 +224,7 @@ def get_kernel_ao2008_via_system_state(
         gravitational_acceleration=STANDARD_GRAVITY,
         re_threshold=0.1,
     )
+    particle_velocity = relative_velocity - particle_settling_velocity
 
     # 4. Turbulence scales
     fluid_rms_velocity = get_fluid_rms_velocity(
@@ -282,7 +282,7 @@ def get_kernel_ao2008_via_system_state(
         fluid_rms_velocity=fluid_rms_velocity,
         collisional_radius=collisional_radius,
         particle_inertia_time=particle_inertia_time,
-        particle_velocity=particle_settling_velocity,
+        particle_velocity=np.abs(particle_velocity),
         taylor_microscale=taylor_microscale,
         eulerian_integral_length=eulerian_integral_length,
         lagrangian_integral_time=lagrangian_integral_time,

@@ -192,9 +192,7 @@ def _compute_phi_term3(
     )
 
     shared_denominator = (
-        (terms.v1 - terms.v2 / terms.phi)
-        + (1 / terms.tau1)
-        + (1 / terms.tau2)
+        (terms.v1 - terms.v2 / terms.phi) + (1 / terms.tau1) + (1 / terms.tau2)
     )
 
     return (first_component + second_component) / (
