@@ -7045,7 +7045,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dfaf7e07">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9c3f0423">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7160,7 +7160,7 @@ data = np.array(
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2f78d04f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1aebdba9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7280,7 +7280,7 @@ velocity_dispersion = get_relative_velocity_variance(
     fluid_rms_velocity=fluid_rms_velocity,
     collisional_radius=collisional_radius,
     particle_inertia_time=particle_inertia_time,
-    particle_velocity=particle_settling_velocity,
+    particle_velocity=np.abs(particle_settling_velocity),
     taylor_microscale=taylor_microscale,
     eulerian_integral_length=eulerian_integral_length,
     lagrangian_integral_time=lagrangian_integral_time,
@@ -7289,15 +7289,15 @@ velocity_dispersion = get_relative_velocity_variance(
 
 # Compute Kernel Values
 kernel_values = get_kernel_ao2008(
-    particle_radius,
-    np.abs(velocity_dispersion),
-    particle_inertia_time,
-    stokes_number,
-    kolmogorov_length_scale,
-    reynolds_lambda,
-    normalized_accel_variance,
-    kolmogorov_velocity,
-    kolmogorov_time,
+    particle_radius=particle_radius,
+    velocity_dispersion=np.abs(velocity_dispersion),
+    particle_inertia_time=particle_inertia_time,
+    stokes_number=stokes_number,
+    kolmogorov_length_scale=kolmogorov_length_scale,
+    reynolds_lambda=reynolds_lambda,
+    normalized_accel_variance=normalized_accel_variance,
+    kolmogorov_velocity=kolmogorov_velocity,
+    kolmogorov_time=kolmogorov_time,
 )
 
 return kernel_values</code></pre>
@@ -7309,7 +7309,7 @@ particle_radius, turbulent_dissipation, reynolds_lambda
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f943b0de">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=42fe7250">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7336,6 +7336,7 @@ particle_radius, turbulent_dissipation, reynolds_lambda
     <span class="n">re_lambda</span><span class="o">=</span><span class="mf">72.41</span><span class="p">,</span>
     <span class="n">relative_velocity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">kernel_via_system_state</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">
 kernel_via_system_state = get_kernel_ao2008_via_system_state(
@@ -7346,14 +7347,15 @@ kernel_via_system_state = get_kernel_ao2008_via_system_state(
     turbulent_dissipation=400 * convert_units("cm^2/s^3", "m^2/s^3"),
     re_lambda=72.41,
     relative_velocity=0.0,
-)</div>
+)
+print(kernel_via_system_state)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b9d7d530">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d6eaf478">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7389,7 +7391,7 @@ This script compares the collision kernel Γ₁₂ between DNS data and the mode
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e9606cf7">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d9fd8d74">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

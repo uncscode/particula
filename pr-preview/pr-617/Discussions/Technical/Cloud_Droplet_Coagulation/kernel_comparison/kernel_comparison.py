@@ -165,7 +165,7 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
         fluid_rms_velocity=fluid_rms_velocity,
         collisional_radius=collisional_radius,
         particle_inertia_time=particle_inertia_time,
-        particle_velocity=particle_settling_velocity,
+        particle_velocity=np.abs(particle_settling_velocity),
         taylor_microscale=taylor_microscale,
         eulerian_integral_length=eulerian_integral_length,
         lagrangian_integral_time=lagrangian_integral_time,
@@ -174,15 +174,15 @@ def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
 
     # Compute Kernel Values
     kernel_values = get_kernel_ao2008(
-        particle_radius,
-        np.abs(velocity_dispersion),
-        particle_inertia_time,
-        stokes_number,
-        kolmogorov_length_scale,
-        reynolds_lambda,
-        normalized_accel_variance,
-        kolmogorov_velocity,
-        kolmogorov_time,
+        particle_radius=particle_radius,
+        velocity_dispersion=np.abs(velocity_dispersion),
+        particle_inertia_time=particle_inertia_time,
+        stokes_number=stokes_number,
+        kolmogorov_length_scale=kolmogorov_length_scale,
+        reynolds_lambda=reynolds_lambda,
+        normalized_accel_variance=normalized_accel_variance,
+        kolmogorov_velocity=kolmogorov_velocity,
+        kolmogorov_time=kolmogorov_time,
     )
 
     return kernel_values
@@ -204,6 +204,7 @@ kernel_via_system_state = get_kernel_ao2008_via_system_state(
     re_lambda=72.41,
     relative_velocity=0.0,
 )
+print(kernel_via_system_state)
 
 # %% [markdown]
 """
