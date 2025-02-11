@@ -230,32 +230,38 @@ plt.tight_layout()
 plt.show()
 
 # Create a DataFrame for percent errors
-percent_errors_df = pd.DataFrame({
-    'Radius (µm)': particle_radius * 1e6,
-    'Percent Error in Re_p (%)': percent_error_re_p,
-    'Percent Error in t_p (%)': percent_error_tp,
-    'Percent Error in Settling Velocity (%)': percent_error_velocity
-})
+percent_errors_df = pd.DataFrame(
+    {
+        "Radius (µm)": particle_radius * 1e6,
+        "Percent Error in Re_p (%)": percent_error_re_p,
+        "Percent Error in t_p (%)": percent_error_tp,
+        "Percent Error in Settling Velocity (%)": percent_error_velocity,
+    }
+)
 display(percent_errors_df)
 # Create DataFrame for Paper Values From Table 2
-paper_values_df = pd.DataFrame({
-    'Radius (µm)': particle_radius * 1e6,
-    't_p (s)': ao2008_t_p,
-    'Settling Velocity (cm/s)': ao2008_velocity * 100,
-    'Re_p': ao2008_re_p,
-    'f(Re_p)': ao2008_f_re_p
-})
+paper_values_df = pd.DataFrame(
+    {
+        "Radius (µm)": particle_radius * 1e6,
+        "t_p (s)": ao2008_t_p,
+        "Settling Velocity (cm/s)": ao2008_velocity * 100,
+        "Re_p": ao2008_re_p,
+        "f(Re_p)": ao2008_f_re_p,
+    }
+)
 display(paper_values_df)
 
 # print settling velocity in a table format
 # Create DataFrame for Particula Computed Values
-computed_values_df = pd.DataFrame({
-    'Radius (µm)': particle_radius * 1e6,
-    't_p (s)': particle_inertia_time,
-    'Settling Velocity (cm/s)': particle_settling_velocity * 100,
-    'Re_p': re_p,
-    'f(Re_p)': f_re_p
-})
+computed_values_df = pd.DataFrame(
+    {
+        "Radius (µm)": particle_radius * 1e6,
+        "t_p (s)": particle_inertia_time,
+        "Settling Velocity (cm/s)": particle_settling_velocity * 100,
+        "Re_p": re_p,
+        "f(Re_p)": f_re_p,
+    }
+)
 display(computed_values_df)
 
 
@@ -367,12 +373,14 @@ We compare the Stokes number and velocity from the paper with the computed value
 """
 # %%
 # Create DataFrame for Paper Values From Table 3 (Stokes Numbers)
-stokes_number_paper_df = pd.DataFrame({
-    'Radius (µm)': particle_radius * 1e6,
-    'St (10 cm^2/s^3)': st_ao2008[:, 0],
-    'St (100 cm^2/s^3)': st_ao2008[:, 1],
-    'St (400 cm^2/s^3)': st_ao2008[:, 2]
-})
+stokes_number_paper_df = pd.DataFrame(
+    {
+        "Radius (µm)": particle_radius * 1e6,
+        "St (10 cm^2/s^3)": st_ao2008[:, 0],
+        "St (100 cm^2/s^3)": st_ao2008[:, 1],
+        "St (400 cm^2/s^3)": st_ao2008[:, 2],
+    }
+)
 display(stokes_number_paper_df)
 
 # Plot Stokes number comparison
@@ -482,31 +490,37 @@ plt.tight_layout()
 plt.show()
 
 # Create DataFrame for Particula Computed Stokes Numbers
-stokes_number_particula_df = pd.DataFrame({
-    'Radius (µm)': particle_radius * 1e6,
-    'St (10 cm^2/s^3)': stokes_number_10,
-    'St (100 cm^2/s^3)': stokes_number_100,
-    'St (400 cm^2/s^3)': stokes_number_400
-})
+stokes_number_particula_df = pd.DataFrame(
+    {
+        "Radius (µm)": particle_radius * 1e6,
+        "St (10 cm^2/s^3)": stokes_number_10,
+        "St (100 cm^2/s^3)": stokes_number_100,
+        "St (400 cm^2/s^3)": stokes_number_400,
+    }
+)
 display(stokes_number_particula_df)
 
 
 # print ao2008 values
 # Create DataFrame for Paper Values From Table 3 (Scaled Velocities)
-sv_paper_df = pd.DataFrame({
-    'Radius (µm)': particle_radius * 1e6,
-    'Sv (10 cm^2/s^3)': sv_ao2008[:, 0],
-    'Sv (100 cm^2/s^3)': sv_ao2008[:, 1],
-    'Sv (400 cm^2/s^3)': sv_ao2008[:, 2]
-})
+sv_paper_df = pd.DataFrame(
+    {
+        "Radius (µm)": particle_radius * 1e6,
+        "Sv (10 cm^2/s^3)": sv_ao2008[:, 0],
+        "Sv (100 cm^2/s^3)": sv_ao2008[:, 1],
+        "Sv (400 cm^2/s^3)": sv_ao2008[:, 2],
+    }
+)
 display(sv_paper_df)
 
 # print stokes velocity in a table format
 # Create DataFrame for Particula Computed Scaled Velocities
-sv_particula_df = pd.DataFrame({
-    'Radius (µm)': particle_radius * 1e6,
-    'Sv (10 cm^2/s^3)': stokes_velocity_10,
-    'Sv (100 cm^2/s^3)': stokes_velocity_100,
-    'Sv (400 cm^2/s^3)': stokes_velocity_400
-})
+sv_particula_df = pd.DataFrame(
+    {
+        "Radius (µm)": particle_radius * 1e6,
+        "Sv (10 cm^2/s^3)": stokes_velocity_10,
+        "Sv (100 cm^2/s^3)": stokes_velocity_100,
+        "Sv (400 cm^2/s^3)": stokes_velocity_400,
+    }
+)
 display(sv_particula_df)
