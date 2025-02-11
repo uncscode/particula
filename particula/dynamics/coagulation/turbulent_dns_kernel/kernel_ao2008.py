@@ -205,9 +205,7 @@ def get_kernel_ao2008_via_system_state(
             re_threshold=0.1,
         )
     )
-    particle_velocity = np.abs(
-            particle_settling_velocity - relative_velocity
-        )
+    particle_velocity = np.abs(particle_settling_velocity - relative_velocity)
 
     # 4. Turbulence scales
     fluid_rms_velocity = gas_properties.get_fluid_rms_velocity(
