@@ -283,7 +283,7 @@ We calculate and compare the Stokes number and velocity for different turbulent 
 
 The **Stokes number** (St) is a dimensionless parameter that characterizes the behavior of particles suspended in a fluid flow, defined as the ratio of the particle's response time to a characteristic time scale of the flow (e.g., the Kolmogorov time scale in turbulence). It indicates how much the particle's motion is influenced by the fluid's turbulence. A small Stokes number implies that the particle closely follows the fluid motion, while a large Stokes number suggests that the particle's inertia dominates, and it is less affected by the fluid fluctuations.
 
-By comparing the computed Stokes numbers and scaled velocities with the values from Ayala et al. (2008), we can assess the accuracy of the `Particula` library in capturing particle dynamics within turbulent flows at different intensities (represented by different turbulent dissipation rates).
+By comparing the computed Stokes numbers and Stokes velocities with the values from Ayala et al. (2008), we can assess the accuracy of the `Particula` library in capturing particle dynamics within turbulent flows at different intensities (represented by different turbulent dissipation rates).
 
 The plots below illustrate these comparisons for three turbulent dissipation rates: 10 cm²/s³ (weak turbulence), 100 cm²/s³ (moderate turbulence), and 400 cm²/s³ (strong turbulence).
 
@@ -291,7 +291,7 @@ The plots below illustrate these comparisons for three turbulent dissipation rat
 
 - **Stokes Number (St):** The computed Stokes numbers show excellent agreement with the paper values across all particle sizes and turbulence levels. This consistency confirms that `Particula` accurately models the interplay between particle inertia and turbulent flow scales.
 
-- **Scaled Velocity (Sv):** The scaled settling velocities (particle settling velocity normalized by the Kolmogorov velocity scale) also match closely with the paper values. This indicates that `Particula` effectively captures how turbulence modulates particle settling rates.
+- **Stokes Velocity (Sv):** The Stokes velocities (particle settling velocity normalized by the Kolmogorov velocity scale) also match closely with the paper values. This indicates that `Particula` effectively captures how turbulence modulates particle settling rates.
 
 These results validate the `Particula` library's capability to simulate particle-turbulence interactions, which are critical for understanding processes like cloud droplet collision-coalescence in atmospheric physics.
 """
@@ -534,12 +534,12 @@ display(percent_errors_stokes_df)
 sv_paper_df = pd.DataFrame(
     {
         "Radius (µm)": particle_radius * 1e6,
-        "Sv (10 cm^2/s^3)": sv_ao2008[:, 0],
-        "Sv (100 cm^2/s^3)": sv_ao2008[:, 1],
-        "Sv (400 cm^2/s^3)": sv_ao2008[:, 2],
+        "Stokes Velocity (10 cm^2/s^3)": sv_ao2008[:, 0],
+        "Stokes Velocity (100 cm^2/s^3)": sv_ao2008[:, 1],
+        "Stokes Velocity (400 cm^2/s^3)": sv_ao2008[:, 2],
     }
 )
-print("Paper Values From Table 3 (Scaled Velocities)")
+print("Paper Values From Table 3 (Stokes Velocities)")
 display(sv_paper_df)
 
 # print stokes velocity in a table format
@@ -547,9 +547,9 @@ display(sv_paper_df)
 sv_particula_df = pd.DataFrame(
     {
         "Radius (µm)": particle_radius * 1e6,
-        "Sv (10 cm^2/s^3)": stokes_velocity_10,
-        "Sv (100 cm^2/s^3)": stokes_velocity_100,
-        "Sv (400 cm^2/s^3)": stokes_velocity_400,
+        "Stokes Velocity (10 cm^2/s^3)": stokes_velocity_10,
+        "Stokes Velocity (100 cm^2/s^3)": stokes_velocity_100,
+        "Stokes Velocity (400 cm^2/s^3)": stokes_velocity_400,
     }
 )
 print("Particula Computed Stokes Velocities")
@@ -574,7 +574,7 @@ percent_errors_sv_df = pd.DataFrame(
         "Percent Error in Sv (400 cm^2/s^3)": percent_error_sv_400,
     }
 )
-print("Percent Errors for Scaled Velocities")
+print("Percent Errors for Stokes Velocities")
 display(percent_errors_sv_df)
 
 # %%
