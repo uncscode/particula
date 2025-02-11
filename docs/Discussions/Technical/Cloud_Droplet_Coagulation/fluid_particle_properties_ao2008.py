@@ -384,7 +384,7 @@ for radius, st_10, st_100, st_400 in zip(
     )
 
 # Plot Stokes number comparison
-fig, ax = plt.subplots(2, 1, figsize=(4, 7))
+fig, ax = plt.subplots(2, 1, figsize=(6, 6))
 
 ax[0].plot(
     particle_radius * 1e6,
@@ -485,7 +485,7 @@ ax[1].set_title("Stokes Velocity Comparison")
 ax[1].set_xlabel("Particle Radius (micrometers)")
 ax[1].set_ylabel("Stokes Velocity (dimensionless)")
 
-ax[1].legend(loc="lower center", ncol=1, bbox_to_anchor=(0.5, -1.0))
+ax[1].legend(loc="lower center", ncol=2, bbox_to_anchor=(0.5, -0.8))
 plt.tight_layout()
 plt.show()
 
