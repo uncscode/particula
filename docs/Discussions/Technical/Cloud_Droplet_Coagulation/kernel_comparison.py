@@ -1,13 +1,21 @@
 # %% [markdown]
 
 """
-DNS Kernel Comparison
+# DNS Kernel Comparison
 
+This notebook provides a comprehensive comparison between DNS (Direct Numerical Simulation) collision kernels and the model predictions using the `particula` package. It serves as an introduction for new users to understand how DNS data and coagulation kernels are utilized in atmospheric and aerosol science.
 
-Reference: Figure 18a form
+## Introduction to DNS and Coagulation Kernels
 
-Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on the geometric collision rate of sedimenting droplets. Part 2. Theory and parameterization. New Journal of Physics, 10. https://doi.org/10.1088/1367-2630/10/7/075016
+**Direct Numerical Simulation (DNS)** is a computational method that solves the Navier-Stokes equations directly, without any turbulence models, to simulate turbulent flows with all scales of motion resolved. This allows for detailed investigation of particle interactions in turbulent flows, which is essential for understanding processes like coagulation.
 
+**Coagulation Kernels** quantify the rate at which particles collide and potentially coalesce in a medium, often influenced by factors like turbulence, Brownian motion, and external forces such as gravity. Understanding these kernels is crucial for predicting particle size distributions in aerosols, clouds, and other particulate systems.
+
+In this notebook, we replicate and compare the collision kernels from the DNS data as presented in Figure 18a of the following reference:
+
+**Reference:**
+
+Ayala, O., Rosa, B., & Wang, L. P. (2008). *Effects of turbulence on the geometric collision rate of sedimenting droplets. Part 2. Theory and parameterization*. New Journal of Physics, 10. https://doi.org/10.1088/1367-2630/10/7/075016
 
 """
 
@@ -62,9 +70,17 @@ data = np.array(
 
 # %% [markdown]
 """
-## Define Particle Radii and Parameters
+## Define Particle Radii and Physical Parameters
 
-We define the particle radii range and other necessary parameters for the calculations.
+In this section, we set up the range of particle radii and other essential physical parameters required for the collision kernel calculations.
+
+- **Particle Radii**: We consider particles ranging from 1 µm to 60 µm in radius, which are typical sizes for cloud droplets.
+- **Turbulent Dissipation Rate (ε)**: Represents the rate at which turbulent kinetic energy is converted into thermal energy. A higher ε indicates more vigorous turbulence, affecting particle collision rates.
+- **Reynolds Number (Reλ)**: The Reynolds number based on the Taylor microscale, indicating the intensity of turbulence in the flow.
+- **Particle and Fluid Densities**: Densities of the particles and the surrounding fluid (air) are necessary for calculating settling velocities and inertia times.
+- **Temperature**: The ambient temperature affects fluid properties like viscosity and mean free path.
+
+These parameters are critical for simulating realistic atmospheric conditions and ensuring that the model predictions are comparable with DNS data.
 """
 particle_radius = np.linspace(1e-6, 60e-6, 200)  # From 1 µm to 60 µm
 
