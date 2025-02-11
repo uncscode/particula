@@ -167,18 +167,18 @@ percent_error_velocity = (
 )
 
 # Plot comparison
-fig, ax = plt.subplots(3, 1, figsize=(10, 15))
+fig, ax = plt.subplots(3, 1, figsize=(4, 6))
 
 ax[0].plot(
     particle_radius * 1e6,
     ao2008_re_p,
     "o-",
-    color="blue",
+    color="black",
     alpha=0.6,
     label="ao2008 Re_p",
 )
 ax[0].plot(
-    particle_radius * 1e6, re_p, "x--", color="blue", label="Particula Re_p"
+    particle_radius * 1e6, re_p, "x--", color="black", label="Particula Re_p"
 )
 ax[0].set_title("Reynolds Number Comparison")
 ax[0].set_xlabel("Radius (µm)")
@@ -189,7 +189,7 @@ ax[1].plot(
     particle_radius * 1e6,
     ao2008_t_p,
     "o-",
-    color="green",
+    color="#E69F00",
     alpha=0.6,
     label="ao2008 t_p",
 )
@@ -197,7 +197,7 @@ ax[1].plot(
     particle_radius * 1e6,
     particle_inertia_time,
     "x--",
-    color="green",
+    color="#E69F00",
     label="Particula t_p",
 )
 ax[1].set_title("Inertia Time Comparison")
@@ -209,7 +209,7 @@ ax[2].plot(
     particle_radius * 1e6,
     ao2008_velocity * 100,
     "o-",
-    color="red",
+    color="#56B4E9",
     alpha=0.6,
     label="ao2008 Velocity",
 )
@@ -217,7 +217,7 @@ ax[2].plot(
     particle_radius * 1e6,
     particle_settling_velocity * 100,
     "x--",
-    color="red",
+    color="#56B4E9",
     label="Particula Velocity",
 )
 ax[2].set_title("Settling Velocity Comparison")
@@ -384,13 +384,13 @@ for radius, st_10, st_100, st_400 in zip(
     )
 
 # Plot Stokes number comparison
-fig, ax = plt.subplots(2, 1, figsize=(10, 10))
+fig, ax = plt.subplots(2, 1, figsize=(4, 4))
 
 ax[0].plot(
     particle_radius * 1e6,
     st_ao2008[:, 0],
     "o-",
-    color="blue",
+    color="black",
     alpha=0.6,
     label="ao2008 St (10 cm^2/s^3)",
 )
@@ -398,14 +398,14 @@ ax[0].plot(
     particle_radius * 1e6,
     stokes_number_10,
     "x--",
-    color="blue",
+    color="black",
     label="Particula St (10 cm^2/s^3)",
 )
 ax[0].plot(
     particle_radius * 1e6,
     st_ao2008[:, 1],
     "o-",
-    color="green",
+    color="#E69F00",
     alpha=0.6,
     label="ao2008 St (100 cm^2/s^3)",
 )
@@ -413,14 +413,14 @@ ax[0].plot(
     particle_radius * 1e6,
     stokes_number_100,
     "x--",
-    color="green",
+    color="#E69F00",
     label="Particula St (100 cm^2/s^3)",
 )
 ax[0].plot(
     particle_radius * 1e6,
     st_ao2008[:, 2],
     "o-",
-    color="red",
+    color="#56B4E9",
     alpha=0.6,
     label="ao2008 St (400 cm^2/s^3)",
 )
@@ -428,7 +428,7 @@ ax[0].plot(
     particle_radius * 1e6,
     stokes_number_400,
     "x--",
-    color="red",
+    color="#56B4E9",
     label="Particula St (400 cm^2/s^3)",
 )
 ax[0].set_title("Stokes Number Comparison")
@@ -441,7 +441,7 @@ ax[1].plot(
     particle_radius * 1e6,
     sv_ao2008[:, 0],
     "o-",
-    color="blue",
+    color="black",
     alpha=0.6,
     label="ao2008 Sv (10 cm^2/s^3)",
 )
@@ -449,14 +449,14 @@ ax[1].plot(
     particle_radius * 1e6,
     stokes_velocity_10,
     "x--",
-    color="blue",
+    color="black",
     label="Particula Sv (10 cm^2/s^3)",
 )
 ax[1].plot(
     particle_radius * 1e6,
     sv_ao2008[:, 1],
     "o-",
-    color="green",
+    color="#E69F00",
     alpha=0.6,
     label="ao2008 Sv (100 cm^2/s^3)",
 )
@@ -464,14 +464,14 @@ ax[1].plot(
     particle_radius * 1e6,
     stokes_velocity_100,
     "x--",
-    color="green",
+    color="#E69F00",
     label="Particula Sv (100 cm^2/s^3)",
 )
 ax[1].plot(
     particle_radius * 1e6,
     sv_ao2008[:, 2],
     "o-",
-    color="red",
+    color="#56B4E9",
     alpha=0.6,
     label="ao2008 Sv (400 cm^2/s^3)",
 )
@@ -479,7 +479,7 @@ ax[1].plot(
     particle_radius * 1e6,
     stokes_velocity_400,
     "x--",
-    color="red",
+    color="#56B4E9",
     label="Particula Sv (400 cm^2/s^3)",
 )
 ax[1].set_title("Stokes Velocity Comparison")
