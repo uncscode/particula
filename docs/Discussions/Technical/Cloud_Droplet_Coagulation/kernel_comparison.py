@@ -79,6 +79,7 @@ reynolds_lambda = 72.41  # Example value
 This function calculates the collision kernel values using the specified parameters and the `particula` package implementations.
 """
 
+
 def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
     # Define constants and parameters
     temperature = 273  # Temperature in Kelvin
@@ -280,8 +281,10 @@ dns_kernels = data[:, 1] * convert_units("cm^3/s", "m^3/s")
 from scipy.interpolate import interp1d
 
 interpolator = interp1d(
-    particle_radius, kernel_values[:, np.argmin(np.abs(particle_radius - 30e-6))],
-    kind='linear', fill_value='extrapolate'
+    particle_radius,
+    kernel_values[:, np.argmin(np.abs(particle_radius - 30e-6))],
+    kind="linear",
+    fill_value="extrapolate",
 )
 model_kernels_at_dns = interpolator(dns_radii)
 
@@ -297,12 +300,15 @@ We display the DNS data, model predictions, and percent errors in a table for co
 
 import pandas as pd
 
-results_df = pd.DataFrame({
-    'Radius (µm)': data[:, 0],
-    'DNS Kernel (cm³/s)': data[:, 1],
-    'Model Kernel (cm³/s)': model_kernels_at_dns * convert_units("m^3/s", "cm^3/s"),
-    'Percent Error (%)': percent_errors,
-})
+results_df = pd.DataFrame(
+    {
+        "Radius (µm)": data[:, 0],
+        "DNS Kernel (cm³/s)": data[:, 1],
+        "Model Kernel (cm³/s)": model_kernels_at_dns
+        * convert_units("m^3/s", "cm^3/s"),
+        "Percent Error (%)": percent_errors,
+    }
+)
 
 print(results_df)
 
