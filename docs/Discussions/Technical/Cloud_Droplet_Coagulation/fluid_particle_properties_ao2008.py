@@ -228,38 +228,34 @@ ax[2].legend()
 plt.tight_layout()
 plt.show()
 
-# Print percent error
-print("Percent Error in Re_p:", percent_error_re_p)
-print("Percent Error in t_p:", percent_error_tp)
-print("Percent Error in Settling Velocity:", percent_error_velocity)
-print("Paper Values From Table 2")
-print("Radius (µm) | tp | Settling Velocity (cm/s)| Re_p | f(Re_p)")
-print("-" * 50)
-for radius, tp, settling_velocity, re, f_re in zip(
-    particle_radius,
-    ao2008_t_p,
-    ao2008_velocity * 100,
-    ao2008_re_p,
-    ao2008_f_re_p,
-):
-    print(
-        f"{radius * 1e6:.1f} \t | {tp:.4f} | {settling_velocity:.2f} \t\t | {re:.3f} | {f_re:.3f}"
-    )
+# Create a DataFrame for percent errors
+percent_errors_df = pd.DataFrame({
+    'Radius (µm)': particle_radius * 1e6,
+    'Percent Error in Re_p (%)': percent_error_re_p,
+    'Percent Error in t_p (%)': percent_error_tp,
+    'Percent Error in Settling Velocity (%)': percent_error_velocity
+})
+display(percent_errors_df)
+# Create DataFrame for Paper Values From Table 2
+paper_values_df = pd.DataFrame({
+    'Radius (µm)': particle_radius * 1e6,
+    't_p (s)': ao2008_t_p,
+    'Settling Velocity (cm/s)': ao2008_velocity * 100,
+    'Re_p': ao2008_re_p,
+    'f(Re_p)': ao2008_f_re_p
+})
+display(paper_values_df)
 
 # print settling velocity in a table format
-print("Particula Computed Values")
-print("Radius (µm) | tp | Settling Velocity (cm/s)| Re_p | f(Re_p)")
-print("-" * 50)
-for radius, tp, settling_velocity, re, f_re in zip(
-    particle_radius,
-    particle_inertia_time,
-    particle_settling_velocity,
-    re_p,
-    f_re_p,
-):
-    print(
-        f"{radius * 1e6:.1f} \t | {tp:.4f} | {settling_velocity * 100:.2f} \t\t | {re:.3f} | {f_re:.3f}"
-    )
+# Create DataFrame for Particula Computed Values
+computed_values_df = pd.DataFrame({
+    'Radius (µm)': particle_radius * 1e6,
+    't_p (s)': particle_inertia_time,
+    'Settling Velocity (cm/s)': particle_settling_velocity * 100,
+    'Re_p': re_p,
+    'f(Re_p)': f_re_p
+})
+display(computed_values_df)
 
 
 # %% Compare Table 3 from paper with computed values
@@ -369,19 +365,14 @@ sv_ao2008 = np.array(
 We compare the Stokes number and velocity from the paper with the computed values for different turbulent dissipation rates.
 """
 # %%
-print("Paper Values From Table 3")
-print("-" * 80)
-print("Radius (µm) | St (10 cm^2/s^3) | St (100 cm^2/s^3) | St (400 cm^2/s^3)")
-print("-" * 80)
-for radius, st_10, st_100, st_400 in zip(
-    particle_radius,
-    st_ao2008[:, 0],
-    st_ao2008[:, 1],
-    st_ao2008[:, 2],
-):
-    print(
-        f"{radius * 1e6:.1f} \t | {st_10:.4f} \t\t | {st_100:.4f} \t\t | {st_400:.4f}"
-    )
+# Create DataFrame for Paper Values From Table 3 (Stokes Numbers)
+stokes_number_paper_df = pd.DataFrame({
+    'Radius (µm)': particle_radius * 1e6,
+    'St (10 cm^2/s^3)': st_ao2008[:, 0],
+    'St (100 cm^2/s^3)': st_ao2008[:, 1],
+    'St (400 cm^2/s^3)': st_ao2008[:, 2]
+})
+display(stokes_number_paper_df)
 
 # Plot Stokes number comparison
 fig, ax = plt.subplots(2, 1, figsize=(6, 6))
@@ -489,46 +480,32 @@ ax[1].legend(loc="lower center", ncol=2, bbox_to_anchor=(0.5, -0.8))
 plt.tight_layout()
 plt.show()
 
-print("Particula Computed Values")
-print("Radius (µm) | St (10 cm^2/s^3) | St (100 cm^2/s^3) | St (400 cm^2/s^3)")
-print("-" * 80)
-for radius, st_10, st_100, st_400 in zip(
-    particle_radius,
-    stokes_number_10,
-    stokes_number_100,
-    stokes_number_400,
-):
-    print(
-        f"{radius * 1e6:.1f} \t | {st_10:.4f} \t\t | {st_100:.4f} \t\t | {st_400:.4f}"
-    )
+# Create DataFrame for Particula Computed Stokes Numbers
+stokes_number_particula_df = pd.DataFrame({
+    'Radius (µm)': particle_radius * 1e6,
+    'St (10 cm^2/s^3)': stokes_number_10,
+    'St (100 cm^2/s^3)': stokes_number_100,
+    'St (400 cm^2/s^3)': stokes_number_400
+})
+display(stokes_number_particula_df)
 
 
 # print ao2008 values
-print("Paper Values From Table 3")
-print("-" * 80)
-print("Radius (µm) | Sv (10 cm^2/s^3) | Sv (100 cm^2/s^3) | Sv (400 cm^2/s^3)")
-print("-" * 80)
-for radius, sv_10, sv_100, sv_400 in zip(
-    particle_radius,
-    sv_ao2008[:, 0],
-    sv_ao2008[:, 1],
-    sv_ao2008[:, 2],
-):
-    print(
-        f"{radius * 1e6:.1f} \t | {sv_10:.4f} \t\t | {sv_100:.4f} \t\t | {sv_400:.4f}"
-    )
+# Create DataFrame for Paper Values From Table 3 (Scaled Velocities)
+sv_paper_df = pd.DataFrame({
+    'Radius (µm)': particle_radius * 1e6,
+    'Sv (10 cm^2/s^3)': sv_ao2008[:, 0],
+    'Sv (100 cm^2/s^3)': sv_ao2008[:, 1],
+    'Sv (400 cm^2/s^3)': sv_ao2008[:, 2]
+})
+display(sv_paper_df)
 
 # print stokes velocity in a table format
-print(
-    "Radius (µm)  | Sv (10 cm^2/s^3) | Sv (100 cm^2/s^3) | Sv (400 cm^2/s^3)"
-)
-print("-" * 80)
-for radius, stv_10, stv_100, stv_400 in zip(
-    particle_radius,
-    stokes_velocity_10,
-    stokes_velocity_100,
-    stokes_velocity_400,
-):
-    print(
-        f"{radius * 1e6:.1f} \t | {stv_10:.4f} \t\t | {stv_100:.4f} \t\t | {stv_400:.4f}"
-    )
+# Create DataFrame for Particula Computed Scaled Velocities
+sv_particula_df = pd.DataFrame({
+    'Radius (µm)': particle_radius * 1e6,
+    'Sv (10 cm^2/s^3)': stokes_velocity_10,
+    'Sv (100 cm^2/s^3)': stokes_velocity_100,
+    'Sv (400 cm^2/s^3)': stokes_velocity_400
+})
+display(sv_particula_df)
