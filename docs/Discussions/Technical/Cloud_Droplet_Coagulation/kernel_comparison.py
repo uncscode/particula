@@ -66,7 +66,7 @@ data = np.array(
 
 We define the particle radii range and other necessary parameters for the calculations.
 """
-particle_radius = np.linspace(1e-6, 60e-6, 100)  # From 1 µm to 60 µm
+particle_radius = np.linspace(1e-6, 60e-6, 200)  # From 1 µm to 60 µm
 
 # Convert turbulent dissipation from cm²/s³ to m²/s³
 turbulent_dissipation = 400 * convert_units("cm^2/s^3", "m^2/s^3")
