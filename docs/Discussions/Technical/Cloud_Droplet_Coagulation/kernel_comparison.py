@@ -72,6 +72,12 @@ particle_radius = np.linspace(1e-6, 60e-6, 100)  # From 1 µm to 60 µm
 turbulent_dissipation = 400 * convert_units("cm^2/s^3", "m^2/s^3")
 reynolds_lambda = 72.41  # Example value
 
+# %% [markdown]
+"""
+## Define the Kernel Calculation Function
+
+This function calculates the collision kernel values using the specified parameters and the `particula` package implementations.
+"""
 
 def kernel_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
     # Define constants and parameters
