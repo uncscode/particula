@@ -181,8 +181,8 @@ ax[0].plot(
     particle_radius * 1e6, re_p, "x--", color="black", label="Particula Re_p"
 )
 ax[0].set_title("Reynolds Number Comparison")
-ax[0].set_xlabel("Radius (µm)")
-ax[0].set_ylabel("Re_p")
+ax[0].set_xlabel("Particle Radius (micrometers)")
+ax[0].set_ylabel("Reynolds Number (Re_p)")
 ax[0].legend()
 
 ax[1].plot(
@@ -200,9 +200,9 @@ ax[1].plot(
     color="#E69F00",
     label="Particula t_p",
 )
-ax[1].set_title("Inertia Time Comparison")
-ax[1].set_xlabel("Radius (µm)")
-ax[1].set_ylabel("t_p (s)")
+ax[1].set_title("Particle Inertia Time Comparison")
+ax[1].set_xlabel("Particle Radius (micrometers)")
+ax[1].set_ylabel("Inertia Time (seconds)")
 ax[1].legend()
 
 ax[2].plot(
@@ -220,9 +220,9 @@ ax[2].plot(
     color="#56B4E9",
     label="Particula Velocity",
 )
-ax[2].set_title("Settling Velocity Comparison")
-ax[2].set_xlabel("Radius (µm)")
-ax[2].set_ylabel("Velocity (cm/s)")
+ax[2].set_title("Particle Settling Velocity Comparison")
+ax[2].set_xlabel("Particle Radius (micrometers)")
+ax[2].set_ylabel("Settling Velocity (centimeters per second)")
 ax[2].legend()
 
 plt.tight_layout()
@@ -432,8 +432,8 @@ ax[0].plot(
     label="Particula St (400 cm^2/s^3)",
 )
 ax[0].set_title("Stokes Number Comparison")
-ax[0].set_xlabel("Radius (µm)")
-ax[0].set_ylabel("Stokes Number")
+ax[0].set_xlabel("Particle Radius (micrometers)")
+ax[0].set_ylabel("Stokes Number (St)")
 ax[0].legend()
 
 # Plot Stokes velocity comparison
@@ -483,8 +483,8 @@ ax[1].plot(
     label="Particula Sv (400 cm^2/s^3)",
 )
 ax[1].set_title("Stokes Velocity Comparison")
-ax[1].set_xlabel("Radius (µm)")
-ax[1].set_ylabel("Stokes Velocity")
+ax[1].set_xlabel("Particle Radius (micrometers)")
+ax[1].set_ylabel("Stokes Velocity (dimensionless)")
 ax[1].legend()
 
 plt.tight_layout()
