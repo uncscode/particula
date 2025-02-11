@@ -525,3 +525,5 @@ sv_particula_df = pd.DataFrame(
     }
 )
 display(sv_particula_df)
+
+# %%
