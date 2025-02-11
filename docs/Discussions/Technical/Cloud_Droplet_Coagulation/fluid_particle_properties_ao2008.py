@@ -226,6 +226,7 @@ ax[2].set_ylabel("Settling Velocity (centimeters per second)")
 ax[2].legend()
 
 plt.tight_layout()
+fig.legend(loc="lower center", ncol=3, bbox_to_anchor=(0.5, -0.2))
 plt.show()
 
 # Print percent error
