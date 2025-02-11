@@ -543,7 +543,7 @@ print("Paper Values From Table 3 (Stokes Velocities)")
 display(sv_paper_df)
 
 # print stokes velocity in a table format
-# Create DataFrame for Particula Computed Scaled Velocities
+# Create DataFrame for Particula Computed Stokes Velocities
 sv_particula_df = pd.DataFrame(
     {
         "Radius (µm)": particle_radius * 1e6,
