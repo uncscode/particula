@@ -277,11 +277,11 @@ ax.plot(
     color="green",
     alpha=0.5,
 )
-plt.xlabel("Particle Radius (µm)")
-plt.ylabel("Collision Kernel (cm³/s)")
+ax.set_xlabel("Particle Radius (µm)")
+ax.set_ylabel("Collision Kernel (cm³/s)")
 plt.title("Collision Kernel Comparison")
-# plt.legend()
-plt.grid(True)
+# ax.legend()
+ax.grid(True)
 plt.show()
 
 # %% [markdown]
