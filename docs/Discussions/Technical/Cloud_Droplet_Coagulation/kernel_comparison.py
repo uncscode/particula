@@ -1,3 +1,19 @@
+# %% [markdown]
+
+"""
+DNS Kernel Comparison
+
+
+Reference: Figure 18a form
+
+Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on the geometric collision rate of sedimenting droplets. Part 2. Theory and parameterization. New Journal of Physics, 10. https://doi.org/10.1088/1367-2630/10/7/075016
+
+
+"""
+
+# %%
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.kernel_ao2008 import (
