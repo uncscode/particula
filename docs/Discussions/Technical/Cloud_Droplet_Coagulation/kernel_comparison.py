@@ -259,16 +259,18 @@ We plot the DNS data and their corresponding model predictions on the same graph
 
 index = np.argmin(np.abs(particle_radius - 30e-6))
 
-plt.scatter(data[:, 0], data[:, 1], label="DNS Data", color="cyan")
-plt.plot(
+fig, ax = plt.subplots(figsize=(4, 4))
+
+ax.scatter(data[:, 0], data[:, 1], label="DNS Data", color="blue")
+ax.plot(
     particle_radius * 1e6,
     kernel_values[:, index] * convert_units("m^3/s", "cm^3/s"),
     label="Model Prediction",
-    color="magenta",
+    color="orange",
     alpha=0.5,
     linewidth=5,
 )
-plt.plot(
+ax.plot(
     particle_radius * 1e6,
     kernel_via_system_state[:, index] * convert_units("m^3/s", "cm^3/s"),
     label="Model Prediction via System State",
