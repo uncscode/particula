@@ -220,7 +220,7 @@ plt.grid(True)
 plt.show()
 
 # # image plot of the radial relative velocity
-fig, ax = plt.subplots(figsize=(7, 9))
+fig, ax = plt.subplots(figsize=(5, 5))
 graph = ax.contourf(radial_relative_velocity, cmap="viridis", origin="lower")
 plt.xlabel("Particle Radius")
 plt.ylabel("Particle Radius")
