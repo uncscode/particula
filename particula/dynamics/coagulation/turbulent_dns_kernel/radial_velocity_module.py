@@ -52,6 +52,7 @@ def get_radial_relative_velocity_dz2002(
         particle_inertia_time[:, np.newaxis]
         - particle_inertia_time[np.newaxis, :]
     )
+
     b = (STANDARD_GRAVITY * tau_diff) / (np.sqrt(2) * velocity_dispersion)
 
     # Compute f(b)
@@ -59,7 +60,7 @@ def get_radial_relative_velocity_dz2002(
     erf_b = erf(b)
     exp_b2 = np.exp(-(b**2))
     f_b = (
-        0.5 * sqrt_pi * (b + 0.5 / np.maximum(b, 1e-12)) * erf_b + 0.5 * exp_b2
+        0.5 * sqrt_pi * (b + 0.5 / np.maximum(b, 1e-16)) * erf_b + 0.5 * exp_b2
     )
 
     return np.sqrt(2 / np.pi) * velocity_dispersion * f_b
@@ -81,7 +82,7 @@ def get_radial_relative_velocity_ao2008(
 
     The relative velocity is given by:
 
-        ⟨ |w_r| ⟩ = sqrt(2 / π) * sqrt(σ² + (π/8) * (τ_p1 + τ_p2)² * |g|²)
+        ⟨ |w_r| ⟩ = sqrt(2 / π) * sqrt(σ² + (π/8) * (τ_p1 - τ_p2)² * |g|²)
 
     - σ : Turbulence velocity dispersion [m/s]
     - τ_p1, τ_p2 : Inertia timescale of particles 1 and 2 [s]
@@ -104,10 +105,13 @@ def get_radial_relative_velocity_ao2008(
         Theory and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
     """
-    tau_sum = (
-        particle_inertia_time[:, np.newaxis]
-        + particle_inertia_time[np.newaxis, :]
-    )
-    gravity_term = (np.pi / 8) * tau_sum**2 * STANDARD_GRAVITY**2
+    # tau_delta = (
+    #     particle_inertia_time[:, np.newaxis]
+    #     - particle_inertia_time[np.newaxis, :]
+    # )
+    # print(f"tau_delta: {tau_delta}")
 
-    return np.sqrt(2 / np.pi) * np.sqrt(velocity_dispersion**2 + gravity_term)
+    # gravity_term = (np.pi / 8) * tau_delta**2 * STANDARD_GRAVITY**2
+
+    # return np.sqrt(2 / np.pi) * np.sqrt(velocity_dispersion + gravity_term)
+    raise NotImplementedError("This function is not yet right.")

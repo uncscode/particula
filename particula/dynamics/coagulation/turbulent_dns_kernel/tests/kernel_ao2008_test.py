@@ -52,7 +52,7 @@ class TestKernelAO2008(unittest.TestCase):
         """Ensure validation errors are raised for invalid inputs."""
         with self.assertRaises(ValueError):
             get_kernel_ao2008(
-                -1*self.particle_radius_array,
+                -1 * self.particle_radius_array,
                 self.velocity_dispersion_scalar,
                 self.particle_inertia_time_array,
                 self.stokes_number_array,
@@ -66,7 +66,7 @@ class TestKernelAO2008(unittest.TestCase):
         with self.assertRaises(ValueError):
             get_kernel_ao2008(
                 self.particle_radius_array,
-                -1*self.velocity_dispersion_scalar,
+                -1 * self.velocity_dispersion_scalar,
                 self.particle_inertia_time_array,
                 self.stokes_number_array,
                 self.kolmogorov_length_scale,
@@ -80,7 +80,7 @@ class TestKernelAO2008(unittest.TestCase):
             get_kernel_ao2008(
                 self.particle_radius_array,
                 self.velocity_dispersion_scalar,
-                -1*self.particle_inertia_time_array,
+                -1 * self.particle_inertia_time_array,
                 self.stokes_number_array,
                 self.kolmogorov_length_scale,
                 self.reynolds_lambda,
@@ -94,7 +94,7 @@ class TestKernelAO2008(unittest.TestCase):
                 self.particle_radius_array,
                 self.velocity_dispersion_scalar,
                 self.particle_inertia_time_array,
-                -1*self.stokes_number_array,
+                -1 * self.stokes_number_array,
                 self.kolmogorov_length_scale,
                 self.reynolds_lambda,
                 self.normalized_accel_variance,
