@@ -125,8 +125,8 @@ def test_get_particle_settling_velocity_via_inertia_array():
     slip_correction_factor = np.array([1.0, 1.1])
     kinematic_viscosity = 1e-6  # m²/s
 
-    Re = (2 * particle_radius * relative_velocity) / kinematic_viscosity
-    drag_correction = 1 + 0.15 * (Re**0.687)
+    r_e = (2 * particle_radius * relative_velocity) / kinematic_viscosity
+    drag_correction = 1 + 0.15 * (r_e**0.687)
     expected = (
         gravitational_acceleration
         * particle_inertia_time
