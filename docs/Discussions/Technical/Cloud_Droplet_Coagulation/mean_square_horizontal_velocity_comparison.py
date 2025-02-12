@@ -8,17 +8,6 @@
 # - Plotting and Graph Comparisons
 #
 # **High-Level Objective:** Improve modularity, readability, and visualization quality.
-# %% [markdown]
-# ## Summary and Next Steps
-#
-# - **Documentation:** Markdown blocks have been inserted before each major code section to help new users understand the workflow.
-# - **Graph Enhancements:** Updated plotting code now uses `fig, ax = plt.subplots()`, with legends arranged for clarity and enhanced visual elements (grid, labels, and titles).
-#
-# **Next Steps:**
-# 1. Run the notebook cell-by-cell to ensure that every section executes correctly.
-# 2. Verify that all Markdown cells render as expected in your Jupyter Notebook.
-# 3. Update any documentation indexes or module links if you split the notebook into separate files.
-#
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
@@ -34,10 +23,6 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity
 )
 from particula.particles.properties.inertia_time import (
     get_particle_inertia_time,
-)
-from particula.particles.properties.settling_velocity import (
-    get_particle_settling_velocity_via_inertia,
-    get_particle_settling_velocity_with_drag,
 )
 from particula.particles import properties
 from particula.gas import properties as gas_properties
@@ -187,16 +172,6 @@ particle_inertia_time = get_particle_inertia_time(
 )
 
 
-particle_settling_velocity = (
-    properties.get_particle_settling_velocity_via_inertia(
-        particle_inertia_time=particle_inertia_time,
-        particle_radius=particle_radius,
-        relative_velocity=iterative_settling_velocity,
-        slip_correction_factor=slip_correction_factor,
-        gravitational_acceleration=STANDARD_GRAVITY,
-        kinematic_viscosity=kinematic_viscosity,
-    )
-)
 
 
 def calculate_horizontal_velocity(turbulent_dissipation, reynolds_lambda):
