@@ -1,3 +1,14 @@
+# %% [markdown]
+# # Mean-Square Horizontal Velocity Comparison
+#
+# This notebook compares the mean-square horizontal velocities between DNS data and the model prediction.
+# It is structured into sections with Markdown descriptions to help new users understand:
+# - Data Loading
+# - Function Definitions for Reusable Calculations
+# - Plotting and Graph Comparisons
+#
+# **High-Level Objective:** Improve modularity, readability, and visualization quality.
+#
 # %%
 from typing import Union
 import numpy as np
@@ -100,6 +111,12 @@ dns_400_cm2_s3 = np.array(
     ]
 )
 
+# %% [markdown]
+# ## Function Definitions
+#
+# The following functions perform repeated calculations and data manipulations:
+# - **calculate_horizontal_velocity:** Computes the mean-square horizontal velocity of particles.
+#
 # %% Model equations
 # Define Particle Radii and Parameters
 particle_radius = np.linspace(10e-6, 60e-6, 6)
@@ -237,8 +254,27 @@ model_rms_400cm2_s3 = calculate_horizontal_velocity(
 )
 
 
-# # Plot the Comparison Graph
-fig, ax = plt.subplots(figsize=(7, 9))
+# %% [markdown]
+# ## Plotting and Graph Comparisons
+#
+# This section generates the comparison graphs using matplotlib.
+# We use the best practice `fig, ax = plt.subplots()` to:
+# - Create clear and scalable figures.
+# - Replace `plt.plot()` calls with `ax.plot()` for better control.
+# - Position legends in the top-left corner (using `ax.legend(loc='upper left')`) and
+#   ensure that DNS data and model predictions are plotted sequentially.
+#
+# The graphs include:
+# - **DNS Data:** Raw experimental or simulation data.
+# - **Model Predictions:** Analytical or simulated forecasts.
+#
+# Additional improvements:
+# - Consistent figure sizes (e.g., `figsize=(8, 6)`).
+# - Grid lines for better readability.
+# - Clear axis labels and titles.
+#
+# %% [code]
+fig, ax = plt.subplots(figsize=(8, 6))
 
 # Case 1: R_lambda = 72.41, epsilon = 10 cm²/s³
 ax.scatter(
@@ -291,13 +327,20 @@ ax.set_ylabel(r"$<(v'_x)^2>$ (cm²/s²)")
 ax.set_ylim(0, 180)
 ax.set_xlim(5, 65)
 ax.set_title("Mean-Square Horizontal Velocity Comparison")
-ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.1), ncol=2)
+ax.legend(loc="upper left")
 ax.grid(True)
 plt.subplots_adjust(bottom=0.2)
 plt.show()
 
-"""
-This script compares the mean-square horizontal velocities between DNS data and the model prediction.
-"""
+# %% [markdown]
+# ## Summary and Next Steps
+#
+# - **Documentation:** Markdown blocks have been inserted before each major code section to help new users understand the workflow.
+# - **Graph Enhancements:** Updated plotting code now uses `fig, ax = plt.subplots()`, with legends arranged for clarity and enhanced visual elements (grid, labels, and titles).
+#
+# **Next Steps:**
+# 1. Run the notebook cell-by-cell to ensure that every section executes correctly.
+# 2. Verify that all Markdown cells render as expected in your Jupyter Notebook.
+# 3. Update any documentation indexes or module links if you split the notebook into separate files.
 
 # %%
