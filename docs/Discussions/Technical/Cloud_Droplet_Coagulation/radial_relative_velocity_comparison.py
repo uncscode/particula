@@ -8,7 +8,12 @@ In this notebook, we replicate and compare the collision kernels from the DNS da
 **Reference:**
 Ayala, O., Rosa, B., & Wang, L. P. (2008). *Effects of turbulence on the geometric collision rate of sedimenting droplets. Part 2. Theory and parameterization*. New Journal of Physics, 10. https://doi.org/10.1088/1367-2630/10/7/075016
 """
-# %%
+# %% [markdown]
+# ## Import Libraries and Modules
+#
+# Import necessary libraries and modules for calculations and plotting.
+# This includes numpy for numerical operations, matplotlib for plotting,
+# and various modules from the particula library for specific calculations.
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
@@ -62,8 +67,11 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_te
 )
 
 
-# %%
-# DNS Data from Figure 13
+# %% [markdown]
+# ## Load DNS Data
+#
+# Load the DNS data from Figure 13 of the reference paper. This data
+# will be used to compare against the model predictions.
 data = np.array(
     [
         [10.06195787, 5.602409639],
@@ -79,7 +87,12 @@ data = np.array(
     ]
 )
 
-# Define Particle Radii and Parameters
+# %% [markdown]
+# ## Define Particle Radii and Parameters
+#
+# Define the particle radii and other parameters such as temperature,
+# particle density, and fluid density. These parameters are essential
+# for calculating various properties and velocities.
 particle_radius = np.linspace(10e-6, 60e-6, 50)
 temperature = 273  # Temperature in Kelvin
 particle_density = 1000  # Particle density in kg/m³
@@ -91,14 +104,23 @@ turbulent_dissipation = 400 * convert_units(
 reynolds_lambda = 72.41  # Example value
 
 
-# Calculate dynamic and kinematic viscosity
+# %% [markdown]
+# ## Calculate Viscosity and Turbulence Properties
+#
+# Calculate the dynamic and kinematic viscosity of the fluid, as well
+# as turbulence properties like Kolmogorov time. These are used in
+# subsequent calculations of particle properties.
 dynamic_viscosity = get_dynamic_viscosity(temperature)
 kinematic_viscosity = get_kinematic_viscosity(dynamic_viscosity, fluid_density)
 kolmogorov_time = get_kolmogorov_time(
     kinematic_viscosity=kinematic_viscosity,
     turbulent_dissipation=turbulent_dissipation,
 )
-# Calculate Particle Inertia Time
+# %% [markdown]
+# ## Calculate Particle Inertia Time
+#
+# Calculate the particle inertia time, which is a measure of how
+# quickly particles respond to changes in the surrounding fluid flow.
 particle_inertia_time = get_particle_inertia_time(
     particle_radius=particle_radius,
     particle_density=particle_density,
@@ -106,7 +128,12 @@ particle_inertia_time = get_particle_inertia_time(
     kinematic_viscosity=kinematic_viscosity,
 )
 
-# Calculate Particle Settling Velocity
+# %% [markdown]
+# ## Calculate Particle Settling Velocity
+#
+# Calculate the settling velocity of particles using the drag model.
+# This involves calculating the mean free path, Knudsen number, and
+# slip correction factor.
 mean_free_path = gas_properties.molecule_mean_free_path(
     temperature=temperature, dynamic_viscosity=dynamic_viscosity
 )
@@ -124,14 +151,23 @@ particle_settling_velocity = get_particle_settling_velocity_with_drag(
     re_threshold=0.1,
 )
 
-# Calculate Fluid RMS Velocity
+# %% [markdown]
+# ## Calculate Fluid RMS Velocity
+#
+# Calculate the root mean square (RMS) velocity of the fluid, which
+# is used to determine the intensity of turbulence in the fluid.
 fluid_rms_velocity = get_fluid_rms_velocity(
     re_lambda=reynolds_lambda,
     kinematic_viscosity=kinematic_viscosity,
     turbulent_dissipation=turbulent_dissipation,
 )
 
-# Calculate Turbulence Scales
+# %% [markdown]
+# ## Calculate Turbulence Scales
+#
+# Calculate various turbulence scales such as the Taylor microscale,
+# Eulerian integral length, and Lagrangian integral time. These scales
+# are important for understanding the turbulence characteristics.
 taylor_microscale = get_taylor_microscale(
     fluid_rms_velocity=fluid_rms_velocity,
     kinematic_viscosity=kinematic_viscosity,
@@ -155,13 +191,22 @@ lagrangian_taylor_microscale_time = get_lagrangian_taylor_microscale_time(
 )
 
 
-# Calculate Collisional Radius
+# %% [markdown]
+# ## Calculate Collisional Radius
+#
+# Calculate the collisional radius, which is the sum of the radii of
+# two colliding particles. This is used in the calculation of collision
+# rates and velocities.
 collisional_radius = (
     particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
 )
 
-# %%
-# Calculate Velocity Dispersion
+# %% [markdown]
+# ## Calculate Velocity Dispersion
+#
+# Calculate the velocity dispersion, which is a measure of the spread
+# of particle velocities. This is used to compute the radial relative
+# velocities.
 velocity_dispersion = get_relative_velocity_variance(
     fluid_rms_velocity=fluid_rms_velocity,
     collisional_radius=collisional_radius,
@@ -199,14 +244,24 @@ def radial_velocity_calc(velocity_dispersion, particle_inertia_time):
     return radial_relative_velocity
 
 
-# Compute Radial Relative Velocities
+# %% [markdown]
+# ## Compute Radial Relative Velocities
+#
+# Define a function to compute the radial relative velocities using
+# the velocity dispersion and particle inertia time. This function
+# includes a check for NaN values in the velocity dispersion.
 radial_relative_velocity = radial_velocity_calc(
     np.abs(velocity_dispersion), particle_inertia_time
 )
 
 # %%
 index = np.argmin(np.abs(particle_radius - 30e-6))
-# Plot the Comparison Graph
+# %% [markdown]
+# ## Plot the Comparison Graph
+#
+# Plot the radial relative velocities for different particle radii.
+# The plot includes both the model predictions and the DNS data for
+# comparison.
 fig, ax = plt.subplots(figsize=(5, 5))
 ax.plot(
     particle_radius * 1e6,
@@ -229,7 +284,11 @@ ax.set_title("Radial Relative Velocity Comparison")
 ax.grid(True)
 plt.show()
 
-# # image plot of the radial relative velocity
+# %% [markdown]
+# ## Image Plot of Radial Relative Velocity
+#
+# Create an image plot of the radial relative velocity using a contour
+# plot. This provides a visual representation of the velocity field.
 fig, ax = plt.subplots(figsize=(5, 5))
 graph = ax.contourf(radial_relative_velocity, cmap="viridis", origin="lower")
 plt.xlabel("Particle Radius")
