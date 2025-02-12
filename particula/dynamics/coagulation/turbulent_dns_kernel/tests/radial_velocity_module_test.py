@@ -30,20 +30,15 @@ def test_get_radial_relative_velocity_dz2002():
 
 def test_get_radial_relative_velocity_ao2008():
     """
-    Test get_radial_relative_velocity_ao2008 with a small array input.
+    Now expect NotImplementedError for valid inputs.
     """
     velocity_dispersion = 0.1  # m/s
     particle_inertia_time = np.array([0.02, 0.03, 0.05])  # s
 
-    expected_shape = (3, 3)
-    result = get_radial_relative_velocity_ao2008(
-        velocity_dispersion, particle_inertia_time
-    )
-
-    assert (
-        result.shape == expected_shape
-    ), f"Expected shape {expected_shape}, but got {result.shape}"
-    assert np.all(result >= 0), "Expected all values to be non-negative"
+    with pytest.raises(NotImplementedError):
+        get_radial_relative_velocity_ao2008(
+            velocity_dispersion, particle_inertia_time
+        )
 
 
 def test_invalid_inputs():
@@ -88,14 +83,13 @@ def test_edge_cases():
         velocity_dispersion, particle_inertia_time
     )
 
-    wr_ao2008 = get_radial_relative_velocity_ao2008(
-        velocity_dispersion, particle_inertia_time
-    )
-
     # Ensure no negative values
     assert np.all(wr_dz2002 >= 0), "Expected all values to be non-negative"
-    assert np.all(wr_ao2008 >= 0), "Expected all values to be non-negative"
 
     # Ensure numerical stability for large inertia values
     assert np.isfinite(wr_dz2002).all(), "Expected all values to be finite"
-    assert np.isfinite(wr_ao2008).all(), "Expected all values to be finite"
+
+    with pytest.raises(NotImplementedError):
+        get_radial_relative_velocity_ao2008(
+            velocity_dispersion, particle_inertia_time
+        )

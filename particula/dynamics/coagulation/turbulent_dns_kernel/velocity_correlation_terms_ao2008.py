@@ -17,32 +17,34 @@ from particula.util.validate_inputs import validate_inputs
 
 @validate_inputs(
     {
-        "lagrangian_integral_time": "positive",
-        "eulerian_integral_length": "positive",
+        "lagrangian_taylor_microscale_time": "positive",
+        "lagrangian_integral_scale": "positive",
     }
 )
 def compute_z(
-    lagrangian_integral_time: Union[float, NDArray[np.float64]],
-    eulerian_integral_length: Union[float, NDArray[np.float64]],
+    lagrangian_taylor_microscale_time: Union[float, NDArray[np.float64]],
+    lagrangian_integral_scale: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Compute z, which is defined as:
 
-        z = τ_T / L_e
+        z = τ_T / T_L
 
-    - τ_T (lagrangian_integral_time) : Lagrangian Taylor microscale time [s].
-    - L_e (eulerian_integral_length) : Eulerian integral length scale [m].
+    - τ_T (lagrangian_taylor_microscale_time) : Lagrangian Taylor
+        microscale time [s].
+    - T_L (lagrangian_integral_scale) : Lagrangian integral timescale [s].
 
     Arguments:
     ----------
-        - lagrangian_integral_time : Lagrangian Taylor microscale time [s].
-        - eulerian_integral_length : Eulerian integral length scale [m].
+        - lagrangian_taylor_microscale_time : Lagrangian Taylor microscale
+            time [s].
+        - lagrangian_integral_scale : Lagrangian integral timescale [s].
 
     Returns:
     --------
         - z value [-].
     """
-    return lagrangian_integral_time / eulerian_integral_length
+    return lagrangian_taylor_microscale_time / lagrangian_integral_scale
 
 
 @validate_inputs(
@@ -91,7 +93,7 @@ def compute_b1(
 
         b₁ = (1 + sqrt(1 - 2z²)) / (2 sqrt(1 - 2z²))
 
-    - z : Defined as z = τ_T / L_e.
+    - z : Defined as z = τ_T / T_L.
 
     Arguments:
     ----------
@@ -121,7 +123,7 @@ def compute_b2(
 
         b₂ = (1 - sqrt(1 - 2z²)) / (2 sqrt(1 - 2z²))
 
-    - z : Defined as z = τ_T / L_e.
+    - z : Defined as z = τ_T / T_L.
 
     Arguments:
     ----------
@@ -142,23 +144,23 @@ def compute_b2(
     return (1 - sqrt_term) / (2 * sqrt_term)
 
 
-@validate_inputs({"z": "positive", "lagrangian_integral_time": "positive"})
+@validate_inputs({"z": "positive", "lagrangian_integral_scale": "positive"})
 def compute_c1(
     z: Union[float, NDArray[np.float64]],
-    lagrangian_integral_time: Union[float, NDArray[np.float64]],
+    lagrangian_integral_scale: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Compute c₁, which is defined as:
 
         c₁ = ((1 + sqrt(1 - 2z²)) * T_L) / 2
 
-    - z : Defined as z = τ_T / L_e.
-    - T_L (lagrangian_integral_time) : Lagrangian integral timescale [s].
+    - z : Defined as z = τ_T / T_L.
+    - T_L (lagrangian_integral_scale) : Lagrangian integral timescale [s].
 
     Arguments:
     ----------
         - z : A dimensionless parameter related to turbulence [-].
-        - lagrangian_integral_time : Lagrangian integral timescale [s].
+        - lagrangian_integral_scale : Lagrangian integral timescale [s].
 
     Returns:
     --------
@@ -171,26 +173,26 @@ def compute_c1(
         Theory and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
     """
-    return ((1 + np.sqrt(1 - 2 * z**2)) * lagrangian_integral_time) / 2
+    return ((1 + np.sqrt(1 - 2 * z**2)) * lagrangian_integral_scale) / 2
 
 
-@validate_inputs({"z": "positive", "lagrangian_integral_time": "positive"})
+@validate_inputs({"z": "positive", "lagrangian_integral_scale": "positive"})
 def compute_c2(
     z: Union[float, NDArray[np.float64]],
-    lagrangian_integral_time: Union[float, NDArray[np.float64]],
+    lagrangian_integral_scale: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Compute c₂, which is defined as:
 
         c₂ = ((1 - sqrt(1 - 2z²)) * T_L) / 2
 
-    - z : Defined as z = τ_T / L_e.
-    - T_L (lagrangian_integral_time) : Lagrangian integral timescale [s].
+    - z : Defined as z = τ_T / T_L.
+    - T_L (lagrangian_integral_scale) : Lagrangian integral timescale [s].
 
     Arguments:
     ----------
         - z : A dimensionless parameter related to turbulence [-].
-        - lagrangian_integral_time : Lagrangian integral timescale [s].
+        - lagrangian_integral_scale : Lagrangian integral timescale [s].
 
     Returns:
     --------
@@ -203,7 +205,7 @@ def compute_c2(
         Theory and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
     """
-    return ((1 - np.sqrt(1 - 2 * z**2)) * lagrangian_integral_time) / 2
+    return ((1 - np.sqrt(1 - 2 * z**2)) * lagrangian_integral_scale) / 2
 
 
 @validate_inputs({"beta": "positive"})
