@@ -66,6 +66,12 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_te
 )
 
 
+# %% [markdown]
+# ## Data Loading
+#
+# This section loads the necessary DNS datasets and corresponding model predictions.
+# Verify that the file paths and dataset formats are correct.
+#
 # %% DNS values
 
 
