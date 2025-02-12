@@ -1,3 +1,13 @@
+# %% [markdown]
+# DNS Kernel Comparison
+
+"""This notebook provides a comparison between DNS (Direct Numerical Simulation) radial relative velocities and the model predictions from the particula library.
+
+In this notebook, we replicate and compare the collision kernels from the DNS data as presented in Figure 13 of the following reference:
+
+**Reference:**
+Ayala, O., Rosa, B., & Wang, L. P. (2008). *Effects of turbulence on the geometric collision rate of sedimenting droplets. Part 2. Theory and parameterization*. New Journal of Physics, 10. https://doi.org/10.1088/1367-2630/10/7/075016
+"""
 # %%
 from typing import Union
 import numpy as np
