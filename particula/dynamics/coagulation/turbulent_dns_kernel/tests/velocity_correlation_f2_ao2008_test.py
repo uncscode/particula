@@ -73,12 +73,8 @@ def test_compute_f2_longitudinal_velocity_correlation_array():
         collisional_radius, taylor_microscale, eulerian_integral_length
     )
 
-    assert (
-        result.shape == expected.shape
-    )
-    assert np.allclose(
-        result, expected, atol=1e-10
-    )
+    assert result.shape == expected.shape
+    assert np.allclose(result, expected, atol=1e-10)
 
 
 def test_invalid_inputs():

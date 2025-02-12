@@ -6,7 +6,7 @@ import pytest
 import numpy as np
 
 from particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008 import (
-    get_phi_ao2008
+    get_phi_ao2008,
 )
 
 

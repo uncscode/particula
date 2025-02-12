@@ -61,6 +61,7 @@ def get_relative_velocity_variance(
     taylor_microscale: float,
     eulerian_integral_length: float,
     lagrangian_integral_time: float,
+    lagrangian_taylor_microscale_time: float,
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, disable=too-many-positional-arguments
     """
@@ -96,7 +97,7 @@ def get_relative_velocity_variance(
         https://doi.org/10.1088/1367-2630/10/7/075016
     """
 
-    z = compute_z(lagrangian_integral_time, eulerian_integral_length)
+    z = compute_z(lagrangian_taylor_microscale_time, lagrangian_integral_time)
     beta = compute_beta(taylor_microscale, eulerian_integral_length)
 
     vel_corr_terms = VelocityCorrelationTerms(
@@ -111,7 +112,10 @@ def get_relative_velocity_variance(
     )
 
     rms_velocity = _compute_rms_fluctuation_velocity(
-        fluid_rms_velocity, particle_inertia_time, vel_corr_terms
+        fluid_rms_velocity,
+        particle_inertia_time,
+        particle_velocity,
+        vel_corr_terms,
     )
 
     cross_correlation = _compute_cross_correlation_velocity(
@@ -123,10 +127,11 @@ def get_relative_velocity_variance(
         eulerian_integral_length,
         vel_corr_terms,
     )
-    rms_velocity_matrix = (
-        rms_velocity[:, np.newaxis] + rms_velocity[np.newaxis, :]
+    return (
+        rms_velocity[:, np.newaxis]
+        + rms_velocity[np.newaxis, :]
+        - 2 * cross_correlation
     )
-    return rms_velocity_matrix**2 - 2 * cross_correlation
 
 
 @validate_inputs(
@@ -138,6 +143,7 @@ def get_relative_velocity_variance(
 def _compute_rms_fluctuation_velocity(
     fluid_rms_velocity: float,
     particle_inertia_time: Union[float, NDArray[np.float64]],
+    particle_velocity: Union[float, NDArray[np.float64]],
     velocity_correlation_terms: VelocityCorrelationTerms,
 ) -> Union[float, NDArray[np.float64]]:
     """
@@ -158,6 +164,7 @@ def _compute_rms_fluctuation_velocity(
         - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
         - particle_inertia_time : Inertia timescale of the droplet k [s].
         - velocity_correlation_terms : Velocity correlation coefficients [-].
+        - particle_velocity : Droplet velocity [m/s].
 
     Returns:
     --------
@@ -174,40 +181,48 @@ def _compute_rms_fluctuation_velocity(
         velocity_correlation_terms.c1,
         velocity_correlation_terms.e1,
         particle_inertia_time,
-        fluid_rms_velocity,
+        particle_velocity,
     )
     psi_c1_e2 = get_psi_ao2008(
         velocity_correlation_terms.c1,
         velocity_correlation_terms.e2,
         particle_inertia_time,
-        fluid_rms_velocity,
+        particle_velocity,
     )
     psi_c2_e1 = get_psi_ao2008(
         velocity_correlation_terms.c2,
         velocity_correlation_terms.e1,
         particle_inertia_time,
-        fluid_rms_velocity,
+        particle_velocity,
     )
     psi_c2_e2 = get_psi_ao2008(
         velocity_correlation_terms.c2,
         velocity_correlation_terms.e2,
         particle_inertia_time,
-        fluid_rms_velocity,
+        particle_velocity,
     )
 
     return (fluid_rms_velocity**2 / particle_inertia_time) * (
-        velocity_correlation_terms.b1
-        * velocity_correlation_terms.d1
-        * psi_c1_e1
-        - velocity_correlation_terms.b1
-        * velocity_correlation_terms.d2
-        * psi_c1_e2
-        - velocity_correlation_terms.b2
-        * velocity_correlation_terms.d1
-        * psi_c2_e1
-        + velocity_correlation_terms.b2
-        * velocity_correlation_terms.d2
-        * psi_c2_e2
+        (
+            velocity_correlation_terms.b1
+            * velocity_correlation_terms.d1
+            * psi_c1_e1
+        )
+        - (
+            velocity_correlation_terms.b1
+            * velocity_correlation_terms.d2
+            * psi_c1_e2
+        )
+        - (
+            velocity_correlation_terms.b2
+            * velocity_correlation_terms.d1
+            * psi_c2_e1
+        )
+        + (
+            velocity_correlation_terms.b2
+            * velocity_correlation_terms.d2
+            * psi_c2_e2
+        )
     )
 
 
@@ -304,17 +319,25 @@ def _compute_cross_correlation_velocity(
         (fluid_rms_velocity**2 * f2_r)
         / (particle_inertia_time_pairwise_product)
         * (
-            velocity_correlation_terms.b1
-            * velocity_correlation_terms.d1
-            * phi_c1_e1
-            - velocity_correlation_terms.b1
-            * velocity_correlation_terms.d2
-            * phi_c1_e2
-            - velocity_correlation_terms.b2
-            * velocity_correlation_terms.d1
-            * phi_c2_e1
-            + velocity_correlation_terms.b2
-            * velocity_correlation_terms.d2
-            * phi_c2_e2
+            (
+                velocity_correlation_terms.b1
+                * velocity_correlation_terms.d1
+                * phi_c1_e1
+            )
+            - (
+                velocity_correlation_terms.b1
+                * velocity_correlation_terms.d2
+                * phi_c1_e2
+            )
+            - (
+                velocity_correlation_terms.b2
+                * velocity_correlation_terms.d1
+                * phi_c2_e1
+            )
+            + (
+                velocity_correlation_terms.b2
+                * velocity_correlation_terms.d2
+                * phi_c2_e2
+            )
         )
     )
