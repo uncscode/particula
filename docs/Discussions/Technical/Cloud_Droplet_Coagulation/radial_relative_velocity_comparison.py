@@ -94,9 +94,8 @@ temperature = 273  # Temperature in Kelvin
 particle_density = 1000  # Particle density in kg/m³
 fluid_density = 1.0  # Fluid (air) density in kg/m³
 
-turbulent_dissipation = 400 * convert_units(
-    "cm^2/s^3", "m^2/s^3"
-)  # Example value in m²/s³
+# Convert turbulent dissipation rate from cm²/s³ to m²/s³
+turbulent_dissipation = 400 * convert_units("cm^2/s^3", "m^2/s^3")
 reynolds_lambda = 72.41  # Example value
 
 
@@ -203,8 +202,6 @@ plt.show()
 
 # %%
 def radial_velocity_calc(velocity_dispersion, particle_inertia_time):
-    # Debugging: Print the value of velocity_dispersion
-
     # Check if velocity_dispersion contains NaN
     if np.isnan(velocity_dispersion).any():
         print("Warning: velocity_dispersion contains NaN")
@@ -232,10 +229,11 @@ radial_relative_velocity = radial_velocity_calc(
 # %%
 index = np.argmin(np.abs(particle_radius - 30e-6))
 fig, ax = plt.subplots(figsize=(5, 5))
+# Plot the average radial relative velocity over all particle pairs
 ax.plot(
     particle_radius * 1e6,
-    radial_relative_velocity[:, :] * 100,
-    label="Model Prediction",
+    radial_relative_velocity.mean(axis=1) * 100,
+    label="Model Prediction (Average)",
     color="brown",
     alpha=0.5,
 )
@@ -248,16 +246,16 @@ ax.plot(
 )
 ax.scatter(data[:, 0], data[:, 1], label="DNS Data", color="purple")
 ax.set_xlabel("Particle Radius (µm)")
-ax.set_ylabel("Radial Relative Velocity (m/s)")
+ax.set_ylabel("Radial Relative Velocity (cm/s)")
 ax.set_title("Radial Relative Velocity Comparison")
 ax.grid(True)
 plt.show()
 
 fig, ax = plt.subplots(figsize=(5, 5))
 graph = ax.contourf(radial_relative_velocity, cmap="viridis", origin="lower")
-plt.xlabel("Particle Radius")
-plt.ylabel("Particle Radius")
-plt.title("Radial Relative Velocity")
+ax.set_xlabel("Particle Radius (µm)")
+ax.set_ylabel("Particle Radius (µm)")
+ax.set_title("Radial Relative Velocity")
 plt.colorbar(graph)
 plt.show()
 
