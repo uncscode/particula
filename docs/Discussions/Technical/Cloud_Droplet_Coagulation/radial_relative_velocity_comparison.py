@@ -163,11 +163,11 @@ velocity_dispersion = get_relative_velocity_variance(
     lagrangian_taylor_microscale_time=lagrangian_taylor_microscale_time,
 )
 
-fig, ax = plt.subplots(figsize=(7, 9))
+fig, ax = plt.subplots(figsize=(5, 5))
 graph = ax.contourf(velocity_dispersion, cmap="viridis", origin="lower")
-plt.xlabel("Particle Radius")
-plt.ylabel("Particle Radius")
-plt.title("Velocity Dispersion")
+ax.set_xlabel("Particle Radius")
+ax.set_ylabel("Particle Radius")
+ax.set_title("Velocity Dispersion")
 plt.colorbar(graph)
 plt.show()
 
@@ -197,26 +197,26 @@ radial_relative_velocity = radial_velocity_calc(
 # %%
 index = np.argmin(np.abs(particle_radius - 30e-6))
 # Plot the Comparison Graph
-plt.plot(
+fig, ax = plt.subplots(figsize=(5, 5))
+ax.plot(
     particle_radius * 1e6,
     radial_relative_velocity[:, :] * 100,
     label="Model Prediction",
     color="brown",
     alpha=0.5,
 )
-plt.plot(
+ax.plot(
     particle_radius * 1e6,
     radial_relative_velocity[:, index] * 100,
     label="Model Prediction at 30 µm",
     color="blue",
     linestyle="--",
 )
-plt.scatter(data[:, 0], data[:, 1], label="DNS Data", color="purple")
-plt.xlabel("Particle Radius (µm)")
-plt.ylabel("Radial Relative Velocity (m/s)")
-plt.title("Radial Relative Velocity Comparison")
-# plt.legend()
-plt.grid(True)
+ax.scatter(data[:, 0], data[:, 1], label="DNS Data", color="purple")
+ax.set_xlabel("Particle Radius (µm)")
+ax.set_ylabel("Radial Relative Velocity (m/s)")
+ax.set_title("Radial Relative Velocity Comparison")
+ax.grid(True)
 plt.show()
 
 # # image plot of the radial relative velocity
