@@ -94,6 +94,7 @@ def test_get_particle_settling_velocity_via_inertia_scalar():
         gravitational_acceleration
         * particle_inertia_time
         * slip_correction_factor
+
     )
     result = get_particle_settling_velocity_via_inertia(
         particle_inertia_time,
