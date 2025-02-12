@@ -8,8 +8,17 @@
 # - Plotting and Graph Comparisons
 #
 # **High-Level Objective:** Improve modularity, readability, and visualization quality.
+# %% [markdown]
+# ## Summary and Next Steps
 #
-# %%
+# - **Documentation:** Markdown blocks have been inserted before each major code section to help new users understand the workflow.
+# - **Graph Enhancements:** Updated plotting code now uses `fig, ax = plt.subplots()`, with legends arranged for clarity and enhanced visual elements (grid, labels, and titles).
+#
+# **Next Steps:**
+# 1. Run the notebook cell-by-cell to ensure that every section executes correctly.
+# 2. Verify that all Markdown cells render as expected in your Jupyter Notebook.
+# 3. Update any documentation indexes or module links if you split the notebook into separate files.
+#
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
@@ -18,7 +27,7 @@ import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
     get_radial_relative_velocity_ao2008,
 )
-from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
+from particula.dynamics.coagulation.tur/bulent_dns_kernel.sigma_relative_velocity_ao2008 import (
     get_relative_velocity_variance,
     _compute_rms_fluctuation_velocity,
     VelocityCorrelationTerms,
@@ -72,6 +81,12 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_te
 # This section loads the necessary DNS datasets and corresponding model predictions.
 # Verify that the file paths and dataset formats are correct.
 #
+# %% [markdown]
+# ## Data Loading
+#
+# This section loads the necessary DNS datasets and corresponding model predictions.
+# Verify that the file paths and dataset formats are correct.
+#
 # %% DNS values
 
 
@@ -117,6 +132,12 @@ dns_400_cm2_s3 = np.array(
     ]
 )
 
+# %% [markdown]
+# ## Function Definitions
+#
+# The following functions perform repeated calculations and data manipulations:
+# - **calculate_horizontal_velocity:** Computes the mean-square horizontal velocity of particles.
+#
 # %% [markdown]
 # ## Function Definitions
 #
