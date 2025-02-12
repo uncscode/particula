@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 from particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module import (
     get_radial_relative_velocity_ao2008,
 )
-from particula.dynamics.coagulation.tur/bulent_dns_kernel.sigma_relative_velocity_ao2008 import (
+from particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008 import (
     get_relative_velocity_variance,
     _compute_rms_fluctuation_velocity,
     VelocityCorrelationTerms,
