@@ -261,6 +261,7 @@ plt.title("Radial Relative Velocity")
 plt.colorbar(graph)
 plt.show()
 
+# %% [markdown]
 """
 This script compares the radial relative velocities between DNS data and the model prediction.
 """
