@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.3">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.d7758b05.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.8608ea7d.min.css">
       
         
         <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.06af60db.min.css">
@@ -6897,7 +6897,7 @@
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VelocityCorrelationTerms</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="_compute_cross_correlation_velocity">_compute_cross_correlation_velocity<a class="headerlink" href="#_compute_cross_correlation_velocity" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L214">Show source in sigma_relative_velocity_ao2008.py:214</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L229">Show source in sigma_relative_velocity_ao2008.py:229</a></p>
 <p>Compute the cross-correlation of the fluctuating velocities of droplets</p>
 <p>The function is given by:</p>
 <p>⟨ v'^(1) v'^(2) ⟩ = (u'² f₂(R) / (τ_p1 τ_p2)) *                            [b₁ d₁ Φ(c₁, e₁) - b₁ d₂ Φ(c₁, e₂)                             - b₂ d₁ Φ(c₂, e₁) + b₂ d₂ Φ(c₂, e₂)]</p>
@@ -6955,7 +6955,7 @@
 <li><a href="#velocitycorrelationterms">VelocityCorrelationTerms</a></li>
 </ul>
 <h2 id="_compute_rms_fluctuation_velocity">_compute_rms_fluctuation_velocity<a class="headerlink" href="#_compute_rms_fluctuation_velocity" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L132">Show source in sigma_relative_velocity_ao2008.py:132</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L137">Show source in sigma_relative_velocity_ao2008.py:137</a></p>
 <p>Compute the square of the RMS fluctuation velocity for the k-th droplet.</p>
 <p>The function is given by:</p>
 <p>⟨ (v'^(k))² ⟩ = (u'² / τ_pk) *                        [b₁ d₁ Ψ(c₁, e₁) - b₁ d₂ Ψ(c₁, e₂)                         - b₂ d₁ Ψ(c₂, e₁) + b₂ d₂ Ψ(c₂, e₂)]</p>
@@ -6969,6 +6969,7 @@
 <div class="highlight"><pre><span></span><code>- fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
 - particle_inertia_time : Inertia timescale of the droplet k [s].
 - velocity_correlation_terms : Velocity correlation coefficients [-].
+- particle_velocity : Droplet velocity [m/s].
 </code></pre></div>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <hr />
@@ -6987,6 +6988,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_compute_rms_fluctuation_velocity</span><span class="p">(</span>
     <span class="n">fluid_rms_velocity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">particle_inertia_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">particle_velocity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">velocity_correlation_terms</span><span class="p">:</span> <span class="n">VelocityCorrelationTerms</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
@@ -7043,6 +7045,7 @@
     <span class="n">taylor_microscale</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">eulerian_integral_length</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">lagrangian_integral_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">lagrangian_taylor_microscale_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 

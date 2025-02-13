@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.3">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.d7758b05.min.css">
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.8608ea7d.min.css">
       
         
         <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.06af60db.min.css">
@@ -6601,11 +6601,11 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/inertia_time.py">particula.particles.properties.inertia_time</a> module.</p>
 </blockquote>
 <h2 id="get_particle_inertia_time">get_particle_inertia_time<a class="headerlink" href="#get_particle_inertia_time" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/inertia_time.py#L11">Show source in inertia_time.py:11</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/inertia_time.py#L12">Show source in inertia_time.py:12</a></p>
 <p>Calculate the particle inertia time.</p>
 <p>The particle inertia time (τ_p) represents the response time of a particle
 to velocity changes in the surrounding fluid and is given by:</p>
-<p>τ_p = (2 / 9) * (ρ_p / ρ_f) * (r² / (ν f(Re_p)))</p>
+<p>τ_p = (2 / 9) * (ρ_p / ρ_f) * (r² / ν )</p>
 <ul>
 <li>τ_p : Particle inertia time [s]</li>
 <li>r (particle_radius) : Particle radius [m]</li>
@@ -6615,14 +6615,6 @@ to velocity changes in the surrounding fluid and is given by:</p>
 <li>ν (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]</li>
 <li>f(Re_p) : Drag correction factor based on the particle Reynolds number
     [-]</li>
-</ul>
-<p>The drag correction factor f(Re_p) is given by:</p>
-<p>f(Re_p) = 1 + 0.15 Re_p^(0.687)</p>
-<p>where the particle Reynolds number is:</p>
-<p>Re_p = (2 r v) / v</p>
-<ul>
-<li>v (relative_velocity) : Relative velocity between particle and fluid
-    [m/s]</li>
 </ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <hr />
@@ -6651,7 +6643,6 @@ https://doi.org/10.1088/1367-2630/10/7/075016
         <span class="s2">&quot;particle_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
         <span class="s2">&quot;fluid_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
         <span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;relative_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_particle_inertia_time</span><span class="p">(</span>
@@ -6659,7 +6650,6 @@ https://doi.org/10.1088/1367-2630/10/7/075016
     <span class="n">particle_density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">fluid_density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">kinematic_viscosity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">relative_velocity</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 

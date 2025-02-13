@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.3">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.d7758b05.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.8608ea7d.min.css">
       
         
         <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.06af60db.min.css">
@@ -7503,11 +7503,11 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py">particula.dynamics.coagulation.turbulent_dns_kernel.velocity_correlation_terms_ao2008</a> module.</p>
 </blockquote>
 <h2 id="compute_b1">compute_b1<a class="headerlink" href="#compute_b1" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L85">Show source in velocity_correlation_terms_ao2008.py:85</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L87">Show source in velocity_correlation_terms_ao2008.py:87</a></p>
 <p>Compute b₁, which is defined as:</p>
 <p>b₁ = (1 + sqrt(1 - 2z²)) / (2 sqrt(1 - 2z²))</p>
 <ul>
-<li>z : Defined as z = τ_T / L_e.</li>
+<li>z : Defined as z = τ_T / T_L.</li>
 </ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <hr />
@@ -7532,11 +7532,11 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="compute_b2">compute_b2<a class="headerlink" href="#compute_b2" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L115">Show source in velocity_correlation_terms_ao2008.py:115</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L117">Show source in velocity_correlation_terms_ao2008.py:117</a></p>
 <p>Compute b₂, which is defined as:</p>
 <p>b₂ = (1 - sqrt(1 - 2z²)) / (2 sqrt(1 - 2z²))</p>
 <ul>
-<li>z : Defined as z = τ_T / L_e.</li>
+<li>z : Defined as z = τ_T / T_L.</li>
 </ul>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <hr />
@@ -7561,7 +7561,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="compute_beta">compute_beta<a class="headerlink" href="#compute_beta" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L48">Show source in velocity_correlation_terms_ao2008.py:48</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L50">Show source in velocity_correlation_terms_ao2008.py:50</a></p>
 <p>Compute β, which is defined as:</p>
 <p>β = (sqrt(2) * λ) / L_e</p>
 <ul>
@@ -7595,17 +7595,17 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="compute_c1">compute_c1<a class="headerlink" href="#compute_c1" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L145">Show source in velocity_correlation_terms_ao2008.py:145</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L147">Show source in velocity_correlation_terms_ao2008.py:147</a></p>
 <p>Compute c₁, which is defined as:</p>
 <p>c₁ = ((1 + sqrt(1 - 2z²)) * T_L) / 2</p>
 <ul>
-<li>z : Defined as z = τ_T / L_e.</li>
-<li>T_L (lagrangian_integral_time) : Lagrangian integral timescale [s].</li>
+<li>z : Defined as z = τ_T / T_L.</li>
+<li>T_L (lagrangian_integral_scale) : Lagrangian integral timescale [s].</li>
 </ul>
 <h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
 <hr />
 <div class="highlight"><pre><span></span><code>- z : A dimensionless parameter related to turbulence [-].
-- lagrangian_integral_time : Lagrangian integral timescale [s].
+- lagrangian_integral_scale : Lagrangian integral timescale [s].
 </code></pre></div>
 <h4 id="returns_3">Returns<a class="headerlink" href="#returns_3" title="Permanent link">&para;</a></h4>
 <hr />
@@ -7620,24 +7620,24 @@
     https://doi.org/10.1088/1367-2630/10/7/075016</li>
 </ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;lagrangian_integral_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;lagrangian_integral_scale&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_c1</span><span class="p">(</span>
     <span class="n">z</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">lagrangian_integral_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">lagrangian_integral_scale</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="compute_c2">compute_c2<a class="headerlink" href="#compute_c2" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L177">Show source in velocity_correlation_terms_ao2008.py:177</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L179">Show source in velocity_correlation_terms_ao2008.py:179</a></p>
 <p>Compute c₂, which is defined as:</p>
 <p>c₂ = ((1 - sqrt(1 - 2z²)) * T_L) / 2</p>
 <ul>
-<li>z : Defined as z = τ_T / L_e.</li>
-<li>T_L (lagrangian_integral_time) : Lagrangian integral timescale [s].</li>
+<li>z : Defined as z = τ_T / T_L.</li>
+<li>T_L (lagrangian_integral_scale) : Lagrangian integral timescale [s].</li>
 </ul>
 <h4 id="arguments_4">Arguments<a class="headerlink" href="#arguments_4" title="Permanent link">&para;</a></h4>
 <hr />
 <div class="highlight"><pre><span></span><code>- z : A dimensionless parameter related to turbulence [-].
-- lagrangian_integral_time : Lagrangian integral timescale [s].
+- lagrangian_integral_scale : Lagrangian integral timescale [s].
 </code></pre></div>
 <h4 id="returns_4">Returns<a class="headerlink" href="#returns_4" title="Permanent link">&para;</a></h4>
 <hr />
@@ -7652,14 +7652,14 @@
     https://doi.org/10.1088/1367-2630/10/7/075016</li>
 </ul>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;lagrangian_integral_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;lagrangian_integral_scale&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_c2</span><span class="p">(</span>
     <span class="n">z</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">lagrangian_integral_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">lagrangian_integral_scale</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="compute_d1">compute_d1<a class="headerlink" href="#compute_d1" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L209">Show source in velocity_correlation_terms_ao2008.py:209</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L211">Show source in velocity_correlation_terms_ao2008.py:211</a></p>
 <p>Compute d₁, which is defined as:</p>
 <p>d₁ = (1 + sqrt(1 - 2β²)) / (2 sqrt(1 - 2β²))</p>
 <ul>
@@ -7688,7 +7688,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="compute_d2">compute_d2<a class="headerlink" href="#compute_d2" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L239">Show source in velocity_correlation_terms_ao2008.py:239</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L241">Show source in velocity_correlation_terms_ao2008.py:241</a></p>
 <p>Compute d₂, which is defined as:</p>
 <p>d₂ = (1 - sqrt(1 - 2β²)) / (2 sqrt(1 - 2β²))</p>
 <ul>
@@ -7717,7 +7717,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="compute_e1">compute_e1<a class="headerlink" href="#compute_e1" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L269">Show source in velocity_correlation_terms_ao2008.py:269</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L271">Show source in velocity_correlation_terms_ao2008.py:271</a></p>
 <p>Compute e₁, which is defined as:</p>
 <p>e₁ = ((1 + sqrt(1 - 2β²)) * L_e) / 2</p>
 <ul>
@@ -7749,7 +7749,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="compute_e2">compute_e2<a class="headerlink" href="#compute_e2" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L301">Show source in velocity_correlation_terms_ao2008.py:301</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L303">Show source in velocity_correlation_terms_ao2008.py:303</a></p>
 <p>Compute e₂, which is defined as:</p>
 <p>e₂ = ((1 - sqrt(1 - 2β²)) * L_e) / 2</p>
 <ul>
@@ -7783,15 +7783,17 @@
 <h2 id="compute_z">compute_z<a class="headerlink" href="#compute_z" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L18">Show source in velocity_correlation_terms_ao2008.py:18</a></p>
 <p>Compute z, which is defined as:</p>
-<p>z = τ_T / L_e</p>
+<p>z = τ_T / T_L</p>
 <ul>
-<li>τ_T (lagrangian_integral_time) : Lagrangian Taylor microscale time [s].</li>
-<li>L_e (eulerian_integral_length) : Eulerian integral length scale [m].</li>
+<li>τ_T (lagrangian_taylor_microscale_time) : Lagrangian Taylor
+    microscale time [s].</li>
+<li>T_L (lagrangian_integral_scale) : Lagrangian integral timescale [s].</li>
 </ul>
 <h4 id="arguments_9">Arguments<a class="headerlink" href="#arguments_9" title="Permanent link">&para;</a></h4>
 <hr />
-<div class="highlight"><pre><span></span><code>- lagrangian_integral_time : Lagrangian Taylor microscale time [s].
-- eulerian_integral_length : Eulerian integral length scale [m].
+<div class="highlight"><pre><span></span><code>- lagrangian_taylor_microscale_time : Lagrangian Taylor microscale
+    time [s].
+- lagrangian_integral_scale : Lagrangian integral timescale [s].
 </code></pre></div>
 <h4 id="returns_9">Returns<a class="headerlink" href="#returns_9" title="Permanent link">&para;</a></h4>
 <hr />
@@ -7799,11 +7801,14 @@
 </code></pre></div>
 <h4 id="signature_9">Signature<a class="headerlink" href="#signature_9" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;lagrangian_integral_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;eulerian_integral_length&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">}</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lagrangian_taylor_microscale_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lagrangian_integral_scale&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_z</span><span class="p">(</span>
-    <span class="n">lagrangian_integral_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">eulerian_integral_length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">lagrangian_taylor_microscale_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">lagrangian_integral_scale</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 

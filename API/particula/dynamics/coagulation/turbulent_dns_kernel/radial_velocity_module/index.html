@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.3">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.d7758b05.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.8608ea7d.min.css">
       
         
         <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.06af60db.min.css">
@@ -6705,11 +6705,11 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/radial_velocity_module.py">particula.dynamics.coagulation.turbulent_dns_kernel.radial_velocity_module</a> module.</p>
 </blockquote>
 <h2 id="get_radial_relative_velocity_ao2008">get_radial_relative_velocity_ao2008<a class="headerlink" href="#get_radial_relative_velocity_ao2008" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/radial_velocity_module.py#L68">Show source in radial_velocity_module.py:68</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/radial_velocity_module.py#L69">Show source in radial_velocity_module.py:69</a></p>
 <p>Compute the radial relative velocity based on the Ayala et al. (2008)
 formulation.</p>
 <p>The relative velocity is given by:</p>
-<p>⟨ |w_r| ⟩ = sqrt(2 / π) * sqrt(σ² + (π/8) * (τ_p1 + τ_p2)² * |g|²)</p>
+<p>⟨ |w_r| ⟩ = sqrt(2 / π) * sqrt(σ² + (π/8) * (τ_p1 - τ_p2)² * |g|²)</p>
 <ul>
 <li>σ : Turbulence velocity dispersion [m/s]</li>
 <li>τ_p1, τ_p2 : Inertia timescale of particles 1 and 2 [s]</li>
