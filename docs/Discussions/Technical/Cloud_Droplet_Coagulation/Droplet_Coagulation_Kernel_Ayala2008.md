@@ -266,7 +266,7 @@ Here are the variables, their definitions.
 
 - v′^{(i)}_p: Particle RMS fluctuation velocity. The root mean square of the fluctuating velocity component, representing variability in turbulent flow.
 
-- $f_u$: Particle response coefficient. Measures how particles respond to fluid velocity fluctuations, helping quantify their turbulent motion.
+- f_u: Particle response coefficient. Measures how particles respond to fluid velocity fluctuations, helping quantify their turbulent motion.
 
 - f(R): Spatial correlation coefficient. Describes the correlation of fluid velocities at two points separated by a distance R, influencing droplet interactions.
 
