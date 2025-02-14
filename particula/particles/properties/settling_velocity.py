@@ -384,12 +384,11 @@ def _drag_coefficient(reynolds_number: float) -> float:
     if reynolds_number < 1.0:
         # Guard against re = 0 => use a large number for drag_coefficient
         return 24.0 / reynolds_number if reynolds_number > 0 else np.inf
-    elif reynolds_number < 1000.0:
+    if reynolds_number < 1000.0:
         return (24.0 / reynolds_number) * (
             1.0 + 0.15 * (reynolds_number**0.687)
         )
-    else:
-        return 0.44
+    return 0.44
 
 
 def _velocity_mismatch(
@@ -400,6 +399,7 @@ def _velocity_mismatch(
     kinematic_viscosity: float,
     gravitational_acceleration: float,
 ) -> float:
+    # pylint disable=too-many-arguments
     """
     Calculate the mismatch between predicted and actual velocities.
 
