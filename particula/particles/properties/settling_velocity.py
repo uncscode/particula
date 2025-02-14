@@ -1,7 +1,5 @@
 """Particle settling velocity in a fluid."""
 
-# pylint: skip-file
-
 from typing import Union
 
 import numpy as np
@@ -28,6 +26,7 @@ from particula.particles.properties.knudsen_number_module import (
 from particula.particles.properties.reynolds_number import (
     get_particle_reynolds_number,
 )
+
 
 @validate_inputs(
     {
@@ -345,7 +344,7 @@ def get_particle_settling_velocity_with_drag(
         # -- Step 4: Otherwise solve for velocity using fminbound. --
         # Form a bracket for velocity. We use the magnitude of v_stokes
         # to guess an lower and upper bound for the numeric solver.
-        v_upper = max(abs(v_stokes)/10, abs(v_stokes))
+        v_upper = max(abs(v_stokes) / 10, abs(v_stokes))
 
         # Minimize mismatch in [0, v_upper]
         v_solution = fminbound(
@@ -386,7 +385,9 @@ def _drag_coefficient(reynolds_number: float) -> float:
         # Guard against re = 0 => use a large number for drag_coefficient
         return 24.0 / reynolds_number if reynolds_number > 0 else np.inf
     elif reynolds_number < 1000.0:
-        return (24.0 / reynolds_number) * (1.0 + 0.15 * (reynolds_number**0.687))
+        return (24.0 / reynolds_number) * (
+            1.0 + 0.15 * (reynolds_number**0.687)
+        )
     else:
         return 0.44
 
