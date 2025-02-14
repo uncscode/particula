@@ -44,7 +44,7 @@ def particle_settling_velocity(
     gravitational_acceleration: float = STANDARD_GRAVITY,
     fluid_density: float = 0.0,
 ) -> Union[float, NDArray[np.float64]]:
-    # pylint disable=too-many-arguments too-many-positional-arguments
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     """
     Calculate the settling velocity of a particle in a fluid.
 
@@ -118,7 +118,7 @@ def get_particle_settling_velocity_via_inertia(
     gravitational_acceleration: float,
     kinematic_viscosity: float,
 ) -> Union[float, NDArray[np.float64]]:
-    # pylint disable=too-many-arguments too-many-positional-arguments
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     """
     Calculate the gravitational settling velocity from the particle inertia time.
 
@@ -245,7 +245,7 @@ def get_particle_settling_velocity_with_drag(
     tol: float = 1e-6,
     max_iter: int = 100,
 ) -> Union[float, NDArray[np.float64]]:
-    # pylint disable=too-many-arguments too-many-locals too-many-positional-arguments
+    # pylint: disable=too-many-arguments, too-many-locals, too-many-positional-arguments
     """
     Calculate the terminal settling velocity of particle(s) in a fluid.
 
@@ -392,6 +392,7 @@ def _drag_coefficient(reynolds_number: float) -> float:
     return 0.44
 
 
+# pylint: disable=too-many-arguments, too-many-positional-arguments
 def _velocity_mismatch(
     velocity: float,
     radius: float,
@@ -400,7 +401,6 @@ def _velocity_mismatch(
     kinematic_viscosity: float,
     gravitational_acceleration: float,
 ) -> float:
-    # pylint disable=too-many-arguments too-many-positional-arguments
     """
     Calculate the mismatch between predicted and actual velocities.
 
