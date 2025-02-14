@@ -7093,11 +7093,11 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/settling_velocity.py">particula.particles.properties.settling_velocity</a> module.</p>
 </blockquote>
 <h2 id="_drag_coefficient">_drag_coefficient<a class="headerlink" href="#_drag_coefficient" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/settling_velocity.py#L374">Show source in settling_velocity.py:374</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/settling_velocity.py#L375">Show source in settling_velocity.py:375</a></p>
 <p>Return drag coefficient c_d given a Reynolds number Re.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>-</code> <em>re</em> - Reynolds number [-].</li>
+<li>reynolds_number : Reynolds number [-].</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7107,16 +7107,16 @@
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_drag_coefficient</span><span class="p">(</span><span class="n">reynolds_number</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="_velocity_mismatch">_velocity_mismatch<a class="headerlink" href="#_velocity_mismatch" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/settling_velocity.py#L394">Show source in settling_velocity.py:394</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/settling_velocity.py#L395">Show source in settling_velocity.py:395</a></p>
 <p>Calculate the mismatch between predicted and actual velocities.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>-</code> <em>velocity</em> - Current estimate of particle velocity [m/s].</li>
-<li><code>-</code> <em>radius</em> - Particle radius [m].</li>
-<li><code>-</code> <em>rho_p</em> - Particle density [kg/m³].</li>
-<li><code>-</code> <em>fluid_density</em> - Fluid density [kg/m³].</li>
-<li><code>-</code> <em>dynamic_viscosity</em> - Dynamic viscosity of the fluid [Pa·s].</li>
-<li><code>-</code> <em>gravitational_acceleration</em> - Gravitational acceleration [m/s²].</li>
+<li>velocity : Current estimate of particle velocity [m/s].</li>
+<li>radius : Particle radius [m].</li>
+<li>rho_p : Particle density [kg/m³].</li>
+<li>fluid_density : Fluid density [kg/m³].</li>
+<li>dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].</li>
+<li>gravitational_acceleration : Gravitational acceleration [m/s²].</li>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7133,7 +7133,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_particle_settling_velocity_via_inertia">get_particle_settling_velocity_via_inertia<a class="headerlink" href="#get_particle_settling_velocity_via_inertia" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/settling_velocity.py#L105">Show source in settling_velocity.py:105</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/settling_velocity.py#L106">Show source in settling_velocity.py:106</a></p>
 <p>Calculate the gravitational settling velocity from the particle inertia time.</p>
 <p>The settling velocity (vₛ) is given by:</p>
 <p>vₛ = (g × τₚ × C_c) ⁄ f(Reₚ)</p>
@@ -7195,7 +7195,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_particle_settling_velocity_with_drag">get_particle_settling_velocity_with_drag<a class="headerlink" href="#get_particle_settling_velocity_with_drag" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/settling_velocity.py#L228">Show source in settling_velocity.py:228</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/settling_velocity.py#L229">Show source in settling_velocity.py:229</a></p>
 <p>Calculate the terminal settling velocity of particle(s) in a fluid.</p>
 <p>Handles both small-particle (Stokes law with slip correction) and
 larger-droplet (nonlinear drag) regimes. For Re &lt; <code>re_threshold</code>, returns
@@ -7334,7 +7334,7 @@ the Stokes velocity directly; otherwise, uses a force-balance approach with
 <li><a href="../../../util/constants/#standard_gravity">STANDARD_GRAVITY</a></li>
 </ul>
 <h2 id="particle_settling_velocity_via_system_state">particle_settling_velocity_via_system_state<a class="headerlink" href="#particle_settling_velocity_via_system_state" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/settling_velocity.py#L180">Show source in settling_velocity.py:180</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/settling_velocity.py#L181">Show source in settling_velocity.py:181</a></p>
 <p>Calculate the settling velocity of a particle.</p>
 <h4 id="arguments_5">Arguments<a class="headerlink" href="#arguments_5" title="Permanent link">&para;</a></h4>
 <ul>
