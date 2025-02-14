@@ -44,6 +44,7 @@ def particle_settling_velocity(
     gravitational_acceleration: float = STANDARD_GRAVITY,
     fluid_density: float = 0.0,
 ) -> Union[float, NDArray[np.float64]]:
+    # pylint disable=too-many-arguments too-many-positional-arguments
     """
     Calculate the settling velocity of a particle in a fluid.
 
@@ -117,7 +118,7 @@ def get_particle_settling_velocity_via_inertia(
     gravitational_acceleration: float,
     kinematic_viscosity: float,
 ) -> Union[float, NDArray[np.float64]]:
-    # pylint disable=too-many-arguments
+    # pylint disable=too-many-arguments too-many-positional-arguments
     """
     Calculate the gravitational settling velocity from the particle inertia time.
 
@@ -244,7 +245,7 @@ def get_particle_settling_velocity_with_drag(
     tol: float = 1e-6,
     max_iter: int = 100,
 ) -> Union[float, NDArray[np.float64]]:
-    # pylint disable=too-many-arguments too-many-locals
+    # pylint disable=too-many-arguments too-many-locals too-many-positional-arguments
     """
     Calculate the terminal settling velocity of particle(s) in a fluid.
 
@@ -376,7 +377,7 @@ def _drag_coefficient(reynolds_number: float) -> float:
     Return drag coefficient c_d given a Reynolds number Re.
 
     Parameters:
-        - re: Reynolds number [-].
+        - reynolds_number : Reynolds number [-].
 
     Returns:
         - Drag coefficient c_d [-].
@@ -399,17 +400,17 @@ def _velocity_mismatch(
     kinematic_viscosity: float,
     gravitational_acceleration: float,
 ) -> float:
-    # pylint disable=too-many-arguments
+    # pylint disable=too-many-arguments too-many-positional-arguments
     """
     Calculate the mismatch between predicted and actual velocities.
 
     Parameters:
-        - velocity: Current estimate of particle velocity [m/s].
-        - radius: Particle radius [m].
-        - rho_p: Particle density [kg/m³].
-        - fluid_density: Fluid density [kg/m³].
-        - dynamic_viscosity: Dynamic viscosity of the fluid [Pa·s].
-        - gravitational_acceleration: Gravitational acceleration [m/s²].
+        - velocity : Current estimate of particle velocity [m/s].
+        - radius : Particle radius [m].
+        - rho_p : Particle density [kg/m³].
+        - fluid_density : Fluid density [kg/m³].
+        - dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].
+        - gravitational_acceleration : Gravitational acceleration [m/s²].
 
     Returns:
         - Squared difference between predicted and actual velocities.
