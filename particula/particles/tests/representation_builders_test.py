@@ -55,9 +55,9 @@ def test_limited_radius_particle_builder():
 
     # set values
     builder = PresetParticleRadiusBuilder()
-    builder.set_mode(np.array([100, 2000])*1e-9, "m")
+    builder.set_mode(np.array([100, 2000]) * 1e-9, "m")
     builder.set_geometric_standard_deviation(np.array([1.4, 1.5]))
-    builder.set_number_concentration(np.array([1e3, 1e3])*1e6, "1/m^3")
+    builder.set_number_concentration(np.array([1e3, 1e3]) * 1e6, "1/m^3")
     particle_representation = builder.build()
     assert isinstance(particle_representation, ParticleRepresentation)
 
@@ -85,7 +85,7 @@ def test_preset_resolved_mass_particle_builder():
 
     # set values
     builder = PresetResolvedParticleMassBuilder()
-    builder.set_mode(np.array([100, 2000])*1e-9, "m")
+    builder.set_mode(np.array([100, 2000]) * 1e-9, "m")
     builder.set_geometric_standard_deviation(np.array([1.4, 1.5]))
     builder.set_particle_resolved_count(1000)
     builder.set_volume(1.0)

@@ -66,7 +66,7 @@ def test_get_mass_concentration():
     """Test get_mass_concentration method."""
     particle = setup_particle()
     mass = particle.get_mass()
-    expected_mass_concentration = np.sum(mass*particle.get_concentration())
+    expected_mass_concentration = np.sum(mass * particle.get_concentration())
     total_mass = particle.get_mass_concentration()
     total_mass_clone = particle.get_mass_concentration(clone=True)
 

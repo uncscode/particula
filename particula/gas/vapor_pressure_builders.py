@@ -86,9 +86,7 @@ class AntoineBuilder(BuilderABC):
         """Build the AntoineVaporPressureStrategy object with the set
         coefficients."""
         self.pre_build_check()
-        return AntoineVaporPressureStrategy(
-            self.a, self.b, self.c
-        )  # type: ignore
+        return AntoineVaporPressureStrategy(self.a, self.b, self.c)  # type: ignore
 
 
 class ClausiusClapeyronBuilder(BuilderABC):

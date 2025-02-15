@@ -127,9 +127,7 @@ class GasSpeciesBuilder(
         return GasSpecies(
             name=self.name,  # type: ignore
             molar_mass=self.molar_mass,  # type: ignore
-            vapor_pressure_strategy=(
-                self.vapor_pressure_strategy
-            ),  # type: ignore
+            vapor_pressure_strategy=(self.vapor_pressure_strategy),  # type: ignore
             condensable=self.condensable,  # type: ignore
             concentration=self.concentration,  # type: ignore
         )
@@ -157,9 +155,7 @@ class PresetGasSpeciesBuilder(
         return GasSpecies(
             name=self.name,  # type: ignore
             molar_mass=self.molar_mass,  # type: ignore
-            vapor_pressure_strategy=(
-                self.vapor_pressure_strategy
-            ),  # type: ignore
+            vapor_pressure_strategy=(self.vapor_pressure_strategy),  # type: ignore
             condensable=self.condensable,  # type: ignore
             concentration=self.concentration,  # type: ignore
         )

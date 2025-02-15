@@ -16,7 +16,7 @@ from particula.util.validate_inputs import validate_inputs
 
 from particula.activity.gibbs_mixing import gibbs_mix_weight
 from particula.activity.convert_functional_group import (
-    convert_to_oh_equivalent
+    convert_to_oh_equivalent,
 )
 
 
