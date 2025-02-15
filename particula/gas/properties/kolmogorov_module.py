@@ -1,5 +1,4 @@
-"""
-Get the Kolmogorov time of a gas particle.
+"""Get the Kolmogorov time of a gas particle.
 
 References:
     Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on the
@@ -22,8 +21,7 @@ def get_kolmogorov_time(
     kinematic_viscosity: Union[float, NDArray[np.float64]],
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Kolmogorov time of a fluid.
+    """Calculate the Kolmogorov time of a fluid.
 
     The Kolmogorov time scale represents the smallest timescale in turbulence
     where viscous forces dominate over inertial effects. This timescale
@@ -59,8 +57,7 @@ def get_kolmogorov_length(
     kinematic_viscosity: Union[float, NDArray[np.float64]],
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Kolmogorov length scale.
+    """Calculate the Kolmogorov length scale.
 
     The Kolmogorov length scale represents the smallest eddies in a turbulent
     flow where viscosity dominates. It is defined as:
@@ -94,8 +91,7 @@ def get_kolmogorov_velocity(
     kinematic_viscosity: Union[float, NDArray[np.float64]],
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the Kolmogorov velocity scale.
+    """Calculate the Kolmogorov velocity scale.
 
     The Kolmogorov velocity scale characterizes the smallest turbulent velocity
     fluctuations and is given by:

@@ -1,8 +1,6 @@
-"""
-Kinematic viscosity for fluids.
+"""Kinematic viscosity for fluids.
 
-The kinematic viscosity is the ratio of the dynamic viscosity to the
-density of a fluid. It is a measure of the fluid's resistance to flow
+The kinematic viscosity is the ratio of the dynamic viscosity to the density of a fluid. It is a measure of the fluid's resistance to flow
 under the influence of gravity.
 
 v = mu / rho
@@ -15,6 +13,7 @@ Where:
 References:
 https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
 https://en.wikipedia.org/wiki/Viscosity#Kinematic_viscosity
+
 """
 
 from particula.util.validate_inputs import validate_inputs
@@ -29,28 +28,26 @@ def get_kinematic_viscosity(
     dynamic_viscosity: float,
     fluid_density: float,
 ) -> float:
-    """
-    Calculate the kinematic viscosity of a fluid.
+    """Calculate the kinematic viscosity of a fluid.
 
     The kinematic viscosity is the ratio of the dynamic viscosity to the
     density of a fluid. It is a measure of the fluid's resistance to flow
     under the influence of gravity.
 
     Args:
-    -----
-        - dynamic_viscosity : Dynamic viscosity of the fluid [Pa*s].
-        - fluid_density : Density of the fluid [kg/m³].
+        dynamic_viscosity : Dynamic viscosity of the fluid [Pa*s].
+        fluid_density : Density of the fluid [kg/m³].
 
     Returns:
-    --------
-        - Kinematic viscosity of the fluid [m^2/s].
+        Kinematic viscosity of the fluid [m^2/s].
+
+    Equation:
+    - v = mu / rho
+        - v : Kinematic viscosity [m^2/s].
+        - mu : Dynamic viscosity [Pa*s].
+        - rho : Density of the fluid [kg/m^3].
 
     References:
-    ----------
-    - Equation : v = mu / rho
-            - v : Kinematic viscosity [m^2/s].
-            - mu : Dynamic viscosity [Pa*s].
-            - rho : Density of the fluid [kg/m^3].
     https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
     """
     return dynamic_viscosity / fluid_density
@@ -63,9 +60,8 @@ def get_kinematic_viscosity_via_system_state(
     reference_viscosity: float = REF_VISCOSITY_AIR_STP,
     reference_temperature: float = REF_TEMPERATURE_STP,
 ) -> float:
-    """
-    Calculate the kinematic viscosity of air by calculating dynamic viscosity
-    of air.
+    """Calculate the kinematic viscosity of air by calculating dynamic
+    viscosity of air.
 
     Parameters:
         temperature : Desired air temperature [K]. Must be greater than 0.
