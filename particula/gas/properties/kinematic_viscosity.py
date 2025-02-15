@@ -67,25 +67,21 @@ def get_kinematic_viscosity_via_system_state(
     Calculate the kinematic viscosity of air by calculating dynamic viscosity
     of air.
 
-    Args:
-    -----
-    - temperature: Desired air temperature [K]. Must be greater than 0.
-    - fluid_density: Density of the fluid [kg/m³].
-    - reference_viscosity: Gas viscosity [Pa*s] at the reference temperature
-    (default is STP).
-    - reference_temperature: Gas temperature [K] for the reference viscosity
-    (default is STP).
+    Parameters:
+        temperature : Desired air temperature [K]. Must be greater than 0.
+        fluid_density : Density of the fluid [kg/m³].
+        reference_viscosity : Gas viscosity [Pa*s] at the reference temperature
+            (default is STP).
+        reference_temperature : Gas temperature [K] for the reference viscosity
+            (default is STP).
 
     Returns:
-    --------
-    - float: The kinematic viscosity of air at the given temperature [m^2/s].
+        The kinematic viscosity of air at the given temperature [m^2/s].
 
     Raises:
-    ------
-    - ValueError: If the temperature is less than or equal to 0.
+        - ValueError : If the temperature is less than or equal to 0.
 
     References:
-    ----------
     https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
     """
     dynamic_viscosity = get_dynamic_viscosity(

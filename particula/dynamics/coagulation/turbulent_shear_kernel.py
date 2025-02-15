@@ -31,18 +31,15 @@ def saffman_turner_1956(
     """
     Calculate the turbulent shear kernel for coagulation.
 
-    Args:
-    -----
-        - particle_radius : Array of particle radii [m].
-        - turbulent_kinetic_energy : Turbulent kinetic energy [m^2/s^2].
-        - kinematic_viscosity : Kinematic viscosity [m^2/s].
+    Parameters:
+        particle_radius : Array of particle radii [m].
+        turbulent_kinetic_energy : Turbulent kinetic energy [m^2/s^2].
+        kinematic_viscosity : Kinematic viscosity [m^2/s].
 
     Returns:
-    --------
-        - Turbulent shear kernel matrix for coagulation [m^3/s].
+        Turbulent shear kernel matrix for coagulation [m^3/s].
 
     References:
-    ----------
     - Equation 13A.2 : K(D1, D2) = (pi * e_k / 120 * v)**1/2 * (D1 + D2)**3
         - K(D1, D2) : Turbulent shear kernel for coagulation [m^3/s].
         - e_k : Turbulent kinetic energy [m^2/s^2].
@@ -72,19 +69,16 @@ def saffman_turner_1956_via_system_state(
     """
     Calculate the turbulent shear kernel for coagulation via system state.
 
-    Args:
-    -----
-        - particle_radius : Array of particle radii [m].
-        - turbulent_kinetic_energy : Turbulent kinetic energy [m^2/s^2].
-        - temperature : Temperature of the system [K].
-        - fluid_density : Density of the fluid [kg/m^3].
+    Arguments:
+        particle_radius : Array of particle radii [m].
+        turbulent_kinetic_energy : Turbulent kinetic energy [m^2/s^2].
+        temperature : Temperature of the system [K].
+        fluid_density : Density of the fluid [kg/m^3].
 
     Returns:
-    --------
-        - Turbulent shear kernel matrix for coagulation [m^3/s].
+        Turbulent shear kernel matrix for coagulation [m^3/s].
 
     References:
-    ----------
     - Saffman, P. G., & Turner, J. S. (1956). On the collision of drops in
         turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
         https://doi.org/10.1017/S0022112056000020
