@@ -7277,12 +7277,20 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">MassBasedMovingBin</span><span class="p">,</span> <span class="n">RadiiBasedMovingBinBuilder</span><span class="p">,</span> <span class="n">DistributionFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MassBasedMovingBin</span><span class="p">,</span>
+    <span class="n">RadiiBasedMovingBinBuilder</span><span class="p">,</span>
+    <span class="n">DistributionFactory</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
-from particula.particles import MassBasedMovingBin, RadiiBasedMovingBinBuilder, DistributionFactory</div>
+from particula.particles import (
+    MassBasedMovingBin,
+    RadiiBasedMovingBinBuilder,
+    DistributionFactory,
+)</div>
 </div>
 </div>
 </div>
@@ -7330,7 +7338,10 @@ $$</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Radius of the particles: </span><span class="si">{</span><span class="n">radius</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>
 
 <span class="n">total_mass</span> <span class="o">=</span> <span class="n">MassBasedMovingBin</span><span class="p">()</span><span class="o">.</span><span class="n">get_total_mass</span><span class="p">(</span>
-    <span class="n">mass_distribution</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">mass_distribution</span><span class="p">),</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+    <span class="n">mass_distribution</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">mass_distribution</span><span class="p">),</span>
+    <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total mass of the particles: </span><span class="si">{</span><span class="n">total_mass</span><span class="si">}</span><span class="s2"> kg"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Same as the sum*concentration: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mass_distribution</span><span class="p">)</span><span class="si">}</span><span class="s2"> kg"</span><span class="p">)</span>
 </pre></div>
@@ -7341,7 +7352,10 @@ radius = MassBasedMovingBin().get_radius(mass_distribution, density)
 print(f"Radius of the particles: {radius} m")
 
 total_mass = MassBasedMovingBin().get_total_mass(
-    mass_distribution, concentration=np.ones_like(mass_distribution), density=density)
+    mass_distribution,
+    concentration=np.ones_like(mass_distribution),
+    density=density,
+)
 print(f"Total mass of the particles: {total_mass} kg")
 print(f"Same as the sum*concentration: {np.sum(mass_distribution)} kg")</div>
 </div>
@@ -7408,7 +7422,10 @@ $$</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Mass of the particles: </span><span class="si">{</span><span class="n">mass_distribution</span><span class="si">}</span><span class="s2"> kg"</span><span class="p">)</span>
 
 <span class="n">total_mass</span> <span class="o">=</span> <span class="n">radii_strategy</span><span class="o">.</span><span class="n">get_total_mass</span><span class="p">(</span>
-    <span class="n">radii_distribution</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">radii_distribution</span><span class="p">),</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+    <span class="n">radii_distribution</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">radii_distribution</span><span class="p">),</span>
+    <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total mass of the particles: </span><span class="si">{</span><span class="n">total_mass</span><span class="si">}</span><span class="s2"> kg"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">radii_distribution = np.linspace(0, 0.1, 5)  # m
@@ -7420,7 +7437,10 @@ mass_distribution = radii_strategy.get_mass(radii_distribution, density)
 print(f"Mass of the particles: {mass_distribution} kg")
 
 total_mass = radii_strategy.get_total_mass(
-    radii_distribution, concentration=np.ones_like(radii_distribution), density=density)
+    radii_distribution,
+    concentration=np.ones_like(radii_distribution),
+    density=density,
+)
 print(f"Total mass of the particles: {total_mass} kg")</div>
 </div>
 </div>
@@ -7476,14 +7496,19 @@ Total mass of the particles: 6.544984694978737 kg
 <span class="n">masses_combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">mass_distribution1</span><span class="p">,</span> <span class="n">mass_distribution2</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
 <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">2000.0</span><span class="p">])</span>  <span class="c1"># kg/m^3</span>
 
-<span class="n">speciated_mass</span> <span class="o">=</span> <span class="n">DistributionFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"speciated_mass_moving_bin"</span><span class="p">)</span>
+<span class="n">speciated_mass</span> <span class="o">=</span> <span class="n">DistributionFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+    <span class="s2">"speciated_mass_moving_bin"</span>
+<span class="p">)</span>
 
 <span class="n">radius</span> <span class="o">=</span> <span class="n">speciated_mass</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">masses_combined</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Radius of the particles: </span><span class="si">{</span><span class="n">radius</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>
 
 <span class="n">total_mass</span> <span class="o">=</span> <span class="n">speciated_mass</span><span class="o">.</span><span class="n">get_total_mass</span><span class="p">(</span>
-    <span class="n">masses_combined</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">mass_distribution1</span><span class="p">),</span> <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)</span>
+    <span class="n">masses_combined</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">mass_distribution1</span><span class="p">),</span>
+    <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total mass of the particles: </span><span class="si">{</span><span class="n">total_mass</span><span class="si">}</span><span class="s2"> kg"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">mass_distribution1 = np.linspace(0, 10, 5)  # kg
@@ -7491,14 +7516,19 @@ mass_distribution2 = np.linspace(0, 10, 5)  # kg
 masses_combined = np.vstack((mass_distribution1, mass_distribution2)).T
 density = np.array([1000.0, 2000.0])  # kg/m^3
 
-speciated_mass = DistributionFactory().get_strategy("speciated_mass_moving_bin")
+speciated_mass = DistributionFactory().get_strategy(
+    "speciated_mass_moving_bin"
+)
 
 radius = speciated_mass.get_radius(masses_combined, density)
 
 print(f"Radius of the particles: {radius} m")
 
 total_mass = speciated_mass.get_total_mass(
-    masses_combined, concentration=np.ones_like(mass_distribution1), density=density)
+    masses_combined,
+    concentration=np.ones_like(mass_distribution1),
+    density=density,
+)
 print(f"Total mass of the particles: {total_mass} kg")</div>
 </div>
 </div>

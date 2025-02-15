@@ -7300,12 +7300,20 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">SurfaceStrategyMolar</span><span class="p">,</span> <span class="n">SurfaceStrategyMassBuilder</span><span class="p">,</span> <span class="n">SurfaceFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SurfaceStrategyMolar</span><span class="p">,</span>
+    <span class="n">SurfaceStrategyMassBuilder</span><span class="p">,</span>
+    <span class="n">SurfaceFactory</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
-from particula.particles import SurfaceStrategyMolar, SurfaceStrategyMassBuilder, SurfaceFactory</div>
+from particula.particles import (
+    SurfaceStrategyMolar,
+    SurfaceStrategyMassBuilder,
+    SurfaceFactory,
+)</div>
 </div>
 </div>
 </div>
@@ -7342,9 +7350,9 @@ from particula.particles import SurfaceStrategyMolar, SurfaceStrategyMassBuilder
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">glycerol_molar_mass</span> <span class="o">=</span> <span class="mf">0.092093</span> <span class="c1"># kg/mol</span>
-<span class="n">glycerol_density</span> <span class="o">=</span> <span class="mi">1261</span> <span class="c1"># kg/m^3</span>
-<span class="n">glycerol_surface_tension</span> <span class="o">=</span> <span class="mf">0.063</span> <span class="c1"># N/m</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">glycerol_molar_mass</span> <span class="o">=</span> <span class="mf">0.092093</span>  <span class="c1"># kg/mol</span>
+<span class="n">glycerol_density</span> <span class="o">=</span> <span class="mi">1261</span>  <span class="c1"># kg/m^3</span>
+<span class="n">glycerol_surface_tension</span> <span class="o">=</span> <span class="mf">0.063</span>  <span class="c1"># N/m</span>
 
 <span class="c1"># Create a surface strategy</span>
 <span class="n">glycerol_surface_strategy</span> <span class="o">=</span> <span class="n">SurfaceStrategyMolar</span><span class="p">(</span>
@@ -7354,14 +7362,14 @@ from particula.particles import SurfaceStrategyMolar, SurfaceStrategyMassBuilder
 <span class="n">glycerol_kelvin_radius</span> <span class="o">=</span> <span class="n">glycerol_surface_strategy</span><span class="o">.</span><span class="n">kelvin_radius</span><span class="p">(</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="n">glycerol_molar_mass</span><span class="p">,</span>
     <span class="n">mass_concentration</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># not this doesn't not matter for a single species mixture</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="mi">300</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"kelvin radius of glycerol </span><span class="si">{</span><span class="n">glycerol_kelvin_radius</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">glycerol_molar_mass = 0.092093 # kg/mol
-glycerol_density = 1261 # kg/m^3
-glycerol_surface_tension = 0.063 # N/m
+<div class="clipboard-copy-txt" id="cell-2">glycerol_molar_mass = 0.092093  # kg/mol
+glycerol_density = 1261  # kg/m^3
+glycerol_surface_tension = 0.063  # N/m
 
 # Create a surface strategy
 glycerol_surface_strategy = SurfaceStrategyMolar(
@@ -7371,7 +7379,7 @@ glycerol_surface_strategy = SurfaceStrategyMolar(
 glycerol_kelvin_radius = glycerol_surface_strategy.kelvin_radius(
     molar_mass=glycerol_molar_mass,
     mass_concentration=0.1,  # not this doesn't not matter for a single species mixture
-    temperature=300
+    temperature=300,
 )
 
 print(f"kelvin radius of glycerol {glycerol_kelvin_radius} m")</div>
@@ -7430,12 +7438,17 @@ print(f"kelvin radius of glycerol {glycerol_kelvin_radius} m")</div>
     <span class="n">radius</span><span class="o">=</span><span class="n">radii</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="n">glycerol_molar_mass</span><span class="p">,</span>
     <span class="n">mass_concentration</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="mi">300</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radii</span><span class="p">,</span> <span class="n">glycerol_kevlin_term</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">glycerol_kelvin_radius</span><span class="p">,</span> <span class="n">glycerol_kelvin_radius</span><span class="p">],</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">glycerol_kevlin_term</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">glycerol_kevlin_term</span><span class="p">)],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">glycerol_kelvin_radius</span><span class="p">,</span> <span class="n">glycerol_kelvin_radius</span><span class="p">],</span>
+    <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">glycerol_kevlin_term</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">glycerol_kevlin_term</span><span class="p">)],</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span>
+    <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Kelvin term of glycerol"</span><span class="p">)</span>
@@ -7450,12 +7463,17 @@ glycerol_kevlin_term = glycerol_surface_strategy.kelvin_term(
     radius=radii,
     molar_mass=glycerol_molar_mass,
     mass_concentration=0.1,
-    temperature=300
+    temperature=300,
 )
 
 fig, ax = plt.subplots(figsize=(8, 6))
 ax.plot(radii, glycerol_kevlin_term)
-ax.plot([glycerol_kelvin_radius, glycerol_kelvin_radius], [min(glycerol_kevlin_term), max(glycerol_kevlin_term)], color="red", linestyle="--")
+ax.plot(
+    [glycerol_kelvin_radius, glycerol_kelvin_radius],
+    [min(glycerol_kevlin_term), max(glycerol_kevlin_term)],
+    color="red",
+    linestyle="--",
+)
 ax.set_yscale("log")
 ax.set_xscale("log")
 ax.set_title("Kelvin term of glycerol")
@@ -7528,7 +7546,12 @@ plt.show()</div>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radii</span><span class="p">,</span> <span class="n">squalane_kelvin_term</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">squalane_kelvin_radius</span><span class="p">,</span> <span class="n">squalane_kelvin_radius</span><span class="p">],</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">squalane_kelvin_term</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">squalane_kelvin_term</span><span class="p">)],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">squalane_kelvin_radius</span><span class="p">,</span> <span class="n">squalane_kelvin_radius</span><span class="p">],</span>
+    <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">squalane_kelvin_term</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">squalane_kelvin_term</span><span class="p">)],</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span>
+    <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Kelvin term of squalane"</span><span class="p">)</span>
@@ -7554,16 +7577,19 @@ squalane_kelvin_term = squalane_surface.kelvin_term(
 
 fig, ax = plt.subplots(figsize=(8, 6))
 ax.plot(radii, squalane_kelvin_term)
-ax.plot([squalane_kelvin_radius, squalane_kelvin_radius], [min(squalane_kelvin_term), max(squalane_kelvin_term)], color="red", linestyle="--")
+ax.plot(
+    [squalane_kelvin_radius, squalane_kelvin_radius],
+    [min(squalane_kelvin_term), max(squalane_kelvin_term)],
+    color="red",
+    linestyle="--",
+)
 ax.set_yscale("log")
 ax.set_xscale("log")
 ax.set_title("Kelvin term of squalane")
 ax.set_xlabel("radius (m)")
 ax.set_ylabel("Kelvin term")
 ax.legend(["Kelvin term", "Kelvin radius"])
-plt.show()
-
-</div>
+plt.show()</div>
 </div>
 </div>
 </div>
@@ -7614,8 +7640,8 @@ plt.show()
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># glycerol, squalane</span>
-        <span class="s2">"density"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1261</span><span class="p">,</span> <span class="mi">810</span><span class="p">]),</span>  <span class="c1"># kg/m^3</span>
-        <span class="s2">"surface_tension"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.063</span><span class="p">,</span> <span class="mf">0.028</span><span class="p">]),</span>  <span class="c1"># N/m</span>
+    <span class="s2">"density"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1261</span><span class="p">,</span> <span class="mi">810</span><span class="p">]),</span>  <span class="c1"># kg/m^3</span>
+    <span class="s2">"surface_tension"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.063</span><span class="p">,</span> <span class="mf">0.028</span><span class="p">]),</span>  <span class="c1"># N/m</span>
 <span class="p">}</span>
 
 <span class="n">mixture_surface</span> <span class="o">=</span> <span class="n">SurfaceFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
@@ -7626,7 +7652,7 @@ plt.show()
 <span class="n">mixture_kelvin_radius</span> <span class="o">=</span> <span class="n">mixture_surface</span><span class="o">.</span><span class="n">kelvin_radius</span><span class="p">(</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.092093</span><span class="p">,</span>
     <span class="n">mass_concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]),</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="mi">300</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"kelvin radius of mixture </span><span class="si">{</span><span class="n">mixture_kelvin_radius</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>
 
@@ -7634,16 +7660,31 @@ plt.show()
     <span class="n">radius</span><span class="o">=</span><span class="n">radii</span><span class="p">,</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.092093</span><span class="p">,</span>
     <span class="n">mass_concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]),</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="mi">300</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radii</span><span class="p">,</span> <span class="n">mixture_kelvin_term</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Mixure"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">mixture_kelvin_radius</span><span class="p">,</span> <span class="n">mixture_kelvin_radius</span><span class="p">],</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">mixture_kelvin_term</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">mixture_kelvin_term</span><span class="p">)],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">mixture_kelvin_radius</span><span class="p">,</span> <span class="n">mixture_kelvin_radius</span><span class="p">],</span>
+    <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">mixture_kelvin_term</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">mixture_kelvin_term</span><span class="p">)],</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span>
+    <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radii</span><span class="p">,</span> <span class="n">glycerol_kevlin_term</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Glycerol"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">glycerol_kelvin_radius</span><span class="p">,</span> <span class="n">glycerol_kelvin_radius</span><span class="p">],</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">glycerol_kevlin_term</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">glycerol_kevlin_term</span><span class="p">)],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">glycerol_kelvin_radius</span><span class="p">,</span> <span class="n">glycerol_kelvin_radius</span><span class="p">],</span>
+    <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">glycerol_kevlin_term</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">glycerol_kevlin_term</span><span class="p">)],</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span>
+    <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radii</span><span class="p">,</span> <span class="n">squalane_kelvin_term</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Squalane"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">squalane_kelvin_radius</span><span class="p">,</span> <span class="n">squalane_kelvin_radius</span><span class="p">],</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">squalane_kelvin_term</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">squalane_kelvin_term</span><span class="p">)],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">squalane_kelvin_radius</span><span class="p">,</span> <span class="n">squalane_kelvin_radius</span><span class="p">],</span>
+    <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">squalane_kelvin_term</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">squalane_kelvin_term</span><span class="p">)],</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span>
+    <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Kelvin term of mixture"</span><span class="p">)</span>
@@ -7653,8 +7694,8 @@ plt.show()
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">parameters = {  # glycerol, squalane
-        "density": np.array([1261, 810]),  # kg/m^3
-        "surface_tension": np.array([0.063, 0.028]),  # N/m
+    "density": np.array([1261, 810]),  # kg/m^3
+    "surface_tension": np.array([0.063, 0.028]),  # N/m
 }
 
 mixture_surface = SurfaceFactory().get_strategy(
@@ -7665,7 +7706,7 @@ mixture_surface = SurfaceFactory().get_strategy(
 mixture_kelvin_radius = mixture_surface.kelvin_radius(
     molar_mass=0.092093,
     mass_concentration=np.array([0.1, 0.1]),
-    temperature=300
+    temperature=300,
 )
 print(f"kelvin radius of mixture {mixture_kelvin_radius} m")
 
@@ -7673,24 +7714,38 @@ mixture_kelvin_term = mixture_surface.kelvin_term(
     radius=radii,
     molar_mass=0.092093,
     mass_concentration=np.array([0.1, 0.1]),
-    temperature=300
+    temperature=300,
 )
 
 fig, ax = plt.subplots(figsize=(8, 6))
 ax.plot(radii, mixture_kelvin_term, label="Mixure")
-ax.plot([mixture_kelvin_radius, mixture_kelvin_radius], [min(mixture_kelvin_term), max(mixture_kelvin_term)], color="red", linestyle="--")
+ax.plot(
+    [mixture_kelvin_radius, mixture_kelvin_radius],
+    [min(mixture_kelvin_term), max(mixture_kelvin_term)],
+    color="red",
+    linestyle="--",
+)
 ax.plot(radii, glycerol_kevlin_term, label="Glycerol")
-ax.plot([glycerol_kelvin_radius, glycerol_kelvin_radius], [min(glycerol_kevlin_term), max(glycerol_kevlin_term)], color="red", linestyle="--")
+ax.plot(
+    [glycerol_kelvin_radius, glycerol_kelvin_radius],
+    [min(glycerol_kevlin_term), max(glycerol_kevlin_term)],
+    color="red",
+    linestyle="--",
+)
 ax.plot(radii, squalane_kelvin_term, label="Squalane")
-ax.plot([squalane_kelvin_radius, squalane_kelvin_radius], [min(squalane_kelvin_term), max(squalane_kelvin_term)], color="red", linestyle="--")
+ax.plot(
+    [squalane_kelvin_radius, squalane_kelvin_radius],
+    [min(squalane_kelvin_term), max(squalane_kelvin_term)],
+    color="red",
+    linestyle="--",
+)
 ax.set_yscale("log")
 ax.set_xscale("log")
 ax.set_title("Kelvin term of mixture")
 ax.set_xlabel("radius (m)")
 ax.set_ylabel("Kelvin term")
 ax.legend()
-plt.show()
-</div>
+plt.show()</div>
 </div>
 </div>
 </div>

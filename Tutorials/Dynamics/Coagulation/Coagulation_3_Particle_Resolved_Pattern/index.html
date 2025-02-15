@@ -7356,9 +7356,15 @@ The <code>Aerosol</code> object brings together the atmosphere and the resolved 
 <span class="c1"># This defines how particle mass, activity, and surface are represented</span>
 <span class="n">resolved_masses</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">particles</span><span class="o">.</span><span class="n">ResolvedParticleMassRepresentationBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_distribution_strategy</span><span class="p">(</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleResolvedSpeciatedMass</span><span class="p">())</span>  <span class="c1"># Use speciated mass distribution</span>
-    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">())</span>  <span class="c1"># Define activity based on ideal mass</span>
-    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyVolume</span><span class="p">())</span>  <span class="c1"># Define surface area based on particle volume</span>
+    <span class="o">.</span><span class="n">set_distribution_strategy</span><span class="p">(</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">ParticleResolvedSpeciatedMass</span><span class="p">()</span>
+    <span class="p">)</span>  <span class="c1"># Use speciated mass distribution</span>
+    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">()</span>
+    <span class="p">)</span>  <span class="c1"># Define activity based on ideal mass</span>
+    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyVolume</span><span class="p">()</span>
+    <span class="p">)</span>  <span class="c1"># Define surface area based on particle volume</span>
     <span class="o">.</span><span class="n">set_mass</span><span class="p">(</span><span class="n">particle_mass_sample</span><span class="p">,</span> <span class="s2">"kg"</span><span class="p">)</span>  <span class="c1"># Assign mass of particles (in kg)</span>
     <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mi">1500</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>  <span class="c1"># Set particle density to 1500 kg/m^3</span>
     <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Assume neutral particles with no charge</span>
@@ -7400,9 +7406,15 @@ particle_mass_sample = (
 # This defines how particle mass, activity, and surface are represented
 resolved_masses = (
     particles.ResolvedParticleMassRepresentationBuilder()
-    .set_distribution_strategy(particles.ParticleResolvedSpeciatedMass())  # Use speciated mass distribution
-    .set_activity_strategy(particles.ActivityIdealMass())  # Define activity based on ideal mass
-    .set_surface_strategy(particles.SurfaceStrategyVolume())  # Define surface area based on particle volume
+    .set_distribution_strategy(
+        particles.ParticleResolvedSpeciatedMass()
+    )  # Use speciated mass distribution
+    .set_activity_strategy(
+        particles.ActivityIdealMass()
+    )  # Define activity based on ideal mass
+    .set_surface_strategy(
+        particles.SurfaceStrategyVolume()
+    )  # Define surface area based on particle volume
     .set_mass(particle_mass_sample, "kg")  # Assign mass of particles (in kg)
     .set_density(1500, "kg/m^3")  # Set particle density to 1500 kg/m^3
     .set_charge(0)  # Assume neutral particles with no charge

@@ -7236,20 +7236,32 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="c1"># particula imports</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="kn">import</span> <span class="n">particles</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="n">AtmosphereBuilder</span><span class="p">,</span> <span class="n">VaporPressureFactory</span><span class="p">,</span> <span class="n">GasSpeciesBuilder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AtmosphereBuilder</span><span class="p">,</span>
+    <span class="n">VaporPressureFactory</span><span class="p">,</span>
+    <span class="n">GasSpeciesBuilder</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.aerosol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aerosol</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.particle_process</span><span class="w"> </span><span class="kn">import</span> <span class="n">MassCondensation</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.condensation.condensation_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">CondensationIsothermal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.condensation.condensation_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CondensationIsothermal</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
 # particula imports
 from particula import particles
-from particula.gas import AtmosphereBuilder, VaporPressureFactory, GasSpeciesBuilder
+from particula.gas import (
+    AtmosphereBuilder,
+    VaporPressureFactory,
+    GasSpeciesBuilder,
+)
 from particula.aerosol import Aerosol
 from particula.dynamics.particle_process import MassCondensation
-from particula.dynamics.condensation.condensation_strategies import CondensationIsothermal</div>
+from particula.dynamics.condensation.condensation_strategies import (
+    CondensationIsothermal,
+)</div>
 </div>
 </div>
 </div>
@@ -7294,17 +7306,21 @@ from particula.dynamics.condensation.condensation_strategies import Condensation
 <span class="n">vapor_pressure_ammonium</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="s2">"constant"</span><span class="p">,</span> <span class="n">parameters_vapor</span>
 <span class="p">)</span>
-<span class="n">vapor_pressure_water</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="s2">"water_buck"</span>
-<span class="p">)</span>
+<span class="n">vapor_pressure_water</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"water_buck"</span><span class="p">)</span>
 
-<span class="n">water_sat</span> <span class="o">=</span> <span class="n">vapor_pressure_water</span><span class="o">.</span><span class="n">saturation_concentration</span><span class="p">(</span><span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">)</span>
+<span class="n">water_sat</span> <span class="o">=</span> <span class="n">vapor_pressure_water</span><span class="o">.</span><span class="n">saturation_concentration</span><span class="p">(</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span>
+<span class="p">)</span>
 <span class="n">water_concentration</span> <span class="o">=</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">water_sat</span>
 
 <span class="n">glycerol_gas</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">GasSpeciesBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">molar_mass_ammonium_sulfate</span><span class="p">]),</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">([</span><span class="n">vapor_pressure_water</span><span class="p">,</span> <span class="n">vapor_pressure_ammonium</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">molar_mass_ammonium_sulfate</span><span class="p">]),</span> <span class="s2">"kg/mol"</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">vapor_pressure_water</span><span class="p">,</span> <span class="n">vapor_pressure_ammonium</span><span class="p">]</span>
+    <span class="p">)</span>
     <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">water_concentration</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">([</span><span class="s2">"H2O"</span><span class="p">,</span> <span class="s2">"NH4HSO4"</span><span class="p">])</span>
     <span class="o">.</span><span class="n">set_condensable</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span>
@@ -7328,17 +7344,21 @@ parameters_vapor = {
 vapor_pressure_ammonium = VaporPressureFactory().get_strategy(
     "constant", parameters_vapor
 )
-vapor_pressure_water = VaporPressureFactory().get_strategy(
-    "water_buck"
-)
+vapor_pressure_water = VaporPressureFactory().get_strategy("water_buck")
 
-water_sat = vapor_pressure_water.saturation_concentration(molar_mass=molar_mass_water, temperature=298.15)
+water_sat = vapor_pressure_water.saturation_concentration(
+    molar_mass=molar_mass_water, temperature=298.15
+)
 water_concentration = 0.8 * water_sat
 
 glycerol_gas = (
     GasSpeciesBuilder()
-    .set_molar_mass(np.array([molar_mass_water, molar_mass_ammonium_sulfate]), "kg/mol")
-    .set_vapor_pressure_strategy([vapor_pressure_water, vapor_pressure_ammonium])
+    .set_molar_mass(
+        np.array([molar_mass_water, molar_mass_ammonium_sulfate]), "kg/mol"
+    )
+    .set_vapor_pressure_strategy(
+        [vapor_pressure_water, vapor_pressure_ammonium]
+    )
     .set_concentration(np.array([water_concentration, 0.0]), "kg/m^3")
     .set_name(["H2O", "NH4HSO4"])
     .set_condensable([True, True])
@@ -7351,10 +7371,7 @@ atmosphere = (
     .set_temperature(25, temperature_units="degC")
     .set_pressure(1, pressure_units="atm")
     .build()
-)
-
-
-</div>
+)</div>
 </div>
 </div>
 </div>
@@ -7393,7 +7410,7 @@ atmosphere = (
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># sample</span>
 <span class="n">particles_sample</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">lognormal_sample_distribution</span><span class="p">(</span>
-    <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-9</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1e-9</span><span class="p">,</span>
     <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]),</span>
     <span class="n">number_of_particles</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e2</span><span class="p">]),</span>
     <span class="n">number_of_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
@@ -7412,7 +7429,7 @@ atmosphere = (
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># sample
 particles_sample = particles.properties.lognormal_sample_distribution(
-    mode=np.array([100, 1000])*1e-9,
+    mode=np.array([100, 1000]) * 1e-9,
     geometric_standard_deviation=np.array([1.3, 1.5]),
     number_of_particles=np.array([1e3, 1e2]),
     number_of_samples=1000,
@@ -7466,8 +7483,10 @@ plt.show()</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># particle radis to mass</span>
 <span class="n">density</span> <span class="o">=</span> <span class="mf">1.26e3</span>  <span class="c1"># kg/m^3</span>
-<span class="n">particle_mass</span> <span class="o">=</span> <span class="n">density</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particles_sample</span> <span class="o">**</span> <span class="mi">3</span>
-<span class="n">mass_speciation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">particle_mass</span><span class="o">*</span><span class="mi">0</span><span class="p">,</span> <span class="n">particle_mass</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># water, ammonium sulfate</span>
+<span class="n">particle_mass</span> <span class="o">=</span> <span class="n">density</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particles_sample</span><span class="o">**</span><span class="mi">3</span>
+<span class="n">mass_speciation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">particle_mass</span> <span class="o">*</span> <span class="mi">0</span><span class="p">,</span> <span class="n">particle_mass</span><span class="p">]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># water, ammonium sulfate</span>
 <span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">particles_sample</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e1</span>
 <span class="n">densities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mf">1.26e3</span><span class="p">])</span>  <span class="c1"># kg/m^3</span>
 
@@ -7491,7 +7510,9 @@ plt.show()</div>
 
 <span class="n">paritcle_rep</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">particles</span><span class="o">.</span><span class="n">ParticleMassRepresentationBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_distribution_strategy</span><span class="p">(</span><span class="n">particles</span><span class="o">.</span><span class="n">SpeciatedMassMovingBinBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">())</span>
+    <span class="o">.</span><span class="n">set_distribution_strategy</span><span class="p">(</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">SpeciatedMassMovingBinBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="p">)</span>
     <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span><span class="n">surface_strat</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span><span class="n">activity_strat</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">densities</span><span class="p">)</span>
@@ -7507,8 +7528,10 @@ plt.show()</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># particle radis to mass
 density = 1.26e3  # kg/m^3
-particle_mass = density * 4 / 3 * np.pi * particles_sample ** 3
-mass_speciation = np.array([particle_mass*0, particle_mass]).T  # water, ammonium sulfate
+particle_mass = density * 4 / 3 * np.pi * particles_sample**3
+mass_speciation = np.array(
+    [particle_mass * 0, particle_mass]
+).T  # water, ammonium sulfate
 concentration = np.ones_like(particles_sample) * 1e1
 densities = np.array([1000, 1.26e3])  # kg/m^3
 
@@ -7532,7 +7555,9 @@ surface_strat = (
 
 paritcle_rep = (
     particles.ParticleMassRepresentationBuilder()
-    .set_distribution_strategy(particles.SpeciatedMassMovingBinBuilder().build())
+    .set_distribution_strategy(
+        particles.SpeciatedMassMovingBinBuilder().build()
+    )
     .set_surface_strategy(surface_strat)
     .set_activity_strategy(activity_strat)
     .set_density(densities)
@@ -7602,11 +7627,15 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ["['H2O', 'NH4HSO4']"]
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># define the condensation process</span>
 <span class="n">condensation_isothermal</span> <span class="o">=</span> <span class="n">CondensationIsothermal</span><span class="p">(</span>
-    <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">molar_mass_ammonium_sulfate</span><span class="p">]),</span>  <span class="c1"># kg/mol</span>
-    <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1">#makes things go slower/faster</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">molar_mass_ammonium_sulfate</span><span class="p">]</span>
+    <span class="p">),</span>  <span class="c1"># kg/mol</span>
+    <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># makes things go slower/faster</span>
     <span class="n">update_gases</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">condensation_process</span> <span class="o">=</span> <span class="n">MassCondensation</span><span class="p">(</span><span class="n">condensation_strategy</span><span class="o">=</span><span class="n">condensation_isothermal</span><span class="p">)</span>
+<span class="n">condensation_process</span> <span class="o">=</span> <span class="n">MassCondensation</span><span class="p">(</span>
+    <span class="n">condensation_strategy</span><span class="o">=</span><span class="n">condensation_isothermal</span>
+<span class="p">)</span>
 
 <span class="c1"># define the time array in seconds</span>
 <span class="n">time_step</span> <span class="o">=</span> <span class="mi">11</span>
@@ -7630,7 +7659,14 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ["['H2O', 'NH4HSO4']"]
 <span class="n">bins</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
     <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins_lognormal</span>
 <span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span> <span class="n">align</span><span class="o">=</span><span class="s2">"edge"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"After 1 step"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+    <span class="n">edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">bins</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span>
+    <span class="n">align</span><span class="o">=</span><span class="s2">"edge"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"After 1 step"</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">aerosol</span><span class="p">)</span>
 <span class="c1"># 10 seconds</span>
@@ -7638,7 +7674,14 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ["['H2O', 'NH4HSO4']"]
 <span class="n">bins</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
     <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins_lognormal</span>
 <span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span> <span class="n">align</span><span class="o">=</span><span class="s2">"edge"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"After 2 steps"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+    <span class="n">edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">bins</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span>
+    <span class="n">align</span><span class="o">=</span><span class="s2">"edge"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"After 2 steps"</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">aerosol</span><span class="p">)</span>
 
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
@@ -7650,11 +7693,15 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ["['H2O', 'NH4HSO4']"]
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5"># define the condensation process
 condensation_isothermal = CondensationIsothermal(
-    molar_mass=np.array([molar_mass_water, molar_mass_ammonium_sulfate]),  # kg/mol
-    accommodation_coefficient=0.1,  #makes things go slower/faster
+    molar_mass=np.array(
+        [molar_mass_water, molar_mass_ammonium_sulfate]
+    ),  # kg/mol
+    accommodation_coefficient=0.1,  # makes things go slower/faster
     update_gases=False,
 )
-condensation_process = MassCondensation(condensation_strategy=condensation_isothermal)
+condensation_process = MassCondensation(
+    condensation_strategy=condensation_isothermal
+)
 
 # define the time array in seconds
 time_step = 11
@@ -7678,7 +7725,14 @@ aerosol = condensation_process.execute(aerosol, time_step, sub_steps)
 bins, edges = np.histogram(
     aerosol.particles[0].get_radius(), bins=bins_lognormal
 )
-ax.bar(edges[:-1], bins, width=np.diff(edges), align="edge", label="After 1 step", alpha=0.8)
+ax.bar(
+    edges[:-1],
+    bins,
+    width=np.diff(edges),
+    align="edge",
+    label="After 1 step",
+    alpha=0.8,
+)
 
 print(aerosol)
 # 10 seconds
@@ -7686,7 +7740,14 @@ aerosol = condensation_process.execute(aerosol, time_step, sub_steps)
 bins, edges = np.histogram(
     aerosol.particles[0].get_radius(), bins=bins_lognormal
 )
-ax.bar(edges[:-1], bins, width=np.diff(edges), align="edge", label="After 2 steps", alpha=0.7)
+ax.bar(
+    edges[:-1],
+    bins,
+    width=np.diff(edges),
+    align="edge",
+    label="After 2 steps",
+    alpha=0.7,
+)
 print(aerosol)
 
 ax.set_xscale("log")

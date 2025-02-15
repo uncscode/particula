@@ -7215,14 +7215,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">PresetParticleRadiusBuilder</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="n">AtmosphereBuilder</span><span class="p">,</span> <span class="n">VaporPressureFactory</span><span class="p">,</span> <span class="n">GasSpeciesBuilder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AtmosphereBuilder</span><span class="p">,</span>
+    <span class="n">VaporPressureFactory</span><span class="p">,</span>
+    <span class="n">GasSpeciesBuilder</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.aerosol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aerosol</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
 from particula.particles import PresetParticleRadiusBuilder
-from particula.gas import AtmosphereBuilder, VaporPressureFactory, GasSpeciesBuilder
+from particula.gas import (
+    AtmosphereBuilder,
+    VaporPressureFactory,
+    GasSpeciesBuilder,
+)
 from particula.aerosol import Aerosol</div>
 </div>
 </div>
@@ -7263,16 +7271,20 @@ from particula.aerosol import Aerosol</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Glycerol gas</span>
 <span class="n">molar_mass_glycerol</span> <span class="o">=</span> <span class="mf">92.09382e-3</span>  <span class="c1"># kg/mol</span>
 <span class="n">parameters_clausius</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"latent_heat"</span><span class="p">:</span> <span class="mf">71.5</span><span class="o">*</span><span class="n">molar_mass_glycerol</span><span class="p">,</span>
+    <span class="s2">"latent_heat"</span><span class="p">:</span> <span class="mf">71.5</span> <span class="o">*</span> <span class="n">molar_mass_glycerol</span><span class="p">,</span>
     <span class="s2">"latent_heat_units"</span><span class="p">:</span> <span class="s2">"kJ/kg"</span><span class="p">,</span>
     <span class="s2">"temperature_initial"</span><span class="p">:</span> <span class="mf">125.5</span><span class="p">,</span>
     <span class="s2">"temperature_initial_units"</span><span class="p">:</span> <span class="s2">"degC"</span><span class="p">,</span>
     <span class="s2">"pressure_initial"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
     <span class="s2">"pressure_initial_units"</span><span class="p">:</span> <span class="s2">"mmHg"</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="n">vapor_pressure_strategy</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"clausius_clapeyron"</span><span class="p">,</span> <span class="n">parameters_clausius</span><span class="p">)</span>
+<span class="n">vapor_pressure_strategy</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+    <span class="s2">"clausius_clapeyron"</span><span class="p">,</span> <span class="n">parameters_clausius</span>
+<span class="p">)</span>
 
-<span class="n">sat_concentration</span> <span class="o">=</span> <span class="n">vapor_pressure_strategy</span><span class="o">.</span><span class="n">saturation_concentration</span><span class="p">(</span><span class="n">molar_mass_glycerol</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">)</span>
+<span class="n">sat_concentration</span> <span class="o">=</span> <span class="n">vapor_pressure_strategy</span><span class="o">.</span><span class="n">saturation_concentration</span><span class="p">(</span>
+    <span class="n">molar_mass_glycerol</span><span class="p">,</span> <span class="mf">298.15</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Saturation concentration: </span><span class="si">{</span><span class="n">sat_concentration</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> kg/m^3"</span><span class="p">)</span>
 
 <span class="n">sat_factor</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># 50% of saturation concentration</span>
@@ -7280,7 +7292,7 @@ from particula.aerosol import Aerosol</div>
     <span class="n">GasSpeciesBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">molar_mass_glycerol</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">vapor_pressure_strategy</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">sat_concentration</span><span class="o">*</span><span class="n">sat_factor</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">sat_concentration</span> <span class="o">*</span> <span class="n">sat_factor</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="s2">"Glycerol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_condensable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -7309,16 +7321,20 @@ from particula.aerosol import Aerosol</div>
 <div class="clipboard-copy-txt" id="cell-2"># Glycerol gas
 molar_mass_glycerol = 92.09382e-3  # kg/mol
 parameters_clausius = {
-    "latent_heat": 71.5*molar_mass_glycerol,
+    "latent_heat": 71.5 * molar_mass_glycerol,
     "latent_heat_units": "kJ/kg",
     "temperature_initial": 125.5,
     "temperature_initial_units": "degC",
     "pressure_initial": 1,
     "pressure_initial_units": "mmHg",
 }
-vapor_pressure_strategy = VaporPressureFactory().get_strategy("clausius_clapeyron", parameters_clausius)
+vapor_pressure_strategy = VaporPressureFactory().get_strategy(
+    "clausius_clapeyron", parameters_clausius
+)
 
-sat_concentration = vapor_pressure_strategy.saturation_concentration(molar_mass_glycerol, 298.15)
+sat_concentration = vapor_pressure_strategy.saturation_concentration(
+    molar_mass_glycerol, 298.15
+)
 print(f"Saturation concentration: {sat_concentration:.2e} kg/m^3")
 
 sat_factor = 0.5  # 50% of saturation concentration
@@ -7326,7 +7342,7 @@ glycerol_gas = (
     GasSpeciesBuilder()
     .set_molar_mass(molar_mass_glycerol, "kg/mol")
     .set_vapor_pressure_strategy(vapor_pressure_strategy)
-    .set_concentration(sat_concentration*sat_factor, "kg/m^3")
+    .set_concentration(sat_concentration * sat_factor, "kg/m^3")
     .set_name("Glycerol")
     .set_condensable(True)
     .build()

@@ -7384,7 +7384,9 @@ We import standard libraries like <code>numpy</code> and <code>matplotlib</code>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">kernel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">rate</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties.lognormal_size_distribution</span><span class="w"> </span><span class="kn">import</span> <span class="n">lognormal_pmf_distribution</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties.lognormal_size_distribution</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">lognormal_pmf_distribution</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
@@ -7410,7 +7412,9 @@ from particula.util.reduced_quantity import reduced_self_broadcast
 
 from particula.dynamics.coagulation import kernel
 from particula.dynamics.coagulation import rate
-from particula.particles.properties.lognormal_size_distribution import lognormal_pmf_distribution</div>
+from particula.particles.properties.lognormal_size_distribution import (
+    lognormal_pmf_distribution,
+)</div>
 </div>
 </div>
 </div>
@@ -7506,7 +7510,9 @@ Determine the number of radius bins</p>
 <span class="n">neg_charges</span> <span class="o">=</span> <span class="o">-</span><span class="n">neg_magnitudes</span>  <span class="c1"># Assign negative sign</span>
 
 <span class="c1"># Generate logarithmically spaced magnitudes for positive charges from 1 to 500</span>
-<span class="n">pos_magnitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">500</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="n">n_bins</span> <span class="o">-</span> <span class="n">split_index</span><span class="p">)</span>
+<span class="n">pos_magnitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">500</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="n">n_bins</span> <span class="o">-</span> <span class="n">split_index</span>
+<span class="p">)</span>
 <span class="n">pos_charges</span> <span class="o">=</span> <span class="n">pos_magnitudes</span>  <span class="c1"># Positive charges</span>
 
 <span class="c1"># Combine the negative and positive charges into one array</span>
@@ -7514,7 +7520,7 @@ Determine the number of radius bins</p>
 
 <span class="c1"># Plot charge vs. radius</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">charge_array</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'none'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">charge_array</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"o"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"symlog"</span><span class="p">,</span> <span class="n">linthresh</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particle radius (m)"</span><span class="p">)</span>
@@ -7535,7 +7541,9 @@ neg_magnitudes = np.logspace(np.log10(10), np.log10(1), num=split_index)
 neg_charges = -neg_magnitudes  # Assign negative sign
 
 # Generate logarithmically spaced magnitudes for positive charges from 1 to 500
-pos_magnitudes = np.logspace(np.log10(1), np.log10(500), num=n_bins - split_index)
+pos_magnitudes = np.logspace(
+    np.log10(1), np.log10(500), num=n_bins - split_index
+)
 pos_charges = pos_magnitudes  # Positive charges
 
 # Combine the negative and positive charges into one array
@@ -7543,7 +7551,7 @@ charge_array = np.concatenate((neg_charges, pos_charges))
 
 # Plot charge vs. radius
 fig, ax = plt.subplots()
-ax.plot(radius_bins, charge_array, marker='o', linestyle='none')
+ax.plot(radius_bins, charge_array, marker="o", linestyle="none")
 ax.set_xscale("log")
 ax.set_yscale("symlog", linthresh=1)
 ax.set_xlabel("Particle radius (m)")
@@ -7745,9 +7753,7 @@ diffusive_knudsen_values = diffusive_knudsen_number(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">coulomb_kinetic_limit</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">kinetic</span><span class="p">(</span>
-    <span class="n">coulomb_potential_ratio</span>
-<span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">coulomb_kinetic_limit</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">kinetic</span><span class="p">(</span><span class="n">coulomb_potential_ratio</span><span class="p">)</span>
 <span class="n">coulomb_continuum_limit</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">continuum</span><span class="p">(</span>
     <span class="n">coulomb_potential_ratio</span>
 <span class="p">)</span>
@@ -7755,9 +7761,7 @@ diffusive_knudsen_values = diffusive_knudsen_number(
 <span class="n">sum_of_radii</span> <span class="o">=</span> <span class="n">radius_bins</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">radius_bins</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
 <span class="n">reduced_mass</span> <span class="o">=</span> <span class="n">reduced_self_broadcast</span><span class="p">(</span><span class="n">mass_bins</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">coulomb_kinetic_limit = coulomb_enhancement.kinetic(
-    coulomb_potential_ratio
-)
+<div class="clipboard-copy-txt" id="cell-6">coulomb_kinetic_limit = coulomb_enhancement.kinetic(coulomb_potential_ratio)
 coulomb_continuum_limit = coulomb_enhancement.continuum(
     coulomb_potential_ratio
 )
@@ -7852,10 +7856,22 @@ reduced_mass = reduced_self_broadcast(mass_bins)</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 
 <span class="c1"># Plot negative charges in blue</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">dimensional_kernel</span><span class="p">[:,</span> <span class="p">:</span><span class="n">split_index</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'blue'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Negative Charges'</span><span class="p">)</span> 
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">radius_bins</span><span class="p">,</span>
+    <span class="n">dimensional_kernel</span><span class="p">[:,</span> <span class="p">:</span><span class="n">split_index</span><span class="p">],</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Negative Charges"</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># Plot positive charges in red</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">dimensional_kernel</span><span class="p">[:,</span> <span class="n">split_index</span><span class="p">:],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Positive Charges'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">radius_bins</span><span class="p">,</span>
+    <span class="n">dimensional_kernel</span><span class="p">[:,</span> <span class="n">split_index</span><span class="p">:],</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Positive Charges"</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># ax.legend()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
@@ -7864,17 +7880,29 @@ reduced_mass = reduced_self_broadcast(mass_bins)</div>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particle radius (m)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Coagulation kernel (m^3/s)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Coagulation kernel vs particle radius"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">1e-22</span><span class="p">,</span> <span class="s2">"Negative Charges"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'blue'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="s2">"Positive Charges"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">1e-22</span><span class="p">,</span> <span class="s2">"Negative Charges"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="s2">"Positive Charges"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8">fig, ax = plt.subplots()
 
 # Plot negative charges in blue
-ax.plot(radius_bins, dimensional_kernel[:, :split_index], linewidth=0.2, color='blue', label='Negative Charges') 
+ax.plot(
+    radius_bins,
+    dimensional_kernel[:, :split_index],
+    linewidth=0.2,
+    color="blue",
+    label="Negative Charges",
+)
 
 # Plot positive charges in red
-ax.plot(radius_bins, dimensional_kernel[:, split_index:], linewidth=0.2, color='red', label='Positive Charges')
+ax.plot(
+    radius_bins,
+    dimensional_kernel[:, split_index:],
+    linewidth=0.2,
+    color="red",
+    label="Positive Charges",
+)
 
 # ax.legend()
 ax.set_xscale("log")
@@ -7883,8 +7911,8 @@ ax.set_ylim(1e-30, 1e4)
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel("Coagulation kernel (m^3/s)")
 ax.set_title("Coagulation kernel vs particle radius")
-ax.text(1e-9, 1e-22, "Negative Charges", color='blue')
-ax.text(1e-6, 1e-6, "Positive Charges", color='red')
+ax.text(1e-9, 1e-22, "Negative Charges", color="blue")
+ax.text(1e-6, 1e-6, "Positive Charges", color="red")
 plt.show()</div>
 </div>
 </div>
@@ -8023,7 +8051,7 @@ net_rate = gain_rate - loss_rate</div>
 <span class="c1"># plot the rates</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">gain_rate</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Gain rate"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">loss_rate</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Loss rate"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">loss_rate</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Loss rate"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">net_rate</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Net rate"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="c1"># ax.set_yscale("log")</span>
@@ -8045,7 +8073,7 @@ plt.show()
 # plot the rates
 fig, ax = plt.subplots()
 ax.plot(radius_bins, gain_rate, label="Gain rate")
-ax.plot(radius_bins, -1*loss_rate, label="Loss rate")
+ax.plot(radius_bins, -1 * loss_rate, label="Loss rate")
 ax.plot(radius_bins, net_rate, label="Net rate", linestyle="--")
 ax.set_xscale("log")
 # ax.set_yscale("log")

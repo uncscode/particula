@@ -8265,8 +8265,12 @@ plt.show()</div>
 <span class="p">)</span>
 
 <span class="c1"># Time step 1: Calculate gain, loss, and update concentration</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_gain</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_loss</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_gain</span><span class="p">(</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span>
+<span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_loss</span><span class="p">(</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span>
+<span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 <span class="n">concentration_lognormal_1</span> <span class="o">=</span> <span class="n">concentration_lognormal_0</span> <span class="o">+</span> <span class="n">net</span> <span class="o">*</span> <span class="n">TIME_STEP</span>
 <span class="n">concentration_lognormal_1</span><span class="p">[</span><span class="n">concentration_lognormal_1</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -8274,8 +8278,12 @@ plt.show()</div>
 <span class="p">)</span>
 
 <span class="c1"># Time step 2: Recalculate rates and update concentration</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_gain</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_loss</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_gain</span><span class="p">(</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span>
+<span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_loss</span><span class="p">(</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span>
+<span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 <span class="n">concentration_lognormal_2</span> <span class="o">=</span> <span class="n">concentration_lognormal_1</span> <span class="o">+</span> <span class="n">net</span> <span class="o">*</span> <span class="n">TIME_STEP</span>
 <span class="n">concentration_lognormal_2</span><span class="p">[</span><span class="n">concentration_lognormal_2</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -8283,8 +8291,12 @@ plt.show()</div>
 <span class="p">)</span>
 
 <span class="c1"># Time step 3: Recalculate rates and update concentration</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_gain</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_loss</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_gain</span><span class="p">(</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span>
+<span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_loss</span><span class="p">(</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span>
+<span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 <span class="n">concentration_lognormal_3</span> <span class="o">=</span> <span class="n">concentration_lognormal_2</span> <span class="o">+</span> <span class="n">net</span> <span class="o">*</span> <span class="n">TIME_STEP</span>
 <span class="n">concentration_lognormal_3</span><span class="p">[</span><span class="n">concentration_lognormal_3</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -8320,8 +8332,12 @@ kernel = brownian_kernel.brownian_coagulation_kernel_via_system_state(
 )
 
 # Time step 1: Calculate gain, loss, and update concentration
-gain = rate.continuous_gain(radius=radius_bins, concentration=concentration_lognormal_0, kernel=kernel)
-loss = rate.continuous_loss(radius=radius_bins, concentration=concentration_lognormal_0, kernel=kernel)
+gain = rate.continuous_gain(
+    radius=radius_bins, concentration=concentration_lognormal_0, kernel=kernel
+)
+loss = rate.continuous_loss(
+    radius=radius_bins, concentration=concentration_lognormal_0, kernel=kernel
+)
 net = gain - loss
 concentration_lognormal_1 = concentration_lognormal_0 + net * TIME_STEP
 concentration_lognormal_1[concentration_lognormal_1 &lt; 0] = (
@@ -8329,8 +8345,12 @@ concentration_lognormal_1[concentration_lognormal_1 &lt; 0] = (
 )
 
 # Time step 2: Recalculate rates and update concentration
-gain = rate.continuous_gain(radius=radius_bins, concentration=concentration_lognormal_1, kernel=kernel)
-loss = rate.continuous_loss(radius=radius_bins, concentration=concentration_lognormal_1, kernel=kernel)
+gain = rate.continuous_gain(
+    radius=radius_bins, concentration=concentration_lognormal_1, kernel=kernel
+)
+loss = rate.continuous_loss(
+    radius=radius_bins, concentration=concentration_lognormal_1, kernel=kernel
+)
 net = gain - loss
 concentration_lognormal_2 = concentration_lognormal_1 + net * TIME_STEP
 concentration_lognormal_2[concentration_lognormal_2 &lt; 0] = (
@@ -8338,8 +8358,12 @@ concentration_lognormal_2[concentration_lognormal_2 &lt; 0] = (
 )
 
 # Time step 3: Recalculate rates and update concentration
-gain = rate.continuous_gain(radius=radius_bins, concentration=concentration_lognormal_2, kernel=kernel)
-loss = rate.continuous_loss(radius=radius_bins, concentration=concentration_lognormal_2, kernel=kernel)
+gain = rate.continuous_gain(
+    radius=radius_bins, concentration=concentration_lognormal_2, kernel=kernel
+)
+loss = rate.continuous_loss(
+    radius=radius_bins, concentration=concentration_lognormal_2, kernel=kernel
+)
 net = gain - loss
 concentration_lognormal_3 = concentration_lognormal_2 + net * TIME_STEP
 concentration_lognormal_3[concentration_lognormal_3 &lt; 0] = (
@@ -8444,7 +8468,7 @@ df_concentration = pd.DataFrame(
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"PDF: Coagulation Gain, Loss, and Net Rates"</span><span class="p">)</span>
 
 <span class="c1"># Add a legend to identify the gain, loss, and net lines</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>    
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
 <span class="c1"># Display the plot</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -8479,7 +8503,7 @@ ax.set_xscale("log")
 ax.set_title("PDF: Coagulation Gain, Loss, and Net Rates")
 
 # Add a legend to identify the gain, loss, and net lines
-plt.legend()    
+plt.legend()
 
 # Display the plot
 plt.show()</div>

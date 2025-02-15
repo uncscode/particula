@@ -7139,7 +7139,9 @@ $$</p>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span>
 <span class="p">)</span>  <span class="c1"># will produce approx 1.84e-5 kg/m/s</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Air dynamic viscosity at 298.15 K is </span><span class="si">{</span><span class="n">air_dynamic_viscosity</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> kg/m/s"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"Air dynamic viscosity at 298.15 K is </span><span class="si">{</span><span class="n">air_dynamic_viscosity</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> kg/m/s"</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from particula.gas.properties import get_dynamic_viscosity
 
@@ -7147,7 +7149,9 @@ air_dynamic_viscosity = get_dynamic_viscosity(
     temperature=298.15
 )  # will produce approx 1.84e-5 kg/m/s
 
-print(f"Air dynamic viscosity at 298.15 K is {air_dynamic_viscosity:.2e} kg/m/s")</div>
+print(
+    f"Air dynamic viscosity at 298.15 K is {air_dynamic_viscosity:.2e} kg/m/s"
+)</div>
 </div>
 </div>
 </div>

@@ -7269,14 +7269,20 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Importing necessary libraries</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>  <span class="c1"># For creating plots and visualizations</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>  <span class="c1"># For numerical operations</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.activity</span><span class="w"> </span><span class="kn">import</span> <span class="n">species_density</span>  <span class="c1"># For calculating species density</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.activity</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">species_density</span><span class="p">,</span>
+<span class="p">)</span>  <span class="c1"># For calculating species density</span>
+
 <span class="c1"># For partitioning calculations in liquid-vapor equilibrium</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.equilibria</span><span class="w"> </span><span class="kn">import</span> <span class="n">partitioning</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># Importing necessary libraries
 import matplotlib.pyplot as plt  # For creating plots and visualizations
 import numpy as np  # For numerical operations
-from particula.activity import species_density  # For calculating species density
+from particula.activity import (
+    species_density,
+)  # For calculating species density
+
 # For partitioning calculations in liquid-vapor equilibrium
 from particula.equilibria import partitioning</div>
 </div>
@@ -7333,10 +7339,8 @@ from particula.equilibria import partitioning</div>
 
 <span class="c1"># Calculate the density of organic compounds</span>
 <span class="n">density</span> <span class="o">=</span> <span class="n">species_density</span><span class="o">.</span><span class="n">organic_array</span><span class="p">(</span>
-    <span class="n">molar_mass</span><span class="p">,</span>
-    <span class="n">oxygen2carbon</span><span class="p">,</span>
-    <span class="n">hydrogen2carbon</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">nitrogen2carbon</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">molar_mass</span><span class="p">,</span> <span class="n">oxygen2carbon</span><span class="p">,</span> <span class="n">hydrogen2carbon</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nitrogen2carbon</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2"># Defining system parameters
 c_star_j_dry = [1e-6, 1e-4, 1e-1, 1e2, 1e4]  # Volatility distribution in ug/m3
@@ -7350,10 +7354,8 @@ molar_mass_ratio = 18.015 / np.array(molar_mass)  # Molar mass ratio
 
 # Calculate the density of organic compounds
 density = species_density.organic_array(
-    molar_mass,
-    oxygen2carbon,
-    hydrogen2carbon=None,
-    nitrogen2carbon=None)</div>
+    molar_mass, oxygen2carbon, hydrogen2carbon=None, nitrogen2carbon=None
+)</div>
 </div>
 </div>
 </div>
@@ -7390,16 +7392,17 @@ density = species_density.organic_array(
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Calculate the properties needed for liquid-vapor partitioning</span>
-<span class="n">gamma_organic_ab</span><span class="p">,</span> <span class="n">mass_fraction_water_ab</span><span class="p">,</span> <span class="n">q_ab</span> <span class="o">=</span> \
+<span class="n">gamma_organic_ab</span><span class="p">,</span> <span class="n">mass_fraction_water_ab</span><span class="p">,</span> <span class="n">q_ab</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">partitioning</span><span class="o">.</span><span class="n">get_properties_for_liquid_vapor_partitioning</span><span class="p">(</span>
         <span class="n">water_activity_desired</span><span class="o">=</span><span class="n">water_activity_desired</span><span class="p">,</span>
         <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
         <span class="n">oxygen2carbon</span><span class="o">=</span><span class="n">oxygen2carbon</span><span class="p">,</span>
         <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
     <span class="p">)</span>
+<span class="p">)</span>
 
 <span class="c1"># The optimization the partition coefficients, i.e. the partitioning calculation</span>
-<span class="n">alpha_opt</span><span class="p">,</span> <span class="n">beta_opt</span><span class="p">,</span> <span class="n">system_opt</span><span class="p">,</span> <span class="n">fit_result</span> <span class="o">=</span> \
+<span class="n">alpha_opt</span><span class="p">,</span> <span class="n">beta_opt</span><span class="p">,</span> <span class="n">system_opt</span><span class="p">,</span> <span class="n">fit_result</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">partitioning</span><span class="o">.</span><span class="n">liquid_vapor_partitioning</span><span class="p">(</span>
         <span class="n">c_star_j_dry</span><span class="o">=</span><span class="n">c_star_j_dry</span><span class="p">,</span>
         <span class="n">concentration_organic_matter</span><span class="o">=</span><span class="n">concentration_organic_matter</span><span class="p">,</span>
@@ -7409,21 +7412,23 @@ density = species_density.organic_array(
         <span class="n">q_ab</span><span class="o">=</span><span class="n">q_ab</span><span class="p">,</span>
         <span class="n">partition_coefficient_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
+<span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mass in organic aerosol [ug/m3]: </span><span class="si">{</span><span class="n">system_opt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mass in water [ug/3]: </span><span class="si">{</span><span class="n">system_opt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Calculate the properties needed for liquid-vapor partitioning
-gamma_organic_ab, mass_fraction_water_ab, q_ab = \
+gamma_organic_ab, mass_fraction_water_ab, q_ab = (
     partitioning.get_properties_for_liquid_vapor_partitioning(
         water_activity_desired=water_activity_desired,
         molar_mass=molar_mass,
         oxygen2carbon=oxygen2carbon,
         density=density,
     )
+)
 
 # The optimization the partition coefficients, i.e. the partitioning calculation
-alpha_opt, beta_opt, system_opt, fit_result = \
+alpha_opt, beta_opt, system_opt, fit_result = (
     partitioning.liquid_vapor_partitioning(
         c_star_j_dry=c_star_j_dry,
         concentration_organic_matter=concentration_organic_matter,
@@ -7433,6 +7438,7 @@ alpha_opt, beta_opt, system_opt, fit_result = \
         q_ab=q_ab,
         partition_coefficient_guess=None,
     )
+)
 
 print(f"mass in organic aerosol [ug/m3]: {system_opt[0]}")
 print(f"mass in water [ug/3]: {system_opt[1]}")</div>
@@ -7493,16 +7499,17 @@ mass in water [ug/3]: 4.826984139901269
 
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">water_activity</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">water_activity_curve</span><span class="p">):</span>
     <span class="c1"># Get properties for liquid-vapor partitioning at each RH value</span>
-    <span class="n">gamma_organic_ab</span><span class="p">,</span> <span class="n">mass_fraction_water_ab</span><span class="p">,</span> <span class="n">q_ab</span> <span class="o">=</span> \
+    <span class="n">gamma_organic_ab</span><span class="p">,</span> <span class="n">mass_fraction_water_ab</span><span class="p">,</span> <span class="n">q_ab</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">partitioning</span><span class="o">.</span><span class="n">get_properties_for_liquid_vapor_partitioning</span><span class="p">(</span>
             <span class="n">water_activity_desired</span><span class="o">=</span><span class="n">water_activity</span><span class="p">,</span>
             <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
             <span class="n">oxygen2carbon</span><span class="o">=</span><span class="n">oxygen2carbon</span><span class="p">,</span>
             <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
         <span class="p">)</span>
+    <span class="p">)</span>
 
     <span class="c1"># Optimize the partition coefficients for each RH value</span>
-    <span class="n">alpha_opt</span><span class="p">,</span> <span class="n">beta_opt</span><span class="p">,</span> <span class="n">system_opt</span><span class="p">,</span> <span class="n">fit_result</span> <span class="o">=</span> \
+    <span class="n">alpha_opt</span><span class="p">,</span> <span class="n">beta_opt</span><span class="p">,</span> <span class="n">system_opt</span><span class="p">,</span> <span class="n">fit_result</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">partitioning</span><span class="o">.</span><span class="n">liquid_vapor_partitioning</span><span class="p">(</span>
             <span class="n">c_star_j_dry</span><span class="o">=</span><span class="n">c_star_j_dry</span><span class="p">,</span>
             <span class="n">concentration_organic_matter</span><span class="o">=</span><span class="n">concentration_organic_matter</span><span class="p">,</span>
@@ -7512,12 +7519,13 @@ mass in water [ug/3]: 4.826984139901269
             <span class="n">q_ab</span><span class="o">=</span><span class="n">q_ab</span><span class="p">,</span>
             <span class="n">partition_coefficient_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
+    <span class="p">)</span>
 
     <span class="c1"># Record the total organic and water concentration</span>
     <span class="n">total_oa_concentration</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_opt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">water_concentration</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">system_opt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'Calculation complete'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Calculation complete"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># Calculating activity coefficients across a range of RH values
 # Range of water activity (RH/100)
@@ -7527,16 +7535,17 @@ water_concentration = np.empty([len(water_activity_curve), 1], dtype=float)
 
 for i, water_activity in enumerate(water_activity_curve):
     # Get properties for liquid-vapor partitioning at each RH value
-    gamma_organic_ab, mass_fraction_water_ab, q_ab = \
+    gamma_organic_ab, mass_fraction_water_ab, q_ab = (
         partitioning.get_properties_for_liquid_vapor_partitioning(
             water_activity_desired=water_activity,
             molar_mass=molar_mass,
             oxygen2carbon=oxygen2carbon,
             density=density,
         )
+    )
 
     # Optimize the partition coefficients for each RH value
-    alpha_opt, beta_opt, system_opt, fit_result = \
+    alpha_opt, beta_opt, system_opt, fit_result = (
         partitioning.liquid_vapor_partitioning(
             c_star_j_dry=c_star_j_dry,
             concentration_organic_matter=concentration_organic_matter,
@@ -7546,12 +7555,13 @@ for i, water_activity in enumerate(water_activity_curve):
             q_ab=q_ab,
             partition_coefficient_guess=None,
         )
+    )
 
     # Record the total organic and water concentration
     total_oa_concentration[i] = system_opt[0]
     water_concentration[i] = system_opt[1]
 
-print('Calculation complete')</div>
+print("Calculation complete")</div>
 </div>
 </div>
 </div>
@@ -7601,41 +7611,57 @@ print('Calculation complete')</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">water_activity_curve</span><span class="p">,</span> <span class="n">total_oa_concentration</span><span class="p">,</span>
-        <span class="n">label</span><span class="o">=</span><span class="s1">'total organic concentration'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'green'</span><span class="p">)</span>
-<span class="n">aw</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
-<span class="n">aw</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">water_activity_curve</span><span class="p">,</span> <span class="n">water_concentration</span><span class="p">,</span>
-        <span class="n">label</span><span class="o">=</span><span class="s1">'water concentration'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'blue'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">'upper left'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'water activity (a_w is RH/100)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">water_activity_curve</span><span class="p">,</span>
+    <span class="n">total_oa_concentration</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"total organic concentration"</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"green"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">aw</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">aw</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">water_activity_curve</span><span class="p">,</span>
+    <span class="n">water_concentration</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"water concentration"</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"water activity (a_w is RH/100)"</span><span class="p">)</span>
 
 <span class="n">handles</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
 <span class="n">aw_handles</span><span class="p">,</span> <span class="n">aw_labels</span> <span class="o">=</span> <span class="n">aw</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
 <span class="n">handles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">aw_handles</span><span class="p">)</span>
 <span class="n">labels</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">aw_labels</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">'upper left'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">)</span>
 
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'organic aerosol concentration [ug/m3]'</span><span class="p">)</span>
-<span class="n">aw</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'aerosol water concentration [ug/m3]'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"organic aerosol concentration [ug/m3]"</span><span class="p">)</span>
+<span class="n">aw</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"aerosol water concentration [ug/m3]"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">fig, ax = plt.subplots()
-ax.plot(water_activity_curve, total_oa_concentration,
-        label='total organic concentration', color='green')
-aw=ax.twinx()
-aw.plot(water_activity_curve, water_concentration,
-        label='water concentration', color='blue')
-plt.legend(loc='upper left')
-ax.set_xlabel('water activity (a_w is RH/100)')
+ax.plot(
+    water_activity_curve,
+    total_oa_concentration,
+    label="total organic concentration",
+    color="green",
+)
+aw = ax.twinx()
+aw.plot(
+    water_activity_curve,
+    water_concentration,
+    label="water concentration",
+    color="blue",
+)
+plt.legend(loc="upper left")
+ax.set_xlabel("water activity (a_w is RH/100)")
 
 handles, labels = ax.get_legend_handles_labels()
 aw_handles, aw_labels = aw.get_legend_handles_labels()
 handles.extend(aw_handles)
 labels.extend(aw_labels)
-plt.legend(handles, labels, loc='upper left')
+plt.legend(handles, labels, loc="upper left")
 
-ax.set_ylabel('organic aerosol concentration [ug/m3]')
-aw.set_ylabel('aerosol water concentration [ug/m3]')
+ax.set_ylabel("organic aerosol concentration [ug/m3]")
+aw.set_ylabel("aerosol water concentration [ug/m3]")
 plt.show()</div>
 </div>
 </div>

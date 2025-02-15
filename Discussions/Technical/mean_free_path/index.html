@@ -7133,7 +7133,10 @@ $$</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.properties</span><span class="w"> </span><span class="kn">import</span> <span class="n">molecule_mean_free_path</span><span class="p">,</span> <span class="n">get_dynamic_viscosity</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.properties</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">molecule_mean_free_path</span><span class="p">,</span>
+    <span class="n">get_dynamic_viscosity</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">air_dynamic_viscosity</span> <span class="o">=</span> <span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">)</span>
 
@@ -7144,9 +7147,12 @@ $$</p>
     <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">air_dynamic_viscosity</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mean free path is </span><span class="si">{</span><span class="n">mean_free_path</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span> <span class="c1"># will produce approx 66.5 nm</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mean free path is </span><span class="si">{</span><span class="n">mean_free_path</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>  <span class="c1"># will produce approx 66.5 nm</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from particula.gas.properties import molecule_mean_free_path, get_dynamic_viscosity
+<div class="clipboard-copy-txt" id="cell-1">from particula.gas.properties import (
+    molecule_mean_free_path,
+    get_dynamic_viscosity,
+)
 
 air_dynamic_viscosity = get_dynamic_viscosity(temperature=298.15)
 
@@ -7157,7 +7163,7 @@ mean_free_path = molecule_mean_free_path(
     dynamic_viscosity=air_dynamic_viscosity,
 )
 
-print(f"mean free path is {mean_free_path} m") # will produce approx 66.5 nm</div>
+print(f"mean free path is {mean_free_path} m")  # will produce approx 66.5 nm</div>
 </div>
 </div>
 </div>

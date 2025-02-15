@@ -7317,17 +7317,22 @@ Density and Surface Tension: Specify the material's density and the surface tens
     <span class="o">.</span><span class="n">set_distribution_strategy</span><span class="p">(</span><span class="n">particles</span><span class="o">.</span><span class="n">RadiiBasedMovingBin</span><span class="p">())</span>
     <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">())</span>
     <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span><span class="n">sufrace_tension_strategy</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">concentration</span><span class="o">=</span><span class="n">concentration</span><span class="p">,</span> <span class="n">concentration_units</span><span class="o">=</span><span class="s2">"1/cm^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span>
+        <span class="n">concentration</span><span class="o">=</span><span class="n">concentration</span><span class="p">,</span> <span class="n">concentration_units</span><span class="o">=</span><span class="s2">"1/cm^3"</span>
+    <span class="p">)</span>
     <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span> <span class="n">density_units</span><span class="o">=</span><span class="s2">"g/cm^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_radius</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">radius_units</span><span class="o">=</span><span class="s2">"nm"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">charge</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
-<span class="c1">#Accessing calculated properties</span>
+<span class="c1"># Accessing calculated properties</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Mass of particles:"</span><span class="p">,</span> <span class="n">particle_rep_mass</span><span class="o">.</span><span class="n">get_mass</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Radius of particles:"</span><span class="p">,</span> <span class="n">particle_rep_mass</span><span class="o">.</span><span class="n">get_radius</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Total mass of the particle distribution:"</span><span class="p">,</span> <span class="n">particle_rep_mass</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">"Total mass of the particle distribution:"</span><span class="p">,</span>
+    <span class="n">particle_rep_mass</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">(),</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2"># Creating particle distribution examples
 radius = np.array([100, 200, 300], dtype=np.float64)  # in nm
@@ -7347,17 +7352,22 @@ particle_rep_mass = (
     .set_distribution_strategy(particles.RadiiBasedMovingBin())
     .set_activity_strategy(particles.ActivityIdealMass())
     .set_surface_strategy(sufrace_tension_strategy)
-    .set_concentration(concentration=concentration, concentration_units="1/cm^3")
+    .set_concentration(
+        concentration=concentration, concentration_units="1/cm^3"
+    )
     .set_density(density=density, density_units="g/cm^3")
     .set_radius(radius=radius, radius_units="nm")
     .set_charge(charge=0)
     .build()
 )
 
-#Accessing calculated properties
+# Accessing calculated properties
 print("Mass of particles:", particle_rep_mass.get_mass())
 print("Radius of particles:", particle_rep_mass.get_radius())
-print("Total mass of the particle distribution:", particle_rep_mass.get_mass_concentration())</div>
+print(
+    "Total mass of the particle distribution:",
+    particle_rep_mass.get_mass_concentration(),
+)</div>
 </div>
 </div>
 </div>
@@ -7410,12 +7420,8 @@ Total mass of the particle distribution: 2.912256389877738e-06
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Generating random properties for speciated particles</span>
-<span class="n">mass_distribution</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">concentration</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e3</span>
-<span class="p">)</span>
+<span class="n">mass_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e3</span>
 
 <span class="c1"># Defining surface tension parameters</span>
 <span class="n">surface_tension_parameter</span> <span class="o">=</span> <span class="p">{</span>
@@ -7423,9 +7429,13 @@ Total mass of the particle distribution: 2.912256389877738e-06
     <span class="s2">"density"</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span>  <span class="c1"># Density in g/cm^3</span>
     <span class="s2">"density_units"</span><span class="p">:</span> <span class="s2">"g/cm^3"</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="n">surface_strategy</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">SurfaceFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s1">'mass'</span><span class="p">,</span> <span class="n">surface_tension_parameter</span><span class="p">)</span>
-<span class="n">distribution_strategy</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">DistributionFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s1">'speciated_mass_moving_bin'</span><span class="p">)</span>
-<span class="n">activity_strategy</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">ActivityFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s1">'mass_ideal'</span><span class="p">)</span>
+<span class="n">surface_strategy</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">SurfaceFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+    <span class="s2">"mass"</span><span class="p">,</span> <span class="n">surface_tension_parameter</span>
+<span class="p">)</span>
+<span class="n">distribution_strategy</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">DistributionFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+    <span class="s2">"speciated_mass_moving_bin"</span>
+<span class="p">)</span>
+<span class="n">activity_strategy</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">ActivityFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"mass_ideal"</span><span class="p">)</span>
 
 <span class="c1"># Setting up parameters for the particle representation factory</span>
 <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
@@ -7458,26 +7468,22 @@ Total mass of the particle distribution: 2.912256389877738e-06
 
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">masses</span><span class="o">*</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">masses</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Mass (ug)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Number of Particles (Droplets)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Mass Distribution Particles"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">radius</span><span class="o">*</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">radius</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Concentration (1/m^3)"</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Radius (nm)"</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Number Distribution Particles"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Generating random properties for speciated particles
-mass_distribution = (
-    np.random.rand(500, 3).astype(np.float64)
-)
-concentration = (
-    np.random.rand(500, 1).astype(np.float64) * 1e3
-)
+mass_distribution = np.random.rand(500, 3).astype(np.float64)
+concentration = np.random.rand(500, 1).astype(np.float64) * 1e3
 
 # Defining surface tension parameters
 surface_tension_parameter = {
@@ -7485,9 +7491,13 @@ surface_tension_parameter = {
     "density": 2.5,  # Density in g/cm^3
     "density_units": "g/cm^3",
 }
-surface_strategy = particles.SurfaceFactory().get_strategy('mass', surface_tension_parameter)
-distribution_strategy = particles.DistributionFactory().get_strategy('speciated_mass_moving_bin')
-activity_strategy = particles.ActivityFactory().get_strategy('mass_ideal')
+surface_strategy = particles.SurfaceFactory().get_strategy(
+    "mass", surface_tension_parameter
+)
+distribution_strategy = particles.DistributionFactory().get_strategy(
+    "speciated_mass_moving_bin"
+)
+activity_strategy = particles.ActivityFactory().get_strategy("mass_ideal")
 
 # Setting up parameters for the particle representation factory
 parameters = {
@@ -7520,14 +7530,14 @@ concentration = speciated_mass_rep.get_concentration(clone=True)
 
 
 fig, ax = plt.subplots(figsize=(8, 6))
-ax.hist(masses*1e6, bins=20, color="blue", alpha=0.7)
+ax.hist(masses * 1e6, bins=20, color="blue", alpha=0.7)
 ax.set_xlabel("Mass (ug)")
 ax.set_ylabel("Number of Particles (Droplets)")
 ax.set_title("Mass Distribution Particles")
 plt.show()
 
 fig, ax2 = plt.subplots(figsize=(8, 6))
-ax2.hist(radius*1e9, bins=20, color="red", alpha=0.7)
+ax2.hist(radius * 1e9, bins=20, color="red", alpha=0.7)
 ax2.set_ylabel("Concentration (1/m^3)")
 ax2.set_xlabel("Radius (nm)")
 ax2.set_title("Number Distribution Particles")
@@ -7603,15 +7613,19 @@ plt.show()</div>
 
 <span class="c1"># plot</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">lognormal_rep</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(),</span> <span class="n">lognormal_rep</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Number Distribution"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
+    <span class="n">lognormal_rep</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(),</span>
+    <span class="n">lognormal_rep</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(),</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Number Distribution"</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Radius (m)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Concentration (1/m^3)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Number Distribution of Particles"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">
-lognormal_rep = (
+<div class="clipboard-copy-txt" id="cell-4">lognormal_rep = (
     particles.PresetParticleRadiusBuilder()
     .set_mode(np.array([100, 2000]), "nm")
     .set_geometric_standard_deviation(np.array([1.5, 2.0]))
@@ -7622,7 +7636,12 @@ lognormal_rep = (
 
 # plot
 fig, ax = plt.subplots(figsize=(8, 6))
-ax.semilogx(lognormal_rep.get_radius(), lognormal_rep.get_concentration(), label="Number Distribution", color="blue")
+ax.semilogx(
+    lognormal_rep.get_radius(),
+    lognormal_rep.get_concentration(),
+    label="Number Distribution",
+    color="blue",
+)
 ax.set_xlabel("Radius (m)")
 ax.set_ylabel("Concentration (1/m^3)")
 ax.set_title("Number Distribution of Particles")

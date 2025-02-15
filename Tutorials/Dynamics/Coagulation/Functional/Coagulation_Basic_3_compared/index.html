@@ -8341,7 +8341,9 @@ Net total volume PMF: -7.758929966665061e-13
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">gain_pdf</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Gain (PDF)"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">loss_pdf</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Loss (PDF)"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">gain_pmf_to_pdf</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Gain (PMF to PDF)"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">gain_pmf_to_pdf</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Gain (PMF to PDF)"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span>
+<span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">radius_bins</span><span class="p">,</span>
     <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">loss_pmf_to_pdf</span><span class="p">,</span>
@@ -8379,7 +8381,9 @@ net_pmf_to_pdf = gain_pmf_to_pdf - loss_pmf_to_pdf
 plt.figure()
 plt.plot(radius_bins, gain_pdf, label="Gain (PDF)", linewidth=4)
 plt.plot(radius_bins, -1 * loss_pdf, label="Loss (PDF)", linewidth=4)
-plt.plot(radius_bins, gain_pmf_to_pdf, label="Gain (PMF to PDF)", linestyle="--")
+plt.plot(
+    radius_bins, gain_pmf_to_pdf, label="Gain (PMF to PDF)", linestyle="--"
+)
 plt.plot(
     radius_bins,
     -1 * loss_pmf_to_pdf,

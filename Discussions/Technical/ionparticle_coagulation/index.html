@@ -7187,17 +7187,15 @@ from particula.util.lf2013_coagulation import lf2013_coag_full</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">approx</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"hardsphere"</span><span class="p">,</span> <span class="s2">"gk2008"</span><span class="p">,</span> <span class="s2">"gh2012"</span><span class="p">,</span> <span class="s2">"dy2007"</span><span class="p">,</span> <span class="s2">"cg2019"</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">approx</span><span class="p">)):</span>
-    <span class="n">shared_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">"temperature"</span><span class="p">:</span> <span class="mi">278</span><span class="p">,</span>
-        <span class="s2">"coagulation_approximation"</span><span class="p">:</span> <span class="n">approx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="p">}</span>
+    <span class="n">shared_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"temperature"</span><span class="p">:</span> <span class="mi">278</span><span class="p">,</span> <span class="s2">"coagulation_approximation"</span><span class="p">:</span> <span class="n">approx</span><span class="p">[</span><span class="n">i</span><span class="p">]}</span>
     <span class="n">positive_particles</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">particle</span><span class="o">.</span><span class="n">Particle</span><span class="p">(</span>
             <span class="o">**</span><span class="n">shared_dict</span><span class="p">,</span>
             <span class="n">particle_radius</span><span class="o">=</span><span class="mf">3e-9</span><span class="p">,</span>
             <span class="n">particle_charge</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
             <span class="n">particle_density</span><span class="o">=</span><span class="mi">1700</span><span class="p">,</span>
-        <span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
     <span class="p">]</span>
     <span class="n">negative_ion</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">Particle</span><span class="p">(</span>
         <span class="o">**</span><span class="n">shared_dict</span><span class="p">,</span>
@@ -7206,40 +7204,42 @@ from particula.util.lf2013_coagulation import lf2013_coag_full</div>
         <span class="n">particle_density</span><span class="o">=</span><span class="mi">1860</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">coags</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">negative_ion</span><span class="o">.</span><span class="n">coagulation</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">particle</span> <span class="ow">in</span> <span class="n">positive_particles</span>
+        <span class="n">negative_ion</span><span class="o">.</span><span class="n">coagulation</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span> <span class="k">for</span> <span class="n">particle</span> <span class="ow">in</span> <span class="n">positive_particles</span>
     <span class="p">]</span>
-    <span class="n">coags_ccps_mags</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">coags</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">"cc/s"</span><span class="p">)</span><span class="o">.</span><span class="n">m</span>
-        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
-    <span class="p">]</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coags_ccps_mags</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="n">approx</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-   
+    <span class="n">coags_ccps_mags</span> <span class="o">=</span> <span class="p">[</span><span class="n">coags</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">"cc/s"</span><span class="p">)</span><span class="o">.</span><span class="n">m</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">)]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span>
+        <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coags_ccps_mags</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="n">approx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="p">)</span>
 
 
-<span class="n">ret</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">lf2013_coag_full</span><span class="p">(</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span>
+    <span class="n">lf2013_coag_full</span><span class="p">(</span>
         <span class="n">ion_type</span><span class="o">=</span><span class="s2">"air"</span><span class="p">,</span>
         <span class="n">particle_type</span><span class="o">=</span><span class="s2">"conductive"</span><span class="p">,</span>
         <span class="n">temperature_val</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
         <span class="n">pressure_val</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span>
         <span class="n">charge_vals</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
-        <span class="n">radius_vals</span><span class="o">=</span><span class="mf">3e-9</span><span class="p">,)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># [0] returns negative, [1] returns positive ions</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ret</span><span class="o">*</span><span class="mf">1e6</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"lf2013"</span><span class="p">);</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mf">1e-7</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">]);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Attachment coefficient, cc/s"</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span> <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"# charges"</span><span class="p">);</span> 
+        <span class="n">radius_vals</span><span class="o">=</span><span class="mf">3e-9</span><span class="p">,</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>  <span class="c1"># [0] returns negative, [1] returns positive ions</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ret</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s2">"lf2013"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mf">1e-7</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Attachment coefficient, cc/s"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"# charges"</span><span class="p">);</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">approx = ["hardsphere", "gk2008", "gh2012", "dy2007", "cg2019"]
 for i in range(len(approx)):
-    shared_dict = {
-        "temperature": 278,
-        "coagulation_approximation": approx[i]
-    }
+    shared_dict = {"temperature": 278, "coagulation_approximation": approx[i]}
     positive_particles = [
         particle.Particle(
             **shared_dict,
             particle_radius=3e-9,
             particle_charge=i,
             particle_density=1700,
-        ) for i in range(1, 10)
+        )
+        for i in range(1, 10)
     ]
     negative_ion = particle.Particle(
         **shared_dict,
@@ -7248,26 +7248,30 @@ for i in range(len(approx)):
         particle_density=1860,
     )
     coags = [
-        negative_ion.coagulation(particle)
-        for particle in positive_particles
+        negative_ion.coagulation(particle) for particle in positive_particles
     ]
-    coags_ccps_mags = [
-        coags[index].to("cc/s").m
-        for index in range(0, 9)
-    ]
-    plt.semilogy(range(1,10), np.array(coags_ccps_mags).squeeze(), label=approx[i]);
-   
+    coags_ccps_mags = [coags[index].to("cc/s").m for index in range(0, 9)]
+    plt.semilogy(
+        range(1, 10), np.array(coags_ccps_mags).squeeze(), label=approx[i]
+    )
 
 
-ret = np.nan_to_num(lf2013_coag_full(
+ret = np.nan_to_num(
+    lf2013_coag_full(
         ion_type="air",
         particle_type="conductive",
         temperature_val=298.15,
         pressure_val=101325,
         charge_vals=np.arange(1, 10),
-        radius_vals=3e-9,)[0], 0)  # [0] returns negative, [1] returns positive ions
-plt.semilogy(range(1,10),  np.array(ret*1e6).squeeze(), label="lf2013");
-plt.ylim([1e-7, 1e-4]); plt.ylabel("Attachment coefficient, cc/s"); plt.legend(); plt.xlabel("# charges"); </div>
+        radius_vals=3e-9,
+    )[0],
+    0,
+)  # [0] returns negative, [1] returns positive ions
+plt.semilogy(range(1, 10), np.array(ret * 1e6).squeeze(), label="lf2013")
+plt.ylim([1e-7, 1e-4])
+plt.ylabel("Attachment coefficient, cc/s")
+plt.legend()
+plt.xlabel("# charges");</div>
 </div>
 </div>
 </div>

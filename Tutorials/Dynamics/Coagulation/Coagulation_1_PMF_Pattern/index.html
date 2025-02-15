@@ -7343,13 +7343,19 @@ from particula.dynamics import coagulation</div>
 
 <span class="c1"># Build a resolved mass representation for each particle</span>
 <span class="c1"># This defines how particle mass, activity, and surface are represented</span>
-<span class="n">radius_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>  <span class="c1"># Define the radius bins for the resolved mass representation</span>
+<span class="n">radius_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span>
+    <span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">250</span>
+<span class="p">)</span>  <span class="c1"># Define the radius bins for the resolved mass representation</span>
 <span class="n">resolved_masses</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">800</span><span class="p">]),</span> <span class="n">mode_units</span><span class="o">=</span><span class="s2">"nm"</span><span class="p">)</span>  <span class="c1"># Set the mode radius</span>
-    <span class="o">.</span><span class="n">set_geometric_standard_deviation</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]))</span>  <span class="c1"># Set the geometric standard deviation</span>
-    <span class="o">.</span><span class="n">set_number_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e5</span><span class="p">,</span> <span class="mf">2e5</span><span class="p">]),</span> <span class="n">number_concentration_units</span><span class="o">=</span><span class="s2">"cm^-3"</span><span class="p">)</span>  <span class="c1"># Set the number concentration</span>
-    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s1">'pmf'</span><span class="p">)</span>  <span class="c1"># Set the distribution type to PMF</span>
+    <span class="o">.</span><span class="n">set_geometric_standard_deviation</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+    <span class="p">)</span>  <span class="c1"># Set the geometric standard deviation</span>
+    <span class="o">.</span><span class="n">set_number_concentration</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e5</span><span class="p">,</span> <span class="mf">2e5</span><span class="p">]),</span> <span class="n">number_concentration_units</span><span class="o">=</span><span class="s2">"cm^-3"</span>
+    <span class="p">)</span>  <span class="c1"># Set the number concentration</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"pmf"</span><span class="p">)</span>  <span class="c1"># Set the distribution type to PMF</span>
     <span class="o">.</span><span class="n">set_radius_bins</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">radius_bins_units</span><span class="o">=</span><span class="s2">"m"</span><span class="p">)</span>  <span class="c1"># Set the radius bins</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>  <span class="c1"># Finalize the resolved mass representation</span>
 <span class="p">)</span>
@@ -7373,13 +7379,19 @@ atmosphere = (
 
 # Build a resolved mass representation for each particle
 # This defines how particle mass, activity, and surface are represented
-radius_bins = np.logspace(-8, -5, 250)  # Define the radius bins for the resolved mass representation
+radius_bins = np.logspace(
+    -8, -5, 250
+)  # Define the radius bins for the resolved mass representation
 resolved_masses = (
     particles.PresetParticleRadiusBuilder()
     .set_mode(np.array([100, 800]), mode_units="nm")  # Set the mode radius
-    .set_geometric_standard_deviation(np.array([1.2, 1.5]))  # Set the geometric standard deviation
-    .set_number_concentration(np.array([1e5, 2e5]), number_concentration_units="cm^-3")  # Set the number concentration
-    .set_distribution_type('pmf')  # Set the distribution type to PMF
+    .set_geometric_standard_deviation(
+        np.array([1.2, 1.5])
+    )  # Set the geometric standard deviation
+    .set_number_concentration(
+        np.array([1e5, 2e5]), number_concentration_units="cm^-3"
+    )  # Set the number concentration
+    .set_distribution_type("pmf")  # Set the distribution type to PMF
     .set_radius_bins(radius_bins, radius_bins_units="m")  # Set the radius bins
     .build()  # Finalize the resolved mass representation
 )

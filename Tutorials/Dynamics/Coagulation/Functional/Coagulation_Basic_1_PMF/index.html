@@ -10476,7 +10476,12 @@ plt.show()</div>
 
 <span class="c1"># Plot the total concentration at each time step</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="p">[</span><span class="n">total_concentration_0</span><span class="p">,</span> <span class="n">total_concentration_1</span><span class="p">,</span> <span class="n">total_concentration_2</span><span class="p">,</span> <span class="n">total_concentration_3</span><span class="p">],</span>
+    <span class="p">[</span>
+        <span class="n">total_concentration_0</span><span class="p">,</span>
+        <span class="n">total_concentration_1</span><span class="p">,</span>
+        <span class="n">total_concentration_2</span><span class="p">,</span>
+        <span class="n">total_concentration_3</span><span class="p">,</span>
+    <span class="p">],</span>
     <span class="n">label</span><span class="o">=</span><span class="s2">"Total concentration"</span><span class="p">,</span>
     <span class="n">marker</span><span class="o">=</span><span class="s2">"o"</span><span class="p">,</span>  <span class="c1"># Add markers to indicate each time step</span>
     <span class="n">linestyle</span><span class="o">=</span><span class="s2">"-"</span><span class="p">,</span>  <span class="c1"># Use a solid line to connect the markers</span>
@@ -10507,7 +10512,12 @@ fig, ax = plt.subplots(figsize=(8, 6))
 
 # Plot the total concentration at each time step
 ax.plot(
-    [total_concentration_0, total_concentration_1, total_concentration_2, total_concentration_3],
+    [
+        total_concentration_0,
+        total_concentration_1,
+        total_concentration_2,
+        total_concentration_3,
+    ],
     label="Total concentration",
     marker="o",  # Add markers to indicate each time step
     linestyle="-",  # Use a solid line to connect the markers

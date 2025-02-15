@@ -7947,7 +7947,10 @@ plt.show()</div>
 <span class="c1"># Plot the Coulomb Dyachkov 2007 kernel</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span>
-    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">radius_bins</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dimensional_kernel_dyachkov</span><span class="p">),</span> <span class="n">shading</span><span class="o">=</span><span class="s2">"auto"</span>
+    <span class="n">radius_bins</span><span class="p">,</span>
+    <span class="n">radius_bins</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dimensional_kernel_dyachkov</span><span class="p">),</span>
+    <span class="n">shading</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
@@ -7980,7 +7983,10 @@ dimensional_kernel_dyachkov = kernel_strategy_dyachkov.kernel(
 # Plot the Coulomb Dyachkov 2007 kernel
 fig, ax = plt.subplots()
 c = ax.pcolormesh(
-    radius_bins, radius_bins, np.log10(dimensional_kernel_dyachkov), shading="auto"
+    radius_bins,
+    radius_bins,
+    np.log10(dimensional_kernel_dyachkov),
+    shading="auto",
 )
 ax.set_xscale("log")
 ax.set_yscale("log")
@@ -8063,7 +8069,10 @@ plt.show()</div>
 <span class="c1"># Plot the Coulomb Gatti 2008 kernel</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span>
-    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">radius_bins</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dimensional_kernel_gatti</span><span class="p">),</span> <span class="n">shading</span><span class="o">=</span><span class="s2">"auto"</span>
+    <span class="n">radius_bins</span><span class="p">,</span>
+    <span class="n">radius_bins</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dimensional_kernel_gatti</span><span class="p">),</span>
+    <span class="n">shading</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
@@ -8096,7 +8105,10 @@ dimensional_kernel_gatti = kernel_strategy_gatti.kernel(
 # Plot the Coulomb Gatti 2008 kernel
 fig, ax = plt.subplots()
 c = ax.pcolormesh(
-    radius_bins, radius_bins, np.log10(dimensional_kernel_gatti), shading="auto"
+    radius_bins,
+    radius_bins,
+    np.log10(dimensional_kernel_gatti),
+    shading="auto",
 )
 ax.set_xscale("log")
 ax.set_yscale("log")
@@ -8181,7 +8193,10 @@ plt.show()</div>
 <span class="c1"># Plot the Coulomb Gopalakrishnan 2012 kernel</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span>
-    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">radius_bins</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dimensional_kernel_gopalakrishnan</span><span class="p">),</span> <span class="n">shading</span><span class="o">=</span><span class="s2">"auto"</span>
+    <span class="n">radius_bins</span><span class="p">,</span>
+    <span class="n">radius_bins</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dimensional_kernel_gopalakrishnan</span><span class="p">),</span>
+    <span class="n">shading</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
@@ -8216,7 +8231,10 @@ dimensional_kernel_gopalakrishnan = kernel_strategy_gopalakrishnan.kernel(
 # Plot the Coulomb Gopalakrishnan 2012 kernel
 fig, ax = plt.subplots()
 c = ax.pcolormesh(
-    radius_bins, radius_bins, np.log10(dimensional_kernel_gopalakrishnan), shading="auto"
+    radius_bins,
+    radius_bins,
+    np.log10(dimensional_kernel_gopalakrishnan),
+    shading="auto",
 )
 ax.set_xscale("log")
 ax.set_yscale("log")
@@ -8300,7 +8318,10 @@ plt.show()</div>
 <span class="c1"># Plot the Coulomb Chahl 2019 kernel</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span>
-    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">radius_bins</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dimensional_kernel_chahl</span><span class="p">),</span> <span class="n">shading</span><span class="o">=</span><span class="s2">"auto"</span>
+    <span class="n">radius_bins</span><span class="p">,</span>
+    <span class="n">radius_bins</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dimensional_kernel_chahl</span><span class="p">),</span>
+    <span class="n">shading</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
@@ -8333,7 +8354,10 @@ dimensional_kernel_chahl = kernel_strategy_chahl.kernel(
 # Plot the Coulomb Chahl 2019 kernel
 fig, ax = plt.subplots()
 c = ax.pcolormesh(
-    radius_bins, radius_bins, np.log10(dimensional_kernel_chahl), shading="auto"
+    radius_bins,
+    radius_bins,
+    np.log10(dimensional_kernel_chahl),
+    shading="auto",
 )
 ax.set_xscale("log")
 ax.set_yscale("log")
@@ -8439,7 +8463,9 @@ plt.show()</div>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particle radius r_j (m)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Kernel K(r_i, r_j) (m³/s)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Comparison of Coagulation Kernels, radius_i = </span><span class="si">{</span><span class="n">radius_bins</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"Comparison of Coagulation Kernels, radius_i = </span><span class="si">{</span><span class="n">radius_bins</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> m"</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -8492,7 +8518,9 @@ ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel("Particle radius r_j (m)")
 ax.set_ylabel("Kernel K(r_i, r_j) (m³/s)")
-ax.set_title(f"Comparison of Coagulation Kernels, radius_i = {radius_bins[index]:.2e} m")
+ax.set_title(
+    f"Comparison of Coagulation Kernels, radius_i = {radius_bins[index]:.2e} m"
+)
 ax.legend()
 plt.show()</div>
 </div>

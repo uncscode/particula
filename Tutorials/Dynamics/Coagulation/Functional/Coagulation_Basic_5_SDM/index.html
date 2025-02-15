@@ -7559,12 +7559,18 @@ Final number of particles: 39420946809.99734
 <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
     <span class="n">particles_original</span><span class="p">,</span>
     <span class="n">weights</span><span class="o">=</span><span class="n">particle_concentration</span><span class="p">,</span>
-    <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s2">"step"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">histtype</span><span class="o">=</span><span class="s2">"step"</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span>
+    <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="p">,</span>
     <span class="n">weights</span><span class="o">=</span><span class="n">particle_concentration_1</span><span class="p">,</span>
-    <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s2">"step"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">histtype</span><span class="o">=</span><span class="s2">"step"</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span>
+    <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
@@ -7577,12 +7583,18 @@ fig, ax = plt.subplots()
 ax.hist(
     particles_original,
     weights=particle_concentration,
-    bins=100, histtype="step", color="black", density=True
+    bins=100,
+    histtype="step",
+    color="black",
+    density=True,
 )
 ax.hist(
     particle_radius,
     weights=particle_concentration_1,
-    bins=100, histtype="step", color="blue", density=True
+    bins=100,
+    histtype="step",
+    color="blue",
+    density=True,
 )
 ax.set_xscale("log")
 ax.set_yscale("log")

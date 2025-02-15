@@ -7348,7 +7348,12 @@ present.</li>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="c1"># From particula</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="n">AtmosphereBuilder</span><span class="p">,</span> <span class="n">VaporPressureFactory</span><span class="p">,</span> <span class="n">GasSpeciesBuilder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AtmosphereBuilder</span><span class="p">,</span>
+    <span class="n">VaporPressureFactory</span><span class="p">,</span>
+    <span class="n">GasSpeciesBuilder</span><span class="p">,</span>
+<span class="p">)</span>
+
 <span class="c1"># from particula.gas.vapor_pressure_factories import VaporPressureFactory</span>
 <span class="c1"># from particula.gas.species_builders import GasSpeciesBuilder</span>
 </pre></div>
@@ -7356,7 +7361,12 @@ present.</li>
 import matplotlib.pyplot as plt
 
 # From particula
-from particula.gas import AtmosphereBuilder, VaporPressureFactory, GasSpeciesBuilder
+from particula.gas import (
+    AtmosphereBuilder,
+    VaporPressureFactory,
+    GasSpeciesBuilder,
+)
+
 # from particula.gas.vapor_pressure_factories import VaporPressureFactory
 # from particula.gas.species_builders import GasSpeciesBuilder</div>
 </div>
@@ -7395,16 +7405,17 @@ from particula.gas import AtmosphereBuilder, VaporPressureFactory, GasSpeciesBui
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Define the coefficients for Butanol using the Antoine equation.</span>
-<span class="n">butanol_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'a'</span><span class="p">:</span> <span class="mf">7.838</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">:</span> <span class="mf">1558.19</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">:</span> <span class="mf">196.881</span><span class="p">}</span>
+<span class="n">butanol_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"a"</span><span class="p">:</span> <span class="mf">7.838</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mf">1558.19</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">:</span> <span class="mf">196.881</span><span class="p">}</span>
 <span class="n">butanol_antione</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="s1">'antoine'</span><span class="p">,</span> <span class="n">butanol_coefficients</span><span class="p">)</span>
-<span class="n">styrene_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'a'</span><span class="p">:</span> <span class="mf">6.924</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">:</span> <span class="mi">1420</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">:</span> <span class="mi">226</span><span class="p">}</span>
+    <span class="s2">"antoine"</span><span class="p">,</span> <span class="n">butanol_coefficients</span>
+<span class="p">)</span>
+<span class="n">styrene_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"a"</span><span class="p">:</span> <span class="mf">6.924</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">1420</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">:</span> <span class="mi">226</span><span class="p">}</span>
 <span class="n">styrene_antione</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="s1">'antoine'</span><span class="p">,</span> <span class="n">styrene_coefficients</span><span class="p">)</span>
+    <span class="s2">"antoine"</span><span class="p">,</span> <span class="n">styrene_coefficients</span>
+<span class="p">)</span>
 
 <span class="c1"># Water uses a different model for vapor pressure calculation called the Buck equation.</span>
-<span class="n">water_buck</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="s1">'water_buck'</span><span class="p">)</span>
+<span class="n">water_buck</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"water_buck"</span><span class="p">)</span>
 
 <span class="c1"># Create the GasSpecies using the GasSpeciesBuilder</span>
 <span class="c1"># water species</span>
@@ -7437,18 +7448,18 @@ from particula.gas import AtmosphereBuilder, VaporPressureFactory, GasSpeciesBui
 <span class="nb">print</span><span class="p">(</span><span class="n">water_species</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">organic_species</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">
-# Define the coefficients for Butanol using the Antoine equation.
-butanol_coefficients = {'a': 7.838, 'b': 1558.19, 'c': 196.881}
+<div class="clipboard-copy-txt" id="cell-2"># Define the coefficients for Butanol using the Antoine equation.
+butanol_coefficients = {"a": 7.838, "b": 1558.19, "c": 196.881}
 butanol_antione = VaporPressureFactory().get_strategy(
-    'antoine', butanol_coefficients)
-styrene_coefficients = {'a': 6.924, 'b': 1420, 'c': 226}
+    "antoine", butanol_coefficients
+)
+styrene_coefficients = {"a": 6.924, "b": 1420, "c": 226}
 styrene_antione = VaporPressureFactory().get_strategy(
-    'antoine', styrene_coefficients)
+    "antoine", styrene_coefficients
+)
 
 # Water uses a different model for vapor pressure calculation called the Buck equation.
-water_buck = VaporPressureFactory().get_strategy(
-    'water_buck')
+water_buck = VaporPressureFactory().get_strategy("water_buck")
 
 # Create the GasSpecies using the GasSpeciesBuilder
 # water species
@@ -7539,24 +7550,24 @@ print(organic_species)</div>
     <span class="n">AtmosphereBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">water_species</span><span class="p">)</span>
     <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">organic_species</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s1">'degC'</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s1">'atm'</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s2">"atm"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'Notice the units conversion to base SI:'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Notice the units conversion to base SI:"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">gas_mixture</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">gas_mixture = (
     AtmosphereBuilder()
     .add_species(water_species)
     .add_species(organic_species)
-    .set_temperature(25, temperature_units='degC')
-    .set_pressure(1, pressure_units='atm')
+    .set_temperature(25, temperature_units="degC")
+    .set_pressure(1, pressure_units="atm")
     .build()
 )
 
-print('Notice the units conversion to base SI:')
+print("Notice the units conversion to base SI:")
 print(gas_mixture)</div>
 </div>
 </div>
@@ -7645,19 +7656,26 @@ $$</p>
 <span class="n">sea_level_temperature</span> <span class="o">=</span> <span class="mi">330</span>  <span class="c1"># Reference temperature at sea level (K)</span>
 <span class="n">gravity</span> <span class="o">=</span> <span class="mf">9.80665</span>  <span class="c1"># Acceleration due to gravity (m/s^2)</span>
 <span class="n">molar_mass_air</span> <span class="o">=</span> <span class="mf">0.0289644</span>  <span class="c1"># Molar mass of Earth's air (kg/mol)</span>
-<span class="n">universal_gas_constant</span> <span class="o">=</span> <span class="mf">8.314</span>    <span class="c1"># Universal gas constant (J/(mol·K))</span>
-<span class="n">temperature_lapse_rate</span> <span class="o">=</span> <span class="mf">0.0065</span>   <span class="c1"># Standard temperature lapse rate (K/m)</span>
+<span class="n">universal_gas_constant</span> <span class="o">=</span> <span class="mf">8.314</span>  <span class="c1"># Universal gas constant (J/(mol·K))</span>
+<span class="n">temperature_lapse_rate</span> <span class="o">=</span> <span class="mf">0.0065</span>  <span class="c1"># Standard temperature lapse rate (K/m)</span>
 
 <span class="c1"># Generate an array of altitudes from sea level (0 meters) to 10 km (10000 meters), divided into 100 intervals</span>
 <span class="n">altitude_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 
 <span class="c1"># Calculate the temperature at each altitude based on the linear temperature lapse rate</span>
-<span class="n">temperature_at_altitudes</span> <span class="o">=</span> <span class="n">sea_level_temperature</span> <span class="o">-</span> <span class="n">temperature_lapse_rate</span> <span class="o">*</span> <span class="n">altitude_range</span>
+<span class="n">temperature_at_altitudes</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">sea_level_temperature</span> <span class="o">-</span> <span class="n">temperature_lapse_rate</span> <span class="o">*</span> <span class="n">altitude_range</span>
+<span class="p">)</span>
 
 <span class="c1"># Calculate the pressure at each altitude using the barometric formula</span>
 <span class="n">pressure_at_altitudes</span> <span class="o">=</span> <span class="n">sea_level_pressure</span> <span class="o">*</span> <span class="p">(</span>
     <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">temperature_lapse_rate</span> <span class="o">*</span> <span class="n">altitude_range</span> <span class="o">/</span> <span class="n">sea_level_temperature</span><span class="p">)</span>
-    <span class="o">**</span> <span class="p">(</span><span class="n">gravity</span> <span class="o">*</span> <span class="n">molar_mass_air</span> <span class="o">/</span> <span class="p">(</span><span class="n">universal_gas_constant</span> <span class="o">*</span> <span class="n">temperature_lapse_rate</span><span class="p">)))</span>
+    <span class="o">**</span> <span class="p">(</span>
+        <span class="n">gravity</span>
+        <span class="o">*</span> <span class="n">molar_mass_air</span>
+        <span class="o">/</span> <span class="p">(</span><span class="n">universal_gas_constant</span> <span class="o">*</span> <span class="n">temperature_lapse_rate</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 
 
 <span class="c1"># Initialize a matrix to hold saturation ratios for each species at each</span>
@@ -7665,22 +7683,26 @@ $$</p>
 <span class="n">saturation_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">altitude_range</span><span class="p">))</span>
 
 <span class="c1"># Loop over each altitude's temperature and pressure</span>
-<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">temperature_at_altitudes</span><span class="p">,</span> <span class="n">pressure_at_altitudes</span><span class="p">)):</span>
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+    <span class="nb">zip</span><span class="p">(</span><span class="n">temperature_at_altitudes</span><span class="p">,</span> <span class="n">pressure_at_altitudes</span><span class="p">)</span>
+<span class="p">):</span>
     <span class="c1"># Set the current temperature and pressure of the gas mixture</span>
     <span class="n">gas_mixture</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
     <span class="n">gas_mixture</span><span class="o">.</span><span class="n">total_pressure</span> <span class="o">=</span> <span class="n">pressure</span>
 
     <span class="c1"># Loop over water</span>
-    <span class="n">saturation_ratio</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">gas_mixture</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span><span class="n">gas_mixture</span><span class="o">.</span><span class="n">temperature</span><span class="p">)</span>
+    <span class="n">saturation_ratio</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">gas_mixture</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span>
+        <span class="n">gas_mixture</span><span class="o">.</span><span class="n">temperature</span>
+    <span class="p">)</span>
 
 
 <span class="c1"># Plot the saturation ratio of water vapor at each altitude</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">saturation_ratio</span><span class="p">,</span> <span class="n">altitude_range</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Water'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">'log'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Altitude (m)'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Water Saturation Ratio'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Saturation Ratio of Water Vapor at Different Altitudes'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">saturation_ratio</span><span class="p">,</span> <span class="n">altitude_range</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Water"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Altitude (m)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Water Saturation Ratio"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Saturation Ratio of Water Vapor at Different Altitudes"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -7689,19 +7711,26 @@ sea_level_pressure = 101325  # Reference pressure at sea level (Pa)
 sea_level_temperature = 330  # Reference temperature at sea level (K)
 gravity = 9.80665  # Acceleration due to gravity (m/s^2)
 molar_mass_air = 0.0289644  # Molar mass of Earth's air (kg/mol)
-universal_gas_constant = 8.314    # Universal gas constant (J/(mol·K))
-temperature_lapse_rate = 0.0065   # Standard temperature lapse rate (K/m)
+universal_gas_constant = 8.314  # Universal gas constant (J/(mol·K))
+temperature_lapse_rate = 0.0065  # Standard temperature lapse rate (K/m)
 
 # Generate an array of altitudes from sea level (0 meters) to 10 km (10000 meters), divided into 100 intervals
 altitude_range = np.linspace(0, 10000, 100)
 
 # Calculate the temperature at each altitude based on the linear temperature lapse rate
-temperature_at_altitudes = sea_level_temperature - temperature_lapse_rate * altitude_range
+temperature_at_altitudes = (
+    sea_level_temperature - temperature_lapse_rate * altitude_range
+)
 
 # Calculate the pressure at each altitude using the barometric formula
 pressure_at_altitudes = sea_level_pressure * (
     (1 - temperature_lapse_rate * altitude_range / sea_level_temperature)
-    ** (gravity * molar_mass_air / (universal_gas_constant * temperature_lapse_rate)))
+    ** (
+        gravity
+        * molar_mass_air
+        / (universal_gas_constant * temperature_lapse_rate)
+    )
+)
 
 
 # Initialize a matrix to hold saturation ratios for each species at each
@@ -7709,25 +7738,28 @@ pressure_at_altitudes = sea_level_pressure * (
 saturation_ratio = np.zeros(len(altitude_range))
 
 # Loop over each altitude's temperature and pressure
-for index, (temperature, pressure) in enumerate(zip(temperature_at_altitudes, pressure_at_altitudes)):
+for index, (temperature, pressure) in enumerate(
+    zip(temperature_at_altitudes, pressure_at_altitudes)
+):
     # Set the current temperature and pressure of the gas mixture
     gas_mixture.temperature = temperature
     gas_mixture.total_pressure = pressure
 
     # Loop over water
-    saturation_ratio[index] = gas_mixture.species[0].get_saturation_ratio(gas_mixture.temperature)
+    saturation_ratio[index] = gas_mixture.species[0].get_saturation_ratio(
+        gas_mixture.temperature
+    )
 
 
 # Plot the saturation ratio of water vapor at each altitude
 fig, ax = plt.subplots()
-ax.plot(saturation_ratio, altitude_range, label='Water')
-ax.set_xscale('log')
-ax.set_ylabel('Altitude (m)')
-ax.set_xlabel('Water Saturation Ratio')
-ax.set_title('Saturation Ratio of Water Vapor at Different Altitudes')
+ax.plot(saturation_ratio, altitude_range, label="Water")
+ax.set_xscale("log")
+ax.set_ylabel("Altitude (m)")
+ax.set_xlabel("Water Saturation Ratio")
+ax.set_title("Saturation Ratio of Water Vapor at Different Altitudes")
 ax.legend()
-plt.show()
-</div>
+plt.show()</div>
 </div>
 </div>
 </div>

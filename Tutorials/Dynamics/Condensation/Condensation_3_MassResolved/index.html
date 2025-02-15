@@ -7254,10 +7254,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="c1"># particula imports</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="kn">import</span> <span class="n">particles</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="n">AtmosphereBuilder</span><span class="p">,</span> <span class="n">VaporPressureFactory</span><span class="p">,</span> <span class="n">GasSpeciesBuilder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AtmosphereBuilder</span><span class="p">,</span>
+    <span class="n">VaporPressureFactory</span><span class="p">,</span>
+    <span class="n">GasSpeciesBuilder</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.aerosol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aerosol</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.particle_process</span><span class="w"> </span><span class="kn">import</span> <span class="n">MassCondensation</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.condensation.condensation_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">CondensationIsothermal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.condensation.condensation_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CondensationIsothermal</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.input_handling</span><span class="w"> </span><span class="kn">import</span> <span class="n">convert_units</span>
 </pre></div>
@@ -7266,10 +7272,16 @@ import matplotlib.pyplot as plt
 
 # particula imports
 from particula import particles
-from particula.gas import AtmosphereBuilder, VaporPressureFactory, GasSpeciesBuilder
+from particula.gas import (
+    AtmosphereBuilder,
+    VaporPressureFactory,
+    GasSpeciesBuilder,
+)
 from particula.aerosol import Aerosol
 from particula.dynamics.particle_process import MassCondensation
-from particula.dynamics.condensation.condensation_strategies import CondensationIsothermal
+from particula.dynamics.condensation.condensation_strategies import (
+    CondensationIsothermal,
+)
 
 from particula.util.input_handling import convert_units</div>
 </div>
@@ -7318,17 +7330,21 @@ from particula.util.input_handling import convert_units</div>
 <span class="n">vapor_pressure_ammonium</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="s2">"constant"</span><span class="p">,</span> <span class="n">parameters_vapor</span>
 <span class="p">)</span>
-<span class="n">vapor_pressure_water</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="s2">"water_buck"</span>
-<span class="p">)</span>
+<span class="n">vapor_pressure_water</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"water_buck"</span><span class="p">)</span>
 
-<span class="n">water_sat</span> <span class="o">=</span> <span class="n">vapor_pressure_water</span><span class="o">.</span><span class="n">saturation_concentration</span><span class="p">(</span><span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">)</span>
+<span class="n">water_sat</span> <span class="o">=</span> <span class="n">vapor_pressure_water</span><span class="o">.</span><span class="n">saturation_concentration</span><span class="p">(</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span>
+<span class="p">)</span>
 <span class="n">water_concentration</span> <span class="o">=</span> <span class="n">water_sat</span> <span class="o">*</span> <span class="n">initial_water_vapor_activity</span>
 
 <span class="n">gas_phase</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">GasSpeciesBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">molar_mass_ammonium_sulfate</span><span class="p">]),</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">([</span><span class="n">vapor_pressure_water</span><span class="p">,</span> <span class="n">vapor_pressure_ammonium</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">molar_mass_ammonium_sulfate</span><span class="p">]),</span> <span class="s2">"kg/mol"</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">vapor_pressure_water</span><span class="p">,</span> <span class="n">vapor_pressure_ammonium</span><span class="p">]</span>
+    <span class="p">)</span>
     <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">water_concentration</span><span class="p">,</span> <span class="mf">1e-30</span><span class="p">]),</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">([</span><span class="s2">"H2O"</span><span class="p">,</span> <span class="s2">"NH4HSO4"</span><span class="p">])</span>
     <span class="o">.</span><span class="n">set_condensable</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span>
@@ -7354,17 +7370,21 @@ parameters_vapor = {
 vapor_pressure_ammonium = VaporPressureFactory().get_strategy(
     "constant", parameters_vapor
 )
-vapor_pressure_water = VaporPressureFactory().get_strategy(
-    "water_buck"
-)
+vapor_pressure_water = VaporPressureFactory().get_strategy("water_buck")
 
-water_sat = vapor_pressure_water.saturation_concentration(molar_mass=molar_mass_water, temperature=298.15)
+water_sat = vapor_pressure_water.saturation_concentration(
+    molar_mass=molar_mass_water, temperature=298.15
+)
 water_concentration = water_sat * initial_water_vapor_activity
 
 gas_phase = (
     GasSpeciesBuilder()
-    .set_molar_mass(np.array([molar_mass_water, molar_mass_ammonium_sulfate]), "kg/mol")
-    .set_vapor_pressure_strategy([vapor_pressure_water, vapor_pressure_ammonium])
+    .set_molar_mass(
+        np.array([molar_mass_water, molar_mass_ammonium_sulfate]), "kg/mol"
+    )
+    .set_vapor_pressure_strategy(
+        [vapor_pressure_water, vapor_pressure_ammonium]
+    )
     .set_concentration(np.array([water_concentration, 1e-30]), "kg/m^3")
     .set_name(["H2O", "NH4HSO4"])
     .set_condensable([True, True])
@@ -7377,8 +7397,7 @@ atmosphere = (
     .set_temperature(25, temperature_units="degC")
     .set_pressure(1, pressure_units="atm")
     .build()
-)
-</div>
+)</div>
 </div>
 </div>
 </div>
@@ -7706,14 +7725,23 @@ print(f"Total iterations to do: {len(time)*sub_steps}")</div>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># Perform condensation for the resolved aerosol</span>
-        <span class="n">aerosol_resolved</span> <span class="o">=</span> <span class="n">condensation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol_resolved</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">)</span>
+        <span class="n">aerosol_resolved</span> <span class="o">=</span> <span class="n">condensation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">aerosol_resolved</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span>
+        <span class="p">)</span>
 
-    <span class="n">total_mass_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
-    <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">number_distribution_binned</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins_lognormal</span><span class="p">)</span>
-    <span class="n">total_number_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">water_saturation_in_time</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">total_mass_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
+        <span class="mi">0</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
+    <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
+        <span class="mi">0</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">number_distribution_binned</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+        <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins_lognormal</span>
+    <span class="p">)</span>
+    <span class="n">total_number_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">water_saturation_in_time</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span>
+        <span class="mi">0</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
 
 <span class="n">number_distribution_binned</span> <span class="o">=</span> <span class="n">number_distribution_binned</span> <span class="o">/</span> <span class="n">volume_sim</span>
@@ -7724,14 +7752,23 @@ print(f"Total iterations to do: {len(time)*sub_steps}")</div>
 for i, t in enumerate(time):
     if i &gt; 0:
         # Perform condensation for the resolved aerosol
-        aerosol_resolved = condensation_process.execute(aerosol_resolved, time_step, sub_steps)
+        aerosol_resolved = condensation_process.execute(
+            aerosol_resolved, time_step, sub_steps
+        )
 
-    total_mass_resolved[i] = aerosol_resolved.particles[0].get_mass_concentration()
-    number_distribution_resolved[i, :] = aerosol_resolved.particles[0].get_radius(clone=True)
-    number_distribution_binned[i, :], edges = np.histogram(number_distribution_resolved[i, :], bins=bins_lognormal)
-    total_number_resolved[i] = np.sum(number_distribution_resolved[i, :]&gt;0)
-    water_saturation_in_time[i] = aerosol_resolved.atmosphere.species[0].get_saturation_ratio(
-        temperature=298.15)[0]
+    total_mass_resolved[i] = aerosol_resolved.particles[
+        0
+    ].get_mass_concentration()
+    number_distribution_resolved[i, :] = aerosol_resolved.particles[
+        0
+    ].get_radius(clone=True)
+    number_distribution_binned[i, :], edges = np.histogram(
+        number_distribution_resolved[i, :], bins=bins_lognormal
+    )
+    total_number_resolved[i] = np.sum(number_distribution_resolved[i, :] &gt; 0)
+    water_saturation_in_time[i] = aerosol_resolved.atmosphere.species[
+        0
+    ].get_saturation_ratio(temperature=298.15)[0]
 
 
 number_distribution_binned = number_distribution_binned / volume_sim
@@ -7913,10 +7950,14 @@ plt.show()</div>
 <span class="n">log_of_number_distribution_binned</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span>
     <span class="n">number_distribution_binned</span><span class="p">,</span>
     <span class="n">out</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">number_distribution_binned</span><span class="p">),</span>
-    <span class="n">where</span><span class="o">=</span><span class="n">number_distribution_binned</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">where</span><span class="o">=</span><span class="n">number_distribution_binned</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">contour</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span>
-    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">log_of_number_distribution_binned</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"viridis"</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">Y</span><span class="p">,</span>
+    <span class="n">log_of_number_distribution_binned</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">"viridis"</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># Add the color bar</span>
@@ -7943,10 +7984,14 @@ X, Y = np.meshgrid(
 log_of_number_distribution_binned = np.log10(
     number_distribution_binned,
     out=np.nan * np.ones_like(number_distribution_binned),
-    where=number_distribution_binned &gt; 0
+    where=number_distribution_binned &gt; 0,
 )
 contour = ax.contourf(
-    X, Y, log_of_number_distribution_binned.T, cmap="viridis", vmin=5,
+    X,
+    Y,
+    log_of_number_distribution_binned.T,
+    cmap="viridis",
+    vmin=5,
 )
 
 # Add the color bar
@@ -8027,8 +8072,7 @@ ax2.set_ylabel("Water saturation", color="red")
 ax2.tick_params(axis="y", labelcolor="red")
 
 fig.tight_layout()
-plt.show()
-</div>
+plt.show()</div>
 </div>
 </div>
 </div>
