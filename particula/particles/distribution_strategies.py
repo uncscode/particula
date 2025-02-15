@@ -202,9 +202,8 @@ class MassBasedMovingBin(DistributionStrategy):
         added_concentration: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         # check if distribution and added distribution have same elements
-        if (
-            (distribution.shape != added_distribution.shape) and
-            (np.allclose(distribution, added_distribution, rtol=1e-6))
+        if (distribution.shape != added_distribution.shape) and (
+            np.allclose(distribution, added_distribution, rtol=1e-6)
         ):
             message = (
                 "When adding concentration to MassBasedMovingBin,"
@@ -472,7 +471,7 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
             np.maximum(distribution * concentration_expand + added_mass, 0),
             concentration_expand,
             out=np.zeros_like(distribution),
-            where=concentration_expand != 0
+            where=concentration_expand != 0,
         )
         return (new_mass, concentration)
 
@@ -487,11 +486,9 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         rescaled = False
         if np.all(added_concentration == 1):
             rescaled = True
-        if (
-            np.allclose(
-                added_concentration, np.max(concentration), atol=1e-2) or
-            np.all(concentration == 0)
-           ):
+        if np.allclose(
+            added_concentration, np.max(concentration), atol=1e-2
+        ) or np.all(concentration == 0):
             # then rescale the added concentration
             added_concentration = added_concentration / np.max(concentration)
             rescaled = True
@@ -510,7 +507,7 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
             concentration,
             concentration,
             out=np.zeros_like(concentration),
-            where=concentration != 0
+            where=concentration != 0,
         )
 
         # find empty distribution bins
@@ -529,12 +526,10 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
             concentration[empty_bins] = added_concentration[:empty_bins_count]
         # add the rest of the added bins to the end of the distribution
         distribution = np.concatenate(
-            (distribution, added_distribution[empty_bins_count:]),
-            axis=0
+            (distribution, added_distribution[empty_bins_count:]), axis=0
         )
         concentration = np.concatenate(
-            (concentration, added_concentration[empty_bins_count:]),
-            axis=0
+            (concentration, added_concentration[empty_bins_count:]), axis=0
         )
         return distribution, concentration
 

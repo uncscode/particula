@@ -1,4 +1,5 @@
 """Test the ratio module."""
+
 from particula.activity.ratio import to_molar_mass_ratio, from_molar_mass_ratio
 
 

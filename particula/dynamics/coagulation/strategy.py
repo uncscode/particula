@@ -338,12 +338,8 @@ class DiscreteSimple(CoagulationStrategy):
         kernel = self.kernel(
             particle=particle, temperature=temperature, pressure=pressure
         )
-        loss_rate = self.loss_rate(
-            particle=particle, kernel=kernel  # type: ignore
-        )
-        gain_rate = self.gain_rate(
-            particle=particle, kernel=kernel  # type: ignore
-        )
+        loss_rate = self.loss_rate(particle=particle, kernel=kernel)  # type: ignore
+        gain_rate = self.gain_rate(particle=particle, kernel=kernel)  # type: ignore
         return gain_rate - loss_rate
 
     def step(
@@ -464,12 +460,8 @@ class DiscreteGeneral(CoagulationStrategy):
         kernel = self.kernel(
             particle=particle, temperature=temperature, pressure=pressure
         )
-        loss_rate = self.loss_rate(
-            particle=particle, kernel=kernel  # type: ignore
-        )
-        gain_rate = self.gain_rate(
-            particle=particle, kernel=kernel  # type: ignore
-        )
+        loss_rate = self.loss_rate(particle=particle, kernel=kernel)  # type: ignore
+        gain_rate = self.gain_rate(particle=particle, kernel=kernel)  # type: ignore
         return gain_rate - loss_rate
 
     def step(
@@ -585,12 +577,8 @@ class ContinuousGeneralPDF(CoagulationStrategy):
         kernel = self.kernel(
             particle=particle, temperature=temperature, pressure=pressure
         )
-        loss_rate = self.loss_rate(
-            particle=particle, kernel=kernel  # type: ignore
-        )
-        gain_rate = self.gain_rate(
-            particle=particle, kernel=kernel  # type: ignore
-        )
+        loss_rate = self.loss_rate(particle=particle, kernel=kernel)  # type: ignore
+        gain_rate = self.gain_rate(particle=particle, kernel=kernel)  # type: ignore
         return gain_rate - loss_rate
 
     def step(
@@ -696,9 +684,7 @@ class ParticleResolved(CoagulationStrategy):
     ) -> Union[float, NDArray[np.float64]]:
         # need to update later with the correct mass dependency
         radius_bins = self.get_kernel_radius(particle)
-        mass_bins = (
-            4 / 3 * np.pi * np.power(radius_bins, 3) * 1000  # type: ignore
-        )
+        mass_bins = 4 / 3 * np.pi * np.power(radius_bins, 3) * 1000  # type: ignore
         return brownian_coagulation_kernel_via_system_state(
             radius_particle=radius_bins,  # type: ignore
             mass_particle=mass_bins,  # type: ignore

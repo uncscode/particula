@@ -92,9 +92,7 @@ def first_order_mass_transport_k(
         and vapor_transition.ndim == 2
     ):  # extent radius
         radius = radius[:, np.newaxis]  # type: ignore
-    return (
-        4 * np.pi * radius * diffusion_coefficient * vapor_transition
-    )  # type: ignore
+    return 4 * np.pi * radius * diffusion_coefficient * vapor_transition  # type: ignore
 
 
 def mass_transfer_rate(

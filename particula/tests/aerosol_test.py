@@ -19,14 +19,14 @@ class TestAerosol(unittest.TestCase):
 
     def setUp(self):
         """Set up the test case with an real Atmosphere
-            and ParticleRepresentation.
+        and ParticleRepresentation.
         """
         # Glycerol gas
         molar_mass_glycerol = 92.09382e-3  # kg/mol
         parameters_clausius = {
-            "latent_heat": 71.5*1e3 * molar_mass_glycerol,
+            "latent_heat": 71.5 * 1e3 * molar_mass_glycerol,
             "latent_heat_units": "J/kg",
-            "temperature_initial": 125.5+273.15,
+            "temperature_initial": 125.5 + 273.15,
             "temperature_initial_units": "K",
             "pressure_initial": 1e5,
             "pressure_initial_units": "Pa",
@@ -53,7 +53,7 @@ class TestAerosol(unittest.TestCase):
         self.atmosphere = (
             AtmosphereBuilder()
             .add_species(glycerol_gas)
-            .set_temperature(25+273.15, temperature_units="K")
+            .set_temperature(25 + 273.15, temperature_units="K")
             .set_pressure(1e5, pressure_units="Pa")
             .build()
         )
@@ -61,9 +61,9 @@ class TestAerosol(unittest.TestCase):
         # Glycerol particle distribution
         self.particle = (
             PresetParticleRadiusBuilder()
-            .set_mode(np.array([100])*1e-9, "m")
+            .set_mode(np.array([100]) * 1e-9, "m")
             .set_geometric_standard_deviation(np.array([1.5]))
-            .set_number_concentration(np.array([1e4])*1e-6, "1/m^3")
+            .set_number_concentration(np.array([1e4]) * 1e-6, "1/m^3")
             .set_density(1.26e3, "kg/m^3")
             .build()
         )

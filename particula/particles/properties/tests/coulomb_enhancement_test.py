@@ -8,7 +8,7 @@ def test_ratio_lower_limit():
     """Test the ratio function for ratio_lower_limit functionality."""
     # Test case where the calculated ratio is below the lower limit
     radius = 1e-9  # Very small radius to increase the Coulomb potential
-    charge = 100   # Large charge to increase the Coulomb potential
+    charge = 100  # Large charge to increase the Coulomb potential
     temperature = 298.15
     expected_result = -200  # Default ratio_lower_limit
 

@@ -64,9 +64,7 @@ def test_get_particle_inertia_time_invalid():
     Test that get_particle_inertia_time raises errors for invalid inputs.
     """
     with pytest.raises(ValueError):
-        get_particle_inertia_time(
-            -50e-6, 1000, 1.2, 1.5e-5
-        )  # Negative radius
+        get_particle_inertia_time(-50e-6, 1000, 1.2, 1.5e-5)  # Negative radius
 
     with pytest.raises(ValueError):
         get_particle_inertia_time(

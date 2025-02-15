@@ -1,6 +1,5 @@
 """Activity Functions Module."""
 
-
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
@@ -42,7 +41,7 @@ def ideal_activity_molar(
         return 1.0
     return convert_mass_concentration.to_mole_fraction(
         mass_concentrations=mass_concentration,  # type: ignore
-        molar_masses=molar_mass  # type: ignore
+        molar_masses=molar_mass,  # type: ignore
     )
 
 
@@ -81,7 +80,7 @@ def ideal_activity_volume(
         return 1.0
     return convert_mass_concentration.to_volume_fraction(
         mass_concentrations=mass_concentration,  # type: ignore
-        densities=density  # type: ignore
+        densities=density,  # type: ignore
     )
 
 
@@ -165,12 +164,11 @@ def kappa_activity(
     """
 
     volume_fractions = convert_mass_concentration.to_volume_fraction(
-        mass_concentrations=mass_concentration,
-        densities=density)
+        mass_concentrations=mass_concentration, densities=density
+    )
     # other species activity based on mole fraction
     activity = convert_mass_concentration.to_mole_fraction(
-        mass_concentrations=mass_concentration,
-        molar_masses=molar_mass
+        mass_concentrations=mass_concentration, molar_masses=molar_mass
     )
 
     expanded = False
@@ -180,9 +178,7 @@ def kappa_activity(
 
     # water activity based on kappa
     water_volume_fraction = volume_fractions[:, water_index]
-    solute_volume_fractions = np.delete(
-        volume_fractions, water_index, axis=1
-    )
+    solute_volume_fractions = np.delete(volume_fractions, water_index, axis=1)
     kappa = np.delete(kappa, water_index)
     # volume weighted kappa, EQ 7 Petters and Kreidenweis (2007)
     if solute_volume_fractions.shape[1] == 1 and not expanded:

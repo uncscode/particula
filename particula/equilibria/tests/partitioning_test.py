@@ -1,6 +1,5 @@
 """Test to make sure the partitioning can run, does not test the results."""
 
-
 import numpy as np
 from particula.activity import species_density
 from particula.equilibria import partitioning
@@ -24,22 +23,22 @@ def test_partitioning():
         nitrogen2carbon=None,
     )
 
-    gamma_organic_ab, mass_fraction_water_ab, q_ab = \
+    gamma_organic_ab, mass_fraction_water_ab, q_ab = (
         partitioning.get_properties_for_liquid_vapor_partitioning(
             water_activity_desired=water_activity_desired,
             molar_mass=molar_mass,
             oxygen2carbon=oxygen2carbon,
             density=density,
         )
+    )
 
     # optimize the partition coefficients
-    _, _, _, _ = \
-        partitioning.liquid_vapor_partitioning(
-            c_star_j_dry=c_star_j_dry,
-            concentration_organic_matter=concentration_organic_matter,
-            molar_mass=molar_mass,
-            gamma_organic_ab=gamma_organic_ab,
-            mass_fraction_water_ab=mass_fraction_water_ab,
-            q_ab=q_ab,
-            partition_coefficient_guess=None,
-        )
+    _, _, _, _ = partitioning.liquid_vapor_partitioning(
+        c_star_j_dry=c_star_j_dry,
+        concentration_organic_matter=concentration_organic_matter,
+        molar_mass=molar_mass,
+        gamma_organic_ab=gamma_organic_ab,
+        mass_fraction_water_ab=mass_fraction_water_ab,
+        q_ab=q_ab,
+        partition_coefficient_guess=None,
+    )

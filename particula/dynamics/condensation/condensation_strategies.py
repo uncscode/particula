@@ -200,7 +200,7 @@ class CondensationStrategy(ABC):
         )
 
     def _fill_zero_radius(
-            self, radius: NDArray[np.float64]
+        self, radius: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         """Fill zero radius values with the maximum radius. The concentration
         value of zero will ensure that the rate of condensation is zero. The

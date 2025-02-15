@@ -15,9 +15,7 @@ def test_particle_diffusion_coefficient_float():
     result = particle_diffusion_coefficient(
         temperature, particle_aerodynamic_mobility
     )
-    assert result == pytest.approx(  # type: ignore
-        expected_diffusion_coefficient
-    )
+    assert result == pytest.approx(expected_diffusion_coefficient)  # type: ignore
 
 
 def test_particle_diffusion_coefficient_array():
