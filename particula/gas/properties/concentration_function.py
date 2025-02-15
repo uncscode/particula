@@ -1,5 +1,4 @@
-"""Function for calculating the gas concentraions.
-"""
+"""Function for calculating the gas concentraions."""
 
 from typing import Union
 from numpy.typing import NDArray
@@ -13,9 +12,8 @@ def calculate_concentration(
     molar_mass: Union[float, NDArray[np.float64]],
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the concentration of a gas from its partial pressure, molar mass,
-    and temperature using the ideal gas law.
+    """Calculate the concentration of a gas from its partial pressure, molar
+    mass, and temperature using the ideal gas law.
 
     Parameters:
     - pressure (float or NDArray[np.float64]): Partial pressure of the gas
