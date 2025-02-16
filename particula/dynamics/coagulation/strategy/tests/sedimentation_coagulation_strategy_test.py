@@ -28,19 +28,13 @@ class TestSedimentationCoagulationStrategy(unittest.TestCase):
         self.particle = PresetParticleRadiusBuilder().build()
         self.temperature = 298.15  # Kelvin
         self.pressure = 101325  # Pascal
-        self.turbulent_kinetic_energy = 0.1  # m^2/s^2
-        self.fluid_density = 1.225  # kg/m^3
 
         # Create strategies for both distribution types
         self.strategy_discrete = SedimentationCoagulationStrategy(
-            distribution_type="discrete",
-            turbulent_kinetic_energy=self.turbulent_kinetic_energy,
-            fluid_density=self.fluid_density
+            distribution_type="discrete"
         )
         self.strategy_continuous_pdf = SedimentationCoagulationStrategy(
-            distribution_type="continuous_pdf",
-            turbulent_kinetic_energy=self.turbulent_kinetic_energy,
-            fluid_density=self.fluid_density
+            distribution_type="continuous_pdf"
         )
 
     def test_kernel_discrete(self):
