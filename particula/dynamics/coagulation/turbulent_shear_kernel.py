@@ -25,7 +25,7 @@ from particula.gas.properties.kinematic_viscosity import (
 
 def get_turbulent_shear_kernel_st1956(
     particle_radius: NDArray[np.float64],
-    turbulent_kinetic_energy: float,
+    turbulent_dissipation: float,
     kinematic_viscosity: float,
 ) -> NDArray[np.float64]:
     """
@@ -33,7 +33,7 @@ def get_turbulent_shear_kernel_st1956(
 
     Parameters:
         particle_radius : Array of particle radii [m].
-        turbulent_kinetic_energy : Turbulent kinetic energy [m^2/s^2].
+        turbulent_dissipation : Turbulent kinetic energy [m^2/s^2].
         kinematic_viscosity : Kinematic viscosity [m^2/s].
 
     Returns:
@@ -56,13 +56,13 @@ def get_turbulent_shear_kernel_st1956(
     ) * 2  # Convert from radius to diameter sum
 
     return (
-        np.pi * turbulent_kinetic_energy / (120 * kinematic_viscosity)
+        np.pi * turbulent_dissipation / (120 * kinematic_viscosity)
     ) ** 0.5 * diameter_sum_matrix**3
 
 
 def get_turbulent_shear_kernel_st1956_via_system_state(
     particle_radius: NDArray[np.float64],
-    turbulent_kinetic_energy: float,
+    turbulent_dissipation: float,
     temperature: float,
     fluid_density: float,
 ) -> NDArray[np.float64]:
@@ -71,7 +71,7 @@ def get_turbulent_shear_kernel_st1956_via_system_state(
 
     Arguments:
         particle_radius : Array of particle radii [m].
-        turbulent_kinetic_energy : Turbulent kinetic energy [m^2/s^2].
+        turbulent_dissipation : Turbulent kinetic energy [m^2/s^2].
         temperature : Temperature of the system [K].
         fluid_density : Density of the fluid [kg/m^3].
 
@@ -88,6 +88,6 @@ def get_turbulent_shear_kernel_st1956_via_system_state(
     )
     return get_turbulent_shear_kernel_st1956(
         particle_radius=particle_radius,
-        turbulent_kinetic_energy=turbulent_kinetic_energy,
+        turbulent_dissipation=turbulent_dissipation,
         kinematic_viscosity=kinematic_viscosity,
     )
