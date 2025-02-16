@@ -15,6 +15,9 @@ from particula.dynamics.coagulation.strategy.coagulation_strategy_abc import (
 from particula.dynamics.coagulation.particle_resolved_method import (
     get_particle_resolved_coagulation_step,
 )
+from particula.dynamics.coagulation.brownian_kernel import (
+    get_brownian_kernel_via_system_state,
+)
 
 logger = logging.getLogger("particula")
 
@@ -122,7 +125,7 @@ class ParticleResolvedCoagulationStrategy(CoagulationStrategyABC):
         # need to update later with the correct mass dependency
         radius_bins = self.get_kernel_radius(particle)
         mass_bins = 4 / 3 * np.pi * np.power(radius_bins, 3) * 1000  # type: ignore
-        return brownian_coagulation_kernel_via_system_state(
+        return get_brownian_kernel_via_system_state(
             particle_radius=radius_bins,  # type: ignore
             mass_particle=mass_bins,  # type: ignore
             temperature=temperature,

@@ -11,8 +11,8 @@ from particula.particles.representation import ParticleRepresentation
 from particula.dynamics.coagulation.strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
-from particula.dynamics.coagulation.turbulent_shear_kernel import (
-    get_turbulent_shear_kernel_st1956_via_system_state,
+from particula.dynamics.coagulation.sedimentation_kernel import (
+    get_sedimentation_kernel_sp2016_via_system_state,
 )
 
 logger = logging.getLogger("particula")
@@ -48,19 +48,10 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
     def __init__(
         self,
         distribution_type: str,
-        turbulent_kinetic_energy: float,
-        fluid_density: float,
     ):
         CoagulationStrategyABC.__init__(
             self, distribution_type=distribution_type
         )
-        self.turbulent_kinetic_energy = turbulent_kinetic_energy
-        self.fluid_density = fluid_density
-
-    def set_turbulent_kinetic_energy(self, turbulent_kinetic_energy: float):
-        """Set the turbulent kinetic energy."""
-        self.turbulent_kinetic_energy = turbulent_kinetic_energy
-        return self
 
     def dimensionless_kernel(
         self,
@@ -68,7 +59,7 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         message = (
-            "Dimensionless kernel not implemented in turbulent shear "
+            "Dimensionless kernel not implemented in sedimentation "
             + "coagulation strategy."
         )
         logger.error(message)
@@ -81,11 +72,12 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
 
-        return get_turbulent_shear_kernel_st1956_via_system_state(
+        return get_sedimentation_kernel_sp2016_via_system_state(
             particle_radius=particle.get_radius(),
-            turbulent_kinetic_energy=self.turbulent_kinetic_energy,
+            particle_density=particle.get_density(),
             temperature=temperature,
-            fluid_density=self.fluid_density,
+            pressure=pressure,
+            calculate_collision_efficiency=False,
         )
 
     def step(
