@@ -1,5 +1,6 @@
 """
-Turbulent Shear Coagulation Strategy
+Turbulent DNS coagulation strategy, for larger particles greater than
+1 microns.
 """
 
 from typing import Union
@@ -11,20 +12,19 @@ from particula.particles.representation import ParticleRepresentation
 from particula.dynamics.coagulation.strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
-from particula.dynamics.coagulation.turbulent_shear_kernel import (
-    get_turbulent_shear_kernel_st1956_via_system_state,
+from particula.dynamics.coagulation.turbulent_dns_kernel.turbulent_dns_kernel_ao2008 import (
+    get_turbulent_dns_kernel_ao2008_via_system_state,
 )
 
 logger = logging.getLogger("particula")
 
 
-class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
+class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
     """
-    Turbulent Shear coagulation strategy.
+    Turbulent DNS coagulation strategy.
 
     This implements the methods defined in `CoagulationStrategy` abstract
-    class. Applied to the Saffman and Turner (1956) turbulent shear
-    coagulation kernel.
+    class. Applied with the turbulent DNS kernel from Ayala et al. (2008).
 
     Arguments:
         - distribution_type : The type of distribution to be used with the
@@ -33,6 +33,8 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         - turbulent_dissipation : The turbulent kinetic energy of the system
             [m^2/s^2].
         - fluid_density : The density of the fluid [kg/m^3].
+        - reynolds_lambda : The Reynolds lambda [m].
+        - relative_velocity : The relative velocity of the air [m/s].
 
     Methods:
     - kernel : Calculate the coagulation kernel.
@@ -41,9 +43,10 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
     - net_rate : Calculate the net coagulation rate.
 
     References:
-    - Saffman, P. G., & Turner, J. S. (1956). On the collision of drops in
-        turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
-        https://doi.org/10.1017/S0022112056000020
+    - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
+        the geometric collision rate of sedimenting droplets. Part 2.
+        Theory and parameterization. New Journal of Physics, 10.
+        https://doi.org/10.1088/1367-2630/10/7/075016
     """
 
     def __init__(
@@ -51,16 +54,31 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         distribution_type: str,
         turbulent_dissipation: float,
         fluid_density: float,
+        reynolds_lambda: float,
+        relative_velocity: float,
     ):
+        # pylint: disable=too-many-arguments, too-many-positional-arguments
         CoagulationStrategyABC.__init__(
             self, distribution_type=distribution_type
         )
         self.turbulent_dissipation = turbulent_dissipation
         self.fluid_density = fluid_density
+        self.reynolds_lambda = reynolds_lambda
+        self.relative_velocity = relative_velocity
 
     def set_turbulent_dissipation(self, turbulent_dissipation: float):
         """Set the turbulent kinetic energy."""
         self.turbulent_dissipation = turbulent_dissipation
+        return self
+
+    def set_reynolds_lambda(self, reynolds_lambda: float):
+        """Set the Reynolds lambda."""
+        self.reynolds_lambda = reynolds_lambda
+        return self
+
+    def set_relative_velocity(self, relative_velocity: float):
+        """Set the relative velocity."""
+        self.relative_velocity = relative_velocity
         return self
 
     def dimensionless_kernel(
@@ -69,7 +87,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         message = (
-            "Dimensionless kernel not implemented in turbulent shear "
+            "Dimensionless kernel not implemented in sedimentation "
             + "coagulation strategy."
         )
         logger.error(message)
@@ -82,11 +100,14 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
 
-        return get_turbulent_shear_kernel_st1956_via_system_state(
+        return get_turbulent_dns_kernel_ao2008_via_system_state(
             particle_radius=particle.get_radius(),
-            turbulent_dissipation=self.turbulent_dissipation,
-            temperature=temperature,
+            particle_density=particle.get_density(),
             fluid_density=self.fluid_density,
+            turbulent_dissipation=self.turbulent_dissipation,
+            re_lambda=self.reynolds_lambda,
+            relative_velocity=self.relative_velocity,
+            temperature=temperature,
         )
 
     def step(

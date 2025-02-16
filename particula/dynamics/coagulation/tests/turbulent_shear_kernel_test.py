@@ -19,17 +19,17 @@ def test_turbulent_shear_kernel_single_value():
     diameters, turbulent kinetic energy, and kinematic viscosity.
     """
     diameter_particle = np.array([1e-6, 2e-6])  # example diameters [m]
-    turbulent_kinetic_energy = (
+    turbulent_dissipation = (
         1.0e-4  # example turbulent kinetic energy [m^2/s^2]
     )
     kinematic_viscosity = 1.5e-5  # example kinematic viscosity [m^2/s]
     expected_kernel = (
-        np.pi * turbulent_kinetic_energy / (120 * kinematic_viscosity)
+        np.pi * turbulent_dissipation / (120 * kinematic_viscosity)
     ) ** 0.5 * (
         diameter_particle[:, np.newaxis] + diameter_particle[np.newaxis, :]
     ) ** 3
     value = get_turbulent_shear_kernel_st1956(
-        diameter_particle / 2, turbulent_kinetic_energy, kinematic_viscosity
+        diameter_particle / 2, turbulent_dissipation, kinematic_viscosity
     )
     np.testing.assert_allclose(value, expected_kernel, rtol=1e-6)
 
@@ -39,7 +39,7 @@ def test_turbulent_shear_kernel_via_system_state():
     Test turbulent_shear_kernel_via_system_state with system state inputs.
     """
     particle_radius = np.array([1e-6, 2e-6])  # example diameters [m]
-    turbulent_kinetic_energy = (
+    turbulent_dissipation = (
         1.0e-4  # example turbulent kinetic energy [m^2/s^2]
     )
     temperature = 298  # example temperature [K]
@@ -48,10 +48,10 @@ def test_turbulent_shear_kernel_via_system_state():
         temperature=temperature, fluid_density=fluid_density
     )
     expected_kernel = get_turbulent_shear_kernel_st1956(
-        particle_radius, turbulent_kinetic_energy, kinematic_viscosity
+        particle_radius, turbulent_dissipation, kinematic_viscosity
     )
     value = get_turbulent_shear_kernel_st1956_via_system_state(
-        particle_radius, turbulent_kinetic_energy, temperature, fluid_density
+        particle_radius, turbulent_dissipation, temperature, fluid_density
     )
     np.testing.assert_allclose(value, expected_kernel, rtol=1e-6)
 

@@ -30,9 +30,6 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
         - distribution_type : The type of distribution to be used with the
             coagulation strategy. Must be "discrete", "continuous_pdf", or
             "particle_resolved".
-        - turbulent_kinetic_energy : The turbulent kinetic energy of the system
-            [m^2/s^2].
-        - fluid_density : The density of the fluid [kg/m^3].
 
     Methods:
     - kernel : Calculate the coagulation kernel.
