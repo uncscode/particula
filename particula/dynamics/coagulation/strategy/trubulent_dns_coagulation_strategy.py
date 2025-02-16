@@ -31,9 +31,10 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
             coagulation strategy. Must be "discrete", "continuous_pdf", or
             "particle_resolved".
         - turbulent_dissipation : The turbulent kinetic energy of the system
-            [m^2/s^2].
+            [m^2/s^2]. DNS fits are for 0.001, 0.01, and 0.04 [m^2/s^2].
         - fluid_density : The density of the fluid [kg/m^3].
-        - reynolds_lambda : The Reynolds lambda of air [m].
+        - reynolds_lambda : The Reynolds lambda of air, DNS fits are for
+            23 and 74 [dimensionless].
         - relative_velocity : The relative velocity of the air [m/s].
 
     Methods:

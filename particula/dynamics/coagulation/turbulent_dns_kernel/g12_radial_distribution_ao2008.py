@@ -13,6 +13,7 @@ from particula.util.self_broadcast import (
     get_pairwise_max_matrix,
     get_pairwise_diff_matrix,
 )
+from particula.util.machine_limit import safe_exp
 
 
 @validate_inputs(
@@ -148,7 +149,7 @@ def _compute_y_stokes(
 
 def _compute_f3_lambda(reynolds_lambda: float) -> float:
     """Compute f_3(R_lambda), an empirical turbulence factor."""
-    return 0.1886 * np.exp(20.306 / reynolds_lambda)
+    return 0.1886 * safe_exp(20.306 / reynolds_lambda)
 
 
 def _calculate_rc(
