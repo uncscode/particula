@@ -11,7 +11,10 @@ import numpy as np
 from particula.dynamics.coagulation.strategy.turbulent_shear_coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
 )
-from particula.particles import PresetParticleRadiusBuilder, PresetResolvedParticleMassBuilder
+from particula.particles import (
+    PresetParticleRadiusBuilder,
+    PresetResolvedParticleMassBuilder,
+)
 
 
 class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
@@ -30,7 +33,7 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         self.particle = PresetParticleRadiusBuilder().build()
         self.temperature = 298.15  # Kelvin
         self.pressure = 101325  # Pascal
-        self.turbulent_dissipation = 0.1  # m^2/s^2
+        self.turbulent_dissipation = 1  # m^2/s^2
         self.fluid_density = 1.225  # kg/m^3
 
         # Create strategies for all distribution types
@@ -46,9 +49,7 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         )
 
         self.particle_resolved = (
-            PresetResolvedParticleMassBuilder()
-            .set_volume(1e-6)
-            .build()
+            PresetResolvedParticleMassBuilder().set_volume(1e-6).build()
         )
         self.strategy_particle_resolved = TurbulentShearCoagulationStrategy(
             distribution_type="particle_resolved",
@@ -119,6 +120,7 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
+
     def test_step_particle_resolved(self):
         """Test the step method for particle_resolved distribution."""
         old_concentration = self.particle_resolved.get_total_concentration()
