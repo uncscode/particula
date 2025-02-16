@@ -311,7 +311,7 @@ class PresetParticleRadiusBuilder(
             SurfaceStrategyVolume(surface_tension=0.072, density=1000)
         )
         self.set_density(1000, "kg/m^3")
-        self.set_charge(0)
+        self.set_charge(np.zeros_like(self.radius_bins.shape))
         self.distribution_type = "pmf"
 
     def set_radius_bins(
@@ -534,7 +534,9 @@ class PresetResolvedParticleMassBuilder(
             SurfaceStrategyVolume(surface_tension=0.072, density=1000)
         )
         self.set_density(1000, "kg/m^3")
-        self.set_charge(0)
+        self.set_charge(
+            np.zeros_like((len(self.mode), self.particle_resolved_count))
+        )
         self.set_volume(1)
 
     def build(self) -> ParticleRepresentation:
