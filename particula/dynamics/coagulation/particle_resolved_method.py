@@ -7,8 +7,8 @@ from numpy.typing import NDArray
 from scipy.interpolate import RectBivariateSpline  # type: ignore
 
 from particula.dynamics.coagulation.super_droplet_method import (
-    bin_particles,
-    get_bin_pairs,
+    _bin_particles,
+    _get_bin_pairs,
 )
 
 
@@ -91,10 +91,10 @@ def get_particle_resolved_coagulation_step(
 
     # Step 1: Bin the particles based on their radii into corresponding kernel
     # bins
-    _, bin_indices = bin_particles(particle_radius, kernel_radius)
+    _, bin_indices = _bin_particles(particle_radius, kernel_radius)
 
     # Step 2: Precompute unique bin pairs for efficient coagulation
-    pair_indices = get_bin_pairs(bin_indices=bin_indices)
+    pair_indices = _get_bin_pairs(bin_indices=bin_indices)
 
     # Step 3: Interpolate the coagulation kernel for efficient lookups during
     # the coagulation process

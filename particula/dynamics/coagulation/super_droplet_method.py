@@ -11,7 +11,7 @@ from numpy.typing import NDArray
 from scipy.interpolate import RectBivariateSpline  # type: ignore
 
 
-def super_droplet_update_step(
+def _super_droplet_update_step(
     particle_radius: NDArray[np.float64],
     concentration: NDArray[np.float64],
     single_event_counter: NDArray[np.int64],
@@ -99,7 +99,7 @@ def super_droplet_update_step(
     return particle_radius, concentration, single_event_counter
 
 
-def event_pairs(
+def _event_pairs(
     lower_bin: int,
     upper_bin: int,
     kernel_max: Union[float, NDArray[np.float64]],
@@ -130,7 +130,7 @@ def event_pairs(
     )
 
 
-def sample_events(
+def _sample_events(
     events: float,
     volume: float,
     time_step: float,
@@ -225,7 +225,7 @@ def random_choice_indices(
     return lower_indices, upper_indices
 
 
-def select_random_indices(
+def _select_random_indices(
     lower_bin: int,
     upper_bin: int,
     events: int,
@@ -272,7 +272,7 @@ def select_random_indices(
     return lower_indices, upper_indices
 
 
-def bin_to_particle_indices(
+def _bin_to_particle_indices(
     lower_indices: NDArray[np.int64],
     upper_indices: NDArray[np.int64],
     lower_bin: int,
@@ -314,7 +314,7 @@ def bin_to_particle_indices(
     return small_index, large_index
 
 
-def filter_valid_indices(
+def _filter_valid_indices(
     small_index: NDArray[np.int64],
     large_index: NDArray[np.int64],
     particle_radius: NDArray[np.float64],
@@ -360,7 +360,7 @@ def filter_valid_indices(
     return small_index[valid_indices], large_index[valid_indices]
 
 
-def coagulation_events(
+def _coagulation_events(
     small_index: NDArray[np.int64],
     large_index: NDArray[np.int64],
     kernel_values: NDArray[np.float64],
@@ -408,7 +408,7 @@ def coagulation_events(
     return small_index[coagulation_occurs], large_index[coagulation_occurs]
 
 
-def sort_particles(
+def _sort_particles(
     particle_radius: NDArray[np.float64],
     particle_concentration: Optional[NDArray[np.float64]] = None,
 ) -> Tuple[
@@ -446,7 +446,7 @@ def sort_particles(
     return unsort_indices, sorted_radius, sorted_concentration
 
 
-def bin_particles(
+def _bin_particles(
     particle_radius: NDArray[np.float64],
     radius_bins: NDArray[np.float64],
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
@@ -473,7 +473,7 @@ def bin_particles(
     return number_in_bins, bin_indices
 
 
-def get_bin_pairs(
+def _get_bin_pairs(
     bin_indices: NDArray[np.int64],
 ) -> list[Tuple[int, int]]:
     """
@@ -489,7 +489,7 @@ def get_bin_pairs(
     return list(combinations_with_replacement(unique_bins, 2))
 
 
-def calculate_concentration_in_bins(
+def _calculate_concentration_in_bins(
     bin_indices: NDArray[np.int64],
     particle_concentration: NDArray[np.float64],
     number_in_bins: NDArray[np.float64],
@@ -517,7 +517,7 @@ def calculate_concentration_in_bins(
 
 
 # pylint: disable=too-many-positional-arguments, too-many-arguments, too-many-locals
-def super_droplet_coagulation_step(
+def get_super_droplet_coagulation_step(
     particle_radius: NDArray[np.float64],
     particle_concentration: NDArray[np.float64],
     kernel: NDArray[np.float64],
@@ -552,20 +552,20 @@ def super_droplet_coagulation_step(
             - Updated array of particle concentrations after coagulation.
     """
     # Step 1: Sort particles by size and obtain indices to revert sorting later
-    unsort_indices, sorted_radius, sorted_concentration = sort_particles(
+    unsort_indices, sorted_radius, sorted_concentration = _sort_particles(
         particle_radius=particle_radius,
         particle_concentration=particle_concentration,
     )
     # Step 2: Bin particles by size using the provided kernel radius bins
-    number_in_bins, bin_indices = bin_particles(
+    number_in_bins, bin_indices = _bin_particles(
         particle_radius=sorted_radius, radius_bins=kernel_radius
     )
     # Step 3: Precompute unique bin pairs for efficient coagulation
     # computations
-    pair_indices = get_bin_pairs(bin_indices=bin_indices)
+    pair_indices = _get_bin_pairs(bin_indices=bin_indices)
 
     # Step 4: Calculate the total concentration of particles within each bin
-    concentration_in_bins = calculate_concentration_in_bins(
+    concentration_in_bins = _calculate_concentration_in_bins(
         bin_indices=bin_indices,
         particle_concentration=sorted_concentration,  # type: ignore
         number_in_bins=number_in_bins,
@@ -591,7 +591,7 @@ def super_droplet_coagulation_step(
 
         # Step 7.2: Determine potential coagulation events between
         # particles in these bins
-        events = event_pairs(
+        events = _event_pairs(
             lower_bin=lower_bin,
             upper_bin=upper_bin,
             kernel_max=kernel_max,
@@ -600,7 +600,7 @@ def super_droplet_coagulation_step(
 
         # Step 7.3: Sample the number of coagulation events from a
         # Poisson distribution
-        num_events = sample_events(
+        num_events = _sample_events(
             events=events,
             volume=volume,
             time_step=time_step,
@@ -622,7 +622,7 @@ def super_droplet_coagulation_step(
 
         # Step 7.6: Randomly select indices of particles involved in the
         # coagulation events within the current bins
-        r_i_indices, r_j_indices = select_random_indices(
+        r_i_indices, r_j_indices = _select_random_indices(
             lower_bin=lower_bin,
             upper_bin=upper_bin,
             events=num_events,
@@ -632,7 +632,7 @@ def super_droplet_coagulation_step(
 
         # Step 7.7: Convert bin-relative indices to actual particle indices
         # in the sorted arrays
-        indices_i, indices_j = bin_to_particle_indices(
+        indices_i, indices_j = _bin_to_particle_indices(
             lower_indices=r_i_indices,
             upper_indices=r_j_indices,
             lower_bin=lower_bin,
@@ -642,7 +642,7 @@ def super_droplet_coagulation_step(
 
         # Step 7.8: Filter out invalid particle pairs based on their radii
         # and event counters
-        indices_i, indices_j = filter_valid_indices(
+        indices_i, indices_j = _filter_valid_indices(
             small_index=indices_i,
             large_index=indices_j,
             particle_radius=particle_radius,
@@ -661,7 +661,7 @@ def super_droplet_coagulation_step(
 
         # Step 7.11: Determine which coagulation events actually occur based
         # on interpolated kernel probabilities
-        indices_i, indices_j = coagulation_events(
+        indices_i, indices_j = _coagulation_events(
             small_index=indices_i,
             large_index=indices_j,
             kernel_values=kernel_values,
@@ -673,7 +673,7 @@ def super_droplet_coagulation_step(
         # This step typically involves merging particles, updating
         # concentrations, and tracking events
         particle_radius, particle_concentration, single_event_counter = (
-            super_droplet_update_step(
+            _super_droplet_update_step(
                 particle_radius=particle_radius,
                 concentration=particle_concentration,
                 single_event_counter=single_event_counter,

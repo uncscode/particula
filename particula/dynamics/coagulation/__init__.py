@@ -23,7 +23,7 @@ from particula.dynamics.coagulation.particle_resolved_method import (
     get_particle_resolved_coagulation_step,
 )
 from particula.dynamics.coagulation.super_droplet_method import (
-    super_droplet_coagulation_step,
+    get_super_droplet_coagulation_step,
 )
 from particula.dynamics.coagulation import strategy
 from particula.dynamics.coagulation.coagulation_rate import (
@@ -38,4 +38,11 @@ from particula.dynamics.coagulation.charged_dimensionless_kernel import (
     get_coulomb_kernel_gatti2008,
     get_coulomb_kernel_gopalakrishnan2012,
     get_coulomb_kernel_chahl2019,
+)
+from particula.dynamics.coagulation.turbulent_shear_kernel import (
+    get_turbulent_shear_kernel_st1956_via_system_state,
+)
+from particula.dynamics.coagulation.turbulent_dns_kernel.turbulent_dns_kernel_ao2008 import (
+    get_turbulent_dns_kernel_ao2008,
+    get_turbulent_dns_kernel_ao2008_via_system_state,
 )

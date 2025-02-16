@@ -33,7 +33,7 @@ from particula.gas import properties as gas_properties
         "particle_inertia_time": "positive",
     }
 )
-def get_kernel_ao2008(
+def get_turbulent_dns_kernel_ao2008(
     particle_radius: Union[float, NDArray[np.float64]],
     velocity_dispersion: Union[float, NDArray[np.float64]],
     particle_inertia_time: Union[float, NDArray[np.float64]],
@@ -108,7 +108,7 @@ def get_kernel_ao2008(
     return gamma_12
 
 
-def get_kernel_ao2008_via_system_state(
+def get_turbulent_dns_kernel_ao2008_via_system_state(
     particle_radius: Union[float, NDArray[np.float64]],
     particle_density: Union[float, NDArray[np.float64]],
     fluid_density: float,
@@ -126,25 +126,26 @@ def get_kernel_ao2008_via_system_state(
     from the provided system state. The returned value (or array) represents
     the collision kernel, Γ₁₂ [m³/s], which describes collision frequency
     under turbulence.
+
     Arguments:
-    ----------
-    - particle_radius : Radius of the particles [m]. If an array is given, it
-        is assumed to represent multiple particle sizes.
-    - particle_density : Density of the particles [kg/m³]. Must match the
-        dimensionality of `particle_radius` if both are arrays.
-    - fluid_density : Density of the surrounding fluid [kg/m³].
-    - temperature : Temperature of the fluid [K].
-    - re_lambda : Turbulent Reynolds number based on the Taylor microscale.
-    - relative_velocity : Mean relative velocity between the particle and fluid
-        [m/s]. Can be a single value or an array of the same dimensionality as
-        `particle_radius`.
-    - turbulent_dissipation : Turbulent kinetic energy dissipation rate
-        [m²/s³].
+        - particle_radius : Radius of the particles [m]. If an array is given,
+            it is assumed to represent multiple particle sizes.
+        - particle_density : Density of the particles [kg/m³]. Must match the
+            dimensionality of `particle_radius` if both are arrays.
+        - fluid_density : Density of the surrounding fluid [kg/m³].
+        - temperature : Temperature of the fluid [K].
+        - re_lambda : Turbulent Reynolds number based on the Taylor microscale.
+        - relative_velocity : Mean relative velocity between the particle and
+            fluid [m/s]. Can be a single value or an array of the same
+            dimensionality as `particle_radius`.
+        - turbulent_dissipation : Turbulent kinetic energy dissipation rate
+            [m²/s³].
+
     Returns:
-    --------
-    - The geometric collision kernel Γ₁₂ [m³/s]. If inputs are scalars, returns
-        a float. If inputs are arrays, returns a numpy array of collision
-        kernels.
+        - The geometric collision kernel Γ₁₂ [m³/s]. If inputs are scalars,
+            returns a float. If inputs are arrays, returns a numpy array of
+            collision kernels.
+
     Notes:
     -----
     This function does the following:
@@ -157,8 +158,10 @@ def get_kernel_ao2008_via_system_state(
     5. Calculates velocity variance and auxiliary terms, e.g. Stokes number.
     6. Calls `get_kernel_ao2008` with all the necessary inputs to get the final
        collision kernel.
+
     References:
     -----------
+    - `get_turbulent_dns_kernel_ao2008` : Computes the kernel.
     - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
         the geometric collision rate of sedimenting droplets. Part 2.
         Theory and parameterization. New Journal of Physics, 10.
@@ -275,7 +278,7 @@ def get_kernel_ao2008_via_system_state(
     )
 
     # Compute Kernel Values
-    return get_kernel_ao2008(
+    return get_turbulent_dns_kernel_ao2008(
         particle_radius=particle_radius,
         velocity_dispersion=np.abs(velocity_dispersion),
         particle_inertia_time=particle_inertia_time,

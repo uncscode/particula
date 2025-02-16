@@ -23,7 +23,7 @@ from particula.gas.properties.kinematic_viscosity import (
 )
 
 
-def saffman_turner_1956(
+def get_turbulent_shear_kernel_st1956(
     particle_radius: NDArray[np.float64],
     turbulent_kinetic_energy: float,
     kinematic_viscosity: float,
@@ -60,7 +60,7 @@ def saffman_turner_1956(
     ) ** 0.5 * diameter_sum_matrix**3
 
 
-def saffman_turner_1956_via_system_state(
+def get_turbulent_shear_kernel_st1956_via_system_state(
     particle_radius: NDArray[np.float64],
     turbulent_kinetic_energy: float,
     temperature: float,
@@ -86,7 +86,7 @@ def saffman_turner_1956_via_system_state(
     kinematic_viscosity = get_kinematic_viscosity_via_system_state(
         temperature=temperature, fluid_density=fluid_density
     )
-    return saffman_turner_1956(
+    return get_turbulent_shear_kernel_st1956(
         particle_radius=particle_radius,
         turbulent_kinetic_energy=turbulent_kinetic_energy,
         kinematic_viscosity=kinematic_viscosity,

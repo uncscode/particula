@@ -5,8 +5,8 @@ Test the turbulent shear kernel functions.
 import numpy as np
 import pytest
 from particula.dynamics.coagulation.turbulent_shear_kernel import (
-    saffman_turner_1956,
-    saffman_turner_1956_via_system_state,
+    get_turbulent_shear_kernel_st1956,
+    get_turbulent_shear_kernel_st1956_via_system_state,
 )
 from particula.gas.properties.kinematic_viscosity import (
     get_kinematic_viscosity_via_system_state,
@@ -28,7 +28,7 @@ def test_turbulent_shear_kernel_single_value():
     ) ** 0.5 * (
         diameter_particle[:, np.newaxis] + diameter_particle[np.newaxis, :]
     ) ** 3
-    value = saffman_turner_1956(
+    value = get_turbulent_shear_kernel_st1956(
         diameter_particle / 2, turbulent_kinetic_energy, kinematic_viscosity
     )
     np.testing.assert_allclose(value, expected_kernel, rtol=1e-6)
@@ -47,10 +47,10 @@ def test_turbulent_shear_kernel_via_system_state():
     kinematic_viscosity = get_kinematic_viscosity_via_system_state(
         temperature=temperature, fluid_density=fluid_density
     )
-    expected_kernel = saffman_turner_1956(
+    expected_kernel = get_turbulent_shear_kernel_st1956(
         particle_radius, turbulent_kinetic_energy, kinematic_viscosity
     )
-    value = saffman_turner_1956_via_system_state(
+    value = get_turbulent_shear_kernel_st1956_via_system_state(
         particle_radius, turbulent_kinetic_energy, temperature, fluid_density
     )
     np.testing.assert_allclose(value, expected_kernel, rtol=1e-6)
@@ -62,7 +62,9 @@ def test_turbulent_shear_kernel_input_validation():
     raises a TypeError.
     """
     with pytest.raises(TypeError):
-        saffman_turner_1956("not a number", "not a number", "not a number")
+        get_turbulent_shear_kernel_st1956(
+            "not a number", "not a number", "not a number"
+        )
 
 
 def test_turbulent_shear_kernel_via_system_state_input_validation():
@@ -71,6 +73,6 @@ def test_turbulent_shear_kernel_via_system_state_input_validation():
     turbulent_shear_kernel_via_system_state raises a TypeError.
     """
     with pytest.raises(TypeError):
-        saffman_turner_1956_via_system_state(
+        get_turbulent_shear_kernel_st1956_via_system_state(
             "not a number", "not a number", "not a number", "not a number"
         )

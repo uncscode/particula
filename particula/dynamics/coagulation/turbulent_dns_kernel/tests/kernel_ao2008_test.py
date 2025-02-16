@@ -4,8 +4,8 @@ Tests that the collision kernel function can be evaluated get_kernel_ao2008.
 
 import unittest
 import numpy as np
-from particula.dynamics.coagulation.turbulent_dns_kernel.kernel_ao2008 import (
-    get_kernel_ao2008,
+from particula.dynamics.coagulation.turbulent_dns_kernel.turbulent_dns_kernel_ao2008 import (
+    get_turbulent_dns_kernel_ao2008,
 )
 
 
@@ -30,7 +30,7 @@ class TestKernelAO2008(unittest.TestCase):
 
     def test_get_kernel_ao2008_array(self):
         """Test get_kernel_ao2008 with NumPy array inputs."""
-        result = get_kernel_ao2008(
+        result = get_turbulent_dns_kernel_ao2008(
             self.particle_radius_array,
             self.velocity_dispersion_scalar,
             self.particle_inertia_time_array,
@@ -51,7 +51,7 @@ class TestKernelAO2008(unittest.TestCase):
     def test_invalid_inputs(self):
         """Ensure validation errors are raised for invalid inputs."""
         with self.assertRaises(ValueError):
-            get_kernel_ao2008(
+            get_turbulent_dns_kernel_ao2008(
                 -1 * self.particle_radius_array,
                 self.velocity_dispersion_scalar,
                 self.particle_inertia_time_array,
@@ -64,7 +64,7 @@ class TestKernelAO2008(unittest.TestCase):
             )  # Negative radius
 
         with self.assertRaises(ValueError):
-            get_kernel_ao2008(
+            get_turbulent_dns_kernel_ao2008(
                 self.particle_radius_array,
                 -1 * self.velocity_dispersion_scalar,
                 self.particle_inertia_time_array,
@@ -77,7 +77,7 @@ class TestKernelAO2008(unittest.TestCase):
             )  # Negative velocity_dispersion
 
         with self.assertRaises(ValueError):
-            get_kernel_ao2008(
+            get_turbulent_dns_kernel_ao2008(
                 self.particle_radius_array,
                 self.velocity_dispersion_scalar,
                 -1 * self.particle_inertia_time_array,
@@ -90,7 +90,7 @@ class TestKernelAO2008(unittest.TestCase):
             )  # Negative particle_inertia_time
 
         with self.assertRaises(ValueError):
-            get_kernel_ao2008(
+            get_turbulent_dns_kernel_ao2008(
                 self.particle_radius_array,
                 self.velocity_dispersion_scalar,
                 self.particle_inertia_time_array,

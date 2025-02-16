@@ -29,58 +29,6 @@ import numpy as np
 from particula.particles.properties import coulomb_enhancement
 from particula.dynamics.coagulation import charged_dimensionless_kernel
 
-
-def dimensional_kernel(
-    dimensionless_kernel: NDArray[np.float64],
-    coulomb_potential_ratio: NDArray[np.float64],
-    sum_of_radii: NDArray[np.float64],
-    reduced_mass: NDArray[np.float64],
-    reduced_friction_factor: NDArray[np.float64],
-) -> NDArray[np.float64]:
-    """
-    The dimensioned coagulation kernel for each particle pair, calculated
-    from the dimensionless coagulation kernel and the reduced quantities.
-    All inputs are square matrices, for all particle-particle interactions.
-
-    Args:
-    -----
-    - dimensionless_kernel: The dimensionless coagulation kernel
-    [dimensionless].
-    - coulomb_potential_ratio: The Coulomb potential ratio [dimensionless].
-    - sum_of_radii: The sum of the radii of the particles [m].
-    - reduced_mass: The reduced mass of the particles [kg].
-    - reduced_friction_factor: The reduced friction factor of the
-    particles [dimensionless].
-
-    Returns:
-    --------
-    The dimensioned coagulation kernel, as a square matrix, of all
-    particle-particle interactions [m^3/s].
-
-    Check, were the /s comes from.
-
-    References:
-    -----------
-    - Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
-    molecular regime Coulombic collisions in aerosols and dusty plasmas.
-    Aerosol Science and Technology, 53(8), 933-957.
-    https://doi.org/10.1080/02786826.2019.1614522
-    """
-    coulomb_kinetic_limit = coulomb_enhancement.kinetic(
-        coulomb_potential_ratio
-    )
-    coulomb_continuum_limit = coulomb_enhancement.continuum(
-        coulomb_potential_ratio
-    )
-    return (
-        dimensionless_kernel
-        * reduced_friction_factor
-        * sum_of_radii**3
-        * coulomb_kinetic_limit**2
-        / (reduced_mass * coulomb_continuum_limit)
-    )
-
-
 class KernelStrategy(ABC):
     """
     Abstract class for dimensionless coagulation strategies. This class defines
