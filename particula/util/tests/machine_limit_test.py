@@ -2,7 +2,11 @@
 
 import warnings
 import numpy as np
-from particula.util.machine_limit import safe_exp, safe_log, safe_log10
+from particula.util.machine_limit import (
+    safe_exp,
+    safe_log,
+    safe_log10,
+)
 
 
 def test_safe_exp():
