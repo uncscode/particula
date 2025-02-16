@@ -34,7 +34,7 @@ def test_sedimentation_kernel():
 def test_sedimentation_kernel_via_system_state():
     """Test the sedimentation kernel via system state."""
     particle_radius = np.array([1e-6, 2e-6, 3e-6, 4e-6])
-    density_particle = np.array([1000, 1000, 1000, 1000])
+    particle_density = np.array([1000, 1000, 1000, 1000])
     temperature = 298.15
     pressure = 101325
     expected_kernel = np.array(
@@ -48,7 +48,7 @@ def test_sedimentation_kernel_via_system_state():
 
     kernel = get_sedimentation_kernel_sp2016_via_system_state(
         particle_radius=particle_radius,
-        density_particle=density_particle,
+        particle_density=particle_density,
         temperature=temperature,
         pressure=pressure,
         calculate_collision_efficiency=False,
