@@ -72,18 +72,3 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
                 particle=particle, temperature=temperature, pressure=pressure
             )
         return combined_kernel
-
-    def step(
-        self,
-        particle: ParticleRepresentation,
-        temperature: float,
-        pressure: float,
-        time_step: float,
-    ) -> ParticleRepresentation:
-        particle.add_concentration(
-            self.net_rate(
-                particle=particle, temperature=temperature, pressure=pressure
-            )
-            * time_step
-        )
-        return particle

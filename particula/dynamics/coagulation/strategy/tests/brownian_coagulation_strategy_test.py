@@ -60,7 +60,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
             np.array_equal(initial_concentration, updated_concentration)
         )
 
-    def test_kernel_particle_resolved(self):
+    def test_step_particle_resolved(self):
         """Test the kernel calculation for particle_resolved distribution."""
         # Test the kernel calculation for particle_resolved distribution
         old_concentration = self.particle_resolved.get_total_concentration()

@@ -2,7 +2,7 @@
 """
 
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import Union, Optional
 import logging
 from numpy.typing import NDArray
 import numpy as np
@@ -11,6 +11,13 @@ from particula.particles.representation import ParticleRepresentation
 from particula.dynamics.coagulation import coagulation_rate
 from particula.particles import properties
 from particula.gas import properties as gas_properties
+from particula.particles.change_particle_representation import (
+    get_particle_resolved_binned_radius,
+    get_speciated_mass_representation_from_particle_resolved,
+)
+from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (
+    get_particle_resolved_coagulation_step,
+)
 
 logger = logging.getLogger("particula")
 
@@ -34,9 +41,13 @@ class CoagulationStrategyABC(ABC):
         coulomb_potential_ratio: Calculate the Coulomb potential ratio.
     """
 
-    def __init__(self, distribution_type: str):
-        self.distribution_type = distribution_type
-
+    def __init__(
+        self,
+        distribution_type: str,
+        particle_resolved_kernel_radius: Optional[NDArray[np.float64]] = None,
+        particle_resolved_kernel_bins_number: Optional[int] = None,
+        particle_resolved_kernel_bins_per_decade: int = 10,
+    ):
         if distribution_type not in [
             "discrete",
             "continuous_pdf",
@@ -46,6 +57,16 @@ class CoagulationStrategyABC(ABC):
                 "Invalid distribution type. Must be one of 'discrete', "
                 + "'continuous_pdf', or 'particle_resolved'."
             )
+        self.distribution_type = distribution_type
+        self.random_generator = np.random.default_rng()
+        # for particle resolved coagulation strategy
+        self.particle_resolved_radius = particle_resolved_kernel_radius
+        self.particle_resolved_bins_number = (
+            particle_resolved_kernel_bins_number
+        )
+        self.particle_resolved_bins_per_decade = (
+            particle_resolved_kernel_bins_per_decade
+        )
 
     @abstractmethod
     def dimensionless_kernel(
@@ -194,7 +215,6 @@ class CoagulationStrategyABC(ABC):
         gain_rate = self.gain_rate(particle=particle, kernel=kernel)
         return gain_rate - loss_rate
 
-    @abstractmethod
     def step(
         self,
         particle: ParticleRepresentation,
@@ -215,6 +235,53 @@ class CoagulationStrategyABC(ABC):
         Returns:
             ParticleRepresentation: The particle after the coagulation step.
         """
+
+        if self.distribution_type in ["discrete", "continuous_pdf"]:
+            particle.add_concentration(
+                self.net_rate(  # type: ignore
+                    particle=particle,
+                    temperature=temperature,
+                    pressure=pressure,
+                )
+                * time_step
+            )
+            return particle
+
+        if self.distribution_type == "particle_resolved":
+            # get the kernel radius
+            kernel_radius = get_particle_resolved_binned_radius(
+                particle=particle,
+                bin_radius=self.particle_resolved_radius,
+                total_bins=self.particle_resolved_bins_number,
+                bins_per_radius_decade=self.particle_resolved_bins_per_decade,
+            )
+            # convert particle representation to calculate kernel
+            kernel_particle = (
+                get_speciated_mass_representation_from_particle_resolved(
+                    particle=particle,
+                    bin_radius=kernel_radius,
+                )
+            )
+            # calculate step
+            loss_gain_indices = get_particle_resolved_coagulation_step(
+                particle_radius=particle.get_radius(),
+                kernel=self.kernel(
+                    particle=kernel_particle,
+                    temperature=temperature,
+                    pressure=pressure,
+                ),
+                kernel_radius=kernel_radius,
+                volume=particle.get_volume(),
+                time_step=time_step,
+                random_generator=self.random_generator,
+            )
+            return particle.collide_pairs(loss_gain_indices)
+
+        raise ValueError(
+            "Invalid distribution type. "
+            "Must be either 'discrete', 'continuous_pdf', or"
+            " 'particle_resolved'."
+        )
 
     def diffusive_knudsen(
         self,

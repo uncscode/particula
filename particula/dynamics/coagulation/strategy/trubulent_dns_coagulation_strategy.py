@@ -110,19 +110,3 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
             relative_velocity=self.relative_velocity,
             temperature=temperature,
         )
-
-    def step(
-        self,
-        particle: ParticleRepresentation,
-        temperature: float,
-        pressure: float,
-        time_step: float,
-    ) -> ParticleRepresentation:
-
-        particle.add_concentration(
-            self.net_rate(  # type: ignore
-                particle=particle, temperature=temperature, pressure=pressure
-            )
-            * time_step
-        )
-        return particle
