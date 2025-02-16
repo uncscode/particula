@@ -12,7 +12,7 @@ from particula.dynamics.coagulation.strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
 from particula.dynamics.coagulation.turbulent_shear_kernel import (
-    saffman_turner_1956_via_system_state,
+    get_turbulent_shear_kernel_st1956_via_system_state,
 )
 
 logger = logging.getLogger("particula")
@@ -82,7 +82,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
 
-        return saffman_turner_1956_via_system_state(
+        return get_turbulent_shear_kernel_st1956_via_system_state(
             particle_radius=particle.get_radius(),
             turbulent_kinetic_energy=self.turbulent_kinetic_energy,
             temperature=temperature,

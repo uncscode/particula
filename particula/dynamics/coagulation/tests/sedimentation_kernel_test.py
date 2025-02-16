@@ -4,8 +4,8 @@ Test the sedimentation kernel functions.
 
 import numpy as np
 from particula.dynamics.coagulation.sedimentation_kernel import (
-    sedimentation_sp2016,
-    sedimentation_sp2016_via_system_state,
+    get_sedimentation_kernel_sp2016,
+    get_sedimentation_kernel_sp2016_via_system_state,
 )
 
 
@@ -22,7 +22,7 @@ def test_sedimentation_kernel():
         ]
     )
 
-    kernel = sedimentation_sp2016(
+    kernel = get_sedimentation_kernel_sp2016(
         radius_particle=radius_particle,
         settling_velocities=settling_velocities,
         calculate_collision_efficiency=False,
@@ -46,7 +46,7 @@ def test_sedimentation_kernel_via_system_state():
         ]
     )
 
-    kernel = sedimentation_sp2016_via_system_state(
+    kernel = get_sedimentation_kernel_sp2016_via_system_state(
         radius_particle=radius_particle,
         density_particle=density_particle,
         temperature=temperature,
