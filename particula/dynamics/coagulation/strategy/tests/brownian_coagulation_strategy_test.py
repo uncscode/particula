@@ -36,6 +36,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         self.pressure = 101325  # Pascal
 
     def test_kernel_discrete(self):
+        """Test the kernel calculation for discrete distribution."""
         # Test the kernel calculation for discrete distribution
         kernel = self.strategy_discrete.kernel(
             particle=self.particle,
@@ -45,6 +46,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         self.assertIsInstance(kernel, np.ndarray)
 
     def test_step_discrete(self):
+        """Test the step method for discrete distribution."""
         # Test the step method for discrete distribution
         initial_concentration = self.particle.get_concentration().copy()
         self.strategy_discrete.step(
@@ -59,6 +61,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         )
 
     def test_kernel_particle_resolved(self):
+        """Test the kernel calculation for particle_resolved distribution."""
         # Test the kernel calculation for particle_resolved distribution
         old_concentration = self.particle_resolved.get_total_concentration()
         self.strategy_particle_resolved.step(
@@ -71,6 +74,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         self.assertNotEqual(old_concentration, new_concentration)
 
     def test_kernel_continuous_pdf(self):
+        """Test the kernel calculation for continuous_pdf distribution."""
         # Test the kernel calculation for continuous_pdf distribution
         kernel = self.strategy_continuous_pdf.kernel(
             particle=self.particle,
@@ -80,6 +84,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         self.assertIsInstance(kernel, np.ndarray)
 
     def test_step_continuous_pdf(self):
+        """Test the step method for continuous_pdf distribution."""
         # Test the step method for continuous_pdf distribution
         initial_concentration = self.particle.get_concentration().copy()
         self.strategy_continuous_pdf.step(
