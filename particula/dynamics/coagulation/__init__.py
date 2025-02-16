@@ -25,17 +25,12 @@ from particula.dynamics.coagulation.particle_resolved_method import (
 from particula.dynamics.coagulation.super_droplet_method import (
     super_droplet_coagulation_step,
 )
-from particula.dynamics.coagulation.strategy.strategy import (
-    BrownianCoagulationStrategy,
-    ChargedCoagulationStrategy,
-    ParticleResolvedCoagulationStrategy,
-    TurbulentShearCoagulationStrategy,
-)
-from particula.dynamics.coagulation.rate import (
-    continuous_loss,
-    discrete_loss,
-    discrete_gain,
-    continuous_gain,
+from particula.dynamics.coagulation import strategy
+from particula.dynamics.coagulation.coagulation_rate import (
+    get_coagulation_loss_rate_continuous,
+    get_coagulation_loss_rate_discrete,
+    get_coagulation_gain_rate_discrete,
+    get_coagulation_gain_rate_continuous,
 )
 from particula.dynamics.coagulation.charged_dimensionless_kernel import (
     get_hard_sphere_kernel,

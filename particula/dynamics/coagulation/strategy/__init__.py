@@ -1,7 +1,13 @@
 """Coagulation functions exposed via __init__.
 
-If you want specific sub functions, import them directly from
-`particula.next.dynamics.coagulation.xxx.xxx` instead.
+Exposed Calls:
+
+- `BrownianCoagulationStrategy`
+- `ChargedCoagulationStrategy`
+- `ParticleResolvedCoagulationStrategy`
+- `TurbulentShearCoagulationStrategy`
+- `CoagulationStrategy`
+
 """
 
 # pylint: disable=unused-import, disable=line-too-long
@@ -19,4 +25,7 @@ from particula.dynamics.coagulation.strategy.particle_resolved_coagulation_strat
 )
 from particula.dynamics.coagulation.strategy.turbulent_shear_coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
+)
+from particula.dynamics.coagulation.strategy.coagulation_strategy_abc import (
+    CoagulationStrategyABC,
 )

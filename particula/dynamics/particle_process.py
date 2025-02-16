@@ -11,7 +11,7 @@ from particula.aerosol import Aerosol
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationStrategy,
 )
-from particula.dynamics.coagulation.strategy.strategy import CoagulationStrategy
+from particula.dynamics.coagulation.strategy import CoagulationStrategyABC
 
 
 class MassCondensation(Runnable):
@@ -102,7 +102,7 @@ class Coagulation(Runnable):
         rate: Calculate the rate of coagulation for each particle.
     """
 
-    def __init__(self, coagulation_strategy: CoagulationStrategy):
+    def __init__(self, coagulation_strategy: CoagulationStrategyABC):
         self.coagulation_strategy = coagulation_strategy
 
     def execute(

@@ -1,6 +1,7 @@
 """
 Turbulent Shear Coagulation Strategy
 """
+
 from typing import Union
 import logging
 import numpy as np
@@ -8,7 +9,7 @@ from numpy.typing import NDArray
 
 from particula.particles.representation import ParticleRepresentation
 from particula.dynamics.coagulation.strategy.coagulation_strategy_abc import (
-    CoagulationStrategy,
+    CoagulationStrategyABC,
 )
 from particula.dynamics.coagulation.turbulent_shear_kernel import (
     saffman_turner_1956_via_system_state,
@@ -17,7 +18,7 @@ from particula.dynamics.coagulation.turbulent_shear_kernel import (
 logger = logging.getLogger("particula")
 
 
-class TurbulentShearCoagulationStrategy(CoagulationStrategy):
+class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
     """
     Turbulent Shear coagulation strategy.
 
@@ -51,7 +52,9 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategy):
         turbulent_kinetic_energy: float,
         fluid_density: float,
     ):
-        CoagulationStrategy.__init__(self, distribution_type=distribution_type)
+        CoagulationStrategyABC.__init__(
+            self, distribution_type=distribution_type
+        )
         self.turbulent_kinetic_energy = turbulent_kinetic_energy
         self.fluid_density = fluid_density
 

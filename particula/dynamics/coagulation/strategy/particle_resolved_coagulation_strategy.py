@@ -10,7 +10,7 @@ from numpy.typing import NDArray
 
 from particula.particles.representation import ParticleRepresentation
 from particula.dynamics.coagulation.strategy.coagulation_strategy_abc import (
-    CoagulationStrategy,
+    CoagulationStrategyABC,
 )
 from particula.dynamics.coagulation.particle_resolved_method import (
     get_particle_resolved_coagulation_step,
@@ -19,7 +19,7 @@ from particula.dynamics.coagulation.particle_resolved_method import (
 logger = logging.getLogger("particula")
 
 
-class ParticleResolvedCoagulationStrategy(CoagulationStrategy):
+class ParticleResolvedCoagulationStrategy(CoagulationStrategyABC):
     """
     Particle-resolved coagulation strategy class. This class implements the
     methods defined in the CoagulationStrategy abstract class. The kernel
@@ -53,7 +53,9 @@ class ParticleResolvedCoagulationStrategy(CoagulationStrategy):
                 "Must be 'particle_resolved' for "
                 "`ParticleResolvedCoagulationStrategy`."
             )
-        CoagulationStrategy.__init__(self, distribution_type=distribution_type)
+        CoagulationStrategyABC.__init__(
+            self, distribution_type=distribution_type
+        )
         self.kernel_radius = kernel_radius
         self.kernel_bins_number = kernel_bins_number
         self.kernel_bins_per_decade = kernel_bins_per_decade
