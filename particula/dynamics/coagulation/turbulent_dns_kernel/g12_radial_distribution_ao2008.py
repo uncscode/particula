@@ -125,7 +125,7 @@ def _calculate_c1(
         kolmogorov_velocity / kolmogorov_time
     )
 
-    return y_stokes / (gravity_term**f3_lambda)
+    return y_stokes / np.power(gravity_term, f3_lambda)
 
 
 def _compute_y_stokes(
