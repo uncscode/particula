@@ -4,19 +4,19 @@ Tests for BrownianCoagulationStrategy.
 
 import unittest
 import numpy as np
-from particula.particles.representation import ParticleRepresentation
-from particula.dynamics.coagulation.strategy.brownian_coagulation_strategy import BrownianCoagulationStrategy
+from particula.dynamics.coagulation.strategy.brownian_coagulation_strategy import (
+    BrownianCoagulationStrategy,
+)
+from particula.particles import PresetParticleRadiusBuilder
+
 
 class TestBrownianCoagulationStrategy(unittest.TestCase):
     def setUp(self):
         # Setup a particle representation for testing
-        self.particle = ParticleRepresentation(
-            distribution=np.array([1.0, 2.0, 3.0]),
-            density=1.0,
-            concentration=np.array([10, 20, 30]),
-            charge=1.0
+        self.particle = PresetParticleRadiusBuilder().build()
+        self.strategy = BrownianCoagulationStrategy(
+            distribution_type="discrete"
         )
-        self.strategy = BrownianCoagulationStrategy(distribution_type="discrete")
         self.temperature = 298.15  # Kelvin
         self.pressure = 101325  # Pascal
 
@@ -25,7 +25,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         kernel = self.strategy.kernel(
             particle=self.particle,
             temperature=self.temperature,
-            pressure=self.pressure
+            pressure=self.pressure,
         )
         self.assertIsInstance(kernel, np.ndarray)
 
@@ -36,10 +36,9 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
             particle=self.particle,
             temperature=self.temperature,
             pressure=self.pressure,
-            time_step=1.0
+            time_step=1.0,
         )
         updated_concentration = self.particle.get_concentration()
-        self.assertFalse(np.array_equal(initial_concentration, updated_concentration))
-
-if __name__ == '__main__':
-    unittest.main()
+        self.assertFalse(
+            np.array_equal(initial_concentration, updated_concentration)
+        )
