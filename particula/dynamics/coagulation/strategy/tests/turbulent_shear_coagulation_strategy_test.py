@@ -8,8 +8,11 @@ both discrete and continuous_pdf distribution types.
 
 import unittest
 import numpy as np
-from particula.dynamics.coagulation.strategy.turbulent_shear_coagulation_strategy import TurbulentShearCoagulationStrategy
+from particula.dynamics.coagulation.strategy.turbulent_shear_coagulation_strategy import (
+    TurbulentShearCoagulationStrategy,
+)
 from particula.particles import PresetParticleRadiusBuilder
+
 
 class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
     """
@@ -34,12 +37,12 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         self.strategy_discrete = TurbulentShearCoagulationStrategy(
             distribution_type="discrete",
             turbulent_kinetic_energy=self.turbulent_kinetic_energy,
-            fluid_density=self.fluid_density
+            fluid_density=self.fluid_density,
         )
         self.strategy_continuous_pdf = TurbulentShearCoagulationStrategy(
             distribution_type="continuous_pdf",
             turbulent_kinetic_energy=self.turbulent_kinetic_energy,
-            fluid_density=self.fluid_density
+            fluid_density=self.fluid_density,
         )
 
     def test_kernel_discrete(self):
@@ -108,5 +111,6 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
             np.array_equal(initial_concentration, updated_concentration)
         )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
