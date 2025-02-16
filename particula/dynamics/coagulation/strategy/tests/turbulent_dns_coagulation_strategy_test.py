@@ -11,7 +11,7 @@ import numpy as np
 from particula.dynamics.coagulation.strategy.trubulent_dns_coagulation_strategy import (
     TurbulentDNSCoagulationStrategy,
 )
-from particula.particles import PresetParticleRadiusBuilder
+from particula.particles import PresetParticleRadiusBuilder, PresetResolvedParticleMassBuilder
 
 
 # pylint: disable=too-many-instance-attributes
@@ -25,8 +25,8 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
         Set up the test environment.
 
         Initializes a particle representation and creates instances of
-        TurbulentDNSCoagulationStrategy for both discrete and continuous_pdf
-        distribution types.
+        TurbulentDNSCoagulationStrategy for discrete, continuous_pdf, and
+        particle_resolved distribution types.
         """
         self.particle = PresetParticleRadiusBuilder().build()
         self.temperature = 298.15  # Kelvin
@@ -52,7 +52,18 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
             relative_velocity=self.relative_velocity,
         )
 
-    def test_kernel_discrete(self):
+        self.particle_resolved = (
+            PresetResolvedParticleMassBuilder()
+            .set_volume(1e-6)
+            .build()
+        )
+        self.strategy_particle_resolved = TurbulentDNSCoagulationStrategy(
+            distribution_type="particle_resolved",
+            turbulent_dissipation=self.turbulent_dissipation,
+            fluid_density=self.fluid_density,
+            reynolds_lambda=self.reynolds_lambda,
+            relative_velocity=self.relative_velocity,
+        )
         """
         Test the kernel calculation for discrete distribution.
 
@@ -117,3 +128,14 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
+    def test_step_particle_resolved(self):
+        """Test the step method for particle_resolved distribution."""
+        old_concentration = self.particle_resolved.get_total_concentration()
+        self.strategy_particle_resolved.step(
+            particle=self.particle_resolved,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1000,
+        )
+        new_concentration = self.particle_resolved.get_total_concentration()
+        self.assertNotEqual(old_concentration, new_concentration)
