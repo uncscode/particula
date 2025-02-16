@@ -8,14 +8,14 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.particles.representation import ParticleRepresentation
-from particula.dynamics.coagulation import rate
+from particula.dynamics.coagulation import coagulation_rate
 from particula.particles import properties
 from particula.gas import properties as gas_properties
 
 logger = logging.getLogger("particula")
 
 
-class CoagulationStrategy(ABC):
+class CoagulationStrategyABC(ABC):
     """
     Abstract class for defining a coagulation strategy. This class defines the
     methods that must be implemented by any coagulation strategy.
@@ -112,12 +112,12 @@ class CoagulationStrategy(ABC):
                 'discrete' and 'continuous_pdf' are valid.
         """
         if self.distribution_type == "discrete":
-            return rate.discrete_loss(
+            return coagulation_rate.get_coagulation_loss_rate_discrete(
                 concentration=particle.concentration,
                 kernel=kernel,
             )
         if self.distribution_type == "continuous_pdf":
-            return rate.continuous_loss(
+            return coagulation_rate.get_coagulation_loss_rate_continuous(
                 radius=particle.get_radius(),
                 concentration=particle.concentration,
                 kernel=kernel,
@@ -150,13 +150,13 @@ class CoagulationStrategy(ABC):
                 'discrete' and 'continuous_pdf' are valid.
         """
         if self.distribution_type == "discrete":
-            return rate.discrete_gain(
+            return coagulation_rate.get_coagulation_gain_rate_discrete(
                 radius=particle.get_radius(),
                 concentration=particle.concentration,
                 kernel=kernel,
             )
         if self.distribution_type == "continuous_pdf":
-            return rate.continuous_gain(
+            return coagulation_rate.get_coagulation_gain_rate_continuous(
                 radius=particle.get_radius(),
                 concentration=particle.concentration,
                 kernel=kernel,

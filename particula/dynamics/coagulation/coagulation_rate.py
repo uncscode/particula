@@ -16,7 +16,7 @@ import numpy as np
 from scipy.interpolate import RectBivariateSpline  # type: ignore
 
 
-def discrete_loss(
+def get_coagulation_loss_rate_discrete(
     concentration: Union[float, NDArray[np.float64]],
     kernel: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
@@ -37,7 +37,7 @@ def discrete_loss(
     return np.sum(kernel * np.outer(concentration, concentration), axis=0)
 
 
-def discrete_gain(
+def get_coagulation_gain_rate_discrete(
     radius: Union[float, NDArray[np.float64]],
     concentration: Union[float, NDArray[np.float64]],
     kernel: NDArray[np.float64],
@@ -93,7 +93,7 @@ def discrete_gain(
     return gain * delta_x_array
 
 
-def continuous_loss(
+def get_coagulation_loss_rate_continuous(
     radius: Union[float, NDArray[np.float64]],
     concentration: Union[float, NDArray[np.float64]],
     kernel: NDArray[np.float64],
@@ -117,7 +117,7 @@ def continuous_loss(
     return concentration * np.trapezoid(y=kernel * concentration, x=radius)
 
 
-def continuous_gain(
+def get_coagulation_gain_rate_continuous(
     radius: Union[float, NDArray[np.float64]],
     concentration: Union[float, NDArray[np.float64]],
     kernel: NDArray[np.float64],

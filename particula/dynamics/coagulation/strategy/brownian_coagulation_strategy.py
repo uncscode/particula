@@ -10,7 +10,7 @@ from numpy.typing import NDArray
 
 from particula.particles.representation import ParticleRepresentation
 from particula.dynamics.coagulation.strategy.coagulation_strategy_abc import (
-    CoagulationStrategy,
+    CoagulationStrategyABC,
 )
 from particula.dynamics.coagulation.brownian_kernel import (
     get_brownian_kernel_via_system_state,
@@ -19,7 +19,7 @@ from particula.dynamics.coagulation.brownian_kernel import (
 logger = logging.getLogger("particula")
 
 
-class BrownianCoagulationStrategy(CoagulationStrategy):
+class BrownianCoagulationStrategy(CoagulationStrategyABC):
     """
     Discrete Brownian coagulation strategy class. This class implements the
     methods defined in the CoagulationStrategy abstract class.
@@ -43,7 +43,9 @@ class BrownianCoagulationStrategy(CoagulationStrategy):
     """
 
     def __init__(self, distribution_type: str):
-        CoagulationStrategy.__init__(self, distribution_type=distribution_type)
+        CoagulationStrategyABC.__init__(
+            self, distribution_type=distribution_type
+        )
 
     def dimensionless_kernel(
         self,
