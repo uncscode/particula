@@ -20,6 +20,7 @@ from particula.dynamics.coagulation.strategy.brownian_coagulation_strategy impor
 from particula.particles import PresetParticleRadiusBuilder
 
 
+# pylint: disable=too-many-instance-attributes
 class TestCombineCoagulationStrategy(unittest.TestCase):
     """
     Test suite for the CombineCoagulationStrategy class.
@@ -97,7 +98,3 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

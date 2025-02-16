@@ -20,9 +20,6 @@ from particula.dynamics.coagulation.strategy.brownian_coagulation_strategy impor
 from particula.dynamics.coagulation.strategy.charged_coagulation_strategy import (
     ChargedCoagulationStrategy,
 )
-from particula.dynamics.coagulation.strategy.particle_resolved_coagulation_strategy import (
-    ParticleResolvedCoagulationStrategy,
-)
 from particula.dynamics.coagulation.strategy.turbulent_shear_coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
 )

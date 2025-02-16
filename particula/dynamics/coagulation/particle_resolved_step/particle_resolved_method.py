@@ -6,7 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 from scipy.interpolate import RectBivariateSpline  # type: ignore
 
-from particula.dynamics.coagulation.super_droplet_method import (
+from particula.dynamics.coagulation.particle_resolved_step.super_droplet_method import (
     _bin_particles,
     _get_bin_pairs,
 )
