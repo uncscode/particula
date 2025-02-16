@@ -8,9 +8,13 @@ both discrete and continuous_pdf distribution types.
 
 import unittest
 import numpy as np
-from particula.dynamics.coagulation.strategy.trubulent_dns_coagulation_strategy import TurbulentDNSCoagulationStrategy
+from particula.dynamics.coagulation.strategy.trubulent_dns_coagulation_strategy import (
+    TurbulentDNSCoagulationStrategy,
+)
 from particula.particles import PresetParticleRadiusBuilder
 
+
+# pylint: disable=too-many-instance-attributes
 class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
     """
     Test suite for the TurbulentDNSCoagulationStrategy class.
@@ -38,14 +42,14 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
             turbulent_dissipation=self.turbulent_dissipation,
             fluid_density=self.fluid_density,
             reynolds_lambda=self.reynolds_lambda,
-            relative_velocity=self.relative_velocity
+            relative_velocity=self.relative_velocity,
         )
         self.strategy_continuous_pdf = TurbulentDNSCoagulationStrategy(
             distribution_type="continuous_pdf",
             turbulent_dissipation=self.turbulent_dissipation,
             fluid_density=self.fluid_density,
             reynolds_lambda=self.reynolds_lambda,
-            relative_velocity=self.relative_velocity
+            relative_velocity=self.relative_velocity,
         )
 
     def test_kernel_discrete(self):
@@ -113,6 +117,3 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
-
-if __name__ == '__main__':
-    unittest.main()
