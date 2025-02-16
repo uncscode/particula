@@ -17,30 +17,39 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
     Test suite for the ChargedCoagulationStrategy class.
     """
     def setUp(self):
-        """
-        Set up the test environment.
+            """
+            Set up the test environment.
 
-        Initializes a particle representation and creates instances of
-        ChargedCoagulationStrategy for both discrete and continuous_pdf
-        distribution types.
-        """
-        # Setup a particle representation for testing
-        self.particle = PresetParticleRadiusBuilder().build()
-        self.temperature = 298.15  # Kelvin
-        self.pressure = 101325  # Pascal
+            Initializes a particle representation and creates instances of
+            ChargedCoagulationStrategy for discrete, continuous_pdf, and
+            particle_resolved distribution types.
+            """
+            # Setup a particle representation for testing
+            self.particle = PresetParticleRadiusBuilder().build()
+            self.temperature = 298.15  # Kelvin
+            self.pressure = 101325  # Pascal
 
-        # Create a kernel strategy instance
-        self.kernel_strategy = HardSphereKernelStrategy()
+            # Create a kernel strategy instance
+            self.kernel_strategy = HardSphereKernelStrategy()
 
-        # Create strategies for both distribution types
-        self.strategy_discrete = ChargedCoagulationStrategy(
-            distribution_type="discrete",
-            kernel_strategy=self.kernel_strategy
-        )
-        self.strategy_continuous_pdf = ChargedCoagulationStrategy(
-            distribution_type="continuous_pdf",
-            kernel_strategy=self.kernel_strategy
-        )
+            # Create strategies for all distribution types
+            self.strategy_discrete = ChargedCoagulationStrategy(
+                distribution_type="discrete",
+                kernel_strategy=self.kernel_strategy
+            )
+            self.strategy_continuous_pdf = ChargedCoagulationStrategy(
+                distribution_type="continuous_pdf",
+                kernel_strategy=self.kernel_strategy
+            )
+            self.particle_resolved = (
+                PresetResolvedParticleMassBuilder()
+                .set_volume(1e-6)
+                .build()
+            )
+            self.strategy_particle_resolved = ChargedCoagulationStrategy(
+                distribution_type="particle_resolved",
+                kernel_strategy=self.kernel_strategy
+            )
 
     def test_kernel_discrete(self):
         """
@@ -79,16 +88,6 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
 
     def test_kernel_particle_resolved(self):
         """Test the kernel calculation for particle_resolved distribution."""
-        # Setup a particle representation for particle_resolved testing
-        self.particle_resolved = (
-            PresetResolvedParticleMassBuilder()
-            .set_volume(1e-6)
-            .build()
-        )
-        self.strategy_particle_resolved = ChargedCoagulationStrategy(
-            distribution_type="particle_resolved",
-            kernel_strategy=self.kernel_strategy
-        )
 
         # Test the kernel calculation for particle_resolved distribution
         old_concentration = self.particle_resolved.get_total_concentration()
