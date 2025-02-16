@@ -11,6 +11,7 @@ import numpy as np
 from particula.dynamics.coagulation.strategy.sedimentation_coagulation_strategy import SedimentationCoagulationStrategy
 from particula.particles import PresetParticleRadiusBuilder
 
+
 class TestSedimentationCoagulationStrategy(unittest.TestCase):
     """
     Test suite for the SedimentationCoagulationStrategy class.
@@ -107,6 +108,3 @@ class TestSedimentationCoagulationStrategy(unittest.TestCase):
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
-
-if __name__ == '__main__':
-    unittest.main()
