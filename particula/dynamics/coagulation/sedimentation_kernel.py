@@ -35,7 +35,7 @@ def calculate_collision_efficiency_function(
 
 
 def get_sedimentation_kernel_sp2016(
-    radius_particle: NDArray[np.float64],
+    particle_radius: NDArray[np.float64],
     settling_velocities: NDArray[np.float64],
     calculate_collision_efficiency: bool = True,
 ) -> NDArray[np.float64]:
@@ -49,14 +49,12 @@ def get_sedimentation_kernel_sp2016(
     collision efficiency
 
     Args:
-    -----
-        - radius_particle : Array of particle radii [m].
+        - particle_radius : Array of particle radii [m].
         - settling_velocities : Array of particle settling velocities [m/s].
         - calculate_collision_efficiency : Boolean to calculate collision
             efficiency or use 1.
 
     Returns:
-    --------
         - Sedimentation kernel matrix for aerosol particles [m^3/s].
 
     References:
@@ -64,7 +62,7 @@ def get_sedimentation_kernel_sp2016(
         physics, Chapter 13, Equation 13A.4.
     """
     diameter_matrix = 2 * (
-        radius_particle[:, np.newaxis] + radius_particle[np.newaxis, :]
+        particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
     )
     velocity_diff_matrix = np.abs(
         settling_velocities[:, np.newaxis] - settling_velocities[np.newaxis, :]
@@ -73,7 +71,7 @@ def get_sedimentation_kernel_sp2016(
     if calculate_collision_efficiency:
         collision_efficiency_matrix = np.vectorize(
             calculate_collision_efficiency_function
-        )(radius_particle[:, np.newaxis], radius_particle[np.newaxis, :])
+        )(particle_radius[:, np.newaxis], particle_radius[np.newaxis, :])
     else:
         collision_efficiency_matrix = np.ones_like(diameter_matrix)
 
@@ -88,7 +86,7 @@ def get_sedimentation_kernel_sp2016(
 
 @validate_inputs({"temperature": "positive", "pressure": "positive"})
 def get_sedimentation_kernel_sp2016_via_system_state(
-    radius_particle: NDArray[np.float64],
+    particle_radius: NDArray[np.float64],
     density_particle: NDArray[np.float64],
     temperature: float,
     pressure: float,
@@ -99,7 +97,7 @@ def get_sedimentation_kernel_sp2016_via_system_state(
 
     Args:
     -----
-        - radius_particle : Array of particle radii [m].
+        - particle_radius : Array of particle radii [m].
         - density_particle : Array of particle densities [kg/m³].
         - temperature : Temperature of the system [K].
         - pressure : Pressure of the system [Pa].
@@ -111,14 +109,14 @@ def get_sedimentation_kernel_sp2016_via_system_state(
         - Sedimentation kernel matrix for aerosol particles [m^3/s].
     """
     settling_velocities = particle_settling_velocity_via_system_state(
-        particle_radius=radius_particle,
+        particle_radius=particle_radius,
         particle_density=density_particle,
         temperature=temperature,
         pressure=pressure,
     )
 
     return get_sedimentation_kernel_sp2016(
-        radius_particle=radius_particle,
+        particle_radius=particle_radius,
         settling_velocities=settling_velocities,
         calculate_collision_efficiency=calculate_collision_efficiency,
     )

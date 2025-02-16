@@ -32,7 +32,7 @@ def test_mass_particle_representation_builder():
     assert isinstance(particle_representation, ParticleRepresentation)
 
 
-def test_radius_particle_representation_builder():
+def test_particle_radius_representation_builder():
     """Test RadiusParticleRepresentationBuilder Builds."""
     builder = ParticleRadiusRepresentationBuilder()
     builder.set_distribution_strategy(RadiiBasedMovingBin())
@@ -46,7 +46,7 @@ def test_radius_particle_representation_builder():
     assert isinstance(particle_representation, ParticleRepresentation)
 
 
-def test_limited_radius_particle_builder():
+def test_limited_particle_radius_builder():
     """Test LimitedRadiusParticleBuilder Builds."""
     # default values
     builder = PresetParticleRadiusBuilder()

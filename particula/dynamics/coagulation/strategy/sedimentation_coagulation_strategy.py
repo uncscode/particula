@@ -1,5 +1,5 @@
 """
-Turbulent Shear Coagulation Strategy
+Sedimentation Coagulation Strategy
 """
 
 from typing import Union
@@ -18,12 +18,12 @@ from particula.dynamics.coagulation.turbulent_shear_kernel import (
 logger = logging.getLogger("particula")
 
 
-class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
+class SedimentationCoagulationStrategy(CoagulationStrategyABC):
     """
-    Turbulent Shear coagulation strategy.
+    Sedimentation coagulation strategy.
 
     This implements the methods defined in `CoagulationStrategy` abstract
-    class. Applied to the Saffman and Turner (1956) turbulent shear
+    class. Applied to the Seinfeld and Pandis (2016) sedimentation
     coagulation kernel.
 
     Arguments:
@@ -41,9 +41,8 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
     - net_rate : Calculate the net coagulation rate.
 
     References:
-    - Saffman, P. G., & Turner, J. S. (1956). On the collision of drops in
-        turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
-        https://doi.org/10.1017/S0022112056000020
+    - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+        physics, Chapter 13, Equation 13A.4.
     """
 
     def __init__(
