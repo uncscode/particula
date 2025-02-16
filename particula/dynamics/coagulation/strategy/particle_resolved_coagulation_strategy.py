@@ -123,7 +123,7 @@ class ParticleResolvedCoagulationStrategy(CoagulationStrategyABC):
         radius_bins = self.get_kernel_radius(particle)
         mass_bins = 4 / 3 * np.pi * np.power(radius_bins, 3) * 1000  # type: ignore
         return brownian_coagulation_kernel_via_system_state(
-            radius_particle=radius_bins,  # type: ignore
+            particle_radius=radius_bins,  # type: ignore
             mass_particle=mass_bins,  # type: ignore
             temperature=temperature,
             pressure=pressure,

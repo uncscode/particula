@@ -16,7 +16,7 @@ from particula.gas.properties import (
 
 
 def get_brownian_kernel(
-    radius_particle: Union[float, NDArray[np.float64]],
+    particle_radius: Union[float, NDArray[np.float64]],
     diffusivity_particle: Union[float, NDArray[np.float64]],
     g_collection_term_particle: Union[float, NDArray[np.float64]],
     mean_thermal_speed_particle: Union[float, NDArray[np.float64]],
@@ -28,7 +28,7 @@ def get_brownian_kernel(
 
     Args
     ----
-    radius_particle : The radius of the particles [m].
+    particle_radius : The radius of the particles [m].
     diffusivity_particle : The diffusivity of the particles [m^2/s].
     g_collection_term_particle : The collection term for Brownian coagulation
     [dimensionless].
@@ -49,7 +49,7 @@ def get_brownian_kernel(
     diffusivity_matrix = np.tile(
         diffusivity_particle, (len(diffusivity_particle), 1)
     )
-    radius_matrix = np.tile(radius_particle, (len(radius_particle), 1))
+    radius_matrix = np.tile(particle_radius, (len(particle_radius), 1))
     g_collection_term_matrix = (
         np.tile(
             g_collection_term_particle, (len(g_collection_term_particle), 1)
@@ -85,7 +85,7 @@ def get_brownian_kernel(
 
 
 def get_brownian_kernel_via_system_state(
-    radius_particle: Union[float, NDArray[np.float64]],
+    particle_radius: Union[float, NDArray[np.float64]],
     mass_particle: Union[float, NDArray[np.float64]],
     temperature: float,
     pressure: float,
@@ -95,7 +95,7 @@ def get_brownian_kernel_via_system_state(
     calculating the intermediate properties needed.
 
     Arguments:
-        radius_particle : The radius of the particles [m].
+        particle_radius : The radius of the particles [m].
         mass_particle : The mass of the particles [kg].
         temperature : The temperature of the air [K].
         pressure : The pressure of the air [Pa].
@@ -120,13 +120,13 @@ def get_brownian_kernel_via_system_state(
     )
     knudsen_number = properties.calculate_knudsen_number(
         air_mean_free_path,
-        radius_particle,
+        particle_radius,
     )
     slip_correction = properties.cunningham_slip_correction(
         knudsen_number=knudsen_number
     )
     aerodyanmic_mobility = properties.particle_aerodynamic_mobility(
-        radius_particle, slip_correction, dynamic_viscosity
+        particle_radius, slip_correction, dynamic_viscosity
     )
     particle_diffusivity = _brownian_diffusivity(
         temperature, aerodyanmic_mobility
@@ -143,11 +143,11 @@ def get_brownian_kernel_via_system_state(
         mean_thermal_speed_particle=mean_thermal_speed_particle,
     )
     g_collection_term_particle = _g_collection_term(
-        mean_free_path_particle, radius_particle
+        mean_free_path_particle, particle_radius
     )
     # get the coagulation kernel
     return get_brownian_kernel(
-        radius_particle=radius_particle,
+        particle_radius=particle_radius,
         diffusivity_particle=particle_diffusivity,
         g_collection_term_particle=g_collection_term_particle,
         mean_thermal_speed_particle=mean_thermal_speed_particle,
@@ -188,7 +188,7 @@ def _mean_free_path_l(
 
 def _g_collection_term(
     mean_free_path_particle: Union[float, NDArray[np.float64]],
-    radius_particle: Union[float, NDArray[np.float64]],
+    particle_radius: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """Returns the `g` collection term for Brownian coagulation.
 
@@ -198,7 +198,7 @@ def _g_collection_term(
     Args
     ----
     mean_free_path_particle : The mean free path of the particles [m].
-    radius_particle : The radius of the particles [m].
+    particle_radius : The radius of the particles [m].
 
     Returns
     -------
@@ -215,9 +215,9 @@ def _g_collection_term(
     values are too small, by about 2x.
     """
     return (
-        (2 * radius_particle + mean_free_path_particle) ** 3
-        - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3 / 2)
-    ) / (6 * radius_particle * mean_free_path_particle) - 2 * radius_particle
+        (2 * particle_radius + mean_free_path_particle) ** 3
+        - (4 * particle_radius**2 + mean_free_path_particle**2) ** (3 / 2)
+    ) / (6 * particle_radius * mean_free_path_particle) - 2 * particle_radius
 
 
 def _brownian_diffusivity(

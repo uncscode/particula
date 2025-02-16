@@ -11,7 +11,7 @@ from particula.dynamics.coagulation.sedimentation_kernel import (
 
 def test_sedimentation_kernel():
     """Test just the sedimentation kernel."""
-    radius_particle = np.array([1e-6, 2e-6, 3e-6, 4e-6])
+    particle_raidus = np.array([1e-6, 2e-6, 3e-6, 4e-6])
     settling_velocities = np.array([0.01, 0.02, 0.03, 0.04])
     expected_kernel = np.array(
         [
@@ -23,7 +23,7 @@ def test_sedimentation_kernel():
     )
 
     kernel = get_sedimentation_kernel_sp2016(
-        radius_particle=radius_particle,
+        particle_radius=particle_raidus,
         settling_velocities=settling_velocities,
         calculate_collision_efficiency=False,
     )
@@ -33,7 +33,7 @@ def test_sedimentation_kernel():
 
 def test_sedimentation_kernel_via_system_state():
     """Test the sedimentation kernel via system state."""
-    radius_particle = np.array([1e-6, 2e-6, 3e-6, 4e-6])
+    particle_radius = np.array([1e-6, 2e-6, 3e-6, 4e-6])
     density_particle = np.array([1000, 1000, 1000, 1000])
     temperature = 298.15
     pressure = 101325
@@ -47,7 +47,7 @@ def test_sedimentation_kernel_via_system_state():
     )
 
     kernel = get_sedimentation_kernel_sp2016_via_system_state(
-        radius_particle=radius_particle,
+        particle_radius=particle_radius,
         density_particle=density_particle,
         temperature=temperature,
         pressure=pressure,

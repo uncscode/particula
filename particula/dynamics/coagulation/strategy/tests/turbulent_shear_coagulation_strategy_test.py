@@ -110,7 +110,3 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
-
-
-if __name__ == "__main__":
-    unittest.main()

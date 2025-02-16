@@ -54,13 +54,13 @@ def test_g_collection_term_single_value():
     radius of particles.
     """
     mean_free_path_particle = 6.085302617379366e-08  # mean free path in meters
-    radius_particle = 1e-5  # radius in meters
+    particle_radius = 1e-5  # radius in meters
     expected_value = (
-        (2 * radius_particle + mean_free_path_particle) ** 3
-        - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3 / 2)
-    ) / (6 * radius_particle * mean_free_path_particle) - 2 * radius_particle
+        (2 * particle_radius + mean_free_path_particle) ** 3
+        - (4 * particle_radius**2 + mean_free_path_particle**2) ** (3 / 2)
+    ) / (6 * particle_radius * mean_free_path_particle) - 2 * particle_radius
     value = brownian_kernel._g_collection_term(
-        mean_free_path_particle, radius_particle
+        mean_free_path_particle, particle_radius
     )
     assert np.isclose(value, expected_value)
 
@@ -71,13 +71,13 @@ def test_g_collection_term_array_input():
     radius of particles.
     """
     mean_free_path_particle = np.array([0.0005, 0.0005])
-    radius_particle = np.array([0.0001, 0.0002])
+    particle_radius = np.array([0.0001, 0.0002])
     expected_value = (
-        (2 * radius_particle + mean_free_path_particle) ** 3
-        - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3 / 2)
-    ) / (6 * radius_particle * mean_free_path_particle) - 2 * radius_particle
+        (2 * particle_radius + mean_free_path_particle) ** 3
+        - (4 * particle_radius**2 + mean_free_path_particle**2) ** (3 / 2)
+    ) / (6 * particle_radius * mean_free_path_particle) - 2 * particle_radius
     value = brownian_kernel._g_collection_term(
-        mean_free_path_particle, radius_particle
+        mean_free_path_particle, particle_radius
     )
     np.testing.assert_allclose(value, expected_value, rtol=1e-6)
 
@@ -97,10 +97,10 @@ def test_g_collection_term_zero_radius():
     without crashing.
     """
     mean_free_path_particle = 0.0005
-    radius_particle = 0.0
+    particle_radius = 0.0
     with pytest.raises(ZeroDivisionError):
         brownian_kernel._g_collection_term(
-            mean_free_path_particle, radius_particle
+            mean_free_path_particle, particle_radius
         )
 
 
@@ -140,7 +140,7 @@ def test_brownian_coagulation_kernel_basic():
     """
     Test brownian_coagulation_kernel with basic input values.
     """
-    radius_particle = np.array([1e-9, 2e-9])  # radii in meters
+    particle_radius = np.array([1e-9, 2e-9])  # radii in meters
     diffusivity_particle = np.array([1e-12, 1e-12])  # diffusivity in m^2/s
     g_collection_term_particle = np.array([0.5, 0.5])  # dimensionless
     mean_thermal_speed_particle = np.array([100, 100])  # speed in m/s
@@ -152,7 +152,7 @@ def test_brownian_coagulation_kernel_basic():
     )
 
     result_kernel = brownian_kernel.get_brownian_kernel(
-        radius_particle,
+        particle_radius,
         diffusivity_particle,
         g_collection_term_particle,
         mean_thermal_speed_particle,
@@ -166,7 +166,7 @@ def test_brownian_coagulation_kernel_with_defaults():
     """
     Test that default parameters are handled correctly.
     """
-    radius_particle = np.array([1e-9])  # single radius
+    particle_radius = np.array([1e-9])  # single radius
     diffusivity_particle = np.array([1e-12])  # single diffusivity
     g_collection_term_particle = np.array([0.5])  # single collection term
     mean_thermal_speed_particle = np.array([100])  # single speed
@@ -175,7 +175,7 @@ def test_brownian_coagulation_kernel_with_defaults():
     expected_kernel = np.array([1.77697548e-15])
 
     result_kernel = brownian_kernel.get_brownian_kernel(
-        radius_particle,
+        particle_radius,
         diffusivity_particle,
         g_collection_term_particle,
         mean_thermal_speed_particle,
@@ -198,8 +198,8 @@ def test_brownian_coagulation_kernel_via_system_state_basic():
     Test the complete system function with basic input values.
     """
     # diameters, 2 nm, 1 um, 20 um
-    radius_particle = np.array([1e-9, 5e-7, 10e-6])  # radii in meters
-    mass_particle = 4 / 3 * np.pi * radius_particle**3 * 1000  # mass in kg
+    particle_radius = np.array([1e-9, 5e-7, 10e-6])  # radii in meters
+    mass_particle = 4 / 3 * np.pi * particle_radius**3 * 1000  # mass in kg
     temperature = 298  # temperature in Kelvin
     pressure = 101325  # pressure in Pascal
     alpha_collision_efficiency = np.array([1.0, 1.0, 1.0])  # dimensionless
@@ -219,7 +219,7 @@ def test_brownian_coagulation_kernel_via_system_state_basic():
 
     # Call the system function
     result = brownian_kernel.get_brownian_kernel_via_system_state(
-        radius_particle,
+        particle_radius,
         mass_particle,
         temperature,
         pressure,
@@ -237,7 +237,7 @@ def test_brownian_coagulation_kernel_via_system_state_input_validation():
     """
     with pytest.raises(TypeError):
         brownian_kernel.get_brownian_kernel_via_system_state(
-            radius_particle="not a number",
+            particle_radius="not a number",
             mass_particle="not a number",
             temperature="not a number",
             pressure="not a number",
