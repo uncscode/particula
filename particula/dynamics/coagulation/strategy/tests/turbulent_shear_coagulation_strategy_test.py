@@ -11,7 +11,7 @@ import numpy as np
 from particula.dynamics.coagulation.strategy.turbulent_shear_coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
 )
-from particula.particles import PresetParticleRadiusBuilder
+from particula.particles import PresetParticleRadiusBuilder, PresetResolvedParticleMassBuilder
 
 
 class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
@@ -24,8 +24,8 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         Set up the test environment.
 
         Initializes a particle representation and creates instances of
-        TurbulentShearCoagulationStrategy for both discrete and continuous_pdf
-        distribution types.
+        TurbulentShearCoagulationStrategy for discrete, continuous_pdf, and
+        particle_resolved distribution types.
         """
         self.particle = PresetParticleRadiusBuilder().build()
         self.temperature = 298.15  # Kelvin
@@ -33,7 +33,7 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         self.turbulent_dissipation = 0.1  # m^2/s^2
         self.fluid_density = 1.225  # kg/m^3
 
-        # Create strategies for both distribution types
+        # Create strategies for all distribution types
         self.strategy_discrete = TurbulentShearCoagulationStrategy(
             distribution_type="discrete",
             turbulent_dissipation=self.turbulent_dissipation,
@@ -45,7 +45,16 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
             fluid_density=self.fluid_density,
         )
 
-    def test_kernel_discrete(self):
+        self.particle_resolved = (
+            PresetResolvedParticleMassBuilder()
+            .set_volume(1e-6)
+            .build()
+        )
+        self.strategy_particle_resolved = TurbulentShearCoagulationStrategy(
+            distribution_type="particle_resolved",
+            turbulent_dissipation=self.turbulent_dissipation,
+            fluid_density=self.fluid_density,
+        )
         """
         Test the kernel calculation for discrete distribution.
 
@@ -110,3 +119,14 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
+    def test_step_particle_resolved(self):
+        """Test the step method for particle_resolved distribution."""
+        old_concentration = self.particle_resolved.get_total_concentration()
+        self.strategy_particle_resolved.step(
+            particle=self.particle_resolved,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1000,
+        )
+        new_concentration = self.particle_resolved.get_total_concentration()
+        self.assertNotEqual(old_concentration, new_concentration)
