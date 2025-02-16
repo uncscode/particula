@@ -27,7 +27,58 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.particles.properties import coulomb_enhancement
-from particula.dynamics.coagulation import transition_regime
+from particula.dynamics.coagulation import charged_dimensionless_kernel
+
+
+def dimensional_kernel(
+    dimensionless_kernel: NDArray[np.float64],
+    coulomb_potential_ratio: NDArray[np.float64],
+    sum_of_radii: NDArray[np.float64],
+    reduced_mass: NDArray[np.float64],
+    reduced_friction_factor: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    """
+    The dimensioned coagulation kernel for each particle pair, calculated
+    from the dimensionless coagulation kernel and the reduced quantities.
+    All inputs are square matrices, for all particle-particle interactions.
+
+    Args:
+    -----
+    - dimensionless_kernel: The dimensionless coagulation kernel
+    [dimensionless].
+    - coulomb_potential_ratio: The Coulomb potential ratio [dimensionless].
+    - sum_of_radii: The sum of the radii of the particles [m].
+    - reduced_mass: The reduced mass of the particles [kg].
+    - reduced_friction_factor: The reduced friction factor of the
+    particles [dimensionless].
+
+    Returns:
+    --------
+    The dimensioned coagulation kernel, as a square matrix, of all
+    particle-particle interactions [m^3/s].
+
+    Check, were the /s comes from.
+
+    References:
+    -----------
+    - Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
+    molecular regime Coulombic collisions in aerosols and dusty plasmas.
+    Aerosol Science and Technology, 53(8), 933-957.
+    https://doi.org/10.1080/02786826.2019.1614522
+    """
+    coulomb_kinetic_limit = coulomb_enhancement.kinetic(
+        coulomb_potential_ratio
+    )
+    coulomb_continuum_limit = coulomb_enhancement.continuum(
+        coulomb_potential_ratio
+    )
+    return (
+        dimensionless_kernel
+        * reduced_friction_factor
+        * sum_of_radii**3
+        * coulomb_kinetic_limit**2
+        / (reduced_mass * coulomb_continuum_limit)
+    )
 
 
 class KernelStrategy(ABC):
@@ -115,8 +166,6 @@ class KernelStrategy(ABC):
         The dimensioned coagulation kernel, as a square matrix, of all
         particle-particle interactions [m^3/s].
 
-        Check, were the /s comes from.
-
         References:
         -----------
         - Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
@@ -124,23 +173,17 @@ class KernelStrategy(ABC):
         Aerosol Science and Technology, 53(8), 933-957.
         https://doi.org/10.1080/02786826.2019.1614522
         """
-        coulomb_kinetic_limit = coulomb_enhancement.kinetic(
-            coulomb_potential_ratio
-        )
-        coulomb_continuum_limit = coulomb_enhancement.continuum(
-            coulomb_potential_ratio
-        )
-        return (
-            dimensionless_kernel
-            * reduced_friction_factor
-            * sum_of_radii**3
-            * coulomb_kinetic_limit**2
-            / (reduced_mass * coulomb_continuum_limit)
+        return charged_dimensionless_kernel.get_dimensional_kernel(
+            dimensionless_kernel=dimensionless_kernel,
+            coulomb_potential_ratio=coulomb_potential_ratio,
+            sum_of_radii=sum_of_radii,
+            reduced_mass=reduced_mass,
+            reduced_friction_factor=reduced_friction_factor,
         )
 
 
 # define strategies
-class HardSphere(KernelStrategy):
+class HardSphereKernelStrategy(KernelStrategy):
     """
     Hard sphere dimensionless coagulation strategy.
     """
@@ -150,10 +193,10 @@ class HardSphere(KernelStrategy):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],  # type: ignore
     ) -> NDArray[np.float64]:
-        return transition_regime.hard_sphere(diffusive_knudsen)  # type: ignore
+        return charged_dimensionless_kernel.get_hard_sphere_kernel(diffusive_knudsen)  # type: ignore
 
 
-class CoulombDyachkov2007(KernelStrategy):
+class CoulombDyachkov2007KernelStrategy(KernelStrategy):
     """
     Dyachkov et al. (2007) approximation for the dimensionless coagulation
     kernel. Accounts for the Coulomb potential between particles.
@@ -171,12 +214,12 @@ class CoulombDyachkov2007(KernelStrategy):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        return transition_regime.coulomb_dyachkov2007(
+        return charged_dimensionless_kernel.get_coulomb_kernel_dyachkov2007(
             diffusive_knudsen, coulomb_potential_ratio
         )  # type: ignore
 
 
-class CoulombGatti2008(KernelStrategy):
+class CoulombGatti2008KernelStrategy(KernelStrategy):
     """
     Gatti and Kortshagen (2008) approximation for the dimensionless coagulation
     kernel. Accounts for the Coulomb potential between particles.
@@ -194,12 +237,12 @@ class CoulombGatti2008(KernelStrategy):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        return transition_regime.coulomb_gatti2008(
+        return charged_dimensionless_kernel.get_coulomb_kernel_gatti2008(
             diffusive_knudsen, coulomb_potential_ratio
         )  # type: ignore
 
 
-class CoulombGopalakrishnan2012(KernelStrategy):
+class CoulombGopalakrishnan2012KernelStrategy(KernelStrategy):
     """
     Gopalakrishnan and Hogan (2012) approximation for the dimensionless
     coagulation kernel. Accounts for the Coulomb potential between particles.
@@ -217,12 +260,14 @@ class CoulombGopalakrishnan2012(KernelStrategy):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        return transition_regime.coulomb_gopalakrishnan2012(
-            diffusive_knudsen, coulomb_potential_ratio
+        return (
+            charged_dimensionless_kernel.get_coulomb_kernel_gopalakrishnan2012(
+                diffusive_knudsen, coulomb_potential_ratio
+            )
         )  # type: ignore
 
 
-class CoulumbChahl2019(KernelStrategy):
+class CoulumbChahl2019KernelStrategy(KernelStrategy):
     """
     Chahl and Gopalakrishnan (2019) approximation for the dimensionless
     coagulation kernel. Accounts for the Coulomb potential between particles.
@@ -240,6 +285,6 @@ class CoulumbChahl2019(KernelStrategy):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        return transition_regime.coulomb_chahl2019(
+        return charged_dimensionless_kernel.get_coulomb_kernel_chahl2019(
             diffusive_knudsen, coulomb_potential_ratio
         )  # type: ignore

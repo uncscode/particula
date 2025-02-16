@@ -4,11 +4,11 @@ import time
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
 from particula.dynamics.coagulation.particle_resolved_method import (
-    interpolate_kernel,
-    calculate_probabilities,
-    resolve_final_coagulation_state,
-    particle_resolved_update_step,
-    particle_resolved_coagulation_step,
+    _interpolate_kernel,
+    _calculate_probabilities,
+    _final_coagulation_state,
+    get_particle_resolved_update_step,
+    get_particle_resolved_coagulation_step,
 )
 
 
@@ -16,7 +16,7 @@ def test_interpolate_kernel():
     """Test the interpolate_kernel function."""
     kernel = np.random.rand(10, 10)
     kernel_radius = np.linspace(0, 1, 10)
-    interp_func = interpolate_kernel(kernel, kernel_radius)
+    interp_func = _interpolate_kernel(kernel, kernel_radius)
     assert isinstance(interp_func, RectBivariateSpline)
 
 
@@ -27,7 +27,7 @@ def test_calculate_probabilities():
     events = 10
     tests = 5
     volume = 100.0
-    probabilities = calculate_probabilities(
+    probabilities = _calculate_probabilities(
         kernel_values, time_step, events, tests, volume
     )
     expected_probabilities = (
@@ -41,10 +41,8 @@ def test_resolve_final_coagulation_state():
     small_indices = np.array([0, 1, 2], dtype=np.int64)
     large_indices = np.array([2, 3, 4], dtype=np.int64)
     particle_radius = np.array([1.0, 2.0, 3.0, 4.0, 5.0], dtype=np.float64)
-    updated_small_indices, updated_large_indices = (
-        resolve_final_coagulation_state(
-            small_indices, large_indices, particle_radius
-        )
+    updated_small_indices, updated_large_indices = _final_coagulation_state(
+        small_indices, large_indices, particle_radius
     )
     assert len(updated_small_indices) == len(small_indices)
     assert len(updated_large_indices) == len(large_indices)
@@ -70,10 +68,8 @@ def test_resolve_final_coagulation_state_large():
 
     # Time the function
     start_time = time.time()
-    updated_small_indices, updated_large_indices = (
-        resolve_final_coagulation_state(
-            small_indices, large_indices, particle_radius
-        )
+    updated_small_indices, updated_large_indices = _final_coagulation_state(
+        small_indices, large_indices, particle_radius
     )
     end_time = time.time()
     elapsed_time = end_time - start_time
@@ -94,8 +90,10 @@ def test_particle_resolved_update_step():
     gain = np.zeros_like(particle_radius)
     small_index = np.array([0], dtype=np.int64)
     large_index = np.array([1], dtype=np.int64)
-    updated_radius, updated_loss, updated_gain = particle_resolved_update_step(
-        particle_radius, loss, gain, small_index, large_index
+    updated_radius, updated_loss, updated_gain = (
+        get_particle_resolved_update_step(
+            particle_radius, loss, gain, small_index, large_index
+        )
     )
     assert updated_radius[0] == 0
     assert updated_radius[1] > 2.0
@@ -111,7 +109,7 @@ def test_particle_resolved_coagulation_step():
     volume = 100.0
     time_step = 1.0
     random_generator = np.random.default_rng(seed=42)
-    loss_gain_index = particle_resolved_coagulation_step(
+    loss_gain_index = get_particle_resolved_coagulation_step(
         particle_radius,
         kernel,
         kernel_radius,
@@ -131,7 +129,7 @@ def test_particle_resolved_coagulation_step_empty_array():
     volume = 100.0
     time_step = 1.0
     random_generator = np.random.default_rng(seed=42)
-    loss_gain_index = particle_resolved_coagulation_step(
+    loss_gain_index = get_particle_resolved_coagulation_step(
         particle_radius,
         kernel,
         kernel_radius,
@@ -150,7 +148,7 @@ def test_particle_resolved_coagulation_step_duplicate_collisions():
     volume = 100.0
     time_step = 1.0
     random_generator = np.random.default_rng(seed=42)
-    loss_gain_index = particle_resolved_coagulation_step(
+    loss_gain_index = get_particle_resolved_coagulation_step(
         particle_radius,
         kernel,
         kernel_radius,

@@ -15,98 +15,7 @@ from particula.gas.properties import (
 )
 
 
-def mean_free_path_l(
-    diffusivity_particle: Union[float, NDArray[np.float64]],
-    mean_thermal_speed_particle: Union[float, NDArray[np.float64]],
-) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the mean free path of particles for coagulation.
-
-    Calculate the mean free path of particles, defined for Brownian
-    coagulation as the ratio of the diffusivity of the particles to their mean
-    thermal speed. This parameter is crucial for understanding particle
-    dynamics in a fluid.
-
-    Args:
-    ----
-    - diffusivity_particle : The diffusivity of the particles [m^2/s].
-    - mean_thermal_speed_particle : The mean thermal speed of the particles
-    [m/s].
-
-    Returns:
-    -------
-    The mean free path of the particles [m].
-
-    References:
-    ----------
-    Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-    physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
-    Coefficient K12.
-    """
-    return 8 * diffusivity_particle / (np.pi * mean_thermal_speed_particle)
-
-
-def g_collection_term(
-    mean_free_path_particle: Union[float, NDArray[np.float64]],
-    radius_particle: Union[float, NDArray[np.float64]],
-) -> Union[float, NDArray[np.float64]]:
-    """Returns the `g` collection term for Brownian coagulation.
-
-    Defined as the ratio of the mean free path of the particles to the
-    radius of the particles.
-
-    Args
-    ----
-    mean_free_path_particle : The mean free path of the particles [m].
-    radius_particle : The radius of the particles [m].
-
-    Returns
-    -------
-    The collection term for Brownian coagulation [dimensionless].
-
-    References
-    ----------
-    Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-    physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
-    Coefficient K12
-
-    The np.sqrt(2) term appears to be an error in the text, as the term is
-    not used in the second edition of the book. And when it it is used, the
-    values are too small, by about 2x.
-    """
-    return (
-        (2 * radius_particle + mean_free_path_particle) ** 3
-        - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3 / 2)
-    ) / (6 * radius_particle * mean_free_path_particle) - 2 * radius_particle
-
-
-def brownian_diffusivity(
-    temperature: Union[float, NDArray[np.float64]],
-    aerodynamic_mobility: Union[float, NDArray[np.float64]],
-) -> Union[float, NDArray[np.float64]]:
-    """Returns the diffusivity of the particles due to Brownian motion
-
-    THis is just the scaled aerodynamic mobility of the particles.
-
-    Args
-    ----
-    - temperature : The temperature of the air [K].
-    - aerodynamic_mobility : The aerodynamic mobility of the particles [m^2/s].
-
-    Returns
-    -------
-    The diffusivity of the particles due to Brownian motion [m^2/s].
-
-    References
-    ----------
-    Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-    physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
-    Coefficient K12
-    """
-    return float(BOLTZMANN_CONSTANT) * temperature * aerodynamic_mobility
-
-
-def brownian_coagulation_kernel(
+def get_brownian_kernel(
     radius_particle: Union[float, NDArray[np.float64]],
     diffusivity_particle: Union[float, NDArray[np.float64]],
     g_collection_term_particle: Union[float, NDArray[np.float64]],
@@ -175,7 +84,7 @@ def brownian_coagulation_kernel(
     )
 
 
-def brownian_coagulation_kernel_via_system_state(
+def get_brownian_kernel_via_system_state(
     radius_particle: Union[float, NDArray[np.float64]],
     mass_particle: Union[float, NDArray[np.float64]],
     temperature: float,
@@ -219,7 +128,7 @@ def brownian_coagulation_kernel_via_system_state(
     aerodyanmic_mobility = properties.particle_aerodynamic_mobility(
         radius_particle, slip_correction, dynamic_viscosity
     )
-    particle_diffusivity = brownian_diffusivity(
+    particle_diffusivity = _brownian_diffusivity(
         temperature, aerodyanmic_mobility
     )
 
@@ -229,18 +138,109 @@ def brownian_coagulation_kernel_via_system_state(
     )
 
     # get g collection term
-    mean_free_path_particle = mean_free_path_l(
+    mean_free_path_particle = _mean_free_path_l(
         diffusivity_particle=particle_diffusivity,
         mean_thermal_speed_particle=mean_thermal_speed_particle,
     )
-    g_collection_term_particle = g_collection_term(
+    g_collection_term_particle = _g_collection_term(
         mean_free_path_particle, radius_particle
     )
     # get the coagulation kernel
-    return brownian_coagulation_kernel(
+    return get_brownian_kernel(
         radius_particle=radius_particle,
         diffusivity_particle=particle_diffusivity,
         g_collection_term_particle=g_collection_term_particle,
         mean_thermal_speed_particle=mean_thermal_speed_particle,
         alpha_collision_efficiency=alpha_collision_efficiency,
     )
+
+
+def _mean_free_path_l(
+    diffusivity_particle: Union[float, NDArray[np.float64]],
+    mean_thermal_speed_particle: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """
+    Calculate the mean free path of particles for coagulation.
+
+    Calculate the mean free path of particles, defined for Brownian
+    coagulation as the ratio of the diffusivity of the particles to their mean
+    thermal speed. This parameter is crucial for understanding particle
+    dynamics in a fluid.
+
+    Args:
+    ----
+    - diffusivity_particle : The diffusivity of the particles [m^2/s].
+    - mean_thermal_speed_particle : The mean thermal speed of the particles
+    [m/s].
+
+    Returns:
+    -------
+    The mean free path of the particles [m].
+
+    References:
+    ----------
+    Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+    physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
+    Coefficient K12.
+    """
+    return 8 * diffusivity_particle / (np.pi * mean_thermal_speed_particle)
+
+
+def _g_collection_term(
+    mean_free_path_particle: Union[float, NDArray[np.float64]],
+    radius_particle: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """Returns the `g` collection term for Brownian coagulation.
+
+    Defined as the ratio of the mean free path of the particles to the
+    radius of the particles.
+
+    Args
+    ----
+    mean_free_path_particle : The mean free path of the particles [m].
+    radius_particle : The radius of the particles [m].
+
+    Returns
+    -------
+    The collection term for Brownian coagulation [dimensionless].
+
+    References
+    ----------
+    Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+    physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
+    Coefficient K12
+
+    The np.sqrt(2) term appears to be an error in the text, as the term is
+    not used in the second edition of the book. And when it it is used, the
+    values are too small, by about 2x.
+    """
+    return (
+        (2 * radius_particle + mean_free_path_particle) ** 3
+        - (4 * radius_particle**2 + mean_free_path_particle**2) ** (3 / 2)
+    ) / (6 * radius_particle * mean_free_path_particle) - 2 * radius_particle
+
+
+def _brownian_diffusivity(
+    temperature: Union[float, NDArray[np.float64]],
+    aerodynamic_mobility: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]:
+    """Returns the diffusivity of the particles due to Brownian motion
+
+    THis is just the scaled aerodynamic mobility of the particles.
+
+    Args
+    ----
+    - temperature : The temperature of the air [K].
+    - aerodynamic_mobility : The aerodynamic mobility of the particles [m^2/s].
+
+    Returns
+    -------
+    The diffusivity of the particles due to Brownian motion [m^2/s].
+
+    References
+    ----------
+    Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+    physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
+    Coefficient K12
+    """
+    return float(BOLTZMANN_CONSTANT) * temperature * aerodynamic_mobility

@@ -12,86 +12,7 @@ from particula.dynamics.coagulation.super_droplet_method import (
 )
 
 
-def interpolate_kernel(
-    kernel: NDArray[np.float64],
-    kernel_radius: NDArray[np.float64],
-) -> RectBivariateSpline:
-    """
-    Create a 2D interpolation function for the coagulation kernel.
-
-    Args:
-        kernel (NDArray[np.float64]): Coagulation kernel.
-        kernel_radius (NDArray[np.float64]): Radii corresponding to kernel
-            bins.
-
-    Returns:
-        RectBivariateSpline: Interpolated kernel function.
-    """
-    return RectBivariateSpline(x=kernel_radius, y=kernel_radius, z=kernel)
-
-
-def calculate_probabilities(
-    kernel_values: Union[float, NDArray[np.float64]],
-    time_step: float,
-    events: int,
-    tests: int,
-    volume: float,
-) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate coagulation probabilities based on kernel values and system
-    parameters.
-
-    Args:
-        kernel_values (float): Interpolated kernel value for a particle pair.
-        time_step (float): The time step over which coagulation occurs.
-        events (int): Number of possible coagulation events.
-        tests (int): Number of tests (or trials) for coagulation.
-        volume (float): Volume of the system.
-
-    Returns:
-        float: Coagulation probability.
-    """
-    return kernel_values * time_step * events / (tests * volume)
-
-
-def resolve_final_coagulation_state(
-    small_indices: NDArray[np.int64],
-    large_indices: NDArray[np.int64],
-    particle_radius: NDArray[np.float64],
-) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
-    """
-    Resolve the final state of particles that have undergone multiple
-    coagulation events.
-
-    Args:
-        small_indices (NDArray[np.int64]): Indices of smaller particles.
-        large_indices (NDArray[np.int64]): Indices of larger particles.
-        particle_radius (NDArray[np.float64]): Radii of particles.
-
-    Returns:
-        Tuple[NDArray[np.int64], NDArray[np.int64]]: Updated small and large
-        indices.
-    """
-    # Find common indices that appear in both small and large arrays
-    commons, small_common, large_common = np.intersect1d(
-        small_indices, large_indices, return_indices=True
-    )
-    # Sort particles by radius to resolve final states in the correct order
-    sorted_args = np.argsort(particle_radius[commons])
-    commons = commons[sorted_args]
-    small_common = small_common[sorted_args]
-    large_common = large_common[sorted_args]
-
-    # Remap to the largest particle in common to resolve the final state
-    for i, common in enumerate(commons):
-        final_value = large_indices[small_common[i]]
-        remap_index = np.flatnonzero(large_indices == common)
-        large_indices[remap_index] = final_value
-
-    return small_indices, large_indices
-
-
-def particle_resolved_update_step(
+def get_particle_resolved_update_step(
     particle_radius: NDArray[np.float64],
     loss: NDArray[np.float64],
     gain: NDArray[np.float64],
@@ -138,7 +59,7 @@ def particle_resolved_update_step(
 
 # pylint: disable=too-many-positional-arguments, too-many-arguments
 # pylint: disable=too-many-locals
-def particle_resolved_coagulation_step(
+def get_particle_resolved_coagulation_step(
     particle_radius: NDArray[np.float64],
     kernel: NDArray[np.float64],
     kernel_radius: NDArray[np.float64],
@@ -177,7 +98,7 @@ def particle_resolved_coagulation_step(
 
     # Step 3: Interpolate the coagulation kernel for efficient lookups during
     # the coagulation process
-    interp_kernel = interpolate_kernel(kernel, kernel_radius)
+    interp_kernel = _interpolate_kernel(kernel, kernel_radius)
 
     # Create output arrays to store the indices of small and large particles
     # involved in coagulation events
@@ -241,7 +162,7 @@ def particle_resolved_coagulation_step(
             kernel_value = np.diagonal(kernel_value)
 
         # Step 10: Calculate coagulation probabilities for each selected pair
-        coagulation_probabilities = calculate_probabilities(
+        coagulation_probabilities = _calculate_probabilities(
             kernel_value, time_step, events, tests, volume
         )
 
@@ -267,7 +188,7 @@ def particle_resolved_coagulation_step(
 
     # Step 14: Resolve any series of coagulation events that involve the same
     # particles multiple times
-    small_index_total, large_index_total = resolve_final_coagulation_state(
+    small_index_total, large_index_total = _final_coagulation_state(
         small_index_total, large_index_total, particle_radius
     )
 
@@ -276,3 +197,82 @@ def particle_resolved_coagulation_step(
     loss_gain_index = np.column_stack([small_index_total, large_index_total])
 
     return loss_gain_index
+
+
+def _interpolate_kernel(
+    kernel: NDArray[np.float64],
+    kernel_radius: NDArray[np.float64],
+) -> RectBivariateSpline:
+    """
+    Create a 2D interpolation function for the coagulation kernel.
+
+    Args:
+        kernel (NDArray[np.float64]): Coagulation kernel.
+        kernel_radius (NDArray[np.float64]): Radii corresponding to kernel
+            bins.
+
+    Returns:
+        RectBivariateSpline: Interpolated kernel function.
+    """
+    return RectBivariateSpline(x=kernel_radius, y=kernel_radius, z=kernel)
+
+
+def _calculate_probabilities(
+    kernel_values: Union[float, NDArray[np.float64]],
+    time_step: float,
+    events: int,
+    tests: int,
+    volume: float,
+) -> Union[float, NDArray[np.float64]]:
+    """
+    Calculate coagulation probabilities based on kernel values and system
+    parameters.
+
+    Args:
+        kernel_values (float): Interpolated kernel value for a particle pair.
+        time_step (float): The time step over which coagulation occurs.
+        events (int): Number of possible coagulation events.
+        tests (int): Number of tests (or trials) for coagulation.
+        volume (float): Volume of the system.
+
+    Returns:
+        float: Coagulation probability.
+    """
+    return kernel_values * time_step * events / (tests * volume)
+
+
+def _final_coagulation_state(
+    small_indices: NDArray[np.int64],
+    large_indices: NDArray[np.int64],
+    particle_radius: NDArray[np.float64],
+) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
+    """
+    Resolve the final state of particles that have undergone multiple
+    coagulation events.
+
+    Args:
+        small_indices (NDArray[np.int64]): Indices of smaller particles.
+        large_indices (NDArray[np.int64]): Indices of larger particles.
+        particle_radius (NDArray[np.float64]): Radii of particles.
+
+    Returns:
+        Tuple[NDArray[np.int64], NDArray[np.int64]]: Updated small and large
+        indices.
+    """
+    # Find common indices that appear in both small and large arrays
+    commons, small_common, large_common = np.intersect1d(
+        small_indices, large_indices, return_indices=True
+    )
+    # Sort particles by radius to resolve final states in the correct order
+    sorted_args = np.argsort(particle_radius[commons])
+    commons = commons[sorted_args]
+    small_common = small_common[sorted_args]
+    large_common = large_common[sorted_args]
+
+    # Remap to the largest particle in common to resolve the final state
+    for i, common in enumerate(commons):
+        final_value = large_indices[small_common[i]]
+        remap_index = np.flatnonzero(large_indices == common)
+        large_indices[remap_index] = final_value
+
+    return small_indices, large_indices
