@@ -46,21 +46,10 @@ def get_turbulent_dns_kernel_ao2008(
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
     """
-    Get the geometric collision kernel Γ₁₂.
-
-        Γ₁₂ = 2π R² ⟨ |w_r| ⟩ g₁₂
-
-    - R = a₁ + a₂ (collision radius)
-    - ⟨ |w_r| ⟩ : Radial relative velocity, computed using
-        `get_radial_relative_velocity_ao2008`
-    - g₁₂ : Radial distribution function, computed using
-        `g12_radial_distribution`
-    - radius << η (Kolmogorov length scale)
-    - ρ_w >> ρ (water density much greater than air density)
-    - Sv > 1 (Stokes number sufficiently large)
+    Get the geometric collision kernel Γ₁₂, derived from direct numerical
+    simulations.
 
     Arguments:
-    ----------
         - particle_radius : Particle radius [m].
         - velocity_dispersion : Velocity dispersion [m/s].
         - particle_inertia_time : Particle inertia time [s].
@@ -72,11 +61,20 @@ def get_turbulent_dns_kernel_ao2008(
         - kolmogorov_time : Kolmogorov time [s].
 
     Returns:
-    --------
         - Collision kernel Γ₁₂ [m³/s].
 
+    Equations:
+    - Γ₁₂ = 2π R² ⟨ |w_r| ⟩ g₁₂
+    - R = a₁ + a₂ (collision radius)
+    - ⟨ |w_r| ⟩ : Radial relative velocity, computed using
+        `get_radial_relative_velocity_ao2008`
+    - g₁₂ : Radial distribution function, computed using
+        `g12_radial_distribution`
+    - radius << η (Kolmogorov length scale)
+    - ρ_w >> ρ (water density much greater than air density)
+    - Sv > 1 (Stokes number sufficiently large)
+
     References:
-    -----------
     - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
         the geometric collision rate of sedimenting droplets. Part 2.
         Theory and parameterization. New Journal of Physics, 10.
@@ -103,9 +101,7 @@ def get_turbulent_dns_kernel_ao2008(
     )
 
     # Compute collision kernel Γ₁₂
-    gamma_12 = 2 * np.pi * collision_radius**2 * wr * g12
-
-    return gamma_12
+    return 2 * np.pi * collision_radius**2 * wr * g12
 
 
 def get_turbulent_dns_kernel_ao2008_via_system_state(
@@ -147,8 +143,7 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
             collision kernels.
 
     Notes:
-    -----
-    This function does the following:
+    - This function does the following:
     1. Calculates fluid properties (dynamic, kinematic viscosity,
         mean free path).
     2. Determines slip correction factors (Knudsen number, Cunningham factor).
@@ -160,7 +155,6 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
        collision kernel.
 
     References:
-    -----------
     - `get_turbulent_dns_kernel_ao2008` : Computes the kernel.
     - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
         the geometric collision rate of sedimenting droplets. Part 2.
