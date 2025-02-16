@@ -535,7 +535,7 @@ class PresetResolvedParticleMassBuilder(
         )
         self.set_density(1000, "kg/m^3")
         self.set_charge(
-            np.zeros_like((len(self.mode), self.particle_resolved_count))
+            np.zeros(self.particle_resolved_count)
         )
         self.set_volume(1)
 

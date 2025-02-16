@@ -19,12 +19,6 @@ from particula.dynamics.coagulation.charged_kernel_strategy import (
     CoulombGopalakrishnan2012KernelStrategy,
     CoulumbChahl2019KernelStrategy,
 )
-from particula.dynamics.coagulation.particle_resolved_method import (
-    get_particle_resolved_coagulation_step,
-)
-from particula.dynamics.coagulation.super_droplet_method import (
-    get_super_droplet_coagulation_step,
-)
 from particula.dynamics.coagulation import strategy
 from particula.dynamics.coagulation.coagulation_rate import (
     get_coagulation_loss_rate_continuous,

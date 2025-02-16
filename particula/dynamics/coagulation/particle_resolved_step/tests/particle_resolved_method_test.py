@@ -3,7 +3,7 @@
 import time
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
-from particula.dynamics.coagulation.particle_resolved_method import (
+from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (
     _interpolate_kernel,
     _calculate_probabilities,
     _final_coagulation_state,

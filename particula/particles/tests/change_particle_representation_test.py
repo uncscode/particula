@@ -2,7 +2,6 @@
 Test the change of particle representation
 """
 
-
 import unittest
 import numpy as np
 from particula.particles import PresetResolvedParticleMassBuilder
@@ -22,7 +21,8 @@ class TestChangeParticleRepresentation(unittest.TestCase):
         """
         Set up the test environment.
 
-        Initializes a particle representation using the PresetResolvedParticleMassBuilder.
+        Initializes a particle representation using the
+        PresetResolvedParticleMassBuilder.
         """
         self.particle = PresetResolvedParticleMassBuilder().build()
 
@@ -32,24 +32,54 @@ class TestChangeParticleRepresentation(unittest.TestCase):
 
         Verifies that the function returns the correct binned radii.
         """
-        bin_radius = get_particle_resolved_binned_radius(self.particle, total_bins=10)
+        bin_radius = get_particle_resolved_binned_radius(
+            self.particle, total_bins=10
+        )
         self.assertEqual(len(bin_radius), 10)
         self.assertTrue(np.all(bin_radius > 0))
 
-    def test_get_speciated_mass_representation_from_particle_resolved(self):
+    def test_get_speciated_mass_representation_single(self):
         """
-        Test the get_speciated_mass_representation_from_particle_resolved function.
+        Test the get_speciated_mass_representation_from_particle_resolved
+        function.
 
-        Verifies that the function returns a new ParticleRepresentation with binned mass.
+        Verifies that the function returns a new ParticleRepresentation with
+        binned mass.
         """
-        bin_radius = get_particle_resolved_binned_radius(self.particle, total_bins=10)
-        new_particle = get_speciated_mass_representation_from_particle_resolved(
-            self.particle, bin_radius
+        bin_radius = get_particle_resolved_binned_radius(
+            self.particle, total_bins=10
+        )
+        new_particle = (
+            get_speciated_mass_representation_from_particle_resolved(
+                self.particle, bin_radius
+            )
         )
         self.assertIsInstance(new_particle, ParticleRepresentation)
         self.assertEqual(len(new_particle.get_distribution()), len(bin_radius))
         self.assertTrue(np.all(new_particle.get_distribution() >= 0))
 
+    def test_get_speciated_mass_representation_double(self):
+        """
+        Test the get_speciated_mass_representation_from_particle_resolved
+        function.
 
-if __name__ == "__main__":
-    unittest.main()
+        Verifies that the function returns a new ParticleRepresentation with
+        binned mass.
+        """
+        bin_radius = get_particle_resolved_binned_radius(
+            self.particle, total_bins=10
+        )
+        self.particle.distribution = np.column_stack(
+            (
+                self.particle.distribution,
+                self.particle.distribution,
+            )
+        )
+        new_particle = (
+            get_speciated_mass_representation_from_particle_resolved(
+                self.particle, bin_radius
+            )
+        )
+        self.assertIsInstance(new_particle, ParticleRepresentation)
+        self.assertEqual(len(new_particle.get_distribution()), len(bin_radius))
+        self.assertTrue(np.all(new_particle.get_distribution() >= 0))
