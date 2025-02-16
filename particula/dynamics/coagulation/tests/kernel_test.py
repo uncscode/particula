@@ -1,7 +1,7 @@
 """Test Kernel class and its methods."""
 
 import numpy as np
-from particula.dynamics.coagulation import kernel
+from particula.dynamics.coagulation import charged_kernel_strategy
 
 # Define constants for common test data
 
@@ -17,7 +17,7 @@ def test_kernel_call():
     reduced_mass_in = np.array([[1e-18, 2e-18], [3e-18, 4e-18]])
     reduced_friction_factor_in = np.array([[1.0, 1.5], [2.0, 2.5]])
     # test kernel dimensioned
-    kernel_concrete = kernel.HardSphere()
+    kernel_concrete = charged_kernel_strategy.HardSphereKernelStrategy()
     dimension_result = kernel_concrete.kernel(
         dimensionless_kernel=dimensionless_kernel_in,
         coulomb_potential_ratio=coulomb_potential_ratio_in,
@@ -39,7 +39,7 @@ def test_hard_sphere():
     array of diffusive_knudsen values.
     """
     # dimensionless
-    kernel_concrete = kernel.HardSphere()
+    kernel_concrete = charged_kernel_strategy.HardSphereKernelStrategy()
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY
     )
@@ -57,7 +57,9 @@ def test_coulomb_dyachkov2007():
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # dimensionless
-    kernel_concrete = kernel.CoulombDyachkov2007()
+    kernel_concrete = (
+        charged_kernel_strategy.CoulombDyachkov2007KernelStrategy()
+    )
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY
     )
@@ -75,7 +77,7 @@ def test_coulomb_gatti2008():
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # dimensionless
-    kernel_concrete = kernel.CoulombGatti2008()
+    kernel_concrete = charged_kernel_strategy.CoulombGatti2008KernelStrategy()
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY
     )
@@ -93,7 +95,9 @@ def test_coulomb_gopalakrishnan2012():
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # dimensionless
-    kernel_concrete = kernel.CoulombGopalakrishnan2012()
+    kernel_concrete = (
+        charged_kernel_strategy.CoulombGopalakrishnan2012KernelStrategy()
+    )
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY
     )
@@ -111,7 +115,7 @@ def test_coulomb_chahl2019():
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # dimensionless
-    kernel_concrete = kernel.CoulumbChahl2019()
+    kernel_concrete = charged_kernel_strategy.CoulumbChahl2019KernelStrategy()
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY
     )

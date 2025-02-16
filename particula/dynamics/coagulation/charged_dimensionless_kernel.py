@@ -10,18 +10,66 @@ from particula.particles.properties import coulomb_enhancement
 from particula.util.machine_limit import safe_exp
 
 
-def hard_sphere(
+def get_dimensional_kernel(
+    dimensionless_kernel: NDArray[np.float64],
+    coulomb_potential_ratio: NDArray[np.float64],
+    sum_of_radii: NDArray[np.float64],
+    reduced_mass: NDArray[np.float64],
+    reduced_friction_factor: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    """
+    The dimensioned coagulation kernel for each particle pair, calculated
+    from the dimensionless coagulation kernel and the reduced quantities.
+    All inputs are square matrices, for all particle-particle interactions.
+
+    Args:
+    -----
+    - dimensionless_kernel: The dimensionless coagulation kernel [H]
+        [dimensionless].
+    - coulomb_potential_ratio: The Coulomb potential ratio [dimensionless].
+    - sum_of_radii: The sum of the radii of the particles [m].
+    - reduced_mass: The reduced mass of the particles [kg].
+    - reduced_friction_factor: The reduced friction factor of the
+        particles [dimensionless].
+
+    Returns:
+    --------
+    The dimensioned coagulation kernel, as a square matrix, of all
+    particle-particle interactions [m^3/s].
+
+    References:
+    -----------
+    - Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
+    molecular regime Coulombic collisions in aerosols and dusty plasmas.
+    Aerosol Science and Technology, 53(8), 933-957.
+    https://doi.org/10.1080/02786826.2019.1614522
+    """
+    coulomb_kinetic_limit = coulomb_enhancement.kinetic(
+        coulomb_potential_ratio
+    )
+    coulomb_continuum_limit = coulomb_enhancement.continuum(
+        coulomb_potential_ratio
+    )
+    return (
+        dimensionless_kernel
+        * reduced_friction_factor
+        * sum_of_radii**3
+        * coulomb_kinetic_limit**2
+        / (reduced_mass * coulomb_continuum_limit)
+    )
+
+
+def get_hard_sphere_kernel(
     diffusive_knudsen: Union[float, NDArray[np.float64]]
 ) -> Union[float, NDArray[np.float64]]:
     """Hard sphere approximation for the dimensionless coagulation kernel.
 
     Args:
-    -----
-    - diffusive_knudsen: The diffusive Knudsen number (K_nD) [dimensionless].
+        - diffusive_knudsen: The diffusive Knudsen number (K_nD)
+            [dimensionless].
 
     Returns:
-    --------
-    The dimensionless coagulation kernel (H) [dimensionless].
+        The dimensionless coagulation kernel (H) [dimensionless].
 
     Raises:
     -------
@@ -61,7 +109,7 @@ def hard_sphere(
     return numerator / denominator
 
 
-def coulomb_dyachkov2007(
+def get_coulomb_kernel_dyachkov2007(
     diffusive_knudsen: Union[float, NDArray[np.float64]],
     coulomb_potential_ratio: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -117,7 +165,7 @@ def coulomb_dyachkov2007(
     return continuum_limit / (term1 / term2 + term3 / term4)
 
 
-def coulomb_gatti2008(
+def get_coulomb_kernel_gatti2008(
     diffusive_knudsen: Union[float, NDArray[np.float64]],
     coulomb_potential_ratio: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -178,11 +226,11 @@ def coulomb_gatti2008(
     return np.where(
         bool_mask,
         term1 + term2,
-        hard_sphere(diffusive_knudsen),
+        get_hard_sphere_kernel(diffusive_knudsen),
     )
 
 
-def coulomb_gopalakrishnan2012(
+def get_coulomb_kernel_gopalakrishnan2012(
     diffusive_knudsen: Union[float, NDArray[np.float64]],
     coulomb_potential_ratio: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -219,11 +267,11 @@ def coulomb_gopalakrishnan2012(
     return np.where(
         condition,
         continuum_limit / (1 + 1.598 * min_fxn**1.1709),
-        hard_sphere(diffusive_knudsen),
+        get_hard_sphere_kernel(diffusive_knudsen),
     )
 
 
-def coulomb_chahl2019(
+def get_coulomb_kernel_chahl2019(
     diffusive_knudsen: Union[float, NDArray[np.float64]],
     coulomb_potential_ratio: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -274,6 +322,6 @@ def coulomb_chahl2019(
     )
     return np.where(
         bool_mask,
-        safe_exp(correction_mu) * hard_sphere(diffusive_knudsen),
-        hard_sphere(diffusive_knudsen),
+        safe_exp(correction_mu) * get_hard_sphere_kernel(diffusive_knudsen),
+        get_hard_sphere_kernel(diffusive_knudsen),
     )
