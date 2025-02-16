@@ -7,7 +7,10 @@ import numpy as np
 from particula.dynamics.coagulation.strategy.brownian_coagulation_strategy import (
     BrownianCoagulationStrategy,
 )
-from particula.particles import PresetParticleRadiusBuilder
+from particula.particles import (
+    PresetParticleRadiusBuilder,
+    PresetResolvedParticleMassBuilder,
+)
 
 
 class TestBrownianCoagulationStrategy(unittest.TestCase):
@@ -20,6 +23,14 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         )
         self.strategy_continuous_pdf = BrownianCoagulationStrategy(
             distribution_type="continuous_pdf"
+        )
+        self.particle_resolved = (
+            PresetResolvedParticleMassBuilder()
+            .set_volume(1e-6)
+            .build()
+        )
+        self.strategy_particle_resolved = BrownianCoagulationStrategy(
+            distribution_type="particle_resolved"
         )
         self.temperature = 298.15  # Kelvin
         self.pressure = 101325  # Pascal
@@ -46,6 +57,19 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
+
+    def test_kernel_particle_resolved(self):
+        # Test the kernel calculation for particle_resolved distribution
+        old_concentration = self.particle_resolved.get_total_concentration()
+        self.strategy_particle_resolved.step(
+            particle=self.particle_resolved,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1000,
+        )
+        new_concentration = self.particle_resolved.get_total_concentration()
+        self.assertNotEqual(old_concentration, new_concentration)
+
     def test_kernel_continuous_pdf(self):
         # Test the kernel calculation for continuous_pdf distribution
         kernel = self.strategy_continuous_pdf.kernel(
