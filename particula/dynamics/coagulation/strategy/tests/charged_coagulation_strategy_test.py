@@ -4,6 +4,7 @@ from particula.dynamics.coagulation.strategy.charged_coagulation_strategy import
 from particula.dynamics.coagulation.charged_kernel_strategy import HardSphereKernelStrategy
 from particula.particles import PresetParticleRadiusBuilder
 
+
 class TestChargedCoagulationStrategy(unittest.TestCase):
     def setUp(self):
         # Setup a particle representation for testing
