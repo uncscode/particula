@@ -128,6 +128,7 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
+
     def test_step_particle_resolved(self):
         """Test the step method for particle_resolved distribution."""
         old_concentration = self.particle_resolved.get_total_concentration()

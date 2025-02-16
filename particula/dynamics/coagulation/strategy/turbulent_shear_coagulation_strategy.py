@@ -88,19 +88,3 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
             temperature=temperature,
             fluid_density=self.fluid_density,
         )
-
-    def step(
-        self,
-        particle: ParticleRepresentation,
-        temperature: float,
-        pressure: float,
-        time_step: float,
-    ) -> ParticleRepresentation:
-
-        particle.add_concentration(
-            self.net_rate(  # type: ignore
-                particle=particle, temperature=temperature, pressure=pressure
-            )
-            * time_step
-        )
-        return particle

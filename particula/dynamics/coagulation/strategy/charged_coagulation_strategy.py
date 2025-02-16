@@ -93,19 +93,3 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
             reduced_mass=reduced_mass,
             reduced_friction_factor=reduced_friction_factor,
         )
-
-    def step(
-        self,
-        particle: ParticleRepresentation,
-        temperature: float,
-        pressure: float,
-        time_step: float,
-    ) -> ParticleRepresentation:
-
-        particle.add_concentration(
-            self.net_rate(  # type: ignore
-                particle=particle, temperature=temperature, pressure=pressure
-            )
-            * time_step
-        )
-        return particle

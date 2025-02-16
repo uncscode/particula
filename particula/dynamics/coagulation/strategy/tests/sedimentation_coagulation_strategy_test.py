@@ -113,8 +113,9 @@ class TestSedimentationCoagulationStrategy(unittest.TestCase):
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
-    def test_kernel_particle_resolved(self):
-        """Test the kernel calculation for particle_resolved distribution."""
+
+    def test_step_particle_resolved(self):
+        """Test the step calculation for particle_resolved distribution."""
         old_concentration = self.particle_resolved.get_total_concentration()
         self.strategy_particle_resolved.step(
             particle=self.particle_resolved,
