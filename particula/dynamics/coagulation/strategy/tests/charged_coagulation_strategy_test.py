@@ -10,7 +10,7 @@ import unittest
 import numpy as np
 from particula.dynamics.coagulation.strategy.charged_coagulation_strategy import ChargedCoagulationStrategy
 from particula.dynamics.coagulation.charged_kernel_strategy import HardSphereKernelStrategy
-from particula.particles import PresetParticleRadiusBuilder
+from particula.particles import PresetParticleRadiusBuilder, PresetResolvedParticleMassBuilder
 
 class TestChargedCoagulationStrategy(unittest.TestCase):
     """
@@ -77,7 +77,29 @@ class TestChargedCoagulationStrategy(unittest.TestCase):
             np.array_equal(initial_concentration, updated_concentration)
         )
 
-    def test_kernel_continuous_pdf(self):
+    def test_kernel_particle_resolved(self):
+        """Test the kernel calculation for particle_resolved distribution."""
+        # Setup a particle representation for particle_resolved testing
+        self.particle_resolved = (
+            PresetResolvedParticleMassBuilder()
+            .set_volume(1e-6)
+            .build()
+        )
+        self.strategy_particle_resolved = ChargedCoagulationStrategy(
+            distribution_type="particle_resolved",
+            kernel_strategy=self.kernel_strategy
+        )
+
+        # Test the kernel calculation for particle_resolved distribution
+        old_concentration = self.particle_resolved.get_total_concentration()
+        self.strategy_particle_resolved.step(
+            particle=self.particle_resolved,
+            temperature=self.temperature,
+            pressure=self.pressure,
+            time_step=1000,
+        )
+        new_concentration = self.particle_resolved.get_total_concentration()
+        self.assertNotEqual(old_concentration, new_concentration)
         """
         Test the kernel calculation for continuous_pdf distribution.
 
