@@ -33,7 +33,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         - turbulent_dissipation : The turbulent kinetic energy of the system
             [m^2/s^2].
         - fluid_density : The density of the fluid [kg/m^3].
-        - reynolds_lambda : The Reynolds lambda [m].
+        - reynolds_lambda : The Reynolds lambda of air [m].
         - relative_velocity : The relative velocity of the air [m/s].
 
     Methods:
