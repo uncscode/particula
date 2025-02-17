@@ -9,7 +9,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from particula.particles.representation import ParticleRepresentation
-from particula.dynamics.coagulation.strategy.coagulation_strategy_abc import (
+from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
 from particula.util.reduced_quantity import reduced_self_broadcast
@@ -28,13 +28,11 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
     abstract class. The kernel strategy is passed as an argument to the class,
     to use a dimensionless kernel representation.
 
-    Attributes:
-    -----------
-    - kernel_strategy: The kernel strategy to be used for the coagulation, from
-    the KernelStrategy class.
+    Parameters:
+        - kernel_strategy : The kernel strategy to be used for the coagulation,
+            from the KernelStrategy class.
 
     Methods:
-    --------
     - kernel: Calculate the coagulation kernel.
     - loss_rate: Calculate the coagulation loss rate.
     - gain_rate: Calculate the coagulation gain rate.

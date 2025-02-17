@@ -19,7 +19,7 @@ from particula.dynamics.coagulation.charged_kernel_strategy import (
     CoulombGopalakrishnan2012KernelStrategy,
     CoulumbChahl2019KernelStrategy,
 )
-from particula.dynamics.coagulation import strategy
+from particula.dynamics.coagulation import coagulation_strategy
 from particula.dynamics.coagulation.coagulation_rate import (
     get_coagulation_loss_rate_continuous,
     get_coagulation_loss_rate_discrete,

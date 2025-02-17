@@ -34,8 +34,8 @@ class BuilderDensityMixin:
         """Set the density of the particle in kg/m^3.
 
         Args:
-            density: Density of the particle.
-            density_units: Units of the density. Default is *kg/m^3*
+            density : Density of the particle.
+            density_units : Units of the density. Default is *kg/m^3*
         """
         if density_units == "kg/m^3":
             self.density = density
