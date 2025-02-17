@@ -121,7 +121,9 @@ def _calculate_c1(
     """
     y_stokes = _compute_y_stokes(stokes_number)
     f3_lambda = _compute_f3_lambda(reynolds_lambda)
-    gravity_term = np.abs(STANDARD_GRAVITY) / (kolmogorov_velocity / kolmogorov_time)
+    gravity_term = np.abs(STANDARD_GRAVITY) / (
+        kolmogorov_velocity / kolmogorov_time
+    )
 
     return y_stokes / np.power(gravity_term, f3_lambda)
 
@@ -188,7 +190,9 @@ def _compute_a_og(
 
     - a_Og = a_o + (π / 8) * (|g| / (v_k / τ_k))^2
     """
-    gravity_term = np.abs(STANDARD_GRAVITY) / (kolmogorov_velocity / kolmogorov_time)
+    gravity_term = np.abs(STANDARD_GRAVITY) / (
+        kolmogorov_velocity / kolmogorov_time
+    )
     return normalized_accel_variance + (np.pi / 8) * gravity_term**2
 
 

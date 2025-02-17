@@ -12,7 +12,9 @@ def test_debye_function_single_float():
     """Test the Debye function for single float values, including extremes."""
     assert np.isclose(debye_function(1.0), 0.7765038970390566)
     assert np.isclose(debye_function(1.0, n=2), 0.7078773477535959)
-    assert np.isclose(debye_function(1e-10, integration_points=10000), 1.0, atol=1e-4)
+    assert np.isclose(
+        debye_function(1e-10, integration_points=10000), 1.0, atol=1e-4
+    )
     assert np.isclose(debye_function(1e10), 0.0)
     assert np.isclose(debye_function(1e-10, n=2), 1.0)
     assert np.isclose(debye_function(1e10, n=2), 0.0)

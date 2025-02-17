@@ -21,7 +21,9 @@ def lf2013_coag_full(
 ):
     """calculate ion--particle coagulation according to lf2013"""
 
-    if charge_vals is not None and (max(charge_vals) > 100 or min(charge_vals) < -100):
+    if charge_vals is not None and (
+        max(charge_vals) > 100 or min(charge_vals) < -100
+    ):
         raise ValueError("charge_vals must be between -100 and 100")
 
     if ion_type == "air" and particle_type == "conductive":
@@ -64,7 +66,9 @@ def lf2013_coag_full(
     if isinstance(radius_vals, float):
         radius_vals = np.array([radius_vals])
 
-    rads = np.expand_dims(np.expand_dims(radius_vals.squeeze(), axis=-1), axis=-1)
+    rads = np.expand_dims(
+        np.expand_dims(radius_vals.squeeze(), axis=-1), axis=-1
+    )
     powers = np.linspace(0, coeffs - 1, coeffs)
 
     neg = 10 ** np.sum(

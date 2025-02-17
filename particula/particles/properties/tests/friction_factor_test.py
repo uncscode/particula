@@ -49,7 +49,9 @@ def test_continuum_limit():
 
     # Expected result using the continuum limit formula
     expected_result = 6 * np.pi * dynamic_viscosity * radius
-    assert np.isclose(result, expected_result), "Test failed for continuum limit"
+    assert np.isclose(
+        result, expected_result
+    ), "Test failed for continuum limit"
 
 
 def test_kinetic_limit():

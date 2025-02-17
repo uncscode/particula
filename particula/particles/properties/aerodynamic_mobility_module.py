@@ -41,7 +41,11 @@ def particle_aerodynamic_mobility(
         ```
     """
     # Validate radius
-    if np.any(radius <= 0) or np.any(np.isnan(radius)) or np.any(np.isinf(radius)):
+    if (
+        np.any(radius <= 0)
+        or np.any(np.isnan(radius))
+        or np.any(np.isinf(radius))
+    ):
         message = "The radius must be a positive, finite number."
         logger.error(message)
         raise ValueError(message)

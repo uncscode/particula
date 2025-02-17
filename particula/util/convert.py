@@ -223,7 +223,9 @@ def kappa_from_volume(
         The kappa parameter as a float.
     """
     # Avoid division by zero
-    water_activity = np.where(water_activity > 1 - 1e-16, 1 - 1e-16, water_activity)
+    water_activity = np.where(
+        water_activity > 1 - 1e-16, 1 - 1e-16, water_activity
+    )
 
     return (1 / water_activity - 1) * volume_water / volume_solute
 
@@ -362,7 +364,10 @@ def mass_fraction_to_volume_fraction(
     volume_fraction_solute = (
         mass_fraction
         / density_solute
-        / (mass_fraction / density_solute + (1 - mass_fraction) / density_solvent)
+        / (
+            mass_fraction / density_solute
+            + (1 - mass_fraction) / density_solvent
+        )
     )
     volume_fraction_solvent = 1 - volume_fraction_solute
     return volume_fraction_solute, volume_fraction_solvent
@@ -389,7 +394,9 @@ def volume_water_from_volume_fraction(
         this function returns 400 mL, indicating that there are 400 mL of water
         in the total 100 mL + 400 mL mixture.
     """
-    return volume_fraction_water * volume_solute_dry / (1 - volume_fraction_water)
+    return (
+        volume_fraction_water * volume_solute_dry / (1 - volume_fraction_water)
+    )
 
 
 def effective_refractive_index(
@@ -499,7 +506,9 @@ def list_to_dict(list_of_str: list) -> dict:
     return {str_val: i for i, str_val in enumerate(list_of_str)}
 
 
-def get_values_in_dict(key_list: List[str], dict_to_check: Dict[str, Any]) -> List[Any]:
+def get_values_in_dict(
+    key_list: List[str], dict_to_check: Dict[str, Any]
+) -> List[Any]:
     """
     Returns a list of values for keys in a dictionary.
 
@@ -622,4 +631,8 @@ def distribution_convert_pdf_pms(
 
     # Converting PMS to PDF by dividing the PMS values by the bin widths. or
     # Converting PDF to PMS by multiplying the PDF values by the bin widths.
-    return distribution / delta_x_array if to_pdf else distribution * delta_x_array
+    return (
+        distribution / delta_x_array
+        if to_pdf
+        else distribution * delta_x_array
+    )

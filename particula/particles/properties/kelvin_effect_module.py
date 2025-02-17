@@ -67,7 +67,9 @@ def kelvin_term(
     """
     kelvin_expand = False
     # Broadcast the arrays if necessary np.isscalar(kelvin_radius_value)
-    if isinstance(kelvin_radius_value, np.ndarray) and (kelvin_radius_value.size > 1):
+    if isinstance(kelvin_radius_value, np.ndarray) and (
+        kelvin_radius_value.size > 1
+    ):
         kelvin_expand = True
         kelvin_radius_value = kelvin_radius_value[np.newaxis, :]
     if isinstance(radius, np.ndarray) and not kelvin_expand:

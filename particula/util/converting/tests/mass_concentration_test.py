@@ -22,7 +22,9 @@ from particula.util.converting import convert_mass_concentration
         (
             np.array([1, 1]),
             np.array([1, 1]),
-            np.array([0.5, 0.5]),  # 1D input with equal masses and molar masses
+            np.array(
+                [0.5, 0.5]
+            ),  # 1D input with equal masses and molar masses
         ),
         (
             np.array([[100, 200], [50, 150]]),  # 2D input
@@ -82,7 +84,9 @@ def test_mass_concentration_to_volume_fraction(
 def test_error_handling_mass_to_mole(mass_concentrations, molar_masses):
     """Test error handling for mass_concentration_to_mole_fraction function"""
     with pytest.raises(Exception):
-        convert_mass_concentration.to_mole_fraction(mass_concentrations, molar_masses)
+        convert_mass_concentration.to_mole_fraction(
+            mass_concentrations, molar_masses
+        )
 
 
 @pytest.mark.parametrize(
@@ -100,4 +104,6 @@ def test_error_handling_mass_to_volume(mass_concentrations, densities):
     """Test error handling for mass_concentration_to_volume_fraction
     function"""
     with pytest.raises(Exception):
-        convert_mass_concentration.to_volume_fraction(mass_concentrations, densities)
+        convert_mass_concentration.to_volume_fraction(
+            mass_concentrations, densities
+        )

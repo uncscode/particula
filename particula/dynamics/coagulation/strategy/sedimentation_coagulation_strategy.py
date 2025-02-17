@@ -46,7 +46,9 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
         self,
         distribution_type: str,
     ):
-        CoagulationStrategyABC.__init__(self, distribution_type=distribution_type)
+        CoagulationStrategyABC.__init__(
+            self, distribution_type=distribution_type
+        )
 
     def dimensionless_kernel(
         self,

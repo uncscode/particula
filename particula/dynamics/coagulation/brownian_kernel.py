@@ -46,13 +46,21 @@ def get_brownian_kernel(
     Coefficient K12 (with alpha collision efficiency term 13.56)
     """
     # Convert 1D arrays to 2D square matrices
-    diffusivity_matrix = np.tile(diffusivity_particle, (len(diffusivity_particle), 1))
+    diffusivity_matrix = np.tile(
+        diffusivity_particle, (len(diffusivity_particle), 1)
+    )
     radius_matrix = np.tile(particle_radius, (len(particle_radius), 1))
     g_collection_term_matrix = (
-        np.tile(g_collection_term_particle, (len(g_collection_term_particle), 1)) ** 2
+        np.tile(
+            g_collection_term_particle, (len(g_collection_term_particle), 1)
+        )
+        ** 2
     )
     mean_thermal_speed_matrix = (
-        np.tile(mean_thermal_speed_particle, (len(mean_thermal_speed_particle), 1)) ** 2
+        np.tile(
+            mean_thermal_speed_particle, (len(mean_thermal_speed_particle), 1)
+        )
+        ** 2
     )
 
     # Sum of diffusivities and radii across particles
@@ -120,7 +128,9 @@ def get_brownian_kernel_via_system_state(
     aerodyanmic_mobility = properties.particle_aerodynamic_mobility(
         particle_radius, slip_correction, dynamic_viscosity
     )
-    particle_diffusivity = _brownian_diffusivity(temperature, aerodyanmic_mobility)
+    particle_diffusivity = _brownian_diffusivity(
+        temperature, aerodyanmic_mobility
+    )
 
     # get thermal speed
     mean_thermal_speed_particle = properties.mean_thermal_speed(

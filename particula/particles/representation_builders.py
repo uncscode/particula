@@ -102,7 +102,9 @@ class BuilderDistributionStrategyMixin:
             - distribution_strategy_units : Not used. (for interface)
         """
         if distribution_strategy_units is not None:
-            logger.warning("Ignoring units for distribution strategy parameter.")
+            logger.warning(
+                "Ignoring units for distribution strategy parameter."
+            )
         self.distribution_strategy = distribution_strategy
         return self
 

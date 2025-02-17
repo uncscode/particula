@@ -20,7 +20,9 @@ config = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "simple": {"format": "[%(levelname)s|%(module)s|L%(lineno)d]: %(message)s"},
+        "simple": {
+            "format": "[%(levelname)s|%(module)s|L%(lineno)d]: %(message)s"
+        },
         "detailed": {
             "format": "[%(levelname)s|%(module)s|L%(lineno)d] %(asctime)s: %(message)s",
             "datefmt": "%Y-%m-%dT%H:%M:%S%z",

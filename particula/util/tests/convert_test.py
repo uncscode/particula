@@ -54,13 +54,17 @@ def test_round_arbitrary():
 
     # Test NumPy array of float values
     assert np.array_equal(
-        convert.round_arbitrary(np.array([1.2, 2.5, 3.8]), base=1.0, mode="floor"),
+        convert.round_arbitrary(
+            np.array([1.2, 2.5, 3.8]), base=1.0, mode="floor"
+        ),
         np.array([1.0, 2.0, 3.0]),
     )
 
     # Test NumPy array of ceil values
     assert np.array_equal(
-        convert.round_arbitrary(np.array([1.2, 2.5, 3.8]), base=1.0, mode="ceil"),
+        convert.round_arbitrary(
+            np.array([1.2, 2.5, 3.8]), base=1.0, mode="ceil"
+        ),
         np.array([2.0, 3.0, 4.0]),
     )
 
@@ -134,28 +138,40 @@ def test_length_to_volume():
 def test_kappa_volume_solute():
     """Test the kappa_volume_solute function."""
     # Test with water_activity = 0.95 and kappa = 0.4
-    assert np.allclose(convert.kappa_volume_solute(100, 0.4, 0.95), 11.6279, rtol=1e-4)
+    assert np.allclose(
+        convert.kappa_volume_solute(100, 0.4, 0.95), 11.6279, rtol=1e-4
+    )
 
     # Test with water_activity = 1 and kappa = 0.0 (zero kappa correction)
-    assert np.allclose(convert.kappa_volume_solute(200, 0.0, 1), 0.0, rtol=1e-4)
+    assert np.allclose(
+        convert.kappa_volume_solute(200, 0.0, 1), 0.0, rtol=1e-4
+    )
 
 
 def test_kappa_volume_water():
     """Test the kappa_volume_water function."""
     # Test with water_activity = 0.95 and kappa = 0.4
-    assert np.allclose(convert.kappa_volume_water(5, 0.5, 0.99), 247.49, rtol=1e-4)
+    assert np.allclose(
+        convert.kappa_volume_water(5, 0.5, 0.99), 247.49, rtol=1e-4
+    )
 
     # Test with water_activity = 1 and kappa = 0.0 (zero correction)
-    assert np.allclose(convert.kappa_volume_solute(5, 0.5, 1), 1.1258e16, rtol=1e14)
+    assert np.allclose(
+        convert.kappa_volume_solute(5, 0.5, 1), 1.1258e16, rtol=1e14
+    )
 
 
 def test_kappa_from_volume():
     """Test the kappa_from_volume function."""
     # Test with water_activity = 0.95 and kappa = 0.4
-    assert np.allclose(convert.kappa_from_volume(100, 200, 0.5), 2.0, rtol=1e-2)
+    assert np.allclose(
+        convert.kappa_from_volume(100, 200, 0.5), 2.0, rtol=1e-2
+    )
 
     # Test with water_activity = 1 (zero kappa correction)
-    assert np.allclose(convert.kappa_from_volume(100, 200, 1), 4.44089e-16, rtol=1e-17)
+    assert np.allclose(
+        convert.kappa_from_volume(100, 200, 1), 4.44089e-16, rtol=1e-17
+    )
 
 
 def test_mole_fraction_to_mass_fraction():

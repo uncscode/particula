@@ -50,7 +50,9 @@ def _super_droplet_update_step(
 
     # Step 3: Determine the concentration differences between small and
     # large particles
-    concentration_delta = concentration[small_index] - concentration[large_index]
+    concentration_delta = (
+        concentration[small_index] - concentration[large_index]
+    )
     more_small = concentration_delta > 0
     more_large = concentration_delta < 0
     equal_concentration = concentration_delta == 0
@@ -75,7 +77,9 @@ def _super_droplet_update_step(
     # small particles.
     if np.any(more_large):
         # print("Handling more large particles case")
-        concentration[large_index[more_large]] = np.abs(concentration_delta[more_large])
+        concentration[large_index[more_large]] = np.abs(
+            concentration_delta[more_large]
+        )
         particle_radius[small_index[more_large]] = new_radii[more_large]
 
     # Step 6: Handle cases where there are more small particles than large ones
@@ -83,7 +87,9 @@ def _super_droplet_update_step(
     # large particles.
     if np.any(more_small):
         # print("Handling more small particles case")
-        concentration[small_index[more_small]] = np.abs(concentration_delta[more_small])
+        concentration[small_index[more_small]] = np.abs(
+            concentration_delta[more_small]
+        )
         particle_radius[large_index[more_small]] = new_radii[more_small]
 
     # Increment event counters for both small and large particles
@@ -113,7 +119,9 @@ def _event_pairs(
     """
     # Calculate the number of particle pairs based on the kernel value
     if lower_bin != upper_bin:
-        return kernel_max * number_in_bins[lower_bin] * number_in_bins[upper_bin]
+        return (
+            kernel_max * number_in_bins[lower_bin] * number_in_bins[upper_bin]
+        )
     return (
         kernel_max
         # * 0.5
@@ -403,7 +411,9 @@ def _coagulation_events(
 def _sort_particles(
     particle_radius: NDArray[np.float64],
     particle_concentration: Optional[NDArray[np.float64]] = None,
-) -> Tuple[NDArray[np.int64], NDArray[np.float64], Optional[NDArray[np.float64]]]:
+) -> Tuple[
+    NDArray[np.int64], NDArray[np.float64], Optional[NDArray[np.float64]]
+]:
     """
     Sort particles by size and optionally sort their concentrations.
 
@@ -563,7 +573,9 @@ def get_super_droplet_coagulation_step(
 
     # Step 5: Initialize a bivariate spline for interpolating kernel values
     # between bin radii
-    interp_kernel = RectBivariateSpline(x=kernel_radius, y=kernel_radius, z=kernel)
+    interp_kernel = RectBivariateSpline(
+        x=kernel_radius, y=kernel_radius, z=kernel
+    )
 
     # Step 6: Initialize a counter to track the number of coagulation events
     # per particle

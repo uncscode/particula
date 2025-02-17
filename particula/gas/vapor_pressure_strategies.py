@@ -56,7 +56,9 @@ class VaporPressureStrategy(ABC):
             )
             ```
         """
-        return calculate_partial_pressure(concentration, molar_mass, temperature)
+        return calculate_partial_pressure(
+            concentration, molar_mass, temperature
+        )
 
     def concentration(
         self,
@@ -85,7 +87,9 @@ class VaporPressureStrategy(ABC):
             )
             ```
         """
-        return calculate_concentration(partial_pressure, molar_mass, temperature)
+        return calculate_concentration(
+            partial_pressure, molar_mass, temperature
+        )
 
     def saturation_ratio(
         self,

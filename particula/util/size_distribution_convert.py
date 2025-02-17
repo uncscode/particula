@@ -48,7 +48,9 @@ class ConversionStrategy:
         Raises:
             NotImplementedError: If the subclass does not implement this.
         """
-        raise NotImplementedError("This method should be overridden by subclasses.")
+        raise NotImplementedError(
+            "This method should be overridden by subclasses."
+        )
 
 
 class SameScaleConversionStrategy(ConversionStrategy):
@@ -76,7 +78,9 @@ class DNdlogDPtoPMSConversionStrategy(ConversionStrategy):
     ) -> np.ndarray:
         # Call the conversion utility function, handling direct and inverse
         # conversions
-        return convert.convert_sizer_dn(diameters, concentration, inverse=inverse)
+        return convert.convert_sizer_dn(
+            diameters, concentration, inverse=inverse
+        )
 
 
 class PMStoPDFConversionStrategy(ConversionStrategy):
@@ -109,7 +113,9 @@ class DNdlogDPtoPDFConversionStrategy(ConversionStrategy):
             concentration_pms = convert.distribution_convert_pdf_pms(
                 diameters, concentration, to_pdf=False
             )
-            return convert.convert_sizer_dn(diameters, concentration_pms, inverse=True)
+            return convert.convert_sizer_dn(
+                diameters, concentration_pms, inverse=True
+            )
         # if not inverse, then dn/dlogdp to PDF
         concentration_pms = convert.convert_sizer_dn(
             diameters, concentration, inverse=False
@@ -151,7 +157,9 @@ class SizerConverter:
         return self.strategy.convert(diameters, concentration, inverse=inverse)
 
 
-def get_conversion_strategy(input_scale: str, output_scale: str) -> ConversionStrategy:
+def get_conversion_strategy(
+    input_scale: str, output_scale: str
+) -> ConversionStrategy:
     """Factory function to create and return an appropriate conversion
     strategy based on input and output scales. Use the inverse flag in the
     converter to invert the directions of the input and output scales.
@@ -210,4 +218,6 @@ def get_conversion_strategy(input_scale: str, output_scale: str) -> ConversionSt
         return PMStoPDFConversionStrategy()
     if input_scale == "dn/dlogdp" and output_scale == "pdf":
         return DNdlogDPtoPDFConversionStrategy()
-    raise ValueError(f"Unsupported conversion from {input_scale} to {output_scale}")
+    raise ValueError(
+        f"Unsupported conversion from {input_scale} to {output_scale}"
+    )

@@ -27,8 +27,12 @@ def test_surface_molar_with_parameters():
     }
     strategy = SurfaceFactory().get_strategy("molar", parameters)
     assert isinstance(strategy, SurfaceStrategyMolar)
-    np.testing.assert_allclose(strategy.molar_mass, parameters["molar_mass"], atol=1e-4)
-    np.testing.assert_allclose(strategy.density, parameters["density"], atol=1e-4)
+    np.testing.assert_allclose(
+        strategy.molar_mass, parameters["molar_mass"], atol=1e-4
+    )
+    np.testing.assert_allclose(
+        strategy.density, parameters["density"], atol=1e-4
+    )
     np.testing.assert_allclose(
         strategy.surface_tension, parameters["surface_tension"], atol=1e-4
     )
@@ -43,7 +47,9 @@ def test_surface_mass_with_parameters():
     }
     strategy = SurfaceFactory().get_strategy("mass", parameters)
     assert isinstance(strategy, SurfaceStrategyMass)
-    np.testing.assert_allclose(strategy.density, parameters["density"], atol=1e-4)
+    np.testing.assert_allclose(
+        strategy.density, parameters["density"], atol=1e-4
+    )
     np.testing.assert_allclose(
         strategy.surface_tension, parameters["surface_tension"], atol=1e-4
     )
@@ -58,7 +64,9 @@ def test_surface_volume_with_parameters():
     }
     strategy = SurfaceFactory().get_strategy("volume", parameters)
     assert isinstance(strategy, SurfaceStrategyVolume)
-    np.testing.assert_allclose(strategy.density, parameters["density"], atol=1e-4)
+    np.testing.assert_allclose(
+        strategy.density, parameters["density"], atol=1e-4
+    )
     np.testing.assert_allclose(
         strategy.surface_tension, parameters["surface_tension"], atol=1e-4
     )

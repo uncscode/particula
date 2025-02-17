@@ -22,7 +22,9 @@ class SurfaceFactory(
             SurfaceStrategyMassBuilder,
             SurfaceStrategyMolarBuilder,
         ],
-        Union[SurfaceStrategyVolume, SurfaceStrategyMass, SurfaceStrategyMolar],
+        Union[
+            SurfaceStrategyVolume, SurfaceStrategyMass, SurfaceStrategyMolar
+        ],
     ]
 ):
     """Factory class to call and create surface tension strategies.

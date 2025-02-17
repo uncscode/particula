@@ -56,7 +56,9 @@ class Aerosol:
         """
         self.atmosphere = atmosphere
         self.particles: List[ParticleRepresentation] = (
-            [particles] if isinstance(particles, ParticleRepresentation) else particles
+            [particles]
+            if isinstance(particles, ParticleRepresentation)
+            else particles
         )
 
     def __str__(self) -> str:

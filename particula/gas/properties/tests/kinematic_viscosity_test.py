@@ -15,7 +15,9 @@ def test_kinematic_viscosity():
     fluid_density = 1.2  # kg/m^3
     expected_kinematic_viscosity = dynamic_viscosity / fluid_density
     assert (
-        pytest.approx(get_kinematic_viscosity(dynamic_viscosity, fluid_density), 1e-5)
+        pytest.approx(
+            get_kinematic_viscosity(dynamic_viscosity, fluid_density), 1e-5
+        )
         == expected_kinematic_viscosity
     )
 

@@ -28,7 +28,9 @@ def test_kernel_call():
     expected_result = np.array(
         [[1.77061203e-09, 2.31008442e-08], [1.12232711e-07, 3.56834831e-07]]
     )
-    np.testing.assert_almost_equal(dimension_result, expected_result, decimal=4)
+    np.testing.assert_almost_equal(
+        dimension_result, expected_result, decimal=4
+    )
 
 
 def test_hard_sphere():
@@ -41,8 +43,12 @@ def test_hard_sphere():
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY
     )
-    expected_result = np.array([1.65971644, 4.12694075, 24.16690909, 49.22484307])
-    np.testing.assert_almost_equal(dimensionless_result, expected_result, decimal=4)
+    expected_result = np.array(
+        [1.65971644, 4.12694075, 24.16690909, 49.22484307]
+    )
+    np.testing.assert_almost_equal(
+        dimensionless_result, expected_result, decimal=4
+    )
 
 
 def test_coulomb_dyachkov2007():
@@ -51,12 +57,18 @@ def test_coulomb_dyachkov2007():
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # dimensionless
-    kernel_concrete = charged_kernel_strategy.CoulombDyachkov2007KernelStrategy()
+    kernel_concrete = (
+        charged_kernel_strategy.CoulombDyachkov2007KernelStrategy()
+    )
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY
     )
-    expected_result = np.array([1.73703563, 4.60921277, 26.22159795, 51.92102133])
-    np.testing.assert_almost_equal(dimensionless_result, expected_result, decimal=4)
+    expected_result = np.array(
+        [1.73703563, 4.60921277, 26.22159795, 51.92102133]
+    )
+    np.testing.assert_almost_equal(
+        dimensionless_result, expected_result, decimal=4
+    )
 
 
 def test_coulomb_gatti2008():
@@ -69,8 +81,12 @@ def test_coulomb_gatti2008():
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY
     )
-    expected_result = np.array([2.00132915, 5.10865767, 26.42422258, 52.43789491])
-    np.testing.assert_almost_equal(dimensionless_result, expected_result, decimal=4)
+    expected_result = np.array(
+        [2.00132915, 5.10865767, 26.42422258, 52.43789491]
+    )
+    np.testing.assert_almost_equal(
+        dimensionless_result, expected_result, decimal=4
+    )
 
 
 def test_coulomb_gopalakrishnan2012():
@@ -79,12 +95,18 @@ def test_coulomb_gopalakrishnan2012():
     array of diffusive_knudsen and coulomb_potential_ratio values.
     """
     # dimensionless
-    kernel_concrete = charged_kernel_strategy.CoulombGopalakrishnan2012KernelStrategy()
+    kernel_concrete = (
+        charged_kernel_strategy.CoulombGopalakrishnan2012KernelStrategy()
+    )
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY
     )
-    expected_result = np.array([1.83746548, 4.83694019, 24.16690909, 49.22484307])
-    np.testing.assert_almost_equal(dimensionless_result, expected_result, decimal=4)
+    expected_result = np.array(
+        [1.83746548, 4.83694019, 24.16690909, 49.22484307]
+    )
+    np.testing.assert_almost_equal(
+        dimensionless_result, expected_result, decimal=4
+    )
 
 
 def test_coulomb_chahl2019():
@@ -97,5 +119,9 @@ def test_coulomb_chahl2019():
     dimensionless_result = kernel_concrete.dimensionless(
         DIFFUSIVE_KNUDSEN, COULOMB_POTENTIAL_RATIO_ARRAY
     )
-    expected_result = np.array([1.65863442, 4.37444613, 28.05501739, 59.74082667])
-    np.testing.assert_almost_equal(dimensionless_result, expected_result, decimal=4)
+    expected_result = np.array(
+        [1.65863442, 4.37444613, 28.05501739, 59.74082667]
+    )
+    np.testing.assert_almost_equal(
+        dimensionless_result, expected_result, decimal=4
+    )

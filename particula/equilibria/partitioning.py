@@ -61,7 +61,9 @@ def liquid_vapor_obj_function(
     mass_weighted_molar_mass_alpha = (
         np.sum(c_j_alpha / molar_mass) + c_j_aq_alpha / 18.015
     )
-    mass_weighted_molar_mass_beta = np.sum(c_j_beta / molar_mass) + c_j_aq_beta / 18.015
+    mass_weighted_molar_mass_beta = (
+        np.sum(c_j_beta / molar_mass) + c_j_aq_beta / 18.015
+    )
 
     # calculate the c_star_j (C*j) of each phase, if the mass weighted molar
     # mass is zero, then the c_star_j is zero
@@ -89,7 +91,9 @@ def liquid_vapor_obj_function(
 
     # calculate the new ci_star_j (Ci*j) of each phase, weighted by the
     # by the q_ab value for each phase
-    c_star_j_new = c_star_j_via_alpha * q_ab[:, 0] + c_star_j_via_beta * q_ab[:, 1]
+    c_star_j_new = (
+        c_star_j_via_alpha * q_ab[:, 0] + c_star_j_via_beta * q_ab[:, 1]
+    )
 
     # with this new value we can calculate the new e_j_partition (Ej)
     e_j_partition_new = (1 + c_star_j_new / (c_liquid_total + 1e-16)) ** -1

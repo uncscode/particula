@@ -59,7 +59,9 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         relative_velocity: float,
     ):
         # pylint: disable=too-many-arguments, too-many-positional-arguments
-        CoagulationStrategyABC.__init__(self, distribution_type=distribution_type)
+        CoagulationStrategyABC.__init__(
+            self, distribution_type=distribution_type
+        )
         self.turbulent_dissipation = turbulent_dissipation
         self.fluid_density = fluid_density
         self.reynolds_lambda = reynolds_lambda

@@ -20,7 +20,9 @@ def test_get_phi_ao2008_scalar():
     particle_velocity = np.array([0.3, 0.1])  # [m/s]
 
     expected_shape = (2, 2)
-    result = get_phi_ao2008(alpha, phi, particle_inertia_time, particle_velocity)
+    result = get_phi_ao2008(
+        alpha, phi, particle_inertia_time, particle_velocity
+    )
 
     assert (
         result.shape == expected_shape
@@ -38,7 +40,9 @@ def test_get_phi_ao2008_array():
     particle_velocity = np.array([0.1, 0.2, 0.3])  # [m/s]
 
     expected_shape = (3, 3)
-    result = get_phi_ao2008(alpha, phi, particle_inertia_time, particle_velocity)
+    result = get_phi_ao2008(
+        alpha, phi, particle_inertia_time, particle_velocity
+    )
 
     assert (
         result.shape == expected_shape
@@ -86,9 +90,13 @@ def test_get_phi_ao2008_edge_cases():
     particle_inertia_time = np.array(
         [5e-6, 1e-3, 20.0]
     )  # Very small and large inertia values
-    particle_velocity = np.array([2e-6, 1e-3, 20.0])  # Very small and large velocities
+    particle_velocity = np.array(
+        [2e-6, 1e-3, 20.0]
+    )  # Very small and large velocities
 
-    result = get_phi_ao2008(alpha, phi, particle_inertia_time, particle_velocity)
+    result = get_phi_ao2008(
+        alpha, phi, particle_inertia_time, particle_velocity
+    )
 
     assert np.all(result >= 0), "Expected all values to be non-negative"
     assert np.isfinite(result).all(), "Expected all values to be finite"
