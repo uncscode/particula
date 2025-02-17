@@ -9,7 +9,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from particula.particles.representation import ParticleRepresentation
-from particula.dynamics.coagulation.strategy.coagulation_strategy_abc import (
+from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
 from particula.dynamics.coagulation.brownian_kernel import (

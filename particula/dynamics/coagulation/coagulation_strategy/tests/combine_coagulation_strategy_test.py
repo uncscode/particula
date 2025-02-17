@@ -10,13 +10,13 @@ both discrete and continuous_pdf distribution types.
 
 import unittest
 import numpy as np
-from particula.dynamics.coagulation.strategy.combine_coagulation_strategy import (
+from particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy import (
     CombineCoagulationStrategy,
 )
-from particula.dynamics.coagulation.strategy.turbulent_shear_coagulation_strategy import (
+from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
 )
-from particula.dynamics.coagulation.strategy.brownian_coagulation_strategy import (
+from particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy import (
     BrownianCoagulationStrategy,
 )
 from particula.particles import PresetParticleRadiusBuilder
