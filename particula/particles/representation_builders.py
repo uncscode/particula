@@ -527,7 +527,7 @@ class PresetResolvedParticleMassBuilder(
         self.mode = np.array([100e-9, 1e-6])
         self.geometric_standard_deviation = np.array([1.2, 1.4])
         self.number_concentration = np.array([1e4 * 1e6, 1e3 * 1e6])
-        self.particle_resolved_count = int(10_000)
+        self.particle_resolved_count = int(20_000)
         self.set_distribution_strategy(ParticleResolvedSpeciatedMass())
         self.set_activity_strategy(ActivityIdealMass())
         self.set_surface_strategy(
