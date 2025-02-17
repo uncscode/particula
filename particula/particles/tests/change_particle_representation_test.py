@@ -32,7 +32,9 @@ class TestChangeParticleRepresentation(unittest.TestCase):
 
         Verifies that the function returns the correct binned radii.
         """
-        bin_radius = get_particle_resolved_binned_radius(self.particle, total_bins=10)
+        bin_radius = get_particle_resolved_binned_radius(
+            self.particle, total_bins=10
+        )
         self.assertEqual(len(bin_radius), 10)
         self.assertTrue(np.all(bin_radius > 0))
 
@@ -44,9 +46,13 @@ class TestChangeParticleRepresentation(unittest.TestCase):
         Verifies that the function returns a new ParticleRepresentation with
         binned mass.
         """
-        bin_radius = get_particle_resolved_binned_radius(self.particle, total_bins=10)
-        new_particle = get_speciated_mass_representation_from_particle_resolved(
-            self.particle, bin_radius
+        bin_radius = get_particle_resolved_binned_radius(
+            self.particle, total_bins=10
+        )
+        new_particle = (
+            get_speciated_mass_representation_from_particle_resolved(
+                self.particle, bin_radius
+            )
         )
         self.assertIsInstance(new_particle, ParticleRepresentation)
         self.assertEqual(len(new_particle.get_distribution()), len(bin_radius))
@@ -60,15 +66,19 @@ class TestChangeParticleRepresentation(unittest.TestCase):
         Verifies that the function returns a new ParticleRepresentation with
         binned mass.
         """
-        bin_radius = get_particle_resolved_binned_radius(self.particle, total_bins=10)
+        bin_radius = get_particle_resolved_binned_radius(
+            self.particle, total_bins=10
+        )
         self.particle.distribution = np.column_stack(
             (
                 self.particle.distribution,
                 self.particle.distribution,
             )
         )
-        new_particle = get_speciated_mass_representation_from_particle_resolved(
-            self.particle, bin_radius
+        new_particle = (
+            get_speciated_mass_representation_from_particle_resolved(
+                self.particle, bin_radius
+            )
         )
         self.assertIsInstance(new_particle, ParticleRepresentation)
         self.assertEqual(len(new_particle.get_distribution()), len(bin_radius))

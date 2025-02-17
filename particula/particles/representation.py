@@ -334,7 +334,9 @@ class ParticleRepresentation:
             ```
         """
         if clone:
-            return np.copy(self.strategy.get_mass(self.distribution, self.density))
+            return np.copy(
+                self.strategy.get_mass(self.distribution, self.density)
+            )
         return self.strategy.get_mass(self.distribution, self.density)
 
     def get_mass_concentration(self, clone: bool = False) -> np.float64:
@@ -386,7 +388,9 @@ class ParticleRepresentation:
             ```
         """
         if clone:
-            return np.copy(self.strategy.get_radius(self.distribution, self.density))
+            return np.copy(
+                self.strategy.get_radius(self.distribution, self.density)
+            )
         return self.strategy.get_radius(self.distribution, self.density)
 
     def add_mass(self, added_mass: NDArray[np.float64]) -> None:
@@ -431,11 +435,13 @@ class ParticleRepresentation:
             logger.warning(message)
             added_distribution = self.get_distribution()
         # self.concentration += added_concentration
-        (self.distribution, self.concentration) = self.strategy.add_concentration(
-            distribution=self.get_distribution(),
-            concentration=self.get_concentration(),
-            added_distribution=added_distribution,
-            added_concentration=added_concentration,
+        (self.distribution, self.concentration) = (
+            self.strategy.add_concentration(
+                distribution=self.get_distribution(),
+                concentration=self.get_concentration(),
+                added_distribution=added_distribution,
+                added_concentration=added_concentration,
+            )
         )
 
     def collide_pairs(self, indices: NDArray[np.int64]) -> None:

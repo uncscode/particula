@@ -68,7 +68,9 @@ class TestAerosol(unittest.TestCase):
             .build()
         )
 
-        self.aerosol = Aerosol(atmosphere=self.atmosphere, particles=self.particle)
+        self.aerosol = Aerosol(
+            atmosphere=self.atmosphere, particles=self.particle
+        )
 
     def test_str(self):
         """Test the __str__ method of the Aerosol class."""

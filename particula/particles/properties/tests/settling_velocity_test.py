@@ -313,7 +313,11 @@ def test_get_particle_settling_velocity_with_drag_transition():
 
     # Calculate the Reynolds number for the Stokes velocity
     re_stokes = (
-        2.0 * particle_radius * stokes_velocity * fluid_density / dynamic_viscosity
+        2.0
+        * particle_radius
+        * stokes_velocity
+        * fluid_density
+        / dynamic_viscosity
     )
 
     # Verify that we're near the threshold

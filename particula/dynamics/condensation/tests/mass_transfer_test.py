@@ -28,7 +28,9 @@ def test_multi_radius_first_order_mass_transport_k():
     radius = np.array([1e-6, 2e-6, 3e-6])
     vapor_transition = 0.6
     diffusion_coefficient = 2e-9
-    expected_result = np.array([1.50796447e-14, 3.01592895e-14, 4.52389342e-14])
+    expected_result = np.array(
+        [1.50796447e-14, 3.01592895e-14, 4.52389342e-14]
+    )
     result = first_order_mass_transport_k(
         radius, vapor_transition, diffusion_coefficient
     )
@@ -104,12 +106,16 @@ def test_single_species_condensation_not_enough_gas_mass():
     result_direct = calculate_mass_transfer_single_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
-    np.testing.assert_allclose(result_direct, expected_mass_transfer, rtol=1e-8)
+    np.testing.assert_allclose(
+        result_direct, expected_mass_transfer, rtol=1e-8
+    )
     # second calc
     result_direct2 = calculate_mass_transfer_single_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
-    np.testing.assert_allclose(result_direct2, expected_mass_transfer, rtol=1e-8)
+    np.testing.assert_allclose(
+        result_direct2, expected_mass_transfer, rtol=1e-8
+    )
 
     # Calculate using the general helper function
     result = calculate_mass_transfer(
@@ -136,7 +142,9 @@ def test_single_species_evaporation_not_enough_particle_mass():
     result_direct = calculate_mass_transfer_single_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
-    np.testing.assert_allclose(result_direct, expected_mass_transfer, rtol=1e-8)
+    np.testing.assert_allclose(
+        result_direct, expected_mass_transfer, rtol=1e-8
+    )
 
     result = calculate_mass_transfer(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
@@ -164,7 +172,9 @@ def test_multiple_species_condensation():
     particle_concentration = np.array([5, 4])  # particles/m^3
 
     # Step 1: Calculate the total mass to change (before scaling)
-    mass_to_change = mass_rate * time_step * particle_concentration[:, np.newaxis]
+    mass_to_change = (
+        mass_rate * time_step * particle_concentration[:, np.newaxis]
+    )
 
     # Step 2: Calculate the total requested mass for each gas species
     total_requested_mass = mass_to_change.sum(axis=0)
@@ -187,7 +197,9 @@ def test_multiple_species_condensation():
     # total mass transfer for the gas phase
     np.testing.assert_allclose(result_direct.sum(axis=0), gas_mass, rtol=1e-8)
     # Check for each individual particle and species
-    np.testing.assert_allclose(result_direct, expected_mass_transfer, rtol=1e-8)
+    np.testing.assert_allclose(
+        result_direct, expected_mass_transfer, rtol=1e-8
+    )
 
     # Test the general helper function
     result = calculate_mass_transfer(
@@ -216,21 +228,29 @@ def test_multiple_species_evaporation_not_enough_particle_mass():
     particle_concentration = np.array([10, 10])  # particles/m^3
 
     # Step 1: Calculate the total mass to change for evaporation
-    mass_to_change = mass_rate * time_step * particle_concentration[:, np.newaxis]
+    mass_to_change = (
+        mass_rate * time_step * particle_concentration[:, np.newaxis]
+    )
 
     # Step 2: Calculate the available particle mass for evaporation
     # Available mass = particle_mass * particle_concentration
-    available_particle_mass = particle_mass * particle_concentration[:, np.newaxis]
+    available_particle_mass = (
+        particle_mass * particle_concentration[:, np.newaxis]
+    )
 
     # Step 3: Limit evaporation by available particle mass
-    expected_mass_transfer = np.maximum(mass_to_change, -available_particle_mass)
+    expected_mass_transfer = np.maximum(
+        mass_to_change, -available_particle_mass
+    )
 
     # Test the direct multiple species function
     result_direct = calculate_mass_transfer_multiple_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
     # Check the individual mass transfer for each particle and species
-    np.testing.assert_allclose(result_direct, expected_mass_transfer, rtol=1e-8)
+    np.testing.assert_allclose(
+        result_direct, expected_mass_transfer, rtol=1e-8
+    )
     # Check the total mass transfer for each particle
     total_mass_possible = np.sum(available_particle_mass, axis=0)
     np.testing.assert_allclose(

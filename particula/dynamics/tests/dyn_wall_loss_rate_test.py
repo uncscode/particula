@@ -49,7 +49,9 @@ def test_spherical_wall_loss_rate():
         pressure,
         chamber_radius,
     )
-    expected_loss_rate = np.array([-9.22955735e03, -3.16327419e04, -1.54304331e11])
+    expected_loss_rate = np.array(
+        [-9.22955735e03, -3.16327419e04, -1.54304331e11]
+    )
     assert np.allclose(result, expected_loss_rate)
 
 
@@ -80,5 +82,7 @@ def test_rectangle_wall_loss_rate():
         chamber_dimensions=(5.0, 5.0, 5.0),
     )
 
-    expected_loss_rate = np.array([-1.84776108e04, -4.22330075e04, -2.05739107e11])
+    expected_loss_rate = np.array(
+        [-1.84776108e04, -4.22330075e04, -2.05739107e11]
+    )
     assert np.allclose(results, expected_loss_rate)

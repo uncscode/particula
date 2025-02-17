@@ -295,8 +295,10 @@ def get_particle_settling_velocity_with_drag(
     """
 
     # --- Step 1: Broadcast inputs to matching shapes if arrays are passed. ---
-    (particle_radius_arr, particle_density_arr, slip_corr_arr) = np.broadcast_arrays(
-        particle_radius, particle_density, slip_correction_factor
+    (particle_radius_arr, particle_density_arr, slip_corr_arr) = (
+        np.broadcast_arrays(
+            particle_radius, particle_density, slip_correction_factor
+        )
     )
 
     # Prepare output array (same shape as the broadcast arrays).
@@ -384,7 +386,9 @@ def _drag_coefficient(reynolds_number: float) -> float:
         # Guard against re = 0 => use a large number for drag_coefficient
         return 24.0 / reynolds_number if reynolds_number > 0 else np.inf
     if reynolds_number < 1000.0:
-        return (24.0 / reynolds_number) * (1.0 + 0.15 * (reynolds_number**0.687))
+        return (24.0 / reynolds_number) * (
+            1.0 + 0.15 * (reynolds_number**0.687)
+        )
     return 0.44
 
 

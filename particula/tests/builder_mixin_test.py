@@ -54,7 +54,9 @@ def test_surface_tension_mixin():
 
     # test array of surface tensions
     builder_mixin.set_surface_tension(np.array([1, 2, 3]))
-    np.testing.assert_allclose(builder_mixin.surface_tension, np.array([1, 2, 3]))
+    np.testing.assert_allclose(
+        builder_mixin.surface_tension, np.array([1, 2, 3])
+    )
 
     # test setting surface tension units
     builder_mixin.set_surface_tension(0.001, surface_tension_units="N/m")
@@ -107,7 +109,9 @@ def test_concentration_mixin():
 
     # test array of concentrations
     builder_mixin.set_concentration(np.array([1, 2, 3]))
-    np.testing.assert_allclose(builder_mixin.concentration, np.array([1, 2, 3]))
+    np.testing.assert_allclose(
+        builder_mixin.concentration, np.array([1, 2, 3])
+    )
 
     # test setting concentration units
     builder_mixin.set_concentration(1 / 1000, concentration_units="kg/m^3")

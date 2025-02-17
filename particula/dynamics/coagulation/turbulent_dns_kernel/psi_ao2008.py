@@ -56,5 +56,7 @@ def get_psi_ao2008(
         Theory and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
     """
-    denominator = (1 / particle_inertia_time) + (1 / alpha) + (particle_velocity / phi)
+    denominator = (
+        (1 / particle_inertia_time) + (1 / alpha) + (particle_velocity / phi)
+    )
     return 1 / denominator - (particle_velocity / (2 * phi * denominator**2))

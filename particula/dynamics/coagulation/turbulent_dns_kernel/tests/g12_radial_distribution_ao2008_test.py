@@ -20,7 +20,9 @@ def test_get_g12_radial_distribution_ao2008_scalar():
     """
     Test get_g12_radial_distribution_ao2008 with a small array input.
     """
-    particle_radius = np.array([10e-6, 20e-6, 30e-6])  # Particle radii in meters
+    particle_radius = np.array(
+        [10e-6, 20e-6, 30e-6]
+    )  # Particle radii in meters
     stokes_number = np.array([0.5, 0.7, 1.2])  # Stokes numbers
     kolmogorov_length_scale = 1e-6  # m
     reynolds_lambda = 100  # Taylor-microscale Reynolds number

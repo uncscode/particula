@@ -38,7 +38,9 @@ def gibbs_of_mixing(
     oxygen2carbon: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
     fit_dict: Tuple[str, List[float]],
-) -> Tuple[Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]]:
+) -> Tuple[
+    Union[float, NDArray[np.float64]], Union[float, NDArray[np.float64]]
+]:
     """
     Calculate the Gibbs free energy of mixing for a binary mixture.
 
@@ -66,7 +68,9 @@ def gibbs_of_mixing(
     rhor = 997.0 / density  # assumes water is the other fluid
 
     scaled_molar_mass_ratio = (
-        molar_mass_ratio * fit_dict.s[1] * (1.0 + oxygen2carbon) ** fit_dict.s[0]
+        molar_mass_ratio
+        * fit_dict.s[1]
+        * (1.0 + oxygen2carbon) ** fit_dict.s[0]
     )
 
     phi2 = organic_mole_fraction / (
@@ -77,7 +81,9 @@ def gibbs_of_mixing(
     sum1 = c1 + c2 * (1 - 2 * phi2)
     gibbs_mix = phi2 * (1.0 - phi2) * sum1
 
-    dphi2dx2 = (scaled_molar_mass_ratio / rhor) * (phi2 / organic_mole_fraction) ** 2
+    dphi2dx2 = (scaled_molar_mass_ratio / rhor) * (
+        phi2 / organic_mole_fraction
+    ) ** 2
 
     derivative_gibbs_mix = (
         (1.0 - 2.0 * phi2) * sum1 - 2 * c2 * phi2 * (1.0 - phi2)
@@ -190,7 +196,8 @@ def _calculate_gibbs_mix_single(
             )
             gibbs_mix = weights[0] * gibbs_mix_low + weights[1] * gibbs_mix_mid
             derivative_gibbs = (
-                weights[0] * derivative_gibbs_low + weights[1] * derivative_gibbs_mid
+                weights[0] * derivative_gibbs_low
+                + weights[1] * derivative_gibbs_mid
             )
         else:  # else paired with high oxygen2carbon region
             gibbs_mix_high, derivative_gibbs_high = gibbs_of_mixing(
@@ -200,9 +207,12 @@ def _calculate_gibbs_mix_single(
                 density=density,
                 fit_dict=G19_FIT_HIGH,
             )
-            gibbs_mix = weights[2] * gibbs_mix_high + weights[1] * gibbs_mix_mid
+            gibbs_mix = (
+                weights[2] * gibbs_mix_high + weights[1] * gibbs_mix_mid
+            )
             derivative_gibbs = (
-                weights[2] * derivative_gibbs_high + weights[1] * derivative_gibbs_mid
+                weights[2] * derivative_gibbs_high
+                + weights[1] * derivative_gibbs_mid
             )
     else:  # when only high 2OC region is used
         gibbs_mix, derivative_gibbs = gibbs_of_mixing(

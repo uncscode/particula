@@ -25,12 +25,18 @@ def test_get_psi_ao2008_scalar():
         / (
             2
             * phi
-            * ((1 / particle_inertia_time) + (1 / alpha) + (particle_velocity / phi))
+            * (
+                (1 / particle_inertia_time)
+                + (1 / alpha)
+                + (particle_velocity / phi)
+            )
             ** 2
         )
     )
 
-    result = get_psi_ao2008(alpha, phi, particle_inertia_time, particle_velocity)
+    result = get_psi_ao2008(
+        alpha, phi, particle_inertia_time, particle_velocity
+    )
 
     assert np.isclose(
         result, expected, atol=1e-10
@@ -46,10 +52,16 @@ def test_get_psi_ao2008_array():
     particle_inertia_time = np.array([0.05, 0.1, 0.2])  # [s]
     particle_velocity = np.array([0.1, 0.2, 0.3])  # [m/s]
 
-    denominator = (1 / particle_inertia_time) + (1 / alpha) + (particle_velocity / phi)
-    expected = 1 / denominator - (particle_velocity / (2 * phi * denominator**2))
+    denominator = (
+        (1 / particle_inertia_time) + (1 / alpha) + (particle_velocity / phi)
+    )
+    expected = 1 / denominator - (
+        particle_velocity / (2 * phi * denominator**2)
+    )
 
-    result = get_psi_ao2008(alpha, phi, particle_inertia_time, particle_velocity)
+    result = get_psi_ao2008(
+        alpha, phi, particle_inertia_time, particle_velocity
+    )
 
     assert (
         result.shape == expected.shape
@@ -99,9 +111,13 @@ def test_get_psi_ao2008_edge_cases():
     particle_inertia_time = np.array(
         [1e-6, 1e-3, 10.0]
     )  # Very small and large inertia values
-    particle_velocity = np.array([1e-6, 1e-3, 10.0])  # Very small and large velocities
+    particle_velocity = np.array(
+        [1e-6, 1e-3, 10.0]
+    )  # Very small and large velocities
 
-    result = get_psi_ao2008(alpha, phi, particle_inertia_time, particle_velocity)
+    result = get_psi_ao2008(
+        alpha, phi, particle_inertia_time, particle_velocity
+    )
 
     assert np.all(result >= 0), "Expected all values to be non-negative"
     assert np.isfinite(result).all(), "Expected all values to be finite"

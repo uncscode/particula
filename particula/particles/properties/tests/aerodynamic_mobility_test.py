@@ -20,7 +20,9 @@ def test_particle_aerodynamic_mobility_single_value():
     actual_mobility = particle_aerodynamic_mobility(
         radius, slip_correction_factor, dynamic_viscosity
     )
-    assert np.isclose(actual_mobility, expected_mobility), "The value does not match."
+    assert np.isclose(
+        actual_mobility, expected_mobility
+    ), "The value does not match."
 
 
 def test_particle_aerodynamic_mobility_array_input():
@@ -51,7 +53,9 @@ def test_particle_aerodynamic_mobility_type_error():
         )
 
 
-@pytest.mark.parametrize("radius", [0, -1e-6, 1e-12, 1e-3, float("inf"), float("nan")])
+@pytest.mark.parametrize(
+    "radius", [0, -1e-6, 1e-12, 1e-3, float("inf"), float("nan")]
+)
 def test_particle_aerodynamic_mobility_extreme_values(radius: float) -> None:
     """
     Verify that the particle_aerodynamic_mobility function handles extreme

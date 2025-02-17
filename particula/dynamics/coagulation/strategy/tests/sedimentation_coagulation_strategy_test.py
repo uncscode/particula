@@ -80,7 +80,9 @@ class TestSedimentationCoagulationStrategy(unittest.TestCase):
             time_step=1.0,
         )
         updated_concentration = self.particle.get_concentration()
-        self.assertFalse(np.array_equal(initial_concentration, updated_concentration))
+        self.assertFalse(
+            np.array_equal(initial_concentration, updated_concentration)
+        )
 
     def test_kernel_continuous_pdf(self):
         """
@@ -111,7 +113,9 @@ class TestSedimentationCoagulationStrategy(unittest.TestCase):
             time_step=1.0,
         )
         updated_concentration = self.particle.get_concentration()
-        self.assertFalse(np.array_equal(initial_concentration, updated_concentration))
+        self.assertFalse(
+            np.array_equal(initial_concentration, updated_concentration)
+        )
 
     def test_step_particle_resolved(self):
         """Test the step calculation for particle_resolved distribution."""

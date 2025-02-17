@@ -135,7 +135,9 @@ class BuilderConcentrationMixin:
         if concentration_units == self.default_units:
             self.concentration = concentration
             return self
-        raise ValueError(f"Concentration units must be in {self.default_units}")
+        raise ValueError(
+            f"Concentration units must be in {self.default_units}"
+        )
 
 
 class BuilderChargeMixin:
@@ -269,7 +271,9 @@ class BuilderTemperatureMixin:
         self.temperature = None
 
     @validate_inputs({"temperature": "positive"})
-    def set_temperature(self, temperature: float, temperature_units: str = "K"):
+    def set_temperature(
+        self, temperature: float, temperature_units: str = "K"
+    ):
         """Set the temperature of the atmosphere.
 
         Args:

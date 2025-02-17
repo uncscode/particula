@@ -115,7 +115,9 @@ def test_clausius_build_failure():
     builder.set_latent_heat(2260, "J/kg").set_temperature_initial(373, "K")
     with pytest.raises(ValueError) as excinfo:
         builder.build()
-    assert "Required parameter(s) not set: pressure_initial" in str(excinfo.value)
+    assert "Required parameter(s) not set: pressure_initial" in str(
+        excinfo.value
+    )
 
 
 def test_constant_set_vapor_pressure_positive():
@@ -152,7 +154,9 @@ def test_constant_build_failure():
     builder = ConstantBuilder()
     with pytest.raises(ValueError) as excinfo:
         builder.build()
-    assert "Required parameter(s) not set: vapor_pressure" in str(excinfo.value)
+    assert "Required parameter(s) not set: vapor_pressure" in str(
+        excinfo.value
+    )
 
 
 def test_build_water_buck():

@@ -80,10 +80,14 @@ def get_turbulent_dns_kernel_ao2008(
         Theory and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
     """
-    collision_radius = particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
+    collision_radius = (
+        particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
+    )
 
     # Compute radial relative velocity ⟨ |w_r| ⟩
-    wr = get_radial_relative_velocity_dz2002(velocity_dispersion, particle_inertia_time)
+    wr = get_radial_relative_velocity_dz2002(
+        velocity_dispersion, particle_inertia_time
+    )
 
     # Compute radial distribution function g₁₂
     g12 = get_g12_radial_distribution_ao2008(
@@ -170,7 +174,9 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
     knudsen_number = properties.calculate_knudsen_number(
         mean_free_path=mean_free_path, particle_radius=particle_radius
     )
-    slip_correction_factor = properties.cunningham_slip_correction(knudsen_number)
+    slip_correction_factor = properties.cunningham_slip_correction(
+        knudsen_number
+    )
 
     # Handle radius addition properly for arrays
     collisional_radius = (
@@ -186,13 +192,15 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
         fluid_density=fluid_density,
         kinematic_viscosity=kinematic_viscosity,
     )
-    particle_settling_velocity = properties.get_particle_settling_velocity_with_drag(
-        particle_radius=particle_radius,
-        particle_density=particle_density,
-        fluid_density=fluid_density,
-        dynamic_viscosity=dynamic_viscosity,
-        slip_correction_factor=slip_correction_factor,
-        re_threshold=0.1,
+    particle_settling_velocity = (
+        properties.get_particle_settling_velocity_with_drag(
+            particle_radius=particle_radius,
+            particle_density=particle_density,
+            fluid_density=fluid_density,
+            dynamic_viscosity=dynamic_viscosity,
+            slip_correction_factor=slip_correction_factor,
+            re_threshold=0.1,
+        )
     )
     particle_velocity = np.abs(particle_settling_velocity - relative_velocity)
 
@@ -234,8 +242,10 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
         particle_velocity=particle_settling_velocity,
         kinematic_viscosity=kinematic_viscosity,
     )
-    normalized_accel_variance = gas_properties.get_normalized_accel_variance_ao2008(
-        re_lambda=re_lambda,
+    normalized_accel_variance = (
+        gas_properties.get_normalized_accel_variance_ao2008(
+            re_lambda=re_lambda,
+        )
     )
     kolmogorov_velocity = gas_properties.get_kolmogorov_velocity(
         kinematic_viscosity=kinematic_viscosity,

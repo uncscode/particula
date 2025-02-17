@@ -34,7 +34,9 @@ def test_vapor_transition_correction_zero_knudsen():
     knudsen_number = 0
     mass_accommodation = 0.2
     result = vapor_transition_correction(knudsen_number, mass_accommodation)
-    expected = (0.75 * 0.2 * (1 + 0)) / ((0**2 + 0) + 0.283 * 0.2 * 0 + 0.75 * 0.2)
+    expected = (0.75 * 0.2 * (1 + 0)) / (
+        (0**2 + 0) + 0.283 * 0.2 * 0 + 0.75 * 0.2
+    )
     assert np.isclose(result, expected), "Failed for zero Knudsen number"
 
 
@@ -53,5 +55,7 @@ def test_vapor_transition_correction_high_values():
     knudsen_number = 100
     mass_accommodation = 1
     result = vapor_transition_correction(knudsen_number, mass_accommodation)
-    expected = (0.75 * 1 * (1 + 100)) / ((100**2 + 100) + 0.283 * 1 * 100 + 0.75 * 1)
+    expected = (0.75 * 1 * (1 + 100)) / (
+        (100**2 + 100) + 0.283 * 1 * 100 + 0.75 * 1
+    )
     assert np.isclose(result, expected), "Failed for high values"

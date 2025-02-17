@@ -129,9 +129,11 @@ def thajudeen_2012(
     alpha2 = -0.218 * fractal_dimension**2 + 0.964 * fractal_dimension - 0.180
     phi = 1 / (alpha1 * np.log(number_of_particles) + alpha2)
     radius_s_i = phi * radius_gyration
-    radius_s_ii = (radius_monomer * (1.203 - 0.4315 / fractal_dimension) / 2) * (
-        4 * radius_s_i / radius_monomer
-    ) ** (0.8806 + 0.3497 / fractal_dimension)
+    radius_s_ii = (
+        radius_monomer * (1.203 - 0.4315 / fractal_dimension) / 2
+    ) * (4 * radius_s_i / radius_monomer) ** (
+        0.8806 + 0.3497 / fractal_dimension
+    )
     return radius_s_ii / 2
 
 

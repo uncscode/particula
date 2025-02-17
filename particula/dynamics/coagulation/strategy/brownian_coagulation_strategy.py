@@ -43,7 +43,9 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
     """
 
     def __init__(self, distribution_type: str):
-        CoagulationStrategyABC.__init__(self, distribution_type=distribution_type)
+        CoagulationStrategyABC.__init__(
+            self, distribution_type=distribution_type
+        )
 
     def dimensionless_kernel(
         self,
@@ -51,7 +53,8 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         message = (
-            "Dimensionless kernel not implemented in simple " + "coagulation strategy."
+            "Dimensionless kernel not implemented in simple "
+            + "coagulation strategy."
         )
         logger.error(message)
         raise NotImplementedError(message)

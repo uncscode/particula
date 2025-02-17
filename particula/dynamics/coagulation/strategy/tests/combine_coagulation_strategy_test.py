@@ -97,4 +97,6 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
             time_step=1.0,
         )
         updated_concentration = self.particle.get_concentration()
-        self.assertFalse(np.array_equal(initial_concentration, updated_concentration))
+        self.assertFalse(
+            np.array_equal(initial_concentration, updated_concentration)
+        )

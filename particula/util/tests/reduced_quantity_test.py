@@ -70,7 +70,9 @@ def test_reduced_self_broadcast_typical():
         ]
     )
     result = reduced_self_broadcast(alpha_array)
-    assert np.allclose(result, expected_result), "Test failed for typical input"
+    assert np.allclose(
+        result, expected_result
+    ), "Test failed for typical input"
 
 
 def test_reduced_self_broadcast_empty():
@@ -85,7 +87,9 @@ def test_reduced_self_broadcast_zero_elements():
     alpha_array = np.array([0, 0, 0])
     expected_result = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     result = reduced_self_broadcast(alpha_array)
-    assert np.allclose(result, expected_result), "Test failed for zero elements input"
+    assert np.allclose(
+        result, expected_result
+    ), "Test failed for zero elements input"
 
 
 def test_reduced_self_broadcast_one_element():
@@ -93,7 +97,9 @@ def test_reduced_self_broadcast_one_element():
     alpha_array = np.array([4])
     expected_result = np.array([[4 * 4 / (4 + 4)]])
     result = reduced_self_broadcast(alpha_array)
-    assert np.allclose(result, expected_result), "Test failed for one element input"
+    assert np.allclose(
+        result, expected_result
+    ), "Test failed for one element input"
 
 
 def test_reduced_self_broadcast_negative_elements():

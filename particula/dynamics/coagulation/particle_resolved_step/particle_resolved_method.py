@@ -174,7 +174,9 @@ def get_particle_resolved_coagulation_step(
 
         # Step 12: Ensure each small particle only coagulates with one large
         # particle
-        _, unique_index = np.unique(small_index[valid_indices], return_index=True)
+        _, unique_index = np.unique(
+            small_index[valid_indices], return_index=True
+        )
         # Valid and unique indices are selected for coagulation,
         # non-unique indices should happen rarely.
         small_index = small_index[valid_indices][unique_index]
