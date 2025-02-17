@@ -7388,12 +7388,14 @@ to use a dimensionless kernel representation.</p>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ChargedCoagulationStrategy</span><span class="p">(</span><span class="n">CoagulationStrategyABC</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">kernel_strategy</span><span class="p">:</span> <span class="n">KernelStrategy</span><span class="p">):</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">kernel_strategy</span><span class="p">:</span> <span class="n">ChargedKernelStrategyABC</span>
+    <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h4 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h4>
 <ul>
+<li><a href="../../charged_kernel_strategy/#chargedkernelstrategyabc">ChargedKernelStrategyABC</a></li>
 <li><a href="../coagulation_strategy_abc/#coagulationstrategyabc">CoagulationStrategyABC</a></li>
-<li><a href="../../charged_kernel_strategy/#kernelstrategy">KernelStrategy</a></li>
 </ul>
 <h3 id="chargedcoagulationstrategydimensionless_kernel">ChargedCoagulationStrategy().dimensionless_kernel<a class="headerlink" href="#chargedcoagulationstrategydimensionless_kernel" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/charged_coagulation_strategy.py#L50">Show source in charged_coagulation_strategy.py:50</a></p>
