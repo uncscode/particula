@@ -54,9 +54,7 @@ class AntoineBuilder(BuilderABC):
         self.b = None
         self.c = None
 
-    def set_a(
-        self, a: float, a_units: Optional[str] = None
-    ) -> "AntoineBuilder":
+    def set_a(self, a: float, a_units: Optional[str] = None) -> "AntoineBuilder":
         """Set the coefficient 'a' of the Antoine equation."""
         if a < 0:
             logger.error("Coefficient 'a' must be a positive value.")

@@ -94,9 +94,7 @@ def get_speciated_mass_representation_from_particle_resolved(
     if old_distribution.ndim == 1:
         new_distribution = np.zeros_like(bin_radius)
     else:
-        new_distribution = np.zeros(
-            (len(bin_radius), np.shape(old_distribution)[1])
-        )
+        new_distribution = np.zeros((len(bin_radius), np.shape(old_distribution)[1]))
 
     # add the charge by bin_indexes
     new_charge = np.zeros(len(bin_radius))
@@ -107,17 +105,13 @@ def get_speciated_mass_representation_from_particle_resolved(
     # loop through the bins and get the median
     for index, _ in enumerate(bin_radius):
         if old_distribution.ndim == 1:
-            new_distribution[index] = np.median(
-                old_distribution[bin_indexes == index]
-            )
+            new_distribution[index] = np.median(old_distribution[bin_indexes == index])
         else:
             new_distribution[index, :] = np.mean(
                 old_distribution[bin_indexes == index, :]
             )
         new_charge[index] = np.median(old_charge[bin_indexes == index])
-        new_concentration[index] = np.sum(
-            old_concentration[bin_indexes == index]
-        )
+        new_concentration[index] = np.sum(old_concentration[bin_indexes == index])
     # check for nans in the new distribution
     if np.any(np.isnan(new_distribution)):
         # interpolate the nans

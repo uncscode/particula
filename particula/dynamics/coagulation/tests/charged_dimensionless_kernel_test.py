@@ -40,10 +40,8 @@ def test_coulomb_dyachkov2007():
     """
     # single value
     expected_single = 0.10960430161885967
-    result_single = (
-        charged_dimensionless_kernel.get_coulomb_kernel_dyachkov2007(
-            DIFFUSIVE_KNUDSEN_SINGLE, COULOMB_POTENTIAL_RATIO_SINGLE
-        )
+    result_single = charged_dimensionless_kernel.get_coulomb_kernel_dyachkov2007(
+        DIFFUSIVE_KNUDSEN_SINGLE, COULOMB_POTENTIAL_RATIO_SINGLE
     )
     np.testing.assert_almost_equal(result_single, expected_single, decimal=4)
     # array
@@ -80,18 +78,14 @@ def test_coulomb_gopalakrishnan2012():
     """
     # single value
     expected_single = 0.1096043
-    result_single = (
-        charged_dimensionless_kernel.get_coulomb_kernel_gopalakrishnan2012(
-            DIFFUSIVE_KNUDSEN_SINGLE, COULOMB_POTENTIAL_RATIO_SINGLE
-        )
+    result_single = charged_dimensionless_kernel.get_coulomb_kernel_gopalakrishnan2012(
+        DIFFUSIVE_KNUDSEN_SINGLE, COULOMB_POTENTIAL_RATIO_SINGLE
     )
     np.testing.assert_almost_equal(result_single, expected_single, decimal=4)
     # array
     expected = np.array([1.83746548, 4.83694019, 24.16690909, 49.22484307])
-    result = (
-        charged_dimensionless_kernel.get_coulomb_kernel_gopalakrishnan2012(
-            DIFFUSIVE_KNUDSEN_ARRAY, COULOMB_POTENTIAL_RATIO_ARRAY
-        )
+    result = charged_dimensionless_kernel.get_coulomb_kernel_gopalakrishnan2012(
+        DIFFUSIVE_KNUDSEN_ARRAY, COULOMB_POTENTIAL_RATIO_ARRAY
     )
     np.testing.assert_almost_equal(result, expected, decimal=4)
 
@@ -133,24 +127,18 @@ def test_transition_regime_coagulation_edge_cases():
         small_zero_input
     )
     small_zero_expected = np.array([0.10960430161885967, 0.0])
-    np.testing.assert_almost_equal(
-        small_zero_result, small_zero_expected, decimal=4
-    )
+    np.testing.assert_almost_equal(small_zero_result, small_zero_expected, decimal=4)
 
     # Test very large values (using realistic upper bound for particle sizes)
     large_input = np.array([1e5, 1e5])  # 100mm particles
-    large_result = charged_dimensionless_kernel.get_hard_sphere_kernel(
-        large_input
-    )
+    large_result = charged_dimensionless_kernel.get_hard_sphere_kernel(large_input)
     assert np.isfinite(
         large_result
     ).all(), "Should handle large values without overflow"
 
     # Test negative values
     negative_input = np.array([-1.0, 1.0])
-    with pytest.raises(
-        ValueError, match="Particle sizes must be non-negative"
-    ):
+    with pytest.raises(ValueError, match="Particle sizes must be non-negative"):
         charged_dimensionless_kernel.get_hard_sphere_kernel(negative_input)
 
     # Test NaN values

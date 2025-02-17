@@ -41,12 +41,8 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
     - net_rate: Calculate the net coagulation rate.
     """
 
-    def __init__(
-        self, distribution_type: str, kernel_strategy: KernelStrategy
-    ):
-        CoagulationStrategyABC.__init__(
-            self, distribution_type=distribution_type
-        )
+    def __init__(self, distribution_type: str, kernel_strategy: KernelStrategy):
+        CoagulationStrategyABC.__init__(self, distribution_type=distribution_type)
         self.kernel_strategy = kernel_strategy
 
     def dimensionless_kernel(

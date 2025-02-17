@@ -94,12 +94,8 @@ def test_integral_scales_edge_case():
     expected_tl = (rms_velocity**2) / turbulent_dissipation
     expected_le = 0.5 * (rms_velocity**3) / turbulent_dissipation
 
-    result_tl = get_lagrangian_integral_time(
-        rms_velocity, turbulent_dissipation
-    )
-    result_le = get_eulerian_integral_length(
-        rms_velocity, turbulent_dissipation
-    )
+    result_tl = get_lagrangian_integral_time(rms_velocity, turbulent_dissipation)
+    result_le = get_eulerian_integral_length(rms_velocity, turbulent_dissipation)
 
     assert np.isclose(result_tl, expected_tl, atol=1e-10)
     assert np.isclose(result_le, expected_le, atol=1e-10)

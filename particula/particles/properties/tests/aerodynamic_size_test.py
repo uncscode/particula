@@ -27,9 +27,7 @@ def test_particle_aerodynamic_length_single_value():
         aerodynamic_slip_correction_factor,
         density,
     )
-    assert np.isclose(
-        actual_length, expected_length
-    ), "The value does not match."
+    assert np.isclose(actual_length, expected_length), "The value does not match."
 
 
 def test_particle_aerodynamic_length_array_input():

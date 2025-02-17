@@ -1,6 +1,7 @@
 """
 Test the sedimentation kernel functions.
 """
+
 # pylint: disable=duplicate-code
 
 

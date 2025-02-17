@@ -51,9 +51,7 @@ def test_mass_based_strategy_total_mass():
     density = np.array([1, 2, 3], dtype=np.float64)  # Example densities
     expected_total_mass = np.sum(distribution * concentration)
     assert (
-        mass_based_strategy.get_total_mass(
-            distribution, concentration, density
-        )
+        mass_based_strategy.get_total_mass(distribution, concentration, density)
         == expected_total_mass
     )
 
@@ -67,9 +65,7 @@ def test_mass_based_strategy_add_mass():
     expected_distribution = distribution + added_mass
     expected_concentration = concentration
     np.testing.assert_array_equal(
-        mass_based_strategy.add_mass(
-            distribution, concentration, density, added_mass
-        ),
+        mass_based_strategy.add_mass(distribution, concentration, density, added_mass),
         (expected_distribution, expected_concentration),
     )
 
@@ -121,27 +117,19 @@ def test_radii_based_get_total_mass():
 
 def test_radii_based_add_mass():
     """Test number-based strategy mass addition."""
-    distribution = np.array(
-        [1, 2, 3], dtype=np.float64
-    )  # Example radii in meters
+    distribution = np.array([1, 2, 3], dtype=np.float64)  # Example radii in meters
     concentration = np.array(
         [10, 20, 30], dtype=np.float64
     )  # Concentrations in number of particles
-    density = np.array(
-        [2, 5, 1], dtype=np.float64
-    )  # Example densities in kg/m^3
+    density = np.array([2, 5, 1], dtype=np.float64)  # Example densities in kg/m^3
     added_mass = np.array([10, 20, 30], dtype=np.float64)  # Added mass in kg
 
     # Step 1: Calculate mass per particle
-    mass_per_particle = (
-        added_mass / concentration
-    )  # Mass added to each particle
+    mass_per_particle = added_mass / concentration  # Mass added to each particle
 
     # Step 2: Calculate new volumes (V = 4/3 * pi * r^3 for initial volume)
     # Then add the mass contribution by mass_per_particle / density
-    new_volumes = (
-        4 / 3
-    ) * np.pi * distribution**3 + mass_per_particle / density
+    new_volumes = (4 / 3) * np.pi * distribution**3 + mass_per_particle / density
 
     # Step 3: Convert new volumes back to radii (r = (3V / 4pi)^(1/3))
     new_radii = (3 * new_volumes / (4 * np.pi)) ** (1 / 3)
@@ -150,9 +138,7 @@ def test_radii_based_add_mass():
     expected_distribution = new_radii
     expected_concentration = concentration  # Concentration remains the same
     np.testing.assert_array_equal(
-        radii_based_strategy.add_mass(
-            distribution, concentration, density, added_mass
-        ),
+        radii_based_strategy.add_mass(distribution, concentration, density, added_mass),
         (expected_distribution, expected_concentration),
     )
 
@@ -188,9 +174,7 @@ def test_speciated_mass_strategy_get_mass():
     )
     expected_total_mass = np.sum(expected_mass)
     np.testing.assert_array_almost_equal(
-        speciated_mass_strategy.get_total_mass(
-            distribution, concentration, densities
-        ),
+        speciated_mass_strategy.get_total_mass(distribution, concentration, densities),
         expected_total_mass,
     )
 
@@ -198,16 +182,12 @@ def test_speciated_mass_strategy_get_mass():
 def test_speciated_mass_strategy_get_radius():
     """Test speciated mass strategy radius calculation."""
     # Example 2D distribution matrix
-    distribution = np.array(
-        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
-    )
+    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     # Example densities for each species
     densities = np.array([2, 3], dtype=np.float64)
     # Calculate expected volumes and then radii
     volumes = np.sum(distribution / densities, axis=1)  # Volume calculation
-    expected_radii = (3 * volumes / (4 * np.pi)) ** (
-        1 / 3
-    )  # Radius calculation
+    expected_radii = (3 * volumes / (4 * np.pi)) ** (1 / 3)  # Radius calculation
     result = speciated_mass_strategy.get_radius(distribution, densities)
     np.testing.assert_array_almost_equal(result, expected_radii)
 
@@ -215,9 +195,7 @@ def test_speciated_mass_strategy_get_radius():
 def test_speciated_mass_strategy_get_total_mass():
     """Test speciated mass strategy total mass calculation."""
     # Example 2D distribution matrix
-    distribution = np.array(
-        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
-    )
+    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     # Example densities for each species
     densities = np.array([2, 3], dtype=np.float64)
     # Example concentrations for each species
@@ -235,9 +213,7 @@ def test_speciated_mass_strategy_get_total_mass():
 def test_speciated_mass_strategy_add_mass():
     """Test speciated mass strategy mass addition."""
     # Example 2D distribution matrix (mass per bin)
-    distribution = np.array(
-        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
-    )
+    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     # Particle densities (not directly used here)
     densities = np.array([2, 3], dtype=np.float64)
     # Concentration (number of particles per bin)
@@ -280,9 +256,7 @@ def test_speciated_mass_strategy_collide():
 def test_particle_resolved_mass_strategy_get_mass():
     """Test particle-resolved mass strategy mass calculation."""
     # Example 2D distribution matrix
-    distribution = np.array(
-        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
-    )
+    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     # Example densities for each species
     densities = np.array([2, 3], dtype=np.float64)
     expected_mass = np.sum(distribution, axis=1)
@@ -295,28 +269,20 @@ def test_particle_resolved_mass_strategy_get_mass():
 def test_particle_resolved_mass_strategy_get_radius():
     """Test particle-resolved mass strategy radius calculation."""
     # Example 2D distribution matrix
-    distribution = np.array(
-        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
-    )
+    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     # Example densities for each species
     densities = np.array([2, 3], dtype=np.float64)
     # Calculate expected volumes and then radii
     volumes = np.sum(distribution / densities, axis=1)  # Volume calculation
-    expected_radii = (3 * volumes / (4 * np.pi)) ** (
-        1 / 3
-    )  # Radius calculation
-    result = particle_resolved_mass_strategy.get_radius(
-        distribution, densities
-    )
+    expected_radii = (3 * volumes / (4 * np.pi)) ** (1 / 3)  # Radius calculation
+    result = particle_resolved_mass_strategy.get_radius(distribution, densities)
     np.testing.assert_array_almost_equal(result, expected_radii)
 
 
 def test_particle_resolved_mass_strategy_get_total_mass():
     """Test particle-resolved mass strategy total mass calculation"""
     # Example 2D distribution matrix
-    distribution = np.array(
-        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
-    )
+    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     # Example densities for each species
     densities = np.array([2, 3], dtype=np.float64)
     # Example concentrations for each species
@@ -334,9 +300,7 @@ def test_particle_resolved_mass_strategy_get_total_mass():
 def test_particle_resolved_mass_strategy_add_mass():
     """Test particle-resolved mass strategy mass addition."""
     # Example 2D distribution matrix (mass per bin)
-    distribution = np.array(
-        [[100, 200], [300, 400], [500, 600]], dtype=np.float64
-    )
+    distribution = np.array([[100, 200], [300, 400], [500, 600]], dtype=np.float64)
     # Particle densities (not directly used here)
     densities = np.array([2, 3], dtype=np.float64)
     # Concentration (number of particles per bin)
@@ -400,18 +364,14 @@ def test_particle_resolved_mass_strategy_collide():
     expected_concentration[small_index] = 0
 
     # Call the method being tested
-    result_mass, result_concentration = (
-        particle_resolved_mass_strategy.collide_pairs(
-            distribution.copy(),
-            concentration.copy(),
-            densities,
-            collision_pairs,
-        )
+    result_mass, result_concentration = particle_resolved_mass_strategy.collide_pairs(
+        distribution.copy(),
+        concentration.copy(),
+        densities,
+        collision_pairs,
     )
 
     # Assert the resulting mass matches the expected distribution
     np.testing.assert_array_almost_equal(result_mass, expected_mass)
     # Assert the resulting concentration matches the expected concentration
-    np.testing.assert_array_almost_equal(
-        result_concentration, expected_concentration
-    )
+    np.testing.assert_array_almost_equal(result_concentration, expected_concentration)

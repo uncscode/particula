@@ -52,9 +52,7 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
         turbulent_dissipation: float,
         fluid_density: float,
     ):
-        CoagulationStrategyABC.__init__(
-            self, distribution_type=distribution_type
-        )
+        CoagulationStrategyABC.__init__(self, distribution_type=distribution_type)
         self.turbulent_dissipation = turbulent_dissipation
         self.fluid_density = fluid_density
 

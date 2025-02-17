@@ -274,9 +274,7 @@ class RadiiBasedMovingBin(DistributionStrategy):
         added_mass: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         # Step 1: Calculate mass added per particle
-        mass_per_particle = np.where(
-            concentration > 0, added_mass / concentration, 0
-        )
+        mass_per_particle = np.where(concentration > 0, added_mass / concentration, 0)
         # Step 2: Calculate new volumes
         initial_volumes = (4 / 3) * np.pi * np.power(distribution, 3)
         new_volumes = initial_volumes + mass_per_particle / density
@@ -486,9 +484,9 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         rescaled = False
         if np.all(added_concentration == 1):
             rescaled = True
-        if np.allclose(
-            added_concentration, np.max(concentration), atol=1e-2
-        ) or np.all(concentration == 0):
+        if np.allclose(added_concentration, np.max(concentration), atol=1e-2) or np.all(
+            concentration == 0
+        ):
             # then rescale the added concentration
             added_concentration = added_concentration / np.max(concentration)
             rescaled = True

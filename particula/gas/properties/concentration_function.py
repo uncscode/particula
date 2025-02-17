@@ -25,6 +25,4 @@ def calculate_concentration(
     - concentration (float or NDArray[np.float64]): Concentration of the gas
     in kg/m^3.
     """
-    return (partial_pressure * molar_mass) / (
-        float(GAS_CONSTANT) * temperature
-    )
+    return (partial_pressure * molar_mass) / (float(GAS_CONSTANT) * temperature)

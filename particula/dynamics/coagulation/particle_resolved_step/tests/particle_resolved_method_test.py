@@ -30,9 +30,7 @@ def test_calculate_probabilities():
     probabilities = _calculate_probabilities(
         kernel_values, time_step, events, tests, volume
     )
-    expected_probabilities = (
-        kernel_values * time_step * events / (tests * volume)
-    )
+    expected_probabilities = kernel_values * time_step * events / (tests * volume)
     np.testing.assert_array_almost_equal(probabilities, expected_probabilities)
 
 
@@ -90,10 +88,8 @@ def test_particle_resolved_update_step():
     gain = np.zeros_like(particle_radius)
     small_index = np.array([0], dtype=np.int64)
     large_index = np.array([1], dtype=np.int64)
-    updated_radius, updated_loss, updated_gain = (
-        get_particle_resolved_update_step(
-            particle_radius, loss, gain, small_index, large_index
-        )
+    updated_radius, updated_loss, updated_gain = get_particle_resolved_update_step(
+        particle_radius, loss, gain, small_index, large_index
     )
     assert updated_radius[0] == 0
     assert updated_radius[1] > 2.0

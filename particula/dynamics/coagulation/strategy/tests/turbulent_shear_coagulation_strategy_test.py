@@ -5,6 +5,7 @@ This module contains tests for the TurbulentShearCoagulationStrategy class,
 which implements the turbulent shear coagulation strategy. The tests cover
 both discrete and continuous_pdf distribution types.
 """
+
 # pylint: disable=duplicate-code
 
 import unittest
@@ -57,6 +58,8 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
             turbulent_dissipation=self.turbulent_dissipation,
             fluid_density=self.fluid_density,
         )
+
+    def test_kernel_discrete(self):
         """
         Test the kernel calculation for discrete distribution.
 

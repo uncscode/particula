@@ -63,7 +63,5 @@ def debye_function(
         integral = np.trapezoid(array[1:] / (exp_array - 1), array[1:], axis=0)
         return integral / variable
 
-    integral = np.trapezoid(
-        array[1:] ** n / (exp_array - 1), array[1:], axis=0
-    )
+    integral = np.trapezoid(array[1:] ** n / (exp_array - 1), array[1:], axis=0)
     return (n / variable**n) * integral

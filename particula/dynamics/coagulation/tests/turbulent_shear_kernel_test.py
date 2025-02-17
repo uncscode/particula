@@ -1,6 +1,7 @@
 """
 Test the turbulent shear kernel functions.
 """
+
 # pylint: disable=duplicate-code
 
 import numpy as np
@@ -20,9 +21,7 @@ def test_turbulent_shear_kernel_single_value():
     diameters, turbulent kinetic energy, and kinematic viscosity.
     """
     diameter_particle = np.array([1e-6, 2e-6])  # example diameters [m]
-    turbulent_dissipation = (
-        1.0e-4  # example turbulent kinetic energy [m^2/s^2]
-    )
+    turbulent_dissipation = 1.0e-4  # example turbulent kinetic energy [m^2/s^2]
     kinematic_viscosity = 1.5e-5  # example kinematic viscosity [m^2/s]
     expected_kernel = (
         np.pi * turbulent_dissipation / (120 * kinematic_viscosity)
@@ -40,9 +39,7 @@ def test_turbulent_shear_kernel_via_system_state():
     Test turbulent_shear_kernel_via_system_state with system state inputs.
     """
     particle_radius = np.array([1e-6, 2e-6])  # example diameters [m]
-    turbulent_dissipation = (
-        1.0e-4  # example turbulent kinetic energy [m^2/s^2]
-    )
+    turbulent_dissipation = 1.0e-4  # example turbulent kinetic energy [m^2/s^2]
     temperature = 298  # example temperature [K]
     fluid_density = 1.2  # example fluid density [kg/m^3]
     kinematic_viscosity = get_kinematic_viscosity_via_system_state(

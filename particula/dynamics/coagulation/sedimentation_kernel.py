@@ -13,9 +13,7 @@ from particula.particles.properties.settling_velocity import (
 from particula.util.validate_inputs import validate_inputs
 
 
-def calculate_collision_efficiency_function(
-    radius1: float, radius2: float
-) -> float:
+def calculate_collision_efficiency_function(radius1: float, radius2: float) -> float:
     """
     Placeholder function to calculate collision efficiency.
 
@@ -29,9 +27,7 @@ def calculate_collision_efficiency_function(
         - Collision efficiency [dimensionless].
     """
     # Implement the actual collision efficiency calculation here
-    raise NotImplementedError(
-        "Collision efficiency calculation not implemented yet."
-    )
+    raise NotImplementedError("Collision efficiency calculation not implemented yet.")
 
 
 def get_sedimentation_kernel_sp2016(

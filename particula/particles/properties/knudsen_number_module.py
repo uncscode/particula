@@ -65,8 +65,7 @@ def calculate_knudsen_number(
         return mean_free_path / particle_radius
 
     message = (
-        "The input arrays must have the same size"
-        " or one of them must have size 1"
+        "The input arrays must have the same size" " or one of them must have size 1"
     )
     logger.error(message)
     raise ValueError(message)

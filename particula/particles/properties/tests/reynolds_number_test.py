@@ -60,9 +60,7 @@ def test_get_particle_reynolds_number_regime_classification():
     """
     Test Reynolds number classification into flow regimes.
     """
-    re_p_stokes = get_particle_reynolds_number(
-        10e-6, 0.001, 1.5e-5
-    )  # Should be < 1
+    re_p_stokes = get_particle_reynolds_number(10e-6, 0.001, 1.5e-5)  # Should be < 1
     re_p_transitional = get_particle_reynolds_number(
         100e-6, 0.5, 1.5e-5
     )  # Should be 1 < Re_p < 1000

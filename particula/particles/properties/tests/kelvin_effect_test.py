@@ -60,9 +60,7 @@ def test_prop_kelvin_term_broadcast():
     """Test kelvin_term function with broadcasting."""
     radius = np.array([0.5, 1.0, 5.0, 8.0])
     kelvin_radius_value = np.array([0.1, 0.2])
-    expected_term = np.exp(
-        kelvin_radius_value[np.newaxis, :] / radius[:, np.newaxis]
-    )
+    expected_term = np.exp(kelvin_radius_value[np.newaxis, :] / radius[:, np.newaxis])
     np.testing.assert_allclose(
         kelvin_term(radius, kelvin_radius_value), expected_term, rtol=1e-8
     )

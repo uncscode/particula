@@ -17,9 +17,7 @@ def test_get_pairwise_sum_matrix():
     """
     input_array = np.array([1, 2, 3], dtype=np.float64)
 
-    expected_output = np.array(
-        [[2, 3, 4], [3, 4, 5], [4, 5, 6]], dtype=np.float64
-    )
+    expected_output = np.array([[2, 3, 4], [3, 4, 5], [4, 5, 6]], dtype=np.float64)
 
     result = get_pairwise_sum_matrix(input_array)
 
@@ -37,9 +35,7 @@ def test_get_pairwise_diff_matrix():
     """
     input_array = np.array([1, 2, 3], dtype=np.float64)
 
-    expected_output = np.array(
-        [[0, -1, -2], [1, 0, -1], [2, 1, 0]], dtype=np.float64
-    )
+    expected_output = np.array([[0, -1, -2], [1, 0, -1], [2, 1, 0]], dtype=np.float64)
 
     result = get_pairwise_diff_matrix(input_array)
 
@@ -57,9 +53,7 @@ def test_get_pairwise_max_matrix():
     """
     input_array = np.array([1, 2, 3], dtype=np.float64)
 
-    expected_output = np.array(
-        [[1, 2, 3], [2, 2, 3], [3, 3, 3]], dtype=np.float64
-    )
+    expected_output = np.array([[1, 2, 3], [2, 2, 3], [3, 3, 3]], dtype=np.float64)
 
     result = get_pairwise_max_matrix(input_array)
 
@@ -90,9 +84,7 @@ def test_pairwise_functions_edge_cases():
     assert np.allclose(
         get_pairwise_diff_matrix(single_element_array), np.array([[0.0]])
     )
-    assert np.allclose(
-        get_pairwise_max_matrix(single_element_array), np.array([[5.0]])
-    )
+    assert np.allclose(get_pairwise_max_matrix(single_element_array), np.array([[5.0]]))
 
 
 def test_pairwise_functions_large_array():

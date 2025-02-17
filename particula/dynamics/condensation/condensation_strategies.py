@@ -199,9 +199,7 @@ class CondensationStrategy(ABC):
             diffusion_coefficient=self.diffusion_coefficient,
         )
 
-    def _fill_zero_radius(
-        self, radius: NDArray[np.float64]
-    ) -> NDArray[np.float64]:
+    def _fill_zero_radius(self, radius: NDArray[np.float64]) -> NDArray[np.float64]:
         """Fill zero radius values with the maximum radius. The concentration
         value of zero will ensure that the rate of condensation is zero. The
         fill is necessary to avoid division by zero in the array operations.

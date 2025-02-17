@@ -5,6 +5,7 @@ This module contains tests for the SedimentationCoagulationStrategy class,
 which implements the sedimentation coagulation strategy. The tests cover
 both discrete and continuous_pdf distribution types.
 """
+
 # pylint: disable=duplicate-code
 
 import unittest
@@ -12,7 +13,10 @@ import numpy as np
 from particula.dynamics.coagulation.strategy.sedimentation_coagulation_strategy import (
     SedimentationCoagulationStrategy,
 )
-from particula.particles import PresetParticleRadiusBuilder, PresetResolvedParticleMassBuilder
+from particula.particles import (
+    PresetParticleRadiusBuilder,
+    PresetResolvedParticleMassBuilder,
+)
 
 
 class TestSedimentationCoagulationStrategy(unittest.TestCase):
@@ -41,9 +45,7 @@ class TestSedimentationCoagulationStrategy(unittest.TestCase):
         )
 
         self.particle_resolved = (
-            PresetResolvedParticleMassBuilder()
-            .set_volume(1e-6)
-            .build()
+            PresetResolvedParticleMassBuilder().set_volume(1e-6).build()
         )
         self.strategy_particle_resolved = SedimentationCoagulationStrategy(
             distribution_type="particle_resolved"
@@ -78,9 +80,7 @@ class TestSedimentationCoagulationStrategy(unittest.TestCase):
             time_step=1.0,
         )
         updated_concentration = self.particle.get_concentration()
-        self.assertFalse(
-            np.array_equal(initial_concentration, updated_concentration)
-        )
+        self.assertFalse(np.array_equal(initial_concentration, updated_concentration))
 
     def test_kernel_continuous_pdf(self):
         """
@@ -111,9 +111,7 @@ class TestSedimentationCoagulationStrategy(unittest.TestCase):
             time_step=1.0,
         )
         updated_concentration = self.particle.get_concentration()
-        self.assertFalse(
-            np.array_equal(initial_concentration, updated_concentration)
-        )
+        self.assertFalse(np.array_equal(initial_concentration, updated_concentration))
 
     def test_step_particle_resolved(self):
         """Test the step calculation for particle_resolved distribution."""

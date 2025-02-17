@@ -23,14 +23,10 @@ def test_compute_f2_longitudinal_velocity_correlation_scalar():
     denominator = 2 * sqrt_term_t
 
     exp_term_1 = np.exp(
-        -2
-        * collisional_radius
-        / ((1 + sqrt_term_t) * eulerian_integral_length)
+        -2 * collisional_radius / ((1 + sqrt_term_t) * eulerian_integral_length)
     )
     exp_term_2 = np.exp(
-        -2
-        * collisional_radius
-        / ((1 - sqrt_term_t) * eulerian_integral_length)
+        -2 * collisional_radius / ((1 - sqrt_term_t) * eulerian_integral_length)
     )
 
     expected = (1 / denominator) * (
@@ -101,9 +97,7 @@ def test_edge_cases():
     """
     Test compute_f2_longitudinal_velocity_correlation with extreme values.
     """
-    collisional_radius = np.array(
-        [1e-6, 1e-3, 10.0]
-    )  # Very small and large values
+    collisional_radius = np.array([1e-6, 1e-3, 10.0])  # Very small and large values
     taylor_microscale = 0.05  # [m]
     eulerian_integral_length = 1.0  # [m]
 

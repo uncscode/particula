@@ -45,9 +45,9 @@ def test_thajudeen_2012():
     alpha2 = -0.218 * 2.5**2 + 0.964 * 2.5 - 0.180
     phi = 1 / (alpha1 * np.log(100) + alpha2)
     radius_s_i = phi * 1.5
-    radius_s_ii = (0.1 * (1.203 - 0.4315 / 2.5) / 2) * (
-        4 * radius_s_i / 0.1
-    ) ** (0.8806 + 0.3497 / 2.5)
+    radius_s_ii = (0.1 * (1.203 - 0.4315 / 2.5) / 2) * (4 * radius_s_i / 0.1) ** (
+        0.8806 + 0.3497 / 2.5
+    )
     expected = radius_s_ii / 2
     assert np.isclose(result, expected)
 
@@ -70,9 +70,7 @@ def test_qian_2022_rg_df_k0():
     """Test the qian_2022_rg_df_k0 function."""
     result = qian_2022_rg_df_k0(2.5, 1.2, 1.5, 0.1)
     expected = (
-        0.777 * (2.5**0.479) * (1.2**0.000970) * (1.5 / 0.1)
-        + 0.267 * 1.2
-        + -0.0790
+        0.777 * (2.5**0.479) * (1.2**0.000970) * (1.5 / 0.1) + 0.267 * 1.2 + -0.0790
     ) * 0.1
     assert np.isclose(result, expected)
 

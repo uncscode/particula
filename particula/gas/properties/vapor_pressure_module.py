@@ -61,8 +61,7 @@ def clausius_clapeyron_vapor_pressure(
         - https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation
     """
     return pressure_initial * np.exp(
-        (latent_heat / gas_constant)
-        * (1 / temperature_initial - 1 / temperature)
+        (latent_heat / gas_constant) * (1 / temperature_initial - 1 / temperature)
     )
 
 

@@ -87,18 +87,10 @@ def test_edge_cases():
     """
     Test compute_relative_velocity_variance with extreme values.
     """
-    fluid_rms_velocity = np.array(
-        [1e-6, 1e-3, 10.0]
-    )  # Very small and large values
-    collisional_radius = np.array(
-        [1e-6, 1e-3, 10.0]
-    )  # Very small and large values
-    particle_inertia_time = np.array(
-        [1e-6, 1e-3, 10.0]
-    )  # Very small and large values
-    particle_velocity = np.array(
-        [1e-6, 1e-3, 10.0]
-    )  # Very small and large values
+    fluid_rms_velocity = np.array([1e-6, 1e-3, 10.0])  # Very small and large values
+    collisional_radius = np.array([1e-6, 1e-3, 10.0])  # Very small and large values
+    particle_inertia_time = np.array([1e-6, 1e-3, 10.0])  # Very small and large values
+    particle_velocity = np.array([1e-6, 1e-3, 10.0])  # Very small and large values
 
     result = get_relative_velocity_variance(
         fluid_rms_velocity=fluid_rms_velocity,

@@ -36,9 +36,7 @@ def test_get_radial_relative_velocity_ao2008():
     particle_inertia_time = np.array([0.02, 0.03, 0.05])  # s
 
     with pytest.raises(NotImplementedError):
-        get_radial_relative_velocity_ao2008(
-            velocity_dispersion, particle_inertia_time
-        )
+        get_radial_relative_velocity_ao2008(velocity_dispersion, particle_inertia_time)
 
 
 def test_invalid_inputs():
@@ -90,6 +88,4 @@ def test_edge_cases():
     assert np.isfinite(wr_dz2002).all(), "Expected all values to be finite"
 
     with pytest.raises(NotImplementedError):
-        get_radial_relative_velocity_ao2008(
-            velocity_dispersion, particle_inertia_time
-        )
+        get_radial_relative_velocity_ao2008(velocity_dispersion, particle_inertia_time)

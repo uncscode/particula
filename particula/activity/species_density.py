@@ -69,12 +69,7 @@ def organic_density_estimate(
     rho1 = molar_mass / (
         5.0
         * number_carbons
-        * (
-            2.0
-            + hydrogen2carbon_est
-            + oxygen2carbon * 2.0
-            + nitrogen2carbon * 2.0
-        )
+        * (2.0 + hydrogen2carbon_est + oxygen2carbon * 2.0 + nitrogen2carbon * 2.0)
     )
 
     # the returned denisty is in [g/cm^3]; and scaled assuming that most
@@ -100,12 +95,8 @@ def organic_array(
     """Get densities for an array."""
     density = np.empty([len(molar_mass), 1], dtype=float)
     for i, molar in enumerate(molar_mass):
-        hydrogen2carbon_run = (
-            None if hydrogen2carbon is None else hydrogen2carbon[i]
-        )
-        nitrogen2carbon_run = (
-            None if nitrogen2carbon is None else nitrogen2carbon[i]
-        )
+        hydrogen2carbon_run = None if hydrogen2carbon is None else hydrogen2carbon[i]
+        nitrogen2carbon_run = None if nitrogen2carbon is None else nitrogen2carbon[i]
         density[i] = organic_density_estimate(
             molar_mass=molar,
             oxygen2carbon=oxygen2carbon[i],

@@ -150,9 +150,7 @@ def fixed_water_activity(
         density=density,
     )
     # find phase separation
-    phase_check = phase_separation.find_phase_separation(
-        activities[0], activities[1]
-    )
+    phase_check = phase_separation.find_phase_separation(activities[0], activities[1])
     # ensure water activity type is float
     activities_water = np.asarray(activities[0], dtype=np.float64)
     if phase_check["phase_sep_check"] == 0:
@@ -182,9 +180,7 @@ def fixed_water_activity(
     # split the activities into alpha and beta phases
 
     # alpha water rich phase
-    alpha_water_activity = activities_water[
-        phase_check["upper_seperation_index"] :
-    ]
+    alpha_water_activity = activities_water[phase_check["upper_seperation_index"] :]
     alpha_organic_mole_fraction = organic_mole_fraction_array[
         phase_check["upper_seperation_index"] :
     ]

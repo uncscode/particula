@@ -72,18 +72,12 @@ def ratio(
         charge = np.array(charge)
         charge = np.tile(charge, (len(charge), 1))
 
-    numerator = (
-        -1 * charge * np.transpose(charge) * (ELEMENTARY_CHARGE_VALUE**2)
-    )
-    denominator = (
-        4 * np.pi * ELECTRIC_PERMITTIVITY * (radius + np.transpose(radius))
-    )
+    numerator = -1 * charge * np.transpose(charge) * (ELEMENTARY_CHARGE_VALUE**2)
+    denominator = 4 * np.pi * ELECTRIC_PERMITTIVITY * (radius + np.transpose(radius))
     coulomb_potential_ratio = numerator / (
         denominator * BOLTZMANN_CONSTANT * temperature
     )
-    return np.clip(
-        coulomb_potential_ratio, ratio_lower_limit, np.finfo(np.float64).max
-    )
+    return np.clip(coulomb_potential_ratio, ratio_lower_limit, np.finfo(np.float64).max)
 
 
 def kinetic(

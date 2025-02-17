@@ -1,7 +1,8 @@
 """
 Tests for BrownianCoagulationStrategy.
 """
-# pylint: disable=duplicate-code
+
+# pylint: disable=duplicate-code, too-many-instance-attributes
 
 
 import unittest
@@ -17,6 +18,7 @@ from particula.particles import (
 
 class TestBrownianCoagulationStrategy(unittest.TestCase):
     """Test suite for the BrownianCoagulationStrategy class."""
+
     def setUp(self):
         # Setup a particle representation for testing
         self.particle = PresetParticleRadiusBuilder().build()
@@ -28,9 +30,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
             distribution_type="continuous_pdf"
         )
         self.particle_resolved = (
-            PresetResolvedParticleMassBuilder()
-            .set_volume(1e-6)
-            .build()
+            PresetResolvedParticleMassBuilder().set_volume(1e-6).build()
         )
         self.strategy_particle_resolved = BrownianCoagulationStrategy(
             distribution_type="particle_resolved"
@@ -59,9 +59,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
             time_step=1.0,
         )
         updated_concentration = self.particle.get_concentration()
-        self.assertFalse(
-            np.array_equal(initial_concentration, updated_concentration)
-        )
+        self.assertFalse(np.array_equal(initial_concentration, updated_concentration))
 
     def test_step_particle_resolved(self):
         """Test the kernel calculation for particle_resolved distribution."""
@@ -97,6 +95,4 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
             time_step=1.0,
         )
         updated_concentration = self.particle.get_concentration()
-        self.assertFalse(
-            np.array_equal(initial_concentration, updated_concentration)
-        )
+        self.assertFalse(np.array_equal(initial_concentration, updated_concentration))
