@@ -31,14 +31,14 @@ jobs:
         python -m pip install pytest ${{ matrix.linter }}
         python -m pip install .
 
-    - 
+    -
       if: ${{ matrix.linter == 'flake8' }}
       name: Lint with flake8
       run: |
         flake8 . --config .github/.flake8
 
-    - 
-      if: ${{ matrix.linter == 'pylint' }} 
+    -
+      if: ${{ matrix.linter == 'pylint' }}
       name: Lint with pylint
       run: |
         pylint $(find particula/ -name "*.py" ! -name "*_test.py" | xargs)
