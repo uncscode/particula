@@ -28,7 +28,8 @@ class TurbulentShearCoagulationBuilder(
         set_turbulent_dissipation(turbulent_dissipation): Set the turbulent
             dissipation rate.
         set_fluid_density(fluid_density): Set the fluid density.
-        build(): Validate and return the TurbulentShearCoagulationStrategy object.
+        build(): Validate and return the TurbulentShearCoagulationStrategy
+            object.
     """
 
     def __init__(self):
