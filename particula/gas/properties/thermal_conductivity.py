@@ -37,7 +37,5 @@ def get_thermal_conductivity(
     """
     if np.any(temperature < 0):
         logger.error("Temperature must be greater than or equal to 0 Kelvin.")
-        raise ValueError(
-            "Temperature must be greater than or equal to 0 Kelvin."
-        )
+        raise ValueError("Temperature must be greater than or equal to 0 Kelvin.")
     return 1e-3 * (4.39 + 0.071 * temperature)

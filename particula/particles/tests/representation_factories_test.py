@@ -30,15 +30,11 @@ def test_mass_based_build():
         "concentration": np.array([10, 20, 30]),
         "charge": 1.0,
     }
-    particle_rep = ParticleRepresentationFactory().get_strategy(
-        "mass", parameters
-    )
+    particle_rep = ParticleRepresentationFactory().get_strategy("mass", parameters)
     assert isinstance(particle_rep, ParticleRepresentation)
     assert np.array_equal(particle_rep.get_distribution(), parameters["mass"])
     assert np.array_equal(particle_rep.get_density(), parameters["density"])
-    assert np.array_equal(
-        particle_rep.get_concentration(), parameters["concentration"]
-    )
+    assert np.array_equal(particle_rep.get_concentration(), parameters["concentration"])
     assert particle_rep.get_charge() == parameters["charge"]
 
 
@@ -54,24 +50,18 @@ def test_radii_based_build():
         "concentration": np.array([10, 20, 30]),
         "charge": np.array([1.0, 2.0, 3.0]),
     }
-    strategy = ParticleRepresentationFactory().get_strategy(
-        "radius", parameters
-    )
+    strategy = ParticleRepresentationFactory().get_strategy("radius", parameters)
     assert isinstance(strategy, ParticleRepresentation)
     assert np.array_equal(strategy.get_distribution(), parameters["radius"])
     assert np.array_equal(strategy.get_density(), parameters["density"])
-    assert np.array_equal(
-        strategy.get_concentration(), parameters["concentration"]
-    )
+    assert np.array_equal(strategy.get_concentration(), parameters["concentration"])
     assert np.array_equal(strategy.get_charge(), parameters["charge"])
 
 
 def test_limited_radius_build():
     """Test factory and build for LimitedRadiusParticleBuilder."""
     # default values
-    particle_rep = ParticleRepresentationFactory().get_strategy(
-        "preset_radius"
-    )
+    particle_rep = ParticleRepresentationFactory().get_strategy("preset_radius")
     assert isinstance(particle_rep, ParticleRepresentation)
 
     # set values
@@ -111,9 +101,7 @@ def test_resolved_mass_build():
 def test_preset_resolved_mass_build():
     """Test factory and build for PresetResolvedMassParticleBuilder."""
     # default values
-    particle_rep = ParticleRepresentationFactory().get_strategy(
-        "preset_resolved_mass"
-    )
+    particle_rep = ParticleRepresentationFactory().get_strategy("preset_resolved_mass")
     assert isinstance(particle_rep, ParticleRepresentation)
 
     parameters = {

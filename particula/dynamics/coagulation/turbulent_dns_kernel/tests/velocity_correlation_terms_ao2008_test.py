@@ -174,11 +174,7 @@ def test_edge_cases():
     )  # Very small and large values
 
     z_values = compute_z(lagrangian_integral_time, eulerian_integral_length)
-    beta_values = compute_beta(
-        lagrangian_integral_time, eulerian_integral_length
-    )
+    beta_values = compute_beta(lagrangian_integral_time, eulerian_integral_length)
 
     assert np.all(np.isfinite(z_values)), "Expected all z values to be finite"
-    assert np.all(
-        np.isfinite(beta_values)
-    ), "Expected all beta values to be finite"
+    assert np.all(np.isfinite(beta_values)), "Expected all beta values to be finite"

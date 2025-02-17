@@ -102,9 +102,7 @@ class BuilderDistributionStrategyMixin:
             - distribution_strategy_units : Not used. (for interface)
         """
         if distribution_strategy_units is not None:
-            logger.warning(
-                "Ignoring units for distribution strategy parameter."
-            )
+            logger.warning("Ignoring units for distribution strategy parameter.")
         self.distribution_strategy = distribution_strategy
         return self
 
@@ -534,9 +532,7 @@ class PresetResolvedParticleMassBuilder(
             SurfaceStrategyVolume(surface_tension=0.072, density=1000)
         )
         self.set_density(1000, "kg/m^3")
-        self.set_charge(
-            np.zeros(self.particle_resolved_count)
-        )
+        self.set_charge(np.zeros(self.particle_resolved_count))
         self.set_volume(1)
 
     def build(self) -> ParticleRepresentation:

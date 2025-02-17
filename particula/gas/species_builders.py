@@ -24,9 +24,7 @@ from particula.gas.vapor_pressure_strategies import (
 logger = logging.getLogger("particula")
 
 
-class GasSpeciesBuilder(
-    BuilderABC, BuilderMolarMassMixin, BuilderConcentrationMixin
-):
+class GasSpeciesBuilder(BuilderABC, BuilderMolarMassMixin, BuilderConcentrationMixin):
     """Builder class for GasSpecies objects, allowing for a more fluent and
     readable creation of GasSpecies instances with optional parameters.
 

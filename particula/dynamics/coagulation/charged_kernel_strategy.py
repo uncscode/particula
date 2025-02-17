@@ -140,9 +140,7 @@ class HardSphereKernelStrategy(KernelStrategy):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],  # type: ignore
     ) -> NDArray[np.float64]:
-        return charged_dimensionless_kernel.get_hard_sphere_kernel(
-            diffusive_knudsen
-        )
+        return charged_dimensionless_kernel.get_hard_sphere_kernel(diffusive_knudsen)
 
 
 class CoulombDyachkov2007KernelStrategy(KernelStrategy):
@@ -208,10 +206,8 @@ class CoulombGopalakrishnan2012KernelStrategy(KernelStrategy):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        return (
-            charged_dimensionless_kernel.get_coulomb_kernel_gopalakrishnan2012(
-                diffusive_knudsen, coulomb_potential_ratio
-            )
+        return charged_dimensionless_kernel.get_coulomb_kernel_gopalakrishnan2012(
+            diffusive_knudsen, coulomb_potential_ratio
         )
 
 

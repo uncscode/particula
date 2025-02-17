@@ -46,9 +46,7 @@ def test_invalid_pressure(pressure):
         molecule_mean_free_path(pressure=pressure)
 
 
-@pytest.mark.parametrize(
-    "molar_mass", [None, -1, "a", np.array([0.028, -0.044])]
-)
+@pytest.mark.parametrize("molar_mass", [None, -1, "a", np.array([0.028, -0.044])])
 def test_invalid_molar_mass(molar_mass):
     """Test when invalid molar mass values are provided to the function"""
     with pytest.raises((TypeError, ValueError)):

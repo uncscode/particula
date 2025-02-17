@@ -41,9 +41,7 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
         distribution_type = strategies[0].distribution_type
         for strategy in strategies:
             if strategy.distribution_type != distribution_type:
-                raise ValueError(
-                    "All strategies must have the same distribution type."
-                )
+                raise ValueError("All strategies must have the same distribution type.")
 
         super().__init__(distribution_type=distribution_type)
         self.strategies = strategies

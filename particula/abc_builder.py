@@ -52,12 +52,8 @@ class BuilderABC(ABC):
         """
 
         # Check if all required keys are present
-        if missing := [
-            p for p in self.required_parameters if p not in parameters
-        ]:
-            error_message = (
-                f"Missing required parameter(s): {', '.join(missing)}"
-            )
+        if missing := [p for p in self.required_parameters if p not in parameters]:
+            error_message = f"Missing required parameter(s): {', '.join(missing)}"
             logger.error(error_message)
             raise ValueError(error_message)
 
@@ -67,9 +63,7 @@ class BuilderABC(ABC):
             + [f"{key}_units" for key in self.required_parameters]
         )
         # Check for any invalid keys and handle them within the if condition
-        if invalid_keys := [
-            key for key in parameters if key not in valid_keys
-        ]:
+        if invalid_keys := [key for key in parameters if key not in valid_keys]:
             error_message = (
                 f"Trying to set an invalid parameter(s) '{invalid_keys}'. "
                 f"The valid parameter(s) '{valid_keys}'."
@@ -105,9 +99,7 @@ class BuilderABC(ABC):
             unit_key = f"{key}_units"
             if unit_key in parameters:
                 # Call set method with units
-                getattr(self, f"set_{key}")(
-                    parameters[key], parameters[unit_key]
-                )
+                getattr(self, f"set_{key}")(parameters[key], parameters[unit_key])
             else:
                 logger.warning("Using default units for parameter: '%s'.", key)
                 # Call set method without units
@@ -126,12 +118,8 @@ class BuilderABC(ABC):
             builder.pre_build_check()
             ```
         """
-        if missing := [
-            p for p in self.required_parameters if getattr(self, p) is None
-        ]:
-            error_message = (
-                f"Required parameter(s) not set: {', '.join(missing)}"
-            )
+        if missing := [p for p in self.required_parameters if getattr(self, p) is None]:
+            error_message = f"Required parameter(s) not set: {', '.join(missing)}"
             logger.error(error_message)
             raise ValueError(error_message)
 

@@ -12,9 +12,7 @@ from particula.gas.vapor_pressure_strategies import (
 
 def test_gas_species_builder_single_species():
     """Test building a single gas species with the GasSpeciesBuilder."""
-    vapor_pressure_strategy = ConstantVaporPressureStrategy(
-        vapor_pressure=101325
-    )
+    vapor_pressure_strategy = ConstantVaporPressureStrategy(vapor_pressure=101325)
     name = "Oxygen"
     molar_mass = 0.032  # kg/mol
     condensable = False
@@ -150,9 +148,7 @@ def test_gas_species_zero_concentration():
     )
 
     assert np.array_equal(zero_concentration_species.get_molar_mass(), [1, 1])
-    assert np.array_equal(
-        zero_concentration_species.get_concentration(), [0, 1]
-    )
+    assert np.array_equal(zero_concentration_species.get_concentration(), [0, 1])
 
 
 def test_gas_species_get_methods():

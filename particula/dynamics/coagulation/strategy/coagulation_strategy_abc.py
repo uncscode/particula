@@ -61,9 +61,7 @@ class CoagulationStrategyABC(ABC):
         self.random_generator = np.random.default_rng()
         # for particle resolved coagulation strategy
         self.particle_resolved_radius = particle_resolved_kernel_radius
-        self.particle_resolved_bins_number = (
-            particle_resolved_kernel_bins_number
-        )
+        self.particle_resolved_bins_number = particle_resolved_kernel_bins_number
         self.particle_resolved_bins_per_decade = (
             particle_resolved_kernel_bins_per_decade
         )
@@ -256,11 +254,9 @@ class CoagulationStrategyABC(ABC):
                 bins_per_radius_decade=self.particle_resolved_bins_per_decade,
             )
             # convert particle representation to calculate kernel
-            kernel_particle = (
-                get_speciated_mass_representation_from_particle_resolved(
-                    particle=particle,
-                    bin_radius=kernel_radius,
-                )
+            kernel_particle = get_speciated_mass_representation_from_particle_resolved(
+                particle=particle,
+                bin_radius=kernel_radius,
             )
             # calculate step
             loss_gain_indices = get_particle_resolved_coagulation_step(

@@ -2,7 +2,6 @@
 
 tested for evaluation not accuracy of the calculations."""
 
-
 import numpy as np
 from particula.dynamics.coagulation import coagulation_rate
 
@@ -28,9 +27,7 @@ def test_discrete_loss():
     Test the discrete_loss function with predefined concentration and kernel
     values.
     """
-    result = coagulation_rate.get_coagulation_loss_rate_discrete(
-        CONCENTRATION, KERNEL
-    )
+    result = coagulation_rate.get_coagulation_loss_rate_discrete(CONCENTRATION, KERNEL)
     expected = np.array([14.0, 56.0, 126.0, 224.0, 350.0, 504.0, 686.0])
     np.testing.assert_almost_equal(result, expected, decimal=6)
 

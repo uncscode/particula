@@ -5,6 +5,7 @@ This module contains tests for the CombineCoagulationStrategy class,
 which combines multiple coagulation strategies into one. The tests cover
 both discrete and continuous_pdf distribution types.
 """
+
 # pylint: disable=duplicate-code
 
 import unittest
@@ -96,6 +97,4 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
             time_step=1.0,
         )
         updated_concentration = self.particle.get_concentration()
-        self.assertFalse(
-            np.array_equal(initial_concentration, updated_concentration)
-        )
+        self.assertFalse(np.array_equal(initial_concentration, updated_concentration))

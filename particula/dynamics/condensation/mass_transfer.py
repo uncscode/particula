@@ -346,9 +346,7 @@ def calculate_mass_transfer_multiple_species(
     """
     # Step 1: Calculate the total mass to change
     # (considering particle concentration)
-    mass_to_change = (
-        mass_rate * time_step * particle_concentration[:, np.newaxis]
-    )
+    mass_to_change = mass_rate * time_step * particle_concentration[:, np.newaxis]
 
     # Step 2: Total requested mass for each gas species (sum over particles)
     total_requested_mass = mass_to_change.sum(axis=0)

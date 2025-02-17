@@ -79,9 +79,7 @@ def wet_mixing(
         mono = 0.3e-9
 
         # Volume of the monolayer
-        film_volume = (
-            (4 / 3) * np.pi * (wet_radius**3 - (wet_radius - mono) ** 3)
-        )
+        film_volume = (4 / 3) * np.pi * (wet_radius**3 - (wet_radius - mono) ** 3)
 
         # Determine if there's enough organics to cover the particle
         surface_coverage = volume_solute / film_volume
@@ -94,15 +92,14 @@ def wet_mixing(
             # If the particle is not completely covered, the surface tension
             # is a weighted average of the surface tension of the solute and
             # water
-            sigma = surface_tension_solute * surface_coverage + water(
-                temperature
-            ) * (1 - surface_coverage)
+            sigma = surface_tension_solute * surface_coverage + water(temperature) * (
+                1 - surface_coverage
+            )
         return sigma
     if method == "volume":
         # Volume method
         sigma = (
-            volume_solute * surface_tension_solute
-            + volume_water * water(temperature)
+            volume_solute * surface_tension_solute + volume_water * water(temperature)
         ) / (volume_solute + volume_water)
         return sigma
     raise ValueError("Invalid method")

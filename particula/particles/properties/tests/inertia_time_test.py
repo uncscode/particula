@@ -72,11 +72,7 @@ def test_get_particle_inertia_time_invalid():
         )  # Negative particle density
 
     with pytest.raises(ValueError):
-        get_particle_inertia_time(
-            50e-6, 1000, -1.2, 1.5e-5
-        )  # Negative fluid density
+        get_particle_inertia_time(50e-6, 1000, -1.2, 1.5e-5)  # Negative fluid density
 
     with pytest.raises(ValueError):
-        get_particle_inertia_time(
-            50e-6, 1000, 1.2, -1.5e-5
-        )  # Negative viscosity
+        get_particle_inertia_time(50e-6, 1000, 1.2, -1.5e-5)  # Negative viscosity

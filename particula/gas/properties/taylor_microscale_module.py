@@ -48,9 +48,7 @@ def get_lagrangian_taylor_microscale_time(
     --------
         - Lagrangian Taylor microscale time [s]
     """
-    return kolmogorov_time * np.sqrt(
-        (2 * re_lambda) / (15**0.5 * accel_variance)
-    )
+    return kolmogorov_time * np.sqrt((2 * re_lambda) / (15**0.5 * accel_variance))
 
 
 @validate_inputs(

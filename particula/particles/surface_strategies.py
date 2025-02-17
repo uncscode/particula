@@ -210,9 +210,7 @@ class SurfaceStrategyMass(SurfaceStrategy):
         if isinstance(self.surface_tension, float):
             return self.surface_tension
         return np.sum(
-            self.surface_tension
-            * mass_concentration
-            / np.sum(mass_concentration),
+            self.surface_tension * mass_concentration / np.sum(mass_concentration),
             dtype=np.float64,
         )
 

@@ -61,11 +61,7 @@ class GasSpecies:
 
     def __len__(self):
         """Return the number of gas species."""
-        return (
-            len(self.molar_mass)
-            if isinstance(self.molar_mass, np.ndarray)
-            else 1.0
-        )
+        return len(self.molar_mass) if isinstance(self.molar_mass, np.ndarray) else 1.0
 
     def get_name(self) -> Union[str, NDArray[np.str_]]:
         """Get the name of the gas species.
@@ -135,9 +131,7 @@ class GasSpecies:
             )
 
         # Handle a single strategy: calculate and return the vapor pressure
-        return self.pure_vapor_pressure_strategy.pure_vapor_pressure(
-            temperature
-        )
+        return self.pure_vapor_pressure_strategy.pure_vapor_pressure(temperature)
 
     def get_partial_pressure(
         self, temperature: Union[float, NDArray[np.float64]]
@@ -309,9 +303,7 @@ class GasSpecies:
             gas_object.set_concentration(new_concentration=1e-10)
             ```
         """
-        new_concentration = self._check_if_negative_concentration(
-            new_concentration
-        )
+        new_concentration = self._check_if_negative_concentration(new_concentration)
         self.concentration = new_concentration
 
     def _check_if_negative_concentration(

@@ -38,9 +38,7 @@ def test_speciated_mass_moving_bin():
 
 def test_particle_resolved_speciated_mass():
     """Test factory function for particle resolved speciated mass strategy."""
-    strategy = DistributionFactory().get_strategy(
-        "particle_resolved_speciated_mass"
-    )
+    strategy = DistributionFactory().get_strategy("particle_resolved_speciated_mass")
     assert isinstance(strategy, ParticleResolvedSpeciatedMass)
 
 

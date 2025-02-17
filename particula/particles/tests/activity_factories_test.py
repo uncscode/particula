@@ -27,9 +27,7 @@ def test_molar_ideal_strategy_with_parameters():
     parameters = {"molar_mass": np.array([100.0, 200.0, 300.0])}
     strategy = ActivityFactory().get_strategy("molar_ideal", parameters)
     assert isinstance(strategy, ActivityIdealMolar)
-    np.testing.assert_allclose(
-        strategy.molar_mass, parameters["molar_mass"], atol=1e-4
-    )
+    np.testing.assert_allclose(strategy.molar_mass, parameters["molar_mass"], atol=1e-4)
 
 
 def test_kappa_parameter_strategy_with_parameters():
@@ -46,12 +44,8 @@ def test_kappa_parameter_strategy_with_parameters():
     strategy = ActivityFactory().get_strategy("kappa_parameter", parameters)
     assert isinstance(strategy, ActivityKappaParameter)
     np.testing.assert_allclose(strategy.kappa, parameters["kappa"], atol=1e-4)
-    np.testing.assert_allclose(
-        strategy.density, parameters["density"], atol=1e-4
-    )
-    np.testing.assert_allclose(
-        strategy.molar_mass, parameters["molar_mass"], atol=1e-4
-    )
+    np.testing.assert_allclose(strategy.density, parameters["density"], atol=1e-4)
+    np.testing.assert_allclose(strategy.molar_mass, parameters["molar_mass"], atol=1e-4)
     assert strategy.water_index == parameters["water_index"]
 
 

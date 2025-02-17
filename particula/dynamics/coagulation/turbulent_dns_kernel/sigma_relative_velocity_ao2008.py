@@ -203,26 +203,10 @@ def _compute_rms_fluctuation_velocity(
     )
 
     return (fluid_rms_velocity**2 / particle_inertia_time) * (
-        (
-            velocity_correlation_terms.b1
-            * velocity_correlation_terms.d1
-            * psi_c1_e1
-        )
-        - (
-            velocity_correlation_terms.b1
-            * velocity_correlation_terms.d2
-            * psi_c1_e2
-        )
-        - (
-            velocity_correlation_terms.b2
-            * velocity_correlation_terms.d1
-            * psi_c2_e1
-        )
-        + (
-            velocity_correlation_terms.b2
-            * velocity_correlation_terms.d2
-            * psi_c2_e2
-        )
+        (velocity_correlation_terms.b1 * velocity_correlation_terms.d1 * psi_c1_e1)
+        - (velocity_correlation_terms.b1 * velocity_correlation_terms.d2 * psi_c1_e2)
+        - (velocity_correlation_terms.b2 * velocity_correlation_terms.d1 * psi_c2_e1)
+        + (velocity_correlation_terms.b2 * velocity_correlation_terms.d2 * psi_c2_e2)
     )
 
 
@@ -311,19 +295,14 @@ def _compute_cross_correlation_velocity(
     )
 
     particle_inertia_time_pairwise_product = (
-        particle_inertia_time[:, np.newaxis]
-        * particle_inertia_time[np.newaxis, :]
+        particle_inertia_time[:, np.newaxis] * particle_inertia_time[np.newaxis, :]
     )
 
     return (
         (fluid_rms_velocity**2 * f2_r)
         / (particle_inertia_time_pairwise_product)
         * (
-            (
-                velocity_correlation_terms.b1
-                * velocity_correlation_terms.d1
-                * phi_c1_e1
-            )
+            (velocity_correlation_terms.b1 * velocity_correlation_terms.d1 * phi_c1_e1)
             - (
                 velocity_correlation_terms.b1
                 * velocity_correlation_terms.d2

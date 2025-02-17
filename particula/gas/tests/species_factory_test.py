@@ -23,9 +23,7 @@ class TestGasSpeciesFactory(unittest.TestCase):
         """Test getting the builders."""
         builders = self.factory.get_builders()
         self.assertIsInstance(builders["gas_species"], GasSpeciesBuilder)
-        self.assertIsInstance(
-            builders["preset_gas_species"], PresetGasSpeciesBuilder
-        )
+        self.assertIsInstance(builders["preset_gas_species"], PresetGasSpeciesBuilder)
 
     def test_get_strategy_gas_species(self):
         """Test getting a gas species strategy."""
@@ -45,17 +43,13 @@ class TestGasSpeciesFactory(unittest.TestCase):
             parameters["vapor_pressure_strategy"],
         )
         self.assertEqual(gas_species.condensable, parameters["condensable"])
-        self.assertEqual(
-            gas_species.concentration, parameters["concentration"]
-        )
+        self.assertEqual(gas_species.concentration, parameters["concentration"])
         self.assertIsInstance(gas_species, GasSpecies)
 
     def test_get_strategy_preset_gas_species(self):
         """Test getting a preset gas species strategy."""
         parameters = {}
-        preset_gas_species = self.factory.get_strategy(
-            "preset_gas_species", parameters
-        )
+        preset_gas_species = self.factory.get_strategy("preset_gas_species", parameters)
         self.assertIsInstance(preset_gas_species, GasSpecies)
         self.assertEqual(preset_gas_species.molar_mass, 0.1)
         self.assertIsInstance(

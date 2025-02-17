@@ -5,6 +5,7 @@ This module contains tests for the TurbulentDNSCoagulationStrategy class,
 which implements the turbulent DNS coagulation strategy. The tests cover
 both discrete and continuous_pdf distribution types.
 """
+
 # pylint: disable=duplicate-code
 
 import unittest
@@ -12,7 +13,10 @@ import numpy as np
 from particula.dynamics.coagulation.strategy.trubulent_dns_coagulation_strategy import (
     TurbulentDNSCoagulationStrategy,
 )
-from particula.particles import PresetParticleRadiusBuilder, PresetResolvedParticleMassBuilder
+from particula.particles import (
+    PresetParticleRadiusBuilder,
+    PresetResolvedParticleMassBuilder,
+)
 
 
 # pylint: disable=too-many-instance-attributes
@@ -54,9 +58,7 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
         )
 
         self.particle_resolved = (
-            PresetResolvedParticleMassBuilder()
-            .set_volume(1e-6)
-            .build()
+            PresetResolvedParticleMassBuilder().set_volume(1e-6).build()
         )
         self.strategy_particle_resolved = TurbulentDNSCoagulationStrategy(
             distribution_type="particle_resolved",
@@ -65,6 +67,8 @@ class TestTurbulentDNSCoagulationStrategy(unittest.TestCase):
             reynolds_lambda=self.reynolds_lambda,
             relative_velocity=self.relative_velocity,
         )
+
+    def test_kernel_discrete(self):
         """
         Test the kernel calculation for discrete distribution.
 

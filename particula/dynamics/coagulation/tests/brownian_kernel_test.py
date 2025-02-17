@@ -1,6 +1,8 @@
 """Test Brownian module functions.
 """
 
+# pylint: disable=protected-access
+
 import pytest
 import numpy as np
 from particula.dynamics.coagulation import brownian_kernel
@@ -14,9 +16,7 @@ def test_mean_free_path_l_single_value():
     """
     diffusivity_particle = 1.0e-5  # example diffusivity [m^2/s]
     mean_thermal_speed_particle = 100  # example speed [m/s]
-    expected_path = (
-        8 * diffusivity_particle / (np.pi * mean_thermal_speed_particle)
-    )
+    expected_path = 8 * diffusivity_particle / (np.pi * mean_thermal_speed_particle)
     value = brownian_kernel._mean_free_path_l(
         diffusivity_particle, mean_thermal_speed_particle
     )
@@ -30,9 +30,7 @@ def test_mean_free_path_l_array_input():
     """
     diffusivity_particle = np.array([1.0e-5, 1.0e-4])
     mean_thermal_speed_particle = np.array([100, 200])
-    expected_path = (
-        8 * diffusivity_particle / (np.pi * mean_thermal_speed_particle)
-    )
+    expected_path = 8 * diffusivity_particle / (np.pi * mean_thermal_speed_particle)
     value = brownian_kernel._mean_free_path_l(
         diffusivity_particle, mean_thermal_speed_particle
     )
@@ -59,9 +57,7 @@ def test_g_collection_term_single_value():
         (2 * particle_radius + mean_free_path_particle) ** 3
         - (4 * particle_radius**2 + mean_free_path_particle**2) ** (3 / 2)
     ) / (6 * particle_radius * mean_free_path_particle) - 2 * particle_radius
-    value = brownian_kernel._g_collection_term(
-        mean_free_path_particle, particle_radius
-    )
+    value = brownian_kernel._g_collection_term(mean_free_path_particle, particle_radius)
     assert np.isclose(value, expected_value)
 
 
@@ -76,9 +72,7 @@ def test_g_collection_term_array_input():
         (2 * particle_radius + mean_free_path_particle) ** 3
         - (4 * particle_radius**2 + mean_free_path_particle**2) ** (3 / 2)
     ) / (6 * particle_radius * mean_free_path_particle) - 2 * particle_radius
-    value = brownian_kernel._g_collection_term(
-        mean_free_path_particle, particle_radius
-    )
+    value = brownian_kernel._g_collection_term(mean_free_path_particle, particle_radius)
     np.testing.assert_allclose(value, expected_value, rtol=1e-6)
 
 
@@ -99,9 +93,7 @@ def test_g_collection_term_zero_radius():
     mean_free_path_particle = 0.0005
     particle_radius = 0.0
     with pytest.raises(ZeroDivisionError):
-        brownian_kernel._g_collection_term(
-            mean_free_path_particle, particle_radius
-        )
+        brownian_kernel._g_collection_term(mean_free_path_particle, particle_radius)
 
 
 def test_brownian_diffusivity_single_value():
@@ -114,9 +106,7 @@ def test_brownian_diffusivity_single_value():
     expected_diffusivity = (
         float(BOLTZMANN_CONSTANT) * temperature * aerodynamic_mobility
     )
-    value = brownian_kernel._brownian_diffusivity(
-        temperature, aerodynamic_mobility
-    )
+    value = brownian_kernel._brownian_diffusivity(temperature, aerodynamic_mobility)
     assert np.isclose(value, expected_diffusivity)
 
 
@@ -130,9 +120,7 @@ def test_brownian_diffusivity_array_input():
     expected_diffusivity = (
         float(BOLTZMANN_CONSTANT) * temperature * aerodynamic_mobility
     )
-    value = brownian_kernel._brownian_diffusivity(
-        temperature, aerodynamic_mobility
-    )
+    value = brownian_kernel._brownian_diffusivity(temperature, aerodynamic_mobility)
     np.testing.assert_allclose(value, expected_diffusivity, rtol=1e-6)
 
 

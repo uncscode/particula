@@ -43,10 +43,7 @@ def organic_water_single_phase(
     # check inputs
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
 
-    return (
-        0.205 / (1 + safe_exp(26.6 * (molar_mass_ratio - 0.12))) ** 0.843
-        + 0.225
-    )
+    return 0.205 / (1 + safe_exp(26.6 * (molar_mass_ratio - 0.12))) ** 0.843 + 0.225
 
 
 # pylint: disable=too-many-locals
@@ -97,15 +94,11 @@ def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
             # The first index where a sign change occurs
             inflection_index = np.where(sign_changes)[0]  # all indices
             index_start = (
-                inflection_index[0]
-                if len(inflection_index) > 0
-                else data_length
+                inflection_index[0] if len(inflection_index) > 0 else data_length
             )
             # The last index where a sign change occurs
             back_index = (
-                inflection_index[-1]
-                if len(inflection_index) > 0
-                else data_length
+                inflection_index[-1] if len(inflection_index) > 0 else data_length
             )
 
             # Check if first section of activity data is greater than 1
@@ -119,8 +112,7 @@ def find_phase_sep_index(activity_data: NDArray[np.float64]) -> dict:
             # Check if second section of activity data is greater than 1
             if np.any(activity_data[back_index:] > 1):
                 index_phase_sep_end = (
-                    np.argmin(np.abs(activity_data[back_index:] - 1))
-                    + back_index
+                    np.argmin(np.abs(activity_data[back_index:] - 1)) + back_index
                 )
             else:
                 index_phase_sep_end = back_index
@@ -193,16 +185,12 @@ def find_phase_separation(
 
             # start from the lower_seperation_index and find the index where
             # the difference between activity_water and match_a_w changes sign
-            match_slice = np.sign(
-                match_a_w - activity_water[lower_seperation_index:]
-            )
+            match_slice = np.sign(match_a_w - activity_water[lower_seperation_index:])
             match_index_prime = np.where(match_slice == -1)
             if len(match_index_prime[0]) == 0:
                 match_index_prime = lower_seperation_index
             else:
-                match_index_prime = (
-                    match_index_prime[0][0] + lower_seperation_index
-                )
+                match_index_prime = match_index_prime[0][0] + lower_seperation_index
         else:  # decreasing a_w with index
             # find the min and max indexes
             lower_seperation_index = max(indexes)
@@ -211,9 +199,7 @@ def find_phase_separation(
 
             # start from the lower_seperation_index and find the index where
             # the difference between activity_water and match_a_w changes sign
-            match_slice = np.sign(
-                activity_water[:lower_seperation_index] - match_a_w
-            )
+            match_slice = np.sign(activity_water[:lower_seperation_index] - match_a_w)
             match_index_prime = np.where(match_slice == -1)
             if len(match_index_prime[0]) == 0:
                 match_index_prime = lower_seperation_index

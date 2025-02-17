@@ -57,14 +57,10 @@ def test_get_fluid_rms_velocity_invalid_values():
         get_fluid_rms_velocity(-10.0, 1.5e-5, 1e-3)  # Negative Reynolds number
 
     with pytest.raises(ValueError):
-        get_fluid_rms_velocity(
-            100.0, -1.5e-5, 1e-3
-        )  # Negative kinematic viscosity
+        get_fluid_rms_velocity(100.0, -1.5e-5, 1e-3)  # Negative kinematic viscosity
 
     with pytest.raises(ValueError):
-        get_fluid_rms_velocity(
-            100.0, 1.5e-5, -1e-3
-        )  # Negative turbulent dissipation
+        get_fluid_rms_velocity(100.0, 1.5e-5, -1e-3)  # Negative turbulent dissipation
 
 
 def test_get_fluid_rms_velocity_edge_case():

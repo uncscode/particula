@@ -23,9 +23,7 @@ def test_get_lagrangian_taylor_microscale_time_scalar():
     ao = 11  # Normalized acceleration variance
 
     expected = kolmogorov_time * np.sqrt((2 * re_lambda) / (15**0.5 * ao))
-    result = get_lagrangian_taylor_microscale_time(
-        kolmogorov_time, re_lambda, ao
-    )
+    result = get_lagrangian_taylor_microscale_time(kolmogorov_time, re_lambda, ao)
 
     assert np.isclose(result, expected, atol=1e-10)
 
@@ -39,9 +37,7 @@ def test_get_lagrangian_taylor_microscale_time_array():
     ao = np.array([11, 12])
 
     expected = kolmogorov_time * np.sqrt((2 * re_lambda) / (15**0.5 * ao))
-    result = get_lagrangian_taylor_microscale_time(
-        kolmogorov_time, re_lambda, ao
-    )
+    result = get_lagrangian_taylor_microscale_time(kolmogorov_time, re_lambda, ao)
 
     assert np.allclose(result, expected, atol=1e-10)
 
@@ -121,9 +117,7 @@ def test_taylor_scales_edge_case():
     ao = 1.0
 
     expected_tt = kolmogorov_time * np.sqrt((2 * re_lambda) / (15**0.5 * ao))
-    result_tt = get_lagrangian_taylor_microscale_time(
-        kolmogorov_time, re_lambda, ao
-    )
+    result_tt = get_lagrangian_taylor_microscale_time(kolmogorov_time, re_lambda, ao)
 
     assert np.isclose(result_tt, expected_tt, atol=1e-10)
 
@@ -152,9 +146,7 @@ class TestTaylorMicroscaleReynolds(unittest.TestCase):
 
         self.fluid_rms_velocity_array = np.array([0.5, 1.0, 1.5])  # [m/s]
         self.taylor_microscale_array = np.array([0.05, 0.08, 0.1])  # [m]
-        self.kinematic_viscosity_array = np.array(
-            [1.5e-5, 1.2e-5, 1.0e-5]
-        )  # [m²/s]
+        self.kinematic_viscosity_array = np.array([1.5e-5, 1.2e-5, 1.0e-5])  # [m²/s]
 
     def test_get_taylor_microscale_reynolds_number_scalar(self):
         """Test with scalar inputs."""

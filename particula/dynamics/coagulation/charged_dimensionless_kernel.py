@@ -44,12 +44,8 @@ def get_dimensional_kernel(
     Aerosol Science and Technology, 53(8), 933-957.
     https://doi.org/10.1080/02786826.2019.1614522
     """
-    coulomb_kinetic_limit = coulomb_enhancement.kinetic(
-        coulomb_potential_ratio
-    )
-    coulomb_continuum_limit = coulomb_enhancement.continuum(
-        coulomb_potential_ratio
-    )
+    coulomb_kinetic_limit = coulomb_enhancement.kinetic(coulomb_potential_ratio)
+    coulomb_continuum_limit = coulomb_enhancement.continuum(coulomb_potential_ratio)
     return (
         dimensionless_kernel
         * reduced_friction_factor
@@ -148,9 +144,7 @@ def get_coulomb_kernel_dyachkov2007(
 
     # collected terms
     exponential_decay = np.exp(-coulomb_potential_ratio / adjustment_factor)
-    term1 = (
-        np.sqrt(2 * np.pi) * diffusive_knudsen * kinetic * exponential_decay
-    )
+    term1 = np.sqrt(2 * np.pi) * diffusive_knudsen * kinetic * exponential_decay
 
     term2 = adjustment_factor**2 - (
         2 + diffusive_knudsen * ratio_k_c
@@ -211,13 +205,7 @@ def get_coulomb_kernel_gatti2008(
         * diffusive_knudsen
         * (
             1
-            + (
-                2
-                * pi_sqrt
-                * (1.22**3)
-                * continuum
-                * (coulomb_potential_ratio**3)
-            )
+            + (2 * pi_sqrt * (1.22**3) * continuum * (coulomb_potential_ratio**3))
             / (9 * (kinetic**2) * diffusive_knudsen)
         )
         * exponential_decay
@@ -301,9 +289,9 @@ def get_coulomb_kernel_chahl2019(
     coulomb_potential_ratio = np.maximum(coulomb_potential_ratio, 1e-12)
 
     correction0 = 2.5
-    correction1 = 4.528 * np.exp(
-        -1.088 * coulomb_potential_ratio
-    ) + 0.7091 * np.log(1 + 1.527 * coulomb_potential_ratio)
+    correction1 = 4.528 * np.exp(-1.088 * coulomb_potential_ratio) + 0.7091 * np.log(
+        1 + 1.527 * coulomb_potential_ratio
+    )
     correction2 = 11.36 * (coulomb_potential_ratio**0.272) - 10.33
     correction3 = -0.003533 * coulomb_potential_ratio + 0.05971
     diff_knudsen_log = np.log(diffusive_knudsen)
@@ -313,10 +301,7 @@ def get_coulomb_kernel_chahl2019(
         ** (-1 / correction3 - 1)
         * np.exp(
             -1
-            * (
-                1
-                + correction3 * (diff_knudsen_log - correction1) / correction0
-            )
+            * (1 + correction3 * (diff_knudsen_log - correction1) / correction0)
             ** (-1 / correction3)
         )
     )
