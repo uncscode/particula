@@ -62,6 +62,8 @@ class BuilderDistributionTypeMixin:
             logger.warning(message)
         self.distribution_type = distribution_type
         return self
+
+
 class BuilderTurbulentShearMixin:
     """Mixin class for turbulent shear parameters.
 
@@ -69,5 +71,6 @@ class BuilderTurbulentShearMixin:
     density for turbulent shear coagulation strategies. It provides a
     validation layer to ensure that the correct values are passed.
     """
+
     def __init__(self):
         BuilderTurbulentShearMixin.__init__(self)
