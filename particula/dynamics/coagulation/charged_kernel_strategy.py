@@ -119,6 +119,7 @@ class KernelStrategy(ABC):
         Aerosol Science and Technology, 53(8), 933-957.
         https://doi.org/10.1080/02786826.2019.1614522
         """
+        # pylint: disable=duplicate-code
         return charged_dimensionless_kernel.get_dimensional_kernel(
             dimensionless_kernel=dimensionless_kernel,
             coulomb_potential_ratio=coulomb_potential_ratio,
