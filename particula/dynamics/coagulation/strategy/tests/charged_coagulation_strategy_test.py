@@ -5,12 +5,15 @@ This module contains tests for the ChargedCoagulationStrategy class, which
 implements the charged particle coagulation strategy. The tests cover both
 discrete and continuous_pdf distribution types.
 """
+# pylint: disable=duplicate-code
+
 
 import unittest
 import numpy as np
 from particula.dynamics.coagulation.strategy.charged_coagulation_strategy import ChargedCoagulationStrategy
 from particula.dynamics.coagulation.charged_kernel_strategy import HardSphereKernelStrategy
 from particula.particles import PresetParticleRadiusBuilder, PresetResolvedParticleMassBuilder
+
 
 class TestChargedCoagulationStrategy(unittest.TestCase):
     """

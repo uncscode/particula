@@ -1,6 +1,7 @@
 """
 Test the turbulent shear kernel functions.
 """
+# pylint: disable=duplicate-code
 
 import numpy as np
 import pytest

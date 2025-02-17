@@ -5,6 +5,7 @@ This module contains tests for the TurbulentDNSCoagulationStrategy class,
 which implements the turbulent DNS coagulation strategy. The tests cover
 both discrete and continuous_pdf distribution types.
 """
+# pylint: disable=duplicate-code
 
 import unittest
 import numpy as np

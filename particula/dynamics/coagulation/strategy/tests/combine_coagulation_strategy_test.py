@@ -5,6 +5,7 @@ This module contains tests for the CombineCoagulationStrategy class,
 which combines multiple coagulation strategies into one. The tests cover
 both discrete and continuous_pdf distribution types.
 """
+# pylint: disable=duplicate-code
 
 import unittest
 import numpy as np

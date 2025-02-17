@@ -1,6 +1,8 @@
 """
 Tests for BrownianCoagulationStrategy.
 """
+# pylint: disable=duplicate-code
+
 
 import unittest
 import numpy as np
@@ -14,6 +16,7 @@ from particula.particles import (
 
 
 class TestBrownianCoagulationStrategy(unittest.TestCase):
+    """Test suite for the BrownianCoagulationStrategy class."""
     def setUp(self):
         # Setup a particle representation for testing
         self.particle = PresetParticleRadiusBuilder().build()
