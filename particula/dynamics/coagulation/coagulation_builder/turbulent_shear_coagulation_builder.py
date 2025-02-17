@@ -7,7 +7,6 @@ from particula.abc_builder import BuilderABC
 from particula.dynamics.coagulation.coagulation_strategy import (
     CoagulationStrategyABC,
     TurbulentShearCoagulationStrategy,
-    BuilderTurbulentShearMixin,
 )
 from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
     BuilderDistributionTypeMixin,
@@ -17,7 +16,8 @@ from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixi
 class TurbulentShearCoagulationBuilder(
     BuilderABC,
     BuilderDistributionTypeMixin,
-, BuilderTurbulentShearMixin):
+    BuilderTurbulentShearMixin,
+):
     """Turbulent Shear Coagulation Builder class.
 
     This class is used to create coagulation strategies for turbulent shear

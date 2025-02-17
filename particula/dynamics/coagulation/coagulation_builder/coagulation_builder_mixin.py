@@ -73,4 +73,5 @@ class BuilderTurbulentShearMixin:
     """
 
     def __init__(self):
-        BuilderTurbulentShearMixin.__init__(self)
+        self.turbulent_dissipation = None
+        self.fluid_density = None
