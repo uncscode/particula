@@ -29,7 +29,7 @@ import numpy as np
 from particula.dynamics.coagulation import charged_dimensionless_kernel
 
 
-class KernelStrategy(ABC):
+class ChargedKernelStrategyABC(ABC):
     """
     Abstract class for dimensionless coagulation strategies. This class defines
     the dimensionless kernel (H) method that must be implemented by any
@@ -130,7 +130,7 @@ class KernelStrategy(ABC):
 
 
 # define strategies
-class HardSphereKernelStrategy(KernelStrategy):
+class HardSphereKernelStrategy(ChargedKernelStrategyABC):
     """
     Hard sphere dimensionless coagulation strategy.
     """
@@ -145,7 +145,7 @@ class HardSphereKernelStrategy(KernelStrategy):
         )
 
 
-class CoulombDyachkov2007KernelStrategy(KernelStrategy):
+class CoulombDyachkov2007KernelStrategy(ChargedKernelStrategyABC):
     """
     Dyachkov et al. (2007) approximation for the dimensionless coagulation
     kernel. Accounts for the Coulomb potential between particles.
@@ -167,7 +167,7 @@ class CoulombDyachkov2007KernelStrategy(KernelStrategy):
         )  # type: ignore
 
 
-class CoulombGatti2008KernelStrategy(KernelStrategy):
+class CoulombGatti2008KernelStrategy(ChargedKernelStrategyABC):
     """
     Gatti and Kortshagen (2008) approximation for the dimensionless coagulation
     kernel. Accounts for the Coulomb potential between particles.
@@ -190,7 +190,7 @@ class CoulombGatti2008KernelStrategy(KernelStrategy):
         )  # type: ignore
 
 
-class CoulombGopalakrishnan2012KernelStrategy(KernelStrategy):
+class CoulombGopalakrishnan2012KernelStrategy(ChargedKernelStrategyABC):
     """
     Gopalakrishnan and Hogan (2012) approximation for the dimensionless
     coagulation kernel. Accounts for the Coulomb potential between particles.
@@ -215,7 +215,7 @@ class CoulombGopalakrishnan2012KernelStrategy(KernelStrategy):
         )
 
 
-class CoulumbChahl2019KernelStrategy(KernelStrategy):
+class CoulumbChahl2019KernelStrategy(ChargedKernelStrategyABC):
     """
     Chahl and Gopalakrishnan (2019) approximation for the dimensionless
     coagulation kernel. Accounts for the Coulomb potential between particles.

@@ -11,6 +11,9 @@ from particula.dynamics.coagulation.coagulation_strategy import (
 from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
     BuilderDistributionTypeMixin,
 )
+from particula.dynamics.coagulation.charged_kernel_strategy import (
+    ChargedKernelStrategyABC,
+)
 
 
 class ChargedCoagulationBuilder(
@@ -33,12 +36,44 @@ class ChargedCoagulationBuilder(
     """
 
     def __init__(self):
-        required_parameters = ["distribution_type", "kernel_strategy"]
+        required_parameters = ["distribution_type", "charged_kernel_strategy"]
         BuilderABC.__init__(self, required_parameters)
         BuilderDistributionTypeMixin.__init__(self)
+        self.charged_kernel_strategy = None
+
+    def set_charged_kernel_strategy(
+        self,
+        charged_kernel_strategy: ChargedKernelStrategyABC,
+        charged_kernel_strategy_units: str = None,
+    ):
+        """Set the kernel strategy.
+
+        Args:
+            charged_kernel_strategy : The kernel strategy to be set.
+            charged_kernel_strategy_units : Not used.
+
+        Raises:
+            ValueError: If the kernel strategy is not valid.
+        """
+        # check type
+        if not isinstance(charged_kernel_strategy, ChargedKernelStrategyABC):
+            message = (
+                f"Invalid kernel strategy: {charged_kernel_strategy}. "
+                f"Valid types -> {ChargedKernelStrategyABC.__subclasses__()}."
+            )
+            raise ValueError(message)
+
+        if charged_kernel_strategy_units is not None:
+            message = (
+                f"Units for kernel strategy are not used. "
+                f"Received: {charged_kernel_strategy_units}."
+            )
+            raise ValueError(message)
+        self.charged_kernel_strategy = charged_kernel_strategy
+        return self
 
     def build(self) -> CoagulationStrategyABC:
-        """Validate and return the CoagulationStrategy object.
+        """Validate and return the ChargedCoagulationStrategy object.
 
         Returns:
             CoagulationStrategy: Instance of the CoagulationStrategy object.
@@ -47,4 +82,5 @@ class ChargedCoagulationBuilder(
 
         return ChargedCoagulationStrategy(
             distribution_type=self.distribution_type,
+            kernel_strategy=self.charged_kernel_strategy,
         )
