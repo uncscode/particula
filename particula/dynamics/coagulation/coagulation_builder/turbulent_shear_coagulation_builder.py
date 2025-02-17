@@ -1,3 +1,7 @@
+"""
+CoagulationBuilder for Turbulent Shear Coagulation.
+"""
+
 from particula.abc_builder import BuilderABC
 
 from particula.dynamics.coagulation.coagulation_strategy import (
@@ -13,11 +17,11 @@ class TurbulentShearCoagulationBuilder(
     BuilderABC,
     BuilderDistributionTypeMixin,
 ):
-    """Turbulent Shear Coagulation Builder class for coagulation strategies.
+    """Turbulent Shear Coagulation Builder class.
 
     This class is used to create coagulation strategies for turbulent shear
-    coagulation, based on the specified distribution type and kernel parameters.
-    It follows a pattern similar to the other builders (Brownian, Charged).
+    coagulation. This provides a validation layer to ensure that the correct
+    values are passed to the coagulation strategy.
 
     Methods:
         set_distribution_type(distribution_type): Set the distribution type.
@@ -63,7 +67,11 @@ class TurbulentShearCoagulationBuilder(
 
     def build(self) -> CoagulationStrategyABC:
         """Validate and return the TurbulentShearCoagulationStrategy object."""
-        self.pre_build_check()
+        """Validate and return the TurbulentShearCoagulationStrategy object.
+
+        Returns:
+            CoagulationStrategy: Instance of the CoagulationStrategy object.
+        """
         return TurbulentShearCoagulationStrategy(
             distribution_type=self.distribution_type,
             turbulent_dissipation=self.turbulent_dissipation,
