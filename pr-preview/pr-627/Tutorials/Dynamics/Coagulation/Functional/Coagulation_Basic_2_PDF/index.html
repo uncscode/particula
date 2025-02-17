@@ -9041,10 +9041,18 @@ plt.show()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Integrate the concentration to calculate the total number of particles at each time step</span>
-<span class="n">total_concentration_lognormal_0</span> <span class="o">=</span> <span class="n">trapezoid</span><span class="p">(</span><span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">)</span>
-<span class="n">total_concentration_lognormal_1</span> <span class="o">=</span> <span class="n">trapezoid</span><span class="p">(</span><span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">)</span>
-<span class="n">total_concentration_lognormal_2</span> <span class="o">=</span> <span class="n">trapezoid</span><span class="p">(</span><span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">)</span>
-<span class="n">total_concentration_lognormal_3</span> <span class="o">=</span> <span class="n">trapezoid</span><span class="p">(</span><span class="n">concentration_lognormal_3</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">)</span>
+<span class="n">total_concentration_lognormal_0</span> <span class="o">=</span> <span class="n">trapezoid</span><span class="p">(</span>
+    <span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">radius_bins</span>
+<span class="p">)</span>
+<span class="n">total_concentration_lognormal_1</span> <span class="o">=</span> <span class="n">trapezoid</span><span class="p">(</span>
+    <span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">radius_bins</span>
+<span class="p">)</span>
+<span class="n">total_concentration_lognormal_2</span> <span class="o">=</span> <span class="n">trapezoid</span><span class="p">(</span>
+    <span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">radius_bins</span>
+<span class="p">)</span>
+<span class="n">total_concentration_lognormal_3</span> <span class="o">=</span> <span class="n">trapezoid</span><span class="p">(</span>
+    <span class="n">concentration_lognormal_3</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">radius_bins</span>
+<span class="p">)</span>
 
 <span class="c1"># Plot the total concentration at each time step for the lognormal distribution</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
@@ -9077,10 +9085,18 @@ plt.show()</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8"># Integrate the concentration to calculate the total number of particles at each time step
-total_concentration_lognormal_0 = trapezoid(concentration_lognormal_0, x=radius_bins)
-total_concentration_lognormal_1 = trapezoid(concentration_lognormal_1, x=radius_bins)
-total_concentration_lognormal_2 = trapezoid(concentration_lognormal_2, x=radius_bins)
-total_concentration_lognormal_3 = trapezoid(concentration_lognormal_3, x=radius_bins)
+total_concentration_lognormal_0 = trapezoid(
+    concentration_lognormal_0, x=radius_bins
+)
+total_concentration_lognormal_1 = trapezoid(
+    concentration_lognormal_1, x=radius_bins
+)
+total_concentration_lognormal_2 = trapezoid(
+    concentration_lognormal_2, x=radius_bins
+)
+total_concentration_lognormal_3 = trapezoid(
+    concentration_lognormal_3, x=radius_bins
+)
 
 # Plot the total concentration at each time step for the lognormal distribution
 fig, ax = plt.subplots(figsize=(8, 6))

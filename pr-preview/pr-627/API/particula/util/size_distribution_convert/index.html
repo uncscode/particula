@@ -7959,7 +7959,7 @@ conversion logic.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="dndlogdptopdfconversionstrategy">DNdlogDPtoPDFConversionStrategy<a class="headerlink" href="#dndlogdptopdfconversionstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L97">Show source in size_distribution_convert.py:97</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L101">Show source in size_distribution_convert.py:101</a></p>
 <p>Implements conversion between dn/dlogdp and PDF formats through an
 intermediate PMS format.</p>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
@@ -7970,14 +7970,14 @@ intermediate PMS format.</p>
 <li><a href="#conversionstrategy">ConversionStrategy</a></li>
 </ul>
 <h3 id="dndlogdptopdfconversionstrategyconvert">DNdlogDPtoPDFConversionStrategy().convert<a class="headerlink" href="#dndlogdptopdfconversionstrategyconvert" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L101">Show source in size_distribution_convert.py:101</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L105">Show source in size_distribution_convert.py:105</a></p>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">diameters</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="dndlogdptopmsconversionstrategy">DNdlogDPtoPMSConversionStrategy<a class="headerlink" href="#dndlogdptopmsconversionstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L67">Show source in size_distribution_convert.py:67</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L69">Show source in size_distribution_convert.py:69</a></p>
 <p>Implements conversion between dn/dlogdp and PMS formats using the
 convert_sizer_dn method.</p>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
@@ -7988,14 +7988,14 @@ convert_sizer_dn method.</p>
 <li><a href="#conversionstrategy">ConversionStrategy</a></li>
 </ul>
 <h3 id="dndlogdptopmsconversionstrategyconvert">DNdlogDPtoPMSConversionStrategy().convert<a class="headerlink" href="#dndlogdptopmsconversionstrategyconvert" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L71">Show source in size_distribution_convert.py:71</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L73">Show source in size_distribution_convert.py:73</a></p>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">diameters</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="pmstopdfconversionstrategy">PMStoPDFConversionStrategy<a class="headerlink" href="#pmstopdfconversionstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L82">Show source in size_distribution_convert.py:82</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L86">Show source in size_distribution_convert.py:86</a></p>
 <p>Implements conversion between PMS and PDF formats.</p>
 <h4 id="signature_6">Signature<a class="headerlink" href="#signature_6" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">PMStoPDFConversionStrategy</span><span class="p">(</span><span class="n">ConversionStrategy</span><span class="p">):</span> <span class="o">...</span>
@@ -8005,14 +8005,14 @@ convert_sizer_dn method.</p>
 <li><a href="#conversionstrategy">ConversionStrategy</a></li>
 </ul>
 <h3 id="pmstopdfconversionstrategyconvert">PMStoPDFConversionStrategy().convert<a class="headerlink" href="#pmstopdfconversionstrategyconvert" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L85">Show source in size_distribution_convert.py:85</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L89">Show source in size_distribution_convert.py:89</a></p>
 <h4 id="signature_7">Signature<a class="headerlink" href="#signature_7" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">diameters</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="samescaleconversionstrategy">SameScaleConversionStrategy<a class="headerlink" href="#samescaleconversionstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L54">Show source in size_distribution_convert.py:54</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L56">Show source in size_distribution_convert.py:56</a></p>
 <p>Implements conversion between the same scales, which is a no-op.</p>
 <h4 id="signature_8">Signature<a class="headerlink" href="#signature_8" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SameScaleConversionStrategy</span><span class="p">(</span><span class="n">ConversionStrategy</span><span class="p">):</span> <span class="o">...</span>
@@ -8022,14 +8022,14 @@ convert_sizer_dn method.</p>
 <li><a href="#conversionstrategy">ConversionStrategy</a></li>
 </ul>
 <h3 id="samescaleconversionstrategyconvert">SameScaleConversionStrategy().convert<a class="headerlink" href="#samescaleconversionstrategyconvert" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L57">Show source in size_distribution_convert.py:57</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L59">Show source in size_distribution_convert.py:59</a></p>
 <h4 id="signature_9">Signature<a class="headerlink" href="#signature_9" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">diameters</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="sizerconverter">SizerConverter<a class="headerlink" href="#sizerconverter" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L122">Show source in size_distribution_convert.py:122</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L128">Show source in size_distribution_convert.py:128</a></p>
 <p>A converter that uses a specified ConversionStrategy to convert
 particle size distribution data between different formats.</p>
 <h4 id="signature_10">Signature<a class="headerlink" href="#signature_10" title="Permanent link">&para;</a></h4>
@@ -8041,7 +8041,7 @@ particle size distribution data between different formats.</p>
 <li><a href="#conversionstrategy">ConversionStrategy</a></li>
 </ul>
 <h3 id="sizerconverterconvert">SizerConverter().convert<a class="headerlink" href="#sizerconverterconvert" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L134">Show source in size_distribution_convert.py:134</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L140">Show source in size_distribution_convert.py:140</a></p>
 <p>Converts particle size distribution data using the specified
 strategy.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
@@ -8060,7 +8060,7 @@ strategy.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_conversion_strategy">get_conversion_strategy<a class="headerlink" href="#get_conversion_strategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L154">Show source in size_distribution_convert.py:154</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/size_distribution_convert.py#L160">Show source in size_distribution_convert.py:160</a></p>
 <p>Factory function to create and return an appropriate conversion
 strategy based on input and output scales. Use the inverse flag in the
 converter to invert the directions of the input and output scales.</p>

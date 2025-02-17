@@ -7643,7 +7643,9 @@ Density and Surface Tension: Specify the material's density and the surface tens
     <span class="o">.</span><span class="n">set_distribution_strategy</span><span class="p">(</span><span class="n">particles</span><span class="o">.</span><span class="n">RadiiBasedMovingBin</span><span class="p">())</span>
     <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">())</span>
     <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span><span class="n">sufrace_tension_strategy</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">concentration</span><span class="o">=</span><span class="n">concentration</span><span class="p">,</span> <span class="n">concentration_units</span><span class="o">=</span><span class="s2">"1/cm^3"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span>
+        <span class="n">concentration</span><span class="o">=</span><span class="n">concentration</span><span class="p">,</span> <span class="n">concentration_units</span><span class="o">=</span><span class="s2">"1/cm^3"</span>
+    <span class="p">)</span>
     <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span> <span class="n">density_units</span><span class="o">=</span><span class="s2">"g/cm^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_radius</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">radius_units</span><span class="o">=</span><span class="s2">"nm"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">charge</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -7676,7 +7678,9 @@ particle_rep_mass = (
     .set_distribution_strategy(particles.RadiiBasedMovingBin())
     .set_activity_strategy(particles.ActivityIdealMass())
     .set_surface_strategy(sufrace_tension_strategy)
-    .set_concentration(concentration=concentration, concentration_units="1/cm^3")
+    .set_concentration(
+        concentration=concentration, concentration_units="1/cm^3"
+    )
     .set_density(density=density, density_units="g/cm^3")
     .set_radius(radius=radius, radius_units="nm")
     .set_charge(charge=0)

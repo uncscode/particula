@@ -7773,7 +7773,9 @@ density = species_density.organic_density_estimate(
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span><span class="p">,</span> <span class="n">gamma_water</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"water"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"dashed"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span><span class="p">,</span> <span class="n">gamma_water</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"water"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"dashed"</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="mi">1</span> <span class="o">-</span> <span class="n">organic_mole_fraction</span><span class="p">,</span>
     <span class="n">gamma_organic</span><span class="p">,</span>
@@ -7804,7 +7806,9 @@ ax.legend()
 plt.show()
 
 fig, ax = plt.subplots()
-ax.plot(1 - organic_mole_fraction, gamma_water, label="water", linestyle="dashed")
+ax.plot(
+    1 - organic_mole_fraction, gamma_water, label="water", linestyle="dashed"
+)
 ax.plot(
     1 - organic_mole_fraction,
     gamma_organic,
@@ -7869,7 +7873,9 @@ plt.show()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Finding phase separation points and calculating q_alpha</span>
-<span class="n">phase_sep_aw</span> <span class="o">=</span> <span class="n">phase_separation</span><span class="o">.</span><span class="n">find_phase_separation</span><span class="p">(</span><span class="n">activity_water</span><span class="p">,</span> <span class="n">activity_organic</span><span class="p">)</span>
+<span class="n">phase_sep_aw</span> <span class="o">=</span> <span class="n">phase_separation</span><span class="o">.</span><span class="n">find_phase_separation</span><span class="p">(</span>
+    <span class="n">activity_water</span><span class="p">,</span> <span class="n">activity_organic</span>
+<span class="p">)</span>
 <span class="n">q_alpha</span> <span class="o">=</span> <span class="n">phase_separation</span><span class="o">.</span><span class="n">q_alpha</span><span class="p">(</span>
     <span class="n">seperation_activity</span><span class="o">=</span><span class="n">phase_sep_aw</span><span class="p">[</span><span class="s2">"upper_seperation"</span><span class="p">],</span>
     <span class="n">activities</span><span class="o">=</span><span class="n">activity_water</span><span class="p">,</span>
@@ -7883,7 +7889,9 @@ plt.show()</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># Finding phase separation points and calculating q_alpha
-phase_sep_aw = phase_separation.find_phase_separation(activity_water, activity_organic)
+phase_sep_aw = phase_separation.find_phase_separation(
+    activity_water, activity_organic
+)
 q_alpha = phase_separation.q_alpha(
     seperation_activity=phase_sep_aw["upper_seperation"],
     activities=activity_water,

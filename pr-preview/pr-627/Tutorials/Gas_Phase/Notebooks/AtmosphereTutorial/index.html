@@ -7732,9 +7732,13 @@ from particula.gas import (
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Define the coefficients for Butanol using the Antoine equation.</span>
 <span class="n">butanol_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"a"</span><span class="p">:</span> <span class="mf">7.838</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mf">1558.19</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">:</span> <span class="mf">196.881</span><span class="p">}</span>
-<span class="n">butanol_antione</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"antoine"</span><span class="p">,</span> <span class="n">butanol_coefficients</span><span class="p">)</span>
+<span class="n">butanol_antione</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+    <span class="s2">"antoine"</span><span class="p">,</span> <span class="n">butanol_coefficients</span>
+<span class="p">)</span>
 <span class="n">styrene_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"a"</span><span class="p">:</span> <span class="mf">6.924</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">1420</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">:</span> <span class="mi">226</span><span class="p">}</span>
-<span class="n">styrene_antione</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"antoine"</span><span class="p">,</span> <span class="n">styrene_coefficients</span><span class="p">)</span>
+<span class="n">styrene_antione</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+    <span class="s2">"antoine"</span><span class="p">,</span> <span class="n">styrene_coefficients</span>
+<span class="p">)</span>
 
 <span class="c1"># Water uses a different model for vapor pressure calculation called the Buck equation.</span>
 <span class="n">water_buck</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"water_buck"</span><span class="p">)</span>
@@ -7772,9 +7776,13 @@ from particula.gas import (
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2"># Define the coefficients for Butanol using the Antoine equation.
 butanol_coefficients = {"a": 7.838, "b": 1558.19, "c": 196.881}
-butanol_antione = VaporPressureFactory().get_strategy("antoine", butanol_coefficients)
+butanol_antione = VaporPressureFactory().get_strategy(
+    "antoine", butanol_coefficients
+)
 styrene_coefficients = {"a": 6.924, "b": 1420, "c": 226}
-styrene_antione = VaporPressureFactory().get_strategy("antoine", styrene_coefficients)
+styrene_antione = VaporPressureFactory().get_strategy(
+    "antoine", styrene_coefficients
+)
 
 # Water uses a different model for vapor pressure calculation called the Buck equation.
 water_buck = VaporPressureFactory().get_strategy("water_buck")
@@ -7988,7 +7996,11 @@ $$</p>
 <span class="c1"># Calculate the pressure at each altitude using the barometric formula</span>
 <span class="n">pressure_at_altitudes</span> <span class="o">=</span> <span class="n">sea_level_pressure</span> <span class="o">*</span> <span class="p">(</span>
     <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">temperature_lapse_rate</span> <span class="o">*</span> <span class="n">altitude_range</span> <span class="o">/</span> <span class="n">sea_level_temperature</span><span class="p">)</span>
-    <span class="o">**</span> <span class="p">(</span><span class="n">gravity</span> <span class="o">*</span> <span class="n">molar_mass_air</span> <span class="o">/</span> <span class="p">(</span><span class="n">universal_gas_constant</span> <span class="o">*</span> <span class="n">temperature_lapse_rate</span><span class="p">))</span>
+    <span class="o">**</span> <span class="p">(</span>
+        <span class="n">gravity</span>
+        <span class="o">*</span> <span class="n">molar_mass_air</span>
+        <span class="o">/</span> <span class="p">(</span><span class="n">universal_gas_constant</span> <span class="o">*</span> <span class="n">temperature_lapse_rate</span><span class="p">)</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 
 
@@ -8039,7 +8051,11 @@ temperature_at_altitudes = (
 # Calculate the pressure at each altitude using the barometric formula
 pressure_at_altitudes = sea_level_pressure * (
     (1 - temperature_lapse_rate * altitude_range / sea_level_temperature)
-    ** (gravity * molar_mass_air / (universal_gas_constant * temperature_lapse_rate))
+    ** (
+        gravity
+        * molar_mass_air
+        / (universal_gas_constant * temperature_lapse_rate)
+    )
 )
 
 

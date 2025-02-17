@@ -9937,8 +9937,12 @@ Concentration 3 max: 98778247873.61397
 
 <span class="c1"># Plot the concentration distribution at each time step</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_0</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"t=0"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"-"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"t=1"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"green"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"t=2"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"-."</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"orange"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"t=1"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"green"</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"t=2"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"-."</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"orange"</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"t=3"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">":"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
 
 <span class="c1"># Set the x-axis label to indicate the particle radius in meters</span>
@@ -9965,8 +9969,12 @@ fig, ax = plt.subplots(figsize=(8, 6))
 
 # Plot the concentration distribution at each time step
 ax.plot(radius_bins, concentration_0, label="t=0", linestyle="-", color="blue")
-ax.plot(radius_bins, concentration_1, label="t=1", linestyle="--", color="green")
-ax.plot(radius_bins, concentration_2, label="t=2", linestyle="-.", color="orange")
+ax.plot(
+    radius_bins, concentration_1, label="t=1", linestyle="--", color="green"
+)
+ax.plot(
+    radius_bins, concentration_2, label="t=2", linestyle="-.", color="orange"
+)
 ax.plot(radius_bins, concentration_3, label="t=3", linestyle=":", color="red")
 
 # Set the x-axis label to indicate the particle radius in meters

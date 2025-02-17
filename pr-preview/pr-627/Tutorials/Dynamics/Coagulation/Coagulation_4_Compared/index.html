@@ -7639,7 +7639,9 @@ from particula.util.input_handling import convert_units</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># common parameters</span>
 <span class="n">mode</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">100e-9</span><span class="p">,</span> <span class="mf">300e-9</span><span class="p">])</span>  <span class="c1"># m</span>
 <span class="n">geometric_standard_deviation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">])</span>
-<span class="n">number_of_particles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">])</span>  <span class="c1"># effective when pdf has multiple modes</span>
+<span class="n">number_of_particles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">]</span>
+<span class="p">)</span>  <span class="c1"># effective when pdf has multiple modes</span>
 <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0e3</span><span class="p">])</span>
 <span class="n">volume</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">convert_units</span><span class="p">(</span><span class="s2">"cm^3"</span><span class="p">,</span> <span class="s2">"m^3"</span><span class="p">)</span>  <span class="c1"># cm^-3 to m^-3</span>
 
@@ -7656,7 +7658,9 @@ from particula.util.input_handling import convert_units</div>
 <div class="clipboard-copy-txt" id="cell-2"># common parameters
 mode = np.array([100e-9, 300e-9])  # m
 geometric_standard_deviation = np.array([1.3, 1.3])
-number_of_particles = np.array([0.75, 0.25])  # effective when pdf has multiple modes
+number_of_particles = np.array(
+    [0.75, 0.25]
+)  # effective when pdf has multiple modes
 density = np.array([1.0e3])
 volume = 1 * convert_units("cm^3", "m^3")  # cm^-3 to m^-3
 
@@ -7719,7 +7723,9 @@ atmosphere = (
 <span class="p">)</span>
 
 <span class="c1"># Calculate the mass of each particle in the sample, assuming density of 1500 kg/m^3</span>
-<span class="n">particle_mass_sample</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radii_sample</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="n">density</span>  <span class="c1"># Particle mass in kg</span>
+<span class="n">particle_mass_sample</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radii_sample</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="n">density</span>
+<span class="p">)</span>  <span class="c1"># Particle mass in kg</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total mass of particles: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">particle_mass_sample</span><span class="p">)</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> kg"</span><span class="p">)</span>
 <span class="c1"># Build a resolved mass representation for each particle</span>
@@ -7755,7 +7761,9 @@ radii_sample = particles.properties.lognormal_sample_distribution(
 )
 
 # Calculate the mass of each particle in the sample, assuming density of 1500 kg/m^3
-particle_mass_sample = 4 / 3 * np.pi * radii_sample**3 * density  # Particle mass in kg
+particle_mass_sample = (
+    4 / 3 * np.pi * radii_sample**3 * density
+)  # Particle mass in kg
 
 print(f"Total mass of particles: {np.sum(particle_mass_sample):.2e} kg")
 # Build a resolved mass representation for each particle
@@ -7951,7 +7959,9 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Preset100']
     <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">"pdf"</span><span class="p">)</span>  <span class="c1"># Set the distribution type to PMF</span>
     <span class="o">.</span><span class="n">set_radius_bins</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">radius_bins_units</span><span class="o">=</span><span class="s2">"m"</span><span class="p">)</span>  <span class="c1"># Set the radius bins</span>
     <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>  <span class="c1"># Set particle density</span>
-    <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">))</span>  <span class="c1"># Assume neutral particles with no charge</span>
+    <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">)</span>
+    <span class="p">)</span>  <span class="c1"># Assume neutral particles with no charge</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>  <span class="c1"># Finalize the resolved mass representation</span>
 <span class="p">)</span>
 
@@ -7969,7 +7979,9 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Preset100']
     .set_distribution_type("pdf")  # Set the distribution type to PMF
     .set_radius_bins(radius_bins, radius_bins_units="m")  # Set the radius bins
     .set_density(density, "kg/m^3")  # Set particle density
-    .set_charge(np.zeros_like(radius_bins))  # Assume neutral particles with no charge
+    .set_charge(
+        np.zeros_like(radius_bins)
+    )  # Assume neutral particles with no charge
     .build()  # Finalize the resolved mass representation
 )
 
@@ -8141,7 +8153,9 @@ plt.show()</div>
 <span class="p">)</span>
 
 <span class="n">coagulation_process_resolved</span> <span class="o">=</span> <span class="n">particle_process</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span>
-    <span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">coagulation</span><span class="o">.</span><span class="n">ParticleResolved</span><span class="p">(</span><span class="n">kernel_bins_per_decade</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">coagulation</span><span class="o">.</span><span class="n">ParticleResolved</span><span class="p">(</span>
+        <span class="n">kernel_bins_per_decade</span><span class="o">=</span><span class="mi">10</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 <span class="n">hard_sphere</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">HardSphere</span><span class="p">()</span>
 <span class="n">coagulation_process_pdf</span> <span class="o">=</span> <span class="n">particle_process</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span>
@@ -8173,7 +8187,9 @@ coagulation_process_pmf = particle_process.Coagulation(
 )
 
 coagulation_process_resolved = particle_process.Coagulation(
-    coagulation_strategy=coagulation.ParticleResolved(kernel_bins_per_decade=10)
+    coagulation_strategy=coagulation.ParticleResolved(
+        kernel_bins_per_decade=10
+    )
 )
 hard_sphere = coagulation.HardSphere()
 coagulation_process_pdf = particle_process.Coagulation(
@@ -8237,18 +8253,24 @@ total_number_pdf = np.zeros_like(time, dtype=np.float64)</div>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># Perform coagulation for the PDF aerosol</span>
-        <span class="n">aerosol_pdf</span> <span class="o">=</span> <span class="n">coagulation_process_pdf</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol_pdf</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">)</span>
+        <span class="n">aerosol_pdf</span> <span class="o">=</span> <span class="n">coagulation_process_pdf</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">aerosol_pdf</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span>
+        <span class="p">)</span>
         <span class="c1"># Perform coagulation for the PMF aerosol</span>
-        <span class="n">aerosol_pmf</span> <span class="o">=</span> <span class="n">coagulation_process_pmf</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol_pmf</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="p">)</span>
+        <span class="n">aerosol_pmf</span> <span class="o">=</span> <span class="n">coagulation_process_pmf</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="n">aerosol_pmf</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span>
+        <span class="p">)</span>
         <span class="c1"># Perform coagulation for the resolved aerosol</span>
         <span class="n">aerosol_resolved</span> <span class="o">=</span> <span class="n">coagulation_process_resolved</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
             <span class="n">aerosol_resolved</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span>
         <span class="p">)</span>
 
-    <span class="n">total_mass_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
-    <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span>
-        <span class="n">clone</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
+    <span class="n">total_mass_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
+        <span class="mi">0</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
+    <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
+        <span class="mi">0</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">total_number_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
 
     <span class="n">total_mass_pmf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_pmf</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
@@ -8261,25 +8283,33 @@ total_number_pdf = np.zeros_like(time, dtype=np.float64)</div>
     <span class="n">number_distribution_pdf</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_pdf</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(</span>
         <span class="n">clone</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
-    <span class="n">total_number_pdf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span><span class="n">number_distribution_pdf</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">radius_bins</span><span class="p">)</span>
+    <span class="n">total_number_pdf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span>
+        <span class="n">number_distribution_pdf</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">radius_bins</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8"># Simulation loop
 
 for i, t in enumerate(time):
     if i &gt; 0:
         # Perform coagulation for the PDF aerosol
-        aerosol_pdf = coagulation_process_pdf.execute(aerosol_pdf, time_step, sub_steps)
+        aerosol_pdf = coagulation_process_pdf.execute(
+            aerosol_pdf, time_step, sub_steps
+        )
         # Perform coagulation for the PMF aerosol
-        aerosol_pmf = coagulation_process_pmf.execute(aerosol_pmf, time_step, sub_steps)
+        aerosol_pmf = coagulation_process_pmf.execute(
+            aerosol_pmf, time_step, sub_steps
+        )
         # Perform coagulation for the resolved aerosol
         aerosol_resolved = coagulation_process_resolved.execute(
             aerosol_resolved, time_step, sub_steps
         )
 
-    total_mass_resolved[i] = aerosol_resolved.particles[0].get_mass_concentration()
-    number_distribution_resolved[i, :] = aerosol_resolved.particles[0].get_radius(
-        clone=True
-    )
+    total_mass_resolved[i] = aerosol_resolved.particles[
+        0
+    ].get_mass_concentration()
+    number_distribution_resolved[i, :] = aerosol_resolved.particles[
+        0
+    ].get_radius(clone=True)
     total_number_resolved[i] = np.sum(number_distribution_resolved[i, :] &gt; 0)
 
     total_mass_pmf[i] = aerosol_pmf.particles[0].get_mass_concentration()
@@ -8292,7 +8322,9 @@ for i, t in enumerate(time):
     number_distribution_pdf[i, :] = aerosol_pdf.particles[0].get_concentration(
         clone=True
     )
-    total_number_pdf[i] = np.trapezoid(number_distribution_pdf[i, :], radius_bins)</div>
+    total_number_pdf[i] = np.trapezoid(
+        number_distribution_pdf[i, :], radius_bins
+    )</div>
 </div>
 </div>
 </div>
@@ -8389,7 +8421,9 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Preset100']
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># plot the initial and final distributions</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
-<span class="n">bins</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">number_distribution_resolved</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">bins</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">)</span>
+<span class="n">bins</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+    <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">bins</span><span class="o">=</span><span class="n">radius_bins</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
     <span class="n">edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
     <span class="n">bins</span> <span class="o">/</span> <span class="n">volume</span><span class="p">,</span>
@@ -8399,7 +8433,9 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Preset100']
     <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span>
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">bins</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">number_distribution_resolved</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">bins</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">)</span>
+<span class="n">bins</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+    <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">bins</span><span class="o">=</span><span class="n">radius_bins</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
     <span class="n">edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
     <span class="n">bins</span> <span class="o">/</span> <span class="n">volume</span><span class="p">,</span>
@@ -8432,7 +8468,9 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Preset100']
 <div class="clipboard-copy-txt" id="cell-10"># plot the initial and final distributions
 fig, ax = plt.subplots(figsize=(8, 5))
 
-bins, edges = np.histogram(number_distribution_resolved[0, :], bins=radius_bins)
+bins, edges = np.histogram(
+    number_distribution_resolved[0, :], bins=radius_bins
+)
 ax.bar(
     edges[:-1],
     bins / volume,
@@ -8442,7 +8480,9 @@ ax.bar(
     color="red",
     alpha=0.7,
 )
-bins, edges = np.histogram(number_distribution_resolved[-1, :], bins=radius_bins)
+bins, edges = np.histogram(
+    number_distribution_resolved[-1, :], bins=radius_bins
+)
 ax.bar(
     edges[:-1],
     bins / volume,
@@ -8609,7 +8649,9 @@ plt.show()</div>
 <span class="n">total_resolved_non_zero</span> <span class="o">=</span> <span class="n">number_distribution_resolved</span> <span class="o">&gt;</span> <span class="mi">0</span>
 <span class="n">total_resolved</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">total_resolved_non_zero</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">volume</span>
 
-<span class="n">percent_diff_resolved</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_number_pdf</span> <span class="o">-</span> <span class="n">total_resolved</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_number_pdf</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">percent_diff_resolved</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="n">total_number_pdf</span> <span class="o">-</span> <span class="n">total_resolved</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_number_pdf</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="p">)</span>
 <span class="n">percent_diff_pmf</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_number_pdf</span> <span class="o">-</span> <span class="n">total_pmf</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_number_pdf</span> <span class="o">*</span> <span class="mi">100</span>
 
 <span class="nb">print</span><span class="p">(</span>
@@ -8618,7 +8660,9 @@ plt.show()</div>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">percent_diff_resolved</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Particle Resolved"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">percent_diff_pmf</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Probability Mass Function"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">time</span><span class="p">,</span> <span class="n">percent_diff_pmf</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Probability Mass Function"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Time (s)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Percent Difference vs Probability Density Function"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Numerical Error in Number Concentration"</span><span class="p">)</span>
@@ -8631,7 +8675,9 @@ total_pmf = np.sum(number_distribution_pmf, axis=1)
 total_resolved_non_zero = number_distribution_resolved &gt; 0
 total_resolved = np.sum(total_resolved_non_zero, axis=1) / volume
 
-percent_diff_resolved = (total_number_pdf - total_resolved) / total_number_pdf * 100
+percent_diff_resolved = (
+    (total_number_pdf - total_resolved) / total_number_pdf * 100
+)
 percent_diff_pmf = (total_number_pdf - total_pmf) / total_number_pdf * 100
 
 print(
@@ -8640,7 +8686,9 @@ print(
 
 fig, ax = plt.subplots(figsize=(8, 5))
 ax.plot(time, percent_diff_resolved, label="Particle Resolved", linestyle="--")
-ax.plot(time, percent_diff_pmf, label="Probability Mass Function", linestyle="--")
+ax.plot(
+    time, percent_diff_pmf, label="Probability Mass Function", linestyle="--"
+)
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Percent Difference vs Probability Density Function")
 ax.set_title("Numerical Error in Number Concentration")

@@ -8034,17 +8034,29 @@ plt.show()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %%</span>
-<span class="n">single_mode_total_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span><span class="n">single_mode_distribution</span><span class="p">,</span> <span class="n">x_values</span><span class="p">)</span>
-<span class="n">multi_mode_total_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span><span class="n">multi_mode_distribution</span><span class="p">,</span> <span class="n">x_values</span><span class="p">)</span>
+<span class="n">single_mode_total_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span>
+    <span class="n">single_mode_distribution</span><span class="p">,</span> <span class="n">x_values</span>
+<span class="p">)</span>
+<span class="n">multi_mode_total_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span>
+    <span class="n">multi_mode_distribution</span><span class="p">,</span> <span class="n">x_values</span>
+<span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Concentration for Single Mode: </span><span class="si">{</span><span class="n">single_mode_total_concentration</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"Total Concentration for Single Mode: </span><span class="si">{</span><span class="n">single_mode_total_concentration</span><span class="si">}</span><span class="s2">"</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Concentration for Multi Mode: </span><span class="si">{</span><span class="n">multi_mode_total_concentration</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6"># %%
-single_mode_total_concentration = np.trapezoid(single_mode_distribution, x_values)
-multi_mode_total_concentration = np.trapezoid(multi_mode_distribution, x_values)
+single_mode_total_concentration = np.trapezoid(
+    single_mode_distribution, x_values
+)
+multi_mode_total_concentration = np.trapezoid(
+    multi_mode_distribution, x_values
+)
 
-print(f"Total Concentration for Single Mode: {single_mode_total_concentration}")
+print(
+    f"Total Concentration for Single Mode: {single_mode_total_concentration}"
+)
 print(f"Total Concentration for Multi Mode: {multi_mode_total_concentration}")</div>
 </div>
 </div>
@@ -8218,14 +8230,18 @@ plt.show()</div>
 <span class="n">single_mode_total_concentration</span> <span class="o">=</span> <span class="n">single_pmf_distribution</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="n">multi_mode_total_concentration</span> <span class="o">=</span> <span class="n">multi_pmf_distribution</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Concentration for Single Mode: </span><span class="si">{</span><span class="n">single_mode_total_concentration</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"Total Concentration for Single Mode: </span><span class="si">{</span><span class="n">single_mode_total_concentration</span><span class="si">}</span><span class="s2">"</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Concentration for Multi Mode: </span><span class="si">{</span><span class="n">multi_mode_total_concentration</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-9"># %%
 single_mode_total_concentration = single_pmf_distribution.sum()
 multi_mode_total_concentration = multi_pmf_distribution.sum()
 
-print(f"Total Concentration for Single Mode: {single_mode_total_concentration}")
+print(
+    f"Total Concentration for Single Mode: {single_mode_total_concentration}"
+)
 print(f"Total Concentration for Multi Mode: {multi_mode_total_concentration}")</div>
 </div>
 </div>

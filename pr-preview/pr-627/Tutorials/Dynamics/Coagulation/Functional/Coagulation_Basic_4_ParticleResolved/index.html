@@ -7664,7 +7664,9 @@ from particula.particles.properties.lognormal_size_distribution import (
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># lognormal spacing</span>
 
-<span class="n">radius_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>  <span class="c1"># Define the radius bins for the distribution</span>
+<span class="n">radius_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span>
+    <span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">20</span>
+<span class="p">)</span>  <span class="c1"># Define the radius bins for the distribution</span>
 <span class="n">mass_bins</span> <span class="o">=</span> <span class="p">(</span>
     <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_bins</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1000</span>
 <span class="p">)</span>  <span class="c1"># Calculate the mass of the particles in the bins</span>
@@ -7680,7 +7682,9 @@ from particula.particles.properties.lognormal_size_distribution import (
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2"># lognormal spacing
 
-radius_bins = np.logspace(-9, -6, num=20)  # Define the radius bins for the distribution
+radius_bins = np.logspace(
+    -9, -6, num=20
+)  # Define the radius bins for the distribution
 mass_bins = (
     4 / 3 * np.pi * radius_bins**3 * 1000
 )  # Calculate the mass of the particles in the bins
@@ -7798,12 +7802,14 @@ particles_original = particle_radius.copy()</div>
     <span class="n">time_step</span><span class="o">=</span><span class="n">delta_t</span><span class="p">,</span>
     <span class="n">random_generator</span><span class="o">=</span><span class="n">random_generator</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">particle_radius</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">particle_resolved_update_step</span><span class="p">(</span>
-    <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
-    <span class="n">gain</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">),</span>
-    <span class="n">loss</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">),</span>
-    <span class="n">small_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
-    <span class="n">large_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="n">particle_radius</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">particle_resolved_update_step</span><span class="p">(</span>
+        <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
+        <span class="n">gain</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">),</span>
+        <span class="n">loss</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">),</span>
+        <span class="n">small_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="n">large_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">loss_gain_index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -7824,12 +7830,14 @@ loss_gain_index = particle_resolved_method.particle_resolved_coagulation_step(
     time_step=delta_t,
     random_generator=random_generator,
 )
-particle_radius, gain, loss = particle_resolved_method.particle_resolved_update_step(
-    particle_radius=particle_radius,
-    gain=np.zeros_like(particle_radius),
-    loss=np.zeros_like(particle_radius),
-    small_index=loss_gain_index[:, 0],
-    large_index=loss_gain_index[:, 1],
+particle_radius, gain, loss = (
+    particle_resolved_method.particle_resolved_update_step(
+        particle_radius=particle_radius,
+        gain=np.zeros_like(particle_radius),
+        loss=np.zeros_like(particle_radius),
+        small_index=loss_gain_index[:, 0],
+        large_index=loss_gain_index[:, 1],
+    )
 )
 
 print(loss_gain_index.shape)
@@ -7892,7 +7900,9 @@ print(loss_gain_index)</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %% plot new distribution</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">particles_original</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s2">"step"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+    <span class="n">particles_original</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s2">"step"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="p">[</span><span class="n">particle_radius</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">],</span>
     <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
@@ -7908,7 +7918,9 @@ print(loss_gain_index)</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5"># %% plot new distribution
 fig, ax = plt.subplots()
-ax.hist(particles_original, bins=100, histtype="step", color="black", density=True)
+ax.hist(
+    particles_original, bins=100, histtype="step", color="black", density=True
+)
 ax.hist(
     particle_radius[particle_radius &gt; 0],
     bins=100,
@@ -8039,8 +8051,12 @@ plt.show()</div>
 <span class="n">particles_i</span> <span class="o">=</span> <span class="n">particles_0</span>
 
 <span class="c1"># Define the time array for the simulation</span>
-<span class="n">time_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>  <span class="c1"># Time span of 1000 seconds</span>
-<span class="n">time_interval</span> <span class="o">=</span> <span class="n">time_array</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">time_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Time interval between each step</span>
+<span class="n">time_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+    <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">100</span>
+<span class="p">)</span>  <span class="c1"># Time span of 1000 seconds</span>
+<span class="n">time_interval</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">time_array</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">time_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">)</span>  <span class="c1"># Time interval between each step</span>
 
 <span class="c1"># Array to store the distribution at each time step</span>
 <span class="n">particles_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">time_array</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">particles_0</span><span class="p">)])</span>
@@ -8049,20 +8065,24 @@ plt.show()</div>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dpa</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time_array</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 
-        <span class="n">loss_gain_index</span> <span class="o">=</span> <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">particle_resolved_coagulation_step</span><span class="p">(</span>
-            <span class="n">particle_radius</span><span class="o">=</span><span class="n">particles_i</span><span class="p">,</span>
-            <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
-            <span class="n">kernel_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
-            <span class="n">volume</span><span class="o">=</span><span class="n">volume_sim</span><span class="p">,</span>
-            <span class="n">time_step</span><span class="o">=</span><span class="n">time_interval</span><span class="p">,</span>
-            <span class="n">random_generator</span><span class="o">=</span><span class="n">random_generator</span><span class="p">,</span>
+        <span class="n">loss_gain_index</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">particle_resolved_coagulation_step</span><span class="p">(</span>
+                <span class="n">particle_radius</span><span class="o">=</span><span class="n">particles_i</span><span class="p">,</span>
+                <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
+                <span class="n">kernel_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
+                <span class="n">volume</span><span class="o">=</span><span class="n">volume_sim</span><span class="p">,</span>
+                <span class="n">time_step</span><span class="o">=</span><span class="n">time_interval</span><span class="p">,</span>
+                <span class="n">random_generator</span><span class="o">=</span><span class="n">random_generator</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="p">)</span>
-        <span class="n">particles_i</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">particle_resolved_update_step</span><span class="p">(</span>
-            <span class="n">particle_radius</span><span class="o">=</span><span class="n">particles_i</span><span class="p">,</span>
-            <span class="n">gain</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particles_i</span><span class="p">),</span>
-            <span class="n">loss</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particles_i</span><span class="p">),</span>
-            <span class="n">small_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
-            <span class="n">large_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="n">particles_i</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">particle_resolved_update_step</span><span class="p">(</span>
+                <span class="n">particle_radius</span><span class="o">=</span><span class="n">particles_i</span><span class="p">,</span>
+                <span class="n">gain</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particles_i</span><span class="p">),</span>
+                <span class="n">loss</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particles_i</span><span class="p">),</span>
+                <span class="n">small_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+                <span class="n">large_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">)</span>
         <span class="p">)</span>
 
         <span class="c1"># Ensure no negative concentrations (set to zero if less than zero)</span>
@@ -8076,8 +8096,12 @@ particles_0 = particles_original
 particles_i = particles_0
 
 # Define the time array for the simulation
-time_array = np.linspace(start=0, stop=1000, num=100)  # Time span of 1000 seconds
-time_interval = time_array[1] - time_array[0]  # Time interval between each step
+time_array = np.linspace(
+    start=0, stop=1000, num=100
+)  # Time span of 1000 seconds
+time_interval = (
+    time_array[1] - time_array[0]
+)  # Time interval between each step
 
 # Array to store the distribution at each time step
 particles_matrix = np.zeros([len(time_array), len(particles_0)])
@@ -8086,20 +8110,24 @@ particles_matrix = np.zeros([len(time_array), len(particles_0)])
 for i, dpa in enumerate(time_array):
     if i &gt; 0:
 
-        loss_gain_index = particle_resolved_method.particle_resolved_coagulation_step(
-            particle_radius=particles_i,
-            kernel=kernel,
-            kernel_radius=radius_bins,
-            volume=volume_sim,
-            time_step=time_interval,
-            random_generator=random_generator,
+        loss_gain_index = (
+            particle_resolved_method.particle_resolved_coagulation_step(
+                particle_radius=particles_i,
+                kernel=kernel,
+                kernel_radius=radius_bins,
+                volume=volume_sim,
+                time_step=time_interval,
+                random_generator=random_generator,
+            )
         )
-        particles_i, _, _ = particle_resolved_method.particle_resolved_update_step(
-            particle_radius=particles_i,
-            gain=np.zeros_like(particles_i),
-            loss=np.zeros_like(particles_i),
-            small_index=loss_gain_index[:, 0],
-            large_index=loss_gain_index[:, 1],
+        particles_i, _, _ = (
+            particle_resolved_method.particle_resolved_update_step(
+                particle_radius=particles_i,
+                gain=np.zeros_like(particles_i),
+                loss=np.zeros_like(particles_i),
+                small_index=loss_gain_index[:, 0],
+                large_index=loss_gain_index[:, 1],
+            )
         )
 
         # Ensure no negative concentrations (set to zero if less than zero)
@@ -8146,7 +8174,9 @@ for i, dpa in enumerate(time_array):
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">filtered</span> <span class="o">=</span> <span class="n">particles_matrix</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">particles_original</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s2">"step"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+    <span class="n">particles_original</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s2">"step"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
     <span class="n">particles_matrix</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">filtered</span><span class="p">],</span>
     <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
@@ -8163,7 +8193,9 @@ for i, dpa in enumerate(time_array):
 <div class="clipboard-copy-txt" id="cell-8">filtered = particles_matrix[-1, :] &gt; 0
 
 fig, ax = plt.subplots()
-ax.hist(particles_original, bins=100, histtype="step", color="black", density=True)
+ax.hist(
+    particles_original, bins=100, histtype="step", color="black", density=True
+)
 ax.hist(
     particles_matrix[-1, filtered],
     bins=100,
@@ -8430,7 +8462,9 @@ plt.show()</div>
         <span class="n">events</span> <span class="o">=</span> <span class="n">small_count</span> <span class="o">*</span> <span class="n">large_count</span>
 
         <span class="c1"># events = random_generator.poisson(events)</span>
-        <span class="n">tests</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">kernel_values</span> <span class="o">*</span> <span class="n">time_step</span> <span class="o">*</span> <span class="n">events</span> <span class="o">/</span> <span class="n">volume</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">tests</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">kernel_values</span> <span class="o">*</span> <span class="n">time_step</span> <span class="o">*</span> <span class="n">events</span> <span class="o">/</span> <span class="n">volume</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+            <span class="nb">int</span>
+        <span class="p">)</span>
         <span class="c1"># print(f"events: {events}, tests: {tests}")</span>
 
         <span class="k">if</span> <span class="n">tests</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -8452,13 +8486,17 @@ plt.show()</div>
 
         <span class="c1"># Determine which coagulation events actually occur based on</span>
         <span class="c1"># interpolated kernel probabilities</span>
-        <span class="n">coagulation_probabilities</span> <span class="o">=</span> <span class="n">kernel_value</span> <span class="o">*</span> <span class="n">time_step</span> <span class="o">*</span> <span class="n">events</span> <span class="o">/</span> <span class="p">(</span><span class="n">tests</span> <span class="o">*</span> <span class="n">volume</span><span class="p">)</span>
+        <span class="n">coagulation_probabilities</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">kernel_value</span> <span class="o">*</span> <span class="n">time_step</span> <span class="o">*</span> <span class="n">events</span> <span class="o">/</span> <span class="p">(</span><span class="n">tests</span> <span class="o">*</span> <span class="n">volume</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="c1"># random number</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">random_generator</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">tests</span><span class="p">)</span>
         <span class="n">valid_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">r</span> <span class="o">&lt;</span> <span class="n">coagulation_probabilities</span><span class="p">)</span>
         <span class="c1"># check if any valid indices are duplicate in small index</span>
         <span class="c1"># error of same small particle going to two different large particles</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">unique_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">small_index</span><span class="p">[</span><span class="n">valid_indices</span><span class="p">],</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">unique_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+            <span class="n">small_index</span><span class="p">[</span><span class="n">valid_indices</span><span class="p">],</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
         <span class="n">small_index</span> <span class="o">=</span> <span class="n">small_index</span><span class="p">[</span><span class="n">valid_indices</span><span class="p">][</span><span class="n">unique_index</span><span class="p">]</span>
         <span class="n">large_index</span> <span class="o">=</span> <span class="n">large_index</span><span class="p">[</span><span class="n">valid_indices</span><span class="p">][</span><span class="n">unique_index</span><span class="p">]</span>
 
@@ -8482,12 +8520,14 @@ plt.show()</div>
         <span class="n">large_index_total0</span><span class="p">[</span><span class="n">remap_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">final_value</span>
 
     <span class="c1"># update particle radius</span>
-    <span class="n">particle_radius</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">particle_resolved_update_step</span><span class="p">(</span>
-        <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
-        <span class="n">gain</span><span class="o">=</span><span class="n">gain_radius</span><span class="p">,</span>
-        <span class="n">loss</span><span class="o">=</span><span class="n">loss_radius</span><span class="p">,</span>
-        <span class="n">small_index</span><span class="o">=</span><span class="n">small_index_total0</span><span class="p">,</span>
-        <span class="n">large_index</span><span class="o">=</span><span class="n">large_index_total0</span><span class="p">,</span>
+    <span class="n">particle_radius</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">particle_resolved_update_step</span><span class="p">(</span>
+            <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
+            <span class="n">gain</span><span class="o">=</span><span class="n">gain_radius</span><span class="p">,</span>
+            <span class="n">loss</span><span class="o">=</span><span class="n">loss_radius</span><span class="p">,</span>
+            <span class="n">small_index</span><span class="o">=</span><span class="n">small_index_total0</span><span class="p">,</span>
+            <span class="n">large_index</span><span class="o">=</span><span class="n">large_index_total0</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"concenration: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">number_in_bins</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">volume</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -8582,7 +8622,9 @@ for time_i in range(total_steps):
         events = small_count * large_count
 
         # events = random_generator.poisson(events)
-        tests = np.ceil(kernel_values * time_step * events / volume).astype(int)
+        tests = np.ceil(kernel_values * time_step * events / volume).astype(
+            int
+        )
         # print(f"events: {events}, tests: {tests}")
 
         if tests == 0:
@@ -8604,13 +8646,17 @@ for time_i in range(total_steps):
 
         # Determine which coagulation events actually occur based on
         # interpolated kernel probabilities
-        coagulation_probabilities = kernel_value * time_step * events / (tests * volume)
+        coagulation_probabilities = (
+            kernel_value * time_step * events / (tests * volume)
+        )
         # random number
         r = random_generator.uniform(size=tests)
         valid_indices = np.flatnonzero(r &lt; coagulation_probabilities)
         # check if any valid indices are duplicate in small index
         # error of same small particle going to two different large particles
-        _, unique_index = np.unique(small_index[valid_indices], return_index=True)
+        _, unique_index = np.unique(
+            small_index[valid_indices], return_index=True
+        )
         small_index = small_index[valid_indices][unique_index]
         large_index = large_index[valid_indices][unique_index]
 
@@ -8634,12 +8680,14 @@ for time_i in range(total_steps):
         large_index_total0[remap_index] = final_value
 
     # update particle radius
-    particle_radius, _, _ = particle_resolved_method.particle_resolved_update_step(
-        particle_radius=particle_radius,
-        gain=gain_radius,
-        loss=loss_radius,
-        small_index=small_index_total0,
-        large_index=large_index_total0,
+    particle_radius, _, _ = (
+        particle_resolved_method.particle_resolved_update_step(
+            particle_radius=particle_radius,
+            gain=gain_radius,
+            loss=loss_radius,
+            small_index=small_index_total0,
+            large_index=large_index_total0,
+        )
     )
 
 print(f"concenration: {np.sum(number_in_bins) / volume:.4e}")</div>

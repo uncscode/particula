@@ -7646,7 +7646,9 @@ from particula.gas import PresetGasSpeciesBuilder, AtmosphereBuilder</div>
 <span class="p">)</span>
 
 <span class="c1"># Calculate the mass of each particle in the sample, assuming density of 1500 kg/m^3</span>
-<span class="n">particle_mass_sample</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particle_sample</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1500</span>  <span class="c1"># Particle mass in kg</span>
+<span class="n">particle_mass_sample</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particle_sample</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1500</span>
+<span class="p">)</span>  <span class="c1"># Particle mass in kg</span>
 
 <span class="c1"># Build a resolved mass representation for each particle</span>
 <span class="c1"># This defines how particle mass, activity, and surface are represented</span>
@@ -7694,7 +7696,9 @@ particle_sample = particles.properties.lognormal_sample_distribution(
 )
 
 # Calculate the mass of each particle in the sample, assuming density of 1500 kg/m^3
-particle_mass_sample = 4 / 3 * np.pi * particle_sample**3 * 1500  # Particle mass in kg
+particle_mass_sample = (
+    4 / 3 * np.pi * particle_sample**3 * 1500
+)  # Particle mass in kg
 
 # Build a resolved mass representation for each particle
 # This defines how particle mass, activity, and surface are represented
@@ -7789,7 +7793,9 @@ print(aerosol)</div>
 <span class="p">)</span>
 
 <span class="c1"># Calculate the mass of each particle in the sample, assuming density of 1500 kg/m^3</span>
-<span class="n">particle_mass_add</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particles_to_add</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1500</span>  <span class="c1"># Particle mass in kg</span>
+<span class="n">particle_mass_add</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particles_to_add</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1500</span>
+<span class="p">)</span>  <span class="c1"># Particle mass in kg</span>
 <span class="n">concentration_add</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">particle_mass_add</span><span class="p">)</span>
 
 
@@ -7808,7 +7814,9 @@ particles_to_add = particles.properties.lognormal_sample_distribution(
 )
 
 # Calculate the mass of each particle in the sample, assuming density of 1500 kg/m^3
-particle_mass_add = 4 / 3 * np.pi * particles_to_add**3 * 1500  # Particle mass in kg
+particle_mass_add = (
+    4 / 3 * np.pi * particles_to_add**3 * 1500
+)  # Particle mass in kg
 concentration_add = np.ones_like(particle_mass_add)
 
 
@@ -7853,7 +7861,9 @@ print(f"Particles to add: {particle_mass_add.shape}")</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Get initial particle radii before adding particle</span>
 <span class="n">initial_radii</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Initial concentration: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"Initial concentration: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+<span class="p">)</span>
 
 <span class="c1"># Perform the add process</span>
 <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
@@ -7863,7 +7873,9 @@ print(f"Particles to add: {particle_mass_add.shape}")</div>
     <span class="n">added_distribution</span><span class="o">=</span><span class="n">particle_mass_add</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">radii_after_step_1</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Concentration after step 1: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"Concentration after step 1: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+<span class="p">)</span>
 
 <span class="c1"># Perform the add process</span>
 <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>
@@ -7872,12 +7884,16 @@ print(f"Particles to add: {particle_mass_add.shape}")</div>
 <span class="p">)</span>
 <span class="n">radii_after_step_2</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Concentration after step 2: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"Concentration after step 2: </span><span class="si">{</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_total_concentration</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+<span class="p">)</span>
 <span class="n">concentration_value</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># Get initial particle radii before adding particle
 initial_radii = aerosol.particles[0].get_radius(clone=True)
-print(f"Initial concentration: {aerosol.particles[0].get_total_concentration()}")
+print(
+    f"Initial concentration: {aerosol.particles[0].get_total_concentration()}"
+)
 
 # Perform the add process
 aerosol.particles[
@@ -7887,7 +7903,9 @@ aerosol.particles[
     added_distribution=particle_mass_add,
 )
 radii_after_step_1 = aerosol.particles[0].get_radius(clone=True)
-print(f"Concentration after step 1: {aerosol.particles[0].get_total_concentration()}")
+print(
+    f"Concentration after step 1: {aerosol.particles[0].get_total_concentration()}"
+)
 
 # Perform the add process
 aerosol.particles[0].add_concentration(
@@ -7896,7 +7914,9 @@ aerosol.particles[0].add_concentration(
 )
 radii_after_step_2 = aerosol.particles[0].get_radius(clone=True)
 
-print(f"Concentration after step 2: {aerosol.particles[0].get_total_concentration()}")
+print(
+    f"Concentration after step 2: {aerosol.particles[0].get_total_concentration()}"
+)
 concentration_value = aerosol.particles[0].concentration</div>
 </div>
 </div>

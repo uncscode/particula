@@ -7877,14 +7877,18 @@ We then plot the charge distribution against the particle radius.</p>
 <span class="n">n_bins</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">)</span>
 
 <span class="c1"># Define the split index where charges transition from negative to positive</span>
-<span class="n">split_index</span> <span class="o">=</span> <span class="n">n_bins</span> <span class="o">//</span> <span class="mi">3</span>  <span class="c1"># Assign the first third of particles negative charges</span>
+<span class="n">split_index</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">n_bins</span> <span class="o">//</span> <span class="mi">3</span>
+<span class="p">)</span>  <span class="c1"># Assign the first third of particles negative charges</span>
 
 <span class="c1"># Generate logarithmically spaced magnitudes for negative charges from 10 to 1</span>
 <span class="n">neg_magnitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="n">split_index</span><span class="p">)</span>
 <span class="n">neg_charges</span> <span class="o">=</span> <span class="o">-</span><span class="n">neg_magnitudes</span>  <span class="c1"># Assign negative sign</span>
 
 <span class="c1"># Generate logarithmically spaced magnitudes for positive charges from 1 to 500</span>
-<span class="n">pos_magnitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">500</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="n">n_bins</span> <span class="o">-</span> <span class="n">split_index</span><span class="p">)</span>
+<span class="n">pos_magnitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">500</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="n">n_bins</span> <span class="o">-</span> <span class="n">split_index</span>
+<span class="p">)</span>
 <span class="n">pos_charges</span> <span class="o">=</span> <span class="n">pos_magnitudes</span>  <span class="c1"># Positive charges</span>
 
 <span class="c1"># Combine the negative and positive charges into one array</span>
@@ -7907,14 +7911,18 @@ We then plot the charge distribution against the particle radius.</p>
 n_bins = len(radius_bins)
 
 # Define the split index where charges transition from negative to positive
-split_index = n_bins // 3  # Assign the first third of particles negative charges
+split_index = (
+    n_bins // 3
+)  # Assign the first third of particles negative charges
 
 # Generate logarithmically spaced magnitudes for negative charges from 10 to 1
 neg_magnitudes = np.logspace(np.log10(10), np.log10(1), num=split_index)
 neg_charges = -neg_magnitudes  # Assign negative sign
 
 # Generate logarithmically spaced magnitudes for positive charges from 1 to 500
-pos_magnitudes = np.logspace(np.log10(1), np.log10(500), num=n_bins - split_index)
+pos_magnitudes = np.logspace(
+    np.log10(1), np.log10(500), num=n_bins - split_index
+)
 pos_charges = pos_magnitudes  # Positive charges
 
 # Combine the negative and positive charges into one array
@@ -8031,7 +8039,10 @@ plt.show()</div>
 <span class="n">reduced_friction_factor</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">friction_factor_value</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
     <span class="o">*</span> <span class="n">friction_factor_value</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="o">/</span> <span class="p">(</span><span class="n">friction_factor_value</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">friction_factor_value</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="o">/</span> <span class="p">(</span>
+        <span class="n">friction_factor_value</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">friction_factor_value</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># %%
@@ -8079,7 +8090,10 @@ reduced_mass = reduced_self_broadcast(mass_bins)
 reduced_friction_factor = (
     friction_factor_value[:, np.newaxis]
     * friction_factor_value[np.newaxis, :]
-    / (friction_factor_value[:, np.newaxis] + friction_factor_value[np.newaxis, :])
+    / (
+        friction_factor_value[:, np.newaxis]
+        + friction_factor_value[np.newaxis, :]
+    )
 )</div>
 </div>
 </div>
@@ -8486,9 +8500,11 @@ plt.show()</div>
 <span class="n">kernel_strategy_gopalakrishnan</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">CoulombGopalakrishnan2012</span><span class="p">()</span>
 
 <span class="c1"># Compute the dimensionless kernel</span>
-<span class="n">dimensionless_kernel_gopalakrishnan</span> <span class="o">=</span> <span class="n">kernel_strategy_gopalakrishnan</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">(</span>
-    <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen_values</span><span class="p">,</span>
-    <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
+<span class="n">dimensionless_kernel_gopalakrishnan</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">kernel_strategy_gopalakrishnan</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">(</span>
+        <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen_values</span><span class="p">,</span>
+        <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 
 <span class="c1"># Compute the dimensional kernel</span>
@@ -8522,9 +8538,11 @@ plt.show()</div>
 kernel_strategy_gopalakrishnan = kernel.CoulombGopalakrishnan2012()
 
 # Compute the dimensionless kernel
-dimensionless_kernel_gopalakrishnan = kernel_strategy_gopalakrishnan.dimensionless(
-    diffusive_knudsen=diffusive_knudsen_values,
-    coulomb_potential_ratio=coulomb_potential_ratio,
+dimensionless_kernel_gopalakrishnan = (
+    kernel_strategy_gopalakrishnan.dimensionless(
+        diffusive_knudsen=diffusive_knudsen_values,
+        coulomb_potential_ratio=coulomb_potential_ratio,
+    )
 )
 
 # Compute the dimensional kernel

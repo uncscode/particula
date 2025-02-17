@@ -8087,7 +8087,7 @@ methods that must be implemented by any coagulation strategy.</p>
     <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="coagulationstrategyabccoulomb_potential_ratio">CoagulationStrategyABC().coulomb_potential_ratio<a class="headerlink" href="#coagulationstrategyabccoulomb_potential_ratio" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L318">Show source in coagulation_strategy_abc.py:318</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L322">Show source in coagulation_strategy_abc.py:322</a></p>
 <p>Calculate the Coulomb potential ratio based on the particle properties
 and temperature.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
@@ -8109,7 +8109,7 @@ and temperature.</p>
 <li><a href="../../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="coagulationstrategyabcdiffusive_knudsen">CoagulationStrategyABC().diffusive_knudsen<a class="headerlink" href="#coagulationstrategyabcdiffusive_knudsen" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L282">Show source in coagulation_strategy_abc.py:282</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L286">Show source in coagulation_strategy_abc.py:286</a></p>
 <p>Calculate the diffusive Knudsen number based on the particle
 properties, temperature, and pressure.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
@@ -8134,7 +8134,7 @@ properties, temperature, and pressure.</p>
 <li><a href="../../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="coagulationstrategyabcdimensionless_kernel">CoagulationStrategyABC().dimensionless_kernel<a class="headerlink" href="#coagulationstrategyabcdimensionless_kernel" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L69">Show source in coagulation_strategy_abc.py:69</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L71">Show source in coagulation_strategy_abc.py:71</a></p>
 <p>Calculate the dimensionless coagulation kernel based on the particle
 properties interactions, diffusive Knudsen number and Coulomb
 potential.</p>
@@ -8157,7 +8157,7 @@ potential.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="coagulationstrategyabcfriction_factor">CoagulationStrategyABC().friction_factor<a class="headerlink" href="#coagulationstrategyabcfriction_factor" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L340">Show source in coagulation_strategy_abc.py:340</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L344">Show source in coagulation_strategy_abc.py:344</a></p>
 <p>Calculate the friction factor based on the particle properties,
 temperature, and pressure.</p>
 <h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
@@ -8179,7 +8179,7 @@ temperature, and pressure.</p>
 <li><a href="../../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="coagulationstrategyabcgain_rate">CoagulationStrategyABC().gain_rate<a class="headerlink" href="#coagulationstrategyabcgain_rate" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L149">Show source in coagulation_strategy_abc.py:149</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L151">Show source in coagulation_strategy_abc.py:151</a></p>
 <p>Calculate the coagulation gain rate based on the particle radius,
 distribution, and the coagulation kernel. Used for discrete and
 continuous PDF distributions.</p>
@@ -8204,7 +8204,7 @@ continuous PDF distributions.</p>
 <li><a href="../../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="coagulationstrategyabckernel">CoagulationStrategyABC().kernel<a class="headerlink" href="#coagulationstrategyabckernel" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L91">Show source in coagulation_strategy_abc.py:91</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L93">Show source in coagulation_strategy_abc.py:93</a></p>
 <p>Calculate the coagulation kernel based on the particle properties,
 temperature, and pressure.</p>
 <h4 id="arguments_5">Arguments<a class="headerlink" href="#arguments_5" title="Permanent link">&para;</a></h4>
@@ -8227,7 +8227,7 @@ temperature, and pressure.</p>
 <li><a href="../../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="coagulationstrategyabcloss_rate">CoagulationStrategyABC().loss_rate<a class="headerlink" href="#coagulationstrategyabcloss_rate" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L112">Show source in coagulation_strategy_abc.py:112</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L114">Show source in coagulation_strategy_abc.py:114</a></p>
 <p>Calculate the coagulation loss rate based on the particle radius,
 distribution, and the coagulation kernel.</p>
 <h4 id="arguments_6">Arguments<a class="headerlink" href="#arguments_6" title="Permanent link">&para;</a></h4>
@@ -8251,7 +8251,7 @@ distribution, and the coagulation kernel.</p>
 <li><a href="../../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="coagulationstrategyabcnet_rate">CoagulationStrategyABC().net_rate<a class="headerlink" href="#coagulationstrategyabcnet_rate" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L188">Show source in coagulation_strategy_abc.py:188</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L190">Show source in coagulation_strategy_abc.py:190</a></p>
 <p>Calculate the net coagulation rate based on the particle radius,
 distribution, and the coagulation kernel.</p>
 <h4 id="arguments_7">Arguments<a class="headerlink" href="#arguments_7" title="Permanent link">&para;</a></h4>
@@ -8276,7 +8276,7 @@ distribution, and the coagulation kernel.</p>
 <li><a href="../../../../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="coagulationstrategyabcstep">CoagulationStrategyABC().step<a class="headerlink" href="#coagulationstrategyabcstep" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L216">Show source in coagulation_strategy_abc.py:216</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/coagulation_strategy_abc.py#L218">Show source in coagulation_strategy_abc.py:218</a></p>
 <p>Perform a single step of the coagulation process.</p>
 <h4 id="arguments_8">Arguments<a class="headerlink" href="#arguments_8" title="Permanent link">&para;</a></h4>
 <ul>

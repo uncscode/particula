@@ -7792,13 +7792,15 @@ Also, calculate the settling velocity of particles using the drag model, which i
     <span class="n">mean_free_path</span><span class="o">=</span><span class="n">mean_free_path</span><span class="p">,</span> <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span>
 <span class="p">)</span>
 <span class="n">slip_correction_factor</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">cunningham_slip_correction</span><span class="p">(</span><span class="n">knudsen_number</span><span class="p">)</span>
-<span class="n">particle_settling_velocity</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get_particle_settling_velocity_with_drag</span><span class="p">(</span>
-    <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
-    <span class="n">particle_density</span><span class="o">=</span><span class="n">particle_density</span><span class="p">,</span>
-    <span class="n">fluid_density</span><span class="o">=</span><span class="n">fluid_density</span><span class="p">,</span>
-    <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span><span class="p">,</span>
-    <span class="n">slip_correction_factor</span><span class="o">=</span><span class="n">slip_correction_factor</span><span class="p">,</span>
-    <span class="n">re_threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+<span class="n">particle_settling_velocity</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">properties</span><span class="o">.</span><span class="n">get_particle_settling_velocity_with_drag</span><span class="p">(</span>
+        <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
+        <span class="n">particle_density</span><span class="o">=</span><span class="n">particle_density</span><span class="p">,</span>
+        <span class="n">fluid_density</span><span class="o">=</span><span class="n">fluid_density</span><span class="p">,</span>
+        <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span><span class="p">,</span>
+        <span class="n">slip_correction_factor</span><span class="o">=</span><span class="n">slip_correction_factor</span><span class="p">,</span>
+        <span class="n">re_threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">particle_inertia_time = properties.get_particle_inertia_time(
@@ -7816,13 +7818,15 @@ knudsen_number = properties.calculate_knudsen_number(
     mean_free_path=mean_free_path, particle_radius=particle_radius
 )
 slip_correction_factor = properties.cunningham_slip_correction(knudsen_number)
-particle_settling_velocity = properties.get_particle_settling_velocity_with_drag(
-    particle_radius=particle_radius,
-    particle_density=particle_density,
-    fluid_density=fluid_density,
-    dynamic_viscosity=dynamic_viscosity,
-    slip_correction_factor=slip_correction_factor,
-    re_threshold=0.1,
+particle_settling_velocity = (
+    properties.get_particle_settling_velocity_with_drag(
+        particle_radius=particle_radius,
+        particle_density=particle_density,
+        fluid_density=fluid_density,
+        dynamic_viscosity=dynamic_viscosity,
+        slip_correction_factor=slip_correction_factor,
+        re_threshold=0.1,
+    )
 )</div>
 </div>
 </div>
@@ -7880,8 +7884,10 @@ These scales are important for understanding the turbulence characteristics.</p>
     <span class="n">fluid_rms_velocity</span><span class="o">=</span><span class="n">fluid_rms_velocity</span><span class="p">,</span>
     <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="n">turbulent_dissipation</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">normalized_accel_variance</span> <span class="o">=</span> <span class="n">gas_properties</span><span class="o">.</span><span class="n">get_normalized_accel_variance_ao2008</span><span class="p">(</span>
-    <span class="n">re_lambda</span><span class="o">=</span><span class="n">reynolds_lambda</span>
+<span class="n">normalized_accel_variance</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">gas_properties</span><span class="o">.</span><span class="n">get_normalized_accel_variance_ao2008</span><span class="p">(</span>
+        <span class="n">re_lambda</span><span class="o">=</span><span class="n">reynolds_lambda</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 <span class="n">lagrangian_taylor_microscale_time</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">gas_properties</span><span class="o">.</span><span class="n">get_lagrangian_taylor_microscale_time</span><span class="p">(</span>
@@ -7910,8 +7916,10 @@ lagrangian_integral_time = gas_properties.get_lagrangian_integral_time(
     fluid_rms_velocity=fluid_rms_velocity,
     turbulent_dissipation=turbulent_dissipation,
 )
-normalized_accel_variance = gas_properties.get_normalized_accel_variance_ao2008(
-    re_lambda=reynolds_lambda
+normalized_accel_variance = (
+    gas_properties.get_normalized_accel_variance_ao2008(
+        re_lambda=reynolds_lambda
+    )
 )
 lagrangian_taylor_microscale_time = (
     gas_properties.get_lagrangian_taylor_microscale_time(
@@ -7958,7 +7966,9 @@ This is used to compute the radial relative velocities.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">collisional_radius</span> <span class="o">=</span> <span class="n">particle_radius</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">particle_radius</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">collisional_radius</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">particle_radius</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">particle_radius</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+<span class="p">)</span>
 
 <span class="n">velocity_dispersion</span> <span class="o">=</span> <span class="n">get_relative_velocity_variance</span><span class="p">(</span>
     <span class="n">fluid_rms_velocity</span><span class="o">=</span><span class="n">fluid_rms_velocity</span><span class="p">,</span>
@@ -7979,7 +7989,9 @@ This is used to compute the radial relative velocities.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">collisional_radius = particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
+<div class="clipboard-copy-txt" id="cell-5">collisional_radius = (
+    particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
+)
 
 velocity_dispersion = get_relative_velocity_variance(
     fluid_rms_velocity=fluid_rms_velocity,
