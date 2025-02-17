@@ -7674,9 +7674,7 @@ The <code>Aerosol</code> object brings together the atmosphere and the resolved 
 <span class="p">)</span>
 
 <span class="c1"># Calculate the mass of each particle in the sample, assuming density of 1500 kg/m^3</span>
-<span class="n">particle_mass_sample</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particle_sample</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1500</span>
-<span class="p">)</span>  <span class="c1"># Particle mass in kg</span>
+<span class="n">particle_mass_sample</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particle_sample</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1500</span>  <span class="c1"># Particle mass in kg</span>
 
 <span class="c1"># Build a resolved mass representation for each particle</span>
 <span class="c1"># This defines how particle mass, activity, and surface are represented</span>
@@ -7724,9 +7722,7 @@ particle_sample = particles.properties.lognormal_sample_distribution(
 )
 
 # Calculate the mass of each particle in the sample, assuming density of 1500 kg/m^3
-particle_mass_sample = (
-    4 / 3 * np.pi * particle_sample**3 * 1500
-)  # Particle mass in kg
+particle_mass_sample = 4 / 3 * np.pi * particle_sample**3 * 1500  # Particle mass in kg
 
 # Build a resolved mass representation for each particle
 # This defines how particle mass, activity, and surface are represented
@@ -7838,15 +7834,11 @@ print(aerosol)</div>
 <span class="n">initial_radii</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
 
 <span class="c1"># Perform coagulation process for step 1</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span>
-<span class="p">)</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span><span class="p">)</span>
 <span class="n">radii_after_step_1</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
 
 <span class="c1"># Perform coagulation process for step 2</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span>
-<span class="p">)</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span><span class="p">)</span>
 <span class="n">radii_after_step_2</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
 
 <span class="c1"># Count particles that have coagulated (i.e., have zero mass)</span>
@@ -7870,15 +7862,11 @@ bins_lognormal = np.logspace(-8, -6, 100)
 initial_radii = aerosol.particles[0].get_radius()
 
 # Perform coagulation process for step 1
-aerosol = coagulation_process.execute(
-    aerosol, time_step=time_step, sub_steps=sub_steps
-)
+aerosol = coagulation_process.execute(aerosol, time_step=time_step, sub_steps=sub_steps)
 radii_after_step_1 = aerosol.particles[0].get_radius()
 
 # Perform coagulation process for step 2
-aerosol = coagulation_process.execute(
-    aerosol, time_step=time_step, sub_steps=sub_steps
-)
+aerosol = coagulation_process.execute(aerosol, time_step=time_step, sub_steps=sub_steps)
 radii_after_step_2 = aerosol.particles[0].get_radius()
 
 # Count particles that have coagulated (i.e., have zero mass)

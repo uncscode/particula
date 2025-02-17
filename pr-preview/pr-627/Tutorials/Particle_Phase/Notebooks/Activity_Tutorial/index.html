@@ -8002,9 +8002,7 @@ Partial pressures: [55.55555556  1.73910458]
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mass_water</span><span class="p">,</span> <span class="n">activities_mass</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Mass: Water"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">mass_water</span><span class="p">,</span> <span class="n">activities_mass</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Mass: Sucrose"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span>
-<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mass_water</span><span class="p">,</span> <span class="n">activities_mass</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Mass: Sucrose"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mass_water</span><span class="p">,</span> <span class="n">activities_molar</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Molar: Water"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">mass_water</span><span class="p">,</span>
@@ -8015,9 +8013,7 @@ Partial pressures: [55.55555556  1.73910458]
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mass_water</span><span class="p">,</span> <span class="n">activities_kappa</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Kappa: Water"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">mass_water</span><span class="p">,</span> <span class="n">activities_kappa</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Kappa: Sucrose"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span>
-<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mass_water</span><span class="p">,</span> <span class="n">activities_kappa</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Kappa: Sucrose"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Mass fraction water"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Activity"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
@@ -8039,9 +8035,7 @@ for i, mass in enumerate(mass_mixture):
 
 fig, ax = plt.subplots(figsize=(8, 6))
 ax.plot(mass_water, activities_mass[:, 0], label="Mass: Water")
-ax.plot(
-    mass_water, activities_mass[:, 1], label="Mass: Sucrose", linestyle="--"
-)
+ax.plot(mass_water, activities_mass[:, 1], label="Mass: Sucrose", linestyle="--")
 ax.plot(mass_water, activities_molar[:, 0], label="Molar: Water")
 ax.plot(
     mass_water,
@@ -8052,9 +8046,7 @@ ax.plot(
     alpha=0.85,
 )
 ax.plot(mass_water, activities_kappa[:, 0], label="Kappa: Water")
-ax.plot(
-    mass_water, activities_kappa[:, 1], label="Kappa: Sucrose", linestyle="--"
-)
+ax.plot(mass_water, activities_kappa[:, 1], label="Kappa: Sucrose", linestyle="--")
 ax.set_xlabel("Mass fraction water")
 ax.set_ylabel("Activity")
 ax.legend()

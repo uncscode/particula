@@ -7647,9 +7647,7 @@ from particula.particles.properties.lognormal_size_distribution import (
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># lognormal spacing</span>
 
-<span class="n">radius_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span>
-    <span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">20</span>
-<span class="p">)</span>  <span class="c1"># Define the radius bins for the distribution</span>
+<span class="n">radius_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>  <span class="c1"># Define the radius bins for the distribution</span>
 <span class="n">mass_bins</span> <span class="o">=</span> <span class="p">(</span>
     <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_bins</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1000</span>
 <span class="p">)</span>  <span class="c1"># Calculate the mass of the particles in the bins</span>
@@ -7665,9 +7663,7 @@ from particula.particles.properties.lognormal_size_distribution import (
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2"># lognormal spacing
 
-radius_bins = np.logspace(
-    -9, -6, num=20
-)  # Define the radius bins for the distribution
+radius_bins = np.logspace(-9, -6, num=20)  # Define the radius bins for the distribution
 mass_bins = (
     4 / 3 * np.pi * radius_bins**3 * 1000
 )  # Calculate the mass of the particles in the bins
@@ -7981,12 +7977,8 @@ plt.show()</div>
 <span class="n">particle_concentration_i</span> <span class="o">=</span> <span class="n">particle_concentration</span>
 
 <span class="c1"># Define the time array for the simulation</span>
-<span class="n">time_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
-    <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">100</span>
-<span class="p">)</span>  <span class="c1"># Time span of 1000 seconds</span>
-<span class="n">time_interval</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">time_array</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">time_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="p">)</span>  <span class="c1"># Time interval between each step</span>
+<span class="n">time_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>  <span class="c1"># Time span of 1000 seconds</span>
+<span class="n">time_interval</span> <span class="o">=</span> <span class="n">time_array</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">time_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Time interval between each step</span>
 
 <span class="c1"># Array to store the distribution at each time step</span>
 <span class="n">particles_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">time_array</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">particles_i</span><span class="p">)])</span>
@@ -8022,12 +8014,8 @@ particles_i = particle_radius
 particle_concentration_i = particle_concentration
 
 # Define the time array for the simulation
-time_array = np.linspace(
-    start=0, stop=1000, num=100
-)  # Time span of 1000 seconds
-time_interval = (
-    time_array[1] - time_array[0]
-)  # Time interval between each step
+time_array = np.linspace(start=0, stop=1000, num=100)  # Time span of 1000 seconds
+time_interval = time_array[1] - time_array[0]  # Time interval between each step
 
 # Array to store the distribution at each time step
 particles_matrix = np.zeros([len(time_array), len(particles_i)])

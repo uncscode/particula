@@ -7800,9 +7800,7 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Glycerol']
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># makes things go slower/faster</span>
 <span class="p">)</span>
-<span class="n">condensation_process</span> <span class="o">=</span> <span class="n">MassCondensation</span><span class="p">(</span>
-    <span class="n">condensation_strategy</span><span class="o">=</span><span class="n">condensation_isothermal</span>
-<span class="p">)</span>
+<span class="n">condensation_process</span> <span class="o">=</span> <span class="n">MassCondensation</span><span class="p">(</span><span class="n">condensation_strategy</span><span class="o">=</span><span class="n">condensation_isothermal</span><span class="p">)</span>
 
 <span class="c1"># define the time array in seconds</span>
 <span class="n">time_step</span> <span class="o">=</span> <span class="mf">0.5</span>
@@ -7857,9 +7855,7 @@ condensation_isothermal = CondensationIsothermal(
     diffusion_coefficient=2e-5,
     accommodation_coefficient=0.1,  # makes things go slower/faster
 )
-condensation_process = MassCondensation(
-    condensation_strategy=condensation_isothermal
-)
+condensation_process = MassCondensation(condensation_strategy=condensation_isothermal)
 
 # define the time array in seconds
 time_step = 0.5

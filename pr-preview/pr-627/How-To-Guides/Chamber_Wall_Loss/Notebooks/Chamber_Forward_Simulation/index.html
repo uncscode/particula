@@ -7656,9 +7656,7 @@ from particula.particles.properties import lognormal_pmf_distribution</div>
 <span class="n">geometric_standard_deviation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
     <span class="p">[</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]</span>
 <span class="p">)</span>  <span class="c1"># Geometric standard deviation of particle size distribution</span>
-<span class="n">number_in_mode</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5e4</span><span class="p">,</span> <span class="mf">5e3</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1e6</span>
-<span class="p">)</span>  <span class="c1"># Number of particles in each mode  1/m^3</span>
+<span class="n">number_in_mode</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5e4</span><span class="p">,</span> <span class="mf">5e3</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1e6</span>  <span class="c1"># Number of particles in each mode  1/m^3</span>
 
 
 <span class="c1"># define the radius bins for the simulation</span>
@@ -7677,9 +7675,7 @@ from particula.particles.properties import lognormal_pmf_distribution</div>
 
 <span class="c1"># plot the initial particle distribution</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentraiton_pmf</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Initial distribution"</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"."</span>
-<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentraiton_pmf</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Initial distribution"</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"."</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particle radius (m)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">"Particle Concentration (dN), $\dfrac</span><span class="si">{1}</span><span class="s2">{m^</span><span class="si">{3}</span><span class="s2">}$"</span><span class="p">)</span>
@@ -7690,9 +7686,7 @@ mode = np.array([100e-9, 500e-9])  # Median diameter of the particles in meters
 geometric_standard_deviation = np.array(
     [1.3, 1.5]
 )  # Geometric standard deviation of particle size distribution
-number_in_mode = (
-    np.array([5e4, 5e3]) * 1e6
-)  # Number of particles in each mode  1/m^3
+number_in_mode = np.array([5e4, 5e3]) * 1e6  # Number of particles in each mode  1/m^3
 
 
 # define the radius bins for the simulation
@@ -7711,9 +7705,7 @@ concentraiton_pmf = lognormal_pmf_distribution(
 
 # plot the initial particle distribution
 fig, ax = plt.subplots()
-ax.plot(
-    radius_bins, concentraiton_pmf, label="Initial distribution", marker="."
-)
+ax.plot(radius_bins, concentraiton_pmf, label="Initial distribution", marker=".")
 ax.set_xscale("log")
 ax.set_xlabel("Particle radius (m)")
 ax.set_ylabel(r"Particle Concentration (dN), $\dfrac{1}{m^{3}}$")
@@ -7772,9 +7764,7 @@ plt.show()</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># coagulation rate</span>
 
-<span class="n">mass_particle</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_bins</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1000</span>
-<span class="p">)</span>  <span class="c1"># mass of the particles in kg</span>
+<span class="n">mass_particle</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_bins</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="c1"># mass of the particles in kg</span>
 
 <span class="n">kernel</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">brownian_coagulation_kernel_via_system_state</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
@@ -7848,9 +7838,7 @@ plt.show()</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># coagulation rate
 
-mass_particle = (
-    4 / 3 * np.pi * radius_bins**3 * 1000
-)  # mass of the particles in kg
+mass_particle = 4 / 3 * np.pi * radius_bins**3 * 1000  # mass of the particles in kg
 
 kernel = coagulation.brownian_coagulation_kernel_via_system_state(
     particle_radius=radius_bins,

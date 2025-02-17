@@ -7822,9 +7822,7 @@ Total mass of the particles: 6.544984694978737 kg
 <span class="n">masses_combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">mass_distribution1</span><span class="p">,</span> <span class="n">mass_distribution2</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
 <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">2000.0</span><span class="p">])</span>  <span class="c1"># kg/m^3</span>
 
-<span class="n">speciated_mass</span> <span class="o">=</span> <span class="n">DistributionFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="s2">"speciated_mass_moving_bin"</span>
-<span class="p">)</span>
+<span class="n">speciated_mass</span> <span class="o">=</span> <span class="n">DistributionFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"speciated_mass_moving_bin"</span><span class="p">)</span>
 
 <span class="n">radius</span> <span class="o">=</span> <span class="n">speciated_mass</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">masses_combined</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
 
@@ -7842,9 +7840,7 @@ mass_distribution2 = np.linspace(0, 10, 5)  # kg
 masses_combined = np.vstack((mass_distribution1, mass_distribution2)).T
 density = np.array([1000.0, 2000.0])  # kg/m^3
 
-speciated_mass = DistributionFactory().get_strategy(
-    "speciated_mass_moving_bin"
-)
+speciated_mass = DistributionFactory().get_strategy("speciated_mass_moving_bin")
 
 radius = speciated_mass.get_radius(masses_combined, density)
 

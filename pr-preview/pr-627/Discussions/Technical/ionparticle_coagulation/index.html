@@ -7529,13 +7529,9 @@ from particula.util.lf2013_coagulation import lf2013_coag_full</div>
         <span class="n">particle_charge</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">particle_density</span><span class="o">=</span><span class="mi">1860</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">coags</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">negative_ion</span><span class="o">.</span><span class="n">coagulation</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span> <span class="k">for</span> <span class="n">particle</span> <span class="ow">in</span> <span class="n">positive_particles</span>
-    <span class="p">]</span>
+    <span class="n">coags</span> <span class="o">=</span> <span class="p">[</span><span class="n">negative_ion</span><span class="o">.</span><span class="n">coagulation</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span> <span class="k">for</span> <span class="n">particle</span> <span class="ow">in</span> <span class="n">positive_particles</span><span class="p">]</span>
     <span class="n">coags_ccps_mags</span> <span class="o">=</span> <span class="p">[</span><span class="n">coags</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">"cc/s"</span><span class="p">)</span><span class="o">.</span><span class="n">m</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">)]</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span>
-        <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coags_ccps_mags</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="n">approx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coags_ccps_mags</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="n">approx</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
 
 <span class="n">ret</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span>
@@ -7573,13 +7569,9 @@ for i in range(len(approx)):
         particle_charge=-1,
         particle_density=1860,
     )
-    coags = [
-        negative_ion.coagulation(particle) for particle in positive_particles
-    ]
+    coags = [negative_ion.coagulation(particle) for particle in positive_particles]
     coags_ccps_mags = [coags[index].to("cc/s").m for index in range(0, 9)]
-    plt.semilogy(
-        range(1, 10), np.array(coags_ccps_mags).squeeze(), label=approx[i]
-    )
+    plt.semilogy(range(1, 10), np.array(coags_ccps_mags).squeeze(), label=approx[i])
 
 
 ret = np.nan_to_num(

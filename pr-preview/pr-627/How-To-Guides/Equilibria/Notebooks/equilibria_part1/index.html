@@ -7728,16 +7728,14 @@ density = species_density.organic_array(
 <span class="p">)</span>
 
 <span class="c1"># The optimization the partition coefficients, i.e. the partitioning calculation</span>
-<span class="n">alpha_opt</span><span class="p">,</span> <span class="n">beta_opt</span><span class="p">,</span> <span class="n">system_opt</span><span class="p">,</span> <span class="n">fit_result</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">partitioning</span><span class="o">.</span><span class="n">liquid_vapor_partitioning</span><span class="p">(</span>
-        <span class="n">c_star_j_dry</span><span class="o">=</span><span class="n">c_star_j_dry</span><span class="p">,</span>
-        <span class="n">concentration_organic_matter</span><span class="o">=</span><span class="n">concentration_organic_matter</span><span class="p">,</span>
-        <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
-        <span class="n">gamma_organic_ab</span><span class="o">=</span><span class="n">gamma_organic_ab</span><span class="p">,</span>
-        <span class="n">mass_fraction_water_ab</span><span class="o">=</span><span class="n">mass_fraction_water_ab</span><span class="p">,</span>
-        <span class="n">q_ab</span><span class="o">=</span><span class="n">q_ab</span><span class="p">,</span>
-        <span class="n">partition_coefficient_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span>
+<span class="n">alpha_opt</span><span class="p">,</span> <span class="n">beta_opt</span><span class="p">,</span> <span class="n">system_opt</span><span class="p">,</span> <span class="n">fit_result</span> <span class="o">=</span> <span class="n">partitioning</span><span class="o">.</span><span class="n">liquid_vapor_partitioning</span><span class="p">(</span>
+    <span class="n">c_star_j_dry</span><span class="o">=</span><span class="n">c_star_j_dry</span><span class="p">,</span>
+    <span class="n">concentration_organic_matter</span><span class="o">=</span><span class="n">concentration_organic_matter</span><span class="p">,</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="n">molar_mass</span><span class="p">,</span>
+    <span class="n">gamma_organic_ab</span><span class="o">=</span><span class="n">gamma_organic_ab</span><span class="p">,</span>
+    <span class="n">mass_fraction_water_ab</span><span class="o">=</span><span class="n">mass_fraction_water_ab</span><span class="p">,</span>
+    <span class="n">q_ab</span><span class="o">=</span><span class="n">q_ab</span><span class="p">,</span>
+    <span class="n">partition_coefficient_guess</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mass in organic aerosol [ug/m3]: </span><span class="si">{</span><span class="n">system_opt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -7754,16 +7752,14 @@ gamma_organic_ab, mass_fraction_water_ab, q_ab = (
 )
 
 # The optimization the partition coefficients, i.e. the partitioning calculation
-alpha_opt, beta_opt, system_opt, fit_result = (
-    partitioning.liquid_vapor_partitioning(
-        c_star_j_dry=c_star_j_dry,
-        concentration_organic_matter=concentration_organic_matter,
-        molar_mass=molar_mass,
-        gamma_organic_ab=gamma_organic_ab,
-        mass_fraction_water_ab=mass_fraction_water_ab,
-        q_ab=q_ab,
-        partition_coefficient_guess=None,
-    )
+alpha_opt, beta_opt, system_opt, fit_result = partitioning.liquid_vapor_partitioning(
+    c_star_j_dry=c_star_j_dry,
+    concentration_organic_matter=concentration_organic_matter,
+    molar_mass=molar_mass,
+    gamma_organic_ab=gamma_organic_ab,
+    mass_fraction_water_ab=mass_fraction_water_ab,
+    q_ab=q_ab,
+    partition_coefficient_guess=None,
 )
 
 print(f"mass in organic aerosol [ug/m3]: {system_opt[0]}")

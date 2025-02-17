@@ -7821,15 +7821,13 @@ dns_400_cm2_s3 = np.array(
 <span class="p">)</span>
 <span class="n">slip_correction_factor</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">cunningham_slip_correction</span><span class="p">(</span><span class="n">knudsen_number</span><span class="p">)</span>
 <span class="c1"># iterative terminal settling velocity</span>
-<span class="n">particle_settling_velocity</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">properties</span><span class="o">.</span><span class="n">get_particle_settling_velocity_with_drag</span><span class="p">(</span>
-        <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
-        <span class="n">particle_density</span><span class="o">=</span><span class="n">particle_density</span><span class="p">,</span>
-        <span class="n">fluid_density</span><span class="o">=</span><span class="n">fluid_density</span><span class="p">,</span>
-        <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span><span class="p">,</span>
-        <span class="n">slip_correction_factor</span><span class="o">=</span><span class="n">slip_correction_factor</span><span class="p">,</span>
-        <span class="n">gravitational_acceleration</span><span class="o">=</span><span class="n">STANDARD_GRAVITY</span><span class="p">,</span>
-    <span class="p">)</span>
+<span class="n">particle_settling_velocity</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get_particle_settling_velocity_with_drag</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">particle_density</span><span class="o">=</span><span class="n">particle_density</span><span class="p">,</span>
+    <span class="n">fluid_density</span><span class="o">=</span><span class="n">fluid_density</span><span class="p">,</span>
+    <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span><span class="p">,</span>
+    <span class="n">slip_correction_factor</span><span class="o">=</span><span class="n">slip_correction_factor</span><span class="p">,</span>
+    <span class="n">gravitational_acceleration</span><span class="o">=</span><span class="n">STANDARD_GRAVITY</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># Calculate Particle Inertia Time</span>
 <span class="n">particle_inertia_time</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get_particle_inertia_time</span><span class="p">(</span>
@@ -7866,10 +7864,8 @@ dns_400_cm2_s3 = np.array(
         <span class="n">fluid_rms_velocity</span><span class="o">=</span><span class="n">fluid_rms_velocity</span><span class="p">,</span>
         <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="n">turbulent_dissipation</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">normalized_accel_variance</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">gas_properties</span><span class="o">.</span><span class="n">get_normalized_accel_variance_ao2008</span><span class="p">(</span>
-            <span class="n">re_lambda</span><span class="o">=</span><span class="n">reynolds_lambda</span>
-        <span class="p">)</span>
+    <span class="n">normalized_accel_variance</span> <span class="o">=</span> <span class="n">gas_properties</span><span class="o">.</span><span class="n">get_normalized_accel_variance_ao2008</span><span class="p">(</span>
+        <span class="n">re_lambda</span><span class="o">=</span><span class="n">reynolds_lambda</span>
     <span class="p">)</span>
     <span class="n">kolmogorov_time</span> <span class="o">=</span> <span class="n">gas_properties</span><span class="o">.</span><span class="n">get_kolmogorov_time</span><span class="p">(</span>
         <span class="n">kinematic_viscosity</span><span class="o">=</span><span class="n">kinematic_viscosity</span><span class="p">,</span>
@@ -7934,15 +7930,13 @@ knudsen_number = properties.calculate_knudsen_number(
 )
 slip_correction_factor = properties.cunningham_slip_correction(knudsen_number)
 # iterative terminal settling velocity
-particle_settling_velocity = (
-    properties.get_particle_settling_velocity_with_drag(
-        particle_radius=particle_radius,
-        particle_density=particle_density,
-        fluid_density=fluid_density,
-        dynamic_viscosity=dynamic_viscosity,
-        slip_correction_factor=slip_correction_factor,
-        gravitational_acceleration=STANDARD_GRAVITY,
-    )
+particle_settling_velocity = properties.get_particle_settling_velocity_with_drag(
+    particle_radius=particle_radius,
+    particle_density=particle_density,
+    fluid_density=fluid_density,
+    dynamic_viscosity=dynamic_viscosity,
+    slip_correction_factor=slip_correction_factor,
+    gravitational_acceleration=STANDARD_GRAVITY,
 )
 # Calculate Particle Inertia Time
 particle_inertia_time = properties.get_particle_inertia_time(
@@ -7979,10 +7973,8 @@ def calculate_horizontal_velocity(turbulent_dissipation, reynolds_lambda):
         fluid_rms_velocity=fluid_rms_velocity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    normalized_accel_variance = (
-        gas_properties.get_normalized_accel_variance_ao2008(
-            re_lambda=reynolds_lambda
-        )
+    normalized_accel_variance = gas_properties.get_normalized_accel_variance_ao2008(
+        re_lambda=reynolds_lambda
     )
     kolmogorov_time = gas_properties.get_kolmogorov_time(
         kinematic_viscosity=kinematic_viscosity,

@@ -8935,7 +8935,7 @@
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coerce_type</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="convert_sizer_dn">convert_sizer_dn<a class="headerlink" href="#convert_sizer_dn" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L440">Show source in convert.py:440</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L433">Show source in convert.py:433</a></p>
 <p>Converts the sizer data from dn/dlogdp to d_num.</p>
 <p>The bin width is defined as the  difference between the upper and lower
 diameter limits of each bin. This function calculates the bin widths
@@ -8964,7 +8964,7 @@ PR-001-RevA_Aerosol-Statistics-AppNote?ext=.pdf</li>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="data_shape_check">data_shape_check<a class="headerlink" href="#data_shape_check" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L543">Show source in convert.py:543</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L534">Show source in convert.py:534</a></p>
 <p>Check the shape of the input data and header list, and reshape the data if
 necessary. The data array can be 1D or 2D. If the data array is 2D, the
 time array must match the last dimensions of the data array. If the data
@@ -8986,7 +8986,7 @@ dimension of the data array.</li>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">data_shape_check</span><span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">header</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="distribution_convert_pdf_pms">distribution_convert_pdf_pms<a class="headerlink" href="#distribution_convert_pdf_pms" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L603">Show source in convert.py:603</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L594">Show source in convert.py:594</a></p>
 <p>Convert between a probability density function (PDF) and a probability
 mass spectrum (PMS) based on the specified direction.</p>
 <h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
@@ -9006,7 +9006,7 @@ to_PDF : Direction of conversion. If True, converts PMS to PDF.
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="effective_refractive_index">effective_refractive_index<a class="headerlink" href="#effective_refractive_index" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L402">Show source in convert.py:402</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L395">Show source in convert.py:395</a></p>
 <p>Calculate the effective refractive index of a mixture of two solutes, given
 the refractive index of each solute and the volume of each solute. The
 mixing is based on volume-weighted molar refraction.</p>
@@ -9034,7 +9034,7 @@ https://doi.org/10.1016/j.jaerosci.2008.06.006</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">complex</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_values_in_dict">get_values_in_dict<a class="headerlink" href="#get_values_in_dict" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L509">Show source in convert.py:509</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L502">Show source in convert.py:502</a></p>
 <p>Returns a list of values for keys in a dictionary.</p>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">my_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
@@ -9142,7 +9142,7 @@ and water activity.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="list_to_dict">list_to_dict<a class="headerlink" href="#list_to_dict" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L486">Show source in convert.py:486</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L479">Show source in convert.py:479</a></p>
 <p>Converts a list of strings to a dictionary. The keys are the strings
 and the values are the index of the string in the list.</p>
 <h4 id="arguments_10">Arguments<a class="headerlink" href="#arguments_10" title="Permanent link">&para;</a></h4>
@@ -9158,7 +9158,7 @@ and the values are the index of the string in the list.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">list_to_dict</span><span class="p">(</span><span class="n">list_of_str</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="mass_concentration_to_mole_fraction">mass_concentration_to_mole_fraction<a class="headerlink" href="#mass_concentration_to_mole_fraction" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L284">Show source in convert.py:284</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L282">Show source in convert.py:282</a></p>
 <p>Convert mass concentrations to mole fractions for N components.</p>
 <h4 id="arguments_11">Arguments<a class="headerlink" href="#arguments_11" title="Permanent link">&para;</a></h4>
 <ul>
@@ -9177,7 +9177,7 @@ concentration to the total molar concentration of all components.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="mass_concentration_to_volume_fraction">mass_concentration_to_volume_fraction<a class="headerlink" href="#mass_concentration_to_volume_fraction" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L311">Show source in convert.py:311</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L309">Show source in convert.py:309</a></p>
 <p>Convert mass concentrations to volume fractions for N components.</p>
 <h4 id="arguments_12">Arguments<a class="headerlink" href="#arguments_12" title="Permanent link">&para;</a></h4>
 <ul>
@@ -9198,7 +9198,7 @@ total volume of all components.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="mass_fraction_to_volume_fraction">mass_fraction_to_volume_fraction<a class="headerlink" href="#mass_fraction_to_volume_fraction" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L342">Show source in convert.py:342</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L340">Show source in convert.py:340</a></p>
 <p>Converts the mass fraction of a solute to the volume fraction in a
 binary mixture.</p>
 <h4 id="arguments_13">Arguments<a class="headerlink" href="#arguments_13" title="Permanent link">&para;</a></h4>
@@ -9223,7 +9223,7 @@ mixture's volume, respectively.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="mole_fraction_to_mass_fraction">mole_fraction_to_mass_fraction<a class="headerlink" href="#mole_fraction_to_mass_fraction" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L233">Show source in convert.py:233</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L231">Show source in convert.py:231</a></p>
 <p>Convert mole fraction to mass fraction.</p>
 <h4 id="arguments_14">Arguments<a class="headerlink" href="#arguments_14" title="Permanent link">&para;</a></h4>
 <ul>
@@ -9239,7 +9239,7 @@ mixture's volume, respectively.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="mole_fraction_to_mass_fraction_multi">mole_fraction_to_mass_fraction_multi<a class="headerlink" href="#mole_fraction_to_mass_fraction_multi" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L259">Show source in convert.py:259</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L257">Show source in convert.py:257</a></p>
 <p>Convert mole fractions to mass fractions for N components.
 Assumes that sum(mole_fractions) == 1.</p>
 <h4 id="arguments_15">Arguments<a class="headerlink" href="#arguments_15" title="Permanent link">&para;</a></h4>
@@ -9311,7 +9311,7 @@ Default is 'radius'.</li>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="volume_water_from_volume_fraction">volume_water_from_volume_fraction<a class="headerlink" href="#volume_water_from_volume_fraction" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L376">Show source in convert.py:376</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/convert.py#L371">Show source in convert.py:371</a></p>
 <p>Calculates the volume of water in a volume of solute, given the volume
 fraction of water in the mixture.</p>
 <h4 id="arguments_19">Arguments<a class="headerlink" href="#arguments_19" title="Permanent link">&para;</a></h4>

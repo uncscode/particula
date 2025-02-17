@@ -7711,9 +7711,7 @@ from particula.util.input_handling import convert_units</div>
 <span class="n">particle_sample</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">lognormal_sample_distribution</span><span class="p">(</span>
     <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">400e-9</span><span class="p">]),</span>  <span class="c1"># Mean particle diameter of 400 nm</span>
     <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">]),</span>  <span class="c1"># GSD of 1.4</span>
-    <span class="n">number_of_particles</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-        <span class="p">[</span><span class="mf">1e4</span><span class="p">]</span>
-    <span class="p">),</span>  <span class="c1"># Number of particles in the distribution</span>
+    <span class="n">number_of_particles</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e4</span><span class="p">]),</span>  <span class="c1"># Number of particles in the distribution</span>
     <span class="n">number_of_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>  <span class="c1"># Number of particle samples</span>
 <span class="p">)</span>
 
@@ -7792,9 +7790,7 @@ atmosphere = (
 particle_sample = particles.properties.lognormal_sample_distribution(
     mode=np.array([400e-9]),  # Mean particle diameter of 400 nm
     geometric_standard_deviation=np.array([1.4]),  # GSD of 1.4
-    number_of_particles=np.array(
-        [1e4]
-    ),  # Number of particles in the distribution
+    number_of_particles=np.array([1e4]),  # Number of particles in the distribution
     number_of_samples=100,  # Number of particle samples
 )
 
@@ -8189,24 +8185,18 @@ step_count = 0</div>
 
 <span class="c1"># 3. Calculate the nucleation rate based on the saturation ratio</span>
 <span class="c1"># Ensure the saturation ratio is above 1, nucleation only occurs above saturation</span>
-<span class="n">saturation_difference</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
-    <span class="n">saturation_ratio</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span>
-<span class="p">)</span>  <span class="c1"># No nucleation if S ≤ 1</span>
+<span class="n">saturation_difference</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">saturation_ratio</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># No nucleation if S ≤ 1</span>
 <span class="c1"># Calculate the nucleation rate using the exponential form (custom)</span>
 <span class="c1"># note this is mass based, if you have a volume based nucleation rate, you need to convert it</span>
 <span class="c1"># to mass, as the resolved particles are mass based</span>
 <span class="n">nucleation_rate</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">base_nucleation_rate</span> <span class="o">*</span> <span class="p">(</span><span class="n">saturation_difference</span> <span class="o">/</span> <span class="mi">500</span><span class="p">)</span> <span class="o">**</span> <span class="n">exponent_nucleation</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s2">"Nucleation rate [mass concentration per sec, kg/m^3/s]: </span><span class="si">{</span><span class="n">nucleation_rate</span><span class="si">}</span><span class="s2">"</span>
-<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Nucleation rate [mass concentration per sec, kg/m^3/s]: </span><span class="si">{</span><span class="n">nucleation_rate</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># 4. Calculate the number of new particles nucleated</span>
 <span class="c1"># Floor division ensures we only get whole particles</span>
-<span class="n">number_of_new_particles</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">time_step</span> <span class="o">*</span> <span class="n">nucleation_rate</span> <span class="o">//</span> <span class="n">mass_nucleated_particle</span>
-<span class="p">)</span>
+<span class="n">number_of_new_particles</span> <span class="o">=</span> <span class="n">time_step</span> <span class="o">*</span> <span class="n">nucleation_rate</span> <span class="o">//</span> <span class="n">mass_nucleated_particle</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Number of new particles nucleated: </span><span class="si">{</span><span class="n">number_of_new_particles</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># 5. Determine the number of resolved particles to create (based on simulation volume)</span>
@@ -8259,17 +8249,13 @@ step_count = 0</div>
     <span class="sa">f</span><span class="s2">"Total particle concentration after dynamics [#/m^3]: </span><span class="si">{</span><span class="n">total_particle_concentration_after_process</span><span class="si">}</span><span class="s2">"</span>
 <span class="p">)</span>
 
-<span class="n">total_particle_mass_after_process</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
-    <span class="mi">0</span>
-<span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
+<span class="n">total_particle_mass_after_process</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">"Total particle mass after dynamics [kg/m^3]: </span><span class="si">{</span><span class="n">total_particle_mass_after_process</span><span class="si">}</span><span class="s2">"</span>
 <span class="p">)</span>
 
 <span class="c1"># Retrieve and print the total number of resolved particles simulated</span>
-<span class="n">total_resolved_particles_in_simulation</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
-    <span class="mi">0</span>
-<span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">total_resolved_particles_in_simulation</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">"Total resolved particles in simulation: </span><span class="si">{</span><span class="n">total_resolved_particles_in_simulation</span><span class="si">}</span><span class="s2">"</span>
 <span class="p">)</span>
@@ -8310,24 +8296,18 @@ print(f"Saturation ratio: {saturation_ratio}")
 
 # 3. Calculate the nucleation rate based on the saturation ratio
 # Ensure the saturation ratio is above 1, nucleation only occurs above saturation
-saturation_difference = np.maximum(
-    saturation_ratio - 1, 0
-)  # No nucleation if S ≤ 1
+saturation_difference = np.maximum(saturation_ratio - 1, 0)  # No nucleation if S ≤ 1
 # Calculate the nucleation rate using the exponential form (custom)
 # note this is mass based, if you have a volume based nucleation rate, you need to convert it
 # to mass, as the resolved particles are mass based
 nucleation_rate = (
     base_nucleation_rate * (saturation_difference / 500) ** exponent_nucleation
 )
-print(
-    f"Nucleation rate [mass concentration per sec, kg/m^3/s]: {nucleation_rate}"
-)
+print(f"Nucleation rate [mass concentration per sec, kg/m^3/s]: {nucleation_rate}")
 
 # 4. Calculate the number of new particles nucleated
 # Floor division ensures we only get whole particles
-number_of_new_particles = (
-    time_step * nucleation_rate // mass_nucleated_particle
-)
+number_of_new_particles = time_step * nucleation_rate // mass_nucleated_particle
 print(f"Number of new particles nucleated: {number_of_new_particles}")
 
 # 5. Determine the number of resolved particles to create (based on simulation volume)
@@ -8380,17 +8360,13 @@ print(
     f"Total particle concentration after dynamics [#/m^3]: {total_particle_concentration_after_process}"
 )
 
-total_particle_mass_after_process = aerosol.particles[
-    0
-].get_mass_concentration()
+total_particle_mass_after_process = aerosol.particles[0].get_mass_concentration()
 print(
     f"Total particle mass after dynamics [kg/m^3]: {total_particle_mass_after_process}"
 )
 
 # Retrieve and print the total number of resolved particles simulated
-total_resolved_particles_in_simulation = aerosol.particles[
-    0
-].concentration.sum()
+total_resolved_particles_in_simulation = aerosol.particles[0].concentration.sum()
 print(
     f"Total resolved particles in simulation: {total_resolved_particles_in_simulation}"
 )</div>
@@ -8624,9 +8600,7 @@ Total iterations to do: 400
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># 1. Add more vapor to the gas phase (e.g., by external sources)</span>
-        <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span>
-            <span class="n">vapor_production</span> <span class="o">*</span> <span class="n">time_step</span>
-        <span class="p">)</span>
+        <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add_concentration</span><span class="p">(</span><span class="n">vapor_production</span> <span class="o">*</span> <span class="n">time_step</span><span class="p">)</span>
 
         <span class="c1"># 2. Calculate the new saturation ratio for sulfate in the atmosphere</span>
         <span class="n">saturation_ratio</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span>
@@ -8642,20 +8616,15 @@ Total iterations to do: 400
         <span class="c1"># note this is mass based, if you have a volume based nucleation rate, you need to convert it</span>
         <span class="c1"># to mass, as the resolved particles are mass based</span>
         <span class="n">nucleation_rate</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">base_nucleation_rate</span>
-            <span class="o">*</span> <span class="p">(</span><span class="n">saturation_difference</span> <span class="o">/</span> <span class="mi">500</span><span class="p">)</span> <span class="o">**</span> <span class="n">exponent_nucleation</span>
+            <span class="n">base_nucleation_rate</span> <span class="o">*</span> <span class="p">(</span><span class="n">saturation_difference</span> <span class="o">/</span> <span class="mi">500</span><span class="p">)</span> <span class="o">**</span> <span class="n">exponent_nucleation</span>
         <span class="p">)</span>
 
         <span class="c1"># 4. Calculate the number of new particles nucleated</span>
         <span class="c1"># Floor division ensures we only get whole particles</span>
-        <span class="n">number_of_new_particles</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">time_step</span> <span class="o">*</span> <span class="n">nucleation_rate</span> <span class="o">//</span> <span class="n">mass_nucleated_particle</span>
-        <span class="p">)</span>
+        <span class="n">number_of_new_particles</span> <span class="o">=</span> <span class="n">time_step</span> <span class="o">*</span> <span class="n">nucleation_rate</span> <span class="o">//</span> <span class="n">mass_nucleated_particle</span>
 
         <span class="c1"># 5. Determine the number of resolved particles to create (based on simulation volume)</span>
-        <span class="n">single_resolved_particle</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-        <span class="p">)</span>
+        <span class="n">single_resolved_particle</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
         <span class="n">number_of_new_resolved_particles</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
             <span class="n">number_of_new_particles</span> <span class="o">//</span> <span class="n">single_resolved_particle</span>
         <span class="p">)</span>
@@ -8693,9 +8662,9 @@ Total iterations to do: 400
         <span class="n">number_distribution</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins_lognormal</span>
     <span class="p">)</span>
     <span class="n">total_number_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">number_distribution</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">saturation_ratio_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span>
-        <span class="mi">0</span>
-    <span class="p">]</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">)</span>
+    <span class="n">saturation_ratio_output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">atmosphere</span><span class="o">.</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># Retrieve and print the total number of resolved particles simulated</span>
@@ -8725,9 +8694,7 @@ exponent_nucleation = 2  # Nucleation rate exponent (empirical)
 for i, t in enumerate(time):
     if i &gt; 0:
         # 1. Add more vapor to the gas phase (e.g., by external sources)
-        aerosol.atmosphere.species[0].add_concentration(
-            vapor_production * time_step
-        )
+        aerosol.atmosphere.species[0].add_concentration(vapor_production * time_step)
 
         # 2. Calculate the new saturation ratio for sulfate in the atmosphere
         saturation_ratio = aerosol.atmosphere.species[0].get_saturation_ratio(
@@ -8743,20 +8710,15 @@ for i, t in enumerate(time):
         # note this is mass based, if you have a volume based nucleation rate, you need to convert it
         # to mass, as the resolved particles are mass based
         nucleation_rate = (
-            base_nucleation_rate
-            * (saturation_difference / 500) ** exponent_nucleation
+            base_nucleation_rate * (saturation_difference / 500) ** exponent_nucleation
         )
 
         # 4. Calculate the number of new particles nucleated
         # Floor division ensures we only get whole particles
-        number_of_new_particles = (
-            time_step * nucleation_rate // mass_nucleated_particle
-        )
+        number_of_new_particles = time_step * nucleation_rate // mass_nucleated_particle
 
         # 5. Determine the number of resolved particles to create (based on simulation volume)
-        single_resolved_particle = (
-            aerosol.particles[0].get_concentration().max()
-        )
+        single_resolved_particle = aerosol.particles[0].get_concentration().max()
         number_of_new_resolved_particles = int(
             number_of_new_particles // single_resolved_particle
         )
@@ -8794,9 +8756,9 @@ for i, t in enumerate(time):
         number_distribution, bins=bins_lognormal
     )
     total_number_resolved[i] = np.sum(number_distribution[i] &gt; 0)
-    saturation_ratio_output[i] = aerosol.atmosphere.species[
-        0
-    ].get_saturation_ratio(temperature=298.15)
+    saturation_ratio_output[i] = aerosol.atmosphere.species[0].get_saturation_ratio(
+        temperature=298.15
+    )
 
     if i % 20 == 0:
         # Retrieve and print the total number of resolved particles simulated

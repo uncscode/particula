@@ -7636,10 +7636,8 @@ for visual comparison.</p>
         <span class="n">kinematic_viscosity</span><span class="o">=</span><span class="n">kinematic_viscosity</span><span class="p">,</span>
         <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="n">turbulent_dissipation</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">normalized_accel_variance</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">gas_properties</span><span class="o">.</span><span class="n">get_normalized_accel_variance_ao2008</span><span class="p">(</span>
-            <span class="n">re_lambda</span><span class="o">=</span><span class="n">reynolds_lambda</span>
-        <span class="p">)</span>
+    <span class="n">normalized_accel_variance</span> <span class="o">=</span> <span class="n">gas_properties</span><span class="o">.</span><span class="n">get_normalized_accel_variance_ao2008</span><span class="p">(</span>
+        <span class="n">re_lambda</span><span class="o">=</span><span class="n">reynolds_lambda</span>
     <span class="p">)</span>
     <span class="n">kolmogorov_velocity</span> <span class="o">=</span> <span class="n">gas_properties</span><span class="o">.</span><span class="n">get_kolmogorov_velocity</span><span class="p">(</span>
         <span class="n">kinematic_viscosity</span><span class="o">=</span><span class="n">kinematic_viscosity</span><span class="p">,</span>
@@ -7703,10 +7701,8 @@ def g12_calc(particle_radius, turbulent_dissipation, reynolds_lambda):
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    normalized_accel_variance = (
-        gas_properties.get_normalized_accel_variance_ao2008(
-            re_lambda=reynolds_lambda
-        )
+    normalized_accel_variance = gas_properties.get_normalized_accel_variance_ao2008(
+        re_lambda=reynolds_lambda
     )
     kolmogorov_velocity = gas_properties.get_kolmogorov_velocity(
         kinematic_viscosity=kinematic_viscosity,

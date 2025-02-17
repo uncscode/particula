@@ -8026,9 +8026,7 @@ $$</p>
     <span class="n">label</span><span class="o">=</span><span class="s2">"Styrene"</span><span class="p">,</span>
     <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">temperatures</span><span class="p">,</span> <span class="n">water_saturation_concentration</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Water"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"-."</span>
-<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperatures</span><span class="p">,</span> <span class="n">water_saturation_concentration</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Water"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"-."</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Temperature (K)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Saturation Concentration (kg/m^3)"</span><span class="p">)</span>
@@ -8061,9 +8059,7 @@ ax.plot(
     label="Styrene",
     linestyle="--",
 )
-ax.plot(
-    temperatures, water_saturation_concentration, label="Water", linestyle="-."
-)
+ax.plot(temperatures, water_saturation_concentration, label="Water", linestyle="-.")
 ax.set_yscale("log")
 ax.set_xlabel("Temperature (K)")
 ax.set_ylabel("Saturation Concentration (kg/m^3)")
@@ -8155,9 +8151,7 @@ $$</p>
 <span class="c1"># Plot the partial pressures for each substance.</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperatures</span><span class="p">,</span> <span class="n">butanol_partial_pressure</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Butanol"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">temperatures</span><span class="p">,</span> <span class="n">styrene_partial_pressure</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Styrene"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span>
-<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperatures</span><span class="p">,</span> <span class="n">styrene_partial_pressure</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Styrene"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperatures</span><span class="p">,</span> <span class="n">water_partial_pressure</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Water"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"-."</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Temperature (K)"</span><span class="p">)</span>
@@ -8191,9 +8185,7 @@ water_partial_pressure = water_antione.partial_pressure(
 # Plot the partial pressures for each substance.
 fig, ax = plt.subplots(figsize=(8, 6))
 ax.plot(temperatures, butanol_partial_pressure, label="Butanol")
-ax.plot(
-    temperatures, styrene_partial_pressure, label="Styrene", linestyle="--"
-)
+ax.plot(temperatures, styrene_partial_pressure, label="Styrene", linestyle="--")
 ax.plot(temperatures, water_partial_pressure, label="Water", linestyle="-.")
 ax.set_yscale("log")
 ax.set_xlabel("Temperature (K)")
@@ -8280,9 +8272,7 @@ $$</p>
 <span class="c1"># Plot the saturation ratios for each substance.</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperatures</span><span class="p">,</span> <span class="n">butanol_saturation_ratio</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Butanol"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">temperatures</span><span class="p">,</span> <span class="n">styrene_saturation_ratio</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Styrene"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span>
-<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperatures</span><span class="p">,</span> <span class="n">styrene_saturation_ratio</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Styrene"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperatures</span><span class="p">,</span> <span class="n">water_saturation_ratio</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Water"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"-."</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Temperature (K)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Saturation Ratio"</span><span class="p">)</span>
@@ -8310,9 +8300,7 @@ water_saturation_ratio = water_antione.saturation_ratio(
 # Plot the saturation ratios for each substance.
 fig, ax = plt.subplots(figsize=(8, 6))
 ax.plot(temperatures, butanol_saturation_ratio, label="Butanol")
-ax.plot(
-    temperatures, styrene_saturation_ratio, label="Styrene", linestyle="--"
-)
+ax.plot(temperatures, styrene_saturation_ratio, label="Styrene", linestyle="--")
 ax.plot(temperatures, water_saturation_ratio, label="Water", linestyle="-.")
 ax.set_xlabel("Temperature (K)")
 ax.set_ylabel("Saturation Ratio")
@@ -8392,9 +8380,7 @@ plt.show()</div>
 <span class="p">)</span>
 
 <span class="c1"># Using the Water Buck strategy, no additional parameters needed</span>
-<span class="n">water_buck_strategy</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"water_buck"</span>
-<span class="p">)</span>
+<span class="n">water_buck_strategy</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="n">strategy_type</span><span class="o">=</span><span class="s2">"water_buck"</span><span class="p">)</span>
 
 <span class="c1"># Define a range of temperatures for which to calculate vapor pressures</span>
 <span class="n">temperatures</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>  <span class="c1"># From 280 K to 320 K</span>
@@ -8404,12 +8390,9 @@ plt.show()</div>
 <span class="n">water_pure_constant</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">water_constant_strategy</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span> <span class="k">for</span> <span class="n">temp</span> <span class="ow">in</span> <span class="n">temperatures</span>
 <span class="p">]</span>
-<span class="n">water_pure_antione</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">water_antione</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span> <span class="k">for</span> <span class="n">temp</span> <span class="ow">in</span> <span class="n">temperatures</span>
-<span class="p">]</span>
+<span class="n">water_pure_antione</span> <span class="o">=</span> <span class="p">[</span><span class="n">water_antione</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span> <span class="k">for</span> <span class="n">temp</span> <span class="ow">in</span> <span class="n">temperatures</span><span class="p">]</span>
 <span class="n">water_pure_clausius_clapeyron</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">water_clausius_clapeyron_strategy</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">temp</span> <span class="ow">in</span> <span class="n">temperatures</span>
+    <span class="n">water_clausius_clapeyron_strategy</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span> <span class="k">for</span> <span class="n">temp</span> <span class="ow">in</span> <span class="n">temperatures</span>
 <span class="p">]</span>
 <span class="n">water_pure_buck</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">water_buck_strategy</span><span class="o">.</span><span class="n">pure_vapor_pressure</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span> <span class="k">for</span> <span class="n">temp</span> <span class="ow">in</span> <span class="n">temperatures</span>
@@ -8452,9 +8435,7 @@ water_clausius_clapeyron_strategy = VaporPressureFactory().get_strategy(
 )
 
 # Using the Water Buck strategy, no additional parameters needed
-water_buck_strategy = VaporPressureFactory().get_strategy(
-    strategy_type="water_buck"
-)
+water_buck_strategy = VaporPressureFactory().get_strategy(strategy_type="water_buck")
 
 # Define a range of temperatures for which to calculate vapor pressures
 temperatures = range(250, 500)  # From 280 K to 320 K
@@ -8464,12 +8445,9 @@ temperatures = range(250, 500)  # From 280 K to 320 K
 water_pure_constant = [
     water_constant_strategy.pure_vapor_pressure(temp) for temp in temperatures
 ]
-water_pure_antione = [
-    water_antione.pure_vapor_pressure(temp) for temp in temperatures
-]
+water_pure_antione = [water_antione.pure_vapor_pressure(temp) for temp in temperatures]
 water_pure_clausius_clapeyron = [
-    water_clausius_clapeyron_strategy.pure_vapor_pressure(temp)
-    for temp in temperatures
+    water_clausius_clapeyron_strategy.pure_vapor_pressure(temp) for temp in temperatures
 ]
 water_pure_buck = [
     water_buck_strategy.pure_vapor_pressure(temp) for temp in temperatures

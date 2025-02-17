@@ -7924,15 +7924,13 @@ kolmogorov_time = gas_properties.get_kolmogorov_time(
 <span class="p">)</span>
 <span class="n">slip_correction_factor</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">cunningham_slip_correction</span><span class="p">(</span><span class="n">knudsen_number</span><span class="p">)</span>
 <span class="c1"># iterative terminal settling velocity</span>
-<span class="n">iterative_settling_velocity</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">properties</span><span class="o">.</span><span class="n">get_particle_settling_velocity_with_drag</span><span class="p">(</span>
-        <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
-        <span class="n">particle_density</span><span class="o">=</span><span class="n">particle_density</span><span class="p">,</span>
-        <span class="n">fluid_density</span><span class="o">=</span><span class="n">fluid_density</span><span class="p">,</span>
-        <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span><span class="p">,</span>
-        <span class="n">slip_correction_factor</span><span class="o">=</span><span class="n">slip_correction_factor</span><span class="p">,</span>
-        <span class="n">gravitational_acceleration</span><span class="o">=</span><span class="n">STANDARD_GRAVITY</span><span class="p">,</span>
-    <span class="p">)</span>
+<span class="n">iterative_settling_velocity</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get_particle_settling_velocity_with_drag</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">particle_density</span><span class="o">=</span><span class="n">particle_density</span><span class="p">,</span>
+    <span class="n">fluid_density</span><span class="o">=</span><span class="n">fluid_density</span><span class="p">,</span>
+    <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span><span class="p">,</span>
+    <span class="n">slip_correction_factor</span><span class="o">=</span><span class="n">slip_correction_factor</span><span class="p">,</span>
+    <span class="n">gravitational_acceleration</span><span class="o">=</span><span class="n">STANDARD_GRAVITY</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">settling_velocity</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">particle_settling_velocity</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
@@ -7954,15 +7952,13 @@ knudsen_number = properties.calculate_knudsen_number(
 )
 slip_correction_factor = properties.cunningham_slip_correction(knudsen_number)
 # iterative terminal settling velocity
-iterative_settling_velocity = (
-    properties.get_particle_settling_velocity_with_drag(
-        particle_radius=particle_radius,
-        particle_density=particle_density,
-        fluid_density=fluid_density,
-        dynamic_viscosity=dynamic_viscosity,
-        slip_correction_factor=slip_correction_factor,
-        gravitational_acceleration=STANDARD_GRAVITY,
-    )
+iterative_settling_velocity = properties.get_particle_settling_velocity_with_drag(
+    particle_radius=particle_radius,
+    particle_density=particle_density,
+    fluid_density=fluid_density,
+    dynamic_viscosity=dynamic_viscosity,
+    slip_correction_factor=slip_correction_factor,
+    gravitational_acceleration=STANDARD_GRAVITY,
 )
 settling_velocity = properties.particle_settling_velocity(
     particle_radius=particle_radius,
@@ -8026,15 +8022,13 @@ relative_velocity = iterative_settling_velocity - air_velocity</div>
 <span class="n">ao2008_velocity</span> <span class="o">=</span> <span class="n">ao2008_re_p</span> <span class="o">*</span> <span class="n">kinematic_viscosity</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">particle_radius</span><span class="p">)</span>
 
 
-<span class="n">particle_settling_velocity</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">properties</span><span class="o">.</span><span class="n">get_particle_settling_velocity_via_inertia</span><span class="p">(</span>
-        <span class="n">particle_inertia_time</span><span class="o">=</span><span class="n">particle_inertia_time</span><span class="p">,</span>
-        <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
-        <span class="n">relative_velocity</span><span class="o">=</span><span class="n">iterative_settling_velocity</span><span class="p">,</span>
-        <span class="n">slip_correction_factor</span><span class="o">=</span><span class="n">slip_correction_factor</span><span class="p">,</span>
-        <span class="n">gravitational_acceleration</span><span class="o">=</span><span class="n">STANDARD_GRAVITY</span><span class="p">,</span>
-        <span class="n">kinematic_viscosity</span><span class="o">=</span><span class="n">kinematic_viscosity</span><span class="p">,</span>
-    <span class="p">)</span>
+<span class="n">particle_settling_velocity</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get_particle_settling_velocity_via_inertia</span><span class="p">(</span>
+    <span class="n">particle_inertia_time</span><span class="o">=</span><span class="n">particle_inertia_time</span><span class="p">,</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">relative_velocity</span><span class="o">=</span><span class="n">iterative_settling_velocity</span><span class="p">,</span>
+    <span class="n">slip_correction_factor</span><span class="o">=</span><span class="n">slip_correction_factor</span><span class="p">,</span>
+    <span class="n">gravitational_acceleration</span><span class="o">=</span><span class="n">STANDARD_GRAVITY</span><span class="p">,</span>
+    <span class="n">kinematic_viscosity</span><span class="o">=</span><span class="n">kinematic_viscosity</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5"># %%
@@ -8057,15 +8051,13 @@ ao2008_f_re_p = np.array([1.008, 1.034, 1.077, 1.134, 1.204, 1.284])
 ao2008_velocity = ao2008_re_p * kinematic_viscosity / (2 * particle_radius)
 
 
-particle_settling_velocity = (
-    properties.get_particle_settling_velocity_via_inertia(
-        particle_inertia_time=particle_inertia_time,
-        particle_radius=particle_radius,
-        relative_velocity=iterative_settling_velocity,
-        slip_correction_factor=slip_correction_factor,
-        gravitational_acceleration=STANDARD_GRAVITY,
-        kinematic_viscosity=kinematic_viscosity,
-    )
+particle_settling_velocity = properties.get_particle_settling_velocity_via_inertia(
+    particle_inertia_time=particle_inertia_time,
+    particle_radius=particle_radius,
+    relative_velocity=iterative_settling_velocity,
+    slip_correction_factor=slip_correction_factor,
+    gravitational_acceleration=STANDARD_GRAVITY,
+    kinematic_viscosity=kinematic_viscosity,
 )</div>
 </div>
 </div>
@@ -8120,9 +8112,7 @@ Overall, the <code>Particula</code> library provides results consistent with est
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
     <span class="n">label</span><span class="o">=</span><span class="s2">"ao2008 Re_p"</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">particle_radius</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">,</span> <span class="n">re_p</span><span class="p">,</span> <span class="s2">"x--"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Particula Re_p"</span>
-<span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">particle_radius</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">,</span> <span class="n">re_p</span><span class="p">,</span> <span class="s2">"x--"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Particula Re_p"</span><span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Reynolds Number Comparison"</span><span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particle Radius (micrometers)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Reynolds Number (Re_p)"</span><span class="p">)</span>
@@ -8182,9 +8172,7 @@ ax[0].plot(
     alpha=0.6,
     label="ao2008 Re_p",
 )
-ax[0].plot(
-    particle_radius * 1e6, re_p, "x--", color="black", label="Particula Re_p"
-)
+ax[0].plot(particle_radius * 1e6, re_p, "x--", color="black", label="Particula Re_p")
 ax[0].set_title("Reynolds Number Comparison")
 ax[0].set_xlabel("Particle Radius (micrometers)")
 ax[0].set_ylabel("Reynolds Number (Re_p)")
@@ -9193,15 +9181,9 @@ plt.show()</div>
 <span class="n">display</span><span class="p">(</span><span class="n">sv_particula_df</span><span class="p">)</span>
 
 <span class="c1"># Calculate percent errors for Stokes Velocities</span>
-<span class="n">percent_error_sv_10</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">stokes_velocity_10</span> <span class="o">-</span> <span class="n">sv_ao2008</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">sv_ao2008</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-<span class="p">)</span>
-<span class="n">percent_error_sv_100</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">stokes_velocity_100</span> <span class="o">-</span> <span class="n">sv_ao2008</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">sv_ao2008</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-<span class="p">)</span>
-<span class="n">percent_error_sv_400</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">stokes_velocity_400</span> <span class="o">-</span> <span class="n">sv_ao2008</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">sv_ao2008</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
-<span class="p">)</span>
+<span class="n">percent_error_sv_10</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">stokes_velocity_10</span> <span class="o">-</span> <span class="n">sv_ao2008</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">sv_ao2008</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">percent_error_sv_100</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">stokes_velocity_100</span> <span class="o">-</span> <span class="n">sv_ao2008</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">sv_ao2008</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">percent_error_sv_400</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">stokes_velocity_400</span> <span class="o">-</span> <span class="n">sv_ao2008</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">sv_ao2008</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
 
 <span class="n">percent_errors_sv_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="p">{</span>
@@ -9288,15 +9270,9 @@ print("Particula Computed Stokes Velocities")
 display(sv_particula_df)
 
 # Calculate percent errors for Stokes Velocities
-percent_error_sv_10 = (
-    100 * (stokes_velocity_10 - sv_ao2008[:, 0]) / sv_ao2008[:, 0]
-)
-percent_error_sv_100 = (
-    100 * (stokes_velocity_100 - sv_ao2008[:, 1]) / sv_ao2008[:, 1]
-)
-percent_error_sv_400 = (
-    100 * (stokes_velocity_400 - sv_ao2008[:, 2]) / sv_ao2008[:, 2]
-)
+percent_error_sv_10 = 100 * (stokes_velocity_10 - sv_ao2008[:, 0]) / sv_ao2008[:, 0]
+percent_error_sv_100 = 100 * (stokes_velocity_100 - sv_ao2008[:, 1]) / sv_ao2008[:, 1]
+percent_error_sv_400 = 100 * (stokes_velocity_400 - sv_ao2008[:, 2]) / sv_ao2008[:, 2]
 
 percent_errors_sv_df = pd.DataFrame(
     {

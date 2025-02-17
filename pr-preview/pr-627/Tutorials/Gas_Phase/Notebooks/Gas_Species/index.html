@@ -7861,9 +7861,7 @@ water_buck = VaporPressureFactory().get_strategy(strategy_type="water_buck")</di
 <span class="nb">print</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">"Notice the units of the concentration are now in kg/m^3: </span><span class="si">{</span><span class="n">water_species</span><span class="o">.</span><span class="n">concentration</span><span class="si">}</span><span class="s2">"</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s2">"Also the units of the molar mass are now in kg/mol: </span><span class="si">{</span><span class="n">water_species</span><span class="o">.</span><span class="n">molar_mass</span><span class="si">}</span><span class="s2">"</span>
-<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Also the units of the molar mass are now in kg/mol: </span><span class="si">{</span><span class="n">water_species</span><span class="o">.</span><span class="n">molar_mass</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Configure the builder with the necessary properties
 water_species = (
@@ -7883,9 +7881,7 @@ print(water_species)
 print(
     f"Notice the units of the concentration are now in kg/m^3: {water_species.concentration}"
 )
-print(
-    f"Also the units of the molar mass are now in kg/mol: {water_species.molar_mass}"
-)</div>
+print(f"Also the units of the molar mass are now in kg/mol: {water_species.molar_mass}")</div>
 </div>
 </div>
 </div>
@@ -8058,12 +8054,8 @@ print(organic_species)</div>
     <span class="mf">273.15</span><span class="p">,</span> <span class="mf">373.15</span><span class="p">,</span> <span class="mi">100</span>
 <span class="p">)</span>  <span class="c1"># Temperature range from 0 to 100 degrees Celsius.</span>
 
-<span class="n">organic_pure_vapor_pressure</span> <span class="o">=</span> <span class="n">organic_species</span><span class="o">.</span><span class="n">get_pure_vapor_pressure</span><span class="p">(</span>
-    <span class="n">temperature_range</span>
-<span class="p">)</span>
-<span class="n">water_pure_vapor_pressure</span> <span class="o">=</span> <span class="n">water_species</span><span class="o">.</span><span class="n">get_pure_vapor_pressure</span><span class="p">(</span>
-    <span class="n">temperature_range</span>
-<span class="p">)</span>
+<span class="n">organic_pure_vapor_pressure</span> <span class="o">=</span> <span class="n">organic_species</span><span class="o">.</span><span class="n">get_pure_vapor_pressure</span><span class="p">(</span><span class="n">temperature_range</span><span class="p">)</span>
+<span class="n">water_pure_vapor_pressure</span> <span class="o">=</span> <span class="n">water_species</span><span class="o">.</span><span class="n">get_pure_vapor_pressure</span><span class="p">(</span><span class="n">temperature_range</span><span class="p">)</span>
 
 <span class="c1"># Plotting the vapor pressure curves for the organic species.</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
@@ -8084,12 +8076,8 @@ print(organic_species)</div>
     273.15, 373.15, 100
 )  # Temperature range from 0 to 100 degrees Celsius.
 
-organic_pure_vapor_pressure = organic_species.get_pure_vapor_pressure(
-    temperature_range
-)
-water_pure_vapor_pressure = water_species.get_pure_vapor_pressure(
-    temperature_range
-)
+organic_pure_vapor_pressure = organic_species.get_pure_vapor_pressure(temperature_range)
+water_pure_vapor_pressure = water_species.get_pure_vapor_pressure(temperature_range)
 
 # Plotting the vapor pressure curves for the organic species.
 fig, ax = plt.subplots(figsize=(8, 6))
@@ -8158,17 +8146,13 @@ plt.show()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Saturation ratio calculation</span>
-<span class="n">organic_saturation_ratio</span> <span class="o">=</span> <span class="n">organic_species</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span>
-    <span class="n">temperature_range</span>
-<span class="p">)</span>
+<span class="n">organic_saturation_ratio</span> <span class="o">=</span> <span class="n">organic_species</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span><span class="n">temperature_range</span><span class="p">)</span>
 <span class="n">water_saturation_ratio</span> <span class="o">=</span> <span class="n">water_species</span><span class="o">.</span><span class="n">get_saturation_ratio</span><span class="p">(</span><span class="n">temperature_range</span><span class="p">)</span>
 
 <span class="c1"># Plotting the saturation ratio curves for the organic species.</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">organic_names</span><span class="p">)):</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-        <span class="n">temperature_range</span><span class="p">,</span> <span class="n">organic_saturation_ratio</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">organic_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature_range</span><span class="p">,</span> <span class="n">organic_saturation_ratio</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">organic_names</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temperature_range</span><span class="p">,</span> <span class="n">water_saturation_ratio</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Water"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Temperature (K)"</span><span class="p">)</span>
@@ -8177,17 +8161,13 @@ plt.show()</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6"># Saturation ratio calculation
-organic_saturation_ratio = organic_species.get_saturation_ratio(
-    temperature_range
-)
+organic_saturation_ratio = organic_species.get_saturation_ratio(temperature_range)
 water_saturation_ratio = water_species.get_saturation_ratio(temperature_range)
 
 # Plotting the saturation ratio curves for the organic species.
 fig, ax = plt.subplots(figsize=(8, 6))
 for i in range(len(organic_names)):
-    ax.plot(
-        temperature_range, organic_saturation_ratio[i], label=organic_names[i]
-    )
+    ax.plot(temperature_range, organic_saturation_ratio[i], label=organic_names[i])
 ax.plot(temperature_range, water_saturation_ratio, label="Water")
 ax.set_ylim(0, 5)
 ax.set_xlabel("Temperature (K)")

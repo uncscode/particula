@@ -7665,12 +7665,8 @@ from particula.util.input_handling import convert_units</div>
 
 <span class="n">gas_phase</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">GasSpeciesBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">molar_mass_ammonium_sulfate</span><span class="p">]),</span> <span class="s2">"kg/mol"</span>
-    <span class="p">)</span>
-    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">vapor_pressure_water</span><span class="p">,</span> <span class="n">vapor_pressure_ammonium</span><span class="p">]</span>
-    <span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">molar_mass_ammonium_sulfate</span><span class="p">]),</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">([</span><span class="n">vapor_pressure_water</span><span class="p">,</span> <span class="n">vapor_pressure_ammonium</span><span class="p">])</span>
     <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">water_concentration</span><span class="p">,</span> <span class="mf">1e-30</span><span class="p">]),</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">([</span><span class="s2">"H2O"</span><span class="p">,</span> <span class="s2">"NH4HSO4"</span><span class="p">])</span>
     <span class="o">.</span><span class="n">set_condensable</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span>
@@ -7705,12 +7701,8 @@ water_concentration = water_sat * initial_water_vapor_activity
 
 gas_phase = (
     GasSpeciesBuilder()
-    .set_molar_mass(
-        np.array([molar_mass_water, molar_mass_ammonium_sulfate]), "kg/mol"
-    )
-    .set_vapor_pressure_strategy(
-        [vapor_pressure_water, vapor_pressure_ammonium]
-    )
+    .set_molar_mass(np.array([molar_mass_water, molar_mass_ammonium_sulfate]), "kg/mol")
+    .set_vapor_pressure_strategy([vapor_pressure_water, vapor_pressure_ammonium])
     .set_concentration(np.array([water_concentration, 1e-30]), "kg/m^3")
     .set_name(["H2O", "NH4HSO4"])
     .set_condensable([True, True])
@@ -7774,9 +7766,7 @@ atmosphere = (
 <span class="p">)</span>
 
 <span class="c1"># Calculate the mass of each particle in the sample, assuming density of 1500 kg/m^3</span>
-<span class="n">particle_mass</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particle_sample</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="n">density</span>
-<span class="p">)</span>  <span class="c1"># Particle mass in kg</span>
+<span class="n">particle_mass</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particle_sample</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="n">density</span>  <span class="c1"># Particle mass in kg</span>
 
 <span class="n">mass_speciation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
     <span class="p">[</span><span class="n">particle_mass</span> <span class="o">*</span> <span class="mi">0</span><span class="p">,</span> <span class="n">particle_mass</span><span class="p">]</span>
@@ -7808,12 +7798,8 @@ atmosphere = (
     <span class="o">.</span><span class="n">set_distribution_strategy</span><span class="p">(</span>
         <span class="n">particles</span><span class="o">.</span><span class="n">ParticleResolvedSpeciatedMass</span><span class="p">()</span>
     <span class="p">)</span>  <span class="c1"># Use speciated mass distribution</span>
-    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span>
-        <span class="n">activity_strat</span>
-    <span class="p">)</span>  <span class="c1"># Define activity based on ideal mass</span>
-    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span>
-        <span class="n">surface_strat</span>
-    <span class="p">)</span>  <span class="c1"># Define surface area based on particle volume</span>
+    <span class="o">.</span><span class="n">set_activity_strategy</span><span class="p">(</span><span class="n">activity_strat</span><span class="p">)</span>  <span class="c1"># Define activity based on ideal mass</span>
+    <span class="o">.</span><span class="n">set_surface_strategy</span><span class="p">(</span><span class="n">surface_strat</span><span class="p">)</span>  <span class="c1"># Define surface area based on particle volume</span>
     <span class="o">.</span><span class="n">set_mass</span><span class="p">(</span><span class="n">mass_speciation</span><span class="p">,</span> <span class="s2">"kg"</span><span class="p">)</span>  <span class="c1"># Assign mass of particles (in kg)</span>
     <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="n">densities</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>  <span class="c1"># Set particle density to 1500 kg/m^3</span>
     <span class="o">.</span><span class="n">set_charge</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Assume neutral particles with no charge</span>
@@ -7841,9 +7827,7 @@ particle_sample = particles.properties.lognormal_sample_distribution(
 )
 
 # Calculate the mass of each particle in the sample, assuming density of 1500 kg/m^3
-particle_mass = (
-    4 / 3 * np.pi * particle_sample**3 * density
-)  # Particle mass in kg
+particle_mass = 4 / 3 * np.pi * particle_sample**3 * density  # Particle mass in kg
 
 mass_speciation = np.column_stack(
     [particle_mass * 0, particle_mass]
@@ -7875,12 +7859,8 @@ resolved_masses = (
     .set_distribution_strategy(
         particles.ParticleResolvedSpeciatedMass()
     )  # Use speciated mass distribution
-    .set_activity_strategy(
-        activity_strat
-    )  # Define activity based on ideal mass
-    .set_surface_strategy(
-        surface_strat
-    )  # Define surface area based on particle volume
+    .set_activity_strategy(activity_strat)  # Define activity based on ideal mass
+    .set_surface_strategy(surface_strat)  # Define surface area based on particle volume
     .set_mass(mass_speciation, "kg")  # Assign mass of particles (in kg)
     .set_density(densities, "kg/m^3")  # Set particle density to 1500 kg/m^3
     .set_charge(0)  # Assume neutral particles with no charge
@@ -7949,16 +7929,12 @@ print(aerosol_resolved)</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># define the condensation process</span>
 <span class="n">condensation_isothermal</span> <span class="o">=</span> <span class="n">CondensationIsothermal</span><span class="p">(</span>
-    <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">molar_mass_ammonium_sulfate</span><span class="p">]</span>
-    <span class="p">),</span>  <span class="c1"># kg/mol</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">molar_mass_water</span><span class="p">,</span> <span class="n">molar_mass_ammonium_sulfate</span><span class="p">]),</span>  <span class="c1"># kg/mol</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>  <span class="c1"># m^2/s</span>
     <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># makes things go slower/faster</span>
     <span class="n">update_gases</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">condensation_process</span> <span class="o">=</span> <span class="n">MassCondensation</span><span class="p">(</span>
-    <span class="n">condensation_strategy</span><span class="o">=</span><span class="n">condensation_isothermal</span>
-<span class="p">)</span>
+<span class="n">condensation_process</span> <span class="o">=</span> <span class="n">MassCondensation</span><span class="p">(</span><span class="n">condensation_strategy</span><span class="o">=</span><span class="n">condensation_isothermal</span><span class="p">)</span>
 
 <span class="c1"># Set up time and sub-steps for the coagulation process</span>
 <span class="n">total_time</span> <span class="o">=</span> <span class="mi">10</span>
@@ -7981,16 +7957,12 @@ print(aerosol_resolved)</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># define the condensation process
 condensation_isothermal = CondensationIsothermal(
-    molar_mass=np.array(
-        [molar_mass_water, molar_mass_ammonium_sulfate]
-    ),  # kg/mol
+    molar_mass=np.array([molar_mass_water, molar_mass_ammonium_sulfate]),  # kg/mol
     diffusion_coefficient=2e-5,  # m^2/s
     accommodation_coefficient=1,  # makes things go slower/faster
     update_gases=True,
 )
-condensation_process = MassCondensation(
-    condensation_strategy=condensation_isothermal
-)
+condensation_process = MassCondensation(condensation_strategy=condensation_isothermal)
 
 # Set up time and sub-steps for the coagulation process
 total_time = 10
@@ -8055,12 +8027,10 @@ print(f"Total iterations to do: {len(time)*sub_steps}")</div>
             <span class="n">aerosol_resolved</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span>
         <span class="p">)</span>
 
-    <span class="n">total_mass_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
-        <span class="mi">0</span>
-    <span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
-    <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span>
-        <span class="mi">0</span>
-    <span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">total_mass_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
+    <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_resolved</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span>
+        <span class="n">clone</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
     <span class="n">number_distribution_binned</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
         <span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins_lognormal</span>
     <span class="p">)</span>
@@ -8082,12 +8052,10 @@ for i, t in enumerate(time):
             aerosol_resolved, time_step, sub_steps
         )
 
-    total_mass_resolved[i] = aerosol_resolved.particles[
-        0
-    ].get_mass_concentration()
-    number_distribution_resolved[i, :] = aerosol_resolved.particles[
-        0
-    ].get_radius(clone=True)
+    total_mass_resolved[i] = aerosol_resolved.particles[0].get_mass_concentration()
+    number_distribution_resolved[i, :] = aerosol_resolved.particles[0].get_radius(
+        clone=True
+    )
     number_distribution_binned[i, :], edges = np.histogram(
         number_distribution_resolved[i, :], bins=bins_lognormal
     )

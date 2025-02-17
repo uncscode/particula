@@ -8268,7 +8268,7 @@ properties like name, molar mass, vapor pressure, and condensability.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspecies_check_if_negative_concentration">GasSpecies()._check_if_negative_concentration<a class="headerlink" href="#gasspecies_check_if_negative_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L317">Show source in species.py:317</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L309">Show source in species.py:309</a></p>
 <p>Log a warning if the concentration is negative.</p>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_check_if_negative_concentration</span><span class="p">(</span>
@@ -8276,7 +8276,7 @@ properties like name, molar mass, vapor pressure, and condensability.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspecies_check_non_positive_value">GasSpecies()._check_non_positive_value<a class="headerlink" href="#gasspecies_check_non_positive_value" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L329">Show source in species.py:329</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L321">Show source in species.py:321</a></p>
 <p>Check for non-positive values and raise an error if found.</p>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_check_non_positive_value</span><span class="p">(</span>
@@ -8284,7 +8284,7 @@ properties like name, molar mass, vapor pressure, and condensability.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesadd_concentration">GasSpecies().add_concentration<a class="headerlink" href="#gasspeciesadd_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L283">Show source in species.py:283</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L277">Show source in species.py:277</a></p>
 <p>Add concentration to the gas species.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
@@ -8300,7 +8300,7 @@ properties like name, molar mass, vapor pressure, and condensability.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_concentration">GasSpecies().get_concentration<a class="headerlink" href="#gasspeciesget_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L94">Show source in species.py:94</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L90">Show source in species.py:90</a></p>
 <p>Get the concentration of the gas species in the mixture, in kg/m^3.</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <p>The concentration of the gas species in the mixture.</p>
@@ -8308,7 +8308,7 @@ properties like name, molar mass, vapor pressure, and condensability.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_concentration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_condensable">GasSpecies().get_condensable<a class="headerlink" href="#gasspeciesget_condensable" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L86">Show source in species.py:86</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L82">Show source in species.py:82</a></p>
 <p>Check if the gas species is condensable or not.</p>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <p>True if the gas species is condensable, False otherwise.</p>
@@ -8316,7 +8316,7 @@ properties like name, molar mass, vapor pressure, and condensability.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_condensable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_molar_mass">GasSpecies().get_molar_mass<a class="headerlink" href="#gasspeciesget_molar_mass" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L78">Show source in species.py:78</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L74">Show source in species.py:74</a></p>
 <p>Get the molar mass of the gas species in kg/mol.</p>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
 <p>The molar mass of the gas species, in kg/mol.</p>
@@ -8324,7 +8324,7 @@ properties like name, molar mass, vapor pressure, and condensability.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_molar_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_name">GasSpecies().get_name<a class="headerlink" href="#gasspeciesget_name" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L70">Show source in species.py:70</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L66">Show source in species.py:66</a></p>
 <p>Get the name of the gas species.</p>
 <h4 id="returns_3">Returns<a class="headerlink" href="#returns_3" title="Permanent link">&para;</a></h4>
 <p>The name of the gas species.</p>
@@ -8332,7 +8332,7 @@ properties like name, molar mass, vapor pressure, and condensability.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_partial_pressure">GasSpecies().get_partial_pressure<a class="headerlink" href="#gasspeciesget_partial_pressure" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L142">Show source in species.py:142</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L136">Show source in species.py:136</a></p>
 <p>Calculate the partial pressure of the gas based on the vapor
 pressure strategy.</p>
 <p>This method accounts for multiple strategies if assigned and
@@ -8358,7 +8358,7 @@ corresponding concentration and molar mass.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_pure_vapor_pressure">GasSpecies().get_pure_vapor_pressure<a class="headerlink" href="#gasspeciesget_pure_vapor_pressure" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L102">Show source in species.py:102</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L98">Show source in species.py:98</a></p>
 <p>Calculate the pure vapor pressure of the gas species at a given
 temperature in Kelvin.</p>
 <p>This method supports both a single strategy or a list of strategies
@@ -8383,7 +8383,7 @@ for calculating vapor pressure.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_saturation_concentration">GasSpecies().get_saturation_concentration<a class="headerlink" href="#gasspeciesget_saturation_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L238">Show source in species.py:238</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L232">Show source in species.py:232</a></p>
 <p>Calculate the saturation concentration of the gas based on the
 vapor pressure strategy.</p>
 <p>This method accounts for multiple strategies if assigned and
@@ -8409,7 +8409,7 @@ molar mass.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesget_saturation_ratio">GasSpecies().get_saturation_ratio<a class="headerlink" href="#gasspeciesget_saturation_ratio" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L190">Show source in species.py:190</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L184">Show source in species.py:184</a></p>
 <p>Calculate the saturation ratio of the gas based on the vapor
 pressure strategy.</p>
 <p>This method accounts for multiple strategies if assigned and
@@ -8433,7 +8433,7 @@ corresponding concentration and molar mass.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="gasspeciesset_concentration">GasSpecies().set_concentration<a class="headerlink" href="#gasspeciesset_concentration" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L299">Show source in species.py:299</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L293">Show source in species.py:293</a></p>
 <p>Set the concentration of the gas species.</p>
 <h4 id="arguments_5">Arguments<a class="headerlink" href="#arguments_5" title="Permanent link">&para;</a></h4>
 <ul>

@@ -7836,9 +7836,7 @@ Determine the number of radius bins</p>
 <span class="n">neg_charges</span> <span class="o">=</span> <span class="o">-</span><span class="n">neg_magnitudes</span>  <span class="c1"># Assign negative sign</span>
 
 <span class="c1"># Generate logarithmically spaced magnitudes for positive charges from 1 to 500</span>
-<span class="n">pos_magnitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">500</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="n">n_bins</span> <span class="o">-</span> <span class="n">split_index</span>
-<span class="p">)</span>
+<span class="n">pos_magnitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">500</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="n">n_bins</span> <span class="o">-</span> <span class="n">split_index</span><span class="p">)</span>
 <span class="n">pos_charges</span> <span class="o">=</span> <span class="n">pos_magnitudes</span>  <span class="c1"># Positive charges</span>
 
 <span class="c1"># Combine the negative and positive charges into one array</span>
@@ -7867,9 +7865,7 @@ neg_magnitudes = np.logspace(np.log10(10), np.log10(1), num=split_index)
 neg_charges = -neg_magnitudes  # Assign negative sign
 
 # Generate logarithmically spaced magnitudes for positive charges from 1 to 500
-pos_magnitudes = np.logspace(
-    np.log10(1), np.log10(500), num=n_bins - split_index
-)
+pos_magnitudes = np.logspace(np.log10(1), np.log10(500), num=n_bins - split_index)
 pos_charges = pos_magnitudes  # Positive charges
 
 # Combine the negative and positive charges into one array
@@ -8080,17 +8076,13 @@ diffusive_knudsen_values = diffusive_knudsen_number(
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">coulomb_kinetic_limit</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">kinetic</span><span class="p">(</span><span class="n">coulomb_potential_ratio</span><span class="p">)</span>
-<span class="n">coulomb_continuum_limit</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">continuum</span><span class="p">(</span>
-    <span class="n">coulomb_potential_ratio</span>
-<span class="p">)</span>
+<span class="n">coulomb_continuum_limit</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">continuum</span><span class="p">(</span><span class="n">coulomb_potential_ratio</span><span class="p">)</span>
 
 <span class="n">sum_of_radii</span> <span class="o">=</span> <span class="n">radius_bins</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">radius_bins</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
 <span class="n">reduced_mass</span> <span class="o">=</span> <span class="n">reduced_self_broadcast</span><span class="p">(</span><span class="n">mass_bins</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">coulomb_kinetic_limit = coulomb_enhancement.kinetic(coulomb_potential_ratio)
-coulomb_continuum_limit = coulomb_enhancement.continuum(
-    coulomb_potential_ratio
-)
+coulomb_continuum_limit = coulomb_enhancement.continuum(coulomb_potential_ratio)
 
 sum_of_radii = radius_bins[:, np.newaxis] + radius_bins[np.newaxis, :]
 reduced_mass = reduced_self_broadcast(mass_bins)</div>
