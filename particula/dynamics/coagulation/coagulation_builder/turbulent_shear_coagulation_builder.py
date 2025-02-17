@@ -14,7 +14,7 @@ class TurbulentShearCoagulationBuilder(
     BuilderDistributionTypeMixin,
 ):
     """Turbulent Shear Coagulation Builder class for coagulation strategies.
-    
+
     This class is used to create coagulation strategies for turbulent shear
     coagulation, based on the specified distribution type and kernel parameters.
     It follows a pattern similar to the other builders (Brownian, Charged).
