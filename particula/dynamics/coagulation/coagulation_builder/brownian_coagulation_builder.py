@@ -32,7 +32,7 @@ class BrownianCoagulationBuilder(
     """
 
     def __init__(self):
-        required_parameters = ["distribution_type", "kernel_strategy"]
+        required_parameters = ["distribution_type"]
         BuilderABC.__init__(self, required_parameters)
         BuilderDistributionTypeMixin.__init__(self)
 

@@ -7,8 +7,14 @@ are passed to the coagulation strategy.
 
 # pylint: disable=too-few-public-methods
 
-from typing import Optional
+from typing import Optional, Union
 import logging
+
+import numpy as np
+from numpy.typing import NDArray
+
+from particula.util.validate_inputs import validate_inputs
+from particula.util.converting.units import convert_units
 
 logger = logging.getLogger("particula")
 
@@ -64,7 +70,7 @@ class BuilderDistributionTypeMixin:
         return self
 
 
-class BuilderTurbulentShearMixin:
+class BuilderTurbulentDissipationMixin:
     """Mixin class for turbulent shear parameters.
 
     This mixin class is used to set the turbulent dissipation and fluid
@@ -74,4 +80,56 @@ class BuilderTurbulentShearMixin:
 
     def __init__(self):
         self.turbulent_dissipation = None
+
+    @validate_inputs({"turbulent_dissipation": "nonnegative"})
+    def set_turbulent_dissipation(
+        self,
+        turbulent_dissipation: float,
+        turbulent_dissipation_units: str,
+    ):
+        """Set the turbulent dissipation rate.
+
+        Arguments:
+            turbulent_dissipation : Turbulent dissipation rate.
+            turbulent_dissipation_units : Units of the turbulent dissipation
+                rate. Default is *m^2/s^3*.
+        """
+        if turbulent_dissipation_units == "m^2/s^3":
+            self.turbulent_dissipation = turbulent_dissipation
+            return self
+        self.turbulent_dissipation = turbulent_dissipation * convert_units(
+            turbulent_dissipation_units, "m^2/s^3"
+        )
+        return self
+
+
+class BuilderFluidDensityMixin:
+    """Mixin class for fluid density parameters.
+
+    This mixin class is used to set the fluid density for turbulent shear
+    coagulation strategies. It provides a validation layer to ensure that
+    the correct values are passed.
+    """
+
+    def __init__(self):
         self.fluid_density = None
+
+    @validate_inputs({"density": "positive"})
+    def set_fluid_density(
+        self,
+        fluid_density: Union[float, NDArray[np.float64]],
+        fluid_density_units: str,
+    ):
+        """Set the density of the particle in kg/m^3.
+
+        Args:
+            density : Density of the particle.
+            density_units : Units of the density. Default is *kg/m^3*
+        """
+        if fluid_density_units == "kg/m^3":
+            self.fluid_density = fluid_density
+            return self
+        self.fluid_density = fluid_density * convert_units(
+            fluid_density_units, "kg/m^3"
+        )
+        return self
