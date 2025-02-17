@@ -1,6 +1,7 @@
 """Kinematic viscosity for fluids.
 
-The kinematic viscosity is the ratio of the dynamic viscosity to the density of a fluid. It is a measure of the fluid's resistance to flow
+The kinematic viscosity is the ratio of the dynamic viscosity to the density
+of a fluid. It is a measure of the fluid's resistance to flow
 under the influence of gravity.
 
 v = mu / rho

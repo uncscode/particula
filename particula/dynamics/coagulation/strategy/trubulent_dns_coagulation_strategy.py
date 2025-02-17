@@ -88,7 +88,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         message = (
-            "Dimensionless kernel not implemented in sedimentation "
+            "Dimensionless kernel not implemented in turbulent DNS "
             + "coagulation strategy."
         )
         logger.error(message)
