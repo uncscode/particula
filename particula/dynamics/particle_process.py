@@ -11,7 +11,9 @@ from particula.aerosol import Aerosol
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationStrategy,
 )
-from particula.dynamics.coagulation.coagulation_strategy import CoagulationStrategyABC
+from particula.dynamics.coagulation.coagulation_strategy import (
+    CoagulationStrategyABC,
+)
 
 
 class MassCondensation(Runnable):

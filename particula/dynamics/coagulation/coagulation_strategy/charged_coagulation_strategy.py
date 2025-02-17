@@ -14,7 +14,7 @@ from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_ab
 )
 from particula.util.reduced_quantity import reduced_self_broadcast
 from particula.dynamics.coagulation.charged_kernel_strategy import (
-    KernelStrategy,
+    ChargedKernelStrategyABC,
 )
 
 logger = logging.getLogger("particula")
@@ -40,7 +40,7 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
     """
 
     def __init__(
-        self, distribution_type: str, kernel_strategy: KernelStrategy
+        self, distribution_type: str, kernel_strategy: ChargedKernelStrategyABC
     ):
         CoagulationStrategyABC.__init__(
             self, distribution_type=distribution_type

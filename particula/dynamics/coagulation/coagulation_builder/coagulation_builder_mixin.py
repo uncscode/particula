@@ -4,6 +4,7 @@ coagulation strategies based on the specified distribution type and kernel
 strategy. This provides a validation layer to ensure that the correct values
 are passed to the coagulation strategy.
 """
+
 # pylint: disable=too-few-public-methods
 
 from typing import Optional
@@ -61,5 +62,3 @@ class BuilderDistributionTypeMixin:
             logger.warning(message)
         self.distribution_type = distribution_type
         return self
-
-
