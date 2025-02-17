@@ -10,13 +10,16 @@ from particula.dynamics.coagulation.coagulation_strategy import (
 )
 from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
     BuilderDistributionTypeMixin,
+    BuilderTurbulentDissipationMixin,
+    BuilderFluidDensityMixin,
 )
 
 
 class TurbulentShearCoagulationBuilder(
     BuilderABC,
     BuilderDistributionTypeMixin,
-    BuilderTurbulentShearMixin,
+    BuilderTurbulentDissipationMixin,
+    BuilderFluidDensityMixin,
 ):
     """Turbulent Shear Coagulation Builder class.
 
@@ -41,34 +44,10 @@ class TurbulentShearCoagulationBuilder(
         ]
         BuilderABC.__init__(self, required_parameters)
         BuilderDistributionTypeMixin.__init__(self)
-        self.turbulent_dissipation = None
-        self.fluid_density = None
-
-    def set_turbulent_dissipation(
-        self,
-        turbulent_dissipation: float,
-        turbulent_dissipation_units: str = None,
-    ):
-        """Set the turbulent dissipation rate."""
-        if turbulent_dissipation_units is not None:
-            # In this example, just note we ignore units:
-            pass
-        self.turbulent_dissipation = turbulent_dissipation
-        return self
-
-    def set_fluid_density(
-        self,
-        fluid_density: float,
-        fluid_density_units: str = None,
-    ):
-        """Set the fluid density."""
-        if fluid_density_units is not None:
-            pass
-        self.fluid_density = fluid_density
-        return self
+        BuilderTurbulentDissipationMixin.__init__(self)
+        BuilderFluidDensityMixin.__init__(self)
 
     def build(self) -> CoagulationStrategyABC:
-        """Validate and return the TurbulentShearCoagulationStrategy object."""
         """Validate and return the TurbulentShearCoagulationStrategy object.
 
         Returns:
