@@ -6,7 +6,7 @@ which implements the turbulent shear coagulation strategy. The tests cover
 both discrete and continuous_pdf distribution types.
 """
 
-# pylint: disable=duplicate-code
+# pylint: disable=duplicate-code, too-many-instance-attributes
 
 import unittest
 import numpy as np
