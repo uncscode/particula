@@ -9,25 +9,25 @@
       
       
       
-        <link rel="prev" href="../particle_resolved_step/super_droplet_method/">
+        <link rel="prev" href="../brownian_coagulation_builder/">
       
       
-        <link rel="next" href="brownian_coagulation_strategy/">
+        <link rel="next" href="../coagulation_builder_mixin/">
       
       
-      <link rel="icon" href="../../../../../assets/images/favicon.png">
+      <link rel="icon" href="../../../../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
     
     
       
-        <title>Strategy - Particula</title>
+        <title>ChargedCoagulationBuilder - Particula</title>
       
     
     
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.8608ea7d.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.8608ea7d.min.css">
       
         
-        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -46,9 +46,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#strategy" class="md-skip">
+        <a href="#chargedcoagulationbuilder" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +90,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../../.." title="Particula" class="md-header__button md-logo" aria-label="Particula" data-md-component="logo">
+    <a href="../../../../../.." title="Particula" class="md-header__button md-logo" aria-label="Particula" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 5h2V3h-2m0 18h2v-2h-2M11 5h2V3h-2m8 2h2V3h-2m0 6h2V7h-2m0 14h2v-2h-2m0-6h2v-2h-2m0 6h2v-2h-2M3 5h2V3H3m0 6h2V7H3m0 6h2v-2H3m0 6h2v-2H3m0 6h2v-2H3m8 2h2v-2h-2m-4 2h2v-2H7M7 5h2V3H7z"/></svg>
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Strategy
+              ChargedCoagulationBuilder
             
           </span>
         </div>
@@ -223,7 +223,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../.." class="md-tabs__link">
+      <a href="../../../../../.." class="md-tabs__link">
         
   
     
@@ -244,7 +244,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../../../" class="md-tabs__link">
+        <a href="../../../../../" class="md-tabs__link">
           
   
     
@@ -264,7 +264,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../Discussions/" class="md-tabs__link">
+        <a href="../../../../../../Discussions/" class="md-tabs__link">
           
   
     
@@ -284,7 +284,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../How-To-Guides/" class="md-tabs__link">
+        <a href="../../../../../../How-To-Guides/" class="md-tabs__link">
           
   
     
@@ -304,7 +304,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../Tutorials/" class="md-tabs__link">
+        <a href="../../../../../../Tutorials/" class="md-tabs__link">
           
   
     
@@ -324,7 +324,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../contribute/" class="md-tabs__link">
+        <a href="../../../../../../contribute/" class="md-tabs__link">
           
   
     
@@ -344,7 +344,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../development/" class="md-tabs__link">
+        <a href="../../../../../../development/" class="md-tabs__link">
           
   
     
@@ -385,7 +385,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../../.." title="Particula" class="md-nav__button md-logo" aria-label="Particula" data-md-component="logo">
+    <a href="../../../../../.." title="Particula" class="md-nav__button md-logo" aria-label="Particula" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 5h2V3h-2m0 18h2v-2h-2M11 5h2V3h-2m8 2h2V3h-2m0 6h2V7h-2m0 14h2v-2h-2m0-6h2v-2h-2m0 6h2v-2h-2M3 5h2V3H3m0 6h2V7H3m0 6h2v-2H3m0 6h2v-2H3m0 6h2v-2H3m8 2h2v-2h-2m-4 2h2v-2H7M7 5h2V3H7z"/></svg>
@@ -415,7 +415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../.." class="md-nav__link">
+      <a href="../../../../../.." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -466,7 +466,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../" class="md-nav__link ">
+            <a href="../../../../../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -552,7 +552,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../" class="md-nav__link ">
+            <a href="../../../../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -586,7 +586,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../abc_builder/" class="md-nav__link">
+      <a href="../../../../abc_builder/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -608,7 +608,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../abc_factory/" class="md-nav__link">
+      <a href="../../../../abc_factory/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -630,7 +630,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../aerosol/" class="md-nav__link">
+      <a href="../../../../aerosol/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -652,7 +652,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../builder_mixin/" class="md-nav__link">
+      <a href="../../../../builder_mixin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -674,7 +674,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../logger_setup/" class="md-nav__link">
+      <a href="../../../../logger_setup/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -696,7 +696,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../runnable/" class="md-nav__link">
+      <a href="../../../../runnable/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -761,7 +761,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../activity/" class="md-nav__link ">
+            <a href="../../../../activity/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -795,7 +795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../activity/activity_coefficients/" class="md-nav__link">
+      <a href="../../../../activity/activity_coefficients/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -817,7 +817,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../activity/bat_blending/" class="md-nav__link">
+      <a href="../../../../activity/bat_blending/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -839,7 +839,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../activity/bat_coefficients/" class="md-nav__link">
+      <a href="../../../../activity/bat_coefficients/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -861,7 +861,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../activity/convert_functional_group/" class="md-nav__link">
+      <a href="../../../../activity/convert_functional_group/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -883,7 +883,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../activity/gibbs/" class="md-nav__link">
+      <a href="../../../../activity/gibbs/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -905,7 +905,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../activity/gibbs_mixing/" class="md-nav__link">
+      <a href="../../../../activity/gibbs_mixing/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -927,7 +927,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../activity/phase_separation/" class="md-nav__link">
+      <a href="../../../../activity/phase_separation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -949,7 +949,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../activity/ratio/" class="md-nav__link">
+      <a href="../../../../activity/ratio/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -971,7 +971,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../activity/species_density/" class="md-nav__link">
+      <a href="../../../../activity/species_density/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -993,7 +993,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../activity/water_activity/" class="md-nav__link">
+      <a href="../../../../activity/water_activity/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1060,7 +1060,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../" class="md-nav__link ">
+            <a href="../../../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -1094,7 +1094,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../dilution/" class="md-nav__link">
+      <a href="../../../dilution/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1116,7 +1116,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../particle_process/" class="md-nav__link">
+      <a href="../../../particle_process/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1138,7 +1138,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../wall_loss/" class="md-nav__link">
+      <a href="../../../wall_loss/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1186,6 +1186,8 @@
       
         
       
+        
+      
     
     
       
@@ -1203,7 +1205,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
+            <a href="../../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -1237,7 +1239,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../brownian_kernel/" class="md-nav__link">
+      <a href="../../brownian_kernel/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1259,7 +1261,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../charged_dimensionless_kernel/" class="md-nav__link">
+      <a href="../../charged_dimensionless_kernel/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1281,7 +1283,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../charged_kernel_strategy/" class="md-nav__link">
+      <a href="../../charged_kernel_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1303,7 +1305,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../coagulation_rate/" class="md-nav__link">
+      <a href="../../coagulation_rate/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1325,7 +1327,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sedimentation_kernel/" class="md-nav__link">
+      <a href="../../sedimentation_kernel/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1347,7 +1349,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../turbulent_shear_kernel/" class="md-nav__link">
+      <a href="../../turbulent_shear_kernel/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1366,6 +1368,8 @@
                 
   
   
+    
+  
   
   
     
@@ -1379,6 +1383,8 @@
       
         
       
+        
+      
     
     
       
@@ -1387,20 +1393,20 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_9_5_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_9_5_8" checked>
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../particle_resolved_step/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
-    Particle resolved step
+    Coagulation builder
     
   </span>
   
@@ -1414,10 +1420,10 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_2_9_5_8_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_2_9_5_8_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2_2_9_5_8">
             <span class="md-nav__icon md-icon"></span>
-            Particle resolved step
+            Coagulation builder
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1430,11 +1436,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../particle_resolved_step/particle_resolved_method/" class="md-nav__link">
+      <a href="../brownian_coagulation_builder/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Particle Resolved Method
+    BrownianCoagulationBuilder
     
   </span>
   
@@ -1449,14 +1455,152 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../particle_resolved_step/super_droplet_method/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    ChargedCoagulationBuilder
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
-    Super Droplet Method
+    ChargedCoagulationBuilder
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#chargedcoagulationbuilder_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      ChargedCoagulationBuilder
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ChargedCoagulationBuilder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#signature" class="md-nav__link">
+    <span class="md-ellipsis">
+      Signature
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      See also
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chargedcoagulationbuilderbuild" class="md-nav__link">
+    <span class="md-ellipsis">
+      ChargedCoagulationBuilder().build
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ChargedCoagulationBuilder().build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#signature_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Signature
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../coagulation_builder_mixin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Coagulation Builder Mixin
     
   </span>
   
@@ -1479,8 +1623,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1512,20 +1654,20 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_9_5_9" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_9_5_9" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="./" class="md-nav__link md-nav__link--active">
+            <a href="../../coagulation_strategy/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
-    Strategy
+    Coagulation strategy
     
   </span>
   
@@ -1533,16 +1675,16 @@
             </a>
             
               
-              <label class="md-nav__link md-nav__link--active" for="__nav_2_2_9_5_9" id="__nav_2_2_9_5_9_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_2_2_9_5_9" id="__nav_2_2_9_5_9_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_2_9_5_9_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_2_9_5_9_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2_2_9_5_9">
             <span class="md-nav__icon md-icon"></span>
-            Strategy
+            Coagulation strategy
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1555,7 +1697,7 @@
   
   
     <li class="md-nav__item">
-      <a href="brownian_coagulation_strategy/" class="md-nav__link">
+      <a href="../../coagulation_strategy/brownian_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1577,7 +1719,7 @@
   
   
     <li class="md-nav__item">
-      <a href="charged_coagulation_strategy/" class="md-nav__link">
+      <a href="../../coagulation_strategy/charged_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1599,7 +1741,7 @@
   
   
     <li class="md-nav__item">
-      <a href="coagulation_strategy_abc/" class="md-nav__link">
+      <a href="../../coagulation_strategy/coagulation_strategy_abc/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1621,7 +1763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="combine_coagulation_strategy/" class="md-nav__link">
+      <a href="../../coagulation_strategy/combine_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1643,7 +1785,7 @@
   
   
     <li class="md-nav__item">
-      <a href="sedimentation_coagulation_strategy/" class="md-nav__link">
+      <a href="../../coagulation_strategy/sedimentation_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1665,7 +1807,7 @@
   
   
     <li class="md-nav__item">
-      <a href="trubulent_dns_coagulation_strategy/" class="md-nav__link">
+      <a href="../../coagulation_strategy/trubulent_dns_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1687,7 +1829,7 @@
   
   
     <li class="md-nav__item">
-      <a href="turbulent_shear_coagulation_strategy/" class="md-nav__link">
+      <a href="../../coagulation_strategy/turbulent_shear_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1727,6 +1869,119 @@
       
         
       
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_9_5_10" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../particle_resolved_step/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Particle resolved step
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_2_9_5_10" id="__nav_2_2_9_5_10_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_2_9_5_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_9_5_10">
+            <span class="md-nav__icon md-icon"></span>
+            Particle resolved step
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../particle_resolved_step/particle_resolved_method/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Particle Resolved Method
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../particle_resolved_step/super_droplet_method/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Super Droplet Method
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
         
       
         
@@ -1751,12 +2006,12 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_9_5_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_9_5_11" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../turbulent_dns_kernel/" class="md-nav__link ">
+            <a href="../../turbulent_dns_kernel/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -1768,14 +2023,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_2_2_9_5_10" id="__nav_2_2_9_5_10_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_2_2_9_5_11" id="__nav_2_2_9_5_11_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_2_9_5_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2_9_5_10">
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_2_2_9_5_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_9_5_11">
             <span class="md-nav__icon md-icon"></span>
             Turbulent dns kernel
           </label>
@@ -1790,7 +2045,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../turbulent_dns_kernel/g12_radial_distribution_ao2008/" class="md-nav__link">
+      <a href="../../turbulent_dns_kernel/g12_radial_distribution_ao2008/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1812,7 +2067,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../turbulent_dns_kernel/phi_ao2008/" class="md-nav__link">
+      <a href="../../turbulent_dns_kernel/phi_ao2008/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1834,7 +2089,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../turbulent_dns_kernel/psi_ao2008/" class="md-nav__link">
+      <a href="../../turbulent_dns_kernel/psi_ao2008/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1856,7 +2111,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../turbulent_dns_kernel/radial_velocity_module/" class="md-nav__link">
+      <a href="../../turbulent_dns_kernel/radial_velocity_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1878,7 +2133,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../turbulent_dns_kernel/sigma_relative_velocity_ao2008/" class="md-nav__link">
+      <a href="../../turbulent_dns_kernel/sigma_relative_velocity_ao2008/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1900,7 +2155,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../turbulent_dns_kernel/turbulent_dns_kernel_ao2008/" class="md-nav__link">
+      <a href="../../turbulent_dns_kernel/turbulent_dns_kernel_ao2008/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1922,7 +2177,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../turbulent_dns_kernel/velocity_correlation_f2_ao2008/" class="md-nav__link">
+      <a href="../../turbulent_dns_kernel/velocity_correlation_f2_ao2008/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1944,7 +2199,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../turbulent_dns_kernel/velocity_correlation_terms_ao2008/" class="md-nav__link">
+      <a href="../../turbulent_dns_kernel/velocity_correlation_terms_ao2008/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2009,7 +2264,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../condensation/" class="md-nav__link ">
+            <a href="../../../condensation/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -2043,7 +2298,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../condensation/condensation_strategies/" class="md-nav__link">
+      <a href="../../../condensation/condensation_strategies/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2065,7 +2320,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../condensation/mass_transfer/" class="md-nav__link">
+      <a href="../../../condensation/mass_transfer/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2120,7 +2375,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../properties/" class="md-nav__link ">
+            <a href="../../../properties/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -2154,7 +2409,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../properties/wall_loss_coefficient/" class="md-nav__link">
+      <a href="../../../properties/wall_loss_coefficient/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2217,7 +2472,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../equilibria/" class="md-nav__link ">
+            <a href="../../../../equilibria/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -2251,7 +2506,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../equilibria/partitioning/" class="md-nav__link">
+      <a href="../../../../equilibria/partitioning/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2322,7 +2577,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../gas/" class="md-nav__link ">
+            <a href="../../../../gas/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -2356,7 +2611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/atmosphere/" class="md-nav__link">
+      <a href="../../../../gas/atmosphere/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2378,7 +2633,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/atmosphere_builders/" class="md-nav__link">
+      <a href="../../../../gas/atmosphere_builders/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2400,7 +2655,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/species/" class="md-nav__link">
+      <a href="../../../../gas/species/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2422,7 +2677,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/species_builders/" class="md-nav__link">
+      <a href="../../../../gas/species_builders/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2444,7 +2699,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/species_factories/" class="md-nav__link">
+      <a href="../../../../gas/species_factories/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2466,7 +2721,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/vapor_pressure_builders/" class="md-nav__link">
+      <a href="../../../../gas/vapor_pressure_builders/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2488,7 +2743,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/vapor_pressure_factories/" class="md-nav__link">
+      <a href="../../../../gas/vapor_pressure_factories/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2510,7 +2765,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/vapor_pressure_strategies/" class="md-nav__link">
+      <a href="../../../../gas/vapor_pressure_strategies/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2579,7 +2834,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../gas/properties/" class="md-nav__link ">
+            <a href="../../../../gas/properties/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -2613,7 +2868,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/properties/concentration_function/" class="md-nav__link">
+      <a href="../../../../gas/properties/concentration_function/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2635,7 +2890,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/properties/dynamic_viscosity/" class="md-nav__link">
+      <a href="../../../../gas/properties/dynamic_viscosity/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2657,7 +2912,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/properties/fluid_rms_velocity/" class="md-nav__link">
+      <a href="../../../../gas/properties/fluid_rms_velocity/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2679,7 +2934,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/properties/integral_scale_module/" class="md-nav__link">
+      <a href="../../../../gas/properties/integral_scale_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2701,7 +2956,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/properties/kinematic_viscosity/" class="md-nav__link">
+      <a href="../../../../gas/properties/kinematic_viscosity/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2723,7 +2978,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/properties/kolmogorov_module/" class="md-nav__link">
+      <a href="../../../../gas/properties/kolmogorov_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2745,7 +3000,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/properties/mean_free_path/" class="md-nav__link">
+      <a href="../../../../gas/properties/mean_free_path/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2767,7 +3022,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/properties/normalize_accel_variance/" class="md-nav__link">
+      <a href="../../../../gas/properties/normalize_accel_variance/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2789,7 +3044,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/properties/pressure_function/" class="md-nav__link">
+      <a href="../../../../gas/properties/pressure_function/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2811,7 +3066,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/properties/taylor_microscale_module/" class="md-nav__link">
+      <a href="../../../../gas/properties/taylor_microscale_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2833,7 +3088,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/properties/thermal_conductivity/" class="md-nav__link">
+      <a href="../../../../gas/properties/thermal_conductivity/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2855,7 +3110,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../gas/properties/vapor_pressure_module/" class="md-nav__link">
+      <a href="../../../../gas/properties/vapor_pressure_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2944,7 +3199,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../particles/" class="md-nav__link ">
+            <a href="../../../../particles/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -2978,7 +3233,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/activity_builders/" class="md-nav__link">
+      <a href="../../../../particles/activity_builders/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3000,7 +3255,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/activity_factories/" class="md-nav__link">
+      <a href="../../../../particles/activity_factories/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3022,7 +3277,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/activity_strategies/" class="md-nav__link">
+      <a href="../../../../particles/activity_strategies/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3044,7 +3299,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/change_particle_representation/" class="md-nav__link">
+      <a href="../../../../particles/change_particle_representation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3066,7 +3321,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/distribution_builders/" class="md-nav__link">
+      <a href="../../../../particles/distribution_builders/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3088,7 +3343,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/distribution_factories/" class="md-nav__link">
+      <a href="../../../../particles/distribution_factories/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3110,7 +3365,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/distribution_strategies/" class="md-nav__link">
+      <a href="../../../../particles/distribution_strategies/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3132,7 +3387,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/representation/" class="md-nav__link">
+      <a href="../../../../particles/representation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3154,7 +3409,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/representation_builders/" class="md-nav__link">
+      <a href="../../../../particles/representation_builders/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3176,7 +3431,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/representation_factories/" class="md-nav__link">
+      <a href="../../../../particles/representation_factories/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3198,7 +3453,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/surface_builders/" class="md-nav__link">
+      <a href="../../../../particles/surface_builders/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3220,7 +3475,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/surface_factories/" class="md-nav__link">
+      <a href="../../../../particles/surface_factories/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3242,7 +3497,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/surface_strategies/" class="md-nav__link">
+      <a href="../../../../particles/surface_strategies/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3327,7 +3582,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../particles/properties/" class="md-nav__link ">
+            <a href="../../../../particles/properties/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -3361,7 +3616,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/activity_module/" class="md-nav__link">
+      <a href="../../../../particles/properties/activity_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3383,7 +3638,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/aerodynamic_mobility_module/" class="md-nav__link">
+      <a href="../../../../particles/properties/aerodynamic_mobility_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3405,7 +3660,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/aerodynamic_size/" class="md-nav__link">
+      <a href="../../../../particles/properties/aerodynamic_size/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3427,7 +3682,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/collision_radius_module/" class="md-nav__link">
+      <a href="../../../../particles/properties/collision_radius_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3449,7 +3704,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/coulomb_enhancement/" class="md-nav__link">
+      <a href="../../../../particles/properties/coulomb_enhancement/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3471,7 +3726,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/diffusion_coefficient/" class="md-nav__link">
+      <a href="../../../../particles/properties/diffusion_coefficient/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3493,7 +3748,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/diffusive_knudsen_module/" class="md-nav__link">
+      <a href="../../../../particles/properties/diffusive_knudsen_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3515,7 +3770,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/friction_factor_module/" class="md-nav__link">
+      <a href="../../../../particles/properties/friction_factor_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3537,7 +3792,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/inertia_time/" class="md-nav__link">
+      <a href="../../../../particles/properties/inertia_time/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3559,7 +3814,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/kelvin_effect_module/" class="md-nav__link">
+      <a href="../../../../particles/properties/kelvin_effect_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3581,7 +3836,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/knudsen_number_module/" class="md-nav__link">
+      <a href="../../../../particles/properties/knudsen_number_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3603,7 +3858,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/lognormal_size_distribution/" class="md-nav__link">
+      <a href="../../../../particles/properties/lognormal_size_distribution/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3625,7 +3880,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/mean_thermal_speed_module/" class="md-nav__link">
+      <a href="../../../../particles/properties/mean_thermal_speed_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3647,7 +3902,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/partial_pressure_module/" class="md-nav__link">
+      <a href="../../../../particles/properties/partial_pressure_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3669,7 +3924,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/reynolds_number/" class="md-nav__link">
+      <a href="../../../../particles/properties/reynolds_number/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3691,7 +3946,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/settling_velocity/" class="md-nav__link">
+      <a href="../../../../particles/properties/settling_velocity/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3713,7 +3968,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/slip_correction_module/" class="md-nav__link">
+      <a href="../../../../particles/properties/slip_correction_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3735,7 +3990,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/special_functions/" class="md-nav__link">
+      <a href="../../../../particles/properties/special_functions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3757,7 +4012,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/stokes_number/" class="md-nav__link">
+      <a href="../../../../particles/properties/stokes_number/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3779,7 +4034,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../particles/properties/vapor_correction_module/" class="md-nav__link">
+      <a href="../../../../particles/properties/vapor_correction_module/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3862,7 +4117,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../util/" class="md-nav__link ">
+            <a href="../../../../util/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -3896,7 +4151,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../util/colors/" class="md-nav__link">
+      <a href="../../../../util/colors/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3918,7 +4173,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../util/constants/" class="md-nav__link">
+      <a href="../../../../util/constants/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3940,7 +4195,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../util/convert/" class="md-nav__link">
+      <a href="../../../../util/convert/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3962,7 +4217,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../util/machine_limit/" class="md-nav__link">
+      <a href="../../../../util/machine_limit/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3984,7 +4239,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../util/reduced_quantity/" class="md-nav__link">
+      <a href="../../../../util/reduced_quantity/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4006,7 +4261,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../util/self_broadcast/" class="md-nav__link">
+      <a href="../../../../util/self_broadcast/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4028,7 +4283,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../util/size_distribution_convert/" class="md-nav__link">
+      <a href="../../../../util/size_distribution_convert/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4050,7 +4305,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../util/surface_tension/" class="md-nav__link">
+      <a href="../../../../util/surface_tension/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4072,7 +4327,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../util/validate_inputs/" class="md-nav__link">
+      <a href="../../../../util/validate_inputs/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4121,7 +4376,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../util/converting/" class="md-nav__link ">
+            <a href="../../../../util/converting/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -4155,7 +4410,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../util/converting/convert_mass_concentration/" class="md-nav__link">
+      <a href="../../../../util/converting/convert_mass_concentration/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4177,7 +4432,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../util/converting/units/" class="md-nav__link">
+      <a href="../../../../util/converting/units/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4232,7 +4487,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../util/lf2013_coagulation/" class="md-nav__link ">
+            <a href="../../../../util/lf2013_coagulation/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -4266,7 +4521,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../util/lf2013_coagulation/src_lf2013_coagulation/" class="md-nav__link">
+      <a href="../../../../util/lf2013_coagulation/src_lf2013_coagulation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4346,7 +4601,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../Discussions/" class="md-nav__link ">
+            <a href="../../../../../../Discussions/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -4425,7 +4680,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Discussions/Particula_Concepts/Particle_maps/" class="md-nav__link">
+      <a href="../../../../../../Discussions/Particula_Concepts/Particle_maps/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4510,7 +4765,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Discussions/Technical/Condensation_Equations/" class="md-nav__link">
+      <a href="../../../../../../Discussions/Technical/Condensation_Equations/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4532,7 +4787,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Discussions/Technical/Droplet_Coagulation_Kernel_Ayala2008/" class="md-nav__link">
+      <a href="../../../../../../Discussions/Technical/Droplet_Coagulation_Kernel_Ayala2008/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4554,7 +4809,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Discussions/Technical/dynamic_viscosity/" class="md-nav__link">
+      <a href="../../../../../../Discussions/Technical/dynamic_viscosity/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4576,7 +4831,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Discussions/Technical/ionparticle_coagulation/" class="md-nav__link">
+      <a href="../../../../../../Discussions/Technical/ionparticle_coagulation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4598,7 +4853,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Discussions/Technical/mean_free_path/" class="md-nav__link">
+      <a href="../../../../../../Discussions/Technical/mean_free_path/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4655,7 +4910,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/" class="md-nav__link ">
+            <a href="../../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -4689,7 +4944,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/DNS_Fluid_and_Particle_Properties_Comparison/" class="md-nav__link">
+      <a href="../../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/DNS_Fluid_and_Particle_Properties_Comparison/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4711,7 +4966,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/DNS_Horizontal_Velocity_Comparison/" class="md-nav__link">
+      <a href="../../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/DNS_Horizontal_Velocity_Comparison/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4733,7 +4988,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/DNS_Kernel_Comparison/" class="md-nav__link">
+      <a href="../../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/DNS_Kernel_Comparison/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4755,7 +5010,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/DNS_Radial_Distribution_Comparison/" class="md-nav__link">
+      <a href="../../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/DNS_Radial_Distribution_Comparison/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4777,7 +5032,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/DNS_Radial_Relative_Velocity_Comparison/" class="md-nav__link">
+      <a href="../../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/DNS_Radial_Relative_Velocity_Comparison/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4799,7 +5054,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/Droplet_Coagulation_Kernel_Ayala2008/" class="md-nav__link">
+      <a href="../../../../../../Discussions/Technical/Cloud_Droplet_Coagulation/Droplet_Coagulation_Kernel_Ayala2008/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -4875,7 +5130,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../How-To-Guides/" class="md-nav__link ">
+            <a href="../../../../../../How-To-Guides/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -4934,7 +5189,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../How-To-Guides/Chamber_Wall_Loss/" class="md-nav__link ">
+            <a href="../../../../../../How-To-Guides/Chamber_Wall_Loss/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -5013,7 +5268,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../How-To-Guides/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation/" class="md-nav__link">
+      <a href="../../../../../../How-To-Guides/Chamber_Wall_Loss/Notebooks/Chamber_Forward_Simulation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5076,7 +5331,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../How-To-Guides/Equilibria/" class="md-nav__link ">
+            <a href="../../../../../../How-To-Guides/Equilibria/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -5157,7 +5412,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../How-To-Guides/Equilibria/Notebooks/activity_part1/" class="md-nav__link">
+      <a href="../../../../../../How-To-Guides/Equilibria/Notebooks/activity_part1/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5179,7 +5434,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../How-To-Guides/Equilibria/Notebooks/equilibria_part1/" class="md-nav__link">
+      <a href="../../../../../../How-To-Guides/Equilibria/Notebooks/equilibria_part1/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5242,7 +5497,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../How-To-Guides/Nucleation/" class="md-nav__link ">
+            <a href="../../../../../../How-To-Guides/Nucleation/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -5321,7 +5576,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../How-To-Guides/Nucleation/Notebooks/Custom_Nucleation_Single_Species/" class="md-nav__link">
+      <a href="../../../../../../How-To-Guides/Nucleation/Notebooks/Custom_Nucleation_Single_Species/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5382,7 +5637,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../How-To-Guides/Setup_Particula/" class="md-nav__link ">
+            <a href="../../../../../../How-To-Guides/Setup_Particula/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -5457,7 +5712,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../Tutorials/" class="md-nav__link ">
+            <a href="../../../../../../Tutorials/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -5516,7 +5771,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../Tutorials/Aerosol/" class="md-nav__link ">
+            <a href="../../../../../../Tutorials/Aerosol/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -5550,7 +5805,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Aerosol/Aerosol_Tutorial/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Aerosol/Aerosol_Tutorial/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5609,7 +5864,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../Tutorials/Dynamics/" class="md-nav__link ">
+            <a href="../../../../../../Tutorials/Dynamics/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -5696,7 +5951,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Coagulation/Coagulation_1_PMF_Pattern/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Coagulation/Coagulation_1_PMF_Pattern/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5718,7 +5973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Coagulation/Coagulation_3_Particle_Resolved_Pattern/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5740,7 +5995,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Coagulation/Coagulation_4_Compared/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Coagulation/Coagulation_4_Compared/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5809,7 +6064,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Coagulation/Charge/Coagulation_with_Charge_functional/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5831,7 +6086,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Coagulation/Charge/Coagulation_with_Charge_objects/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5914,7 +6169,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Coagulation/Functional/Coagulation_Basic_1_PMF/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5936,7 +6191,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Coagulation/Functional/Coagulation_Basic_2_PDF/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5958,7 +6213,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Coagulation/Functional/Coagulation_Basic_3_compared/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -5980,7 +6235,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Coagulation/Functional/Coagulation_Basic_4_ParticleResolved/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6002,7 +6257,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Coagulation/Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Coagulation/Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6089,7 +6344,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Condensation/Condensation_1_Bin/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Condensation/Condensation_1_Bin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6111,7 +6366,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Condensation/Condensation_2_MassBin/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Condensation/Condensation_2_MassBin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6133,7 +6388,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Condensation/Condensation_3_MassResolved/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Condensation/Condensation_3_MassResolved/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6208,7 +6463,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Dynamics/Customization/Adding_Particles_During_Simulation/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Dynamics/Customization/Adding_Particles_During_Simulation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6271,7 +6526,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../Tutorials/Gas_Phase/" class="md-nav__link ">
+            <a href="../../../../../../Tutorials/Gas_Phase/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -6354,7 +6609,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Gas_Phase/Notebooks/AtmosphereTutorial/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Gas_Phase/Notebooks/AtmosphereTutorial/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6376,7 +6631,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Gas_Phase/Notebooks/Gas_Species/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Gas_Phase/Notebooks/Gas_Species/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6398,7 +6653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Gas_Phase/Notebooks/Vapor_Pressure/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Gas_Phase/Notebooks/Vapor_Pressure/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6461,7 +6716,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../Tutorials/Particle_Phase/" class="md-nav__link ">
+            <a href="../../../../../../Tutorials/Particle_Phase/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -6550,7 +6805,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Particle_Phase/Notebooks/Activity_Tutorial/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Particle_Phase/Notebooks/Activity_Tutorial/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6572,7 +6827,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Particle_Phase/Notebooks/Aerosol_Distributions/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Particle_Phase/Notebooks/Aerosol_Distributions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6594,7 +6849,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Particle_Phase/Notebooks/Distribution_Tutorial/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Particle_Phase/Notebooks/Distribution_Tutorial/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6616,7 +6871,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Particle_Phase/Notebooks/Particle_Representation_Tutorial/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Particle_Phase/Notebooks/Particle_Representation_Tutorial/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6638,7 +6893,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Particle_Phase/Notebooks/Particle_Surface_Tutorial/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Particle_Phase/Notebooks/Particle_Surface_Tutorial/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6705,7 +6960,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../Tutorials/Particle_Phase/Notebooks/Functional/Activity_Functions/" class="md-nav__link">
+      <a href="../../../../../../Tutorials/Particle_Phase/Notebooks/Functional/Activity_Functions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6785,7 +7040,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../contribute/" class="md-nav__link ">
+            <a href="../../../../../../contribute/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -6819,7 +7074,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../contribute/CODE_OF_CONDUCT/" class="md-nav__link">
+      <a href="../../../../../../contribute/CODE_OF_CONDUCT/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6841,7 +7096,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../contribute/CONTRIBUTING/" class="md-nav__link">
+      <a href="../../../../../../contribute/CONTRIBUTING/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -6893,7 +7148,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../../development/" class="md-nav__link ">
+            <a href="../../../../../../development/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -6949,11 +7204,77 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#modules" class="md-nav__link">
+  <a href="#chargedcoagulationbuilder_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Modules
+      ChargedCoagulationBuilder
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="ChargedCoagulationBuilder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#signature" class="md-nav__link">
+    <span class="md-ellipsis">
+      Signature
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      See also
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chargedcoagulationbuilderbuild" class="md-nav__link">
+    <span class="md-ellipsis">
+      ChargedCoagulationBuilder().build
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ChargedCoagulationBuilder().build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#signature_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Signature
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -6976,21 +7297,45 @@
   
 
 
-<h1 id="strategy">Strategy<a class="headerlink" href="#strategy" title="Permanent link">&para;</a></h1>
-<p><a href="../../../../#particula-index">Particula Index</a> / <a href="../../../#particula">Particula</a> / <a href="../../#dynamics">Dynamics</a> / <a href="../#coagulation">Coagulation</a> / Strategy</p>
+<h1 id="chargedcoagulationbuilder">ChargedCoagulationBuilder<a class="headerlink" href="#chargedcoagulationbuilder" title="Permanent link">&para;</a></h1>
+<p><a href="../../../../../#particula-index">Particula Index</a> / <a href="../../../../#particula">Particula</a> / <a href="../../../#dynamics">Dynamics</a> / <a href="../../#coagulation">Coagulation</a> / <a href="../#coagulation-builder">Coagulation Builder</a> / ChargedCoagulationBuilder</p>
 <blockquote>
-<p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/strategy/__init__.py">particula.dynamics.coagulation.strategy</a> module.</p>
+<p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py">particula.dynamics.coagulation.coagulation_builder.charged_coagulation_builder</a> module.</p>
 </blockquote>
-<h2 id="modules">Modules<a class="headerlink" href="#modules" title="Permanent link">&para;</a></h2>
+<h2 id="chargedcoagulationbuilder_1">ChargedCoagulationBuilder<a class="headerlink" href="#chargedcoagulationbuilder_1" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L16">Show source in charged_coagulation_builder.py:16</a></p>
+<p>Charged Coagulation Builder class for coagulation strategies.</p>
+<p>This class is used to create charged coagulation strategies based on the
+specified distribution type and kernel strategy. This provides a validation
+layer to ensure that the correct values are passed to the coagulation
+strategy.</p>
+<h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
 <ul>
-<li><a href="brownian_coagulation_strategy/">BrownianCoagulationStrategy</a></li>
-<li><a href="charged_coagulation_strategy/">ChargedCoagulationStrategy</a></li>
-<li><a href="coagulation_strategy_abc/">CoagulationStrategyABC</a></li>
-<li><a href="combine_coagulation_strategy/">CombineCoagulationStrategy</a></li>
-<li><a href="sedimentation_coagulation_strategy/">SedimentationCoagulationStrategy</a></li>
-<li><a href="trubulent_dns_coagulation_strategy/">Trubulent Dns Coagulation Strategy</a></li>
-<li><a href="turbulent_shear_coagulation_strategy/">TurbulentShearCoagulationStrategy</a></li>
+<li><code>set_distribution_type(distribution_type)</code> - Set the distribution type.</li>
+<li><code>set_kernel_strategy(kernel_strategy)</code> - Set the kernel strategy.</li>
+<li><code>set_parameters(params)</code> - Set the parameters of the CoagulationStrategy
+    object from a dictionary including optional units.</li>
+<li><code>build()</code> - Validate and return the CoagulationStrategy object.</li>
 </ul>
+<h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ChargedCoagulationBuilder</span><span class="p">(</span><span class="n">BuilderABC</span><span class="p">,</span> <span class="n">BuilderDistributionTypeMixin</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+</code></pre></div>
+<h4 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="../../../../abc_builder/#builderabc">BuilderABC</a></li>
+<li><a href="../coagulation_builder_mixin/#builderdistributiontypemixin">BuilderDistributionTypeMixin</a></li>
+</ul>
+<h3 id="chargedcoagulationbuilderbuild">ChargedCoagulationBuilder().build<a class="headerlink" href="#chargedcoagulationbuilderbuild" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L40">Show source in charged_coagulation_builder.py:40</a></p>
+<p>Validate and return the CoagulationStrategy object.</p>
+<h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>CoagulationStrategy</code> - Instance of the CoagulationStrategy object.</li>
+</ul>
+<h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoagulationStrategyABC</span><span class="p">:</span> <span class="o">...</span>
+</code></pre></div>
 
 
 
@@ -7052,12 +7397,12 @@
       <div class="md-progress" data-md-component="progress" role="progressbar"></div>
     
     
-    <script id="__config" type="application/json">{"base": "../../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.tracking", "navigation.top", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "header.autohide", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.tracking", "navigation.top", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "header.autohide", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../../../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../../assets/javascripts/bundle.f1b6f286.min.js"></script>
+      <script src="../../../../../../assets/javascripts/bundle.f1b6f286.min.js"></script>
       
-        <script src="../../../../../javascripts/mathjax.js"></script>
+        <script src="../../../../../../javascripts/mathjax.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
