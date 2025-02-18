@@ -5,10 +5,10 @@ Test the wall loss functions.
 import numpy as np
 
 from particula.dynamics.properties.wall_loss_coefficient import (
-    spherical_wall_loss_coefficient,
-    rectangle_wall_loss_coefficient,
-    rectangle_wall_loss_coefficient_via_system_state,
-    spherical_wall_loss_coefficient_via_system_state,
+    get_spherical_wall_loss_coefficient,
+    get_rectangle_wall_loss_coefficient,
+    get_rectangle_wall_loss_coefficient_via_system_state,
+    get_spherical_wall_loss_coefficient_via_system_state,
 )
 
 
@@ -23,7 +23,7 @@ def test_spherical_wall_loss_coefficient():
     expected_output = 0.11816  # This is a hypothetical value.
 
     # Call the function with the test case
-    calculated_output = spherical_wall_loss_coefficient(
+    calculated_output = get_spherical_wall_loss_coefficient(
         _ktp_value,
         _diffusion_coefficient_value,
         _settling_velocity_value,
@@ -45,7 +45,7 @@ def test_rectangle_wall_loss():
     expected_output = 0.47312  # This is a hypothetical value.
 
     # Call the function with the test case
-    calculated_output = rectangle_wall_loss_coefficient(
+    calculated_output = get_rectangle_wall_loss_coefficient(
         ktp_value,
         diffusion_coefficient_value,
         settling_velocity_value,
@@ -66,7 +66,7 @@ def test_spherical_system_state():
     pressure = 101325  # Example value
     chamber_radius = 2.0  # Example value
 
-    result = spherical_wall_loss_coefficient_via_system_state(
+    result = get_spherical_wall_loss_coefficient_via_system_state(
         wall_eddy_diffusivity=wall_eddy,
         particle_radius=radii1,
         particle_density=densities,
@@ -89,7 +89,7 @@ def test_rectangle_system_state():
     pressure = 101325  # Example value
     dimensions = (1.0, 1.0, 1.0)  # Example value
 
-    result = rectangle_wall_loss_coefficient_via_system_state(
+    result = get_rectangle_wall_loss_coefficient_via_system_state(
         wall_eddy_diffusivity=wall_eddy,
         particle_radius=radii2,
         particle_density=densities,

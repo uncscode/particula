@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 
-def volume_dilution_coefficient(
+def get_volume_dilution_coefficient(
     volume: Union[float, NDArray[np.float64]],
     input_flow_rate: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -46,7 +46,7 @@ def volume_dilution_coefficient(
     return input_flow_rate / volume
 
 
-def dilution_rate(
+def get_dilution_rate(
     coefficient: Union[float, NDArray[np.float64]],
     concentration: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:

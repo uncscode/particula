@@ -7,13 +7,13 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.dynamics.properties.wall_loss_coefficient import (
-    rectangle_wall_loss_coefficient_via_system_state,
-    spherical_wall_loss_coefficient_via_system_state,
+    get_rectangle_wall_loss_coefficient_via_system_state,
+    get_spherical_wall_loss_coefficient_via_system_state,
 )
 
 
 # pylint: disable=too-many-positional-arguments, too-many-arguments
-def spherical_wall_loss_rate(
+def get_spherical_wall_loss_rate(
     wall_eddy_diffusivity: float,
     particle_radius: Union[float, NDArray[np.float64]],
     particle_density: Union[float, NDArray[np.float64]],
@@ -48,7 +48,7 @@ def spherical_wall_loss_rate(
     """
 
     # Step 1: Calculate the wall loss coefficient
-    loss_coefficient = spherical_wall_loss_coefficient_via_system_state(
+    loss_coefficient = get_spherical_wall_loss_coefficient_via_system_state(
         wall_eddy_diffusivity=wall_eddy_diffusivity,
         particle_radius=particle_radius,
         particle_density=particle_density,
@@ -62,7 +62,7 @@ def spherical_wall_loss_rate(
 
 
 # pylint: disable=too-many-positional-arguments, too-many-arguments
-def rectangle_wall_loss_rate(
+def get_rectangle_wall_loss_rate(
     wall_eddy_diffusivity: float,
     particle_radius: Union[float, NDArray[np.float64]],
     particle_density: Union[float, NDArray[np.float64]],
@@ -99,7 +99,7 @@ def rectangle_wall_loss_rate(
     """
 
     # Step 1: Calculate the wall loss coefficient
-    loss_coefficient = rectangle_wall_loss_coefficient_via_system_state(
+    loss_coefficient = get_rectangle_wall_loss_coefficient_via_system_state(
         wall_eddy_diffusivity=wall_eddy_diffusivity,
         particle_radius=particle_radius,
         particle_density=particle_density,
