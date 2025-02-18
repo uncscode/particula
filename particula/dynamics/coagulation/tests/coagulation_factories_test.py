@@ -103,5 +103,5 @@ def test_combine_coagulation():
 def test_invalid_coagulation():
     """Test that an invalid coagulation strategy raises a ValueError."""
     factory = CoagulationFactory()
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError):
         factory.get_strategy("nonexistent", {})
