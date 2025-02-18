@@ -2,7 +2,7 @@
 """
 
 from typing import Union
-from particula.abc_factory import StrategyFactory
+from particula.abc_factory import StrategyFactoryABC
 from particula.particles.distribution_strategies import (
     MassBasedMovingBin,
     RadiiBasedMovingBin,
@@ -18,7 +18,7 @@ from particula.particles.distribution_builders import (
 
 
 class DistributionFactory(
-    StrategyFactory[
+    StrategyFactoryABC[
         Union[
             MassBasedMovingBinBuilder,
             RadiiBasedMovingBinBuilder,
