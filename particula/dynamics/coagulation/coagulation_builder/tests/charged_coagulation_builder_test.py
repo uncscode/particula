@@ -19,7 +19,9 @@ def test_build_with_valid_parameters():
     Test that building with valid parameters returns a ChargedCoagulationStrategy.
     """
     builder = ChargedCoagulationBuilder()
-    builder.set_distribution_type("discrete", distribution_type_units="dimensionless")
+    builder.set_distribution_type(
+        "discrete", distribution_type_units="dimensionless"
+    )
     builder.set_charged_kernel_strategy(HardSphereKernelStrategy())
     strategy = builder.build()
     assert isinstance(strategy, ChargedCoagulationStrategy)
@@ -36,7 +38,9 @@ def test_build_missing_required_parameters():
         builder.build()
 
     # Provide distribution_type, still missing charged_kernel_strategy
-    builder.set_distribution_type("discrete", distribution_type_units="dimensionless")
+    builder.set_distribution_type(
+        "discrete", distribution_type_units="dimensionless"
+    )
     with pytest.raises(ValueError):
         builder.build()
 
