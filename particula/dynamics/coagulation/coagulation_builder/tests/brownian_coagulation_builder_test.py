@@ -1,6 +1,11 @@
 import unittest
-from particula.dynamics.coagulation.coagulation_builder.brownian_coagulation_builder import BrownianCoagulationBuilder
-from particula.dynamics.coagulation.coagulation_strategy import BrownianCoagulationStrategy
+from particula.dynamics.coagulation.coagulation_builder.brownian_coagulation_builder import (
+    BrownianCoagulationBuilder,
+)
+from particula.dynamics.coagulation.coagulation_strategy import (
+    BrownianCoagulationStrategy,
+)
+
 
 class TestBrownianCoagulationBuilder(unittest.TestCase):
     def test_build_with_valid_parameters(self):
@@ -13,6 +18,7 @@ class TestBrownianCoagulationBuilder(unittest.TestCase):
         builder = BrownianCoagulationBuilder()
         with self.assertRaises(ValueError):
             _ = builder.build()
+
 
 if __name__ == "__main__":
     unittest.main()
