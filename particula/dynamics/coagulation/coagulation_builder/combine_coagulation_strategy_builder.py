@@ -1,5 +1,10 @@
 """
-CombineCoagulationStrategyBuilder class to create a combined coagulation strategy.
+CombineCoagulationStrategyBuilder
+---------------------------------
+Creates a combined coagulation strategy from multiple sub-strategies.
+
+This builder follows standard usage:
+    builder.set_strategies([...]).build()
 """
 
 from typing import List
@@ -12,32 +17,39 @@ from particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_str
 
 
 class CombineCoagulationStrategyBuilder(BuilderABC):
-    """
-    Builder for creating a CombineCoagulationStrategy instance.
+    """Builder used to create a CombineCoagulationStrategy object.
+
+    Attributes:
+        strategies (List[CoagulationStrategyABC]):
+            Collection of CoagulationStrategyABC objects to be combined.
     """
 
     def __init__(self):
-        """
-        Initializes the builder with the required parameters.
-        """
+        """Initializes the builder with the required parameters."""
         required_parameters = ["strategies"]
         super().__init__(required_parameters)
         self.strategies = []
 
     def set_strategies(self, strategies: List[CoagulationStrategyABC]):
-        """
-        Set a list of CoagulationStrategyABC-compatible strategies to be combined.
+        """Sets a list of CoagulationStrategyABC objects to be combined.
 
-        :param strategies: A list of coagulation strategies to combine.
+        Args:
+            strategies (List[CoagulationStrategyABC]):
+                A list of coagulation strategies to be combined.
+
+        Returns:
+            CombineCoagulationStrategyBuilder:
+                The builder instance, for fluent chaining.
         """
         self.strategies = strategies
         return self
 
     def build(self) -> CombineCoagulationStrategy:
-        """
-        Finalize and return the combined coagulation strategy.
+        """Builds and returns the combined coagulation strategy.
 
-        :return: An instance of CombineCoagulationStrategy.
+        Returns:
+            CombineCoagulationStrategy:
+                A strategy that combines all the previously added sub-strategies.
         """
         self.pre_build_check()
         return CombineCoagulationStrategy(strategies=self.strategies)
