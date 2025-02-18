@@ -16,9 +16,9 @@ def test_build_with_valid_parameters():
     Test that building with valid parameters returns a TurbulentShearCoagulationStrategy.
     """
     builder = TurbulentShearCoagulationBuilder()
-    builder.set_distribution_type("discrete")
-    builder.set_turbulent_dissipation(1e-4)
-    builder.set_fluid_density(1.2)
+    builder.set_distribution_type("discrete", distribution_type_units="dimensionless")
+    builder.set_turbulent_dissipation(1e-4, turbulent_dissipation_units="m^2/s^3")
+    builder.set_fluid_density(1.2, fluid_density_units="kg/m^3")
     strategy = builder.build()
     assert isinstance(strategy, TurbulentShearCoagulationStrategy)
 
