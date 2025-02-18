@@ -19,6 +19,7 @@ from particula.dynamics.coagulation.charged_kernel_strategy import (
     HardSphereKernelStrategy,
 )
 
+
 def test_build_with_valid_strategies():
     """
     Test that CombineCoagulationStrategyBuilder with valid sub-strategies
@@ -27,12 +28,16 @@ def test_build_with_valid_strategies():
     # Example sub-strategies:
     brownian_strategy = (
         BrownianCoagulationBuilder()
-        .set_distribution_type("discrete", distribution_type_units="dimensionless")
+        .set_distribution_type(
+            "discrete", distribution_type_units="dimensionless"
+        )
         .build()
     )
     charged_strategy = (
         ChargedCoagulationBuilder()
-        .set_distribution_type("discrete", distribution_type_units="dimensionless")
+        .set_distribution_type(
+            "discrete", distribution_type_units="dimensionless"
+        )
         .set_charged_kernel_strategy(HardSphereKernelStrategy())
         .build()
     )
@@ -43,6 +48,7 @@ def test_build_with_valid_strategies():
 
     assert isinstance(combined, CombineCoagulationStrategy)
     assert len(combined.strategies) == 2
+
 
 def test_build_missing_strategies():
     """
