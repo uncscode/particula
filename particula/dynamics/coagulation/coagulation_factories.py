@@ -22,6 +22,7 @@ based on a given type string. Supported types include:
   - 'combine'
 """
 
+
 class CoagulationFactory(
     StrategyFactory[
         BrownianCoagulationBuilder
