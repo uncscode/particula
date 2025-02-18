@@ -17,24 +17,24 @@ Exposed Calls:
 # flake8: noqa
 # pyright: basic
 
-from particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy import (
+from .brownian_coagulation_strategy import (
     BrownianCoagulationStrategy,
 )
-from particula.dynamics.coagulation.coagulation_strategy.charged_coagulation_strategy import (
+from .charged_coagulation_strategy import (
     ChargedCoagulationStrategy,
 )
-from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy import (
+from .turbulent_shear_coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
 )
-from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
+from .coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
-from particula.dynamics.coagulation.coagulation_strategy.trubulent_dns_coagulation_strategy import (
+from .trubulent_dns_coagulation_strategy import (
     TurbulentDNSCoagulationStrategy,
 )
-from particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy import (
+from .combine_coagulation_strategy import (
     CombineCoagulationStrategy,
 )
-from particula.dynamics.coagulation.coagulation_strategy.sedimentation_coagulation_strategy import (
+from .sedimentation_coagulation_strategy import (
     SedimentationCoagulationStrategy,
 )
