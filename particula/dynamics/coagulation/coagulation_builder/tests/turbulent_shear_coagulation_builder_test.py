@@ -10,6 +10,7 @@ from particula.dynamics.coagulation.coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
 )
 
+
 def test_build_with_valid_parameters():
     """
     Test that building with valid parameters returns a TurbulentShearCoagulationStrategy.
@@ -20,6 +21,7 @@ def test_build_with_valid_parameters():
     builder.set_fluid_density(1.2)
     strategy = builder.build()
     assert isinstance(strategy, TurbulentShearCoagulationStrategy)
+
 
 def test_build_missing_required_parameters():
     """
