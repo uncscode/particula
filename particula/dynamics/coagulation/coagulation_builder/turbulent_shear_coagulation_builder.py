@@ -15,6 +15,7 @@ from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixi
 )
 
 
+# pylint: disable=duplicate-code
 class TurbulentShearCoagulationBuilder(
     BuilderABC,
     BuilderDistributionTypeMixin,
