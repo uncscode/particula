@@ -16,6 +16,7 @@ def test_build_with_valid_parameters():
     strategy = builder.build()
     assert isinstance(strategy, BrownianCoagulationStrategy)
 
+
 def test_build_missing_required_parameters():
     """
     Test that building without required parameters raises a ValueError.
@@ -23,5 +24,3 @@ def test_build_missing_required_parameters():
     builder = BrownianCoagulationBuilder()
     with pytest.raises(ValueError):
         builder.build()
-
-
