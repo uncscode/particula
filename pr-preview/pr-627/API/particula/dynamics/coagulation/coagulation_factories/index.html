@@ -7361,7 +7361,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py">particula.dynamics.coagulation.coagulation_factories</a> module.</p>
 </blockquote>
 <h2 id="coagulationfactory">CoagulationFactory<a class="headerlink" href="#coagulationfactory" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py#L15">Show source in coagulation_factories.py:15</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py#L19">Show source in coagulation_factories.py:19</a></p>
 <p>Factory class for creating coagulation strategy instances
 based on a given type string. Supported types include:
     - 'brownian'
@@ -7384,17 +7384,19 @@ based on a given type string. Supported types include:
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CoagulationFactory</span><span class="p">(</span>
     <span class="n">StrategyFactoryABC</span><span class="p">[</span>
-        <span class="n">BrownianCoagulationBuilder</span>
-        <span class="o">|</span> <span class="n">ChargedCoagulationBuilder</span>
-        <span class="o">|</span> <span class="n">TurbulentShearCoagulationBuilder</span>
-        <span class="o">|</span> <span class="n">TurbulentDNSCoagulationBuilder</span>
-        <span class="o">|</span> <span class="n">CombineCoagulationStrategyBuilder</span><span class="p">,</span>
+        <span class="n">Union</span><span class="p">[</span>
+            <span class="n">BrownianCoagulationBuilder</span><span class="p">,</span>
+            <span class="n">ChargedCoagulationBuilder</span><span class="p">,</span>
+            <span class="n">TurbulentShearCoagulationBuilder</span><span class="p">,</span>
+            <span class="n">TurbulentDNSCoagulationBuilder</span><span class="p">,</span>
+            <span class="n">CombineCoagulationStrategyBuilder</span><span class="p">,</span>
+        <span class="p">],</span>
         <span class="n">CoagulationStrategyABC</span><span class="p">,</span>
     <span class="p">]</span>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="coagulationfactoryget_builders">CoagulationFactory().get_builders<a class="headerlink" href="#coagulationfactoryget_builders" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py#L44">Show source in coagulation_factories.py:44</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py#L50">Show source in coagulation_factories.py:50</a></p>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
