@@ -15,7 +15,8 @@ from particula.dynamics.coagulation.coagulation_strategy import (
 
 def test_build_with_valid_parameters():
     """
-    Test that building with valid parameters returns a TurbulentShearCoagulationStrategy.
+    Test that building with valid parameters returns a
+    TurbulentShearCoagulationStrategy.
     """
     builder = TurbulentShearCoagulationBuilder()
     builder.set_distribution_type("discrete")
