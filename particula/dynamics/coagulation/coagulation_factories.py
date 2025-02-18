@@ -1,4 +1,8 @@
-from typing import Dict, Any
+"""
+Coagulation Factory Module
+"""
+
+from typing import Dict, Union, Any
 from particula.abc_factory import StrategyFactoryABC
 from particula.dynamics.coagulation.coagulation_builder import (
     BrownianCoagulationBuilder,
@@ -14,11 +18,13 @@ from particula.dynamics.coagulation.coagulation_strategy import (
 
 class CoagulationFactory(
     StrategyFactoryABC[
-        BrownianCoagulationBuilder
-        | ChargedCoagulationBuilder
-        | TurbulentShearCoagulationBuilder
-        | TurbulentDNSCoagulationBuilder
-        | CombineCoagulationStrategyBuilder,
+        Union[
+            BrownianCoagulationBuilder,
+            ChargedCoagulationBuilder,
+            TurbulentShearCoagulationBuilder,
+            TurbulentDNSCoagulationBuilder,
+            CombineCoagulationStrategyBuilder,
+        ],
         CoagulationStrategyABC,
     ]
 ):
