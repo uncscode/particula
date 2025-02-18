@@ -2,7 +2,13 @@
 CoagulationBuilder for Turbulent DNS Coagulation.
 """
 
+from typing import Optional
+import logging
+
 from particula.abc_builder import BuilderABC
+
+from particula.util.validate_inputs import validate_inputs
+from particula.util.converting.units import convert_units
 
 from particula.dynamics.coagulation.coagulation_strategy import (
     CoagulationStrategyABC,
@@ -13,6 +19,8 @@ from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixi
     BuilderTurbulentDissipationMixin,
     BuilderFluidDensityMixin,
 )
+
+logger = logging.getLogger("particula")
 
 
 class TurbulentDNSCoagulationBuilder(
@@ -45,12 +53,51 @@ class TurbulentDNSCoagulationBuilder(
         self.reynolds_lambda = None
         self.relative_velocity = None
 
-    def set_reynolds_lambda(self, reynolds_lambda: float):
+    @validate_inputs({"reynolds_lambda": "nonnegative"})
+    def set_reynolds_lambda(
+        self,
+        reynolds_lambda: float,
+        reynolds_lambda_units: Optional[str] = None,
+    ):
+        """
+        Set the Reynolds lambda. This is a measure of the turbulence length
+        scale, of airflow, and is used in the turbulent DNS model.
+        Shorthand for the Taylor-scale Reynolds number, Reλ.
+
+        Args:
+            reynolds_lambda : Reynolds lambda.
+            reynolds_lambda_units : Units of the Reynolds lambda
+                [dimensionless].
+        """
+        if reynolds_lambda_units == "dimensionless":
+            self.reynolds_lambda = reynolds_lambda
+            return self
+        if reynolds_lambda_units is not None:
+            logger.warning("Units for reynolds_lambda are not used. ")
         self.reynolds_lambda = reynolds_lambda
         return self
 
-    def set_relative_velocity(self, relative_velocity: float):
-        self.relative_velocity = relative_velocity
+    def set_relative_velocity(
+        self,
+        relative_velocity: float,
+        relative_velocity_units: str,
+    ):
+        """
+        Set the relative vertical velocity. This is the relative
+        velocity between particles and airflow,
+        (excluding turbulence, and gravity).
+
+        Args:
+            relative_velocity : Relative velocity.
+            relative_velocity_units : Units of the relative velocity
+                [m/s].
+        """
+        if relative_velocity_units == "m/s":
+            self.relative_velocity = relative_velocity
+            return self
+        self.relative_velocity = relative_velocity * convert_units(
+            relative_velocity_units, "m/s"
+        )
         return self
 
     def build(self) -> CoagulationStrategyABC:
