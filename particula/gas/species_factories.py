@@ -1,7 +1,7 @@
 """Factory module to create a concrete Species object using builders."""
 
 from typing import Union
-from particula.abc_factory import StrategyFactory
+from particula.abc_factory import StrategyFactoryABC
 from particula.gas.species_builders import (
     GasSpeciesBuilder,
     PresetGasSpeciesBuilder,
@@ -10,7 +10,7 @@ from particula.gas.species import GasSpecies
 
 
 class GasSpeciesFactory(
-    StrategyFactory[
+    StrategyFactoryABC[
         Union[
             GasSpeciesBuilder,
             PresetGasSpeciesBuilder,

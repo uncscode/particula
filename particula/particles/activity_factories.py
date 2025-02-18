@@ -2,7 +2,7 @@
 of species in a mixture of liquids."""
 
 from typing import Union
-from particula.abc_factory import StrategyFactory
+from particula.abc_factory import StrategyFactoryABC
 from particula.particles.activity_builders import (
     ActivityIdealMassBuilder,
     ActivityIdealMolarBuilder,
@@ -18,7 +18,7 @@ from particula.particles.activity_strategies import (
 # There is a bit of work in the constructor, but it is necessary to set the
 # types of the builders and strategies correctly.
 class ActivityFactory(
-    StrategyFactory[
+    StrategyFactoryABC[
         Union[
             ActivityIdealMassBuilder,
             ActivityIdealMolarBuilder,

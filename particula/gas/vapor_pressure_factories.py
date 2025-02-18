@@ -2,7 +2,7 @@
 builders."""
 
 from typing import Union
-from particula.abc_factory import StrategyFactory
+from particula.abc_factory import StrategyFactoryABC
 from particula.gas.vapor_pressure_builders import (
     ConstantBuilder,
     AntoineBuilder,
@@ -18,7 +18,7 @@ from particula.gas.vapor_pressure_strategies import (
 
 
 class VaporPressureFactory(
-    StrategyFactory[
+    StrategyFactoryABC[
         Union[
             ConstantBuilder,
             AntoineBuilder,

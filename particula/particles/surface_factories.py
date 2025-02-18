@@ -2,7 +2,7 @@
 """
 
 from typing import Union
-from particula.abc_factory import StrategyFactory
+from particula.abc_factory import StrategyFactoryABC
 from particula.particles.surface_builders import (
     SurfaceStrategyMolarBuilder,
     SurfaceStrategyMassBuilder,
@@ -16,7 +16,7 @@ from particula.particles.surface_strategies import (
 
 
 class SurfaceFactory(
-    StrategyFactory[
+    StrategyFactoryABC[
         Union[
             SurfaceStrategyVolumeBuilder,
             SurfaceStrategyMassBuilder,
@@ -34,24 +34,24 @@ class SurfaceFactory(
     particulate phases.
 
     Methods:
-        get_builders(): Returns the mapping of strategy types to builder
+    - get_builders() : Returns the mapping of strategy types to builder
         instances.
-        get_strategy(strategy_type, parameters): Gets the strategy instance
+    - get_strategy(strategy_type, parameters): Gets the strategy instance
         for the specified strategy type.
-            strategy_type: Type of surface tension strategy to use, can be
+        - strategy_type: Type of surface tension strategy to use, can be
             'volume', 'mass', or 'molar'.
-            parameters(Dict[str, Any], optional): Parameters required for the
+        - parameters(Dict[str, Any], optional): Parameters required for the
             builder, dependent on the chosen strategy type.
-                volume: density, surface_tension
-                mass: density, surface_tension
-                molar: molar_mass, density, surface_tension
+            - volume: density, surface_tension
+            - mass: density, surface_tension
+            - molar: molar_mass, density, surface_tension
 
     Returns:
-        SurfaceStrategy: An instance of the specified SurfaceStrategy.
+        SurfaceStrategy : An instance of the specified SurfaceStrategy.
 
     Raises:
-        ValueError: If an unknown strategy type is provided.
-        ValueError: If any required key is missing during check_keys or
+        ValueError : If an unknown strategy type is provided.
+        ValueError : If any required key is missing during check_keys or
             pre_build_check, or if trying to set an invalid parameter.
     """
 
@@ -60,11 +60,10 @@ class SurfaceFactory(
         Returns the mapping of strategy types to builder instances.
 
         Returns:
-            Dict[str, BuilderT]: A dictionary mapping strategy types to
-            builder instances.
-                volume: SurfaceStrategyVolumeBuilder
-                mass: SurfaceStrategyMassBuilder
-                molar: SurfaceStrategyMolarBuilder
+            - A dictionary mapping strategy types to builder instances.
+                    - volume: SurfaceStrategyVolumeBuilder
+                    - mass: SurfaceStrategyMassBuilder
+                    - molar: SurfaceStrategyMolarBuilder
         """
         return {
             "volume": SurfaceStrategyVolumeBuilder(),

@@ -3,7 +3,7 @@ This module contains the representation factories for the particles.
 """
 
 from typing import Union
-from particula.abc_factory import StrategyFactory
+from particula.abc_factory import StrategyFactoryABC
 from particula.particles.representation_builders import (
     ParticleMassRepresentationBuilder,
     ParticleRadiusRepresentationBuilder,
@@ -15,7 +15,7 @@ from particula.particles.representation import ParticleRepresentation
 
 
 class ParticleRepresentationFactory(
-    StrategyFactory[
+    StrategyFactoryABC[
         Union[
             ParticleMassRepresentationBuilder,
             ParticleRadiusRepresentationBuilder,
