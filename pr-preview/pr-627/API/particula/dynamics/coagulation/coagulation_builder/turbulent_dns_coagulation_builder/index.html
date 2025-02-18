@@ -7528,9 +7528,11 @@ are passed.</p>
 velocity between particles and airflow,
 (excluding turbulence, and gravity).</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<p>relative_velocity : Relative velocity.
-relative_velocity_units : Units of the relative velocity
-    [m/s].</p>
+<ul>
+<li>relative_velocity : Relative velocity.</li>
+<li>relative_velocity_units : Units of the relative velocity
+    [m/s].</li>
+</ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_relative_velocity</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">relative_velocity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">relative_velocity_units</span><span class="p">:</span> <span class="nb">str</span>
@@ -7542,9 +7544,11 @@ relative_velocity_units : Units of the relative velocity
 scale, of airflow, and is used in the turbulent DNS model.
 Shorthand for the Taylor-scale Reynolds number, Reλ.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<p>reynolds_lambda : Reynolds lambda.
-reynolds_lambda_units : Units of the Reynolds lambda
-    [dimensionless].</p>
+<ul>
+<li>reynolds_lambda : Reynolds lambda.</li>
+<li>reynolds_lambda_units : Units of the Reynolds lambda
+    [dimensionless].</li>
+</ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;reynolds_lambda&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_reynolds_lambda</span><span class="p">(</span>
