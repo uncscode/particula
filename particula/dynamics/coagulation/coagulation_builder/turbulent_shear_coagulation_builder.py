@@ -48,11 +48,7 @@ class TurbulentShearCoagulationBuilder(
         BuilderFluidDensityMixin.__init__(self)
 
     def build(self) -> CoagulationStrategyABC:
-        """Validate and return the TurbulentShearCoagulationStrategy object.
-
-        Returns:
-            CoagulationStrategy: Instance of the CoagulationStrategy object.
-        """
+        self.pre_build_check()
         return TurbulentShearCoagulationStrategy(
             distribution_type=self.distribution_type,
             turbulent_dissipation=self.turbulent_dissipation,

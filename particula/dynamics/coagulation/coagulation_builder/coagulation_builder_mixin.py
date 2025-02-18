@@ -114,7 +114,7 @@ class BuilderFluidDensityMixin:
     def __init__(self):
         self.fluid_density = None
 
-    @validate_inputs({"density": "positive"})
+    @validate_inputs({"fluid_density": "positive"})
     def set_fluid_density(
         self,
         fluid_density: Union[float, NDArray[np.float64]],

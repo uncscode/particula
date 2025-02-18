@@ -16,9 +16,7 @@ def test_build_with_valid_parameters():
     Test that building with valid parameters returns a TurbulentShearCoagulationStrategy.
     """
     builder = TurbulentShearCoagulationBuilder()
-    builder.set_distribution_type(
-        "discrete", distribution_type_units="dimensionless"
-    )
+    builder.set_distribution_type("discrete")
     builder.set_turbulent_dissipation(
         1e-4, turbulent_dissipation_units="m^2/s^3"
     )
@@ -40,11 +38,13 @@ def test_build_missing_required_parameters():
     with pytest.raises(ValueError):
         builder.build()
 
-    builder.set_turbulent_dissipation(1e-4)
+    builder.set_turbulent_dissipation(
+        1e-4, turbulent_dissipation_units="m^2/s^3"
+    )
     with pytest.raises(ValueError):
         builder.build()
 
-    builder.set_fluid_density(1.2)
+    builder.set_fluid_density(1.2, fluid_density_units="kg/m^3")
     # With all required parameters set, it should now succeed:
     strategy = builder.build()
     assert isinstance(strategy, TurbulentShearCoagulationStrategy)
