@@ -12,6 +12,16 @@ from particula.dynamics.coagulation.coagulation_strategy import (
 )
 
 
+"""
+Factory class for creating coagulation strategy instances
+based on a given type string. Supported types include:
+  - 'brownian'
+  - 'charged'
+  - 'turbulent_shear'
+  - 'turbulent_dns'
+  - 'combine'
+"""
+
 class CoagulationFactory(
     StrategyFactory[
         BrownianCoagulationBuilder
