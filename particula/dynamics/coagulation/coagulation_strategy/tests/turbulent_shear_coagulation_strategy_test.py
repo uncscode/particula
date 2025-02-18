@@ -10,6 +10,7 @@ both discrete and continuous_pdf distribution types.
 
 import unittest
 import numpy as np
+# pylint: disable=line-too-long
 from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
 )
