@@ -46,7 +46,9 @@ def test_distribution_type_units():
     doesn't raise an error (only logs a warning).
     """
     tester = MixinTester()
-    tester.set_distribution_type("discrete", distribution_type_units="dimensionless")
+    tester.set_distribution_type(
+        "discrete", distribution_type_units="dimensionless"
+    )
     assert tester.distribution_type == "discrete"
 
 
