@@ -12,7 +12,7 @@
         <link rel="prev" href="../charged_coagulation_builder/">
       
       
-        <link rel="next" href="../turbulent_dns_coagulation_builder/">
+        <link rel="next" href="../combine_coagulation_strategy_builder/">
       
       
       <link rel="icon" href="../../../../../../assets/images/favicon.png">
@@ -1389,6 +1389,8 @@
       
         
       
+        
+      
     
     
       
@@ -1724,6 +1726,28 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../combine_coagulation_strategy_builder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CombineCoagulationStrategyBuilder
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -7625,7 +7649,7 @@ the correct values are passed.</p>
 <p>density : Density of the particle.
 density_units : Units of the density. Default is <em>kg/m^3</em></p>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;fluid_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_fluid_density</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">fluid_density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">fluid_density_units</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">):</span> <span class="o">...</span>
