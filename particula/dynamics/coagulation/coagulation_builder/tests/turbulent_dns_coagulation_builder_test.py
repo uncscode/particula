@@ -1,6 +1,7 @@
 """
 Tests for the TurbulentDNSCoagulationBuilder class.
 """
+
 # pylint: disable=duplicate-code
 
 import pytest

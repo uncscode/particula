@@ -1,9 +1,11 @@
 """
 Tests for the TurbulentShearCoagulationBuilder class.
 """
+
 # pylint: disable=duplicate-code
 
 import pytest
+
 # pylint: disable=line-too-long
 from particula.dynamics.coagulation.coagulation_builder.turbulent_shear_coagulation_builder import (
     TurbulentShearCoagulationBuilder,
