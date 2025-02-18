@@ -66,8 +66,8 @@ class TurbulentDNSCoagulationBuilder(
         Shorthand for the Taylor-scale Reynolds number, Reλ.
 
         Args:
-            reynolds_lambda : Reynolds lambda.
-            reynolds_lambda_units : Units of the Reynolds lambda
+            - reynolds_lambda : Reynolds lambda.
+            - reynolds_lambda_units : Units of the Reynolds lambda
                 [dimensionless].
         """
         if reynolds_lambda_units == "dimensionless":
@@ -89,8 +89,8 @@ class TurbulentDNSCoagulationBuilder(
         (excluding turbulence, and gravity).
 
         Args:
-            relative_velocity : Relative velocity.
-            relative_velocity_units : Units of the relative velocity
+            - relative_velocity : Relative velocity.
+            - relative_velocity_units : Units of the relative velocity
                 [m/s].
         """
         if relative_velocity_units == "m/s":
