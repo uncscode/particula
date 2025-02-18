@@ -1,6 +1,7 @@
 """
 Tests for the TurbulentDNSCoagulationBuilder class.
 """
+# pylint: disable=duplicate-code
 
 import pytest
 from particula.dynamics.coagulation.coagulation_builder.turbulent_dns_coagulation_builder import (
