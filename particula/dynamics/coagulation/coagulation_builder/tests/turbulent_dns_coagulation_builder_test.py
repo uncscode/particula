@@ -13,7 +13,8 @@ from particula.dynamics.coagulation.coagulation_strategy import (
 
 def test_build_with_valid_parameters():
     """
-    Test that building with valid parameters returns a TurbulentDNSCoagulationStrategy.
+    Test that building with valid parameters returns a
+    TurbulentDNSCoagulationStrategy.
     """
     builder = TurbulentDNSCoagulationBuilder()
     builder.set_distribution_type(

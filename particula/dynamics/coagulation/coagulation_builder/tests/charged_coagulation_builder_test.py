@@ -16,7 +16,8 @@ from particula.dynamics.coagulation.charged_kernel_strategy import (
 
 def test_build_with_valid_parameters():
     """
-    Test that building with valid parameters returns a ChargedCoagulationStrategy.
+    Test that building with valid parameters returns a
+    ChargedCoagulationStrategy.
     """
     builder = ChargedCoagulationBuilder()
     builder.set_distribution_type(

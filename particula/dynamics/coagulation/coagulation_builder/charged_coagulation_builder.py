@@ -2,6 +2,8 @@
 CoagulationBuilder for Charged Coagulation.
 """
 
+from typing import Optional
+
 from particula.abc_builder import BuilderABC
 
 from particula.dynamics.coagulation.coagulation_strategy import (
@@ -44,7 +46,7 @@ class ChargedCoagulationBuilder(
     def set_charged_kernel_strategy(
         self,
         charged_kernel_strategy: ChargedKernelStrategyABC,
-        charged_kernel_strategy_units: str = None,
+        charged_kernel_strategy_units: Optional[str] = None,
     ):
         """Set the kernel strategy.
 
