@@ -1,7 +1,5 @@
-"""Condensation dynamics exposed via __init__.
-
-If you want specific sub functions, import them directly from
-`particula.next.dynamics.condensation.xxx.xxx` instead.
+"""
+Dynamics exposed via __init__.
 """
 
 # pylint: disable=unused-import, disable=line-too-long
@@ -13,13 +11,13 @@ from particula.dynamics import coagulation
 from particula.dynamics import properties
 
 from particula.dynamics.dilution import (
-    dilution_rate,
-    volume_dilution_coefficient,
+    get_dilution_rate,
+    get_volume_dilution_coefficient,
 )
 
 from particula.dynamics.wall_loss import (
-    rectangle_wall_loss_rate,
-    spherical_wall_loss_rate,
+    get_rectangle_wall_loss_rate,
+    get_spherical_wall_loss_rate,
 )
 
 from particula.dynamics.particle_process import (

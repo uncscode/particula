@@ -25,7 +25,7 @@ from particula.particles.properties import (
 )
 
 
-def spherical_wall_loss_coefficient(
+def get_spherical_wall_loss_coefficient(
     wall_eddy_diffusivity: Union[float, NDArray[np.float64]],
     diffusion_coefficient: Union[float, NDArray[np.float64]],
     settling_velocity: Union[float, NDArray[np.float64]],
@@ -62,7 +62,7 @@ def spherical_wall_loss_coefficient(
     )
 
 
-def rectangle_wall_loss_coefficient(
+def get_rectangle_wall_loss_coefficient(
     wall_eddy_diffusivity: Union[float, NDArray[np.float64]],
     diffusion_coefficient: Union[float, NDArray[np.float64]],
     settling_velocity: Union[float, NDArray[np.float64]],
@@ -117,7 +117,7 @@ def rectangle_wall_loss_coefficient(
 
 
 # pylint: disable=too-many-positional-arguments, too-many-arguments
-def spherical_wall_loss_coefficient_via_system_state(
+def get_spherical_wall_loss_coefficient_via_system_state(
     wall_eddy_diffusivity: float,
     particle_radius: Union[float, NDArray[np.float64]],
     particle_density: Union[float, NDArray[np.float64]],
@@ -165,7 +165,7 @@ def spherical_wall_loss_coefficient_via_system_state(
     )
 
     # Step 3: Calculate the wall loss coefficient for the spherical chamber
-    return spherical_wall_loss_coefficient(
+    return get_spherical_wall_loss_coefficient(
         wall_eddy_diffusivity=wall_eddy_diffusivity,
         diffusion_coefficient=diffusion_coefficient,
         settling_velocity=settling_velocity,
@@ -174,7 +174,7 @@ def spherical_wall_loss_coefficient_via_system_state(
 
 
 # pylint: disable=too-many-positional-arguments, too-many-arguments
-def rectangle_wall_loss_coefficient_via_system_state(
+def get_rectangle_wall_loss_coefficient_via_system_state(
     wall_eddy_diffusivity: float,
     particle_radius: Union[float, NDArray[np.float64]],
     particle_density: Union[float, NDArray[np.float64]],
@@ -228,7 +228,7 @@ def rectangle_wall_loss_coefficient_via_system_state(
     )
 
     # Step 3: Calculate and return the wall loss coefficient for the chamber
-    return rectangle_wall_loss_coefficient(
+    return get_rectangle_wall_loss_coefficient(
         wall_eddy_diffusivity=wall_eddy_diffusivity,
         diffusion_coefficient=diffusion_coefficient,
         settling_velocity=settling_velocity,

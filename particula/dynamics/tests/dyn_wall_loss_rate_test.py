@@ -2,8 +2,8 @@
 
 import numpy as np
 from particula.dynamics.wall_loss import (
-    spherical_wall_loss_rate,
-    rectangle_wall_loss_rate,
+    get_spherical_wall_loss_rate,
+    get_rectangle_wall_loss_rate,
 )
 
 
@@ -18,7 +18,7 @@ def test_spherical_wall_loss_rate():
     pressure = 101325.0
     chamber_radius = 10.0
 
-    result = spherical_wall_loss_rate(
+    result = get_spherical_wall_loss_rate(
         wall_eddy_diffusivity,
         particle_radius,
         particle_density,
@@ -40,7 +40,7 @@ def test_spherical_wall_loss_rate():
     pressure = 100000.0
     chamber_radius = 5.0
 
-    result = spherical_wall_loss_rate(
+    result = get_spherical_wall_loss_rate(
         wall_eddy_diffusivity,
         particle_radius,
         particle_density,
@@ -58,7 +58,7 @@ def test_spherical_wall_loss_rate():
 def test_rectangle_wall_loss_rate():
     """Test the rectangle wall loss rate function."""
     # Test single float input
-    results = rectangle_wall_loss_rate(
+    results = get_rectangle_wall_loss_rate(
         wall_eddy_diffusivity=0.1,
         particle_radius=1e-6,
         particle_density=1000.0,
@@ -72,7 +72,7 @@ def test_rectangle_wall_loss_rate():
     assert np.isclose(results, expected_loss_rate)
 
     # Test single array input
-    results = rectangle_wall_loss_rate(
+    results = get_rectangle_wall_loss_rate(
         wall_eddy_diffusivity=0.05,
         particle_radius=np.array([1e-9, 2e-6, 3e-3]),
         particle_density=np.array([1000.0, 2000.0, 3000.0]),

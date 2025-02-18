@@ -9,8 +9,8 @@ If you want specific sub functions, import them directly from
 # pyright: basic
 
 from particula.dynamics.properties.wall_loss_coefficient import (
-    spherical_wall_loss_coefficient,
-    spherical_wall_loss_coefficient_via_system_state,
-    rectangle_wall_loss_coefficient,
-    rectangle_wall_loss_coefficient_via_system_state,
+    get_spherical_wall_loss_coefficient,
+    get_spherical_wall_loss_coefficient_via_system_state,
+    get_rectangle_wall_loss_coefficient,
+    get_rectangle_wall_loss_coefficient_via_system_state,
 )
