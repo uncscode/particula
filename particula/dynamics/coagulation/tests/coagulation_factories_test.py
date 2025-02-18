@@ -2,6 +2,12 @@ import pytest
 from particula.dynamics.coagulation.coagulation_factories import (
     CoagulationFactory,
 )
+"""
+Simple tests for CoagulationFactory, verifying that known strategy types
+produce the expected strategy classes, and that invalid types raise
+the appropriate ValueError.
+"""
+
 from particula.dynamics.coagulation.coagulation_strategy import (
     BrownianCoagulationStrategy,
     ChargedCoagulationStrategy,
