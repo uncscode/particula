@@ -5,6 +5,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.util.constants import GAS_CONSTANT
+from particula.util.machine_limit import safe_exp
 
 
 def kelvin_radius(
@@ -73,7 +74,7 @@ def kelvin_term(
         kelvin_expand = True
         kelvin_radius_value = kelvin_radius_value[np.newaxis, :]
     if isinstance(radius, np.ndarray) and not kelvin_expand:
-        return np.exp(kelvin_radius_value / radius)
+        return safe_exp(kelvin_radius_value / radius)
     if isinstance(radius, np.ndarray) and (radius.size > 1) and kelvin_expand:
         radius = radius[:, np.newaxis]
-    return np.exp(kelvin_radius_value / radius)
+    return safe_exp(kelvin_radius_value / radius)
