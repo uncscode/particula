@@ -54,3 +54,17 @@ def test_validate_nonzero():
 def test_valid_inputs():
     """ " Test that the decorator does not raise an error when all arguments are valid"""
     assert sample_function(1, -1, 0, 0, 1) == (1, -1, 0, 0, 1)
+
+
+def test_valid_finite():
+    """Test that the decorator raises an error when a finite argument is
+    infinite"""
+    some_dict = {"x": "finite"}
+
+    @validate_inputs(some_dict)
+    def sample_function(x):
+        """A sample function to test the decorator"""
+        return x
+
+    with pytest.raises(ValueError, match="Argument 'x' must be finite."):
+        sample_function(float("inf"))

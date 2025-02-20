@@ -44,10 +44,11 @@ def test_mass_transfer_rate():
     temperature = 300.0
     molar_mass = 0.02897
     expected_result = 1.16143004e-21
+    result = mass_transfer_rate(
+        pressure_delta, first_order_mass_transport, temperature, molar_mass
+    )
     assert np.isclose(
-        mass_transfer_rate(
-            pressure_delta, first_order_mass_transport, temperature, molar_mass
-        ),
+        result,
         expected_result,
     )
 
