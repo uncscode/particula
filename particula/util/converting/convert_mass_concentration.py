@@ -60,11 +60,12 @@ def to_mole_fraction(
 def to_volume_fraction(
     mass_concentrations: NDArray[np.float64], densities: NDArray[np.float64]
 ) -> NDArray[np.float64]:
-    """Convert mass concentrations to volume fractions for N components.
+    """
+    Convert mass concentrations to volume fractions for N components.
 
-    If inputs are the one dimensional or float, the summation is done over the
-    the whole array. It mass_concentration is a 2D array, the summation is done
-    row-wise.
+    If inputs are one dimensional (1D) or floating-point scalars, the summation
+    is done over the entire array. If `mass_concentrations` is 2D, the summation
+    is done row-wise.
 
     Args:
         mass_concentrations: A list or ndarray of mass concentrations
@@ -73,7 +74,7 @@ def to_volume_fraction(
             (SI, kg/m^3).
 
     Returns:
-        An ndarray of volume fractions.
+        An ndarray of volume fractions. Zero volumes yield zero fractions.
 
     Reference:
         The volume fraction of a component is calculated by dividing the volume
@@ -81,21 +82,39 @@ def to_volume_fraction(
         total volume of all components.
         - https://en.wikipedia.org/wiki/Volume_fraction
     """
-    # Calculate volumes for each component using mass concentration and density
+    # Calculate per-component volumes
     volumes = mass_concentrations / densities
-    # Calculate total volume of the mixture
-    # Check if the input is 1D or 2D
+
+    # Handle 1D arrays
     if volumes.ndim == 1:
-        # For 1D input, sum over the entire array
-        total_volume = np.sum(volumes)
+        total_volume = volumes.sum()
+        # If total volume is zero, return all zeros
+        if total_volume == 0:
+            return np.zeros_like(volumes)
+        return volumes / total_volume
+
+    # Handle 2D arrays
     elif volumes.ndim == 2:
-        # For 2D input, sum row-wise
-        total_volume = np.sum(volumes, axis=1, keepdims=True)
+        total_volume = volumes.sum(axis=1, keepdims=True)  # shape: (n_rows, 1)
+
+        # Prepare an output array of the same shape
+        volume_fractions = np.zeros_like(volumes)
+
+        # We want a boolean array for which rows are nonzero
+        # Squeeze to (n_rows,) for simpler indexing
+        nonzero_rows = np.squeeze(total_volume != 0, axis=1)
+
+        # Option 1: Use integer row indices
+        # Identify the indices of the rows that have nonzero total volume
+        indices = np.where(nonzero_rows)[0]
+        # Divide row-by-row for those rows
+        volume_fractions[indices, :] = (
+            volumes[indices, :] / total_volume[indices, :]
+        )
+        return volume_fractions
+
     else:
         raise ValueError("mass_concentrations must be either 1D or 2D")
-    # Calculate volume fractions by dividing the volume of each component by
-    # the total volume
-    return volumes / total_volume
 
 
 @validate_inputs(
@@ -110,15 +129,15 @@ def to_mass_fraction(
     Convert mass concentrations to mass fractions for N components.
 
     If inputs are one-dimensional or float, the summation is done over the
-    entire array. If mass_concentration is a 2D array, the summation is done
-    row-wise.
+    entire array. If `mass_concentrations` is a 2D array, the summation is
+    done row-wise.
 
     Args:
         mass_concentrations: A list or ndarray of mass concentrations
             (SI, kg/m^3).
 
     Returns:
-        An ndarray of mass fractions.
+        An ndarray of mass fractions. Zero total mass yields zero fractions.
 
     Reference:
         The mass fraction of a component is calculated by dividing the mass
@@ -126,16 +145,32 @@ def to_mass_fraction(
         all components.
         - https://en.wikipedia.org/wiki/Mass_fraction_(chemistry)
     """
-    # Calculate total mass of the mixture
-    # Check if the input is 1D or 2D
+    # Handle 1D arrays
     if mass_concentrations.ndim == 1:
-        # For 1D input, sum over the entire array
         total_mass = np.sum(mass_concentrations)
+        if total_mass == 0:
+            return np.zeros_like(mass_concentrations)
+        return mass_concentrations / total_mass
+
+    # Handle 2D arrays
     elif mass_concentrations.ndim == 2:
-        # For 2D input, sum row-wise
-        total_mass = np.sum(mass_concentrations, axis=1, keepdims=True)
+        # Row-wise sum
+        total_mass = mass_concentrations.sum(axis=1, keepdims=True)
+        # Prepare output
+        mass_fractions = np.zeros_like(mass_concentrations)
+
+        # Identify rows where total_mass is nonzero
+        # Squeeze the mask to 1D so we can use row indices
+        nonzero_rows = np.squeeze(total_mass != 0, axis=1)
+        # Get actual row indices where total mass is nonzero
+        row_indices = np.where(nonzero_rows)[0]
+
+        # Compute fractions only for the nonzero rows
+        mass_fractions[row_indices, :] = (
+            mass_concentrations[row_indices, :] / total_mass[row_indices, :]
+        )
+
+        return mass_fractions
+
     else:
         raise ValueError("mass_concentrations must be either 1D or 2D")
-
-    # Calculate mass fractions by dividing each component by the total mass
-    return mass_concentrations / total_mass
