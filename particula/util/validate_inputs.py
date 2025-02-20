@@ -37,6 +37,12 @@ def validate_nonzero(value, name):
         raise ValueError(f"Argument '{name}' must be nonzero.")
 
 
+def validate_finite(value, name):
+    """validate finite"""
+    if np.any(np.isinf(value)):
+        raise ValueError(f"Argument '{name}' must be finite.")
+
+
 def validate_inputs(dict_args):
     """
     A decorator to validate that specified arguments meet certain constraints.
@@ -45,7 +51,7 @@ def validate_inputs(dict_args):
         - dict_args : Dictionary of argument names and their constraints.
             {"arg1": "positive", "arg2": "negative", ...}
             - Options: "positive", "negative", "nonpositive", "nonnegative",
-                "nonzero".
+                "nonzero", "finite".
 
 
     Returns:
@@ -77,6 +83,8 @@ def validate_inputs(dict_args):
                     validate_nonnegative(value, name)
                 elif comp == "nonzero":
                     validate_nonzero(value, name)
+                elif comp == "finite":
+                    validate_finite(value, name)
                 else:
                     raise ValueError(
                         f"Unknown validation '{comp}' for argument '{name}'."

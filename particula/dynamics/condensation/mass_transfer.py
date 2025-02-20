@@ -41,8 +41,14 @@ import numpy as np
 
 # particula imports
 from particula.util.constants import GAS_CONSTANT  # type: ignore
+from particula.util.validate_inputs import validate_inputs
 
 
+@validate_inputs(
+        {
+            "radius": "nonnegative",
+        }
+)
 def first_order_mass_transport_k(
     radius: Union[float, NDArray[np.float64]],
     vapor_transition: Union[float, NDArray[np.float64]],
@@ -95,6 +101,14 @@ def first_order_mass_transport_k(
     return 4 * np.pi * radius * diffusion_coefficient * vapor_transition  # type: ignore
 
 
+@validate_inputs(
+        {
+            "pressure_delta": "finite",
+            "first_order_mass_transport": "finite",
+            "temperature": "positive",
+            "molar_mass": "positive"
+        }
+)
 def mass_transfer_rate(
     pressure_delta: Union[float, NDArray[np.float64]],
     first_order_mass_transport: Union[float, NDArray[np.float64]],
@@ -152,6 +166,13 @@ def mass_transfer_rate(
     )
 
 
+@validate_inputs(
+        {
+            "mass_rate": "finite",
+            "radius": "nonnegative",
+            "density": "positive"
+        }
+)
 def radius_transfer_rate(
     mass_rate: Union[float, NDArray[np.float64]],
     radius: Union[float, NDArray[np.float64]],
@@ -194,6 +215,15 @@ def radius_transfer_rate(
     return mass_rate / (density * 4 * np.pi * radius**2)  # type: ignore
 
 
+@validate_inputs(
+        {
+            "mass_rate": "finite",
+            "time_step": "positive",
+            "gas_mass": "nonnegative",
+            "particle_mass": "nonnegative",
+            "particle_concentration": "nonnegative"
+        }
+)
 def calculate_mass_transfer(
     mass_rate: NDArray[np.float64],
     time_step: float,
@@ -256,6 +286,15 @@ def calculate_mass_transfer(
     )
 
 
+@validate_inputs(
+        {
+            "mass_rate": "finite",
+            "time_step": "positive",
+            "gas_mass": "nonnegative",
+            "particle_mass": "nonnegative",
+            "particle_concentration": "nonnegative"
+        }
+)
 def calculate_mass_transfer_single_species(
     mass_rate: NDArray[np.float64],
     time_step: float,
@@ -311,6 +350,15 @@ def calculate_mass_transfer_single_species(
     return transferable_mass
 
 
+@validate_inputs(
+        {
+            "mass_rate": "finite",
+            "time_step": "positive",
+            "gas_mass": "nonnegative",
+            "particle_mass": "nonnegative",
+            "particle_concentration": "nonnegative"
+        }
+)
 def calculate_mass_transfer_multiple_species(
     mass_rate: NDArray[np.float64],
     time_step: float,
