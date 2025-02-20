@@ -78,7 +78,7 @@ def test_mass_concentration_to_volume_fraction(
             np.array([100, -100]),
             np.array([10, 20]),
         ),  # Negative mass concentration
-        (np.array([100, 200]), np.array([-10, 20])),  # Negative molar mass
+        (np.array([100, 200]), np.array([np.nan, 20])),  # Negative molar mass
     ],
 )
 def test_error_handling_mass_to_mole(mass_concentrations, molar_masses):

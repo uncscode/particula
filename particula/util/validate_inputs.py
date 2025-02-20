@@ -38,9 +38,9 @@ def validate_nonzero(value, name):
 
 
 def validate_finite(value, name):
-    """validate finite"""
-    if np.any(np.isinf(value)):
-        raise ValueError(f"Argument '{name}' must be finite.")
+    """Validate that `value` contains no infinities or NaNs."""
+    if not np.all(np.isfinite(value)):
+        raise ValueError(f"Argument '{name}' must be finite (no inf or NaN).")
 
 
 def validate_inputs(dict_args):
@@ -75,14 +75,19 @@ def validate_inputs(dict_args):
                 )
                 if comp == "positive":
                     validate_positive(value, name)
+                    validate_finite(value, name)
                 elif comp == "negative":
                     validate_negative(value, name)
+                    validate_finite(value, name)
                 elif comp == "nonpositive":
                     validate_nonpositive(value, name)
+                    validate_finite(value, name)
                 elif comp == "nonnegative":
                     validate_nonnegative(value, name)
+                    validate_finite(value, name)
                 elif comp == "nonzero":
                     validate_nonzero(value, name)
+                    validate_finite(value, name)
                 elif comp == "finite":
                     validate_finite(value, name)
                 else:

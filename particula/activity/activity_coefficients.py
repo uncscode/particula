@@ -24,7 +24,6 @@ from particula.activity.convert_functional_group import (
     {
         "molar_mass_ratio": "positive",
         "organic_mole_fraction": "nonnegative",
-        "oxygen2carbon": "nonnegative",
         "density": "positive",
     }
 )

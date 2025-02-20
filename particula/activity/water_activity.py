@@ -201,7 +201,7 @@ def fixed_water_activity(
         xp=alpha_water_activity,
         fp=alpha_organic_mole_fraction,
         x=water_activity,
-        left=np.nan,
+        left=0.0,
         right=LOWEST_ORGANIC_MOLE_FRACTION,
     )
     # find the water activity of the beta phase
@@ -210,7 +210,7 @@ def fixed_water_activity(
         fp=beta_organic_mole_fraction,
         x=water_activity,
         left=1,
-        right=np.nan,
+        right=0.0,
     )
     # calculate the activity coefficients for the alpha phase
     activities_alpha = bat_activity_coefficients(

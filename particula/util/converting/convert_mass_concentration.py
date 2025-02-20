@@ -3,7 +3,15 @@
 from numpy.typing import NDArray
 import numpy as np
 
+from particula.util.validate_inputs import validate_inputs
 
+
+@validate_inputs(
+    {
+        "mass_concentrations": "nonnegative",
+        "molar_masses": "positive",
+    }
+)
 def to_mole_fraction(
     mass_concentrations: NDArray[np.float64], molar_masses: NDArray[np.float64]
 ) -> NDArray[np.float64]:
@@ -25,11 +33,6 @@ def to_mole_fraction(
         concentration to the total molar concentration of all components.
         - https://en.wikipedia.org/wiki/Mole_fraction
     """
-    # check for negative values
-    if np.any(mass_concentrations < 0):
-        raise ValueError("Mass concentrations must be positive")
-    if np.any(molar_masses <= 0):
-        raise ValueError("Molar masses must be non-zero, positive")
 
     # Convert mass concentrations to moles for each component
     moles = mass_concentrations / molar_masses
@@ -48,6 +51,12 @@ def to_mole_fraction(
     return moles / total_moles
 
 
+@validate_inputs(
+    {
+        "mass_concentrations": "nonnegative",
+        "densities": "positive",
+    }
+)
 def to_volume_fraction(
     mass_concentrations: NDArray[np.float64], densities: NDArray[np.float64]
 ) -> NDArray[np.float64]:
@@ -72,11 +81,6 @@ def to_volume_fraction(
         total volume of all components.
         - https://en.wikipedia.org/wiki/Volume_fraction
     """
-    # check for negative values
-    if np.any(mass_concentrations < 0):
-        raise ValueError("Mass concentrations must be positive")
-    if np.any(densities <= 0):
-        raise ValueError("Densities must be Non-zero positive")
     # Calculate volumes for each component using mass concentration and density
     volumes = mass_concentrations / densities
     # Calculate total volume of the mixture
@@ -94,6 +98,11 @@ def to_volume_fraction(
     return volumes / total_volume
 
 
+@validate_inputs(
+    {
+        "mass_concentrations": "nonnegative",
+    }
+)
 def to_mass_fraction(
     mass_concentrations: NDArray[np.float64],
 ) -> NDArray[np.float64]:
@@ -117,10 +126,6 @@ def to_mass_fraction(
         all components.
         - https://en.wikipedia.org/wiki/Mass_fraction_(chemistry)
     """
-    # check for negative values
-    if np.any(mass_concentrations < 0):
-        raise ValueError("Mass concentrations must be positive")
-
     # Calculate total mass of the mixture
     # Check if the input is 1D or 2D
     if mass_concentrations.ndim == 1:
