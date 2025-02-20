@@ -187,6 +187,8 @@ def kappa_activity(
         solute_volume_fractions = np.divide(
             solute_volume_fractions,
             np.sum(solute_volume_fractions, axis=1, keepdims=True),
+            out=np.zeros_like(solute_volume_fractions),
+            where=np.sum(solute_volume_fractions, axis=1, keepdims=True) != 0,
         )
         kappa_weighted = np.sum(solute_volume_fractions * kappa, axis=1)
     # kappa activity parameterization, EQ 2 Petters and Kreidenweis

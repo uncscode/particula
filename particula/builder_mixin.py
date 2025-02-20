@@ -117,7 +117,7 @@ class BuilderConcentrationMixin:
         self.concentration = None
         self.default_units = default_units if default_units else "kg/m^3"
 
-    @validate_inputs({"concentration": "positive"})
+    @validate_inputs({"concentration": "nonnegative"})
     def set_concentration(
         self,
         concentration: Union[float, NDArray[np.float64]],
@@ -177,7 +177,7 @@ class BuilderMassMixin:
     def __init__(self):
         self.mass = None
 
-    @validate_inputs({"mass": "positive"})
+    @validate_inputs({"mass": "nonnegative"})
     def set_mass(
         self,
         mass: Union[float, NDArray[np.float64]],
