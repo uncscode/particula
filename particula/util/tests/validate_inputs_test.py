@@ -2,8 +2,10 @@
 """
 
 import pytest
+import numpy as np
 
 from particula.util.validate_inputs import validate_inputs
+
 
 # Define a sample function to test the decorator
 some_dict = {
@@ -67,4 +69,4 @@ def test_valid_finite():
         return x
 
     with pytest.raises(ValueError, match="Argument 'x' must be finite."):
-        sample_function(float("inf"))
+        sample_function(np.nan)
