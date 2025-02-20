@@ -15,18 +15,21 @@ from particula.util.validate_inputs import validate_inputs
 def to_mole_fraction(
     mass_concentrations: NDArray[np.float64], molar_masses: NDArray[np.float64]
 ) -> NDArray[np.float64]:
-    """Convert mass concentrations to mole fractions for N components.
+    """
+    Convert mass concentrations to mole fractions for N components.
 
-    If the input mass_concentrations is 1D, the summation is performed over the
-    entire array. If mass_concentrations is 2D, the summation is done row-wise.
+    If the input `mass_concentrations` is 1D, the summation is performed over
+    the entire array. If `mass_concentrations` is 2D, the summation is done
+    row-wise.
 
     Args:
         mass_concentrations: A list or ndarray of mass concentrations
             (SI, kg/m^3).
-        molar_masses: A list or ndarray of molecular weights (SI, kg/mol).
+        molar_masses: A list or ndarray of molecular weights
+            (SI, kg/mol).
 
     Returns:
-        An ndarray of mole fractions.
+        An ndarray of mole fractions. Zero total moles yield zero fractions.
 
     Reference:
         The mole fraction of a component is given by the ratio of its molar
@@ -37,18 +40,35 @@ def to_mole_fraction(
     # Convert mass concentrations to moles for each component
     moles = mass_concentrations / molar_masses
 
-    # Handle 1D and 2D cases separately
+    # Handle 1D arrays
     if moles.ndim == 1:
-        # For 1D input, sum over the entire array
         total_moles = np.sum(moles)
+        # If total moles are zero, return an array of zeros
+        if total_moles == 0:
+            return np.zeros_like(moles)
+        return moles / total_moles
+
+    # Handle 2D arrays
     elif moles.ndim == 2:
-        # For 2D input, sum row-wise
-        total_moles = np.sum(moles, axis=1, keepdims=True)
+        # Sum row-wise (shape: (n_rows, 1))
+        total_moles = moles.sum(axis=1, keepdims=True)
+        # Prepare output array
+        mole_fractions = np.zeros_like(moles)
+
+        # Create a row mask for nonzero total moles
+        nonzero_rows = np.squeeze(total_moles != 0, axis=1)
+        # Get the row indices that are nonzero
+        row_indices = np.where(nonzero_rows)[0]
+
+        # Compute fractions only for rows with nonzero total moles
+        mole_fractions[row_indices, :] = (
+            moles[row_indices, :] / total_moles[row_indices, :]
+        )
+
+        return mole_fractions
+
     else:
         raise ValueError("mass_concentrations must be either 1D or 2D")
-
-    # Return mole fractions by dividing moles by the total moles
-    return moles / total_moles
 
 
 @validate_inputs(
