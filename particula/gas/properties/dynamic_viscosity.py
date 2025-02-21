@@ -34,8 +34,14 @@ def get_dynamic_viscosity(
     Calculate the dynamic viscosity of air using Sutherland's formula.
 
     Equation:
-
         μ(T) = μ₀ × (T / T₀)^(3/2) × (T₀ + S) / (T + S)
+
+    Where:
+        - μ(T) is the dynamic viscosity at temperature T (Pa·s).
+        - μ₀ is the reference viscosity (Pa·s).
+        - T is the temperature in Kelvin.
+        - T₀ is the reference temperature in Kelvin.
+        - S is the Sutherland constant in Kelvin.
 
     Arguments:
         temperature : Desired air temperature in Kelvin. Must be > 0.
