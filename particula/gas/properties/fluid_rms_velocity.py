@@ -27,6 +27,7 @@ def get_fluid_rms_velocity(
 
     The fluid root-mean-square (RMS) velocity fluctuation quantifies
     turbulence intensity in a fluid flow. It is calculated as:
+
     - u' = (R_λ^(1/2) v_K) / 15^(1/4)
     - u' is Fluid RMS fluctuation velocity [m/s]
     - R_λ (re_lambda) is Taylor-microscale Reynolds number [-]
@@ -61,7 +62,7 @@ def get_fluid_rms_velocity(
 
     References:
         - H. Tennekes and J. L. Lumley, "A First Course in Turbulence,"
-          MIT Press, 1972.
+          MIT Press, 1972. [check this]
     """
     kolmogorov_velocity = get_kolmogorov_velocity(
         kinematic_viscosity, turbulent_dissipation
