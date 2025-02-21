@@ -11,7 +11,7 @@ from particula.util.constants import BOLTZMANN_CONSTANT
 from particula.particles import properties
 from particula.gas.properties import (
     get_dynamic_viscosity,
-    molecule_mean_free_path,
+    get_molecule_mean_free_path,
 )
 
 
@@ -113,7 +113,7 @@ def get_brownian_kernel_via_system_state(
     """
     # calculations to get particle diffusivity
     dynamic_viscosity = get_dynamic_viscosity(temperature)
-    air_mean_free_path = molecule_mean_free_path(
+    air_mean_free_path = get_molecule_mean_free_path(
         temperature=temperature,
         pressure=pressure,
         dynamic_viscosity=dynamic_viscosity,

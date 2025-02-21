@@ -72,6 +72,7 @@ def validate_inputs(dict_args):
                         else None
                     ),
                 )
+                value = np.asarray(value)
                 if comp == "positive":
                     validate_positive(value, name)
                     validate_finite(value, name)

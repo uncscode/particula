@@ -166,7 +166,7 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
     kinematic_viscosity = gas_properties.get_kinematic_viscosity(
         dynamic_viscosity=dynamic_viscosity, fluid_density=fluid_density
     )
-    mean_free_path = gas_properties.molecule_mean_free_path(
+    mean_free_path = gas_properties.get_molecule_mean_free_path(
         temperature=temperature, dynamic_viscosity=dynamic_viscosity
     )
 

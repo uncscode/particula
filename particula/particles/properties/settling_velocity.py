@@ -12,7 +12,7 @@ from particula.gas.properties.dynamic_viscosity import (
     get_dynamic_viscosity,
 )
 from particula.gas.properties.mean_free_path import (
-    molecule_mean_free_path,
+    get_molecule_mean_free_path,
 )
 from particula.gas.properties.kinematic_viscosity import (
     get_kinematic_viscosity,
@@ -201,7 +201,7 @@ def particle_settling_velocity_via_system_state(
     dynamic_viscosity = get_dynamic_viscosity(temperature=temperature)
 
     # Step 2: Calculate the mean free path of the gas molecules
-    mean_free_path = molecule_mean_free_path(
+    mean_free_path = get_molecule_mean_free_path(
         temperature=temperature,
         pressure=pressure,
         dynamic_viscosity=dynamic_viscosity,

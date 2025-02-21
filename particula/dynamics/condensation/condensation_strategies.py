@@ -49,7 +49,7 @@ from particula.particles.properties import (
     vapor_transition_correction,
     partial_pressure_delta,
 )
-from particula.gas.properties import molecule_mean_free_path
+from particula.gas.properties import get_molecule_mean_free_path
 from particula.dynamics.condensation.mass_transfer import (
     first_order_mass_transport_k,
     mass_transfer_rate,
@@ -114,7 +114,7 @@ class CondensationStrategy(ABC):
             Mean Free Path
             [Wikipedia](https://en.wikipedia.org/wiki/Mean_free_path)
         """
-        return molecule_mean_free_path(
+        return get_molecule_mean_free_path(
             molar_mass=self.molar_mass,
             temperature=temperature,
             pressure=pressure,
