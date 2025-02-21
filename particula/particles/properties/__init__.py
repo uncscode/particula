@@ -30,7 +30,11 @@ from particula.particles.properties.knudsen_number_module import (
 from particula.particles.properties.friction_factor_module import (
     friction_factor,
 )
-from particula.particles.properties import coulomb_enhancement
+from particula.particles.properties.coulomb_enhancement import (
+    get_coulomb_enhancement_ratio,
+    get_coulomb_kinetic_limit,
+    get_coulomb_continuum_limit,
+)
 from particula.particles.properties.diffusive_knudsen_module import (
     diffusive_knudsen_number,
 )

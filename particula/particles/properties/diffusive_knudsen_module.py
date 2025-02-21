@@ -67,8 +67,12 @@ def diffusive_knudsen_number(
         reduced_friction_factor = friction_factor
 
     # Calculate the kinetic and continuum enhancements
-    kinetic_enhance = coulomb_enhancement.kinetic(coulomb_potential_ratio)
-    continuum_enhance = coulomb_enhancement.continuum(coulomb_potential_ratio)
+    kinetic_enhance = coulomb_enhancement.get_coulomb_kinetic_limit(
+        coulomb_potential_ratio
+    )
+    continuum_enhance = coulomb_enhancement.get_coulomb_continuum_limit(
+        coulomb_potential_ratio
+    )
 
     # Final calculation of diffusive Knudsen number
     numerator = (

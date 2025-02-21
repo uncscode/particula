@@ -44,10 +44,10 @@ def get_dimensional_kernel(
     Aerosol Science and Technology, 53(8), 933-957.
     https://doi.org/10.1080/02786826.2019.1614522
     """
-    coulomb_kinetic_limit = coulomb_enhancement.kinetic(
+    coulomb_kinetic_limit = coulomb_enhancement.get_coulomb_kinetic_limit(
         coulomb_potential_ratio
     )
-    coulomb_continuum_limit = coulomb_enhancement.continuum(
+    coulomb_continuum_limit = coulomb_enhancement.get_coulomb_continuum_limit(
         coulomb_potential_ratio
     )
     return (
@@ -140,8 +140,12 @@ def get_coulomb_kernel_dyachkov2007(
     )  # Avoid division by zero
 
     continuum_limit = 4 * np.pi * diffusive_knudsen**2
-    kinetic = coulomb_enhancement.kinetic(coulomb_potential_ratio)
-    continuum = coulomb_enhancement.continuum(coulomb_potential_ratio)
+    kinetic = coulomb_enhancement.get_coulomb_kinetic_limit(
+        coulomb_potential_ratio
+    )
+    continuum = coulomb_enhancement.get_coulomb_continuum_limit(
+        coulomb_potential_ratio
+    )
 
     ratio_k_c = kinetic / continuum
     adjustment_factor = 1 + diffusive_knudsen * ratio_k_c
@@ -194,8 +198,12 @@ def get_coulomb_kernel_gatti2008(
     # Ensure no division by zero
     coulomb_potential_ratio = np.maximum(coulomb_potential_ratio, 1e-16)
 
-    kinetic = coulomb_enhancement.kinetic(coulomb_potential_ratio)
-    continuum = coulomb_enhancement.continuum(coulomb_potential_ratio)
+    kinetic = coulomb_enhancement.get_coulomb_kinetic_limit(
+        coulomb_potential_ratio
+    )
+    continuum = coulomb_enhancement.get_coulomb_continuum_limit(
+        coulomb_potential_ratio
+    )
 
     continuum_limit = 4 * np.pi * diffusive_knudsen**2
     pi_sqrt = np.sqrt(np.pi)

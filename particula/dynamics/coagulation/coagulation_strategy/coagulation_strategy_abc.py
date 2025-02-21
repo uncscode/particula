@@ -334,8 +334,8 @@ class CoagulationStrategyABC(ABC):
             The Coulomb potential ratio for the particle
                 [dimensionless].
         """
-        return properties.coulomb_enhancement.ratio(
-            radius=particle.get_radius(),
+        return properties.coulomb_enhancement.get_coulomb_enhancement_ratio(
+            particle_radius=particle.get_radius(),
             charge=particle.get_charge(),
             temperature=temperature,
         )  # type: ignore
