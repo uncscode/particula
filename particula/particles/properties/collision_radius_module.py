@@ -16,11 +16,11 @@ from particula.util.validate_inputs import validate_inputs
 
 @validate_inputs(
     {
-        "radius_gyration": "nonnegative",
+        "gyration_radius": "nonnegative",
     }
 )
 def get_collision_radius_mg1988(
-    radius_gyration: Union[NDArray[np.float64], float],
+    gyration_radius: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
     """
     Calculate the collision radius using the mg1988 model.
@@ -30,7 +30,7 @@ def get_collision_radius_mg1988(
     - R_c = R_g
 
     Arguments:
-        - radius_gyration : Radius of gyration of the particle (m).
+        - gyration_radius : Radius of gyration of the particle (m).
 
     Returns:
         - Collision radius of the particle (m).
@@ -47,17 +47,17 @@ def get_collision_radius_mg1988(
         (1988). "Cluster Size Distribution for Free Molecular Agglomeration."
           Energy and Fuels, 2(4). https://doi.org/10.1021/ef00010a014
     """
-    return radius_gyration
+    return gyration_radius
 
 
 @validate_inputs(
     {
-        "radius_gyration": "positive",
+        "gyration_radius": "positive",
         "fractal_dimension": "positive",
     }
 )
 def get_collision_radius_sr1992(
-    radius_gyration: Union[NDArray[np.float64], float],
+    gyration_radius: Union[NDArray[np.float64], float],
     fractal_dimension: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
     """
@@ -72,7 +72,7 @@ def get_collision_radius_sr1992(
         - R_g is the radius of gyration (m).
 
     Arguments:
-        - radius_gyration : Radius of gyration of the particle (m).
+        - gyration_radius : Radius of gyration of the particle (m).
         - fractal_dimension : Fractal dimension of the particle
             (dimensionless).
 
@@ -92,17 +92,17 @@ def get_collision_radius_sr1992(
           Interface Science, 151(1), 203-224.
           https://doi.org/10.1016/0021-9797(92)90252-H
     """
-    return np.sqrt((fractal_dimension + 2) / 3) * radius_gyration
+    return np.sqrt((fractal_dimension + 2) / 3) * gyration_radius
 
 
 @validate_inputs(
     {
-        "radius_gyration": "positive",
+        "gyration_radius": "positive",
         "fractal_prefactor": "positive",
     }
 )
 def get_collision_radius_mzg2002(
-    radius_gyration: Union[NDArray[np.float64], float],
+    gyration_radius: Union[NDArray[np.float64], float],
     fractal_prefactor: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
     """
@@ -116,7 +116,7 @@ def get_collision_radius_mzg2002(
         - R_g is the radius of gyration (m).
 
     Arguments:
-        - radius_gyration : Radius of gyration of the particle (m).
+        - gyration_radius : Radius of gyration of the particle (m).
         - fractal_prefactor : Fractal prefactor of particle (dimensionless).
 
     Returns:
@@ -136,21 +136,21 @@ def get_collision_radius_mzg2002(
           Interface Science, 255(1).
           https://doi.org/10.1006/jcis.2002.8634
     """
-    return 1.037 * (fractal_prefactor**0.077) * radius_gyration
+    return 1.037 * (fractal_prefactor**0.077) * gyration_radius
 
 
 @validate_inputs(
     {
         "fractal_dimension": "positive",
         "number_of_particles": "positive",
-        "radius_gyration": "positive",
+        "gyration_radius": "positive",
         "radius_monomer": "positive",
     }
 )
 def get_collision_radius_tt2012(
     fractal_dimension: float,
     number_of_particles: float,
-    radius_gyration: Union[NDArray[np.float64], float],
+    gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
     """
@@ -165,7 +165,7 @@ def get_collision_radius_tt2012(
     Arguments:
         - fractal_dimension : Fractal dimension of the particle (dimensionless).
         - number_of_particles : Number of monomers in the aggregate.
-        - radius_gyration : Radius of gyration of the particle (m).
+        - gyration_radius : Radius of gyration of the particle (m).
         - radius_monomer : Radius of the monomer (m).
 
     Returns:
@@ -187,7 +187,7 @@ def get_collision_radius_tt2012(
     alpha1 = 0.253 * fractal_dimension**2 - 1.209 * fractal_dimension + 1.433
     alpha2 = -0.218 * fractal_dimension**2 + 0.964 * fractal_dimension - 0.180
     phi = 1 / (alpha1 * np.log(number_of_particles) + alpha2)
-    radius_s_i = phi * radius_gyration
+    radius_s_i = phi * gyration_radius
     radius_s_ii = (
         radius_monomer * (1.203 - 0.4315 / fractal_dimension) / 2
     ) * (4 * radius_s_i / radius_monomer) ** (
@@ -198,12 +198,12 @@ def get_collision_radius_tt2012(
 
 @validate_inputs(
     {
-        "radius_gyration": "positive",
+        "gyration_radius": "positive",
         "radius_monomer": "positive",
     }
 )
 def get_collision_radius_wq2022_rg(
-    radius_gyration: Union[NDArray[np.float64], float],
+    gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
     """
@@ -219,7 +219,7 @@ def get_collision_radius_wq2022_rg(
         - A, B are empirical coefficients from Qian et al. (2022).
 
     Arguments:
-        - radius_gyration : Radius of gyration of the particle (m).
+        - gyration_radius : Radius of gyration of the particle (m).
         - radius_monomer : Monomer radius (m).
 
     Returns:
@@ -240,20 +240,20 @@ def get_collision_radius_wq2022_rg(
     """
     coefficient = (0.973, 0.441)
     return (
-        coefficient[0] * (radius_gyration / radius_monomer) + coefficient[1]
+        coefficient[0] * (gyration_radius / radius_monomer) + coefficient[1]
     ) * radius_monomer
 
 
 @validate_inputs(
     {
         "fractal_dimension": "positive",
-        "radius_gyration": "positive",
+        "gyration_radius": "positive",
         "radius_monomer": "positive",
     }
 )
 def get_collision_radius_wq2022_rg_df(
     fractal_dimension: Union[NDArray[np.float64], float],
-    radius_gyration: Union[NDArray[np.float64], float],
+    gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
     """
@@ -271,7 +271,7 @@ def get_collision_radius_wq2022_rg_df(
 
     Arguments:
         - fractal_dimension : Fractal dimension of particle (dimensionless).
-        - radius_gyration : Radius of gyration of the particle (m).
+        - gyration_radius : Radius of gyration of the particle (m).
         - radius_monomer : Monomer radius (m).
 
     Returns:
@@ -294,7 +294,7 @@ def get_collision_radius_wq2022_rg_df(
     return (
         coefficient[0]
         * (fractal_dimension ** coefficient[1])
-        * (radius_gyration / radius_monomer)
+        * (gyration_radius / radius_monomer)
         + coefficient[2]
     ) * radius_monomer
 
@@ -303,14 +303,14 @@ def get_collision_radius_wq2022_rg_df(
     {
         "fractal_dimension": "positive",
         "fractal_prefactor": "positive",
-        "radius_gyration": "positive",
+        "gyration_radius": "positive",
         "radius_monomer": "positive",
     }
 )
 def get_collision_radius_wq2022_rg_df_k0(
     fractal_dimension: float,
     fractal_prefactor: float,
-    radius_gyration: Union[NDArray[np.float64], float],
+    gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
     """
@@ -331,7 +331,7 @@ def get_collision_radius_wq2022_rg_df_k0(
     Arguments:
         - fractal_dimension : Fractal dimension of particle (dimensionless).
         - fractal_prefactor : Fractal prefactor of particle (dimensionless).
-        - radius_gyration : Radius of gyration (m).
+        - gyration_radius : Radius of gyration (m).
         - radius_monomer : Monomer radius (m).
 
     Returns:
@@ -355,7 +355,7 @@ def get_collision_radius_wq2022_rg_df_k0(
         coefficient[0]
         * (fractal_dimension ** coefficient[1])
         * (fractal_prefactor ** coefficient[2])
-        * (radius_gyration / radius_monomer)
+        * (gyration_radius / radius_monomer)
         + coefficient[3] * fractal_prefactor
         + coefficient[4]
     ) * radius_monomer
@@ -366,7 +366,7 @@ def get_collision_radius_wq2022_rg_df_k0(
         "fractal_dimension": "positive",
         "fractal_prefactor": "positive",
         "shape_anisotropy": "positive",
-        "radius_gyration": "positive",
+        "gyration_radius": "positive",
         "radius_monomer": "positive",
     }
 )
@@ -374,7 +374,7 @@ def get_collision_radius_wq2022_rg_df_k0_a13(
     fractal_dimension: float,
     fractal_prefactor: float,
     shape_anisotropy: float,
-    radius_gyration: Union[NDArray[np.float64], float],
+    gyration_radius: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
     """
@@ -397,7 +397,7 @@ def get_collision_radius_wq2022_rg_df_k0_a13(
         - fractal_dimension : Fractal dimension of particle (dimensionless).
         - fractal_prefactor : Fractal prefactor of particle (dimensionless).
         - shape_anisotropy : Shape anisotropy parameter (dimensionless, A₁₃).
-        - radius_gyration : Radius of gyration (m).
+        - gyration_radius : Radius of gyration (m).
         - radius_monomer : Monomer radius (m).
 
     Returns:
@@ -423,7 +423,7 @@ def get_collision_radius_wq2022_rg_df_k0_a13(
         coefficient[0]
         * (fractal_dimension ** coefficient[1])
         * (fractal_prefactor ** coefficient[2])
-        * (radius_gyration / radius_monomer)
+        * (gyration_radius / radius_monomer)
         + coefficient[3] * fractal_prefactor
         + coefficient[4] * shape_anisotropy
         + coefficient[5]

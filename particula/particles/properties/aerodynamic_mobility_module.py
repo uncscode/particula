@@ -12,13 +12,13 @@ logger = logging.getLogger("particula")
 
 @validate_inputs(
     {
-        "radius": "positive",
+        "particle_radius": "positive",
         "slip_correction_factor": "nonnegative",
         "dynamic_viscosity": "positive",
     }
 )
 def get_aerodynamic_mobility(
-    radius: Union[float, NDArray[np.float64]],
+    particle_radius: Union[float, NDArray[np.float64]],
     slip_correction_factor: Union[float, NDArray[np.float64]],
     dynamic_viscosity: float,
 ) -> Union[float, NDArray[np.float64]]:
@@ -35,7 +35,7 @@ def get_aerodynamic_mobility(
         - r is the radius of the particle (m).
 
     Arguments:
-        - radius : The radius of the particle in meters.
+        - particle_radius : The radius of the particle in meters.
         - slip_correction_factor : Slip correction factor (dimensionless).
         - dynamic_viscosity : Dynamic viscosity of the fluid in Pa·s.
 
@@ -46,7 +46,7 @@ def get_aerodynamic_mobility(
         ``` py title="Example"
         import particula as par
         par.particles.get_particle_aerodynamic_mobility(
-            radius=0.00005,
+            particle_radius=0.00005,
             slip_correction_factor=1.1,
             dynamic_viscosity=0.0000181
         )
@@ -55,4 +55,6 @@ def get_aerodynamic_mobility(
         - Wikipedia contributors, "Stokes' Law," Wikipedia,
         https://en.wikipedia.org/wiki/Stokes%27_law.
     """
-    return slip_correction_factor / (6 * np.pi * dynamic_viscosity * radius)
+    return slip_correction_factor / (
+        6 * np.pi * dynamic_viscosity * particle_radius
+    )
