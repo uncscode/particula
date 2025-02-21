@@ -1,11 +1,14 @@
-"""calculating the mean free path of air
+"""
+Calculating the mean free path of air
 
-The mean free path is the average distance
-traveled by a molecule between collisions
-with other molecules present in a medium (air).
+Long Description:
+    The mean free path is the average distance traveled by a molecule
+    between collisions with other molecules in a medium (air). Typical
+    mean free path values in air are about 65 nm at 298 K and 101325 Pa.
 
-The expected mean free path of air is approx.
-65 nm at 298 K and 101325 Pa.
+References:
+    - "Mean Free Path," Wikipedia, The Free Encyclopedia,
+      https://en.wikipedia.org/wiki/Mean_free_path
 
 """
 
@@ -35,8 +38,21 @@ def molecule_mean_free_path(
     """
     Calculate the mean free path of a gas molecule in air.
 
+    Long Description:
+        This function calculates λ based on the input conditions. If
+        dynamic_viscosity is not provided, it is computed via
+        get_dynamic_viscosity(temperature).
+
     Equation:
         λ = (2 × μ / P) / √(8 × M / (π × R × T))
+
+    Where:
+        - λ : Mean free path [m].
+        - μ : Dynamic viscosity [Pa·s].
+        - P : Gas pressure [Pa].
+        - M : Molar mass [kg/mol].
+        - R : Universal gas constant [J/(mol·K)].
+        - T : Gas temperature [K].
 
     Arguments:
         molar_mass : The molar mass of the gas molecule [kg/mol].
@@ -47,6 +63,12 @@ def molecule_mean_free_path(
 
     Returns:
         Mean free path of the gas molecule in meters (m).
+
+    Examples:
+        ```py title="Example usage"
+        lam = molecule_mean_free_path()
+        # Returns mean free path at ~298K and 101325Pa, ~6.5e-8 m
+        ```
 
     References:
         - "Mean Free Path," Wikipedia, The Free Encyclopedia.
