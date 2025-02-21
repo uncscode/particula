@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from particula.util.convert import distribution_convert_pdf_pms
 
 
-def lognormal_pdf_distribution(
+def get_lognormal_pdf_distribution(
     x_values: NDArray[np.float64],
     mode: NDArray[np.float64],
     geometric_standard_deviation: NDArray[np.float64],
@@ -63,7 +63,7 @@ def lognormal_pdf_distribution(
     return np.nansum(scaled_distribution, axis=1)
 
 
-def lognormal_pmf_distribution(
+def get_lognormal_pmf_distribution(
     x_values: NDArray[np.float64],
     mode: NDArray[np.float64],
     geometric_standard_deviation: NDArray[np.float64],
@@ -93,7 +93,7 @@ def lognormal_pmf_distribution(
             https://en.wikipedia.org/wiki/Probability_mass_function)
     """
 
-    distribution_pdf = lognormal_pdf_distribution(
+    distribution_pdf = get_lognormal_pdf_distribution(
         x_values=x_values,
         mode=mode,
         geometric_standard_deviation=geometric_standard_deviation,
@@ -117,7 +117,7 @@ def lognormal_pmf_distribution(
     )
 
 
-def lognormal_sample_distribution(
+def get_lognormal_sample_distribution(
     mode: NDArray[np.float64],
     geometric_standard_deviation: NDArray[np.float64],
     number_of_particles: NDArray[np.float64],
