@@ -1,7 +1,6 @@
 """Module for coulomb-related enhancements
 
 References:
-----------
 Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
 in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear,
 and Soft Matter Physics, 85(2).
@@ -20,7 +19,7 @@ from particula.util.constants import (
 from particula.util.machine_limit import safe_exp
 
 
-def ratio(
+def get_coulomb_enhancement_ratio(
     radius: Union[float, NDArray[np.float64]],
     charge: Union[int, NDArray[np.float64]] = 0,
     temperature: float = 298.15,
@@ -44,7 +43,6 @@ def ratio(
     - T        : Temperature [K].
 
     Arguments:
-    ----------
         - radius : Radius of the particles [m].
         - charge : Number of charges on the particles [dimensionless].
         - temperature : Temperature of the system [K].
@@ -54,12 +52,10 @@ def ratio(
             negative values of the ratio, which are high repulsion cases.
 
     Returns:
-    --------
         - coulomb_potential_ratio : The Coulomb potential ratio ϕ_E
             [dimensionless].
 
     References:
-    -----------
         - Equation (7): Gopalakrishnan, R., & Hogan, C. J. (2012).
           Coulomb-influenced collisions in aerosols and dusty plasmas.
           Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410
@@ -86,7 +82,7 @@ def ratio(
     )
 
 
-def kinetic(
+def get_coulomb_kinetic_limit(
     coulomb_potential: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
@@ -99,16 +95,13 @@ def kinetic(
             exp(ϕ_E)         if ϕ_E < 0
 
     Arguments:
-    ----------
         - coulomb_potential : The Coulomb potential ratio ϕ_E [dimensionless].
 
     Returns:
-    --------
         - gamma_kinetic : Coulomb enhancement factor in the kinetic limit
             [dimensionless].
 
     References:
-    -----------
         - Equations (6d) and (6e): Gopalakrishnan, R., & Hogan, C. J. (2012).
           Coulomb-influenced collisions in aerosols and dusty plasmas.
           Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410
@@ -120,7 +113,7 @@ def kinetic(
     )
 
 
-def continuum(
+def get_coulomb_continuum_limit(
     coulomb_potential: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
@@ -133,16 +126,13 @@ def continuum(
             1                         if ϕ_E = 0
 
     Arguments:
-    ----------
         - coulomb_potential : The Coulomb potential ratio ϕ_E [dimensionless].
 
     Returns:
-    --------
         - gamma_continuum : Coulomb enhancement factor in the continuum limit
             [dimensionless].
 
     References:
-    -----------
         - Equation (6b): Gopalakrishnan, R., & Hogan, C. J. (2012).
           Coulomb-influenced collisions in aerosols and dusty plasmas.
           Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410
