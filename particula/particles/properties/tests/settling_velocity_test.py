@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from particula.particles.properties.settling_velocity import (
-    particle_settling_velocity,
+    get_particle_settling_velocity,
     get_particle_settling_velocity_via_inertia,
     get_particle_settling_velocity_with_drag,  # Add this line
 )
@@ -28,7 +28,7 @@ def test_calculate_settling_velocity_with_floats():
         / (18 * dynamic_viscosity)
     )
 
-    assert particle_settling_velocity(
+    assert get_particle_settling_velocity(
         radius,
         density,
         slip_correction_factor,
@@ -54,7 +54,7 @@ def test_calculate_settling_velocity_with_np_array():
     )
 
     assert np.allclose(
-        particle_settling_velocity(
+        get_particle_settling_velocity(
             radii_array,
             density_array,
             slip_correction_factor,
@@ -74,7 +74,7 @@ def test_calculate_settling_velocity_with_invalid_inputs():
     gravitational_acceleration = 9.80665
 
     with pytest.raises(TypeError):
-        particle_settling_velocity(
+        get_particle_settling_velocity(
             radius_invalid,
             particle_density,
             slip_correction_factor,
@@ -185,7 +185,7 @@ def test_get_particle_settling_velocity_with_drag_scalar_stokes():
     gravitational_acceleration = 9.80665  # m/s²
 
     # Expected settling velocity using the Stokes formula
-    expected_velocity = particle_settling_velocity(
+    expected_velocity = get_particle_settling_velocity(
         particle_radius,
         particle_density,
         slip_correction_factor,
@@ -217,7 +217,7 @@ def test_get_particle_settling_velocity_with_drag_array_stokes():
     gravitational_acceleration = 9.80665  # m/s²
 
     # Expected settling velocities using the Stokes formula
-    expected_velocity = particle_settling_velocity(
+    expected_velocity = get_particle_settling_velocity(
         particle_radius,
         particle_density,
         slip_correction_factor,
@@ -303,7 +303,7 @@ def test_get_particle_settling_velocity_with_drag_transition():
     re_threshold = 0.1  # As defined in the function
 
     # Calculate the Stokes velocity
-    stokes_velocity = particle_settling_velocity(
+    stokes_velocity = get_particle_settling_velocity(
         particle_radius,
         particle_density,
         slip_correction_factor,

@@ -1,5 +1,5 @@
 """Import all the property functions, so they can be accessed from
-particula.next.particles.properties.
+particula.particles.properties.
 """
 
 # These also need to be moved
@@ -25,10 +25,20 @@ from particula.particles.properties.aerodynamic_size import (
     get_aerodynamic_length,
     get_aerodynamic_shape_factor,
 )
+from particula.particles.properties.collision_radius_module import (
+    get_collision_radius_mg1988,
+    get_collision_radius_sr1992,
+    get_collision_radius_mzg2002,
+    get_collision_radius_tt2012,
+    get_collision_radius_wq2022_rg,
+    get_collision_radius_wq2022_rg_df,
+    get_collision_radius_wq2022_rg_df_k0,
+    get_collision_radius_wq2022_rg_df_k0_a13,
+)
 from particula.particles.properties.coulomb_enhancement import (
-    get_coulomb_continuum_limit,
     get_coulomb_enhancement_ratio,
     get_coulomb_kinetic_limit,
+    get_coulomb_continuum_limit,
 )
 from particula.particles.properties.diffusion_coefficient import (
     get_diffusion_coefficient,
@@ -65,10 +75,13 @@ from particula.particles.properties.reynolds_number import (
     get_particle_reynolds_number,
 )
 from particula.particles.properties.settling_velocity import (
+    get_particle_settling_velocity,
     get_particle_settling_velocity_via_inertia,
+    get_particle_settling_velocity_via_system_state,
     get_particle_settling_velocity_with_drag,
-    particle_settling_velocity,
-    particle_settling_velocity_via_system_state,
+)
+from particula.particles.properties.slip_correction_module import (
+    get_cunningham_slip_correction,
 )
 from particula.particles.properties.special_functions import (
     get_debye_function,

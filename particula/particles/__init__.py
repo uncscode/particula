@@ -7,6 +7,8 @@
 # flake8: noqa
 # pyright: basic
 
+from particula.particles import properties
+
 from particula.particles.distribution_strategies import (
     MassBasedMovingBin,
     RadiiBasedMovingBin,
@@ -61,4 +63,3 @@ from particula.particles.surface_builders import (
 from particula.particles.surface_factories import (
     SurfaceFactory,
 )
-from particula.particles import properties
