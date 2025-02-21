@@ -38,14 +38,12 @@ def get_fluid_rms_velocity(
 
 
     Arguments:
-    ----------
         - re_lambda : Taylor-microscale Reynolds number [-]
         - kinematic_viscosity : Kinematic viscosity of the fluid [m²/s]
         - turbulent_dissipation : Rate of dissipation of turbulent kinetic
             energy [m²/s³]
 
     Returns:
-    --------
         - Fluid RMS fluctuation velocity [m/s]
     """
     kolmogorov_velocity = get_kolmogorov_velocity(
