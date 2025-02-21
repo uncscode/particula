@@ -31,18 +31,39 @@ def get_diffusion_coefficient(
     boltzmann_constant: float = BOLTZMANN_CONSTANT,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the diffusion coefficient of a particle.
+    Calculate the diffusion coefficient of a particle based on temperature and aerodynamic mobility.
+
+    The diffusion coefficient (D) can be computed using:
+
+    - D = k_B T × B
+        - D is the diffusion coefficient in m²/s,
+        - k_B is the Boltzmann constant in J/K,
+        - T is the temperature in Kelvin,
+        - B is the aerodynamic mobility in m²/s.
 
     Arguments:
-        temperature: The temperature at which the particle is
-            diffusing, in Kelvin. Defaults to 298.15 K.
-        boltzmann_constant: The Boltzmann constant. Defaults to the
-            standard value of 1.380649 x 10^-23 J/K.
-        aerodynamic_mobility: The aerodynamic mobility of
-            the particle [m^2/s].
+        - temperature : Temperature in Kelvin (K).
+        - aerodynamic_mobility : Aerodynamic mobility in m²/s.
+        - boltzmann_constant : Boltzmann constant in J/K (default: 1.380649e-23).
 
     Returns:
-        The diffusion coefficient of the particle [m^2/s].
+        - The diffusion coefficient of the particle in m²/s.
+
+    Examples:
+        ``` py title="Example"
+        from particula.particles.properties.diffusion_coefficient import get_diffusion_coefficient
+
+        D = get_diffusion_coefficient(temperature=300.0, aerodynamic_mobility=1.0e-8)
+        print(D)
+        # Output: ...
+        ```
+
+    References:
+        - Einstein, A. (1905). "On the movement of small particles suspended
+          in stationary liquids required by the molecular-kinetic theory of heat."
+          Annalen der Physik, 17(8), 549–560.
+        - "Stokes-Einstein equation," Wikipedia,
+          https://en.wikipedia.org/wiki/Stokes%E2%80%93Einstein_equation
     """
     return boltzmann_constant * temperature * aerodynamic_mobility
 
@@ -53,16 +74,38 @@ def get_diffusion_coefficient_via_system_state(
     pressure: float,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the diffusion coefficient of a particle.
+    Calculate the diffusion coefficient from system state parameters.
+
+    This function determines the diffusion coefficient (D) of a particle by:
+    1. Computing gas properties (dynamic viscosity, mean free path),
+    2. Determining particle slip correction and aerodynamic mobility,
+    3. Calling get_diffusion_coefficient() to get D.
 
     Arguments:
-        temperature: The temperature of the system in Kelvin (K).
-        particle_radius: The radius of the particle in meters (m).
-        pressure: The pressure of the system in Pascals (Pa).
+        - particle_radius : Particle radius in meters (m).
+        - temperature : System temperature in Kelvin (K).
+        - pressure : System pressure in Pascals (Pa).
 
     Returns:
-        The diffusion coefficient of the particle in square meters per
-        second (m²/s).
+        - The diffusion coefficient of the particle in m²/s.
+
+    Examples:
+        ``` py title="Example"
+        from particula.particles.properties.diffusion_coefficient import get_diffusion_coefficient_via_system_state
+        D = get_diffusion_coefficient_via_system_state(
+            particle_radius=1.0e-7,
+            temperature=298.15,
+            pressure=101325
+        )
+        print(D)
+        # Output: ...
+        ```
+
+    References:
+        - Millikan, R. A. (1923). "On the elementary electrical charge and the
+          Avogadro constant." Physical Review, 2(2), 109–143.
+        - "Mass Diffusion," Wikipedia,
+          https://en.wikipedia.org/wiki/Diffusion#Mass_diffusion
     """
 
     # Step 1: Calculate gas properties
