@@ -376,9 +376,9 @@ class BuilderLognormalMixin:
         """Set the geometric standard deviation for the distribution.
 
         Args:
-            geometric_standard_deviation: The geometric standard deviation for
+            geometric_standard_deviation : The geometric standard deviation for
                 the radius.
-            geometric_standard_deviation_units: Optional, ignored units for
+            geometric_standard_deviation_units : Optional, ignored units for
                 geometric standard deviation [dimensionless].
         """
         if geometric_standard_deviation_units is not None:
