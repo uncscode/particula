@@ -7370,13 +7370,15 @@
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/fluid_rms_velocity.py#L13">Show source in fluid_rms_velocity.py:13</a></p>
 <p>Calculate the fluid RMS fluctuation velocity.</p>
 <p>The fluid root-mean-square (RMS) velocity fluctuation quantifies
-turbulence intensity in a fluid flow. It is calculated as:
-- u' = (R_λ^(&frac12;) v_K) / 15^(&frac14;)
-- u' is Fluid RMS fluctuation velocity [m/s]
-- R_λ (re_lambda) is Taylor-microscale Reynolds number [-]
-- v_K is Kolmogorov velocity scale, computed as v_K = ( ε)^(&frac14;) [m/s]
-- v (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s]
-- ε (turbulent_dissipation) is Turbulent energy dissipation rate [m²/s³]</p>
+turbulence intensity in a fluid flow. It is calculated as:</p>
+<ul>
+<li>u' = (R_λ^(&frac12;) v_K) / 15^(&frac14;)</li>
+<li>u' is Fluid RMS fluctuation velocity [m/s]</li>
+<li>R_λ (re_lambda) is Taylor-microscale Reynolds number [-]</li>
+<li>v_K is Kolmogorov velocity scale, computed as v_K = ( ε)^(&frac14;) [m/s]</li>
+<li>v (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s]</li>
+<li>ε (turbulent_dissipation) is Turbulent energy dissipation rate [m²/s³]</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
 <li>re_lambda : Taylor-microscale Reynolds number [-]</li>
@@ -7402,7 +7404,7 @@ turbulence intensity in a fluid flow. It is calculated as:
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
 <ul>
 <li>H. Tennekes and J. L. Lumley, "A First Course in Turbulence,"
-  MIT Press, 1972.</li>
+  MIT Press, 1972. [check this]</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
