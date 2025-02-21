@@ -36,7 +36,7 @@ from particula.particles.properties.coulomb_enhancement import (
     get_coulomb_continuum_limit,
 )
 from particula.particles.properties.diffusive_knudsen_module import (
-    diffusive_knudsen_number,
+    get_diffusive_knudsen_number,
 )
 from particula.particles.properties.vapor_correction_module import (
     vapor_transition_correction,

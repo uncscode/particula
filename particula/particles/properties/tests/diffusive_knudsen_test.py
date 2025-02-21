@@ -2,7 +2,7 @@
 
 import pytest
 import numpy as np
-from particula.particles.properties import diffusive_knudsen_number
+from particula.particles.properties import get_diffusive_knudsen_number
 
 
 def test_diffusive_knudsen_number_scalar():
@@ -13,7 +13,7 @@ def test_diffusive_knudsen_number_scalar():
     coulomb_potential_ratio = 0.5  # dimensionless
     temperature = 298.15  # K
 
-    result = diffusive_knudsen_number(
+    result = get_diffusive_knudsen_number(
         radius,
         mass_particle,
         friction_factor,
@@ -33,7 +33,7 @@ def test_diffusive_knudsen_number_array():
     coulomb_potential_ratio = np.array([0.5, 0])  # different charges
     temperature = 298.15
 
-    result = diffusive_knudsen_number(
+    result = get_diffusive_knudsen_number(
         radius,
         mass_particle,
         friction_factor,
@@ -56,7 +56,7 @@ def test_with_zero_coulomb_potential_ratio():
     coulomb_potential_ratio = 0.0  # no charges
     temperature = 298.15
 
-    result = diffusive_knudsen_number(
+    result = get_diffusive_knudsen_number(
         radius,
         mass_particle,
         friction_factor,
@@ -70,7 +70,7 @@ def test_with_zero_coulomb_potential_ratio():
 def test_invalid_inputs():
     """Test the diffusive Knudsen number calculation with invalid inputs."""
     with pytest.raises(TypeError):
-        diffusive_knudsen_number(
+        get_diffusive_knudsen_number(
             "invalid",  # invalid radius
             1e-18,  # valid mass
             1.0,  # valid friction factor
