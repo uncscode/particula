@@ -16,6 +16,8 @@ def get_lagrangian_integral_time(
     fluid_rms_velocity: Union[float, NDArray[np.float64]],
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
+    """
+    """
     Examples:
         ``` py title="Example Usage"
         T_L = get_lagrangian_integral_time(0.5, 0.1)

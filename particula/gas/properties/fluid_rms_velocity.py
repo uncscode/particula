@@ -22,6 +22,7 @@ def get_fluid_rms_velocity(
     kinematic_viscosity: Union[float, NDArray[np.float64]],
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
+    """
     Examples:
         ``` py title="Example Usage"
         velocity = get_fluid_rms_velocity(500, 1.5e-5, 0.1)
