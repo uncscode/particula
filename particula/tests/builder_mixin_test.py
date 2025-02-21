@@ -101,7 +101,9 @@ def test_concentration_mixin():
     # test setting concentration
     with pytest.raises(ValueError) as excinfo:
         builder_mixin.set_concentration(-1)
-    assert "Argument 'concentration' must be positive." in str(excinfo.value)
+    assert "Argument 'concentration' must be nonnegative." in str(
+        excinfo.value
+    )
 
     # test positive concentration
     builder_mixin.set_concentration(1)
@@ -132,8 +134,10 @@ def test_temperature_mixin():
 
     # test setting temperature in Kelvin
     with pytest.raises(ValueError) as excinfo:
-        builder_mixin.set_temperature(-1)
-    assert "Argument 'temperature' must be positive." in str(excinfo.value)
+        builder_mixin.set_temperature(np.nan)
+    assert "Argument 'temperature' must be finite (no inf or NaN)." in str(
+        excinfo.value
+    )
 
     # test positive temperature in Kelvin
     builder_mixin.set_temperature(300)
@@ -147,7 +151,7 @@ def test_pressure_mixin():
     # test setting pressure
     with pytest.raises(ValueError) as excinfo:
         builder_mixin.set_pressure(-1)
-    assert "Argument 'pressure' must be positive." in str(excinfo.value)
+    assert "Argument 'pressure' must be nonnegative." in str(excinfo.value)
 
     # test positive pressure
     builder_mixin.set_pressure(102000)
@@ -171,7 +175,7 @@ def test_mass_mixin():
     # test setting mass
     with pytest.raises(ValueError) as excinfo:
         builder_mixin.set_mass(-1)
-    assert "Argument 'mass' must be positive." in str(excinfo.value)
+    assert "Argument 'mass' must be nonnegative." in str(excinfo.value)
 
     # test positive mass
     builder_mixin.set_mass(1)
@@ -199,7 +203,7 @@ def test_radius_mixin():
     # test setting radius
     with pytest.raises(ValueError) as excinfo:
         builder_mixin.set_radius(-1)
-    assert "Argument 'radius' must be positive." in str(excinfo.value)
+    assert "Argument 'radius' must be nonnegative." in str(excinfo.value)
 
     # test positive radius
     builder_mixin.set_radius(1)

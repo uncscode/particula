@@ -1,11 +1,11 @@
-""" calculating the mean free path of air
+"""calculating the mean free path of air
 
-    The mean free path is the average distance
-    traveled by a molecule between collisions
-    with other molecules present in a medium (air).
+The mean free path is the average distance
+traveled by a molecule between collisions
+with other molecules present in a medium (air).
 
-    The expeected mean free path of air is approx.
-    65 nm at 298 K and 101325 Pa.
+The expeected mean free path of air is approx.
+65 nm at 298 K and 101325 Pa.
 
 """
 

@@ -1,5 +1,4 @@
-""" testing the utility calculating reduced quantities
-"""
+"""testing the utility calculating reduced quantities"""
 
 import numpy as np
 import pytest

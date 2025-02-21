@@ -1,5 +1,4 @@
-""" test the slip correction factor calculation
-"""
+"""test the slip correction factor calculation"""
 
 import numpy as np
 import pytest

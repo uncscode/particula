@@ -19,7 +19,7 @@ from particula.gas.properties.thermal_conductivity import (
     get_thermal_conductivity,
 )
 from particula.gas.properties.concentration_function import (
-    calculate_concentration,
+    get_concentration_from_pressure,
 )
 from particula.gas.properties.pressure_function import (
     calculate_partial_pressure,

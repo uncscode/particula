@@ -1,5 +1,4 @@
-""" Module for calculating Knudsen number
-"""
+"""Module for calculating Knudsen number"""
 
 from typing import Union
 import logging

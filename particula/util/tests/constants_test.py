@@ -1,5 +1,4 @@
-""" testing getting constants from the get_constants.py file
-"""
+"""testing getting constants from the get_constants.py file"""
 
 from particula.util.constants import (
     AVOGADRO_NUMBER,

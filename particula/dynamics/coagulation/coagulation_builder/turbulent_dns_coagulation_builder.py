@@ -78,6 +78,7 @@ class TurbulentDNSCoagulationBuilder(
         self.reynolds_lambda = reynolds_lambda
         return self
 
+    @validate_inputs({"relative_velocity": "finite"})
     def set_relative_velocity(
         self,
         relative_velocity: float,

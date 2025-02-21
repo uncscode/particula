@@ -1,5 +1,4 @@
-""" Module for the diffusive knudsen number
-"""
+"""Module for the diffusive knudsen number"""
 
 from typing import Union
 from numpy.typing import NDArray

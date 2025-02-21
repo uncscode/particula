@@ -85,7 +85,7 @@ def ideal_activity_volume(
 
 
 def ideal_activity_mass(
-    mass_concentration: Union[float, NDArray[np.float64]]
+    mass_concentration: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Calculate the ideal activity of a species based on mass fractions.

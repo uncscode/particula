@@ -1,5 +1,4 @@
-""" test the coag approx utility for lf2013
-"""
+"""test the coag approx utility for lf2013"""
 
 # import pytest
 import numpy as np

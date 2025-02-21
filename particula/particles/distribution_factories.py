@@ -1,5 +1,4 @@
-"""Factory Classes for selecting the distribution strategy.
-"""
+"""Factory Classes for selecting the distribution strategy."""
 
 from typing import Union
 from particula.abc_factory import StrategyFactoryABC

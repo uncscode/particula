@@ -86,7 +86,7 @@ def compute_beta(
 
 @validate_inputs({"z": "positive"})
 def compute_b1(
-    z: Union[float, NDArray[np.float64]]
+    z: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Compute b₁, which is defined as:
@@ -116,7 +116,7 @@ def compute_b1(
 
 @validate_inputs({"z": "positive"})
 def compute_b2(
-    z: Union[float, NDArray[np.float64]]
+    z: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Compute b₂, which is defined as:
@@ -210,7 +210,7 @@ def compute_c2(
 
 @validate_inputs({"beta": "positive"})
 def compute_d1(
-    beta: Union[float, NDArray[np.float64]]
+    beta: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Compute d₁, which is defined as:
@@ -240,7 +240,7 @@ def compute_d1(
 
 @validate_inputs({"beta": "positive"})
 def compute_d2(
-    beta: Union[float, NDArray[np.float64]]
+    beta: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Compute d₂, which is defined as:

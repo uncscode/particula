@@ -1,5 +1,4 @@
-""" Module for calculate slip correction
-"""
+"""Module for calculate slip correction"""
 
 from typing import Union
 from numpy.typing import NDArray
@@ -7,7 +6,7 @@ import numpy as np
 
 
 def cunningham_slip_correction(
-    knudsen_number: Union[float, NDArray[np.float64]]
+    knudsen_number: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Calculate the Cunningham slip correction factor. Accounts for

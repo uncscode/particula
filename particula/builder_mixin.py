@@ -1,5 +1,4 @@
-"""Mixin classes for Builder classes to set attributes and units.
-"""
+"""Mixin classes for Builder classes to set attributes and units."""
 
 # pylint: disable=too-few-public-methods
 
@@ -49,7 +48,6 @@ class BuilderSurfaceTensionMixin:
     """Mixin class for Builder classes to set surface_tension.
 
     Methods:
-    -------
         set_surface_tension: Set the surface_tension attribute and units.
     """
 
@@ -114,7 +112,7 @@ class BuilderConcentrationMixin:
     concentration_units.
 
     Args:
-        default_units: Default units of concentration. Default is *kg/m^3*.
+        default_units : Default units of concentration. Default is *kg/m^3*.
 
     Methods:
         set_concentration: Set the concentration attribute and units.
@@ -135,7 +133,7 @@ class BuilderConcentrationMixin:
         Args:
             concentration : Concentration in the mixture.
             concentration_units : Units of the concentration.
-            Default is *kg/m^3*.
+                Default is *kg/m^3*.
         """
         if concentration_units is None:
             concentration_units = self.default_units
@@ -322,9 +320,6 @@ class BuilderPressureMixin:
 
         Returns:
             AtmosphereBuilderMixin: This object instance with updated pressure.
-
-        Raises:
-            ValueError: If the total pressure is below zero.
         """
         if pressure_units == "Pa":
             self.pressure = pressure
@@ -396,8 +391,8 @@ class BuilderLognormalMixin:
 
         Args:
             number_concentration : The number concentration for the radius.
-            number_concentration_units : The units for the number concentration,
-                default is '1/m^3'.
+            number_concentration_units : The units for the number
+                concentration [1/m^3].
         """
         if number_concentration_units == "1/m^3":
             self.number_concentration = number_concentration
@@ -428,10 +423,8 @@ class BuilderParticleResolvedCountMixin:
 
         Args:
             particle_resolved_count : The number of particles to resolve.
-            particle_resolved_count_units : Ignored units for particle resolved.
-
-        Raises:
-            ValueError: If particle_resolved_count is negative.
+            particle_resolved_count_units : Ignored units for particle
+                resolved.
         """
         if particle_resolved_count_units is not None:
             logger.warning("Ignoring units for particle resolved count.")

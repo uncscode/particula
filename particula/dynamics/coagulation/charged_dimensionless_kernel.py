@@ -1,5 +1,5 @@
-""" Dimensionless coagulation according for several approximations of the
-    transition regime.
+"""Dimensionless coagulation according for several approximations of the
+transition regime.
 """
 
 from typing import Union
@@ -60,7 +60,7 @@ def get_dimensional_kernel(
 
 
 def get_hard_sphere_kernel(
-    diffusive_knudsen: Union[float, NDArray[np.float64]]
+    diffusive_knudsen: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """Hard sphere approximation for the dimensionless coagulation kernel.
 

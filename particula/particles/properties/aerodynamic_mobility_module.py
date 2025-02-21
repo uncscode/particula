@@ -1,5 +1,4 @@
-"""Module for aerodynamic mobility of a particle in a fluid.
-"""
+"""Module for aerodynamic mobility of a particle in a fluid."""
 
 from typing import Union
 import logging

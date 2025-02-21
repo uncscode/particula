@@ -1,7 +1,7 @@
-""" A centralized location for important, unchanged physics parameters.
+"""A centralized location for important, unchanged physics parameters.
 
 
-    All constants are given in their base units. We use scipy constants.
+All constants are given in their base units. We use scipy constants.
 """
 
 import scipy
