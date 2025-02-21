@@ -55,7 +55,7 @@ def to_mole_fraction(
         return moles / total_moles
 
     # Handle 2D arrays
-    elif moles.ndim == 2:
+    if moles.ndim == 2:
         # Sum row-wise (shape: (n_rows, 1))
         total_moles = moles.sum(axis=1, keepdims=True)
         # Prepare output array
@@ -72,9 +72,7 @@ def to_mole_fraction(
         )
 
         return mole_fractions
-
-    else:
-        raise ValueError("mass_concentrations must be either 1D or 2D")
+    raise ValueError("mass_concentrations must be either 1D or 2D")
 
 
 @validate_inputs(
@@ -120,7 +118,7 @@ def to_volume_fraction(
         return volumes / total_volume
 
     # Handle 2D arrays
-    elif volumes.ndim == 2:
+    if volumes.ndim == 2:
         total_volume = volumes.sum(axis=1, keepdims=True)  # shape: (n_rows, 1)
 
         # Prepare an output array of the same shape
@@ -138,9 +136,7 @@ def to_volume_fraction(
             volumes[indices, :] / total_volume[indices, :]
         )
         return volume_fractions
-
-    else:
-        raise ValueError("mass_concentrations must be either 1D or 2D")
+    raise ValueError("mass_concentrations must be either 1D or 2D")
 
 
 @validate_inputs(
@@ -179,7 +175,7 @@ def to_mass_fraction(
         return mass_concentrations / total_mass
 
     # Handle 2D arrays
-    elif mass_concentrations.ndim == 2:
+    if mass_concentrations.ndim == 2:
         # Row-wise sum
         total_mass = mass_concentrations.sum(axis=1, keepdims=True)
         # Prepare output
@@ -195,8 +191,5 @@ def to_mass_fraction(
         mass_fractions[row_indices, :] = (
             mass_concentrations[row_indices, :] / total_mass[row_indices, :]
         )
-
         return mass_fractions
-
-    else:
-        raise ValueError("mass_concentrations must be either 1D or 2D")
+    raise ValueError("mass_concentrations must be either 1D or 2D")
