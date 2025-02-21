@@ -196,7 +196,9 @@ class BuilderMassMixin:
         if mass_units == "kg":
             self.mass = mass
         else:
-            self.mass = mass * convert_units(mass_units, "kg")
+            self.mass = (
+                mass * convert_units(mass_units, "kg")
+            )
         return self
 
 
@@ -228,7 +230,9 @@ class BuilderVolumeMixin:
         if volume_units == "m^3":
             self.volume = volume
         else:
-            self.volume = volume * convert_units(volume_units, "m^3")
+            self.volume = (
+                volume * convert_units(volume_units, "m^3")
+            )
         return self
 
 
@@ -260,7 +264,9 @@ class BuilderRadiusMixin:
         if radius_units == "m":
             self.radius = radius
         else:
-            self.radius = radius * convert_units(radius_units, "m")
+            self.radius = (
+                radius * convert_units(radius_units, "m")
+            )
         return self
 
 
@@ -331,7 +337,9 @@ class BuilderPressureMixin:
         if pressure_units == "Pa":
             self.pressure = pressure
         else:
-            self.pressure = pressure * convert_units(pressure_units, "Pa")
+            self.pressure = (
+                pressure * convert_units(pressure_units, "Pa")
+            )
         return self
 
 
@@ -369,7 +377,9 @@ class BuilderLognormalMixin:
         if mode_units == "m":
             self.mode = mode
         else:
-            self.mode = mode * convert_units(mode_units, "m")
+            self.mode = (
+                mode * convert_units(mode_units, "m")
+            )
         return self
 
     @validate_inputs({"geometric_standard_deviation": "positive"})
