@@ -15,28 +15,44 @@ def get_kelvin_radius(
     temperature: float,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the Kelvin radius which determines the curvature effect on
-    vapor pressure.
+    Compute the Kelvin radius (rₖ) to account for curvature effects on vapor pressure.
 
-    Args:
-    -----
-    - surface_tension (float or NDArray[float]): Surface tension of the
-    mixture [N/m].
-    - molar_mass (float or NDArray[float]): Molar mass of the species
-    [kg/mol].
-    - mass_concentration (float or NDArray[float]): Concentration of the
-    species [kg/m^3].
-    - temperature (float): Temperature of the system [K].
+    The Kelvin radius is defined by:
+
+    - rₖ = (2 × σ × M) / (R × T × ρ)
+        - rₖ is Kelvin radius in meters (m).
+        - σ is the effective surface tension in N/m.
+        - M is the molar mass in kg/mol.
+        - R is the universal gas constant in J/(mol·K).
+        - T is the temperature in Kelvin (K).
+        - ρ is the effective density in kg/m³.
+
+    Arguments:
+        - effective_surface_tension : Surface tension of the mixture (N/m).
+        - effective_density : Effective density of the mixture (kg/m³).
+        - molar_mass : Molar mass (kg/mol).
+        - temperature : Temperature of the system (K).
 
     Returns:
-    --------
-    - float or NDArray[float]: Kelvin radius [m].
+        - Kelvin radius in meters (float or NDArray[np.float64]).
+
+    Examples:
+        ``` py title="Example"
+        import numpy as np
+        from particula.particles.properties.kelvin_effect_module import get_kelvin_radius
+        r_kelvin = get_kelvin_radius(
+            effective_surface_tension=0.072,
+            effective_density=1000.0,
+            molar_mass=0.018,
+            temperature=298.15
+        )
+        print(r_kelvin)
+        # Output: ...
+        ```
 
     References:
-    -----------
-    - Based on Neil Donahue's approach to the Kelvin equation:
-    r = 2 * surface_tension * molar_mass / (R * T * density)
-    See more: https://en.wikipedia.org/wiki/Kelvin_equation
+        - "Kelvin equation," Wikipedia,
+          https://en.wikipedia.org/wiki/Kelvin_equation
     """
     return (2 * effective_surface_tension * molar_mass) / (
         GAS_CONSTANT * temperature * effective_density
@@ -48,23 +64,38 @@ def get_kelvin_term(
     kelvin_radius_value: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the Kelvin term, which quantifies the effect of particle
-    curvature on vapor pressure.
+    Compute the Kelvin exponential term to account for curvature effects.
 
-    Args:
-    -----
-    - radius (float or NDArray[float]): Radius of the particle [m].
-    - kelvin_radius (float or NDArray[float]): Kelvin radius [m].
+    The Kelvin term (K) is given by:
+
+    - K = exp(rₖ / rₚ)
+        - K is dimensionless.
+        - rₖ is the Kelvin radius (m).
+        - rₚ is the particle radius (m).
+
+    Arguments:
+        - particle_radius : Radius of the particle (m).
+        - kelvin_radius_value : Precomputed Kelvin radius (m).
 
     Returns:
-    --------
-    - float or NDArray[float]: The exponential factor adjusting vapor
-    pressure due to curvature.
+        - Dimensionless exponential factor adjusting vapor pressure.
+
+    Examples:
+        ``` py title="Example"
+        import numpy as np
+        from particula.particles.properties.kelvin_effect_module import get_kelvin_term
+        kv_term = get_kelvin_term(
+            particle_radius=1e-7,
+            kelvin_radius_value=2e-7
+        )
+        print(kv_term)
+        # Output: ...
+        ```
 
     References:
-        Based on Neil Donahue's collection of terms in the Kelvin equation:
-        exp(kelvin_radius / particle_radius)
-        See more: https://en.wikipedia.org/wiki/Kelvin_equation
+        - Donahue, N. M., et al. (2013). "How do organic vapors contribute to
+          new-particle formation?" Faraday Discussions, 165, 91–104.
+          https://doi.org/10.1039/C3FD00046J.
     """
     kelvin_expand = False
     # Broadcast the arrays if necessary np.isscalar(kelvin_radius_value)
