@@ -25,7 +25,7 @@ def get_particle_reynolds_number(
     Calculate the Reynolds number (Reₚ) of a particle in a fluid.
 
     This dimensionless quantity characterizes the flow regime:
-        
+
     - Reₚ = (2 × a × vₚ) / ν
         - a is the particle radius in meters (m).
         - vₚ is the particle velocity in meters/second (m/s).
