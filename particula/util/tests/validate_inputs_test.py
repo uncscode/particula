@@ -60,12 +60,12 @@ def test_valid_inputs():
 def test_valid_finite():
     """Test that the decorator raises an error when a finite argument is
     infinite"""
-    some_dict = {"x": "finite"}
+    some_dict2 = {"x": "finite"}
 
-    @validate_inputs(some_dict)
-    def sample_function(x):
+    @validate_inputs(some_dict2)
+    def sample_function2(x):
         """A sample function to test the decorator"""
         return x
 
     with pytest.raises(ValueError, match="Argument 'x' must be finite."):
-        sample_function(np.nan)
+        sample_function2(np.nan)
