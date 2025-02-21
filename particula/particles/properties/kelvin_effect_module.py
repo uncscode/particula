@@ -8,7 +8,7 @@ from particula.util.constants import GAS_CONSTANT
 from particula.util.machine_limit import safe_exp
 
 
-def kelvin_radius(
+def get_kelvin_radius(
     effective_surface_tension: Union[float, NDArray[np.float64]],
     effective_density: Union[float, NDArray[np.float64]],
     molar_mass: Union[float, NDArray[np.float64]],
@@ -43,8 +43,8 @@ def kelvin_radius(
     )
 
 
-def kelvin_term(
-    radius: Union[float, NDArray[np.float64]],
+def get_kelvin_term(
+    particle_radius: Union[float, NDArray[np.float64]],
     kelvin_radius_value: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
@@ -73,8 +73,12 @@ def kelvin_term(
     ):
         kelvin_expand = True
         kelvin_radius_value = kelvin_radius_value[np.newaxis, :]
-    if isinstance(radius, np.ndarray) and not kelvin_expand:
-        return safe_exp(kelvin_radius_value / radius)
-    if isinstance(radius, np.ndarray) and (radius.size > 1) and kelvin_expand:
-        radius = radius[:, np.newaxis]
-    return safe_exp(kelvin_radius_value / radius)
+    if isinstance(particle_radius, np.ndarray) and not kelvin_expand:
+        return safe_exp(kelvin_radius_value / particle_radius)
+    if (
+        isinstance(particle_radius, np.ndarray)
+        and (particle_radius.size > 1)
+        and kelvin_expand
+    ):
+        particle_radius = particle_radius[:, np.newaxis]
+    return safe_exp(kelvin_radius_value / particle_radius)
