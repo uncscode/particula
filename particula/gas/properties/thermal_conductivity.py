@@ -15,22 +15,19 @@ def get_thermal_conductivity(
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
+    Thermal conductivity of air as a function of temperature.
+
     Calculate the thermal conductivity of air as a function of temperature.
     Based on a simplified linear relation from atmospheric science literature.
     Only valid for temperatures within the range typically found on
     Earth's surface.
 
-    Long Description:
-        This function uses a simplified linear relation from
-        atmospheric science literature. Valid for Earth-like surface
-        temperatures, typically 200–330 K.
-
     Equation:
         - k(T) = 1e-3 × (4.39 + 0.071 × T)
 
     Where:
-        - k(T) : Thermal conductivity [W/(m·K)].
-        - T : Temperature [K].
+        - k(T) is Thermal conductivity [W/(m·K)].
+        - T is Temperature [K].
 
     Arguments:
         - temperature : The temperature in Kelvin (K).

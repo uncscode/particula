@@ -5,9 +5,17 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.util.constants import GAS_CONSTANT
+from particula.util.validate_inputs import validate_inputs
 
 
-def calculate_partial_pressure(
+@validate_inputs(
+    {
+        "concentration": "nonnegative",
+        "molar_mass": "positive",
+        "temperature": "positive",
+    }
+)
+def get_partial_pressure(
     concentration: Union[float, NDArray[np.float64]],
     molar_mass: Union[float, NDArray[np.float64]],
     temperature: Union[float, NDArray[np.float64]],
@@ -16,19 +24,15 @@ def calculate_partial_pressure(
     Calculate the partial pressure of a gas from its concentration, molar mass,
     and temperature.
 
-    Long Description:
-        This function uses the ideal gas relation:
-        p = (c × R × T) / M
-
     Equation:
         - p = (c × R × T) / M
 
     Where:
-        - p : Partial pressure [Pa].
-        - c : Gas concentration [kg/m³].
-        - R : Universal gas constant [J/(mol·K)].
-        - T : Temperature [K].
-        - M : Molar mass [kg/mol].
+        - p is Partial pressure [Pa].
+        - c is Gas concentration [kg/m³].
+        - R is Universal gas constant [J/(mol·K)].
+        - T is Temperature [K].
+        - M is Molar mass [kg/mol].
 
     Arguments:
         - concentration : Concentration of the gas [kg/m³].
@@ -48,19 +52,17 @@ def calculate_partial_pressure(
         - Wikipedia contributors, "Ideal gas law," Wikipedia,
           https://en.wikipedia.org/wiki/Ideal_gas_law
     """
-    # Input validation
-    if np.any(concentration < 0):
-        raise ValueError("Concentration must be positive")
-    if np.any(molar_mass <= 0):
-        raise ValueError("Molar mass must be positive")
-    if np.any(temperature <= 0):
-        raise ValueError("Temperature must be positive")
-
     # Calculate the partial pressure
     return (concentration * float(GAS_CONSTANT) * temperature) / molar_mass
 
 
-def calculate_saturation_ratio(
+@validate_inputs(
+    {
+        "partial_pressure": "positive",
+        "pure_vapor_pressure": "positive",
+    }
+)
+def get_saturation_ratio_from_concentration(
     partial_pressure: Union[float, NDArray[np.float64]],
     pure_vapor_pressure: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -68,17 +70,16 @@ def calculate_saturation_ratio(
     Calculate the saturation ratio of the gas at a given partial pressure and
     pure vapor pressure.
 
-    Long Description:
-        The saturation ratio is defined as the ratio of partial pressure to the
-        pure vapor pressure.
+    The saturation ratio is defined as the ratio of partial pressure to the
+    pure vapor pressure.
 
     Equation:
         - S = p / p_vap
 
     Where:
-        - S : Saturation ratio (dimensionless).
-        - p : Partial pressure [Pa].
-        - p_vap : Pure vapor pressure [Pa].
+        - S is Saturation ratio (dimensionless).
+        - p is Partial pressure [Pa].
+        - p_vap is Pure vapor pressure [Pa].
 
     Arguments:
         - partial_pressure : Partial pressure [Pa].

@@ -9,7 +9,7 @@ from particula.util.constants import GAS_CONSTANT
 
 
 # Antoine equation function
-def antoine_vapor_pressure(
+def get_antoine_vapor_pressure(
     a: Union[float, NDArray[np.float64]],
     b: Union[float, NDArray[np.float64]],
     c: Union[float, NDArray[np.float64]],
@@ -37,7 +37,7 @@ def antoine_vapor_pressure(
 
 
 # Clausius-Clapeyron equation function
-def clausius_clapeyron_vapor_pressure(
+def get_clausius_clapeyron_vapor_pressure(
     latent_heat: Union[float, NDArray[np.float64]],
     temperature_initial: Union[float, NDArray[np.float64]],
     pressure_initial: Union[float, NDArray[np.float64]],
@@ -67,7 +67,7 @@ def clausius_clapeyron_vapor_pressure(
 
 
 # Buck equation function
-def buck_vapor_pressure(
+def get_buck_vapor_pressure(
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """

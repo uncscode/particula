@@ -29,23 +29,23 @@ def get_lagrangian_taylor_microscale_time(
     time for the decay of turbulent velocity correlations. It provides insight
     into the memory of turbulent fluid elements. It is given by:
 
-        τ_T = τ_k * (2 R_λ / (15^(1/2) a_o))^(1/2)
+    Equation:
+        - τ_T = τ_k * (2 R_λ / (15^(1/2) a_o))^(1/2)
 
-    - τ_T : Lagrangian Taylor microscale time [s]
-    - τ_k (kolmogorov_time) : Kolmogorov time scale [s]
-    - R_λ (re_lambda) : Taylor-microscale Reynolds number [-]
-    - a_o (accel_variance) : Normalized acceleration variance in isotropic
-        turbulence [-]
+    Where:
+        - τ_T is Lagrangian Taylor microscale time [s]
+        - τ_k (kolmogorov_time) is Kolmogorov time scale [s]
+        - R_λ (re_lambda) is Taylor-microscale Reynolds number [-]
+        - a_o (accel_variance) is Normalized acceleration variance in isotropic
+            turbulence [-]
 
     Arguments:
-    ----------
         - kolmogorov_time : Kolmogorov time scale [s]
         - re_lambda : Taylor-microscale Reynolds number [-]
         - accel_variance : Normalized acceleration variance in isotropic
             turbulence [-]
 
     Returns:
-    --------
         - Lagrangian Taylor microscale time [s]
     """
     return kolmogorov_time * np.sqrt(
@@ -73,27 +73,26 @@ def get_taylor_microscale(
     turbulence. It characterizes the smoothness of velocity fluctuations
     in turbulent flows. It is given by:
 
-        λ = u' * (15 ν² / ε)^(1/2)
+    Equation:
+        - λ = u' * (15 ν² / ε)^(1/2)
 
-    - λ : Taylor microscale [m]
-    - u' (rms_velocity) : Fluid RMS fluctuation velocity [m/s]
-    - v (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]
-    - ε (turbulent_dissipation) : Turbulent kinetic energy dissipation
-        rate [m²/s³]
+    Where:
+        - λ is Taylor microscale [m]
+        - u' (rms_velocity) is Fluid RMS fluctuation velocity [m/s]
+        - v (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s]
+        - ε (turbulent_dissipation) is Turbulent kinetic energy dissipation
+            rate [m²/s³]
 
     Arguments:
-    ----------
         - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]
         - kinematic_viscosity : Kinematic viscosity of the fluid [m²/s]
         - turbulent_dissipation : Turbulent kinetic energy dissipation rate
             [m²/s³]
 
     Returns:
-    --------
         - Taylor microscale [m]
 
     References:
-    -----------
         - https://en.wikipedia.org/wiki/Taylor_microscale
     """
     return fluid_rms_velocity * np.sqrt(
@@ -120,26 +119,23 @@ def get_taylor_microscale_reynolds_number(
     turbulence studies to characterize the relative importance of inertial and
     viscous forces at the Taylor microscale.
 
-    The function is given by:
+    Equation:
+        - Re_λ = (u' λ) / ν
 
-        Re_λ = (u' λ) / ν
-
-    - u' (fluid_rms_velocity) : Fluid (RMS) velocity fluctuation [m/s].
-    - λ (taylor_microscale) : Taylor microscale [m].
-    - ν (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s].
+    Where:
+        - u' (fluid_rms_velocity) is Fluid (RMS) velocity fluctuation [m/s].
+        - λ (taylor_microscale) is Taylor microscale [m].
+        - ν (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s].
 
     Arguments:
-    ----------
         - fluid_rms_velocity : Fluid RMS velocity fluctuation [m/s].
         - taylor_microscale : Taylor microscale [m].
         - kinematic_viscosity : Kinematic viscosity of the fluid [m²/s].
 
     Returns:
-    --------
-        - Re_λ : Taylor-microscale Reynolds number [-].
+        - Taylor-microscale Reynolds number [dimensionless].
 
     References:
-    -----------
         - https://en.wikipedia.org/wiki/Taylor_microscale
     """
     return (fluid_rms_velocity * taylor_microscale) / kinematic_viscosity
