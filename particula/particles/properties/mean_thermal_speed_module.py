@@ -1,5 +1,7 @@
-"""Module contains the function for calculating the mean thermal speed
-of particles in a fluid."""
+"""
+Module contains the function for calculating the mean thermal speed
+of particles in a fluid.
+"""
 
 from typing import Union
 from numpy.typing import NDArray
@@ -8,7 +10,7 @@ import numpy as np
 from particula.util.constants import BOLTZMANN_CONSTANT
 
 
-def mean_thermal_speed(
+def get_mean_thermal_speed(
     mass: Union[float, NDArray[np.float64]],
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
