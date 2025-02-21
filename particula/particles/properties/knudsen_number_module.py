@@ -13,25 +13,34 @@ def calculate_knudsen_number(
     particle_radius: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the Knudsen number using the mean free path of the gas and the
-    radius of the particle. The Knudsen number is a dimensionless number that
-    indicates the regime of gas flow relative to the size of particles.
+    Calculate the Knudsen number (Kn) from the gas mean free path and particle radius.
 
-    Args:
-    -----
-    - mean_free_path (Union[float, NDArray[np.float64]]): The mean free path of
-    the gas molecules [meters (m)].
-    - particle_radius (Union[float, NDArray[np.float64]]): The radius of the
-    particle [meters (m)].
+    The Knudsen number (Kn) indicates whether a flow is in the continuum regime or
+    the free molecular regime. It is computed by:
+
+    - Kn = λ / r
+        - Kn is the Knudsen number (dimensionless),
+        - λ is the mean free path in meters (m),
+        - r is the particle radius in meters (m).
+
+    Arguments:
+        - mean_free_path : Mean free path of the gas molecules in meters (m).
+        - particle_radius : Radius of the particle in meters (m).
 
     Returns:
-    --------
-    - Union[float, NDArray[np.float64]]: The Knudsen number, which is the
-    ratio of the mean free path to the particle radius.
+        - The Knudsen number, which is the ratio of the mean free path to the particle radius.
+
+    Examples:
+        ``` py title="Example Usage"
+        from particula.particles.properties.knudsen_number_module import calculate_knudsen_number
+        kn_value = calculate_knudsen_number(6.5e-8, 1.0e-7)
+        print(kn_value)
+        # Output: 0.65
+        ```
 
     References:
-    -----------
-    - For more information at https://en.wikipedia.org/wiki/Knudsen_number
+        - Knudsen number, Wikipedia,
+          https://en.wikipedia.org/wiki/Knudsen_number
     """
     if not isinstance(mean_free_path, (float, np.ndarray)) or not isinstance(
         particle_radius, (float, np.ndarray)
