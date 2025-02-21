@@ -1,15 +1,15 @@
-""" Module for calculating the dynamic viscosity
+"""Module for calculating the dynamic viscosity
 
-    The dynamic viscosity is calculated using the Sutherland formula,
-    assuming ideal gas behavior, as a function of temperature.
+The dynamic viscosity is calculated using the Sutherland formula,
+assuming ideal gas behavior, as a function of temperature.
 
-    "The dynamic viscosity equals the product of the sum of
-    Sutherland's constant and the reference temperature divided by
-    the sum of Sutherland's constant and the temperature,
-    the reference viscosity and the ratio to the 3/2 power
-    of the temperature to reference temperature."
+"The dynamic viscosity equals the product of the sum of
+Sutherland's constant and the reference temperature divided by
+the sum of Sutherland's constant and the temperature,
+the reference viscosity and the ratio to the 3/2 power
+of the temperature to reference temperature."
 
-    https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
+https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
 """
 
 import logging
