@@ -23,10 +23,18 @@ from particula.util.constants import (
 from particula.gas.properties.dynamic_viscosity import (
     get_dynamic_viscosity,
 )
+from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")  # get instance of logger
 
 
+@validate_inputs(
+    {
+        "molar_mass": "positive",
+        "temperature": "positive",
+        "pressure": "positive",
+    }
+)
 def molecule_mean_free_path(
     molar_mass: Union[
         float, NDArray[np.float64]
@@ -38,31 +46,30 @@ def molecule_mean_free_path(
     """
     Calculate the mean free path of a gas molecule in air.
 
-    Long Description:
-        This function calculates λ based on the input conditions. If
-        dynamic_viscosity is not provided, it is computed via
-        get_dynamic_viscosity(temperature).
+    This function calculates λ based on the input conditions. If
+    dynamic_viscosity is not provided, it is computed via
+    get_dynamic_viscosity(temperature).
 
     Equation:
-        λ = (2 × μ / P) / √(8 × M / (π × R × T))
+        - λ = (2 × μ / P) / √(8 × M / (π × R × T))
 
     Where:
-        - λ : Mean free path [m].
-        - μ : Dynamic viscosity [Pa·s].
-        - P : Gas pressure [Pa].
-        - M : Molar mass [kg/mol].
-        - R : Universal gas constant [J/(mol·K)].
-        - T : Gas temperature [K].
+        - λ is Mean free path [m].
+        - μ is Dynamic viscosity [Pa·s].
+        - P is Gas pressure [Pa].
+        - M is Molar mass [kg/mol].
+        - R is Universal gas constant [J/(mol·K)].
+        - T is Gas temperature [K].
 
     Arguments:
-        molar_mass : The molar mass of the gas molecule [kg/mol].
-        temperature : The temperature of the gas [K].
-        pressure : The pressure of the gas [Pa].
-        dynamic_viscosity : The dynamic viscosity of the gas [Pa·s].
+        - molar_mass : The molar mass of the gas molecule [kg/mol].
+        - temperature : The temperature of the gas [K].
+        - pressure : The pressure of the gas [Pa].
+        - dynamic_viscosity : The dynamic viscosity of the gas [Pa·s].
             If None, it will be calculated based on the temperature.
 
     Returns:
-        Mean free path of the gas molecule in meters (m).
+        - Mean free path of the gas molecule in meters (m).
 
     Examples:
         ```py title="Example usage"
@@ -74,16 +81,6 @@ def molecule_mean_free_path(
         - "Mean Free Path," Wikipedia, The Free Encyclopedia.
           https://en.wikipedia.org/wiki/Mean_free_path
     """
-    # check inputs are positive
-    if temperature <= 0:
-        logger.error("Temperature must be positive [Kelvin]")
-        raise ValueError("Temperature must be positive [Kelvin]")
-    if pressure <= 0:
-        logger.error("Pressure must be positive [Pascal]")
-        raise ValueError("Pressure must be positive [Pascal]")
-    if np.any(molar_mass <= 0):
-        logger.error("Molar mass must be positive [kg/mol]")
-        raise ValueError("Molar mass must be positive [kg/mol]")
     if dynamic_viscosity is None:
         dynamic_viscosity = get_dynamic_viscosity(temperature)
     gas_constant = float(GAS_CONSTANT)
