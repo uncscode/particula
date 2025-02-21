@@ -44,7 +44,7 @@ def get_partial_pressure_delta(
         ```
 
     References:
-        - (Kelvin effect, Wikipedia)[https://en.wikipedia.org/wiki/Kelvin_equation]
-        - (Partial pressure, Wikipedia)[https://en.wikipedia.org/wiki/Partial_pressure]
+        - [Kelvin effect, Wikipedia](https://en.wikipedia.org/wiki/Kelvin_equation)
+        - [Partial pressure, Wikipedia](https://en.wikipedia.org/wiki/Partial_pressure)
     """
     return partial_pressure_gas - partial_pressure_particle * kelvin_term
