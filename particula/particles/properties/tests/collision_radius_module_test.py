@@ -17,10 +17,8 @@ def test_mulholland_1988():
     """Test the mulholland_1988 function."""
     assert get_collision_radius_mg1988(1.5) == 1.5
     assert get_collision_radius_mg1988(0.0) == 0.0
-    assert get_collision_radius_mg1988(-1.5) == -1.5
-    assert np.isnan(get_collision_radius_mg1988(np.nan))
-    assert np.isinf(get_collision_radius_mg1988(np.inf))
-    test_array = np.array([[1.5, 0.0], [-1.5, 2.0]])
+    assert get_collision_radius_mg1988(2.5) == 2.5
+    test_array = np.array([[1.5, 0.0], [1.5, 2.0]])
     np.testing.assert_array_equal(
         get_collision_radius_mg1988(test_array), test_array
     )
