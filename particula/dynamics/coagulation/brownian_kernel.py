@@ -133,7 +133,7 @@ def get_brownian_kernel_via_system_state(
     )
 
     # get thermal speed
-    mean_thermal_speed_particle = properties.mean_thermal_speed(
+    mean_thermal_speed_particle = properties.get_mean_thermal_speed(
         mass_particle, temperature
     )
 

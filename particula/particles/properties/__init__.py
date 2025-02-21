@@ -19,7 +19,7 @@ from particula.particles.properties.aerodynamic_size import (
     AERODYNAMIC_SHAPE_FACTOR_DICT,
 )
 from particula.particles.properties.mean_thermal_speed_module import (
-    mean_thermal_speed,
+    get_mean_thermal_speed,
 )
 from particula.particles.properties.slip_correction_module import (
     cunningham_slip_correction,
