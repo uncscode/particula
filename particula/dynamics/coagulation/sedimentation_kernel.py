@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.particles.properties.settling_velocity import (
-    particle_settling_velocity_via_system_state,
+    get_particle_settling_velocity_via_system_state,
 )
 from particula.util.validate_inputs import validate_inputs
 
@@ -106,7 +106,7 @@ def get_sedimentation_kernel_sp2016_via_system_state(
     Returns:
         - Sedimentation kernel matrix for aerosol particles [m^3/s].
     """
-    settling_velocities = particle_settling_velocity_via_system_state(
+    settling_velocities = get_particle_settling_velocity_via_system_state(
         particle_radius=particle_radius,
         particle_density=particle_density,
         temperature=temperature,

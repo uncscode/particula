@@ -36,7 +36,7 @@ from particula.particles.properties.reynolds_number import (
         "dynamic_viscosity": "nonnegative",
     }
 )
-def particle_settling_velocity(
+def get_particle_settling_velocity(
     particle_radius: Union[float, NDArray[np.float64]],
     particle_density: Union[float, NDArray[np.float64]],
     slip_correction_factor: Union[float, NDArray[np.float64]],
@@ -178,7 +178,7 @@ def get_particle_settling_velocity_via_inertia(
     )
 
 
-def particle_settling_velocity_via_system_state(
+def get_particle_settling_velocity_via_system_state(
     particle_radius: Union[float, NDArray[np.float64]],
     particle_density: Union[float, NDArray[np.float64]],
     temperature: float,
@@ -242,7 +242,7 @@ def particle_settling_velocity_via_system_state(
     )
 
     # Step 5: Calculate the particle settling velocity
-    return particle_settling_velocity(
+    return get_particle_settling_velocity(
         particle_radius=particle_radius,
         particle_density=particle_density,
         slip_correction_factor=slip_correction_factor,
@@ -348,7 +348,7 @@ def get_particle_settling_velocity_with_drag(
         idx = it.multi_index
 
         # Step 2: Compute the Stokes velocity guess (with slip correction).
-        v_stokes = particle_settling_velocity(
+        v_stokes = get_particle_settling_velocity(
             particle_radius=radius,
             particle_density=rho_p,
             slip_correction_factor=ccf,
