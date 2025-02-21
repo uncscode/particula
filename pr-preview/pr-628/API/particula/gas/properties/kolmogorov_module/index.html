@@ -7557,24 +7557,29 @@
 <p>Calculate the Kolmogorov length scale.</p>
 <p>The Kolmogorov length scale represents the smallest eddies in a turbulent
 flow where viscosity dominates. It is defined as:</p>
-<p>η = (ν³ / ε)^(&frac14;)</p>
+<p>Equation:
+    η = (ν³ / ε)^(&frac14;)</p>
+<p>Where:
+    - η Kolmogorov length scale [m]
+    - ν Kinematic viscosity of the fluid [m^2/s]
+    - ε Rate of dissipation of turbulent kinetic energy [m<sup>2/s</sup>3]</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- kinematic_viscosity : Kinematic viscosity of the fluid [m^2/s]
-- turbulent_dissipation : Rate of dissipation of turbulent kinetic
-    energy [m^2/s^3]
-</code></pre></div>
+<ul>
+<li>kinematic_viscosity : Kinematic viscosity of the fluid [m^2/s]</li>
+<li>turbulent_dissipation : Rate of dissipation of turbulent kinetic
+    energy [m<sup>2/s</sup>3]</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Kolmogorov length scale [m]
-</code></pre></div>
+<ul>
+<li>Kolmogorov length scale [m]</li>
+</ul>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
+<ul>
+<li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
 the geometric collision rate of sedimenting droplets. Part 2. Theory
 and parameterization. New Journal of Physics, 10.
-https://doi.org/10.1088/1367-2630/10/7/075016
-</code></pre></div>
+https://doi.org/10.1088/1367-2630/10/7/075016</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span><span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">}</span>
@@ -7619,7 +7624,7 @@ https://doi.org/10.1088/1367-2630/10/7/075016
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_kolmogorov_velocity">get_kolmogorov_velocity<a class="headerlink" href="#get_kolmogorov_velocity" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kolmogorov_module.py#L87">Show source in kolmogorov_module.py:87</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kolmogorov_module.py#L90">Show source in kolmogorov_module.py:90</a></p>
 <p>Calculate the Kolmogorov velocity scale.</p>
 <p>The Kolmogorov velocity scale characterizes the smallest turbulent velocity
 fluctuations and is given by:</p>

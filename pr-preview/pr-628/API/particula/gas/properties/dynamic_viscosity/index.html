@@ -2944,6 +2944,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7311,6 +7320,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7371,22 +7389,32 @@
 <p>Calculate the dynamic viscosity of air using Sutherland's formula.</p>
 <p>Equation:
     μ(T) = μ₀ × (T / T₀)^(3/2) × (T₀ + S) / (T + S)</p>
-<p>where:
-    - μ(T) is the dynamic viscosity at temperature T,
-    - μ₀ is the reference viscosity at temperature T₀,
-    - S is the Sutherland constant.</p>
+<p>Where:
+    - μ(T) is the dynamic viscosity at temperature T (Pa·s).
+    - μ₀ is the reference viscosity (Pa·s).
+    - T is the temperature in Kelvin.
+    - T₀ is the reference temperature in Kelvin.
+    - S is the Sutherland constant in Kelvin.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<p>temperature : Desired air temperature in Kelvin. Must be &gt; 0.
-reference_viscosity : Gas viscosity at the reference temperature
-    (default is STP).
-reference_temperature : Gas temperature in Kelvin for the reference
-    viscosity (default is STP).</p>
+<ul>
+<li>temperature : Desired air temperature in Kelvin. Must be &gt; 0.</li>
+<li>reference_viscosity : Gas viscosity at the reference temperature
+    (default is STP).</li>
+<li>reference_temperature : Gas temperature in Kelvin for the reference
+    viscosity (default is STP).</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>Dynamic viscosity of air at the given temperature in Pa·s.</p>
+<ul>
+<li>Dynamic viscosity of air at the given temperature in Pa·s.</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="n">viscosity</span> <span class="o">=</span> <span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="mf">300.0</span><span class="p">)</span>
+<span class="c1"># Output (approx.): 1.846e-05</span>
+</code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
 <ul>
 <li>Wolfram Formula Repository, "Sutherland's Formula,"
-https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula</li>
+  https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>

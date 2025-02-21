@@ -2966,6 +2966,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7293,6 +7311,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7335,14 +7371,14 @@
 <p>Calculate the fluid RMS fluctuation velocity.</p>
 <p>The fluid root-mean-square (RMS) velocity fluctuation quantifies
 turbulence intensity in a fluid flow. It is calculated as:</p>
-<p>u' = (R_λ^(&frac12;) v_K) / 15^(&frac14;)</p>
-<ul>
-<li>u' : Fluid RMS fluctuation velocity [m/s]</li>
-<li>R_λ (re_lambda) : Taylor-microscale Reynolds number [-]</li>
-<li>v_K : Kolmogorov velocity scale, computed as v_K = ( ε)^(&frac14;) [m/s]</li>
-<li>v (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]</li>
-<li>ε (turbulent_dissipation) : Turbulent energy dissipation rate [m²/s³]</li>
-</ul>
+<p>Equation:
+    - u' = (R_λ^(&frac12;) v_K) / 15^(&frac14;)</p>
+<p>Where:
+    - u' : Fluid RMS fluctuation velocity [m/s]
+    - R_λ (re_lambda) : Taylor-microscale Reynolds number [-]
+    - v_K : Kolmogorov velocity scale, computed as v_K = ( ε)^(&frac14;) [m/s]
+    - v (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]
+    - ε (turbulent_dissipation) : Turbulent energy dissipation rate [m²/s³]</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
 <li>re_lambda : Taylor-microscale Reynolds number [-]</li>
@@ -7353,6 +7389,22 @@ turbulence intensity in a fluid flow. It is calculated as:</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <ul>
 <li>Fluid RMS fluctuation velocity [m/s]</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="n">velocity</span> <span class="o">=</span> <span class="n">get_fluid_rms_velocity</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mf">1.5e-5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="c1"># Output (example): 0.35</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">Example Usage with Array Input</span><pre><span></span><code><span class="n">velocity</span> <span class="o">=</span> <span class="n">get_fluid_rms_velocity</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">500</span><span class="p">,</span> <span class="mi">600</span><span class="p">]),</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5e-5</span><span class="p">,</span> <span class="mf">1.7e-5</span><span class="p">]),</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.12</span><span class="p">])</span>
+<span class="p">)</span>
+<span class="c1"># Output (example): array([0.35, 0.41])</span>
+</code></pre></div>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
+<ul>
+<li>H. Tennekes and J. L. Lumley, "A First Course in Turbulence,"
+  MIT Press, 1972.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
