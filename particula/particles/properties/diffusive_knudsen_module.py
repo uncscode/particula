@@ -47,7 +47,7 @@ def diffusive_knudsen_number(
         ```py title="Example"
         import numpy as np
         from particula.particles.properties.diffusive_knudsen_module import diffusive_knudsen_number
-        
+
         # Single particle example
         single_kn = diffusive_knudsen_number(
             particle_radius=1e-7,
