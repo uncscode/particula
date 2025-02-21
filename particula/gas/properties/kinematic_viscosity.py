@@ -13,7 +13,7 @@ Where:
     - ρ : Fluid density [kg/m³].
 
 References:
-    - "Viscosity Conversion Formula," Wolfram Formula Repository, 
+    - "Viscosity Conversion Formula," Wolfram Formula Repository,
       https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
     - Wikipedia contributors, "Viscosity," Wikipedia,
       https://en.wikipedia.org/wiki/Viscosity#Kinematic_viscosity
