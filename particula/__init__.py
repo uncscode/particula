@@ -13,6 +13,10 @@ The main features of particula are:
 More details to follow.
 """
 
+# pylint: disable=unused-import
+# flake8: noqa
+# pyright: basic
+
 from particula.logger_setup import setup
 
 __version__ = "0.1.3"
@@ -21,3 +25,5 @@ __version__ = "0.1.3"
 logger = setup()
 # log the version of particula upon loading
 logger.info("particula version %s loaded.", __version__)
+
+from particula import gas
