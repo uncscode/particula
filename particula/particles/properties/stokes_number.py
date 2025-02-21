@@ -20,13 +20,13 @@ def get_stokes_number(
     kolmogorov_time: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Compute the Stokes number (St) to measure particle inertia relative to fluid flow.
+    Compute the Stokes number (St) to measure particle inertia relative to
+    fluid flow.
 
-    The Stokes number is a dimensionless parameter reflecting how much a particle
-    resists following changes in the fluid’s motion. If St >> 1, particle inertia
-    dominates; if St << 1, the particle closely follows fluid flow.
-
-    Mathematically:
+    The Stokes number is a dimensionless parameter reflecting how much a
+    particle resists following changes in the fluid’s motion. If St >> 1,
+    particle inertia dominates; if St << 1, the particle closely follows
+    fluid flow. Mathematically:
 
     - St = τ_p / τ_k
         - St : Stokes number (dimensionless),
@@ -42,14 +42,13 @@ def get_stokes_number(
 
     Examples:
         ``` py title="Example"
-        from particula.particles.properties.stokes_number import get_stokes_number
-        st_value = get_stokes_number(1e-3, 2e-3)
+        import particula as par
+        par.particles.get_stokes_number(1e-3, 2e-3)
         # Output: 0.5
         ```
 
     References:
-        - "Stokes number," Wikipedia,
-          https://en.wikipedia.org/wiki/Stokes_number
+        - [Stokes number, Wikipedia](https://en.wikipedia.org/wiki/Stokes_number)
         - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and
           Physics, 3rd ed., Wiley-Interscience.
     """

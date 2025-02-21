@@ -4,11 +4,20 @@ Suchs and Futugin transition function.
 """
 
 from typing import Union
+
 from numpy.typing import NDArray
 import numpy as np
 
+from particula.util.validate_inputs import validate_inputs
 
-def vapor_transition_correction(
+
+@validate_inputs(
+    {
+        "knudsen_number": "nonnegative",
+        "mass_accommodation": "nonnegative",
+    }
+)
+def get_vapor_transition_correction(
     knudsen_number: Union[float, NDArray[np.float64]],
     mass_accommodation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -16,7 +25,8 @@ def vapor_transition_correction(
     Calculate the Fuchs–Sutugin vapor transition correction factor.
 
     This correction factor (f) accounts for the transition regime between free
-    molecular flow and continuum diffusion when computing mass or heat transport.
+    molecular flow and continuum diffusion when computing mass or heat
+    transport.
 
     Mathematically:
 
@@ -33,8 +43,10 @@ def vapor_transition_correction(
 
     Examples:
         ``` py title="Example"
-        from particula.particles.properties.vapor_correction_module import vapor_transition_correction
-        result = vapor_transition_correction(knudsen_number=0.1, mass_accommodation=1.0)
+        import particula as par
+        par.particles.get_vapor_transition_correction(
+            knudsen_number=0.1, mass_accommodation=1.0
+        )
         # Output: 0.73...
         ```
 

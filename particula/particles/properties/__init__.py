@@ -39,7 +39,7 @@ from particula.particles.properties.diffusive_knudsen_module import (
     get_diffusive_knudsen_number,
 )
 from particula.particles.properties.vapor_correction_module import (
-    vapor_transition_correction,
+    get_vapor_transition_correction,
 )
 from particula.particles.properties.partial_pressure_module import (
     get_partial_pressure_delta,
