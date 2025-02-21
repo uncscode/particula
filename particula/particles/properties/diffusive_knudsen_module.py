@@ -17,35 +17,68 @@ def diffusive_knudsen_number(
     temperature: float = 298.15,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Diffusive Knudsen number. The *diffusive* Knudsen number is different
-    from Knudsen number. Ratio of: mean persistence of one particle to the
-    effective length scale of particle--particle Coulombic interaction
+    Compute the diffusive Knudsen number for particle-particle interactions.
 
-    Args:
-    - radius: The radius of the particle [m].
-    - mass_particle: The mass of the particle [kg].
-    - friction_factor: The friction factor of the particle [dimensionless].
-    - coulomb_potential_ratio: The Coulomb potential ratio, zero if
-     no charges [dimensionless].
-    - temperature: The temperature of the system [K].
+    The *diffusive* Knudsen number (Kn_d) differs from the standard Knudsen number.
+    It represents the ratio of the mean particle persistence distance to the
+    effective Coulombic interaction scale. Mathematically:
+
+    - Kn_d = [ √(k_B × T × μ_red) / f_red ] / [ (rᵢ + rⱼ) × (Γ_c / Γ_k) ]
+        - k_B is the Boltzmann constant (J/K).
+        - T is the temperature (K).
+        - μ_red is the reduced mass of particles (kg).
+        - f_red is the reduced friction factor (dimensionless).
+        - rᵢ + rⱼ is the sum of radii for the interacting particles (m).
+        - Γ_c is the continuum-limit Coulomb enhancement factor (dimensionless).
+        - Γ_k is the kinetic-limit Coulomb enhancement factor (dimensionless).
+
+    Arguments:
+        - particle_radius : Radius of the particle(s) in meters (m).
+        - particle_mass : Mass of the particle(s) in kilograms (kg).
+        - friction_factor : Friction factor(s) (dimensionless).
+        - coulomb_potential_ratio : Coulomb potential ratio (dimensionless),
+          zero if no charge.
+        - temperature : Temperature of the system in Kelvin (K).
 
     Returns:
-    --------
-    The diffusive Knudsen number [dimensionless], as a square matrix, of all
-    particle-particle interactions.
+        - The diffusive Knudsen number, either a float or NDArray[np.float64].
+
+    Examples:
+        ```py title="Example"
+        import numpy as np
+        from particula.particles.properties.diffusive_knudsen_module import diffusive_knudsen_number
+        
+        # Single particle example
+        single_kn = diffusive_knudsen_number(
+            particle_radius=1e-7,
+            particle_mass=1e-17,
+            friction_factor=0.8,
+            coulomb_potential_ratio=0.3,
+            temperature=300
+        )
+        print(single_kn)
+        # Output: 0.12...
+
+        # Multiple particles example
+        radius_arr = np.array([1e-7, 2e-7])
+        mass_arr = np.array([1e-17, 2e-17])
+        friction_arr = np.array([0.8, 1.1])
+        potential_arr = np.array([0.3, 0.5])
+        multiple_kn = diffusive_knudsen_number(
+            radius_arr, mass_arr, friction_arr, potential_arr
+        )
+        print(multiple_kn)
+        # Output: array([...])
+        ```
 
     References:
-    -----------
-    - Equation 5 in, with charges:
-    Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
-    molecular regime Coulombic collisions in aerosols and dusty plasmas.
-    Aerosol Science and Technology, 53(8), 933-957.
-    https://doi.org/10.1080/02786826.2019.1614522
-    - Equation 3b in, no charges:
-    Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
-    in aerosols and dusty plasmas. Physical Review E - Statistical,
-    Nonlinear, and Soft Matter Physics, 85(2).
-    https://doi.org/10.1103/PhysRevE.85.026410
+        - Chahl, H. S., & Gopalakrishnan, R. (2019). "High potential, near free
+          molecular regime Coulombic collisions in aerosols and dusty plasmas."
+          Aerosol Science and Technology, 53(8), 933-957.
+          https://doi.org/10.1080/02786826.2019.1614522
+        - Gopalakrishnan, R., & Hogan, C. J. (2012). "Coulomb-influenced collisions
+          in aerosols and dusty plasmas." Physical Review E, 85(2).
+          https://doi.org/10.1103/PhysRevE.85.026410
     """
     # Calculate the pairwise sum of radii
     if isinstance(particle_radius, np.ndarray):
