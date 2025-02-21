@@ -374,8 +374,8 @@ class CoagulationStrategyABC(ABC):
         slip_correction = properties.cunningham_slip_correction(
             knudsen_number=knudsen_number
         )
-        return properties.friction_factor(
-            radius=particle.get_radius(),
+        return properties.get_friction_factor(
+            particle_radius=particle.get_radius(),
             dynamic_viscosity=dynamic_viscosity,
             slip_correction=slip_correction,
         )  # type: ignore
