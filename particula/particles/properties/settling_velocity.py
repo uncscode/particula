@@ -46,49 +46,48 @@ def particle_settling_velocity(
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
     """
-    Calculate the settling velocity of a particle in a fluid.
+    Calculate the settling velocity of a particle in a fluid using Stokes' law.
 
-    The settling velocity (vₛ) is given by:
+    The settling velocity (vₛ) is given by the equation:
 
-        vₛ = (2 × r² × (ρₚ − ρ_f) × g × C_c) ⁄ (9 × μ)
+    - vₛ = (2 × r² × (ρₚ − ρ_f) × g × C_c) / (9 × μ)
+        - vₛ : Settling velocity in m/s
+        - r : Particle radius in m
+        - ρₚ : Particle density in kg/m³
+        - ρ_f : Fluid density in kg/m³
+        - g : Gravitational acceleration in m/s²
+        - C_c : Cunningham slip correction factor (dimensionless)
+        - μ : Dynamic viscosity in Pa·s
 
-        - vₛ : Settling velocity [m/s]
-        - r : Particle radius [m]
-        - ρₚ : Particle density [kg/m³]
-        - ρ_f : Fluid density [kg/m³]
-        - g : Gravitational acceleration [m/s²]
-        - C_c : Cunningham slip correction factor [-]
-        - μ : Dynamic viscosity of the fluid [Pa·s]
-
-    Parameters:
-        - particle_radius : The radius of the particle [m].
-        - particle_density : The density of the particle [kg/m³].
-        - slip_correction_factor : The slip correction factor to
-            account for non-continuum effects [dimensionless].
-        - dynamic_viscosity : The dynamic viscosity of the fluid [Pa·s].
-        - gravitational_acceleration : The gravitational acceleration [m/s²].
-            Defaults to standard gravity (9.80665 m/s²).
+    Arguments:
+        - particle_radius : The radius of the particle in meters.
+        - particle_density : The density of the particle in kg/m³.
+        - slip_correction_factor : Account for non-continuum effects (dimensionless).
+        - dynamic_viscosity : Dynamic viscosity of the fluid in Pa·s.
+        - gravitational_acceleration : Gravitational acceleration in m/s².
+        - fluid_density : The fluid density in kg/m³. Defaults to 0.0.
 
     Returns:
-    --------
-        - The settling velocity of the particle in the fluid [m/s].
+        - Settling velocity of the particle in m/s.
 
-    Example:
-    --------
-        ``` py title="Array input"
-        particle_setting_velocity(
+    Examples:
+        ```py title="Array Input Example"
+        from particula.particles.properties.settling_velocity import particle_settling_velocity
+        import numpy as np
+
+        velocities = particle_settling_velocity(
             particle_radius=np.array([1e-6, 1e-5, 1e-4]),
             particle_density=np.array([1000, 2000, 3000]),
             slip_correction_factor=np.array([1, 1, 1]),
-            dynamic_viscosity=0.001,
+            dynamic_viscosity=1.0e-3
         )
+        print(velocities)
+        # Output: array([...])
         ```
 
     References:
-    ----------
-        - When fluid denisty is much less than particle density, then the
-            fluid density can be neglected.
-        - https://en.wikipedia.org/wiki/Stokes%27_law
+        - "Stokes' Law," Wikipedia,
+          https://en.wikipedia.org/wiki/Stokes%27_law
     """
 
     # Calculate the settling velocity using the given formula
@@ -120,48 +119,47 @@ def get_particle_settling_velocity_via_inertia(
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
     """
-    Calculate the gravitational settling velocity from the particle inertia time.
+    Calculate gravitational settling velocity using particle inertia time.
 
-    The settling velocity (vₛ) is given by:
+    The settling velocity (vₛ) is determined by:
+    - vₛ = (g × τₚ × C_c) / f(Reₚ)
+        - g is gravitational acceleration (m/s²).
+        - τₚ is particle inertia time (s).
+        - C_c is the Cunningham slip correction factor (dimensionless).
+        - f(Reₚ) is the drag correction factor, 1 + 0.15 × Reₚ^0.687.
+        - Reₚ is particle Reynolds number (dimensionless).
 
-        vₛ = (g × τₚ × C_c) ⁄ f(Reₚ)
-
-    - vₛ : Settling velocity [m/s]
-    - g : Gravitational acceleration [m/s²]
-    - τₚ : Particle inertia time [s]
-    - C_c : Cunningham slip correction factor [-]
-    - f(Reₚ) : Drag correction factor [-]
-
-    The drag correction factor f(Reₚ) is given by:
-
-        f(Reₚ) = 1 + 0.15 × Reₚ⁰·⁶⁸⁷
-
-    - r : Particle radius [m]
-    - v : Relative velocity between particle and fluid [m/s]
-    - ν : Kinematic viscosity of the fluid [m²/s]
-    - Reₚ : Particle Reynolds number [-]
-
-    Parameters:
-        - particle_inertia_time : Particle inertia time [s].
-        - particle_radius : Particle radius [m].
-        - relative_velocity : Relative velocity between particle and
-            fluid [m/s].
-        - slip_correction_factor : Cunningham slip correction factor [-].
-        - gravitational_acceleration : Gravitational acceleration [m/s²].
-        - kinematic_viscosity : Kinematic viscosity of the fluid [m²/s].
+    Arguments:
+        - particle_inertia_time : Particle inertia time in seconds (s).
+        - particle_radius : Particle radius in meters (m).
+        - relative_velocity : Relative velocity between particle and fluid (m/s).
+        - slip_correction_factor : Cunningham slip correction factor (dimensionless).
+        - gravitational_acceleration : Gravitational acceleration (m/s²).
+        - kinematic_viscosity : Kinematic viscosity of the fluid (m²/s).
 
     Returns:
-        - Particle settling velocity [m/s].
+        - Particle settling velocity in m/s.
+
+    Examples:
+        ```py title="Example"
+        from particula.particles.properties.settling_velocity import get_particle_settling_velocity_via_inertia
+        v_s = get_particle_settling_velocity_via_inertia(
+            particle_inertia_time=0.002,
+            particle_radius=1.0e-6,
+            relative_velocity=0.1,
+            slip_correction_factor=1.05,
+            gravitational_acceleration=9.81,
+            kinematic_viscosity=1.5e-5
+        )
+        print(v_s)
+        # Output: ...
+        ```
 
     References:
-        - Ayala, O., Rosa, B., Wang, L. P., & Grabowski, W. W. (2008). Effects
-          of turbulence on the geometric collision rate of sedimenting droplets.
-          Part 1. Results from direct numerical simulation. New Journal of
-          Physics, 10. https://doi.org/10.1088/1367-2630/10/7/075015
-        - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-          the geometric collision rate of sedimenting droplets. Part 2. Theory
-          and parameterization. New Journal of Physics, 10.
-          https://doi.org/10.1088/1367-2630/10/7/075016
+        - Ayala, O., Rosa, B., Wang, L. P., & Grabowski, W. W. (2008).
+          "Effects of turbulence on the geometric collision rate of
+          sedimenting droplets. Part 1. Results from direct numerical simulation."
+          New Journal of Physics, 10. https://doi.org/10.1088/1367-2630/10/7/075015
     """
 
     re_p = get_particle_reynolds_number(
@@ -185,16 +183,42 @@ def particle_settling_velocity_via_system_state(
     pressure: float,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the settling velocity of a particle.
+    Compute the particle settling velocity based on system state parameters.
 
-    Parameters:
-        - particle_radius: The radius of the particle [m].
-        - particle_density: The density of the particle [kg/m³].
-        - temperature: The temperature of the system [K].
-        - pressure: The pressure of the system [Pa].
+    This function calculates the dynamic viscosity from temperature, the mean free
+    path from the same system state, and the Knudsen number of the particle,
+    then applies the slip correction factor. Finally, it returns the settling
+    velocity from Stokes' law with slip correction.
+
+    Arguments:
+        - particle_radius : Particle radius in meters (m).
+        - particle_density : Particle density in kg/m³.
+        - temperature : Temperature of the system in Kelvin (K).
+        - pressure : Pressure of the system in Pascals (Pa).
 
     Returns:
-        - The settling velocity of the particle [m/s].
+        - Settling velocity of the particle in m/s.
+
+    Examples:
+        ```py title="System State Example"
+        from particula.particles.properties.settling_velocity import particle_settling_velocity_via_system_state
+
+        v_s_system = particle_settling_velocity_via_system_state(
+            particle_radius=1e-6,
+            particle_density=1200,
+            temperature=298.15,
+            pressure=101325
+        )
+        print(v_s_system)
+        # Output: ...
+        ```
+
+    References:
+        - Gas viscosity property estimation:
+          https://en.wikipedia.org/wiki/Viscosity#Gases
+        - Slip correction and Knudsen number relations from:
+          Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric
+          Chemistry and Physics. Wiley-Interscience.
     """
 
     # Step 1: Calculate the dynamic viscosity of the gas
@@ -247,51 +271,57 @@ def get_particle_settling_velocity_with_drag(
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, too-many-locals, too-many-positional-arguments
     """
-    Calculate the terminal settling velocity of particle(s) in a fluid.
+    Calculate the particle's terminal settling velocity with a full drag model.
 
-    Handles both small-particle (Stokes law with slip correction) and
-    larger-droplet (nonlinear drag) regimes. For Re < `re_threshold`, returns
-    the Stokes velocity directly; otherwise, uses a force-balance approach with
-    `fminbound`. The limiting cases and equations are:
+    For low Reynolds numbers (Re < re_threshold), the Stokes settling velocity
+    (with slip correction) is used:
 
-    - **Stokes regime (Re < 0.1):**
+    - vₛ(Stokes) = (2/9) × [r² × (ρₚ − ρ_f) × g × C_c] / μ
 
-        vₛ = (2⁄9) × [ r² × (ρₚ − ρ_f) × g × C_c ] ⁄ μ
+    For higher Reynolds numbers, a force-balance approach is solved numerically,
+    using a variable drag coefficient (c_d).
 
-    - **Nonlinear drag regime (Re > 0.1):**
-
-        vₛ = √[ (8 × r × (ρₚ − ρ_f) × g) ⁄ (3 × ρ_f × c_d) ]
-
-    Where:
-
-    - vₛ : Terminal settling velocity [m/s]
-    - r : Particle radius [m]
-    - ρₚ : Particle density [kg/m³]
-    - ρ_f : Fluid density [kg/m³]
-    - g : Gravitational acceleration [m/s²]
-    - C_c : Cunningham slip correction factor [-]
-    - μ : Dynamic viscosity of the fluid [Pa·s]
-    - c_d : Drag coefficient [-]
-    - Re : Particle Reynolds number [-]
-        - Re = (2 × r × vₛ × ρ_f) ⁄ μ
-
-
-    Parameters:
-        - particle_radius : Particle radius [m].
-        - particle_density : Particle density [kg/m³].
-        - fluid_density : Fluid density [kg/m³].
-        - dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].
-        - slip_correction_factor : Cunningham slip correction factor [-].
-        - gravitational_acceleration : Gravitational acceleration [m/s²].
-            Defaults to standard gravity (9.80665 m/s²).
-        - re_threshold : Reynolds-number threshold to decide which approach to
-            use. Default is 0.1.
-        - tol : Tolerance for the numeric solver `fminbound`. Default is 1e-6.
-        - max_iter : Maximum function evaluations for `fminbound`.
-            Default is 100.
+    Arguments:
+        - particle_radius : Particle radius (m).
+        - particle_density : Particle density (kg/m³).
+        - fluid_density : Fluid density (kg/m³).
+        - dynamic_viscosity : Fluid dynamic viscosity (Pa·s).
+        - slip_correction_factor : Slip correction factor, dimensionless.
+        - gravitational_acceleration : Gravitational acceleration (m/s²),
+          default is 9.80665.
+        - re_threshold : Reynolds number threshold (dimensionless),
+          default is 0.1.
+        - tol : Numeric tolerance for solver (dimensionless),
+          default is 1e-6.
+        - max_iter : Maximum function evaluations in numeric solver,
+          default is 100.
 
     Returns:
-        - Terminal settling velocity [m/s] for each particle.
+        - Terminal settling velocity (m/s). Scalar or NDArray.
+
+    Examples:
+        ```py title="Example"
+        import numpy as np
+        from particula.particles.properties.settling_velocity import get_particle_settling_velocity_with_drag
+        
+        r_array = np.array([1e-6, 5e-5, 2e-4])
+        rho_array = np.array([1500, 2000, 1850])
+        v_drag = get_particle_settling_velocity_with_drag(
+            particle_radius=r_array,
+            particle_density=rho_array,
+            fluid_density=1.225,
+            dynamic_viscosity=1.8e-5,
+            slip_correction_factor=np.array([1.0, 0.95, 1.1])
+        )
+        print(v_drag)
+        # Output: array([...])
+        ```
+
+    References:
+        - "Drag Coefficient," Wikipedia,
+          https://en.wikipedia.org/wiki/Drag_coefficient
+        - Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry
+          and Physics*, 3rd ed., John Wiley & Sons.
     """
 
     # --- Step 1: Broadcast inputs to matching shapes if arrays are passed. ---
