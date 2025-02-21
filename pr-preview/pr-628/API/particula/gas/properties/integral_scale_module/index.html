@@ -7487,7 +7487,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/integral_scale_module.py">particula.gas.properties.integral_scale_module</a> module.</p>
 </blockquote>
 <h2 id="get_eulerian_integral_length">get_eulerian_integral_length<a class="headerlink" href="#get_eulerian_integral_length" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/integral_scale_module.py#L56">Show source in integral_scale_module.py:56</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/integral_scale_module.py#L53">Show source in integral_scale_module.py:53</a></p>
 <p>Calculate the Eulerian integral length scale.</p>
 <p>The Eulerian integral length scale is a measure of the size of the largest
 turbulent eddies in a fluid flow.</p>
@@ -7529,13 +7529,15 @@ turbulent eddies in a fluid flow.</p>
 <p>Calculate the Lagrangian integral timescale.</p>
 <p>The Lagrangian integral timescale is a measure of the time it takes for
 a fluid particle to travel a distance equal to the integral length scale.</p>
-<p>Equation:
-    - T_L = (u'²) / ε</p>
-<p>Where:
-    - T_L is Lagrangian integral timescale [s].
-    - fluid_rms_velocity (u') is Fluid RMS fluctuation velocity [m/s].
-    - turbulent_dissipation (ε) is Turbulent energy dissipation rate
-        [m²/s³].</p>
+<ul>
+<li>T_L = (u'²) / ε<ul>
+<li>T_L is Lagrangian integral timescale [s].</li>
+<li>fluid_rms_velocity (u') is Fluid RMS fluctuation velocity [m/s].</li>
+<li>turbulent_dissipation (ε) is Turbulent energy dissipation rate
+    [m²/s³].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].</li>

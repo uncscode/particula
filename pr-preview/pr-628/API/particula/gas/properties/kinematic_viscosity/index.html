@@ -7509,8 +7509,9 @@
 <p>Calculate the kinematic viscosity of a fluid.</p>
 <p>The function calculates ν by dividing the dynamic viscosity (μ)
 by the fluid density (ρ).</p>
-<p>Equation:
-    ν = μ / ρ</p>
+<ul>
+<li>ν = μ / ρ</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
 <li>dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].</li>
@@ -7534,7 +7535,7 @@ by the fluid density (ρ).</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kinematic_viscosity</span><span class="p">(</span><span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_kinematic_viscosity_via_system_state">get_kinematic_viscosity_via_system_state<a class="headerlink" href="#get_kinematic_viscosity_via_system_state" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kinematic_viscosity.py#L67">Show source in kinematic_viscosity.py:67</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kinematic_viscosity.py#L66">Show source in kinematic_viscosity.py:66</a></p>
 <p>Calculate the kinematic viscosity of air by first computing its dynamic
 viscosity.</p>
 <p>This function uses get_dynamic_viscosity(...) and divides by the given

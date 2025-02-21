@@ -7390,15 +7390,17 @@
 <p>This function calculates λ based on the input conditions. If
 dynamic_viscosity is not provided, it is computed via
 get_dynamic_viscosity(temperature).</p>
-<p>Equation:
-    - λ = (2 × μ / P) / √(8 × M / (π × R × T))</p>
-<p>Where:
-    - λ is Mean free path [m].
-    - μ is Dynamic viscosity [Pa·s].
-    - P is Gas pressure [Pa].
-    - M is Molar mass [kg/mol].
-    - R is Universal gas constant [J/(mol·K)].
-    - T is Gas temperature [K].</p>
+<ul>
+<li>λ = (2 × μ / P) / √(8 × M / (π × R × T))<ul>
+<li>λ is Mean free path [m].</li>
+<li>μ is Dynamic viscosity [Pa·s].</li>
+<li>P is Gas pressure [Pa].</li>
+<li>M is Molar mass [kg/mol].</li>
+<li>R is Universal gas constant [J/(mol·K)].</li>
+<li>T is Gas temperature [K].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
 <li>molar_mass : The molar mass of the gas molecule [kg/mol].</li>
