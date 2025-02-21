@@ -12,20 +12,39 @@ def get_partial_pressure_delta(
     kelvin_term: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the difference in partial pressure of a species between the gas
-    phase and the particle phase, which is used in the calculation of the rate
-    of change of mass of an aerosol particle.
+    Calculate the difference in partial pressure between gas and particle phase,
+    considering the Kelvin effect.
 
-    Args:
-        partial_pressure_gas: The partial pressure of the species in the
-            gas phase.
-        partial_pressure_particle: The partial pressure of the species in
-            the particle phase.
-        kelvin_term: Kelvin effect to account for the curvature of
-            the particle.
+    This function computes:
+        Δp = p_gas − (p_particle × K)
+    where:
+        - p_gas is the partial pressure in the gas phase,
+        - p_particle is the partial pressure in the particle phase,
+        - K is the Kelvin term (dimensionless).
+
+    Arguments:
+        - partial_pressure_gas : Partial pressure of the species in the gas phase.
+        - partial_pressure_particle : Partial pressure of the species in
+          the particle phase.
+        - kelvin_term : Dimensionless Kelvin effect factor due to particle curvature.
 
     Returns:
-        The difference in partial pressure between the gas phase and the
-            particle phase.
+        - The difference in partial pressure, as either a float or NDArray[np.float64].
+
+    Examples:
+        ``` py title="Example"
+        from particula.particles.properties.partial_pressure_module import get_partial_pressure_delta
+        difference = get_partial_pressure_delta(
+            partial_pressure_gas=1000.0,
+            partial_pressure_particle=900.0,
+            kelvin_term=1.01
+        )
+        print(difference)
+        # Output: 1000.0 - (900.0 * 1.01) = 91.0
+        ```
+
+    References:
+        - Kelvin effect, "Kelvin equation," Wikipedia,
+          https://en.wikipedia.org/wiki/Kelvin_equation
     """
     return partial_pressure_gas - partial_pressure_particle * kelvin_term
