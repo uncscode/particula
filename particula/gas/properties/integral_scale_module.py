@@ -31,13 +31,11 @@ def get_lagrangian_integral_time(
         - ε (turbulent_dissipation) : Turbulent energy dissipation rate [m²/s³]
 
     Arguments:
-    ----------
         - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]
         - turbulent_dissipation : Turbulent kinetic energy dissipation rate
             [m²/s³]
 
     Returns:
-    --------
         - Lagrangian integral timescale [s]
     """
     return (fluid_rms_velocity**2) / turbulent_dissipation
