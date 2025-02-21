@@ -34,7 +34,7 @@ from particula.gas.properties.normalize_accel_variance import (
 )
 from particula.gas.properties.pressure_function import (
     get_partial_pressure,
-    get_saturation_ratio_from_concentration,
+    get_saturation_ratio_from_pressure,
 )
 from particula.gas.properties.taylor_microscale_module import (
     get_lagrangian_taylor_microscale_time,

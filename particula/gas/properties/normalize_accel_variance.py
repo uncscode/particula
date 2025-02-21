@@ -20,8 +20,9 @@ def get_normalized_accel_variance_ao2008(
     This coefficient describes the statistical behavior of acceleration
     fluctuations in turbulent flows.
 
-    Equation:
-        - a_o = (11 + 7 R_λ) / (205 + R_λ)
+    - a_o = (11 + 7 R_λ) / (205 + R_λ)
+        - a_o is Normalized acceleration variance in isotropic turbulence [-].
+        - R_λ is Taylor-microscale Reynolds number [-].
 
     Where:
         - a_o (accel_variance) is Normalized acceleration variance in isotropic
@@ -38,7 +39,8 @@ def get_normalized_accel_variance_ao2008(
 
     Examples:
         ```py title="Example Usage"
-        result = get_normalized_accel_variance_ao2008(500.0)
+        import particula as par
+        par.gas.get_normalized_accel_variance_ao2008(500.0)
         # Output: ~0.05
         ```
 

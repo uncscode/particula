@@ -24,10 +24,7 @@ def get_partial_pressure(
     Calculate the partial pressure of a gas from its concentration, molar mass,
     and temperature.
 
-    Equation:
-        - p = (c × R × T) / M
-
-    Where:
+    - p = (c × R × T) / M
         - p is Partial pressure [Pa].
         - c is Gas concentration [kg/m³].
         - R is Universal gas constant [J/(mol·K)].
@@ -44,7 +41,8 @@ def get_partial_pressure(
 
     Examples:
         ```py title="Example usage"
-        partial = calculate_partial_pressure(1.2, 0.02897, 298)
+        import particula as par
+        par.gas.get_partial_pressure(1.2, 0.02897, 298)
         # Output: ~986.4 Pa
         ```
 
@@ -62,7 +60,7 @@ def get_partial_pressure(
         "pure_vapor_pressure": "positive",
     }
 )
-def get_saturation_ratio_from_concentration(
+def get_saturation_ratio_from_pressure(
     partial_pressure: Union[float, NDArray[np.float64]],
     pure_vapor_pressure: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -73,10 +71,7 @@ def get_saturation_ratio_from_concentration(
     The saturation ratio is defined as the ratio of partial pressure to the
     pure vapor pressure.
 
-    Equation:
-        - S = p / p_vap
-
-    Where:
+    - S = p / p_vap
         - S is Saturation ratio (dimensionless).
         - p is Partial pressure [Pa].
         - p_vap is Pure vapor pressure [Pa].
@@ -90,7 +85,8 @@ def get_saturation_ratio_from_concentration(
 
     Examples:
         ```py title="Example usage"
-        ratio = calculate_saturation_ratio(800.0, 1000.0)
+        import particula as par
+        par.gas.get_saturation_ratio_from_pressure(800.0, 1000.0)
         # Output: 0.8
         ```
 
