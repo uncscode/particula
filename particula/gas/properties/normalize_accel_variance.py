@@ -28,7 +28,7 @@ def get_normalized_accel_variance_ao2008(
         - a_o (accel_variance) : Normalized acceleration variance in isotropic
           turbulence [-].
         - R_λ (re_lambda) : Taylor-microscale Reynolds number [-].
-        - ε (numerical_stability_epsilon) : Small number added to R_λ 
+        - ε (numerical_stability_epsilon) : Small number added to R_λ
           for numerical stability.
 
     Arguments:
