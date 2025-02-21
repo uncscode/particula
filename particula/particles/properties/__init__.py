@@ -28,7 +28,7 @@ from particula.particles.properties.knudsen_number_module import (
     calculate_knudsen_number,
 )
 from particula.particles.properties.friction_factor_module import (
-    friction_factor,
+    get_friction_factor,
 )
 from particula.particles.properties.coulomb_enhancement import (
     get_coulomb_enhancement_ratio,
