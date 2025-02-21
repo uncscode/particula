@@ -11,28 +11,33 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
+from particula.util.machine_limit import safe_exp
+from particula.util.validate_inputs import validate_inputs
 from particula.util.constants import (
     BOLTZMANN_CONSTANT,
     ELECTRIC_PERMITTIVITY,
     ELEMENTARY_CHARGE_VALUE,
 )
-from particula.util.machine_limit import safe_exp
 
 
+@validate_inputs(
+    {"particle_radius": "nonnegative"},
+)
 def get_coulomb_enhancement_ratio(
-    radius: Union[float, NDArray[np.float64]],
+    particle_radius: Union[float, NDArray[np.float64]],
     charge: Union[int, NDArray[np.float64]] = 0,
     temperature: float = 298.15,
     ratio_lower_limit: float = -200,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the Coulomb potential ratio, ϕ_E, for particle-particle interactions.
+    Calculate the Coulomb potential ratio, ϕ_E, for particle-particle
+    interactions.
 
     The potential ratio is computed using:
 
     - ϕ_E = - (qᵢ × qⱼ × e²) / [4π ε₀ (rᵢ + rⱼ) k_B T]
         - ϕ_E is the Coulomb potential ratio (dimensionless).
-        - qᵢ, qⱼ are the charges (dimensionless, e.g., the number of electrons).
+        - qᵢ, qⱼ are the charges (dimensionless, e.g. the number of electrons).
         - e is the elementary charge in coulombs (C).
         - ε₀ is the electric permittivity of free space (F·m⁻¹).
         - rᵢ, rⱼ are the particle radii (m).
@@ -41,7 +46,7 @@ def get_coulomb_enhancement_ratio(
 
     Arguments:
         - radius : Radius of the particles (m).
-        - charge : Number of charges on the particles (dimensionless).
+        - charge : Number of integer charges on the particles (dimensionless).
         - temperature : System temperature (K).
         - ratio_lower_limit : Lower limit to clip the potential ratio for very
           large negative (repulsive) values.
@@ -52,15 +57,13 @@ def get_coulomb_enhancement_ratio(
     Examples:
         ``` py title="Example"
         import numpy as np
-        from particula.particles.properties.coulomb_enhancement import get_coulomb_enhancement_ratio
-
-        ratio = get_coulomb_enhancement_ratio(
+        import particula as par
+        par.particles.get_coulomb_enhancement_ratio(
             radius=np.array([1e-7, 2e-7]),
             charge=np.array([1, 2]),
             temperature=298.15,
             ratio_lower_limit=-200
         )
-        print(ratio)
         # Output: array([...])
         ```
 
@@ -69,10 +72,10 @@ def get_coulomb_enhancement_ratio(
           Coulomb-influenced collisions in aerosols and dusty plasmas.
           Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410
     """
-    if isinstance(radius, np.ndarray):
+    if isinstance(particle_radius, np.ndarray):
         # square matrix of radius
-        radius = np.array(radius)
-        radius = np.tile(radius, (len(radius), 1))
+        particle_radius = np.array(particle_radius)
+        particle_radius = np.tile(particle_radius, (len(particle_radius), 1))
         # square matrix of charge
         charge = np.array(charge)
         charge = np.tile(charge, (len(charge), 1))
@@ -81,7 +84,10 @@ def get_coulomb_enhancement_ratio(
         -1 * charge * np.transpose(charge) * (ELEMENTARY_CHARGE_VALUE**2)
     )
     denominator = (
-        4 * np.pi * ELECTRIC_PERMITTIVITY * (radius + np.transpose(radius))
+        4
+        * np.pi
+        * ELECTRIC_PERMITTIVITY
+        * (particle_radius + np.transpose(particle_radius))
     )
     coulomb_potential_ratio = numerator / (
         denominator * BOLTZMANN_CONSTANT * temperature
@@ -91,6 +97,9 @@ def get_coulomb_enhancement_ratio(
     )
 
 
+@validate_inputs(
+    {"coulomb_potential": "finite"},
+)
 def get_coulomb_kinetic_limit(
     coulomb_potential: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -114,11 +123,9 @@ def get_coulomb_kinetic_limit(
     Examples:
         ``` py title="Example"
         import numpy as np
-        from particula.particles.properties.coulomb_enhancement import get_coulomb_kinetic_limit
-
+        import particula as par
         potential = np.array([-0.5, 0.0, 0.5])
-        gamma_kin = get_coulomb_kinetic_limit(potential)
-        print(gamma_kin)
+        par.particles.get_coulomb_kinetic_limit(potential)
         # Output: array([...])
         ```
 
@@ -134,6 +141,9 @@ def get_coulomb_kinetic_limit(
     )
 
 
+@validate_inputs(
+    {"coulomb_potential": "finite"},
+)
 def get_coulomb_continuum_limit(
     coulomb_potential: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -157,10 +167,9 @@ def get_coulomb_continuum_limit(
     Examples:
         ``` py title="Example"
         import numpy as np
-        from particula.particles.properties.coulomb_enhancement import get_coulomb_continuum_limit
-
+        import particula as par
         potential = np.array([-0.5, 0.0, 0.5])
-        gamma_cont = get_coulomb_continuum_limit(potential)
+        par.particles.get_coulomb_continuum_limit(potential)
         print(gamma_cont)
         # Output: array([...])
         ```
