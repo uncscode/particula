@@ -125,7 +125,7 @@ def get_brownian_kernel_via_system_state(
     slip_correction = properties.cunningham_slip_correction(
         knudsen_number=knudsen_number
     )
-    aerodyanmic_mobility = properties.particle_aerodynamic_mobility(
+    aerodyanmic_mobility = properties.get_aerodynamic_mobility(
         particle_radius, slip_correction, dynamic_viscosity
     )
     particle_diffusivity = _brownian_diffusivity(

@@ -11,10 +11,10 @@ particula.next.particles.properties.
 # pyright: basic
 
 from particula.particles.properties.aerodynamic_mobility_module import (
-    particle_aerodynamic_mobility,
+    get_aerodynamic_mobility,
 )
 from particula.particles.properties.aerodynamic_size import (
-    particle_aerodynamic_length,
+    get_aerodynamic_length,
     get_aerodynamic_shape_factor,
     AERODYNAMIC_SHAPE_FACTOR_DICT,
 )

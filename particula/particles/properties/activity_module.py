@@ -3,9 +3,17 @@
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
+
 from particula.util.converting import convert_mass_concentration
+from particula.util.validate_inputs import validate_inputs
 
 
+@validate_inputs(
+    {
+        "mass_concentration": "nonnegative",
+        "molar_mass": "positive",
+    }
+)
 def get_ideal_activity_molar(
     mass_concentration: Union[float, NDArray[np.float64]],
     molar_mass: Union[float, NDArray[np.float64]],
@@ -48,6 +56,12 @@ def get_ideal_activity_molar(
     )
 
 
+@validate_inputs(
+    {
+        "mass_concentration": "nonnegative",
+        "density": "positive",
+    }
+)
 def get_ideal_activity_volume(
     mass_concentration: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
@@ -90,6 +104,11 @@ def get_ideal_activity_volume(
     )
 
 
+@validate_inputs(
+    {
+        "mass_concentration": "nonnegative",
+    }
+)
 def get_ideal_activity_mass(
     mass_concentration: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -126,7 +145,14 @@ def get_ideal_activity_mass(
     )
 
 
-# pylint: disable=too-many-locals
+@validate_inputs(
+    {
+        "mass_concentration": "nonnegative",
+        "kappa": "nonnegative",
+        "density": "positive",
+        "molar_mass": "positive",
+    }
+)
 def get_kappa_activity(
     mass_concentration: NDArray[np.float64],
     kappa: NDArray[np.float64],
@@ -134,6 +160,7 @@ def get_kappa_activity(
     molar_mass: NDArray[np.float64],
     water_index: int,
 ) -> NDArray[np.float64]:
+    # pylint: disable=too-many-locals
     """
     Compute species activity using the κ (kappa) hygroscopic growth parameter.
 
@@ -231,6 +258,12 @@ def get_kappa_activity(
     return activity
 
 
+@validate_inputs(
+    {
+        "pure_vapor_pressure": "positive",
+        "activity": "nonnegative",
+    }
+)
 def get_surface_partial_pressure(
     pure_vapor_pressure: Union[float, NDArray[np.float64]],
     activity: Union[float, NDArray[np.float64]],

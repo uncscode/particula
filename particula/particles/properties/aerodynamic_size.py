@@ -4,6 +4,7 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
+from particula.util.validate_inputs import validate_inputs
 
 AERODYNAMIC_SHAPE_FACTOR_DICT = {
     "sphere": 1.0,
@@ -20,7 +21,14 @@ AERODYNAMIC_SHAPE_FACTOR_DICT = {
 }
 
 
-# pylint: disable=too-many-positional-arguments, too-many-arguments
+@validate_inputs(
+    {
+        "physical_length": "nonnegative",
+        "physical_slip_correction_factor": "nonnegative",
+        "aerodynamic_slip_correction_factor": "nonnegative",
+        "density": "positive",
+    }
+)
 def get_aerodynamic_length(
     physical_length: Union[float, NDArray[np.float64]],
     physical_slip_correction_factor: Union[float, NDArray[np.float64]],
@@ -29,6 +37,7 @@ def get_aerodynamic_length(
     reference_density: float = 1000,
     aerodynamic_shape_factor: float = 1.0,
 ) -> Union[float, NDArray[np.float64]]:
+    # pylint: disable=too-many-positional-arguments, too-many-arguments
     """
     Calculate the aerodynamic length scale of a particle for a given shape.
 
@@ -37,8 +46,8 @@ def get_aerodynamic_length(
     - d_a = d_p × √( (C_p / C_a) × (ρ / (ρ₀ × χ)) )
         - d_a is the aerodynamic size (m).
         - d_p is the physical size (m).
-        - C_p is the slip correction factor for the physical size (dimensionless).
-        - C_a is the slip correction factor for the aerodynamic size (dimensionless).
+        - C_p is the slip correction factor for the physical size.
+        - C_a is the slip correction factor for the aerodynamic size.
         - ρ is the particle density (kg/m³).
         - ρ₀ is the reference density (kg/m³).
         - χ is the shape factor (dimensionless).
@@ -46,19 +55,22 @@ def get_aerodynamic_length(
     Arguments:
         - physical_length : Physical length scale of the particle (m).
         - physical_slip_correction_factor : Slip correction factor for the
-          particle's physical size (dimensionless).
+            particle's physical size (dimensionless).
         - aerodynamic_slip_correction_factor : Slip correction factor for the
-          particle's aerodynamic size (dimensionless).
+            particle's aerodynamic size (dimensionless).
         - density : Density of the particle in kg/m³.
-        - reference_density : Reference density in kg/m³, typically water (1000 by default).
-        - aerodynamic_shape_factor : Shape factor (dimensionless, 1.0 for spheres).
+        - reference_density : Reference density in kg/m³, typically water
+            (1000 by default).
+        - aerodynamic_shape_factor : Shape factor
+            (dimensionless, 1.0 for spheres).
 
     Returns:
         - Aerodynamic length scale (m).
 
     Examples:
         ``` py title="Example"
-        aerodynamic_length = get_aerodynamic_length(
+        import particula as par
+        par.particles.get_aerodynamic_length(
             physical_length=0.00005,
             physical_slip_correction_factor=1.1,
             aerodynamic_slip_correction_factor=1.0,
@@ -86,11 +98,13 @@ def get_aerodynamic_shape_factor(shape_key: str) -> float:
     """
     Retrieve the aerodynamic shape factor for a given particle shape.
 
-    The shape factor (χ) accounts for non-sphericity in aerodynamic calculations.
-    For spheres, χ=1.0. Larger values indicate more deviation from spherical shape.
+    The shape factor (χ) accounts for non-sphericity in aerodynamic
+    calculations. For spheres, χ=1.0. Larger values indicate more deviation
+    from spherical shape.
 
     Arguments:
-        - shape_key : String representing the particle's shape (e.g. "sphere", "sand").
+        - shape_key : String representing the particle's shape
+            (e.g. "sphere", "sand").
 
     Returns:
         - The shape factor (dimensionless).
@@ -102,7 +116,8 @@ def get_aerodynamic_shape_factor(shape_key: str) -> float:
         ```
 
     Raises:
-        - ValueError : If the shape key is not found in the predefined dictionary.
+        - ValueError : If the shape key is not found in the predefined
+            dictionary.
 
     References:
         - Hinds, W.C. (1998). Aerosol Technology: Properties, behavior, and

@@ -12,7 +12,7 @@ from particula.particles.activity_strategies import (
 # Test MolarIdealActivity
 def test_molar_ideal_activity_single_species():
     """Test activity calculation for a single species."""
-    activity_strategy = ActivityIdealMolar()
+    activity_strategy = ActivityIdealMolar(molar_mass=50.0)
     mass_concentration = 100.0
     expected_activity = 1.0
     assert activity_strategy.activity(mass_concentration) == expected_activity

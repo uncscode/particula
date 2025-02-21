@@ -3,7 +3,7 @@
 from contextlib import nullcontext
 import numpy as np
 import pytest
-from particula.particles.properties import particle_aerodynamic_mobility
+from particula.particles.properties import get_aerodynamic_mobility
 
 
 def test_particle_aerodynamic_mobility_single_value():
@@ -17,7 +17,7 @@ def test_particle_aerodynamic_mobility_single_value():
     expected_mobility = slip_correction_factor / (
         6 * np.pi * dynamic_viscosity * radius
     )
-    actual_mobility = particle_aerodynamic_mobility(
+    actual_mobility = get_aerodynamic_mobility(
         radius, slip_correction_factor, dynamic_viscosity
     )
     assert np.isclose(
@@ -36,7 +36,7 @@ def test_particle_aerodynamic_mobility_array_input():
     expected_mobility = slip_correction_factor / (
         6 * np.pi * dynamic_viscosity * radius
     )
-    actual_mobility = particle_aerodynamic_mobility(
+    actual_mobility = get_aerodynamic_mobility(
         radius, slip_correction_factor, dynamic_viscosity
     )
     assert np.allclose(actual_mobility, expected_mobility)
@@ -48,7 +48,7 @@ def test_particle_aerodynamic_mobility_type_error():
     with incorrect input types.
     """
     with pytest.raises(TypeError):
-        particle_aerodynamic_mobility(
+        get_aerodynamic_mobility(
             "not a number", "also not a number", "still not a number"
         )
 
@@ -69,7 +69,7 @@ def test_particle_aerodynamic_mobility_extreme_values(radius: float) -> None:
         if (radius <= 0 or np.isnan(radius) or np.isinf(radius))
         else nullcontext()
     ):
-        actual_mobility = particle_aerodynamic_mobility(
+        actual_mobility = get_aerodynamic_mobility(
             radius, slip_correction_factor, dynamic_viscosity
         )
         if radius > 0:
