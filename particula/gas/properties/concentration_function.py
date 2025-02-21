@@ -18,9 +18,7 @@ def get_concentration_from_pressure(
     The concentration is determined from the partial pressure, molar mass,
     and temperature using the ideal gas equation:
 
-        C = (P × M) / (R × T)
-
-    where:
+    - C = (P × M) / (R × T)
         - C is the concentration in kg/m³,
         - P is the partial pressure in Pascals (Pa),
         - M is the molar mass in kg/mol,
