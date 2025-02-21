@@ -4,7 +4,7 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.constants import BOLTZMANN_CONSTANT
+from particula.util.validate_inputs import validate_inputs
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
 from particula.gas.properties.mean_free_path import get_molecule_mean_free_path
 from particula.particles.properties.aerodynamic_mobility_module import (
@@ -16,9 +16,16 @@ from particula.particles.properties.slip_correction_module import (
 from particula.particles.properties.knudsen_number_module import (
     calculate_knudsen_number,
 )
+from particula.util.constants import BOLTZMANN_CONSTANT
 
 
-def particle_diffusion_coefficient(
+@validate_inputs(
+    {
+        "temperature": "positive",
+        "aerodynamic_mobility": "nonnegative",
+    }
+)
+def get_diffusion_coefficient(
     temperature: Union[float, NDArray[np.float64]],
     aerodynamic_mobility: Union[float, NDArray[np.float64]],
     boltzmann_constant: float = BOLTZMANN_CONSTANT,
@@ -40,7 +47,7 @@ def particle_diffusion_coefficient(
     return boltzmann_constant * temperature * aerodynamic_mobility
 
 
-def particle_diffusion_coefficient_via_system_state(
+def get_diffusion_coefficient_via_system_state(
     particle_radius: Union[float, NDArray[np.float64]],
     temperature: float,
     pressure: float,
@@ -80,7 +87,7 @@ def particle_diffusion_coefficient_via_system_state(
     )
 
     # Step 3: Calculate the particle diffusion coefficient
-    return particle_diffusion_coefficient(
+    return get_diffusion_coefficient(
         temperature=temperature,
         aerodynamic_mobility=_aerodynamic_mobility,
     )
