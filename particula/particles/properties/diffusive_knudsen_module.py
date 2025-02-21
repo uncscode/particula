@@ -10,8 +10,8 @@ from particula.util.reduced_quantity import reduced_self_broadcast
 
 
 def diffusive_knudsen_number(
-    radius: Union[float, NDArray[np.float64]],
-    mass_particle: Union[float, NDArray[np.float64]],
+    particle_radius: Union[float, NDArray[np.float64]],
+    particle_mass: Union[float, NDArray[np.float64]],
     friction_factor: Union[float, NDArray[np.float64]],
     coulomb_potential_ratio: Union[float, NDArray[np.float64]] = 0.0,
     temperature: float = 298.15,
@@ -22,7 +22,6 @@ def diffusive_knudsen_number(
     effective length scale of particle--particle Coulombic interaction
 
     Args:
-    -----
     - radius: The radius of the particle [m].
     - mass_particle: The mass of the particle [kg].
     - friction_factor: The friction factor of the particle [dimensionless].
@@ -49,16 +48,16 @@ def diffusive_knudsen_number(
     https://doi.org/10.1103/PhysRevE.85.026410
     """
     # Calculate the pairwise sum of radii
-    if isinstance(radius, np.ndarray):
-        sum_of_radii = radius[:, np.newaxis] + radius
+    if isinstance(particle_radius, np.ndarray):
+        sum_of_radii = particle_radius[:, np.newaxis] + particle_radius
     else:
-        sum_of_radii = 2 * radius
+        sum_of_radii = 2 * particle_radius
 
     # Calculate reduced mass
-    if isinstance(mass_particle, np.ndarray):
-        reduced_mass = reduced_self_broadcast(mass_particle)
+    if isinstance(particle_mass, np.ndarray):
+        reduced_mass = reduced_self_broadcast(particle_mass)
     else:
-        reduced_mass = mass_particle
+        reduced_mass = particle_mass
 
     # Calculate reduced friction factor
     if isinstance(friction_factor, np.ndarray):
