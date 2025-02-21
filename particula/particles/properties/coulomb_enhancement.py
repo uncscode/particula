@@ -87,7 +87,7 @@ def ratio(
 
 
 def kinetic(
-    coulomb_potential: Union[float, NDArray[np.float64]]
+    coulomb_potential: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Calculate the kinetic limit of the Coulombic enhancement factor.
@@ -121,7 +121,7 @@ def kinetic(
 
 
 def continuum(
-    coulomb_potential: Union[float, NDArray[np.float64]]
+    coulomb_potential: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Calculate the continuum limit of the Coulombic enhancement factor.

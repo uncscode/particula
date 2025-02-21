@@ -1,5 +1,4 @@
-"""Tests for the Aerosol class.
-"""
+"""Tests for the Aerosol class."""
 
 import unittest
 import numpy as np

@@ -122,7 +122,7 @@ class BuilderFluidDensityMixin:
     ):
         """Set the density of the particle in kg/m^3.
 
-        Args:
+        Arguments:
             density : Density of the particle.
             density_units : Units of the density. Default is *kg/m^3*
         """

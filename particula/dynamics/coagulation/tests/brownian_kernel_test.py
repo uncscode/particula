@@ -1,5 +1,4 @@
-"""Test Brownian module functions.
-"""
+"""Test Brownian module functions."""
 
 # pylint: disable=protected-access
 

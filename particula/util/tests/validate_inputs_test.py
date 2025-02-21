@@ -1,5 +1,4 @@
-""" This module contains tests for the validate_inputs decorator.
-"""
+"""This module contains tests for the validate_inputs decorator."""
 
 import pytest
 import numpy as np

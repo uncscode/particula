@@ -1,5 +1,4 @@
-""" calculate ion--particle coagulation according to lf2013
-"""
+"""calculate ion--particle coagulation according to lf2013"""
 
 import os
 

@@ -1,5 +1,4 @@
-""" testing the mean free path calculation
-"""
+"""testing the mean free path calculation"""
 
 import pytest
 import numpy as np

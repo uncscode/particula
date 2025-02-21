@@ -1,4 +1,4 @@
-""" calculating the surface tension of a mixture of solutes and water """
+"""calculating the surface tension of a mixture of solutes and water"""
 
 # pylint: disable=too-many-positional-arguments, too-many-arguments
 

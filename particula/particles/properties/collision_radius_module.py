@@ -13,7 +13,7 @@ from numpy.typing import NDArray
 
 
 def mulholland_1988(
-    radius_gyration: Union[NDArray[np.float64], float]
+    radius_gyration: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
     """Collision radius is equal to the radius of gyration.
 

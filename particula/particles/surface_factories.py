@@ -1,5 +1,4 @@
-""""Surface tension strategies factory.
-"""
+""" "Surface tension strategies factory."""
 
 from typing import Union
 from particula.abc_factory import StrategyFactoryABC

@@ -1,5 +1,4 @@
-""" validate inputs
-"""
+"""validate inputs"""
 
 import inspect
 from functools import wraps

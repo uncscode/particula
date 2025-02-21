@@ -1,8 +1,8 @@
-""" test knudsen number utility
+"""test knudsen number utility
 
-    the knudsen number goes like:
-        0   for larger  particles
-        inf for smaller particles
+the knudsen number goes like:
+    0   for larger  particles
+    inf for smaller particles
 """
 
 import pytest

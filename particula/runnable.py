@@ -1,5 +1,4 @@
-"""RunnableProcess classes for modifying aerosol instances.
-"""
+"""RunnableProcess classes for modifying aerosol instances."""
 
 from abc import ABC, abstractmethod
 from typing import Any

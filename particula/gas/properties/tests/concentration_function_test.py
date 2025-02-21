@@ -5,7 +5,7 @@ import pytest
 from particula.util.constants import GAS_CONSTANT
 
 from particula.gas.properties.concentration_function import (
-    calculate_concentration,
+    get_concentration_from_pressure,
 )
 
 
@@ -18,7 +18,7 @@ def test_calculate_concentration_scalar():
     expected_concentration = (partial_pressure * molar_mass) / (
         GAS_CONSTANT * temperature
     )
-    assert calculate_concentration(
+    assert get_concentration_from_pressure(
         partial_pressure, molar_mass, temperature
     ) == pytest.approx(expected_concentration)
 
@@ -33,6 +33,8 @@ def test_calculate_concentration_array():
         GAS_CONSTANT * temperature
     )
     np.testing.assert_array_almost_equal(
-        calculate_concentration(partial_pressure, molar_mass, temperature),
+        get_concentration_from_pressure(
+            partial_pressure, molar_mass, temperature
+        ),
         expected_concentration,
     )

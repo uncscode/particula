@@ -13,7 +13,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.gas.properties.concentration_function import (
-    calculate_concentration,
+    get_concentration_from_pressure,
 )
 from particula.gas.properties.pressure_function import (
     calculate_partial_pressure,
@@ -87,7 +87,7 @@ class VaporPressureStrategy(ABC):
             )
             ```
         """
-        return calculate_concentration(
+        return get_concentration_from_pressure(
             partial_pressure, molar_mass, temperature
         )
 

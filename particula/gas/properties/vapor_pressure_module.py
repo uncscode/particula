@@ -68,7 +68,7 @@ def clausius_clapeyron_vapor_pressure(
 
 # Buck equation function
 def buck_vapor_pressure(
-    temperature: Union[float, NDArray[np.float64]]
+    temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Calculate vapor pressure using the Buck equation for water vapor.

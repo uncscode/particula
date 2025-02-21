@@ -1,7 +1,7 @@
-""" calculating reduced quantity.
+"""calculating reduced quantity.
 
-    reduced_quantity =
-        quantity_1 * quantity_2 / (quantity_1 + quantity_2)
+reduced_quantity =
+    quantity_1 * quantity_2 / (quantity_1 + quantity_2)
 """
 
 import logging

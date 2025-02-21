@@ -475,8 +475,7 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy):
         )
         # where total new_mass is zero, set concentration to zero
         new_mass_sum = np.sum(new_mass, axis=1)
-        concentration = np.where(
-            new_mass_sum > 0, concentration, 0)
+        concentration = np.where(new_mass_sum > 0, concentration, 0)
         return (new_mass, concentration)
 
     def add_concentration(

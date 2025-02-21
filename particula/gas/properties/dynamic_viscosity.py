@@ -19,10 +19,12 @@ from particula.util.constants import (
     REF_VISCOSITY_AIR_STP,
     SUTHERLAND_CONSTANT,
 )
+from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")  # get instance of logger
 
 
+@validate_inputs({"temperature": "positive"})
 def get_dynamic_viscosity(
     temperature: float,
     reference_viscosity: float = REF_VISCOSITY_AIR_STP,
@@ -41,18 +43,18 @@ def get_dynamic_viscosity(
 
     Arguments:
         temperature : Desired air temperature in Kelvin. Must be > 0.
-        reference_viscosity : Gas viscosity at the reference temperature (default is STP).
-        reference_temperature : Gas temperature in Kelvin for the reference viscosity (default is STP).
+        reference_viscosity : Gas viscosity at the reference temperature
+            (default is STP).
+        reference_temperature : Gas temperature in Kelvin for the reference
+            viscosity (default is STP).
 
     Returns:
         Dynamic viscosity of air at the given temperature in Pa·s.
 
     References:
-        - Wolfram Formula Repository, "Sutherland's Formula," https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
+        - Wolfram Formula Repository, "Sutherland's Formula,"
+        https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
     """
-    if temperature <= 0:
-        logger.error("Temperature must be greater than 0 Kelvin.")
-        raise ValueError("Temperature must be greater than 0 Kelvin.")
     return (
         reference_viscosity
         * (temperature / reference_temperature) ** 1.5

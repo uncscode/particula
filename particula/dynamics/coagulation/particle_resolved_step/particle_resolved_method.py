@@ -1,5 +1,4 @@
-"""Particle resolved method for coagulation.
-"""
+"""Particle resolved method for coagulation."""
 
 from typing import Tuple, Union
 import numpy as np

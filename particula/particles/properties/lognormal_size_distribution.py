@@ -1,5 +1,4 @@
-"""Lognormal size distribution properties.
-"""
+"""Lognormal size distribution properties."""
 
 # from typing import Union
 from scipy.stats import lognorm

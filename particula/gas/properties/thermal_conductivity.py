@@ -9,7 +9,7 @@ logger = logging.getLogger("particula")  # get instance of logger
 
 
 def get_thermal_conductivity(
-    temperature: Union[float, NDArray[np.float64]]
+    temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Calculate the thermal conductivity of air as a function of temperature.

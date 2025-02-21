@@ -1,5 +1,4 @@
-"""conversion functions common for aerosol processing
-"""
+"""conversion functions common for aerosol processing"""
 
 from typing import Union, Tuple, Any, List, Dict
 from numpy.typing import NDArray

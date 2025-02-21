@@ -1,5 +1,4 @@
-"""Module for aerodynamic size and shape factor of a particle in a fluid.
-"""
+"""Module for aerodynamic size and shape factor of a particle in a fluid."""
 
 from typing import Union
 from numpy.typing import NDArray

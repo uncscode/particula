@@ -90,8 +90,8 @@ def to_volume_fraction(
     Convert mass concentrations to volume fractions for N components.
 
     If inputs are one dimensional (1D) or floating-point scalars, the summation
-    is done over the entire array. If `mass_concentrations` is 2D, the summation
-    is done row-wise.
+    is done over the entire array. If `mass_concentrations` is 2D, the
+    summation is done row-wise.
 
     Args:
         mass_concentrations: A list or ndarray of mass concentrations
