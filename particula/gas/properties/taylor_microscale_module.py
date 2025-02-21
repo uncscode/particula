@@ -29,10 +29,7 @@ def get_lagrangian_taylor_microscale_time(
     time for the decay of turbulent velocity correlations. It provides insight
     into the memory of turbulent fluid elements. It is given by:
 
-    Equation:
-        - τ_T = τ_k * (2 R_λ / (15^(1/2) a_o))^(1/2)
-
-    Where:
+    - τ_T = τ_k * (2 R_λ / (15^(1/2) a_o))^(1/2)
         - τ_T is Lagrangian Taylor microscale time [s]
         - τ_k (kolmogorov_time) is Kolmogorov time scale [s]
         - R_λ (re_lambda) is Taylor-microscale Reynolds number [-]
@@ -45,6 +42,12 @@ def get_lagrangian_taylor_microscale_time(
         - accel_variance : Normalized acceleration variance in isotropic
             turbulence [-]
 
+    Examples:
+        ``` py title="Example Usage"
+        import particula as par
+        par.gas.get_lagrangian_taylor_microscale_time(0.387, 500, 0.05)
+        # Output: 0.3872983346207417
+        ```
     Returns:
         - Lagrangian Taylor microscale time [s]
     """
@@ -73,10 +76,7 @@ def get_taylor_microscale(
     turbulence. It characterizes the smoothness of velocity fluctuations
     in turbulent flows. It is given by:
 
-    Equation:
-        - λ = u' * (15 ν² / ε)^(1/2)
-
-    Where:
+    - λ = u' * (15 ν² / ε)^(1/2)
         - λ is Taylor microscale [m]
         - u' (rms_velocity) is Fluid RMS fluctuation velocity [m/s]
         - v (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s]
@@ -91,6 +91,13 @@ def get_taylor_microscale(
 
     Returns:
         - Taylor microscale [m]
+
+    Examples:
+        ``` py title="Example Usage"
+        import particula as par
+        par.gas.get_taylor_microscale(0.35, 1.5e-5, 0.1)
+        # Output: 0.00021081851067789195
+        ```
 
     References:
         - https://en.wikipedia.org/wiki/Taylor_microscale
@@ -119,10 +126,7 @@ def get_taylor_microscale_reynolds_number(
     turbulence studies to characterize the relative importance of inertial and
     viscous forces at the Taylor microscale.
 
-    Equation:
-        - Re_λ = (u' λ) / ν
-
-    Where:
+    - Re_λ = (u' λ) / ν
         - u' (fluid_rms_velocity) is Fluid (RMS) velocity fluctuation [m/s].
         - λ (taylor_microscale) is Taylor microscale [m].
         - ν (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s].
@@ -134,6 +138,13 @@ def get_taylor_microscale_reynolds_number(
 
     Returns:
         - Taylor-microscale Reynolds number [dimensionless].
+
+    Examples:
+        ``` py title="Example Usage"
+        import particula as par
+        par.gas.get_taylor_microscale_reynolds_number(0.35, 0.00021, 1.5e-5)
+        # Output: 500.0
+        ```
 
     References:
         - https://en.wikipedia.org/wiki/Taylor_microscale

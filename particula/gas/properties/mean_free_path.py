@@ -62,7 +62,8 @@ def get_molecule_mean_free_path(
 
     Examples:
         ```py title="Example usage"
-        lam = molecule_mean_free_path()
+        import particula as par
+        par.gas.get_molecule_mean_free_path()
         # Returns mean free path at ~298K and 101325Pa, ~6.5e-8 m
         ```
 

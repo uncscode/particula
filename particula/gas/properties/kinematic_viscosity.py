@@ -42,6 +42,9 @@ def get_kinematic_viscosity(
     by the fluid density (ρ).
 
     - ν = μ / ρ
+        - ν is Kinematic viscosity [m²/s].
+        - μ is Dynamic viscosity [Pa·s].
+        - ρ is Fluid density [kg/m³].
 
     Arguments:
         - dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].
@@ -52,7 +55,8 @@ def get_kinematic_viscosity(
 
     Examples:
         ```py title="Example usage"
-        nu = get_kinematic_viscosity(1.8e-5, 1.2)
+        import particula as par
+        par.gas.get_kinematic_viscosity(1.8e-5, 1.2)
         # Output: ~1.5e-5
         ```
 
@@ -77,8 +81,10 @@ def get_kinematic_viscosity_via_system_state(
     This function uses get_dynamic_viscosity(...) and divides by the given
     fluid_density to get the kinematic viscosity.
 
-    Equation:
-        - ν = μ / ρ
+    - ν = μ / ρ
+        - ν is Kinematic viscosity [m²/s].
+        - μ is Dynamic viscosity [Pa·s].
+        - ρ is Fluid density [kg/m³].
 
     Where:
         - ν is Kinematic viscosity [m²/s].
@@ -96,7 +102,8 @@ def get_kinematic_viscosity_via_system_state(
 
     Examples:
         ```py title="Example usage"
-        nu_air = get_kinematic_viscosity_via_system_state(300, 1.2)
+        import particula as par
+        par.gas.get_kinematic_viscosity_via_system_state(300, 1.2)
         # Output: ~1.5e-5
         ```
 

@@ -51,8 +51,9 @@ def get_dynamic_viscosity(
         - Dynamic viscosity of air at the given temperature in Pa·s.
 
     Examples:
-        ``` py title="Example Usage"
-        viscosity = get_dynamic_viscosity(300.0)
+        ``` py title="Example Float Usage"
+        import particula as par
+        par.gas.get_dynamic_viscosity(300.0)
         # Output (approx.): 1.846e-05
         ```
 

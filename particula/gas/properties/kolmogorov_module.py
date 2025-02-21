@@ -42,6 +42,7 @@ def get_kolmogorov_time(
 
     Examples:
         ```py title="Kolmogorov time of a fluid"
+        import particula as par
         par.gas.get_kolmogorov_time(1.5e-5, 0.1)
         # Output: 0.3872983346207417
         ```
@@ -87,9 +88,10 @@ def get_kolmogorov_length(
 
     Examples:
         ```py title="Kolmogorov length scale of a fluid"
+        import particula as par
         par.gas.get_kolmogorov_length(1.5e-5, 0.1)
         # Output: 0.0029154759474226504
-        ``
+        ```
 
     References:
         - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
@@ -127,6 +129,7 @@ def get_kolmogorov_velocity(
 
     Examples:
         ```py title="Kolmogorov velocity scale of a fluid"
+        import particula as par
         par.gas.get_kolmogorov_velocity(1.5e-5, 0.1)
         # Output: 0.3872983346207417
         ```

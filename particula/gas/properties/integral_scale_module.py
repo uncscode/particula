@@ -38,7 +38,8 @@ def get_lagrangian_integral_time(
 
     Examples:
         ``` py title="Example Usage"
-        >>> timescale = get_lagrangian_integral_time(0.3, 1e-4)
+        import particula as par
+        par.gas.get_lagrangian_integral_time(0.3, 1e-4)
         # Output: 900.0
         ```
 
@@ -63,10 +64,7 @@ def get_eulerian_integral_length(
     The Eulerian integral length scale is a measure of the size of the largest
     turbulent eddies in a fluid flow.
 
-    Equation:
-        - L_e = 0.5 × (u'³) / ε
-
-    Where:
+    - L_e = 0.5 × (u'³) / ε
         - L_e is Eulerian integral length scale [m].
         - fluid_rms_velocity (u') is Fluid RMS fluctuation velocity [m/s].
         - turbulent_dissipation (ε) is Turbulent energy dissipation rate
@@ -81,8 +79,9 @@ def get_eulerian_integral_length(
         - Eulerian integral length scale [m].
 
     Examples:
-        ``` py title="Example Usage"
-        >>> length_scale = get_eulerian_integral_length(0.3, 1e-4)
+        ``` py title="Example"
+        import particula as par
+        par.gas.get_eulerian_integral_length(0.3, 1e-4)
         # Output: 1350.0
         ```
 

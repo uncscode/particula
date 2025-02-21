@@ -30,6 +30,13 @@ def get_concentration_from_pressure(
         molar_mass : Molar mass of the gas in kg/mol.
         temperature : Temperature in Kelvin.
 
+    Examples:
+        ```py title="Floating-point Example Usage"
+        import particula as par
+        par.gas.get_concentration_from_pressure(101325, 0.02897, 298.15)
+        # Output: 1.184587604735883
+        ```
+
     Returns:
         Concentration of the gas in kg/m³.
     """

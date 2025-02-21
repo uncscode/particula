@@ -22,10 +22,7 @@ def get_thermal_conductivity(
     Only valid for temperatures within the range typically found on
     Earth's surface.
 
-    Equation:
-        - k(T) = 1e-3 × (4.39 + 0.071 × T)
-
-    Where:
+    - k(T) = 1e-3 × (4.39 + 0.071 × T)
         - k(T) is Thermal conductivity [W/(m·K)].
         - T is Temperature [K].
 
@@ -36,8 +33,9 @@ def get_thermal_conductivity(
         - The thermal conductivity [W/(m·K)] or [J/(m·s·K)].
 
     Examples:
-        ```py
-        k_300K = get_thermal_conductivity(300)
+        ``` py title="Example Usage"
+        import particula as par
+        par.gas.get_thermal_conductivity(300)
         # ~0.449 W/(m·K)
         ```
 

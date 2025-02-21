@@ -30,10 +30,7 @@ def get_antoine_vapor_pressure(
     The Antoine equation relates the logarithm of vapor pressure to
     temperature for a pure substance.
 
-    Equation:
-        - P = 10^(a - b / (T - c)) × 133.322
-
-    Where:
+    - P = 10^(a - b / (T - c)) × 133.322
         - P is Vapor pressure [Pa].
         - a, b, c is Antoine equation parameters (dimensionless).
         - T is Temperature [K].
@@ -49,7 +46,8 @@ def get_antoine_vapor_pressure(
 
     Examples:
         ```py title="Example usage"
-        p_antoine = get_antoine_vapor_pressure(
+        import particula as par
+        par.gas.get_antoine_vapor_pressure(
             8.07131, 1730.63, 233.426, 373.15
         )
         # Output: ~101325 Pa (roughly 1 atm)
@@ -87,10 +85,7 @@ def get_clausius_clapeyron_vapor_pressure(
     temperature/pressure pair and the latent heat of vaporization,
     assuming ideal gas behavior.
 
-    Equation:
-        - P_final = P_initial × exp( (L / R) × (1 / T_initial - 1 / T_final) )
-
-    Where:
+    - P_final = P_initial × exp( (L / R) × (1 / T_initial - 1 / T_final) )
         - P_final is Final vapor pressure [Pa].
         - P_initial is Initial vapor pressure [Pa].
         - L is Latent heat of vaporization [J/mol].
@@ -110,7 +105,8 @@ def get_clausius_clapeyron_vapor_pressure(
 
     Examples:
         ```py title="Example usage"
-        p_final = get_clausius_clapeyron_vapor_pressure(
+        import particula as par
+        par.gas.get_clausius_clapeyron_vapor_pressure(
             40660, 373.15, 101325, 300
         )
         # Output: ~35307 Pa
@@ -139,11 +135,10 @@ def get_buck_vapor_pressure(
     Uses separate empirical formulas below 0 °C and above 0 °C to compute
     water vapor pressure.
 
-    Equation:
-        - For T < 0 °C, as
-            p = 6.1115 × exp( (23.036 - T/333.7) × T / (279.82 + T ) ) × 100
-        - For T ≥ 0 °C, as
-            p = 6.1121 × exp( (18.678 - T/234.5) × T / (257.14 + T ) ) × 100
+    - For T < 0 °C, as
+        p = 6.1115 × exp( (23.036 - T/333.7) × T / (279.82 + T ) ) × 100
+    - For T ≥ 0 °C, as
+        p = 6.1121 × exp( (18.678 - T/234.5) × T / (257.14 + T ) ) × 100
 
     Where:
         - p is Vapor pressure [Pa].
@@ -157,12 +152,13 @@ def get_buck_vapor_pressure(
 
     Examples:
         ```py title="Example usage"
-        p_buck = get_buck_vapor_pressure(273.15)
+        import particula as par
+        par.gas.get_buck_vapor_pressure(273.15)
         # Output: ~611 Pa (around ice point)
         ```
 
     References:
-        - Buck, A. L., (1981) ...
+        - Buck, A. L., (1981)
         - https://en.wikipedia.org/wiki/Arden_Buck_equation
     """
     temp = np.array(temperature) - 273.15  # Convert to Celsius
