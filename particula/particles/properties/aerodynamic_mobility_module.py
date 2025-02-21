@@ -16,6 +16,10 @@ def particle_aerodynamic_mobility(
     """
     Calculate the aerodynamic mobility of a particle.
 
+    This is defined as the ratio of the slip correction factor to the product
+    of the dynamic viscosity of the fluid, the particle radius, and a slip
+    correction constant derived. This mobility quantifies the ease with which
+    a particle can move through a fluid.
 
     Args:
         - radius : The radius of the particle (m).
