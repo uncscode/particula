@@ -139,8 +139,6 @@ def get_buck_vapor_pressure(
         p = 6.1115 × exp( (23.036 - T/333.7) × T / (279.82 + T ) ) × 100
     - For T ≥ 0 °C, as
         p = 6.1121 × exp( (18.678 - T/234.5) × T / (257.14 + T ) ) × 100
-
-    Where:
         - p is Vapor pressure [Pa].
         - T is Temperature in Celsius [°C] (converted internally from Kelvin).
 
