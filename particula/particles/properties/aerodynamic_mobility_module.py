@@ -13,31 +13,40 @@ def particle_aerodynamic_mobility(
     slip_correction_factor: Union[float, NDArray[np.float64]],
     dynamic_viscosity: float,
 ) -> Union[float, NDArray[np.float64]]:
-    """
-    Calculate the aerodynamic mobility of a particle.
+"""
+Calculate the aerodynamic mobility of a particle using classical fluid mechanics.
 
-    This is defined as the ratio of the slip correction factor to the product
-    of the dynamic viscosity of the fluid, the particle radius, and a slip
-    correction constant derived. This mobility quantifies the ease with which
-    a particle can move through a fluid.
+The aerodynamic mobility (B) can be determined by:
 
-    Args:
-        - radius : The radius of the particle (m).
-        - slip_correction_factor : The slip correction factor for the particle
-             in the fluid (dimensionless).
-        - dynamic_viscosity : The dynamic viscosity of the fluid (Pa.s).
+- B = C / (6πμr)
+    - B is the aerodynamic mobility (m²/s).
+    - C is the slip correction factor (dimensionless).
+    - μ is the dynamic viscosity of the fluid (Pa·s).
+    - r is the radius of the particle (m).
 
-    Returns:
-        The particle aerodynamic mobility (m^2/s).
+Arguments:
+    - radius : The radius of the particle in meters.
+    - slip_correction_factor : Slip correction factor (dimensionless).
+    - dynamic_viscosity : Dynamic viscosity of the fluid in Pa·s.
 
-    Example:
-        ``` py title="Example"
-        aerodynamic_mobility = particle_aerodynamic_mobility(
-            radius=0.00005,
-            slip_correction_factor=1.1,
-            dynamic_viscosity=0.0000181,
-        )
-        ```
+Returns:
+    - The particle aerodynamic mobility in m²/s.
+
+Examples:
+    ``` py title="Example"
+    from particula.particles.properties.aerodynamic_mobility_module import particle_aerodynamic_mobility
+    aerodynamic_mobility = particle_aerodynamic_mobility(
+        radius=0.00005,
+        slip_correction_factor=1.1,
+        dynamic_viscosity=0.0000181
+    )
+    # Output: ...
+    ```
+
+References:
+    - Wikipedia contributors, "Stokes' Law," Wikipedia,
+      https://en.wikipedia.org/wiki/Stokes%27_law.
+"""
     """
     # Validate radius
     if (
