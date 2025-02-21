@@ -18,9 +18,9 @@ from typing import Union, Tuple
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.particles.properties import (
+from particula.particles import (
     get_diffusion_coefficient_via_system_state,
-    particle_settling_velocity_via_system_state,
+    get_particle_settling_velocity_via_system_state,
     get_debye_function,
 )
 
@@ -157,7 +157,7 @@ def get_spherical_wall_loss_coefficient_via_system_state(
     )
 
     # Step 2: Get particle settling velocity
-    settling_velocity = particle_settling_velocity_via_system_state(
+    settling_velocity = get_particle_settling_velocity_via_system_state(
         particle_radius=particle_radius,
         particle_density=particle_density,
         temperature=temperature,
@@ -213,7 +213,7 @@ def get_rectangle_wall_loss_coefficient_via_system_state(
             https://doi.org/10.1016/0021-8502(81)90036-7
     """
     # Step 1: Get particle settling velocity
-    settling_velocity = particle_settling_velocity_via_system_state(
+    settling_velocity = get_particle_settling_velocity_via_system_state(
         particle_radius=particle_radius,
         particle_density=particle_density,
         temperature=temperature,
