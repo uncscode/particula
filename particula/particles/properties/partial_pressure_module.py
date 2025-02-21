@@ -6,7 +6,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 
-def partial_pressure_delta(
+def get_partial_pressure_delta(
     partial_pressure_gas: Union[float, NDArray[np.float64]],
     partial_pressure_particle: Union[float, NDArray[np.float64]],
     kelvin_term: Union[float, NDArray[np.float64]],
