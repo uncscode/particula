@@ -58,8 +58,8 @@ from particula.particles.properties.settling_velocity import (
     get_particle_settling_velocity_with_drag,
 )
 from particula.particles.properties.diffusion_coefficient import (
-    particle_diffusion_coefficient,
-    particle_diffusion_coefficient_via_system_state,
+    get_diffusion_coefficient,
+    get_diffusion_coefficient_via_system_state,
 )
 from particula.particles.properties.lognormal_size_distribution import (
     lognormal_pdf_distribution,

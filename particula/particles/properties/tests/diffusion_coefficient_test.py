@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 from particula.particles.properties.diffusion_coefficient import (
-    particle_diffusion_coefficient,
+    get_diffusion_coefficient,
 )
 
 
@@ -12,7 +12,7 @@ def test_particle_diffusion_coefficient_float():
     temperature = 298.15
     particle_aerodynamic_mobility = 1e-9
     expected_diffusion_coefficient = 4.116404993e-30
-    result = particle_diffusion_coefficient(
+    result = get_diffusion_coefficient(
         temperature, particle_aerodynamic_mobility
     )
     assert result == pytest.approx(expected_diffusion_coefficient)  # type: ignore
@@ -25,7 +25,7 @@ def test_particle_diffusion_coefficient_array():
     expected_diffusion_coefficient = np.array(
         [1.380649e-32, 2.761298e-32, 4.141947e-32]
     )
-    result = particle_diffusion_coefficient(
+    result = get_diffusion_coefficient(
         temperature, particle_aerodynamic_mobility
     )
     assert np.allclose(result, expected_diffusion_coefficient)
@@ -36,6 +36,6 @@ def test_particle_diffusion_coefficient_invalid():
     temperature = "invalid"
     particle_aerodynamic_mobility = 1e-9
     with pytest.raises(TypeError):
-        particle_diffusion_coefficient(
+        get_diffusion_coefficient(
             temperature, particle_aerodynamic_mobility  # type: ignore
         )

@@ -31,7 +31,8 @@ def get_diffusion_coefficient(
     boltzmann_constant: float = BOLTZMANN_CONSTANT,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the diffusion coefficient of a particle based on temperature and aerodynamic mobility.
+    Calculate the diffusion coefficient of a particle based on temperature
+    and aerodynamic mobility.
 
     The diffusion coefficient (D) can be computed using:
 
@@ -44,24 +45,24 @@ def get_diffusion_coefficient(
     Arguments:
         - temperature : Temperature in Kelvin (K).
         - aerodynamic_mobility : Aerodynamic mobility in m²/s.
-        - boltzmann_constant : Boltzmann constant in J/K (default: 1.380649e-23).
+        - boltzmann_constant : Boltzmann constant in J/K.
 
     Returns:
         - The diffusion coefficient of the particle in m²/s.
 
     Examples:
         ``` py title="Example"
-        from particula.particles.properties.diffusion_coefficient import get_diffusion_coefficient
-
-        D = get_diffusion_coefficient(temperature=300.0, aerodynamic_mobility=1.0e-8)
-        print(D)
+        import particula as par
+        par.particles.get_diffusion_coefficient(
+            temperature=300.0, aerodynamic_mobility=1.0e-8
+        )
         # Output: ...
         ```
 
     References:
         - Einstein, A. (1905). "On the movement of small particles suspended
-          in stationary liquids required by the molecular-kinetic theory of heat."
-          Annalen der Physik, 17(8), 549–560.
+          in stationary liquids required by the molecular-kinetic theory of
+          heat." Annalen der Physik, 17(8), 549–560.
         - "Stokes-Einstein equation," Wikipedia,
           https://en.wikipedia.org/wiki/Stokes%E2%80%93Einstein_equation
     """
@@ -91,19 +92,18 @@ def get_diffusion_coefficient_via_system_state(
 
     Examples:
         ``` py title="Example"
-        from particula.particles.properties.diffusion_coefficient import get_diffusion_coefficient_via_system_state
-        D = get_diffusion_coefficient_via_system_state(
+        import particula as par
+        par.particles.get_diffusion_coefficient_via_system_state(
             particle_radius=1.0e-7,
             temperature=298.15,
             pressure=101325
         )
-        print(D)
         # Output: ...
         ```
 
     References:
         - Millikan, R. A. (1923). "On the elementary electrical charge and the
-          Avogadro constant." Physical Review, 2(2), 109–143.
+          Avogadro constant." Physical Review, 2(2), 109–143. [check]
         - "Mass Diffusion," Wikipedia,
           https://en.wikipedia.org/wiki/Diffusion#Mass_diffusion
     """
@@ -124,7 +124,7 @@ def get_diffusion_coefficient_via_system_state(
         knudsen_number=_knudsen_number,
     )
     _aerodynamic_mobility = get_aerodynamic_mobility(
-        radius=particle_radius,
+        particle_radius=particle_radius,
         slip_correction_factor=_slip_correction_factor,
         dynamic_viscosity=_dynamic_viscosity,
     )

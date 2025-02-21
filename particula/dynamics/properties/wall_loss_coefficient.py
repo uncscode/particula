@@ -19,7 +19,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from particula.particles.properties import (
-    particle_diffusion_coefficient_via_system_state,
+    get_diffusion_coefficient_via_system_state,
     particle_settling_velocity_via_system_state,
     debye_function,
 )
@@ -150,7 +150,7 @@ def get_spherical_wall_loss_coefficient_via_system_state(
     """
 
     # Step 1: Get particle diffusion coefficient
-    diffusion_coefficient = particle_diffusion_coefficient_via_system_state(
+    diffusion_coefficient = get_diffusion_coefficient_via_system_state(
         particle_radius=particle_radius,
         temperature=temperature,
         pressure=pressure,
@@ -221,7 +221,7 @@ def get_rectangle_wall_loss_coefficient_via_system_state(
     )
 
     # Step 2: Get particle diffusion coefficient
-    diffusion_coefficient = particle_diffusion_coefficient_via_system_state(
+    diffusion_coefficient = get_diffusion_coefficient_via_system_state(
         particle_radius=particle_radius,
         temperature=temperature,
         pressure=pressure,
