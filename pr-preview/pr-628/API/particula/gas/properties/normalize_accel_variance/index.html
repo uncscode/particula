@@ -3076,6 +3076,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7302,6 +7311,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7352,23 +7370,28 @@
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/normalize_accel_variance.py#L12">Show source in normalize_accel_variance.py:12</a></p>
 <p>Calculate the normalized acceleration variance in isotropic turbulence.</p>
 <p>This coefficient describes the statistical behavior of acceleration
-fluctuations in turbulent flows. It is given by:</p>
-<p>a_o = (11 + 7 R_λ) / (205 + R_λ)</p>
-<ul>
-<li>a_o (accel_variance) : Normalized acceleration variance in isotropic
-    turbulence [-]</li>
-<li>R_λ (re_lambda) : Taylor-microscale Reynolds number [-]</li>
-</ul>
+fluctuations in turbulent flows.</p>
+<p>Equation:
+    - a_o = (11 + 7 R_λ) / (205 + R_λ)</p>
+<p>Where:
+    - a_o (accel_variance) is Normalized acceleration variance in isotropic
+      turbulence [-].
+    - R_λ (re_lambda) is Taylor-microscale Reynolds number [-].
+    - ε (numerical_stability_epsilon) is Small number added to R_λ
+      for numerical stability.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- re_lambda : Taylor-microscale Reynolds number [-]
-</code></pre></div>
+<ul>
+<li>re_lambda : Taylor-microscale Reynolds number [-]</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- accel_variance : Normalized acceleration variance [-]
+<ul>
+<li>accel_variance : Normalized acceleration variance [-]</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="n">result</span> <span class="o">=</span> <span class="n">get_normalized_accel_variance_ao2008</span><span class="p">(</span><span class="mf">500.0</span><span class="p">)</span>
+<span class="c1"># Output: ~0.05</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
 <li>The equivalent numerically stable version used is this.
     (7 + 11 / (R_λ + ε)) / (1 + 205 / (R_λ + ε))</li>

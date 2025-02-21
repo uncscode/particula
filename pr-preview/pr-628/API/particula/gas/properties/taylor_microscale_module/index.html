@@ -7540,25 +7540,25 @@
 <p>The Lagrangian Taylor microscale time (τ_T) represents the characteristic
 time for the decay of turbulent velocity correlations. It provides insight
 into the memory of turbulent fluid elements. It is given by:</p>
-<p>τ_T = τ_k * (2 R_λ / (15^(&frac12;) a_o))^(&frac12;)</p>
+<p>Equation:
+    - τ_T = τ_k * (2 R_λ / (15^(&frac12;) a_o))^(&frac12;)</p>
+<p>Where:
+    - τ_T is Lagrangian Taylor microscale time [s]
+    - τ_k (kolmogorov_time) is Kolmogorov time scale [s]
+    - R_λ (re_lambda) is Taylor-microscale Reynolds number [-]
+    - a_o (accel_variance) is Normalized acceleration variance in isotropic
+        turbulence [-]</p>
+<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li>τ_T : Lagrangian Taylor microscale time [s]</li>
-<li>τ_k (kolmogorov_time) : Kolmogorov time scale [s]</li>
-<li>R_λ (re_lambda) : Taylor-microscale Reynolds number [-]</li>
-<li>a_o (accel_variance) : Normalized acceleration variance in isotropic
+<li>kolmogorov_time : Kolmogorov time scale [s]</li>
+<li>re_lambda : Taylor-microscale Reynolds number [-]</li>
+<li>accel_variance : Normalized acceleration variance in isotropic
     turbulence [-]</li>
 </ul>
-<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- kolmogorov_time : Kolmogorov time scale [s]
-- re_lambda : Taylor-microscale Reynolds number [-]
-- accel_variance : Normalized acceleration variance in isotropic
-    turbulence [-]
-</code></pre></div>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Lagrangian Taylor microscale time [s]
-</code></pre></div>
+<ul>
+<li>Lagrangian Taylor microscale time [s]</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
@@ -7580,29 +7580,29 @@ into the memory of turbulent fluid elements. It is given by:</p>
 turbulence, linking the dissipative and energy-containing ranges of
 turbulence. It characterizes the smoothness of velocity fluctuations
 in turbulent flows. It is given by:</p>
-<p>λ = u' * (15 ν² / ε)^(&frac12;)</p>
-<ul>
-<li>λ : Taylor microscale [m]</li>
-<li>u' (rms_velocity) : Fluid RMS fluctuation velocity [m/s]</li>
-<li>v (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]</li>
-<li>ε (turbulent_dissipation) : Turbulent kinetic energy dissipation
-    rate [m²/s³]</li>
-</ul>
+<p>Equation:
+    - λ = u' * (15 ν² / ε)^(&frac12;)</p>
+<p>Where:
+    - λ is Taylor microscale [m]
+    - u' (rms_velocity) is Fluid RMS fluctuation velocity [m/s]
+    - v (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s]
+    - ε (turbulent_dissipation) is Turbulent kinetic energy dissipation
+        rate [m²/s³]</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]
-- kinematic_viscosity : Kinematic viscosity of the fluid [m²/s]
-- turbulent_dissipation : Turbulent kinetic energy dissipation rate
-    [m²/s³]
-</code></pre></div>
+<ul>
+<li>fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]</li>
+<li>kinematic_viscosity : Kinematic viscosity of the fluid [m²/s]</li>
+<li>turbulent_dissipation : Turbulent kinetic energy dissipation rate
+    [m²/s³]</li>
+</ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Taylor microscale [m]
-</code></pre></div>
+<ul>
+<li>Taylor microscale [m]</li>
+</ul>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- https://en.wikipedia.org/wiki/Taylor_microscale
-</code></pre></div>
+<ul>
+<li>https://en.wikipedia.org/wiki/Taylor_microscale</li>
+</ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
@@ -7618,32 +7618,31 @@ in turbulent flows. It is given by:</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_taylor_microscale_reynolds_number">get_taylor_microscale_reynolds_number<a class="headerlink" href="#get_taylor_microscale_reynolds_number" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/taylor_microscale_module.py#L104">Show source in taylor_microscale_module.py:104</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/taylor_microscale_module.py#L103">Show source in taylor_microscale_module.py:103</a></p>
 <p>Compute the Taylor-microscale Reynolds number (Re_λ).</p>
 <p>The Taylor-scale micro Reynolds number is a dimensionless quantity used in
 turbulence studies to characterize the relative importance of inertial and
 viscous forces at the Taylor microscale.</p>
-<p>The function is given by:</p>
-<p>Re_λ = (u' λ) / ν</p>
-<ul>
-<li>u' (fluid_rms_velocity) : Fluid (RMS) velocity fluctuation [m/s].</li>
-<li>λ (taylor_microscale) : Taylor microscale [m].</li>
-<li>ν (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s].</li>
-</ul>
+<p>Equation:
+    - Re_λ = (u' λ) / ν</p>
+<p>Where:
+    - u' (fluid_rms_velocity) is Fluid (RMS) velocity fluctuation [m/s].
+    - λ (taylor_microscale) is Taylor microscale [m].
+    - ν (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s].</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- fluid_rms_velocity : Fluid RMS velocity fluctuation [m/s].
-- taylor_microscale : Taylor microscale [m].
-- kinematic_viscosity : Kinematic viscosity of the fluid [m²/s].
-</code></pre></div>
+<ul>
+<li>fluid_rms_velocity : Fluid RMS velocity fluctuation [m/s].</li>
+<li>taylor_microscale : Taylor microscale [m].</li>
+<li>kinematic_viscosity : Kinematic viscosity of the fluid [m²/s].</li>
+</ul>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Re_λ : Taylor-microscale Reynolds number [-].
-</code></pre></div>
+<ul>
+<li>Taylor-microscale Reynolds number [dimensionless].</li>
+</ul>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- https://en.wikipedia.org/wiki/Taylor_microscale
-</code></pre></div>
+<ul>
+<li>https://en.wikipedia.org/wiki/Taylor_microscale</li>
+</ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
