@@ -17,24 +17,6 @@ def get_lagrangian_integral_time(
     turbulent_dissipation: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    """
-    Examples:
-        ``` py title="Example Usage"
-        T_L = get_lagrangian_integral_time(0.5, 0.1)
-        # Output (example): 2.5
-        ```
-
-        ``` py title="Example Usage with Array Input"
-        T_L = get_lagrangian_integral_time(
-            np.array([0.5, 0.7]),
-            np.array([0.1, 0.09])
-        )
-        # Output (example): array([2.5, 5.4444])
-        ```
-
-    References:
-        - G. K. Batchelor, "An Introduction to Fluid Dynamics,"  
-          Cambridge University Press, 1967.
     Calculate the Lagrangian integral timescale.
 
     The Lagrangian integral scale (T_L) characterizes the timescale of large
@@ -55,22 +37,7 @@ def get_lagrangian_integral_time(
 
     Returns:
         - Lagrangian integral timescale [s]
-    Examples:
-        ``` py title="Example Usage"
-        L_e = get_eulerian_integral_length(0.35, 0.1)
-        # Output (example): 0.021437
-        ```
-
-        ``` py title="Example Usage with Array Input"
-        L_e = get_eulerian_integral_length(
-            np.array([0.35, 0.4]),
-            np.array([0.1, 0.12])
-        )
-        # Output (example): array([0.021437, 0.026667])
-        ```
-
-    References:
-        - S. B. Pope, "Turbulent Flows," Cambridge University Press, 2000.
+    """
     return (fluid_rms_velocity**2) / turbulent_dissipation
 
 
