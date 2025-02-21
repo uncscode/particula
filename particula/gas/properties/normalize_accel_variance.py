@@ -17,24 +17,33 @@ def get_normalized_accel_variance_ao2008(
     """
     Calculate the normalized acceleration variance in isotropic turbulence.
 
-    This coefficient describes the statistical behavior of acceleration
-    fluctuations in turbulent flows. It is given by:
+    Long Description:
+        This coefficient describes the statistical behavior of acceleration
+        fluctuations in turbulent flows.
 
-        a_o = (11 + 7 R_λ) / (205 + R_λ)
+    Equation:
+        - a_o = (11 + 7 R_λ) / (205 + R_λ)
 
-    - a_o (accel_variance) : Normalized acceleration variance in isotropic
-        turbulence [-]
-    - R_λ (re_lambda) : Taylor-microscale Reynolds number [-]
+    Where:
+        - a_o (accel_variance) : Normalized acceleration variance in isotropic
+          turbulence [-].
+        - R_λ (re_lambda) : Taylor-microscale Reynolds number [-].
+        - ε (numerical_stability_epsilon) : Small number added to R_λ 
+          for numerical stability.
 
     Arguments:
         - re_lambda : Taylor-microscale Reynolds number [-]
 
     Returns:
-    --------
         - accel_variance : Normalized acceleration variance [-]
 
+    Examples:
+        ```py title="Example Usage"
+        result = get_normalized_accel_variance_ao2008(500.0)
+        # Output: ~0.05
+        ```
+
     References:
-    -----------
     - The equivalent numerically stable version used is this.
         (7 + 11 / (R_λ + ε)) / (1 + 205 / (R_λ + ε))
     - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
