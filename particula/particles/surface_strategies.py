@@ -12,7 +12,7 @@ from particula.util.convert import (
     mass_concentration_to_mole_fraction,
     mass_concentration_to_volume_fraction,
 )
-from particula.particles.properties import kelvin_radius, kelvin_term
+from particula.particles.properties import get_kelvin_radius, get_kelvin_term
 
 
 class SurfaceStrategy(ABC):
@@ -90,7 +90,7 @@ class SurfaceStrategy(ABC):
         r = 2 * surface_tension * molar_mass / (R * T * density)
         [Kelvin Wikipedia](https://en.wikipedia.org/wiki/Kelvin_equation)
         """
-        return kelvin_radius(
+        return get_kelvin_radius(
             self.effective_surface_tension(mass_concentration),
             self.effective_density(mass_concentration),
             molar_mass,
@@ -124,7 +124,7 @@ class SurfaceStrategy(ABC):
         exp(kelvin_radius / particle_radius)
         [Kelvin Eq Wikipedia](https://en.wikipedia.org/wiki/Kelvin_equation)
         """
-        return kelvin_term(
+        return get_kelvin_term(
             radius,
             self.kelvin_radius(molar_mass, mass_concentration, temperature),
         )

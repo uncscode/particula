@@ -2,8 +2,8 @@
 
 import numpy as np
 from particula.particles.properties.kelvin_effect_module import (
-    kelvin_radius,
-    kelvin_term,
+    get_kelvin_radius,
+    get_kelvin_term,
 )
 
 
@@ -17,7 +17,7 @@ def test_prop_kelvin_radius_scalar():
         8.314 * temperature * effective_density
     )
     assert np.isclose(
-        kelvin_radius(
+        get_kelvin_radius(
             effective_surface_tension,
             effective_density,
             molar_mass,
@@ -37,7 +37,7 @@ def test_prop_kelvin_radius_array():
         8.314 * temperature * effective_density
     )
     np.testing.assert_allclose(
-        kelvin_radius(
+        get_kelvin_radius(
             effective_surface_tension,
             effective_density,
             molar_mass,
@@ -53,7 +53,9 @@ def test_prop_kelvin_term_scalar():
     radius = 0.5  # m
     kelvin_radius_value = 0.1  # m
     expected_term = np.exp(kelvin_radius_value / radius)
-    assert np.isclose(kelvin_term(radius, kelvin_radius_value), expected_term)
+    assert np.isclose(
+        get_kelvin_term(radius, kelvin_radius_value), expected_term
+    )
 
 
 def test_prop_kelvin_term_broadcast():
@@ -64,7 +66,7 @@ def test_prop_kelvin_term_broadcast():
         kelvin_radius_value[np.newaxis, :] / radius[:, np.newaxis]
     )
     np.testing.assert_allclose(
-        kelvin_term(radius, kelvin_radius_value), expected_term, rtol=1e-8
+        get_kelvin_term(radius, kelvin_radius_value), expected_term, rtol=1e-8
     )
 
 
@@ -74,5 +76,5 @@ def test_prop_kelvin_term_broadcast_single():
     kelvin_radius_value = np.array([0.1])
     expected_term = np.exp(kelvin_radius_value / radius)
     np.testing.assert_allclose(
-        kelvin_term(radius, kelvin_radius_value), expected_term, rtol=1e-8
+        get_kelvin_term(radius, kelvin_radius_value), expected_term, rtol=1e-8
     )

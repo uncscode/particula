@@ -6,8 +6,17 @@ import numpy as np
 
 from particula.util.constants import GAS_CONSTANT
 from particula.util.machine_limit import safe_exp
+from particula.util.validate_inputs import validate_inputs
 
 
+@validate_inputs(
+    {
+        "effective_surface_tension": "positive",
+        "effective_density": "positive",
+        "molar_mass": "positive",
+        "temperature": "positive",
+    }
+)
 def get_kelvin_radius(
     effective_surface_tension: Union[float, NDArray[np.float64]],
     effective_density: Union[float, NDArray[np.float64]],
@@ -15,7 +24,8 @@ def get_kelvin_radius(
     temperature: float,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Compute the Kelvin radius (rₖ) to account for curvature effects on vapor pressure.
+    Compute the Kelvin radius (rₖ) to account for curvature effects on vapor
+    pressure.
 
     The Kelvin radius is defined by:
 
@@ -39,14 +49,13 @@ def get_kelvin_radius(
     Examples:
         ``` py title="Example"
         import numpy as np
-        from particula.particles.properties.kelvin_effect_module import get_kelvin_radius
-        r_kelvin = get_kelvin_radius(
+        import particula as par
+        par.particles.get_kelvin_radius(
             effective_surface_tension=0.072,
             effective_density=1000.0,
             molar_mass=0.018,
             temperature=298.15
         )
-        print(r_kelvin)
         # Output: ...
         ```
 
@@ -59,6 +68,12 @@ def get_kelvin_radius(
     )
 
 
+@validate_inputs(
+    {
+        "particle_radius": "nonnegative",
+        "kelvin_radius_value": "nonnegative",
+    }
+)
 def get_kelvin_term(
     particle_radius: Union[float, NDArray[np.float64]],
     kelvin_radius_value: Union[float, NDArray[np.float64]],
@@ -82,9 +97,8 @@ def get_kelvin_term(
 
     Examples:
         ``` py title="Example"
-        import numpy as np
-        from particula.particles.properties.kelvin_effect_module import get_kelvin_term
-        kv_term = get_kelvin_term(
+        import particula as par
+        par.particles.get_kelvin_term(
             particle_radius=1e-7,
             kelvin_radius_value=2e-7
         )
@@ -95,7 +109,7 @@ def get_kelvin_term(
     References:
         - Donahue, N. M., et al. (2013). "How do organic vapors contribute to
           new-particle formation?" Faraday Discussions, 165, 91–104.
-          https://doi.org/10.1039/C3FD00046J.
+          https://doi.org/10.1039/C3FD00046J. [check]
     """
     kelvin_expand = False
     # Broadcast the arrays if necessary np.isscalar(kelvin_radius_value)
