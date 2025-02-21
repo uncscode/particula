@@ -11,11 +11,11 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 from particula.particles.properties.activity_module import (
-    ideal_activity_molar,
-    ideal_activity_volume,
-    ideal_activity_mass,
-    kappa_activity,
-    calculate_partial_pressure,
+    get_ideal_activity_molar,
+    get_ideal_activity_volume,
+    get_ideal_activity_mass,
+    get_kappa_activity,
+    get_surface_partial_pressure,
 )
 
 
@@ -69,7 +69,7 @@ class ActivityStrategy(ABC):
             Union[float, NDArray[np.float64]]: Vapor pressure of the particle
             in pascals (Pa).
         """
-        return calculate_partial_pressure(
+        return get_surface_partial_pressure(
             pure_vapor_pressure=pure_vapor_pressure,
             activity=self.activity(mass_concentration),
         )
@@ -107,7 +107,7 @@ class ActivityIdealMolar(ActivityStrategy):
             Union[float, NDArray[np.float64]]: Activity of the species,
             unitless.
         """
-        return ideal_activity_molar(
+        return get_ideal_activity_molar(
             mass_concentration=mass_concentration, molar_mass=self.molar_mass
         )
 
@@ -135,7 +135,7 @@ class ActivityIdealMass(ActivityStrategy):
             Union[float, NDArray[np.float64]]: Activity of the particle,
             unitless.
         """
-        return ideal_activity_mass(mass_concentration=mass_concentration)
+        return get_ideal_activity_mass(mass_concentration=mass_concentration)
 
 
 class ActivityIdealVolume(ActivityStrategy):
@@ -167,7 +167,7 @@ class ActivityIdealVolume(ActivityStrategy):
             Union[float, NDArray[np.float64]]: Activity of the particle,
             unitless.
         """
-        return ideal_activity_volume(
+        return get_ideal_activity_volume(
             mass_concentration=mass_concentration, density=self.density
         )
 
@@ -221,7 +221,7 @@ class ActivityKappaParameter(ActivityStrategy):
             activity. Atmospheric Chemistry and Physics, 7(8), 1961-1971.
             [DOI](https://doi.org/10.5194/acp-7-1961-2007), see EQ 2 and 7.
         """
-        return kappa_activity(
+        return get_kappa_activity(
             mass_concentration=mass_concentration,
             kappa=self.kappa,
             density=self.density,

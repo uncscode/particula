@@ -28,8 +28,8 @@ def get_ideal_activity_molar(
 
     Examples:
         ``` py title="Example"
-        from particula.particles.properties.activity_module import get_ideal_activity_molar
-        get_ideal_activity_molar(
+        import particula as par
+        par.particles.get_ideal_activity_molar(
             mass_concentration=np.array([1.0, 2.0]),
             molar_mass=np.array([18.015, 28.97])
         )
@@ -55,8 +55,8 @@ def get_ideal_activity_volume(
     """
     Compute the ideal activity based on volume fractions.
 
-    This function calculates the activity of a species using its volume fraction.
-    In an ideal mixture, the activity (aᵢ) can be expressed as:
+    This function calculates the activity of a species using its volume
+    fraction. In an ideal mixture, the activity (aᵢ) can be expressed as:
 
     - aᵢ = φᵢ
         - φᵢ is the volume fraction of species i.
@@ -70,8 +70,8 @@ def get_ideal_activity_volume(
 
     Examples:
         ``` py title="Example"
-        from particula.particles.properties.activity_module import get_ideal_activity_volume
-        get_ideal_activity_volume(
+        import particula as par
+        par.particles.get_ideal_activity_volume(
             mass_concentration=np.array([1.0, 2.0]),
             density=np.array([1000.0, 1200.0])
         )
@@ -110,8 +110,8 @@ def get_ideal_activity_mass(
 
     Examples:
         ``` py title="Example"
-        from particula.particles.properties.activity_module import get_ideal_activity_mass
-        get_ideal_activity_mass(np.array([1.0, 2.0]))
+        import particula as par
+        par.particles.get_ideal_activity_mass(np.array([1.0, 2.0]))
         # Output: array([...])
         ```
 
@@ -137,8 +137,9 @@ def get_kappa_activity(
     """
     Compute species activity using the κ (kappa) hygroscopic growth parameter.
 
-    This function calculates the activity of a mixture by combining volume-fraction
-    weighted κ-values. The water activity (aₘ) is determined by:
+    This function calculates the activity of a mixture by combining
+    volume-fraction weighted κ-values. The water activity (aₘ) is
+    determined by:
 
     - aₘ = 1 / (1 + κₑ ( Vₛ / Vₐ ))
         - κₑ is the volume-fraction weighted hygroscopic parameter.
@@ -157,8 +158,8 @@ def get_kappa_activity(
 
     Examples:
         ``` py title="Example"
-        from particula.particles.properties.activity_module import get_kappa_activity
-        get_kappa_activity(
+        import particula as par
+        par.particles.get_kappa_activity(
             mass_concentration=np.array([[1.0, 2.0], [3.0, 4.0]]),
             kappa=np.array([0.0, 0.2]),
             density=np.array([1000.0, 1200.0]),
@@ -251,8 +252,8 @@ def get_surface_partial_pressure(
 
     Examples:
         ``` py title="Example"
-        from particula.particles.properties.activity_module import get_surface_partial_pressure
-        get_surface_partial_pressure(1000.0, 0.95)
+        import particula as par
+        par.particles.get_surface_partial_pressure(1000.0, 0.95)
         # Output: 950.0
         ```
     """
