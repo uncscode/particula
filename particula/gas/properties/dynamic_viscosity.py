@@ -42,14 +42,14 @@ def get_dynamic_viscosity(
         - S is the Sutherland constant.
 
     Arguments:
-        temperature : Desired air temperature in Kelvin. Must be > 0.
-        reference_viscosity : Gas viscosity at the reference temperature
+        - temperature : Desired air temperature in Kelvin. Must be > 0.
+        - reference_viscosity : Gas viscosity at the reference temperature
             (default is STP).
-        reference_temperature : Gas temperature in Kelvin for the reference
+        - reference_temperature : Gas temperature in Kelvin for the reference
             viscosity (default is STP).
 
     Returns:
-        Dynamic viscosity of air at the given temperature in Pa·s.
+        - Dynamic viscosity of air at the given temperature in Pa·s.
 
     References:
         - Wolfram Formula Repository, "Sutherland's Formula,"
