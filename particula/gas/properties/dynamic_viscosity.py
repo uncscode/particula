@@ -33,27 +33,29 @@ def get_dynamic_viscosity(
     """
     Calculate the dynamic viscosity of air using Sutherland's formula.
 
-    Equation:
+    Equation (if applicable):
+
         μ(T) = μ₀ × (T / T₀)^(3/2) × (T₀ + S) / (T + S)
 
-    where:
-        - μ(T) is the dynamic viscosity at temperature T,
-        - μ₀ is the reference viscosity at temperature T₀,
-        - S is the Sutherland constant.
-
     Arguments:
-        - temperature : Desired air temperature in Kelvin. Must be > 0.
-        - reference_viscosity : Gas viscosity at the reference temperature
+        temperature : Desired air temperature in Kelvin. Must be > 0.
+        reference_viscosity : Gas viscosity at the reference temperature
             (default is STP).
-        - reference_temperature : Gas temperature in Kelvin for the reference
+        reference_temperature : Gas temperature in Kelvin for the reference
             viscosity (default is STP).
 
     Returns:
-        - Dynamic viscosity of air at the given temperature in Pa·s.
+        Dynamic viscosity of air at the given temperature in Pa·s.
+
+    Examples:
+        ``` py title="Example Usage"
+        viscosity = get_dynamic_viscosity(300.0)
+        # Output (approx.): 1.846e-05
+        ```
 
     References:
         - Wolfram Formula Repository, "Sutherland's Formula,"
-        https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
+          https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
     """
     return (
         reference_viscosity
