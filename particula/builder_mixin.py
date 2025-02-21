@@ -69,10 +69,10 @@ class BuilderSurfaceTensionMixin:
         """
         if surface_tension_units == "N/m":
             self.surface_tension = surface_tension
-        else:
-            self.surface_tension = (
-                surface_tension * convert_units(surface_tension_units, "N/m")
-            )
+            return self
+        self.surface_tension = (
+            surface_tension * convert_units(surface_tension_units, "N/m")
+        )
         return self
 
 
@@ -101,10 +101,10 @@ class BuilderMolarMassMixin:
         """
         if molar_mass_units == "kg/mol":
             self.molar_mass = molar_mass
-        else:
-            self.molar_mass = (
-                molar_mass * convert_units(molar_mass_units, "kg/mol")
-            )
+            return self
+        self.molar_mass = (
+            molar_mass * convert_units(molar_mass_units, "kg/mol")
+        )
         return self
 
 
@@ -140,10 +140,10 @@ class BuilderConcentrationMixin:
             concentration_units = self.default_units
         if concentration_units == self.default_units:
             self.concentration = concentration
-        else:
-            self.concentration = (
-                concentration * convert_units(concentration_units, self.default_units)
-            )
+            return self
+        self.concentration = (
+            concentration * convert_units(concentration_units, self.default_units)
+        )
         return self
 
 
@@ -201,10 +201,8 @@ class BuilderMassMixin:
         """
         if mass_units == "kg":
             self.mass = mass
-        else:
-            self.mass = (
-                mass * convert_units(mass_units, "kg")
-            )
+            return self
+        self.mass = mass * convert_units(mass_units, "kg")
         return self
 
 
@@ -235,10 +233,8 @@ class BuilderVolumeMixin:
         """
         if volume_units == "m^3":
             self.volume = volume
-        else:
-            self.volume = (
-                volume * convert_units(volume_units, "m^3")
-            )
+            return self
+        self.volume = volume * convert_units(volume_units, "m^3")
         return self
 
 
@@ -269,10 +265,8 @@ class BuilderRadiusMixin:
         """
         if radius_units == "m":
             self.radius = radius
-        else:
-            self.radius = (
-                radius * convert_units(radius_units, "m")
-            )
+            return self
+        self.radius = radius * convert_units(radius_units, "m")
         return self
 
 
@@ -306,10 +300,10 @@ class BuilderTemperatureMixin:
         """
         if temperature_units == "K":
             self.temperature = temperature
-        else:
-            self.temperature = (
-                temperature * convert_units(temperature_units, "K")
-            )
+            return self
+        self.temperature = (
+            temperature * convert_units(temperature_units, "K")
+        )
         return self
 
 
@@ -344,10 +338,10 @@ class BuilderPressureMixin:
         """
         if pressure_units == "Pa":
             self.pressure = pressure
-        else:
-            self.pressure = (
-                pressure * convert_units(pressure_units, "Pa")
-            )
+            return self
+        self.pressure = (
+            pressure * convert_units(pressure_units, "Pa")
+        )
         return self
 
 
@@ -384,10 +378,8 @@ class BuilderLognormalMixin:
         """
         if mode_units == "m":
             self.mode = mode
-        else:
-            self.mode = (
-                mode * convert_units(mode_units, "m")
-            )
+            return self
+        self.mode = mode * convert_units(mode_units, "m")
         return self
 
     @validate_inputs({"geometric_standard_deviation": "positive"})
@@ -430,10 +422,10 @@ class BuilderLognormalMixin:
         """
         if number_concentration_units == "1/m^3":
             self.number_concentration = number_concentration
-        else:
-            self.number_concentration = (
-                number_concentration * convert_units(number_concentration_units, "1/m^3")
-            )
+            return self
+        self.number_concentration = (
+            number_concentration * convert_units(number_concentration_units, "1/m^3")
+        )
         return self
 
 
