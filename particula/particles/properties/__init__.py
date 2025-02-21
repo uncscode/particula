@@ -45,8 +45,8 @@ from particula.particles.properties.partial_pressure_module import (
     partial_pressure_delta,
 )
 from particula.particles.properties.kelvin_effect_module import (
-    kelvin_radius,
-    kelvin_term,
+    get_kelvin_radius,
+    get_kelvin_term,
 )
 from particula.particles.properties.special_functions import (
     debye_function,
