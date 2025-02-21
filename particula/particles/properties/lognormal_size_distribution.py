@@ -15,27 +15,45 @@ def get_lognormal_pdf_distribution(
     number_of_particles: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """
-    Probability Density Function for the lognormal distribution of particles
-    for varying modes, geometric standard deviations, and numbers of particles,
-    across a range of x_values.
+    Compute a lognormal probability density function (PDF) for given modes.
 
-    Args:
-        x_values: The size interval of the distribution.
-        mode: Scales corresponding to the mode in lognormal for different
-            modes.
-        geometric_standard_deviation: Geometric standard deviations of the
-            distribution for different modes.
-        number_of_particles: Number of particles for each mode.
+    This function superimposes multiple lognormal PDFs, each with its own mode,
+    geometric standard deviation, and particle count. It then returns their sum
+    across the provided x_values.
+
+    Mathematically, for each mode i:
+
+    - PDFᵢ(x) = (1 / [x · ln(gsdᵢ) · √(2π)]) ×
+                 exp(- [ln(x) - ln(modeᵢ)]² / [2 · (ln(gsdᵢ))² ])
+
+    Arguments:
+        - x_values : 1D array of the size points at which the PDF is evaluated.
+        - mode : Array of lognormal mode (scale) values for each mode.
+        - geometric_standard_deviation : Array of GSD values for each mode.
+        - number_of_particles : Number of particles in each mode.
 
     Returns:
-        The normalized lognormal distribution of the particles, summed
-        across all modes.
+        - 1D array of the total PDF values summed across all modes.
+
+    Examples:
+        ```py title="Example"
+        import numpy as np
+        from particula.particles.properties.lognormal_size_distribution import get_lognormal_pdf_distribution
+
+        x_vals = np.linspace(1e-9, 1e-6, 100)
+        pdf = get_lognormal_pdf_distribution(
+            x_values=x_vals,
+            mode=np.array([5e-8, 1e-7]),
+            geometric_standard_deviation=np.array([1.5, 2.0]),
+            number_of_particles=np.array([1e9, 5e9])
+        )
+        print(pdf[:10])
+        # Output: [...]
+        ```
 
     References:
-        - [Log-normal Distribution Wikipedia](
-            https://en.wikipedia.org/wiki/Log-normal_distribution)
-         - [Probability Density Function Wikipedia](
-            https://en.wikipedia.org/wiki/Probability_density_function)
+        - [Log-normal Distribution Wikipedia](https://en.wikipedia.org/wiki/Log-normal_distribution)
+        - [Probability Density Function Wikipedia](https://en.wikipedia.org/wiki/Probability_density_function)
     """
     if not (
         x_values.ndim == 1
@@ -70,27 +88,41 @@ def get_lognormal_pmf_distribution(
     number_of_particles: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """
-    Probability Mass function for lognormal distribution of particles for
-    varying modes, geometric standard deviations, and numbers of particles,
-    across a range of x_values.
+    Compute a lognormal probability mass function (PMF) for given modes.
 
-    Args:
-        x_values: The size interval of the distribution.
-        mode: Scales corresponding to the mode in lognormal for different
-            modes.
-        geometric_standard_deviation: Geometric standard deviations of the
-            distribution for different modes.
-        number_of_particles: Number of particles for each mode.
+    This function first calculates the lognormal PDF using
+    get_lognormal_pdf_distribution(), then converts it to a PMF by
+    integrating (or summing) over x_values. The result reflects discrete mass
+    (probability) distribution across the given size points.
+
+    Arguments:
+        - x_values : 1D array of size points at which the PMF is evaluated.
+        - mode : Array of lognormal mode (scale) values for each mode.
+        - geometric_standard_deviation : Array of GSD values for each mode.
+        - number_of_particles : Number of particles in each mode.
 
     Returns:
-        The normalized lognormal distribution of the particles, summed
-        across all modes.
+        - 1D array of the total PMF values summed across all modes.
+
+    Examples:
+        ```py title="Example"
+        import numpy as np
+        from particula.particles.properties.lognormal_size_distribution import get_lognormal_pmf_distribution
+
+        x_vals = np.linspace(1e-9, 1e-6, 100)
+        pmf = get_lognormal_pmf_distribution(
+            x_values=x_vals,
+            mode=np.array([5e-8, 1e-7]),
+            geometric_standard_deviation=np.array([1.5, 2.0]),
+            number_of_particles=np.array([1e9, 5e9])
+        )
+        print(pmf[:10])
+        # Output: [...]
+        ```
 
     References:
-        - [Log-normal Distribution Wikipedia](
-            https://en.wikipedia.org/wiki/Log-normal_distribution)
-        - [Probability Mass Function Wikipedia](
-            https://en.wikipedia.org/wiki/Probability_mass_function)
+        - [Log-normal Distribution Wikipedia](https://en.wikipedia.org/wiki/Log-normal_distribution)
+        - [Probability Mass Function Wikipedia](https://en.wikipedia.org/wiki/Probability_mass_function)
     """
 
     distribution_pdf = get_lognormal_pdf_distribution(
@@ -123,29 +155,40 @@ def get_lognormal_sample_distribution(
     number_of_particles: NDArray[np.float64],
     number_of_samples: int,
 ) -> NDArray[np.float64]:
-    """Sample a Probability Density Function for the lognormal distribution.
+    """
+    Generate random samples from a lognormal distribution for given modes.
 
-    Samples a set of samples (particle) to represent the lognormal distribution
-    for varying modes, geometric standard deviations, and numbers of particles,
-    across a range of x_values.
+    This function uses scipy.stats.lognorm.rvs() to draw samples for each mode,
+    with a specified scale (mode) and shape (GSD). The total samples are then
+    combined according to the relative number of particles in each mode.
 
-    Args:
-        mode: Scales corresponding to the mode in lognormal for different
-            modes.
-        geometric_standard_deviation: Geometric standard deviations of the
-            distribution for different modes.
-        number_of_particles: Number of particles for each mode.
-        number_of_samples: Number of samples to generate.
+    Arguments:
+        - mode : Array of lognormal mode (scale) values for each mode.
+        - geometric_standard_deviation : Array of GSD values for each mode.
+        - number_of_particles : Number of particles for each mode.
+        - number_of_samples : Total number of random samples to generate.
 
     Returns:
-        The normalized lognormal distribution of the particles, summed
-        across all modes.
+        - 1D array of sampled particle sizes, combining all modes.
+
+    Examples:
+        ```py title="Example"
+        import numpy as np
+        from particula.particles.properties.lognormal_size_distribution import get_lognormal_sample_distribution
+
+        samples = get_lognormal_sample_distribution(
+            mode=np.array([5e-8, 1e-7]),
+            geometric_standard_deviation=np.array([1.5, 2.0]),
+            number_of_particles=np.array([1e9, 5e9]),
+            number_of_samples=10000
+        )
+        print(samples[:10])
+        # Output: [...]
+        ```
 
     References:
-        - [Log-normal Distribution Wikipedia](
-            https://en.wikipedia.org/wiki/Log-normal_distribution)
-         - [Probability Density Function Wikipedia](
-            https://en.wikipedia.org/wiki/Probability_density_function)
+        - [Log-normal Distribution Wikipedia](https://en.wikipedia.org/wiki/Log-normal_distribution)
+        - [Probability Density Function Wikipedia](https://en.wikipedia.org/wiki/Probability_density_function)
     """
 
     # Calculate PDF for each set of parameters
