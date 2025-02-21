@@ -8,7 +8,7 @@ from particula.util.constants import BOLTZMANN_CONSTANT
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
 from particula.gas.properties.mean_free_path import get_molecule_mean_free_path
 from particula.particles.properties.aerodynamic_mobility_module import (
-    particle_aerodynamic_mobility,
+    get_aerodynamic_mobility,
 )
 from particula.particles.properties.slip_correction_module import (
     cunningham_slip_correction,
@@ -73,7 +73,7 @@ def particle_diffusion_coefficient_via_system_state(
     _slip_correction_factor = cunningham_slip_correction(
         knudsen_number=_knudsen_number,
     )
-    _aerodynamic_mobility = particle_aerodynamic_mobility(
+    _aerodynamic_mobility = get_aerodynamic_mobility(
         radius=particle_radius,
         slip_correction_factor=_slip_correction_factor,
         dynamic_viscosity=_dynamic_viscosity,

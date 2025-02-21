@@ -12,7 +12,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 
-def mulholland_1988(
+def get_collision_radius_mg1988(
     radius_gyration: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
     """Collision radius is equal to the radius of gyration.
@@ -37,7 +37,7 @@ def mulholland_1988(
     return radius_gyration
 
 
-def rogak_flagan_1992(
+def get_collision_radius_sr1992(
     radius_gyration: Union[NDArray[np.float64], float],
     fractal_dimension: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
@@ -66,7 +66,7 @@ def rogak_flagan_1992(
     return np.sqrt((fractal_dimension + 2) / 3) * radius_gyration
 
 
-def zurita_gotor_2002(
+def get_collision_radius_mzg2002(
     radius_gyration: Union[NDArray[np.float64], float],
     fractal_prefactor: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
@@ -96,7 +96,7 @@ def zurita_gotor_2002(
     return 1.037 * (fractal_prefactor**0.077) * radius_gyration
 
 
-def thajudeen_2012(
+def get_collision_radius_tt2012(
     fractal_dimension: float,
     number_of_particles: float,
     radius_gyration: Union[NDArray[np.float64], float],
@@ -137,7 +137,7 @@ def thajudeen_2012(
     return radius_s_ii / 2
 
 
-def qian_2022_rg(
+def get_collision_radius_wq2022_rg(
     radius_gyration: Union[NDArray[np.float64], float],
     radius_monomer: float,
 ) -> Union[NDArray[np.float64], float]:
@@ -168,7 +168,7 @@ def qian_2022_rg(
     ) * radius_monomer
 
 
-def qian_2022_rg_df(
+def get_collision_radius_wq2022_rg_df(
     fractal_dimension: Union[NDArray[np.float64], float],
     radius_gyration: Union[NDArray[np.float64], float],
     radius_monomer: float,
@@ -204,7 +204,7 @@ def qian_2022_rg_df(
     ) * radius_monomer
 
 
-def qian_2022_rg_df_k0(
+def get_collision_radius_wq2022_rg_df_k0(
     fractal_dimension: float,
     fractal_prefactor: float,
     radius_gyration: Union[NDArray[np.float64], float],
@@ -244,7 +244,7 @@ def qian_2022_rg_df_k0(
     ) * radius_monomer
 
 
-def qian_2022_rg_df_k0_a13(
+def get_collision_radius_wq2022_rg_df_k0_a13(
     fractal_dimension: float,
     fractal_prefactor: float,
     shape_anisotropy: float,

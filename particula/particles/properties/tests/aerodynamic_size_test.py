@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 from particula.particles.properties.aerodynamic_size import (
-    particle_aerodynamic_length,
+    get_aerodynamic_length,
     get_aerodynamic_shape_factor,
 )
 
@@ -21,7 +21,7 @@ def test_particle_aerodynamic_length_single_value():
         (physical_slip_correction_factor / aerodynamic_slip_correction_factor)
         * (density / 1000)
     )
-    actual_length = particle_aerodynamic_length(
+    actual_length = get_aerodynamic_length(
         physical_length,
         physical_slip_correction_factor,
         aerodynamic_slip_correction_factor,
@@ -45,7 +45,7 @@ def test_particle_aerodynamic_length_array_input():
         (physical_slip_correction_factor / aerodynamic_slip_correction_factor)
         * (density / 1000)
     )
-    actual_length = particle_aerodynamic_length(
+    actual_length = get_aerodynamic_length(
         physical_length,
         physical_slip_correction_factor,
         aerodynamic_slip_correction_factor,
