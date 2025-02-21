@@ -46,7 +46,7 @@ from particula.particles.representation import ParticleRepresentation
 from particula.gas.species import GasSpecies
 from particula.particles.properties import (
     get_knudsen_number,
-    vapor_transition_correction,
+    get_vapor_transition_correction,
     get_partial_pressure_delta,
 )
 from particula.gas.properties import get_molecule_mean_free_path
@@ -184,7 +184,7 @@ class CondensationStrategy(ABC):
             - Aerosol Modeling, Chapter 2, Equation 2.49 (excluding particle
                 number)
         """
-        vapor_transition = vapor_transition_correction(
+        vapor_transition = get_vapor_transition_correction(
             knudsen_number=self.knudsen_number(
                 radius=radius,
                 temperature=temperature,
