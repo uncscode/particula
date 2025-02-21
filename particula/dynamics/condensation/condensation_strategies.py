@@ -45,7 +45,7 @@ import numpy as np
 from particula.particles.representation import ParticleRepresentation
 from particula.gas.species import GasSpecies
 from particula.particles.properties import (
-    calculate_knudsen_number,
+    get_knudsen_number,
     vapor_transition_correction,
     partial_pressure_delta,
 )
@@ -147,7 +147,7 @@ class CondensationStrategy(ABC):
         References:
             [Knudsen Number](https://en.wikipedia.org/wiki/Knudsen_number)
         """
-        return calculate_knudsen_number(
+        return get_knudsen_number(
             mean_free_path=self.mean_free_path(
                 temperature=temperature,
                 pressure=pressure,

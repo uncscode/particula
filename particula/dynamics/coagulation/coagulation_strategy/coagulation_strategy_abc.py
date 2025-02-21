@@ -367,7 +367,7 @@ class CoagulationStrategyABC(ABC):
             pressure=pressure,
             dynamic_viscosity=dynamic_viscosity,
         )
-        knudsen_number = properties.calculate_knudsen_number(
+        knudsen_number = properties.get_knudsen_number(
             mean_free_path=mean_free_path,
             particle_radius=particle.get_radius(),
         )

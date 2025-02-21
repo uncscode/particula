@@ -25,7 +25,7 @@ from particula.particles.properties.slip_correction_module import (
     cunningham_slip_correction,
 )
 from particula.particles.properties.knudsen_number_module import (
-    calculate_knudsen_number,
+    get_knudsen_number,
 )
 from particula.particles.properties.friction_factor_module import (
     get_friction_factor,

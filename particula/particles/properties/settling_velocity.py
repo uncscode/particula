@@ -21,7 +21,7 @@ from particula.particles.properties.slip_correction_module import (
     cunningham_slip_correction,
 )
 from particula.particles.properties.knudsen_number_module import (
-    calculate_knudsen_number,
+    get_knudsen_number,
 )
 from particula.particles.properties.reynolds_number import (
     get_particle_reynolds_number,
@@ -208,7 +208,7 @@ def particle_settling_velocity_via_system_state(
     )
 
     # Step 3: Calculate the Knudsen number (characterizes flow regime)
-    knudsen_number = calculate_knudsen_number(
+    knudsen_number = get_knudsen_number(
         mean_free_path=mean_free_path, particle_radius=particle_radius
     )
 

@@ -14,7 +14,7 @@ from particula.particles.properties.slip_correction_module import (
     cunningham_slip_correction,
 )
 from particula.particles.properties.knudsen_number_module import (
-    calculate_knudsen_number,
+    get_knudsen_number,
 )
 from particula.util.constants import BOLTZMANN_CONSTANT
 
@@ -117,7 +117,7 @@ def get_diffusion_coefficient_via_system_state(
     )
 
     # Step 2: Particle properties in fluid
-    _knudsen_number = calculate_knudsen_number(
+    _knudsen_number = get_knudsen_number(
         mean_free_path=_mean_free_path, particle_radius=particle_radius
     )
     _slip_correction_factor = cunningham_slip_correction(
