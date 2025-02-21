@@ -18,30 +18,37 @@ def to_mole_fraction(
     """
     Convert mass concentrations to mole fractions for N components.
 
-    If the input `mass_concentrations` is 1D, the summation is performed over
-    the entire array. If `mass_concentrations` is 2D, the summation is done
-    row-wise.
+    The mole fraction is computed using:
 
-    Args:
-        mass_concentrations : A list or ndarray of mass concentrations
-            (SI, kg/m^3).
-        molar_masses : A list or ndarray of molecular weights
-            (SI, kg/mol).
+    - xᵢ = (mᵢ / Mᵢ) / Σⱼ(mⱼ / Mⱼ)
+        - xᵢ is the mole fraction of component i,
+        - mᵢ is the mass concentration of component i (kg/m³),
+        - Mᵢ is the molar mass of component i (kg/mol).
+
+    Arguments:
+        - mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
+        - molar_masses : Molar masses (kg/mol). Must match dimensions of
+          mass_concentrations.
 
     Returns:
-        An ndarray of mole fractions. Zero total moles yield zero fractions.
+        - Mole fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
+          mole fractions if input is 1D.
 
-    Equation:
-        - xᵢ = nᵢ / nₜₒₜₐₗ
-        - xᵢ: Mole fraction of component i
-        - nᵢ: Moles of component i
-        - nₜₒₜₐₗ: Total moles of all components
+    Examples:
+        ```py
+        import numpy as np
+        from particula.util.converting.convert_mass_concentration import to_mole_fraction
 
-    Reference:
-        The mole fraction of a component is given by the ratio of its molar
-        concentration to the total molar concentration of all components.
-        - https://en.wikipedia.org/wiki/Mole_fraction
-    """
+        mass_conc = np.array([0.2, 0.8])  # kg/m³
+        mol_masses = np.array([0.018, 0.032])  # kg/mol
+        print(to_mole_fraction(mass_conc, mol_masses))
+        # Output might be array([0.379..., 0.620...])
+        ```
+
+    References:
+        - Wikipedia contributors, "Mole fraction," Wikipedia,
+          https://en.wikipedia.org/wiki/Mole_fraction.
+    """ 
 
     # Convert mass concentrations to moles for each component
     moles = mass_concentrations / molar_masses
@@ -87,24 +94,41 @@ def to_volume_fraction(
     """
     Convert mass concentrations to volume fractions for N components.
 
-    If inputs are one dimensional (1D) or floating-point scalars, the summation
-    is done over the entire array. If `mass_concentrations` is 2D, the
-    summation is done row-wise.
+    The volume fraction is determined by:
 
-    Args:
-        mass_concentrations: A list or ndarray of mass concentrations
-            (SI, kg/m^3).
-        densities: A list or ndarray of densities of each component
-            (SI, kg/m^3).
+    - ϕᵢ = vᵢ / vₜₒₜₐₗ
+        - ϕᵢ is the volume fraction of component i (unitless),
+        - vᵢ is the volume of component i (m³),
+        - vₜₒₜₐₗ is the total volume of all components (m³).
+
+    Volumes computed from mass concentration (mᵢ) and density (ρᵢ) using:
+    - vᵢ = mᵢ / ρᵢ.
+
+    Arguments:
+        - mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
+        - densities : Densities (kg/m³). Must match the shape of
+          mass_concentrations.
 
     Returns:
-        An ndarray of volume fractions. Zero volumes yield zero fractions.
+        - Volume fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
+          volume fractions if input is 1D.
 
-    Reference:
-        The volume fraction of a component is calculated by dividing the volume
-        of that component (derived from mass concentration and density) by the
-        total volume of all components.
-        - https://en.wikipedia.org/wiki/Volume_fraction
+    Examples:
+        ```py
+        import numpy as np
+        from particula.util.converting.convert_mass_concentration import to_volume_fraction
+
+        mass_conc = np.array([[1.0, 2.0], [0.5, 0.5]])  # kg/m³
+        dens = np.array([1000.0, 800.0])               # kg/m³
+        print(to_volume_fraction(mass_conc, dens))
+        # Output might be:
+        # array([[0.444..., 0.555...],
+        #        [0.5     , 0.5     ]])
+        ```
+
+    References:
+        - Wikipedia contributors, "Volume fraction," Wikipedia,
+          https://en.wikipedia.org/wiki/Volume_fraction.
     """
     # Calculate per-component volumes
     volumes = mass_concentrations / densities
@@ -150,22 +174,33 @@ def to_mass_fraction(
     """
     Convert mass concentrations to mass fractions for N components.
 
-    If inputs are one-dimensional or float, the summation is done over the
-    entire array. If `mass_concentrations` is a 2D array, the summation is
-    done row-wise.
+    The mass fraction is computed by:
 
-    Args:
-        mass_concentrations: A list or ndarray of mass concentrations
-            (SI, kg/m^3).
+    - wᵢ = mᵢ / mₜₒₜₐₗ
+        - wᵢ is the mass fraction of component i (unitless),
+        - mᵢ is the mass concentration of component i (kg/m³),
+        - mₜₒₜₐₗ is the total mass concentration of all components (kg/m³).
+
+    Arguments:
+        - mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
 
     Returns:
-        An ndarray of mass fractions. Zero total mass yields zero fractions.
+        - Mass fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
+          mass fractions if input is 1D.
 
-    Reference:
-        The mass fraction of a component is calculated by dividing the mass
-        concentration of that component by the total mass concentration of
-        all components.
-        - https://en.wikipedia.org/wiki/Mass_fraction_(chemistry)
+    Examples:
+        ```py
+        import numpy as np
+        from particula.util.converting.convert_mass_concentration import to_mass_fraction
+
+        mass_conc = np.array([10.0, 30.0, 60.0])  # kg/m³
+        print(to_mass_fraction(mass_conc))
+        # Output might be array([0.1, 0.3, 0.6])
+        ```
+
+    References:
+        - Wikipedia contributors, "Mass fraction (chemistry)," Wikipedia,
+          https://en.wikipedia.org/wiki/Mass_fraction_(chemistry).
     """
     # Handle 1D arrays
     if mass_concentrations.ndim == 1:
