@@ -70,28 +70,41 @@ def get_kinematic_viscosity_via_system_state(
     reference_temperature: float = REF_TEMPERATURE_STP,
 ) -> float:
     """
-    Calculate the kinematic viscosity of air by calculating dynamic
-    viscosity of air.
+    Calculate the kinematic viscosity of air by first computing its dynamic viscosity.
+
+    Long Description:
+        This function uses get_dynamic_viscosity(...) and divides by the given
+        fluid_density to get the kinematic viscosity.
 
     Equation:
-        ν = μ / ρ
+        - ν = μ / ρ
+
+    Where:
+        - ν : Kinematic viscosity [m²/s].
+        - μ : Dynamic viscosity [Pa·s].
+        - ρ : Fluid density [kg/m³].
 
     Arguments:
-        temperature : Desired air temperature [K]. Must be greater than 0.
-        fluid_density : Density of the fluid [kg/m³].
-        reference_viscosity : Gas viscosity [Pa*s] at the reference temperature
-            (default is STP).
-        reference_temperature : Gas temperature [K] for the reference viscosity
-            (default is STP).
+        - temperature : Desired air temperature [K]. Must be > 0.
+        - fluid_density : Density of the fluid [kg/m³].
+        - reference_viscosity : Reference dynamic viscosity [Pa·s].
+        - reference_temperature : Reference temperature [K].
 
     Returns:
-        The kinematic viscosity of air at the given temperature [m^2/s].
+        - The kinematic viscosity of air [m²/s].
 
     Raises:
-        - ValueError : If the temperature is less than or equal to 0.
+        - ValueError : If temperature ≤ 0.
+
+    Examples:
+        ```py title="Example usage"
+        nu_air = get_kinematic_viscosity_via_system_state(300, 1.2)
+        # Output: ~1.5e-5
+        ```
 
     References:
-        https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
+        - "Sutherland's Formula," Wolfram Formula Repository,
+          https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
     """
     dynamic_viscosity = get_dynamic_viscosity(
         temperature=temperature,
