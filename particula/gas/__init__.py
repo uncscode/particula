@@ -30,4 +30,4 @@ from particula.gas.species_factories import GasSpeciesFactory
 from particula.gas.atmosphere import Atmosphere
 
 from particula.gas.atmosphere_builders import AtmosphereBuilder
-from particula.gas import properties
+from particula.gas.properties import *

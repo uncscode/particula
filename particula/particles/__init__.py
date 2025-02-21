@@ -7,7 +7,7 @@
 # flake8: noqa
 # pyright: basic
 
-from particula.particles import properties
+from particula.particles.properties import *
 
 from particula.particles.distribution_strategies import (
     MassBasedMovingBin,
