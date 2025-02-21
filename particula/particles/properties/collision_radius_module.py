@@ -11,7 +11,14 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.util.validate_inputs import validate_inputs
 
+
+@validate_inputs(
+    {
+        "radius_gyration": "nonnegative",
+    }
+)
 def get_collision_radius_mg1988(
     radius_gyration: Union[NDArray[np.float64], float],
 ) -> Union[NDArray[np.float64], float]:
@@ -30,19 +37,25 @@ def get_collision_radius_mg1988(
 
     Examples:
         ``` py title="Example"
-        mulholland_1988(1.5)
+        import particula as par
+        par.particles.get_collision_radius_mg1988(1.5)
         # 1.5
         ```
 
     References:
-        - Mulholland, G. W., Mountain, R. D., Samson, R. J., & Ernst, M. H. (1988).
-          "Cluster Size Distribution for Free Molecular Agglomeration."
+        - Mulholland, G. W., Mountain, R. D., Samson, R. J., & Ernst, M. H.
+        (1988). "Cluster Size Distribution for Free Molecular Agglomeration."
           Energy and Fuels, 2(4). https://doi.org/10.1021/ef00010a014
-    """
     """
     return radius_gyration
 
 
+@validate_inputs(
+    {
+        "radius_gyration": "positive",
+        "fractal_dimension": "positive",
+    }
+)
 def get_collision_radius_sr1992(
     radius_gyration: Union[NDArray[np.float64], float],
     fractal_dimension: Union[NDArray[np.float64], float],
@@ -50,7 +63,8 @@ def get_collision_radius_sr1992(
     """
     Calculate the collision radius using the sr1992 model.
 
-    This model includes the fractal dimension (d_f). The collision radius (R_c) is:
+    This model includes the fractal dimension (d_f). The collision radius
+    (R_c) is:
 
     - R_c = √((d_f + 2) / 3) × R_g
         - R_c is the collision radius (m).
@@ -59,26 +73,34 @@ def get_collision_radius_sr1992(
 
     Arguments:
         - radius_gyration : Radius of gyration of the particle (m).
-        - fractal_dimension : Fractal dimension of the particle (dimensionless).
+        - fractal_dimension : Fractal dimension of the particle
+            (dimensionless).
 
     Returns:
         - Collision radius of the particle (m).
 
     Examples:
         ``` py title="Example"
-        rogak_flagan_1992(1.5, 2.5)
+        import particula as par
+        par.particles.get_collision_radius_sr1992(1.5, 1.2)
         # 1.8371173...
         ```
 
     References:
         - Rogak, S. N., & Flagan, R. C. (1992). "Coagulation of aerosol
           agglomerates in the transition regime." Journal of Colloid and
-          Interface Science, 151(1), 203-224. https://doi.org/10.1016/0021-9797(92)90252-H
-    """
+          Interface Science, 151(1), 203-224.
+          https://doi.org/10.1016/0021-9797(92)90252-H
     """
     return np.sqrt((fractal_dimension + 2) / 3) * radius_gyration
 
 
+@validate_inputs(
+    {
+        "radius_gyration": "positive",
+        "fractal_prefactor": "positive",
+    }
+)
 def get_collision_radius_mzg2002(
     radius_gyration: Union[NDArray[np.float64], float],
     fractal_prefactor: Union[NDArray[np.float64], float],
@@ -95,14 +117,15 @@ def get_collision_radius_mzg2002(
 
     Arguments:
         - radius_gyration : Radius of gyration of the particle (m).
-        - fractal_prefactor : Fractal prefactor of the particle (dimensionless).
+        - fractal_prefactor : Fractal prefactor of particle (dimensionless).
 
     Returns:
         - Collision radius of the particle (m).
 
     Examples:
         ``` py title="Example"
-        zurita_gotor_2002(1.5, 1.2)
+        import particula as par
+        par.particles.get_collision_radius_mzg2002(1.5, 1.2)
         # 1.577...
         ```
 
@@ -110,12 +133,20 @@ def get_collision_radius_mzg2002(
         - Zurita-Gotor, M., & Rosner, D. E. (2002). "Effective diameters for
           collisions of fractal-like aggregates: Recommendations for improved
           aerosol coagulation frequency predictions." Journal of Colloid and
-          Interface Science, 255(1). https://doi.org/10.1006/jcis.2002.8634
-    """
+          Interface Science, 255(1).
+          https://doi.org/10.1006/jcis.2002.8634
     """
     return 1.037 * (fractal_prefactor**0.077) * radius_gyration
 
 
+@validate_inputs(
+    {
+        "fractal_dimension": "positive",
+        "number_of_particles": "positive",
+        "radius_gyration": "positive",
+        "radius_monomer": "positive",
+    }
+)
 def get_collision_radius_tt2012(
     fractal_dimension: float,
     number_of_particles: float,
@@ -125,9 +156,9 @@ def get_collision_radius_tt2012(
     """
     Calculate the collision radius using the tt2012 model.
 
-    This function uses fitting parameters α₁, α₂ based on the fractal dimension (d_f)
-    and number of monomers (N). The collision radius (R_c) is derived in multiple
-    steps, ultimately returning:
+    This function uses fitting parameters α₁, α₂ based on the fractal
+    dimension (d_f) and number of monomers (N). The collision radius
+    (R_c) is derived in multiple steps, ultimately returning:
 
     - R_c = (radius_s_ii) / 2
 
@@ -142,16 +173,16 @@ def get_collision_radius_tt2012(
 
     Examples:
         ``` py title="Example"
-        thajudeen_2012(2.5, 100, 1.5, 0.1)
+        import particula as par
+        par.particles.get_collision_radius_tt2012(2.5, 100, 1.5, 0.1)
         # 2.034...
         ```
 
     References:
-        - Thajudeen, T., Gopalakrishnan, R., & Hogan, C. J. (2012). "The collision
-          rate of nonspherical particles and aggregates for all diffusive knudsen
-          numbers." Aerosol Science and Technology, 46(11).
+        - Thajudeen, T., Gopalakrishnan, R., & Hogan, C. J. (2012). "The
+          collision rate of nonspherical particles and aggregates for all
+          diffusive knudsen numbers." Aerosol Science and Technology, 46(11).
           https://doi.org/10.1080/02786826.2012.701353
-    """
     """
     alpha1 = 0.253 * fractal_dimension**2 - 1.209 * fractal_dimension + 1.433
     alpha2 = -0.218 * fractal_dimension**2 + 0.964 * fractal_dimension - 0.180
@@ -165,6 +196,12 @@ def get_collision_radius_tt2012(
     return radius_s_ii / 2
 
 
+@validate_inputs(
+    {
+        "radius_gyration": "positive",
+        "radius_monomer": "positive",
+    }
+)
 def get_collision_radius_wq2022_rg(
     radius_gyration: Union[NDArray[np.float64], float],
     radius_monomer: float,
@@ -172,8 +209,8 @@ def get_collision_radius_wq2022_rg(
     """
     Calculate the collision radius using the wq2022_rg model.
 
-    This function uses a fitted model based on the ratio (R_g / rₘ). The collision
-    radius (R_c) is:
+    This function uses a fitted model based on the ratio (R_g / rₘ).
+    The collision radius (R_c) is:
 
     - R_c = (A × (R_g / rₘ) + B) × rₘ
         - R_c is the collision radius (m).
@@ -190,7 +227,8 @@ def get_collision_radius_wq2022_rg(
 
     Examples:
         ``` py title="Example"
-        qian_2022_rg(1.5, 0.1)
+        import particula as par
+        par.particles.get_collision_radius_wq2022_rg(1.5, 0.1)
         # 1.50...
         ```
 
@@ -200,13 +238,19 @@ def get_collision_radius_wq2022_rg(
           the free molecular regime." Journal of Aerosol Science, 159.
           https://doi.org/10.1016/j.jaerosci.2021.105868
     """
-    """
     coefficient = (0.973, 0.441)
     return (
         coefficient[0] * (radius_gyration / radius_monomer) + coefficient[1]
     ) * radius_monomer
 
 
+@validate_inputs(
+    {
+        "fractal_dimension": "positive",
+        "radius_gyration": "positive",
+        "radius_monomer": "positive",
+    }
+)
 def get_collision_radius_wq2022_rg_df(
     fractal_dimension: Union[NDArray[np.float64], float],
     radius_gyration: Union[NDArray[np.float64], float],
@@ -226,7 +270,7 @@ def get_collision_radius_wq2022_rg_df(
         - A, B, C are empirical coefficients from Qian et al. (2022).
 
     Arguments:
-        - fractal_dimension : Fractal dimension of the particle (dimensionless).
+        - fractal_dimension : Fractal dimension of particle (dimensionless).
         - radius_gyration : Radius of gyration of the particle (m).
         - radius_monomer : Monomer radius (m).
 
@@ -235,7 +279,8 @@ def get_collision_radius_wq2022_rg_df(
 
     Examples:
         ``` py title="Example"
-        qian_2022_rg_df(2.5, 1.5, 0.1)
+        import particula as par
+        par.particles.get_collision_radius_wq2022_rg_df(2.5, 1.5, 0.1)
         # 1.66...
         ```
 
@@ -244,7 +289,6 @@ def get_collision_radius_wq2022_rg_df(
           "Effects of agglomerate characteristics on their collision kernels in
           the free molecular regime." Journal of Aerosol Science, 159.
           https://doi.org/10.1016/j.jaerosci.2021.105868
-    """
     """
     coefficient = (0.882, 0.223, 0.387)
     return (
@@ -255,6 +299,14 @@ def get_collision_radius_wq2022_rg_df(
     ) * radius_monomer
 
 
+@validate_inputs(
+    {
+        "fractal_dimension": "positive",
+        "fractal_prefactor": "positive",
+        "radius_gyration": "positive",
+        "radius_monomer": "positive",
+    }
+)
 def get_collision_radius_wq2022_rg_df_k0(
     fractal_dimension: float,
     fractal_prefactor: float,
@@ -264,8 +316,9 @@ def get_collision_radius_wq2022_rg_df_k0(
     """
     Calculate the collision radius using the wq2022_rg_df_k0 model.
 
-    This function uses a fitted expression depending on fractal dimension (d_f),
-    fractal prefactor (k₀), and ratio (R_g / rₘ). The collision radius (R_c) is:
+    This function uses a fitted expression depending on fractal dimension
+    (d_f), fractal prefactor (k₀), and ratio (R_g / rₘ). The collision
+    radius (R_c) is:
 
     - R_c = (A × d_f^B × k₀^C × (R_g / rₘ) + D × k₀ + E) × rₘ
         - R_c is the collision radius (m).
@@ -276,8 +329,8 @@ def get_collision_radius_wq2022_rg_df_k0(
         - A, B, C, D, E are empirical coefficients from Qian et al. (2022).
 
     Arguments:
-        - fractal_dimension : Fractal dimension of the particle (dimensionless).
-        - fractal_prefactor : Fractal prefactor of the particle (dimensionless).
+        - fractal_dimension : Fractal dimension of particle (dimensionless).
+        - fractal_prefactor : Fractal prefactor of particle (dimensionless).
         - radius_gyration : Radius of gyration (m).
         - radius_monomer : Monomer radius (m).
 
@@ -286,7 +339,8 @@ def get_collision_radius_wq2022_rg_df_k0(
 
     Examples:
         ``` py title="Example"
-        qian_2022_rg_df_k0(2.5, 1.2, 1.5, 0.1)
+        import particula as par
+        par.particles.get_collision_radius_wq2022_rg_df_k0(2.5, 1.2, 1.5, 0.1)
         # 1.83...
         ```
 
@@ -295,7 +349,6 @@ def get_collision_radius_wq2022_rg_df_k0(
           "Effects of agglomerate characteristics on their collision kernels in
           the free molecular regime." Journal of Aerosol Science, 159.
           https://doi.org/10.1016/j.jaerosci.2021.105868
-    """
     """
     coefficient = (0.777, 0.479, 0.000970, 0.267, -0.0790)
     return (
@@ -308,6 +361,15 @@ def get_collision_radius_wq2022_rg_df_k0(
     ) * radius_monomer
 
 
+@validate_inputs(
+    {
+        "fractal_dimension": "positive",
+        "fractal_prefactor": "positive",
+        "shape_anisotropy": "positive",
+        "radius_gyration": "positive",
+        "radius_monomer": "positive",
+    }
+)
 def get_collision_radius_wq2022_rg_df_k0_a13(
     fractal_dimension: float,
     fractal_prefactor: float,
@@ -318,9 +380,9 @@ def get_collision_radius_wq2022_rg_df_k0_a13(
     """
     Calculate the collision radius using the wq2022_rg_df_k0_a13 model.
 
-    This function uses a fitted expression depending on fractal dimension (d_f),
-    fractal prefactor (k₀), shape anisotropy (A₁₃), and ratio (R_g / rₘ). The collision
-    radius (R_c) is:
+    This function uses a fitted expression depending on fractal dimension
+    (d_f), fractal prefactor (k₀), shape anisotropy (A₁₃), and ratio
+    (R_g / rₘ). The collision radius (R_c) is:
 
     - R_c = (A × d_f^B × k₀^C × (R_g / rₘ) + D × k₀ + E × A₁₃ + F) × rₘ
         - R_c is the collision radius (m).
@@ -332,8 +394,8 @@ def get_collision_radius_wq2022_rg_df_k0_a13(
         - A, B, C, D, E, F are empirical coefficients from Qian et al. (2022).
 
     Arguments:
-        - fractal_dimension : Fractal dimension of the particle (dimensionless).
-        - fractal_prefactor : Fractal prefactor of the particle (dimensionless).
+        - fractal_dimension : Fractal dimension of particle (dimensionless).
+        - fractal_prefactor : Fractal prefactor of particle (dimensionless).
         - shape_anisotropy : Shape anisotropy parameter (dimensionless, A₁₃).
         - radius_gyration : Radius of gyration (m).
         - radius_monomer : Monomer radius (m).
@@ -343,7 +405,10 @@ def get_collision_radius_wq2022_rg_df_k0_a13(
 
     Examples:
         ``` py title="Example"
-        qian_2022_rg_df_k0_a13(2.5, 1.2, 0.5, 1.5, 0.1)
+        import particula as par
+        par.particles.get_collision_radius_wq2022_rg_df_k0_a13(
+            2.5, 1.2, 1.82, 1.5, 0.1
+        )
         # 1.82...
         ```
 
@@ -352,7 +417,6 @@ def get_collision_radius_wq2022_rg_df_k0_a13(
           "Effects of agglomerate characteristics on their collision kernels in
           the free molecular regime." Journal of Aerosol Science, 159.
           https://doi.org/10.1016/j.jaerosci.2021.105868
-    """
     """
     coefficient = (0.876, 0.363, -0.105, 0.421, -0.0360, -0.227)
     return (
