@@ -24,41 +24,46 @@ def get_particle_inertia_time(
     kinematic_viscosity: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the particle inertia time.
+    Compute the particle inertia time (τ_p).
 
-    The particle inertia time (τ_p) represents the response time of a particle
-    to velocity changes in the surrounding fluid and is given by:
+    The particle inertia time represents the response time of a particle to changes
+    in fluid velocity, given by:
 
-        τ_p = (2 / 9) * (ρ_p / ρ_f) * (r² / ν )
-
-    - τ_p : Particle inertia time [s]
-    - r (particle_radius) : Particle radius [m]
-    - ρ_p (particle_density) : Particle (e.g., droplet, dust) density [kg/m³]
-    - ρ_f (fluid_density) : Density of the surrounding fluid (e.g., air, water)
-        [kg/m³]
-    - ν (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]
-    - f(Re_p) : Drag correction factor based on the particle Reynolds number
-        [-]
+    - τ_p = (2 / 9) × (ρ_p / ρ_f) × (r² / ν)
+        - τ_p is the particle inertia time in seconds (s).
+        - ρ_p is the particle density (kg/m³).
+        - ρ_f is the surrounding fluid density (kg/m³).
+        - r is the particle radius (m).
+        - ν is the kinematic viscosity of the fluid (m²/s).
 
     Arguments:
-    ----------
-        - particle_radius : Radius of the particle [m]
-        - particle_density : Density of the particle [kg/m³]
-        - fluid_density : Density of the surrounding fluid [kg/m³]
-        - kinematic_viscosity : Kinematic viscosity of the fluid [m²/s]
-        - relative_velocity : Relative velocity between particle and fluid
-            [m/s]
+        - particle_radius : Particle radius in meters (m).
+        - particle_density : Density of the particle in kg/m³.
+        - fluid_density : Density of the fluid in kg/m³.
+        - kinematic_viscosity : Kinematic viscosity of the fluid in m²/s.
 
     Returns:
-    --------
-        - Particle inertia time [s]
+        - The particle inertia time in seconds (s). Returned as either a float or
+          NDArray[np.float64].
+
+    Examples:
+        ```py title="Example"
+        from particula.particles.properties.inertia_time import get_particle_inertia_time
+        tau_p = get_particle_inertia_time(
+            particle_radius=1e-6,
+            particle_density=1000.0,
+            fluid_density=1.225,
+            kinematic_viscosity=1.5e-5
+        )
+        print(tau_p)
+        # Output: ...
+        ```
 
     References:
-    ----------
-        - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-        the geometric collision rate of sedimenting droplets. Part 2. Theory
-        and parameterization. New Journal of Physics, 10.
-        https://doi.org/10.1088/1367-2630/10/7/075016
+        - Ayala, O., Rosa, B., & Wang, L. P. (2008). "Effects of turbulence on the
+          geometric collision rate of sedimenting droplets. Part 2. Theory and
+          parameterization." New Journal of Physics, 10.
+          https://doi.org/10.1088/1367-2630/10/7/075016
     """
 
     return (
