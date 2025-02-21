@@ -20,18 +20,31 @@ def get_thermal_conductivity(
     Only valid for temperatures within the range typically found on
     Earth's surface.
 
-    Args:
-    -----
-    - temperature (Union[float, NDArray[np.float64]]): The temperature at which
-    the thermal conductivity of air is to be calculated, in Kelvin (K).
+    Long Description:
+        This function uses a simplified linear relation from
+        atmospheric science literature. Valid for Earth-like surface
+        temperatures, typically 200–330 K.
+
+    Equation:
+        - k(T) = 1e-3 × (4.39 + 0.071 × T)
+
+    Where:
+        - k(T) : Thermal conductivity [W/(m·K)].
+        - T : Temperature [K].
+
+    Arguments:
+        - temperature : The temperature in Kelvin (K).
 
     Returns:
-    --------
-    - Union[float, NDArray[np.float64]]: The thermal conductivity of air at the
-    specified temperature in Watts per meter-Kelvin (W/m·K) or J/(m s K).
+        - The thermal conductivity [W/(m·K)] or [J/(m·s·K)].
+
+    Examples:
+        ```py
+        k_300K = get_thermal_conductivity(300)
+        # ~0.449 W/(m·K)
+        ```
 
     References:
-    ----------
     - Seinfeld and Pandis, "Atmospheric Chemistry and Physics", Equation 17.54.
     """
     return 1e-3 * (4.39 + 0.071 * temperature)
