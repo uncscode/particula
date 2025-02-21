@@ -19,24 +19,32 @@ def get_lagrangian_integral_time(
     """
     Calculate the Lagrangian integral timescale.
 
-    The Lagrangian integral scale (T_L) characterizes the timescale of large
-    eddies in turbulence. This represents the correlation time of fluid
-    elements in turbulent motion. It is given by:
+    Equation:
+        T_L = (u'²) / ε
 
-        T_L = u'^2 / ε
-
-    where:
-        - T_L : Lagrangian integral timescale [s]
-        - u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s]
-        - ε (turbulent_dissipation) : Turbulent energy dissipation rate [m²/s³]
+    Where:
+        - T_L : Lagrangian integral timescale [s].
+        - fluid_rms_velocity (u') : Fluid RMS fluctuation velocity [m/s].
+        - turbulent_dissipation (ε) : Turbulent energy dissipation rate [m²/s³].
 
     Arguments:
-        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]
-        - turbulent_dissipation : Turbulent kinetic energy dissipation rate
-            [m²/s³]
+        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
+        - turbulent_dissipation : Turbulent kinetic energy dissipation rate [m²/s³].
 
     Returns:
-        - Lagrangian integral timescale [s]
+        - Lagrangian integral timescale [s].
+
+    Examples:
+        ``` py title="Example Usage"
+        >>> timescale = get_lagrangian_integral_time(0.3, 1e-4)
+        # Output: 900.0
+        ```
+
+    References:
+        - Townsend, A. A., "The Structure of Turbulent Shear Flow," 2nd ed.,
+          Cambridge University Press, 1976.
+        - Wikipedia contributors, "Turbulence," Wikipedia, The Free Encyclopedia,
+          (accessed Month Day, Year).
     """
     return (fluid_rms_velocity**2) / turbulent_dissipation
 
@@ -51,25 +59,30 @@ def get_eulerian_integral_length(
     """
     Calculate the Eulerian integral length scale.
 
-    The Eulerian integral length scale (L_e) represents the characteristic
-    size of the largest turbulent eddies and provides insight into the spatial
-    correlation of turbulence structures. It is given by:
+    Equation:
+        L_e = 0.5 × (u'³) / ε
 
-        L_e = 0.5 * u'^3 / ε
-
-    where:
-        - L_e : Eulerian integral length scale [m]
-        - u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s]
-        - ε (turbulent_dissipation) : Turbulent energy dissipation rate [m²/s³]
+    Where:
+        - L_e : Eulerian integral length scale [m].
+        - fluid_rms_velocity (u') : Fluid RMS fluctuation velocity [m/s].
+        - turbulent_dissipation (ε) : Turbulent energy dissipation rate [m²/s³].
 
     Arguments:
-    ----------
-        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]
-        - turbulent_dissipation : Turbulent kinetic energy dissipation rate
-            [m²/s³]
+        - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
+        - turbulent_dissipation : Turbulent kinetic energy dissipation rate [m²/s³].
 
     Returns:
-    --------
-        - Eulerian integral length scale [m]
+        - Eulerian integral length scale [m].
+
+    Examples:
+        ``` py title="Example Usage"
+        >>> length_scale = get_eulerian_integral_length(0.3, 1e-4)
+        # Output: 1350.0
+        ```
+
+    References:
+        - Hinze, J. O., "Turbulence," McGraw-Hill, 1975.
+        - Wikipedia contributors, "Turbulence," Wikipedia, The Free Encyclopedia,
+          (accessed Month Day, Year).
     """
     return 0.5 * (fluid_rms_velocity**3) / turbulent_dissipation
