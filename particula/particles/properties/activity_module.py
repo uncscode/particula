@@ -6,7 +6,7 @@ from numpy.typing import NDArray
 from particula.util.converting import convert_mass_concentration
 
 
-def ideal_activity_molar(
+def get_ideal_activity_molar(
     mass_concentration: Union[float, NDArray[np.float64]],
     molar_mass: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -45,7 +45,7 @@ def ideal_activity_molar(
     )
 
 
-def ideal_activity_volume(
+def get_ideal_activity_volume(
     mass_concentration: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
@@ -84,7 +84,7 @@ def ideal_activity_volume(
     )
 
 
-def ideal_activity_mass(
+def get_ideal_activity_mass(
     mass_concentration: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
@@ -117,7 +117,7 @@ def ideal_activity_mass(
 
 
 # pylint: disable=too-many-locals
-def kappa_activity(
+def get_kappa_activity(
     mass_concentration: NDArray[np.float64],
     kappa: NDArray[np.float64],
     density: NDArray[np.float64],
@@ -218,7 +218,7 @@ def kappa_activity(
     return activity
 
 
-def calculate_partial_pressure(
+def get_surface_partial_pressure(
     pure_vapor_pressure: Union[float, NDArray[np.float64]],
     activity: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
