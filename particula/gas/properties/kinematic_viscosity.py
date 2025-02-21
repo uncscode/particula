@@ -29,11 +29,31 @@ def get_kinematic_viscosity(
     dynamic_viscosity: float,
     fluid_density: float,
 ) -> float:
-    """
+    Examples:
+        ``` py title="Example Usage"
+        >>> visc = get_kinematic_viscosity(1.81e-5, 1.225)
+        # Output: ~1.48e-5
+        ```
+
+    References:
+        ...
+        - Wikipedia contributors, "Viscosity," Wikipedia, The Free Encyclopedia,
+          (accessed Month Day, Year).
+    """ 
     Calculate the kinematic viscosity of a fluid.
 
     Equation:
         ν = μ / ρ
+
+    Where:
+        - ν : Kinematic viscosity [m²/s].
+        - μ : Dynamic viscosity [Pa·s].
+        - ρ : Density of the fluid [kg/m³].
+
+    Where:
+        - ν : Kinematic viscosity [m²/s].
+        - μ : Dynamic viscosity [Pa·s].
+        - ρ : Density of the fluid [kg/m³].
 
     Arguments:
         dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].
@@ -45,6 +65,18 @@ def get_kinematic_viscosity(
     References:
         - "Viscosity Conversion Formula," Wolfram Formula Repository.
           https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
+    Examples:
+        ``` py title="Example Usage"
+        >>> kin_visc = get_kinematic_viscosity_via_system_state(
+        ...     temperature=300, fluid_density=1.225
+        ... )
+        # Output: ~1.50e-5
+        ```
+
+    References:
+        ...
+        - Wikipedia contributors, "Kinematic viscosity," Wikipedia, The Free
+          Encyclopedia, (accessed Month Day, Year).
     """
     return dynamic_viscosity / fluid_density
 
