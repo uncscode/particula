@@ -31,7 +31,8 @@ class BuilderDensityMixin:
         density: Union[float, NDArray[np.float64]],
         density_units: str,
     ):
-        """Set the density of the particle in kg/m^3.
+        """
+        Set the density of the particle in kg/m^3.
 
         Args:
             density : Density of the particle.
@@ -70,8 +71,8 @@ class BuilderSurfaceTensionMixin:
         if surface_tension_units == "N/m":
             self.surface_tension = surface_tension
             return self
-        self.surface_tension = (
-            surface_tension * convert_units(surface_tension_units, "N/m")
+        self.surface_tension = surface_tension * convert_units(
+            surface_tension_units, "N/m"
         )
         return self
 
@@ -92,18 +93,18 @@ class BuilderMolarMassMixin:
         molar_mass: Union[float, NDArray[np.float64]],
         molar_mass_units: Optional[str] = "kg/mol",
     ):
-        """Set the molar mass of the particle in kg/mol.
+        """
+        Set the molar mass of the particle in kg/mol.
 
         Args:
-        -----
-        - molar_mass: Molar mass of the particle.
-        - molar_mass_units: Units of the molar mass. Default is *kg/mol*.
+            molar_mass : Molar mass of the particle.
+            molar_mass_units : Units of the molar mass. Default is *kg/mol*.
         """
         if molar_mass_units == "kg/mol":
             self.molar_mass = molar_mass
             return self
-        self.molar_mass = (
-            molar_mass * convert_units(molar_mass_units, "kg/mol")
+        self.molar_mass = molar_mass * convert_units(
+            molar_mass_units, "kg/mol"
         )
         return self
 
@@ -141,8 +142,8 @@ class BuilderConcentrationMixin:
         if concentration_units == self.default_units:
             self.concentration = concentration
             return self
-        self.concentration = (
-            concentration * convert_units(concentration_units, self.default_units)
+        self.concentration = concentration * convert_units(
+            concentration_units, self.default_units
         )
         return self
 
@@ -195,9 +196,6 @@ class BuilderMassMixin:
         Args:
             mass: Mass of the particle.
             mass_units: Units of the mass. Default is *kg*.
-
-        Raises:
-            ValueError: If mass is negative
         """
         if mass_units == "kg":
             self.mass = mass
@@ -216,7 +214,7 @@ class BuilderVolumeMixin:
     def __init__(self):
         self.volume = None
 
-    @validate_inputs({"volume": "positive"})
+    @validate_inputs({"volume": "nonnegative"})
     def set_volume(
         self,
         volume: Union[float, NDArray[np.float64]],
@@ -227,9 +225,6 @@ class BuilderVolumeMixin:
         Args:
             volume: Volume.
             volume_units: Units of the volume. Default is *m^3*.
-
-        Raises:
-            ValueError: If volume is negative
         """
         if volume_units == "m^3":
             self.volume = volume
@@ -248,7 +243,7 @@ class BuilderRadiusMixin:
     def __init__(self):
         self.radius = None
 
-    @validate_inputs({"radius": "positive"})
+    @validate_inputs({"radius": "nonnegative"})
     def set_radius(
         self,
         radius: Union[float, NDArray[np.float64]],
@@ -259,9 +254,6 @@ class BuilderRadiusMixin:
         Args:
             radius: Radius of the particle.
             radius_units: Units of the radius. Default is *m*.
-
-        Raises:
-            ValueError: If radius is negative
         """
         if radius_units == "m":
             self.radius = radius
@@ -280,7 +272,7 @@ class BuilderTemperatureMixin:
     def __init__(self):
         self.temperature = None
 
-    @validate_inputs({"temperature": "positive"})
+    @validate_inputs({"temperature": "finite"})
     def set_temperature(
         self, temperature: float, temperature_units: str = "K"
     ):
@@ -301,9 +293,7 @@ class BuilderTemperatureMixin:
         if temperature_units == "K":
             self.temperature = temperature
             return self
-        self.temperature = (
-            temperature * convert_units(temperature_units, "K")
-        )
+        self.temperature = temperature * convert_units(temperature_units, "K")
         return self
 
 
@@ -317,7 +307,7 @@ class BuilderPressureMixin:
     def __init__(self):
         self.pressure = None
 
-    @validate_inputs({"pressure": "positive"})
+    @validate_inputs({"pressure": "nonnegative"})
     def set_pressure(
         self,
         pressure: Union[float, NDArray[np.float64]],
@@ -339,9 +329,7 @@ class BuilderPressureMixin:
         if pressure_units == "Pa":
             self.pressure = pressure
             return self
-        self.pressure = (
-            pressure * convert_units(pressure_units, "Pa")
-        )
+        self.pressure = pressure * convert_units(pressure_units, "Pa")
         return self
 
 
@@ -371,10 +359,7 @@ class BuilderLognormalMixin:
 
         Args:
             mode: The modes for the radius.
-            mode_units: The units for the modes, default is 'm'.
-
-        Raises:
-            ValueError: If mode is negative.
+            mode_units: The units for the modes, default is [m].
         """
         if mode_units == "m":
             self.mode = mode
@@ -395,9 +380,6 @@ class BuilderLognormalMixin:
                 the radius.
             geometric_standard_deviation_units: Optional, ignored units for
                 geometric standard deviation [dimensionless].
-
-        Raises:
-            ValueError: If geometric standard deviation is negative.
         """
         if geometric_standard_deviation_units is not None:
             logger.warning("Ignoring units for surface strategy parameter.")
@@ -416,15 +398,12 @@ class BuilderLognormalMixin:
             number_concentration: The number concentration for the radius.
             number_concentration_units: The units for the number concentration,
                 default is '1/m^3'.
-
-        Raises:
-            ValueError: If number concentration is negative.
         """
         if number_concentration_units == "1/m^3":
             self.number_concentration = number_concentration
             return self
-        self.number_concentration = (
-            number_concentration * convert_units(number_concentration_units, "1/m^3")
+        self.number_concentration = number_concentration * convert_units(
+            number_concentration_units, "1/m^3"
         )
         return self
 
