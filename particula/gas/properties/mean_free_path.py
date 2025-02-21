@@ -42,10 +42,7 @@ def get_molecule_mean_free_path(
     dynamic_viscosity is not provided, it is computed via
     get_dynamic_viscosity(temperature).
 
-    Equation:
-        - λ = (2 × μ / P) / √(8 × M / (π × R × T))
-
-    Where:
+    - λ = (2 × μ / P) / √(8 × M / (π × R × T))
         - λ is Mean free path [m].
         - μ is Dynamic viscosity [Pa·s].
         - P is Gas pressure [Pa].

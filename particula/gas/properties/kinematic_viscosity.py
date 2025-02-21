@@ -41,8 +41,7 @@ def get_kinematic_viscosity(
     The function calculates ν by dividing the dynamic viscosity (μ)
     by the fluid density (ρ).
 
-    Equation:
-        ν = μ / ρ
+    - ν = μ / ρ
 
     Arguments:
         - dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].

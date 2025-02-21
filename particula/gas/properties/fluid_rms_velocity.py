@@ -29,11 +29,11 @@ def get_fluid_rms_velocity(
     turbulence intensity in a fluid flow. It is calculated as:
 
     - u' = (R_λ^(1/2) v_K) / 15^(1/4)
-    - u' is Fluid RMS fluctuation velocity [m/s]
-    - R_λ (re_lambda) is Taylor-microscale Reynolds number [-]
-    - v_K is Kolmogorov velocity scale, computed as v_K = ( ε)^(1/4) [m/s]
-    - v (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s]
-    - ε (turbulent_dissipation) is Turbulent energy dissipation rate [m²/s³]
+        - u' is Fluid RMS fluctuation velocity [m/s]
+        - R_λ (re_lambda) is Taylor-microscale Reynolds number [-]
+        - v_K is Kolmogorov velocity scale, computed as v_K = ( ε)^(1/4) [m/s]
+        - v (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s]
+        - ε (turbulent_dissipation) is Turbulent energy dissipation rate [m²/s³]
 
 
     Arguments:

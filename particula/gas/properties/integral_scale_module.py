@@ -22,10 +22,7 @@ def get_lagrangian_integral_time(
     The Lagrangian integral timescale is a measure of the time it takes for
     a fluid particle to travel a distance equal to the integral length scale.
 
-    Equation:
-        - T_L = (u'²) / ε
-
-    Where:
+    - T_L = (u'²) / ε
         - T_L is Lagrangian integral timescale [s].
         - fluid_rms_velocity (u') is Fluid RMS fluctuation velocity [m/s].
         - turbulent_dissipation (ε) is Turbulent energy dissipation rate
