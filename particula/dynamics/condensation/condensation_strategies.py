@@ -47,7 +47,7 @@ from particula.gas.species import GasSpecies
 from particula.particles.properties import (
     get_knudsen_number,
     vapor_transition_correction,
-    partial_pressure_delta,
+    get_partial_pressure_delta,
 )
 from particula.gas.properties import get_molecule_mean_free_path
 from particula.dynamics.condensation.mass_transfer import (
@@ -265,7 +265,7 @@ class CondensationStrategy(ABC):
             temperature=temperature,
         )
 
-        return partial_pressure_delta(
+        return get_partial_pressure_delta(
             partial_pressure_gas=partial_pressure_gas,
             partial_pressure_particle=partial_pressure_particle,
             kelvin_term=kelvin_term,

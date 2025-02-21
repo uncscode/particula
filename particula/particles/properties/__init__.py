@@ -42,7 +42,7 @@ from particula.particles.properties.vapor_correction_module import (
     vapor_transition_correction,
 )
 from particula.particles.properties.partial_pressure_module import (
-    partial_pressure_delta,
+    get_partial_pressure_delta,
 )
 from particula.particles.properties.kelvin_effect_module import (
     get_kelvin_radius,
