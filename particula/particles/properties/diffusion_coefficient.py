@@ -11,7 +11,7 @@ from particula.particles.properties.aerodynamic_mobility_module import (
     get_aerodynamic_mobility,
 )
 from particula.particles.properties.slip_correction_module import (
-    cunningham_slip_correction,
+    get_cunningham_slip_correction,
 )
 from particula.particles.properties.knudsen_number_module import (
     get_knudsen_number,
@@ -120,7 +120,7 @@ def get_diffusion_coefficient_via_system_state(
     _knudsen_number = get_knudsen_number(
         mean_free_path=_mean_free_path, particle_radius=particle_radius
     )
-    _slip_correction_factor = cunningham_slip_correction(
+    _slip_correction_factor = get_cunningham_slip_correction(
         knudsen_number=_knudsen_number,
     )
     _aerodynamic_mobility = get_aerodynamic_mobility(

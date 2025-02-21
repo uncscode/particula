@@ -2,7 +2,7 @@
 
 import numpy as np
 import pytest
-from particula.particles.properties import cunningham_slip_correction
+from particula.particles.properties import get_cunningham_slip_correction
 
 
 def test_cunningham_slip_correction_basic():
@@ -12,7 +12,7 @@ def test_cunningham_slip_correction_basic():
     expected = 1 + knudsen_number * (
         1.257 + 0.4 * np.exp(-1.1 / knudsen_number)
     )
-    assert np.isclose(cunningham_slip_correction(knudsen_number), expected)
+    assert np.isclose(get_cunningham_slip_correction(knudsen_number), expected)
 
 
 def test_cunningham_slip_correction_array():
@@ -22,7 +22,7 @@ def test_cunningham_slip_correction_array():
         1.257 + 0.4 * np.exp(-1.1 / knudsen_numbers)
     )
     np.testing.assert_allclose(
-        cunningham_slip_correction(knudsen_numbers), expected
+        get_cunningham_slip_correction(knudsen_numbers), expected
     )
 
 
@@ -32,7 +32,7 @@ def test_cunningham_slip_correction_high_value():
     expected = 1 + knudsen_number * (
         1.257 + 0.4 * np.exp(-1.1 / knudsen_number)
     )
-    assert np.isclose(cunningham_slip_correction(knudsen_number), expected)
+    assert np.isclose(get_cunningham_slip_correction(knudsen_number), expected)
 
 
 def test_cunningham_slip_correction_low_value():
@@ -41,21 +41,19 @@ def test_cunningham_slip_correction_low_value():
     expected = 1 + knudsen_number * (
         1.257 + 0.4 * np.exp(-1.1 / knudsen_number)
     )
-    assert np.isclose(cunningham_slip_correction(knudsen_number), expected)
+    assert np.isclose(get_cunningham_slip_correction(knudsen_number), expected)
 
 
 def test_cunningham_slip_correction_negative_value():
     """Test with a negative Knudsen number to see if the function handles it,
     remove once value error handling is implemented in the function"""
     knudsen_number = -0.5
-    expected = 1 + knudsen_number * (
-        1.257 + 0.4 * np.exp(-1.1 / knudsen_number)
-    )
-    assert np.isclose(cunningham_slip_correction(knudsen_number), expected)
+    with pytest.raises(ValueError):
+        get_cunningham_slip_correction(knudsen_number)
 
 
 def test_cunningham_slip_correction_type_error():
     """Test with an incorrect type for the Knudsen number input"""
     knudsen_number = "0.5"  # Incorrect type (string)
     with pytest.raises(TypeError):
-        cunningham_slip_correction(knudsen_number)
+        get_cunningham_slip_correction(knudsen_number)

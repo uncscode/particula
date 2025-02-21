@@ -18,7 +18,7 @@ from particula.gas.properties.kinematic_viscosity import (
     get_kinematic_viscosity,
 )
 from particula.particles.properties.slip_correction_module import (
-    cunningham_slip_correction,
+    get_cunningham_slip_correction,
 )
 from particula.particles.properties.knudsen_number_module import (
     get_knudsen_number,
@@ -237,7 +237,7 @@ def particle_settling_velocity_via_system_state(
     )
 
     # Step 4: Calculate the slip correction factor (Cunningham correction)
-    slip_correction_factor = cunningham_slip_correction(
+    slip_correction_factor = get_cunningham_slip_correction(
         knudsen_number=knudsen_number,
     )
 

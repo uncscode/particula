@@ -174,7 +174,7 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
     knudsen_number = properties.get_knudsen_number(
         mean_free_path=mean_free_path, particle_radius=particle_radius
     )
-    slip_correction_factor = properties.cunningham_slip_correction(
+    slip_correction_factor = properties.get_cunningham_slip_correction(
         knudsen_number
     )
 

@@ -22,7 +22,7 @@ from particula.particles.properties.mean_thermal_speed_module import (
     get_mean_thermal_speed,
 )
 from particula.particles.properties.slip_correction_module import (
-    cunningham_slip_correction,
+    get_cunningham_slip_correction,
 )
 from particula.particles.properties.knudsen_number_module import (
     get_knudsen_number,
@@ -49,7 +49,7 @@ from particula.particles.properties.kelvin_effect_module import (
     get_kelvin_term,
 )
 from particula.particles.properties.special_functions import (
-    debye_function,
+    get_debye_function,
 )
 from particula.particles.properties.settling_velocity import (
     particle_settling_velocity,

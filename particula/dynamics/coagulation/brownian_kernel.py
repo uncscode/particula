@@ -122,7 +122,7 @@ def get_brownian_kernel_via_system_state(
         air_mean_free_path,
         particle_radius,
     )
-    slip_correction = properties.cunningham_slip_correction(
+    slip_correction = properties.get_cunningham_slip_correction(
         knudsen_number=knudsen_number
     )
     aerodyanmic_mobility = properties.get_aerodynamic_mobility(

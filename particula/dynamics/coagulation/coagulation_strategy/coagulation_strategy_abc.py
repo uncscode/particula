@@ -371,7 +371,7 @@ class CoagulationStrategyABC(ABC):
             mean_free_path=mean_free_path,
             particle_radius=particle.get_radius(),
         )
-        slip_correction = properties.cunningham_slip_correction(
+        slip_correction = properties.get_cunningham_slip_correction(
             knudsen_number=knudsen_number
         )
         return properties.get_friction_factor(

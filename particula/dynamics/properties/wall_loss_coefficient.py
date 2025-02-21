@@ -21,7 +21,7 @@ from numpy.typing import NDArray
 from particula.particles.properties import (
     get_diffusion_coefficient_via_system_state,
     particle_settling_velocity_via_system_state,
-    debye_function,
+    get_debye_function,
 )
 
 
@@ -57,7 +57,7 @@ def get_spherical_wall_loss_coefficient(
     )
     return 6 * np.sqrt(wall_eddy_diffusivity * diffusion_coefficient) / (
         np.pi * chamber_radius
-    ) * debye_function(variable=debye_variable) + settling_velocity / (
+    ) * get_debye_function(variable=debye_variable) + settling_velocity / (
         4 * chamber_radius / 3
     )
 
