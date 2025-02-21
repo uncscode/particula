@@ -27,7 +27,6 @@ def get_normalized_accel_variance_ao2008(
     - R_λ (re_lambda) : Taylor-microscale Reynolds number [-]
 
     Arguments:
-    ----------
         - re_lambda : Taylor-microscale Reynolds number [-]
 
     Returns:
