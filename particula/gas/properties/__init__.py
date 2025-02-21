@@ -22,12 +22,12 @@ from particula.gas.properties.concentration_function import (
     get_concentration_from_pressure,
 )
 from particula.gas.properties.pressure_function import (
-    calculate_partial_pressure,
+    get_partial_pressure,
 )
 from particula.gas.properties.vapor_pressure_module import (
-    antoine_vapor_pressure,
-    clausius_clapeyron_vapor_pressure,
-    buck_vapor_pressure,
+    get_antoine_vapor_pressure,
+    get_clausius_clapeyron_vapor_pressure,
+    get_buck_vapor_pressure,
 )
 from particula.gas.properties.normalize_accel_variance import (
     get_normalized_accel_variance_ao2008,

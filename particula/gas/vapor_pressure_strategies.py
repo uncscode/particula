@@ -16,12 +16,12 @@ from particula.gas.properties.concentration_function import (
     get_concentration_from_pressure,
 )
 from particula.gas.properties.pressure_function import (
-    calculate_partial_pressure,
+    get_partial_pressure,
 )
 from particula.gas.properties.vapor_pressure_module import (
-    antoine_vapor_pressure,
-    buck_vapor_pressure,
-    clausius_clapeyron_vapor_pressure,
+    get_antoine_vapor_pressure,
+    get_buck_vapor_pressure,
+    get_clausius_clapeyron_vapor_pressure,
 )
 
 
@@ -56,9 +56,7 @@ class VaporPressureStrategy(ABC):
             )
             ```
         """
-        return calculate_partial_pressure(
-            concentration, molar_mass, temperature
-        )
+        return get_partial_pressure(concentration, molar_mass, temperature)
 
     def concentration(
         self,
@@ -233,7 +231,7 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
             - Kelvin form:
                 https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781118135341.app1
         """
-        return antoine_vapor_pressure(
+        return get_antoine_vapor_pressure(
             a=self.a, b=self.b, c=self.c, temperature=temperature
         )
 
@@ -283,7 +281,7 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
         References:
             - https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation
         """
-        return clausius_clapeyron_vapor_pressure(
+        return get_clausius_clapeyron_vapor_pressure(
             latent_heat=self.latent_heat,
             temperature_initial=self.temperature_initial,
             pressure_initial=self.pressure_initial,
@@ -320,4 +318,4 @@ class WaterBuckStrategy(VaporPressureStrategy):
               https://doi.org/10.1175/1520-0450(1981)020<1527:NEFCVP>2.0.CO;2.
             - https://en.wikipedia.org/wiki/Arden_Buck_equation
         """
-        return buck_vapor_pressure(temperature)
+        return get_buck_vapor_pressure(temperature)

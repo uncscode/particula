@@ -5,7 +5,7 @@ import pytest
 from particula.util.constants import GAS_CONSTANT
 
 from particula.gas.properties.pressure_function import (
-    calculate_partial_pressure,
+    get_partial_pressure,
 )
 
 
@@ -18,7 +18,7 @@ def test_calculate_partial_pressure_scalar():
     expected_pressure = (
         concentration * GAS_CONSTANT * temperature
     ) / molar_mass
-    assert calculate_partial_pressure(
+    assert get_partial_pressure(
         concentration, molar_mass, temperature
     ) == pytest.approx(expected_pressure)
 
@@ -33,7 +33,7 @@ def test_calculate_partial_pressure_array():
         concentration * GAS_CONSTANT * temperature
     ) / molar_mass
     np.testing.assert_array_almost_equal(
-        calculate_partial_pressure(concentration, molar_mass, temperature),
+        get_partial_pressure(concentration, molar_mass, temperature),
         expected_pressure,
     )
 
@@ -52,6 +52,6 @@ def test_calculate_partial_pressure_edge_cases():
         expected_pressure = (
             concentration * GAS_CONSTANT * temperature
         ) / molar_mass
-        assert calculate_partial_pressure(
+        assert get_partial_pressure(
             concentration, molar_mass, temperature
         ) == pytest.approx(expected_pressure)
