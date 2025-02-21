@@ -6,7 +6,7 @@ from numpy.typing import NDArray
 
 from particula.util.constants import BOLTZMANN_CONSTANT
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
-from particula.gas.properties.mean_free_path import molecule_mean_free_path
+from particula.gas.properties.mean_free_path import get_molecule_mean_free_path
 from particula.particles.properties.aerodynamic_mobility_module import (
     particle_aerodynamic_mobility,
 )
@@ -60,7 +60,7 @@ def particle_diffusion_coefficient_via_system_state(
 
     # Step 1: Calculate gas properties
     _dynamic_viscosity = get_dynamic_viscosity(temperature=temperature)
-    _mean_free_path = molecule_mean_free_path(
+    _mean_free_path = get_molecule_mean_free_path(
         temperature=temperature,
         pressure=pressure,
         dynamic_viscosity=_dynamic_viscosity,

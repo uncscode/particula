@@ -23,19 +23,11 @@ from particula.util.constants import (
 from particula.gas.properties.dynamic_viscosity import (
     get_dynamic_viscosity,
 )
-from particula.util.validate_inputs import validate_inputs
 
 logger = logging.getLogger("particula")  # get instance of logger
 
 
-@validate_inputs(
-    {
-        "molar_mass": "positive",
-        "temperature": "positive",
-        "pressure": "positive",
-    }
-)
-def molecule_mean_free_path(
+def get_molecule_mean_free_path(
     molar_mass: Union[
         float, NDArray[np.float64]
     ] = MOLECULAR_WEIGHT_AIR,  # type: ignore
@@ -81,6 +73,16 @@ def molecule_mean_free_path(
         - "Mean Free Path," Wikipedia, The Free Encyclopedia.
           https://en.wikipedia.org/wiki/Mean_free_path
     """
+    # check inputs are positive
+    if temperature <= 0:
+        logger.error("Temperature must be positive [Kelvin]")
+        raise ValueError("Temperature must be positive [Kelvin]")
+    if pressure <= 0:
+        logger.error("Pressure must be positive [Pascal]")
+        raise ValueError("Pressure must be positive [Pascal]")
+    if np.any(molar_mass <= 0):
+        logger.error("Molar mass must be positive [kg/mol]")
+        raise ValueError("Molar mass must be positive [kg/mol]")
     if dynamic_viscosity is None:
         dynamic_viscosity = get_dynamic_viscosity(temperature)
     gas_constant = float(GAS_CONSTANT)

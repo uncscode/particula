@@ -362,7 +362,7 @@ class CoagulationStrategyABC(ABC):
         dynamic_viscosity = gas_properties.get_dynamic_viscosity(
             temperature=temperature  # assume standard atmospheric composition
         )
-        mean_free_path = gas_properties.molecule_mean_free_path(
+        mean_free_path = gas_properties.get_molecule_mean_free_path(
             temperature=temperature,
             pressure=pressure,
             dynamic_viscosity=dynamic_viscosity,
