@@ -1,5 +1,7 @@
 """Lognormal size distribution properties."""
 
+# pylint: disable=line-too-long
+
 # from typing import Union
 from scipy.stats import lognorm
 import numpy as np
