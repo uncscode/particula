@@ -9,28 +9,32 @@ def cunningham_slip_correction(
     knudsen_number: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the Cunningham slip correction factor. Accounts for
-    non-continuum effects on small particles.
+    Calculate the Cunningham slip correction factor for small particles in a fluid.
 
-    Args:
-    -----
-    - knudsen_number: Knudsen number [unitless].
+    The slip correction factor (C_c) accounts for non-continuum effects on small
+    particles, correcting for the no-slip assumption used in Stokes' law. It is
+    calculated using:
+
+    - C_c = 1 + Kn × (1.257 + 0.4 × exp(-1.1 / Kn))
+        - Kn is the dimensionless Knudsen number.
+
+    Arguments:
+        - knudsen_number : Knudsen number (dimensionless).
 
     Returns:
-    --------
-    - Slip correction factor [unitless].
+        - Slip correction factor (dimensionless).
 
-    Reference:
-    ----------
-    - Dimensionless quantity accounting for non-continuum effects
-    on small particles. It is a deviation from Stokes' Law.
-    Stokes assumes a no-slip condition that is not correct at
-    high Knudsen numbers. The slip correction factor is used to
-    calculate the friction factor.
-    Thus, the slip correction factor is about unity (1) for larger
-    particles (Kn -> 0). Its behavior on the other end of the
-    spectrum (smaller particles; Kn -> inf) is more nuanced, though
-    it tends to scale linearly on a log-log scale, log Cc vs log Kn.
-    - https://en.wikipedia.org/wiki/Cunningham_correction_factor
+    Examples:
+        ``` py title="Example"
+        import numpy as np
+        from particula.particles.properties.slip_correction_module import cunningham_slip_correction
+        cc_factor = cunningham_slip_correction(0.1)
+        print(cc_factor)
+        # Output: ...
+        ```
+
+    References:
+        - "Cunningham correction factor," Wikipedia,
+          https://en.wikipedia.org/wiki/Cunningham_correction_factor
     """
     return 1 + knudsen_number * (1.257 + 0.4 * np.exp(-1.1 / knudsen_number))
