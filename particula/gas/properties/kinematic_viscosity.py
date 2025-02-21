@@ -28,6 +28,9 @@ from particula.util.constants import (
 )
 
 
+@validate_inputs(
+    {"dynamic_viscosity": "positive", "fluid_density": "positive"}
+)
 def get_kinematic_viscosity(
     dynamic_viscosity: float,
     fluid_density: float,
@@ -35,9 +38,8 @@ def get_kinematic_viscosity(
     """
     Calculate the kinematic viscosity of a fluid.
 
-    Long Description:
-        The function calculates ν by dividing the dynamic viscosity (μ)
-        by the fluid density (ρ).
+    The function calculates ν by dividing the dynamic viscosity (μ)
+    by the fluid density (ρ).
 
     Equation:
         ν = μ / ρ
@@ -62,7 +64,7 @@ def get_kinematic_viscosity(
     return dynamic_viscosity / fluid_density
 
 
-@validate_inputs({"temperature": "positive"})
+@validate_inputs({"temperature": "positive", "fluid_density": "positive"})
 def get_kinematic_viscosity_via_system_state(
     temperature: float,
     fluid_density: float,
@@ -70,19 +72,19 @@ def get_kinematic_viscosity_via_system_state(
     reference_temperature: float = REF_TEMPERATURE_STP,
 ) -> float:
     """
-    Calculate the kinematic viscosity of air by first computing its dynamic viscosity.
+    Calculate the kinematic viscosity of air by first computing its dynamic
+    viscosity.
 
-    Long Description:
-        This function uses get_dynamic_viscosity(...) and divides by the given
-        fluid_density to get the kinematic viscosity.
+    This function uses get_dynamic_viscosity(...) and divides by the given
+    fluid_density to get the kinematic viscosity.
 
     Equation:
         - ν = μ / ρ
 
     Where:
-        - ν : Kinematic viscosity [m²/s].
-        - μ : Dynamic viscosity [Pa·s].
-        - ρ : Fluid density [kg/m³].
+        - ν is Kinematic viscosity [m²/s].
+        - μ is Dynamic viscosity [Pa·s].
+        - ρ is Fluid density [kg/m³].
 
     Arguments:
         - temperature : Desired air temperature [K]. Must be > 0.
@@ -92,9 +94,6 @@ def get_kinematic_viscosity_via_system_state(
 
     Returns:
         - The kinematic viscosity of air [m²/s].
-
-    Raises:
-        - ValueError : If temperature ≤ 0.
 
     Examples:
         ```py title="Example usage"

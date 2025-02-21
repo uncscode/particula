@@ -62,20 +62,23 @@ def get_kolmogorov_length(
     The Kolmogorov length scale represents the smallest eddies in a turbulent
     flow where viscosity dominates. It is defined as:
 
+    Equation:
         η = (ν³ / ε)^(1/4)
 
+    Where:
+        - η Kolmogorov length scale [m]
+        - ν Kinematic viscosity of the fluid [m^2/s]
+        - ε Rate of dissipation of turbulent kinetic energy [m^2/s^3]
+
     Arguments:
-    ----------
         - kinematic_viscosity : Kinematic viscosity of the fluid [m^2/s]
         - turbulent_dissipation : Rate of dissipation of turbulent kinetic
             energy [m^2/s^3]
 
     Returns:
-    --------
         - Kolmogorov length scale [m]
 
     References:
-    ----------
         - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
         the geometric collision rate of sedimenting droplets. Part 2. Theory
         and parameterization. New Journal of Physics, 10.
