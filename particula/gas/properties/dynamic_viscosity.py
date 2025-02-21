@@ -33,7 +33,7 @@ def get_dynamic_viscosity(
     """
     Calculate the dynamic viscosity of air using Sutherland's formula.
 
-    Equation (if applicable):
+    Equation:
 
         μ(T) = μ₀ × (T / T₀)^(3/2) × (T₀ + S) / (T + S)
 
