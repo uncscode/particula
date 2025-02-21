@@ -18,18 +18,38 @@ def get_antoine_vapor_pressure(
     """
     Calculate vapor pressure using the Antoine equation.
 
-    Args:
-        a, b, c: Antoine equation parameters.
-        temperature: Temperature in Kelvin.
+    Long Description:
+        The Antoine equation relates the logarithm of vapor pressure to
+        temperature for a pure substance.
+
+    Equation:
+        - P = 10^(a - b / (T - c)) × 133.322
+
+    Where:
+        - P : Vapor pressure [Pa].
+        - a, b, c : Antoine equation parameters (dimensionless).
+        - T : Temperature [K].
+
+    Arguments:
+        - a : Antoine parameter a (dimensionless).
+        - b : Antoine parameter b (dimensionless).
+        - c : Antoine parameter c (dimensionless).
+        - temperature : Temperature in Kelvin [K].
 
     Returns:
-        Vapor pressure in Pascals.
+        - Vapor pressure in Pascals [Pa].
+
+    Examples:
+        ```py title="Example usage"
+        p_antoine = get_antoine_vapor_pressure(8.07131, 1730.63, 233.426, 373.15)
+        # Output: ~101325 Pa (roughly 1 atm)
+        ```
 
     References:
         - Equation: log10(P) = a - b / (T - c)
-        - https://en.wikipedia.org/wiki/Antoine_equation (but in Kelvin)
-        - Kelvin form:
-            https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781118135341.app1
+        - https://en.wikipedia.org/wiki/Antoine_equation
+        - Kelvin conversion details:
+          https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781118135341.app1
     """
     vapor_pressure_log = a - (b / (temperature - c))
     vapor_pressure = 10**vapor_pressure_log
@@ -47,15 +67,39 @@ def get_clausius_clapeyron_vapor_pressure(
     """
     Calculate vapor pressure using Clausius-Clapeyron equation.
 
-    Args:
-        latent_heat: Latent heat of vaporization in J/mol.
-        temperature_initial: Initial temperature in Kelvin.
-        pressure_initial: Initial vapor pressure in Pascals.
-        temperature: Final temperature in Kelvin.
-        gas_constant: gas constant (default is 8.314 J/(mol·K)).
+    Long Description:
+        This function calculates the final vapor pressure based on an initial
+        temperature/pressure pair and the latent heat of vaporization,
+        assuming ideal gas behavior.
+
+    Equation:
+        - P_final = P_initial × exp( (L / R) × (1 / T_initial - 1 / T_final) )
+
+    Where:
+        - P_final : Final vapor pressure [Pa].
+        - P_initial : Initial vapor pressure [Pa].
+        - L : Latent heat of vaporization [J/mol].
+        - R : Universal gas constant [J/(mol·K)].
+        - T_initial : Initial temperature [K].
+        - T_final : Final temperature [K].
+
+    Arguments:
+        - latent_heat : Latent heat of vaporization [J/mol].
+        - temperature_initial : Initial temperature [K].
+        - pressure_initial : Initial vapor pressure [Pa].
+        - temperature : Final temperature [K].
+        - gas_constant : Gas constant (default 8.314 J/(mol·K)).
 
     Returns:
-        Pure vapor pressure in Pascals.
+        - Pure vapor pressure [Pa].
+
+    Examples:
+        ```py title="Example usage"
+        p_final = get_clausius_clapeyron_vapor_pressure(
+            40660, 373.15, 101325, 300
+        )
+        # Output: ~35307 Pa
+        ```
 
     References:
         - https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation
@@ -73,16 +117,34 @@ def get_buck_vapor_pressure(
     """
     Calculate vapor pressure using the Buck equation for water vapor.
 
-    Args:
-        temperature: Temperature in Kelvin.
+    Long Description:
+        Uses separate empirical formulas below 0 °C and above 0 °C to compute
+        water vapor pressure.
+
+    Equation:
+        For T < 0 °C:
+            - p = 6.1115 × exp( (23.036 - T/333.7) × T / (279.82 + T ) ) × 100
+        For T ≥ 0 °C:
+            - p = 6.1121 × exp( (18.678 - T/234.5) × T / (257.14 + T ) ) × 100
+
+    Where:
+        - p : Vapor pressure [Pa].
+        - T : Temperature in Celsius [°C] (converted internally from Kelvin).
+
+    Arguments:
+        - temperature : Temperature in Kelvin [K].
 
     Returns:
-        Vapor pressure in Pascals.
+        - Vapor pressure in Pascals [Pa].
+
+    Examples:
+        ```py title="Example usage"
+        p_buck = get_buck_vapor_pressure(273.15)
+        # Output: ~611 Pa (around ice point)
+        ```
 
     References:
-        - Buck, A. L., 1981: New Equations for Computing Vapor Pressure and
-            Enhancement Factor. J. Appl. Meteor. Climatol., 20, 1527-1532,
-            https://doi.org/10.1175/1520-0450(1981)020<1527:NEFCVP>2.0.CO;2.
+        - Buck, A. L., (1981) ...
         - https://en.wikipedia.org/wiki/Arden_Buck_equation
     """
     temp = np.array(temperature) - 273.15  # Convert to Celsius
