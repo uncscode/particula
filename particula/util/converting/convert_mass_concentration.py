@@ -48,7 +48,7 @@ def to_mole_fraction(
     References:
         - Wikipedia contributors, "Mole fraction," Wikipedia,
           https://en.wikipedia.org/wiki/Mole_fraction.
-    """ 
+    """
 
     # Convert mass concentrations to moles for each component
     moles = mass_concentrations / molar_masses
