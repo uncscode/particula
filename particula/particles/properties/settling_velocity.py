@@ -303,7 +303,7 @@ def get_particle_settling_velocity_with_drag(
         ```py title="Example"
         import numpy as np
         from particula.particles.properties.settling_velocity import get_particle_settling_velocity_with_drag
-        
+
         r_array = np.array([1e-6, 5e-5, 2e-4])
         rho_array = np.array([1500, 2000, 1850])
         v_drag = get_particle_settling_velocity_with_drag(
