@@ -4,7 +4,7 @@ The mean free path is the average distance
 traveled by a molecule between collisions
 with other molecules present in a medium (air).
 
-The expeected mean free path of air is approx.
+The expected mean free path of air is approx.
 65 nm at 298 K and 101325 Pa.
 
 """
@@ -33,28 +33,24 @@ def molecule_mean_free_path(
     dynamic_viscosity: Optional[float] = None,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the mean free path of a gas molecule in air based on the
-    temperature, pressure, and molar mass of the gas. The mean free path
-    is the average distance traveled by a molecule between collisions with
-    other molecules present in a medium (air).
+    Calculate the mean free path of a gas molecule in air.
 
-    Args:
-    -----
-    - molar_mass (Union[float, NDArray[np.float64]]): The molar mass
-    of the gas molecule [kg/mol]. Default is the molecular weight of air.
-    - temperature (float): The temperature of the gas [K]. Default is 298.15 K.
-    - pressure (float): The pressure of the gas [Pa]. Default is 101325 Pa.
-    - dynamic_viscosity (Optional[float]): The dynamic viscosity of the gas
-    [Pa*s]. If not provided, it will be calculated based on the temperature.
+    Equation:
+        λ = (2 × μ / P) / √(8 × M / (π × R × T))
+
+    Arguments:
+        molar_mass : The molar mass of the gas molecule [kg/mol].
+        temperature : The temperature of the gas [K].
+        pressure : The pressure of the gas [Pa].
+        dynamic_viscosity : The dynamic viscosity of the gas [Pa·s].
+            If None, it will be calculated based on the temperature.
 
     Returns:
-    --------
-    - Union[float, NDArray[np.float64]]: The mean free path of the gas molecule
-    in meters (m).
+        Mean free path of the gas molecule in meters (m).
 
     References:
-    ----------
-    - https://en.wikipedia.org/wiki/Mean_free_path
+        - "Mean Free Path," Wikipedia, The Free Encyclopedia.
+          https://en.wikipedia.org/wiki/Mean_free_path
     """
     # check inputs are positive
     if temperature <= 0:

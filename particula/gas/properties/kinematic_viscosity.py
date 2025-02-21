@@ -29,27 +29,22 @@ def get_kinematic_viscosity(
     dynamic_viscosity: float,
     fluid_density: float,
 ) -> float:
-    """Calculate the kinematic viscosity of a fluid.
+    """
+    Calculate the kinematic viscosity of a fluid.
 
-    The kinematic viscosity is the ratio of the dynamic viscosity to the
-    density of a fluid. It is a measure of the fluid's resistance to flow
-    under the influence of gravity.
+    Equation:
+        ν = μ / ρ
 
-    Args:
-        dynamic_viscosity : Dynamic viscosity of the fluid [Pa*s].
+    Arguments:
+        dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].
         fluid_density : Density of the fluid [kg/m³].
 
     Returns:
-        Kinematic viscosity of the fluid [m^2/s].
-
-    Equation:
-    - v = mu / rho
-        - v : Kinematic viscosity [m^2/s].
-        - mu : Dynamic viscosity [Pa*s].
-        - rho : Density of the fluid [kg/m^3].
+        Kinematic viscosity of the fluid [m²/s].
 
     References:
-    https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
+        - "Viscosity Conversion Formula," Wolfram Formula Repository.
+          https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
     """
     return dynamic_viscosity / fluid_density
 
@@ -61,10 +56,14 @@ def get_kinematic_viscosity_via_system_state(
     reference_viscosity: float = REF_VISCOSITY_AIR_STP,
     reference_temperature: float = REF_TEMPERATURE_STP,
 ) -> float:
-    """Calculate the kinematic viscosity of air by calculating dynamic
+    """
+    Calculate the kinematic viscosity of air by calculating dynamic
     viscosity of air.
 
-    Parameters:
+    Equation:
+        ν = μ / ρ
+
+    Arguments:
         temperature : Desired air temperature [K]. Must be greater than 0.
         fluid_density : Density of the fluid [kg/m³].
         reference_viscosity : Gas viscosity [Pa*s] at the reference temperature
@@ -79,7 +78,7 @@ def get_kinematic_viscosity_via_system_state(
         - ValueError : If the temperature is less than or equal to 0.
 
     References:
-    https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
+        https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula
     """
     dynamic_viscosity = get_dynamic_viscosity(
         temperature=temperature,
