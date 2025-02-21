@@ -310,9 +310,9 @@ class CoagulationStrategyABC(ABC):
         coulomb_potential_ratio = self.coulomb_potential_ratio(
             particle=particle, temperature=temperature
         )
-        return properties.diffusive_knudsen_number(
-            radius=particle.get_radius(),
-            mass_particle=particle.get_mass(),
+        return properties.get_diffusive_knudsen_number(
+            particle_radius=particle.get_radius(),
+            particle_mass=particle.get_mass(),
             friction_factor=friction_factor,
             coulomb_potential_ratio=coulomb_potential_ratio,
             temperature=temperature,
