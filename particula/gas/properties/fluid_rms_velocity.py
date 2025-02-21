@@ -62,7 +62,7 @@ def get_fluid_rms_velocity(
         ```
 
     References:
-        - H. Tennekes and J. L. Lumley, "A First Course in Turbulence,"  
+        - H. Tennekes and J. L. Lumley, "A First Course in Turbulence,"
           MIT Press, 1972.
     """
     kolmogorov_velocity = get_kolmogorov_velocity(
