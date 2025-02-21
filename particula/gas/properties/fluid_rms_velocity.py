@@ -45,6 +45,25 @@ def get_fluid_rms_velocity(
 
     Returns:
         - Fluid RMS fluctuation velocity [m/s]
+
+    Examples:
+        ``` py title="Example Usage"
+        velocity = get_fluid_rms_velocity(500, 1.5e-5, 0.1)
+        # Output (example): 0.35
+        ```
+
+        ``` py title="Example Usage with Array Input"
+        velocity = get_fluid_rms_velocity(
+            np.array([500, 600]),
+            np.array([1.5e-5, 1.7e-5]),
+            np.array([0.1, 0.12])
+        )
+        # Output (example): array([0.35, 0.41])
+        ```
+
+    References:
+        - H. Tennekes and J. L. Lumley, "A First Course in Turbulence,"  
+          MIT Press, 1972.
     """
     kolmogorov_velocity = get_kolmogorov_velocity(
         kinematic_viscosity, turbulent_dissipation
