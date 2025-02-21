@@ -7607,7 +7607,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/lognormal_size_distribution.py">particula.particles.properties.lognormal_size_distribution</a> module.</p>
 </blockquote>
 <h2 id="get_lognormal_pdf_distribution">get_lognormal_pdf_distribution<a class="headerlink" href="#get_lognormal_pdf_distribution" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/lognormal_size_distribution.py#L12">Show source in lognormal_size_distribution.py:12</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/lognormal_size_distribution.py#L14">Show source in lognormal_size_distribution.py:14</a></p>
 <p>Compute a lognormal probability density function (PDF) for given modes.</p>
 <p>This function superimposes multiple lognormal PDFs, each with its own mode,
 geometric standard deviation, and particle count. It then returns their sum
@@ -7662,7 +7662,7 @@ across the provided x_values. Mathematically, for each mode i:</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_lognormal_pmf_distribution">get_lognormal_pmf_distribution<a class="headerlink" href="#get_lognormal_pmf_distribution" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/lognormal_size_distribution.py#L90">Show source in lognormal_size_distribution.py:90</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/lognormal_size_distribution.py#L92">Show source in lognormal_size_distribution.py:92</a></p>
 <p>Compute a lognormal probability mass function (PMF) for given modes.</p>
 <p>This function first calculates the lognormal PDF using
 get_lognormal_pdf_distribution(), then converts it to a PMF by
@@ -7714,7 +7714,7 @@ integrating (or summing) over x_values. The result reflects discrete mass
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_lognormal_sample_distribution">get_lognormal_sample_distribution<a class="headerlink" href="#get_lognormal_sample_distribution" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/lognormal_size_distribution.py#L164">Show source in lognormal_size_distribution.py:164</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/lognormal_size_distribution.py#L166">Show source in lognormal_size_distribution.py:166</a></p>
 <p>Generate random samples from a lognormal distribution for given modes.</p>
 <p>This function uses scipy.stats.lognorm.rvs() to draw samples for each mode,
 with a specified scale (mode) and shape (GSD). The total samples are then
