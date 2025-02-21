@@ -7,11 +7,18 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
+from particula.util.validate_inputs import validate_inputs
 from particula.util.constants import BOLTZMANN_CONSTANT
 
 
+@validate_inputs(
+    {
+        "particle_mass": "nonnegative",
+        "temperature": "positive",
+    }
+)
 def get_mean_thermal_speed(
-    mass: Union[float, NDArray[np.float64]],
+    particle_mass: Union[float, NDArray[np.float64]],
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
@@ -26,22 +33,25 @@ def get_mean_thermal_speed(
         - m is the particle mass in kilograms (kg).
 
     Arguments:
-        - mass : The mass of the particle(s) in kg.
+        - particle_mass : The mass of the particle(s) in kg.
         - temperature : The temperature of the system in Kelvin (K).
 
     Returns:
-        - The mean thermal speed in m/s, as either a float or an NDArray[np.float64].
+        - The mean thermal speed in m/s, as either a float or an
+            NDArray[np.float64].
 
     Examples:
         ``` py title="Example"
-        from particula.particles.properties.mean_thermal_speed_module import get_mean_thermal_speed
-        result = get_mean_thermal_speed(1e-17, 298)
-        print(result)
+        import particula as par
+        par.particles.get_mean_thermal_speed(1e-17, 298)
         # Output: ...
         ```
 
     References:
-        - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and Physics,
-          Section 9.5.3 Mean Free Path of an Aerosol Particle, Equation 9.87.
+        - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and
+          Physics, Section 9.5.3 Mean Free Path of an Aerosol Particle,
+          Equation 9.87.
     """
-    return np.sqrt((8 * BOLTZMANN_CONSTANT * temperature) / (np.pi * mass))
+    return np.sqrt(
+        (8 * BOLTZMANN_CONSTANT * temperature) / (np.pi * particle_mass)
+    )

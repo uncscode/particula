@@ -2,7 +2,7 @@
 
 import pytest
 import numpy as np
-from particula.particles.properties import mean_thermal_speed
+from particula.particles.properties import get_mean_thermal_speed
 from particula.util.constants import BOLTZMANN_CONSTANT
 
 
@@ -15,7 +15,9 @@ def test_mean_thermal_speed_single_value():
     expected_speed = np.sqrt(
         (8 * BOLTZMANN_CONSTANT * temperature) / (np.pi * mass)
     )
-    assert np.isclose(mean_thermal_speed(mass, temperature), expected_speed)
+    assert np.isclose(
+        get_mean_thermal_speed(mass, temperature), expected_speed
+    )
 
 
 def test_mean_thermal_speed_array_input():
@@ -28,7 +30,7 @@ def test_mean_thermal_speed_array_input():
         (8 * BOLTZMANN_CONSTANT * temperature) / (np.pi * mass)
     )
     assert np.allclose(
-        mean_thermal_speed(mass, temperature), expected_speed, rtol=1e-6
+        get_mean_thermal_speed(mass, temperature), expected_speed, rtol=1e-6
     )
 
 
@@ -38,4 +40,4 @@ def test_mean_thermal_speed_input_validation():
     a TypeError.
     """
     with pytest.raises(TypeError):
-        mean_thermal_speed("not a number", "also not a number")
+        get_mean_thermal_speed("not a number", "also not a number")
