@@ -7681,11 +7681,12 @@ water vapor pressure.</p>
 <li>For T &lt; 0 °C, as
     p = 6.1115 × exp( (23.036 - T/333.7) × T / (279.82 + T ) ) × 100</li>
 <li>For T ≥ 0 °C, as
-    p = 6.1121 × exp( (18.678 - T/234.5) × T / (257.14 + T ) ) × 100</li>
+    p = 6.1121 × exp( (18.678 - T/234.5) × T / (257.14 + T ) ) × 100<ul>
+<li>p is Vapor pressure [Pa].</li>
+<li>T is Temperature in Celsius [°C] (converted internally from Kelvin).</li>
 </ul>
-<p>Where:
-    - p is Vapor pressure [Pa].
-    - T is Temperature in Celsius [°C] (converted internally from Kelvin).</p>
+</li>
+</ul>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>temperature : Temperature in Kelvin [K].</li>
