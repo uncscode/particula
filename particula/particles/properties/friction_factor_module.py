@@ -12,8 +12,8 @@ from numpy.typing import NDArray
 import numpy as np
 
 
-def friction_factor(
-    radius: Union[float, NDArray[np.float64]],
+def get_friction_factor(
+    particle_radius: Union[float, NDArray[np.float64]],
     dynamic_viscosity: float,
     slip_correction: Union[float, NDArray[np.float64]],
 ):
@@ -54,4 +54,4 @@ def friction_factor(
     Technology, 46(10), 1065-1078. https://doi.org/10.1080/02786826.2012.690543
     """
 
-    return 6 * np.pi * dynamic_viscosity * radius / slip_correction
+    return 6 * np.pi * dynamic_viscosity * particle_radius / slip_correction
