@@ -5,10 +5,17 @@ Special non-standard functions for aerosol properties
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
+
 from particula.util.machine_limit import safe_exp
+from particula.util.validate_inputs import validate_inputs
 
 
-def debye_function(
+@validate_inputs(
+    {
+        "variable": "finite",
+    }
+)
+def get_debye_function(
     variable: Union[float, NDArray[np.float64]],
     integration_points: int = 1000,
     n: int = 1,
@@ -34,26 +41,26 @@ def debye_function(
 
     Examples:
         ``` py title="Debye function with n=1 for a single float value"
-        out = debye_function(1.0)
-        print(out)
+        import particula as par
+        par.particles.get_debye_function(1.0)
         # Output: 0.7765038970390566
         ```
 
         ``` py title="Debye function with n=2 for a single float value"
-        out = debye_function(1.0, n=2)
-        print(out)
+        import particula as par
+        par.particles.get_debye_function(1.0, n=2)
         # Output: 0.6007582206816492
         ```
 
         ``` py title="Debye function with n=1 for a numpy array"
-        out = debye_function(np.array([1.0, 2.0, 3.0]))
-        print(out)
+        import particula as par
+        par.particles.get_debye_function(np.array([1.0, 2.0, 3.0]))
         # Output: [0.84140566 0.42278434 0.28784241]
         ```
 
     References:
-        - Debye function, https://en.wikipedia.org/wiki/Debye_function
-        - Wolfram MathWorld: Debye Functions, https://mathworld.wolfram.com/DebyeFunctions.html
+        - [Debye function](https://en.wikipedia.org/wiki/Debye_function)
+        - [Wolfram MathWorld: Debye Functions](https://mathworld.wolfram.com/DebyeFunctions.html)
     """
     array = np.linspace(0, variable, integration_points)
     exp_array = safe_exp(array[1:])
