@@ -22,8 +22,8 @@ def get_stokes_number(
     """
     Compute the Stokes number (St) to measure particle inertia relative to fluid flow.
 
-    The Stokes number is a dimensionless parameter reflecting how much a particle 
-    resists following changes in the fluid’s motion. If St >> 1, particle inertia 
+    The Stokes number is a dimensionless parameter reflecting how much a particle
+    resists following changes in the fluid’s motion. If St >> 1, particle inertia
     dominates; if St << 1, the particle closely follows fluid flow.
 
     Mathematically:
@@ -48,9 +48,9 @@ def get_stokes_number(
         ```
 
     References:
-        - "Stokes number," Wikipedia, 
+        - "Stokes number," Wikipedia,
           https://en.wikipedia.org/wiki/Stokes_number
-        - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and 
+        - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and
           Physics, 3rd ed., Wiley-Interscience.
     """
     return particle_inertia_time / kolmogorov_time

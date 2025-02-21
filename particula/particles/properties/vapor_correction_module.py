@@ -15,7 +15,7 @@ def vapor_transition_correction(
     """
     Calculate the Fuchs–Sutugin vapor transition correction factor.
 
-    This correction factor (f) accounts for the transition regime between free 
+    This correction factor (f) accounts for the transition regime between free
     molecular flow and continuum diffusion when computing mass or heat transport.
 
     Mathematically:
@@ -39,9 +39,9 @@ def vapor_transition_correction(
         ```
 
     References:
-        - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry 
+        - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry
           and Physics, Ch. 12. Equation 12.43.
-        - Fuchs, N. A., & Sutugin, A. G. (1971). *High-Dispersed Aerosols*. 
+        - Fuchs, N. A., & Sutugin, A. G. (1971). *High-Dispersed Aerosols*.
           In *Topics in Current Aerosol Research*, Elsevier, pp. 1–60.
     """
     return (0.75 * mass_accommodation * (1 + knudsen_number)) / (
