@@ -62,9 +62,9 @@ from particula.particles.properties.diffusion_coefficient import (
     get_diffusion_coefficient_via_system_state,
 )
 from particula.particles.properties.lognormal_size_distribution import (
-    lognormal_pdf_distribution,
-    lognormal_pmf_distribution,
-    lognormal_sample_distribution,
+    get_lognormal_pdf_distribution,
+    get_lognormal_pmf_distribution,
+    get_lognormal_sample_distribution,
 )
 from particula.particles.properties.activity_module import (
     get_ideal_activity_mass,

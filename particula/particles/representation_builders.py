@@ -43,9 +43,9 @@ from particula.particles.surface_strategies import (
 )
 from particula.particles.representation import ParticleRepresentation
 from particula.particles.properties.lognormal_size_distribution import (
-    lognormal_pdf_distribution,
-    lognormal_pmf_distribution,
-    lognormal_sample_distribution,
+    get_lognormal_pdf_distribution,
+    get_lognormal_pmf_distribution,
+    get_lognormal_sample_distribution,
 )
 
 logger = logging.getLogger("particula")
@@ -362,14 +362,14 @@ class PresetParticleRadiusBuilder(
             - The validated ParticleRepresentation object.
         """
         if self.distribution_type == "pdf":
-            number_concentration = lognormal_pdf_distribution(
+            number_concentration = get_lognormal_pdf_distribution(
                 x_values=self.radius_bins,
                 mode=self.mode,
                 geometric_standard_deviation=self.geometric_standard_deviation,
                 number_of_particles=self.number_concentration,
             )
         elif self.distribution_type == "pmf":
-            number_concentration = lognormal_pmf_distribution(
+            number_concentration = get_lognormal_pmf_distribution(
                 x_values=self.radius_bins,
                 mode=self.mode,
                 geometric_standard_deviation=self.geometric_standard_deviation,
@@ -547,7 +547,7 @@ class PresetResolvedParticleMassBuilder(
             - The validated ParticleRepresentation object.
         """
 
-        resolved_radii = lognormal_sample_distribution(
+        resolved_radii = get_lognormal_sample_distribution(
             mode=self.mode,
             geometric_standard_deviation=self.geometric_standard_deviation,
             number_of_particles=self.number_concentration,
