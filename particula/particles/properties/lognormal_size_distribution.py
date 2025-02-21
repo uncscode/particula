@@ -6,8 +6,17 @@ import numpy as np
 from numpy.typing import NDArray
 
 from particula.util.convert import distribution_convert_pdf_pms
+from particula.util.validate_inputs import validate_inputs
 
 
+@validate_inputs(
+    {
+        "x_values": "nonnegative",
+        "mode": "positive",
+        "geometric_standard_deviation": "positive",
+        "number_of_particles": "positive",
+    }
+)
 def get_lognormal_pdf_distribution(
     x_values: NDArray[np.float64],
     mode: NDArray[np.float64],
@@ -19,9 +28,7 @@ def get_lognormal_pdf_distribution(
 
     This function superimposes multiple lognormal PDFs, each with its own mode,
     geometric standard deviation, and particle count. It then returns their sum
-    across the provided x_values.
-
-    Mathematically, for each mode i:
+    across the provided x_values. Mathematically, for each mode i:
 
     - PDFᵢ(x) = (1 / [x · ln(gsdᵢ) · √(2π)]) ×
                  exp(- [ln(x) - ln(modeᵢ)]² / [2 · (ln(gsdᵢ))² ])
@@ -38,22 +45,21 @@ def get_lognormal_pdf_distribution(
     Examples:
         ```py title="Example"
         import numpy as np
-        from particula.particles.properties.lognormal_size_distribution import get_lognormal_pdf_distribution
-
+        import particula as par
         x_vals = np.linspace(1e-9, 1e-6, 100)
-        pdf = get_lognormal_pdf_distribution(
+        par.particles.get_lognormal_pdf_distribution(
             x_values=x_vals,
             mode=np.array([5e-8, 1e-7]),
             geometric_standard_deviation=np.array([1.5, 2.0]),
             number_of_particles=np.array([1e9, 5e9])
         )
-        print(pdf[:10])
         # Output: [...]
         ```
 
     References:
         - [Log-normal Distribution Wikipedia](https://en.wikipedia.org/wiki/Log-normal_distribution)
         - [Probability Density Function Wikipedia](https://en.wikipedia.org/wiki/Probability_density_function)
+        - [Scipy Lognorm Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html)
     """
     if not (
         x_values.ndim == 1
@@ -81,6 +87,14 @@ def get_lognormal_pdf_distribution(
     return np.nansum(scaled_distribution, axis=1)
 
 
+@validate_inputs(
+    {
+        "x_values": "nonnegative",
+        "mode": "positive",
+        "geometric_standard_deviation": "positive",
+        "number_of_particles": "positive",
+    }
+)
 def get_lognormal_pmf_distribution(
     x_values: NDArray[np.float64],
     mode: NDArray[np.float64],
@@ -107,24 +121,22 @@ def get_lognormal_pmf_distribution(
     Examples:
         ```py title="Example"
         import numpy as np
-        from particula.particles.properties.lognormal_size_distribution import get_lognormal_pmf_distribution
-
+        import particula as par
         x_vals = np.linspace(1e-9, 1e-6, 100)
-        pmf = get_lognormal_pmf_distribution(
+        par.particles.get_lognormal_pmf_distribution(
             x_values=x_vals,
             mode=np.array([5e-8, 1e-7]),
             geometric_standard_deviation=np.array([1.5, 2.0]),
             number_of_particles=np.array([1e9, 5e9])
         )
-        print(pmf[:10])
         # Output: [...]
         ```
 
     References:
         - [Log-normal Distribution Wikipedia](https://en.wikipedia.org/wiki/Log-normal_distribution)
         - [Probability Mass Function Wikipedia](https://en.wikipedia.org/wiki/Probability_mass_function)
+        - [Scipy Lognorm Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html)
     """
-
     distribution_pdf = get_lognormal_pdf_distribution(
         x_values=x_values,
         mode=mode,
@@ -149,6 +161,14 @@ def get_lognormal_pmf_distribution(
     )
 
 
+@validate_inputs(
+    {
+        "mode": "positive",
+        "geometric_standard_deviation": "positive",
+        "number_of_particles": "positive",
+        "number_of_samples": "positive",
+    }
+)
 def get_lognormal_sample_distribution(
     mode: NDArray[np.float64],
     geometric_standard_deviation: NDArray[np.float64],
@@ -174,21 +194,20 @@ def get_lognormal_sample_distribution(
     Examples:
         ```py title="Example"
         import numpy as np
-        from particula.particles.properties.lognormal_size_distribution import get_lognormal_sample_distribution
-
-        samples = get_lognormal_sample_distribution(
+        import particula as par
+        par.particles.get_lognormal_sample_distribution(
             mode=np.array([5e-8, 1e-7]),
             geometric_standard_deviation=np.array([1.5, 2.0]),
             number_of_particles=np.array([1e9, 5e9]),
-            number_of_samples=10000
+            number_of_samples=10_000
         )
-        print(samples[:10])
         # Output: [...]
         ```
 
     References:
         - [Log-normal Distribution Wikipedia](https://en.wikipedia.org/wiki/Log-normal_distribution)
         - [Probability Density Function Wikipedia](https://en.wikipedia.org/wiki/Probability_density_function)
+        - [Scipy Lognorm Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html)
     """
 
     # Calculate PDF for each set of parameters
