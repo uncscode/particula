@@ -118,7 +118,7 @@ def get_brownian_kernel_via_system_state(
         pressure=pressure,
         dynamic_viscosity=dynamic_viscosity,
     )
-    knudsen_number = properties.calculate_knudsen_number(
+    knudsen_number = properties.get_knudsen_number(
         air_mean_free_path,
         particle_radius,
     )

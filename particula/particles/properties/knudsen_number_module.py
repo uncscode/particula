@@ -5,18 +5,27 @@ import logging
 from numpy.typing import NDArray
 import numpy as np
 
+from particula.util.validate_inputs import validate_inputs
+
 logger = logging.getLogger("particula")
 
 
-def calculate_knudsen_number(
+@validate_inputs(
+    {
+        "mean_free_path": "nonnegative",
+        "particle_radius": "nonnegative",
+    }
+)
+def get_knudsen_number(
     mean_free_path: Union[float, NDArray[np.float64]],
     particle_radius: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the Knudsen number (Kn) from the gas mean free path and particle radius.
+    Calculate the Knudsen number (Kn) from the gas mean free path and particle
+    radius.
 
-    The Knudsen number (Kn) indicates whether a flow is in the continuum regime or
-    the free molecular regime. It is computed by:
+    The Knudsen number (Kn) indicates whether a flow is in the continuum
+    regime or the free molecular regime. It is computed by:
 
     - Kn = λ / r
         - Kn is the Knudsen number (dimensionless),
@@ -28,13 +37,13 @@ def calculate_knudsen_number(
         - particle_radius : Radius of the particle in meters (m).
 
     Returns:
-        - The Knudsen number, which is the ratio of the mean free path to the particle radius.
+        - The Knudsen number, which is the ratio of the mean free path to the
+            particle radius.
 
     Examples:
         ``` py title="Example Usage"
-        from particula.particles.properties.knudsen_number_module import calculate_knudsen_number
-        kn_value = calculate_knudsen_number(6.5e-8, 1.0e-7)
-        print(kn_value)
+        import particula as par
+        par.particles.get_knudsen_number(6.5e-8, 1.0e-7)
         # Output: 0.65
         ```
 
