@@ -21,7 +21,7 @@ AERODYNAMIC_SHAPE_FACTOR_DICT = {
 
 
 # pylint: disable=too-many-positional-arguments, too-many-arguments
-def particle_aerodynamic_length(
+def get_aerodynamic_length(
     physical_length: Union[float, NDArray[np.float64]],
     physical_slip_correction_factor: Union[float, NDArray[np.float64]],
     aerodynamic_slip_correction_factor: Union[float, NDArray[np.float64]],
