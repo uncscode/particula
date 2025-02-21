@@ -65,8 +65,8 @@ class BuilderSurfaceTensionMixin:
         """Set the surface tension of the particle in N/m.
 
         Args:
-            surface_tension: Surface tension of the particle.
-            surface_tension_units: Surface tension units. Default is *N/m*.
+            surface_tension : Surface tension of the particle.
+            surface_tension_units : Surface tension units. Default is *N/m*.
         """
         if surface_tension_units == "N/m":
             self.surface_tension = surface_tension
@@ -133,8 +133,8 @@ class BuilderConcentrationMixin:
         """Set the concentration.
 
         Args:
-            concentration: Concentration in the mixture.
-            concentration_units: Units of the concentration.
+            concentration : Concentration in the mixture.
+            concentration_units : Units of the concentration.
             Default is *kg/m^3*.
         """
         if concentration_units is None:
@@ -166,8 +166,8 @@ class BuilderChargeMixin:
         """Set the number of elemental charges on the particle.
 
         Args:
-            charge: Charge of the particle [C].
-            charge_units: Not used. (for interface consistency)
+            charge : Charge of the particle [C].
+            charge_units : Not used. (for interface consistency)
         """
         if charge_units is not None:
             logger.warning("Ignoring units for charge parameter.")
@@ -194,8 +194,8 @@ class BuilderMassMixin:
         """Set the mass of the particle in kg.
 
         Args:
-            mass: Mass of the particle.
-            mass_units: Units of the mass. Default is *kg*.
+            mass : Mass of the particle.
+            mass_units : Units of the mass. Default is *kg*.
         """
         if mass_units == "kg":
             self.mass = mass
@@ -223,8 +223,8 @@ class BuilderVolumeMixin:
         """Set the volume in m^3.
 
         Args:
-            volume: Volume.
-            volume_units: Units of the volume. Default is *m^3*.
+            volume : Volume.
+            volume_units : Units of the volume. Default is *m^3*.
         """
         if volume_units == "m^3":
             self.volume = volume
@@ -252,8 +252,8 @@ class BuilderRadiusMixin:
         """Set the radius of the particle in meters.
 
         Args:
-            radius: Radius of the particle.
-            radius_units: Units of the radius. Default is *m*.
+            radius : Radius of the particle.
+            radius_units : Units of the radius. Default is *m*.
         """
         if radius_units == "m":
             self.radius = radius
@@ -279,8 +279,8 @@ class BuilderTemperatureMixin:
         """Set the temperature of the atmosphere.
 
         Args:
-            temperature (float): Temperature of the gas mixture.
-            temperature_units (str): Units of the temperature.
+            temperature : Temperature of the gas mixture.
+            temperature_units : Units of the temperature.
                 Options include 'degC', 'degF', 'degR', 'K'. Default is 'K'.
 
         Returns:
@@ -316,8 +316,8 @@ class BuilderPressureMixin:
         """Set the total pressure of the atmosphere.
 
         Args:
-            total_pressure: Total pressure of the gas mixture.
-            pressure_units: Units of the pressure. Options include
+            pressure : Total pressure of the gas mixture.
+            pressure_units : Units of the pressure. Options include
                 'Pa', 'kPa', 'MPa', 'psi', 'bar', 'atm'. Default is 'Pa'.
 
         Returns:
@@ -358,8 +358,8 @@ class BuilderLognormalMixin:
         """Set the mode for distribution.
 
         Args:
-            mode: The modes for the radius.
-            mode_units: The units for the modes, default is [m].
+            mode : The modes for the radius.
+            mode_units : The units for the modes, default is [m].
         """
         if mode_units == "m":
             self.mode = mode
@@ -395,8 +395,8 @@ class BuilderLognormalMixin:
         """Set the number concentration for the distribution.
 
         Args:
-            number_concentration: The number concentration for the radius.
-            number_concentration_units: The units for the number concentration,
+            number_concentration : The number concentration for the radius.
+            number_concentration_units : The units for the number concentration,
                 default is '1/m^3'.
         """
         if number_concentration_units == "1/m^3":
@@ -427,8 +427,8 @@ class BuilderParticleResolvedCountMixin:
         """Set the number of particles to resolve.
 
         Args:
-            particle_resolved_count: The number of particles to resolve.
-            particle_resolved_count_units: Ignored units for particle resolved.
+            particle_resolved_count : The number of particles to resolve.
+            particle_resolved_count_units : Ignored units for particle resolved.
 
         Raises:
             ValueError: If particle_resolved_count is negative.
