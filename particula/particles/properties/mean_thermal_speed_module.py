@@ -14,22 +14,34 @@ def get_mean_thermal_speed(
     mass: Union[float, NDArray[np.float64]],
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """Returns the particles mean thermal speed. Due to the the impact
-    of air molecules on the particles, the particles will have a mean
-    thermal speed.
+    """
+    Calculate the mean thermal speed of a particle in a fluid.
 
-    Args
-    ----
-    mass : The per particle mass of the particles [kg].
-    temperature : The temperature of the air [K].
+    The mean thermal speed (v) is derived from kinetic theory and is given by:
 
-    Returns
-    -------
-    The mean thermal speed of the particles [m/s].
+    - v = √( (8 × k_B × T) / (π × m) )
+        - v is the mean thermal speed in m/s,
+        - k_B is the Boltzmann constant in J/K,
+        - T is the temperature in Kelvin (K),
+        - m is the particle mass in kilograms (kg).
 
-    References
-    ----------
-    Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-    physics, Section 9.5.3 Mean Free Path of an Aerosol Particle Equation 9.87.
+    Arguments:
+        - mass : The mass of the particle(s) in kg.
+        - temperature : The temperature of the system in Kelvin (K).
+
+    Returns:
+        - The mean thermal speed in m/s, as either a float or an NDArray[np.float64].
+
+    Examples:
+        ``` py title="Example"
+        from particula.particles.properties.mean_thermal_speed_module import get_mean_thermal_speed
+        result = get_mean_thermal_speed(1e-17, 298)
+        print(result)
+        # Output: ...
+        ```
+
+    References:
+        - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and Physics,
+          Section 9.5.3 Mean Free Path of an Aerosol Particle, Equation 9.87.
     """
     return np.sqrt((8 * BOLTZMANN_CONSTANT * temperature) / (np.pi * mass))
