@@ -11,31 +11,34 @@ def get_ideal_activity_molar(
     molar_mass: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the ideal activity of a species based on mole fractions.
+    Compute the ideal activity based on mole fractions.
 
-    This function computes the activity based on the mole fractions of species
-    according to Raoult's Law.
+    This function calculates the activity of a species using its mole fraction,
+    which follows Raoult's Law. The ideal activity (aᵢ) is determined using:
 
-    Args:
-        mass_concentration (float or NDArray[np.float64]): Mass concentration
-            of the species in kilograms per cubic meter (kg/m^3).
-        molar_mass (float or NDArray[np.float64]): Molar mass of the species in
-            kilograms per mole (kg/mol). A single value applies to all species
-            if only one is provided.
+    - aᵢ = Xᵢ
+        - Xᵢ is the mole fraction of species i.
+
+    Arguments:
+        - mass_concentration : Mass concentration of the species in kg/m³.
+        - molar_mass : Molar mass of the species in kg/mol.
 
     Returns:
-        float or NDArray[np.float64]: Activity of the species, unitless.
+        - Ideal activity of the species as a dimensionless value.
 
-    Example:
+    Examples:
         ``` py title="Example"
-        ideal_activity_molar(
+        from particula.particles.properties.activity_module import get_ideal_activity_molar
+        get_ideal_activity_molar(
             mass_concentration=np.array([1.0, 2.0]),
-            molar_mass=np.array([18.015, 28.97]))
-        # array([0.0525, 0.0691])
+            molar_mass=np.array([18.015, 28.97])
+        )
+        # Output: array([...])
         ```
 
     References:
-        Raoult's Law: https://en.wikipedia.org/wiki/Raoult%27s_law
+        - Raoult's Law, "Raoult's law," Wikipedia,
+          https://en.wikipedia.org/wiki/Raoult%27s_law.
     """
     if isinstance(mass_concentration, float):
         return 1.0
@@ -50,31 +53,34 @@ def get_ideal_activity_volume(
     density: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the ideal activity of a species based on volume fractions.
+    Compute the ideal activity based on volume fractions.
 
-    This function computes the activity based on the volume fractions of
-    species consistent with Raoult's Law.
+    This function calculates the activity of a species using its volume fraction.
+    In an ideal mixture, the activity (aᵢ) can be expressed as:
 
-    Args:
-        mass_concentration (float or NDArray[np.float64]): Mass concentration
-            of the species in kilograms per cubic meter (kg/m^3).
-        density (float or NDArray[np.float64]): Density of the species in
-            kilograms per cubic meter (kg/m^3). A single value applies to all
-            species if only one is provided.
+    - aᵢ = φᵢ
+        - φᵢ is the volume fraction of species i.
+
+    Arguments:
+        - mass_concentration : Mass concentration of the species in kg/m³.
+        - density : Density of the species in kg/m³.
 
     Returns:
-        float or NDArray[np.float64]: Activity of the species, unitless.
+        - Ideal activity of the species as a dimensionless value.
 
-    Example:
+    Examples:
         ``` py title="Example"
-        ideal_activity_volume(
+        from particula.particles.properties.activity_module import get_ideal_activity_volume
+        get_ideal_activity_volume(
             mass_concentration=np.array([1.0, 2.0]),
-            density=np.array([1000.0, 1200.0]))
-        # array([0.001, 0.002])
+            density=np.array([1000.0, 1200.0])
+        )
+        # Output: array([...])
         ```
 
     References:
-        Raoult's Law: https://en.wikipedia.org/wiki/Raoult%27s_law
+        - Raoult's Law, "Raoult's law," Wikipedia,
+          https://en.wikipedia.org/wiki/Raoult%27s_law.
     """
     if isinstance(mass_concentration, float):
         return 1.0
@@ -88,26 +94,30 @@ def get_ideal_activity_mass(
     mass_concentration: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the ideal activity of a species based on mass fractions.
+    Compute the ideal activity based on mass fractions.
 
-    This function computes the activity based on the mass fractions of species
-    consistent with Raoult's Law.
+    This function calculates the activity of a species using its mass fraction.
+    In an ideal mixture, the activity (aᵢ) can be expressed as:
 
-    Args:
-        mass_concentration (float or NDArray[np.float64]): Mass concentration
-            of the species in kilograms per cubic meter (kg/m^3).
+    - aᵢ = wᵢ
+        - wᵢ is the mass fraction of species i.
+
+    Arguments:
+        - mass_concentration : Mass concentration of the species in kg/m³.
 
     Returns:
-        float or NDArray[np.float64]]: Activity of the species, unitless.
+        - Ideal activity of the species as a dimensionless value.
 
-    Example:
+    Examples:
         ``` py title="Example"
-        ideal_activity_mass(np.array([1.0, 2.0]))
-        array([0.3333, 0.6667])
+        from particula.particles.properties.activity_module import get_ideal_activity_mass
+        get_ideal_activity_mass(np.array([1.0, 2.0]))
+        # Output: array([...])
         ```
 
     References:
-        Raoult's Law: https://en.wikipedia.org/wiki/Raoult%27s_law
+        - Raoult's Law, "Raoult's law," Wikipedia,
+          https://en.wikipedia.org/wiki/Raoult%27s_law.
     """
     if isinstance(mass_concentration, float):
         return 1.0
@@ -125,42 +135,44 @@ def get_kappa_activity(
     water_index: int,
 ) -> NDArray[np.float64]:
     """
-    Calculate the activity of species based on the kappa hygroscopic parameter.
+    Compute species activity using the κ (kappa) hygroscopic growth parameter.
 
-    This function computes the activity using the kappa parameter and the
-    species' mass concentrations, considering the volume fractions and water
-    content.
+    This function calculates the activity of a mixture by combining volume-fraction
+    weighted κ-values. The water activity (aₘ) is determined by:
 
-    Args:
-        mass_concentration (float or NDArray[np.float64]]): Mass concentration
-            of the species in kilograms per cubic meter (kg/m^3).
-        kappa (NDArray[np.float64]): Kappa hygroscopic parameter, unitless.
-        density (NDArray[np.float64]): Density of the species in kilograms per
-            cubic meter (kg/m^3).
-        molar_mass (NDArray[np.float64]): Molar mass of the species in
-            kilograms per mole (kg/mol).
-        water_index (int): Index of water in the mass concentration array.
+    - aₘ = 1 / (1 + κₑ ( Vₛ / Vₐ ))
+        - κₑ is the volume-fraction weighted hygroscopic parameter.
+        - Vₛ is the total solute volume fraction (all species except water).
+        - Vₐ is the water volume fraction.
+
+    Arguments:
+        - mass_concentration : Array of mass concentrations in kg/m³.
+        - kappa : Array of κ (kappa) hygroscopic parameters, dimensionless.
+        - density : Array of densities in kg/m³ for each species.
+        - molar_mass : Array of molar masses in kg/mol for each species.
+        - water_index : Index of the water component in the arrays.
 
     Returns:
-        NDArray[np.float64]: Activity of the species, unitless.
+        - Array of species activities, dimensionless.
 
-    Example:
+    Examples:
         ``` py title="Example"
-        kappa_activity(
+        from particula.particles.properties.activity_module import get_kappa_activity
+        get_kappa_activity(
             mass_concentration=np.array([[1.0, 2.0], [3.0, 4.0]]),
             kappa=np.array([0.0, 0.2]),
             density=np.array([1000.0, 1200.0]),
             molar_mass=np.array([18.015, 28.97]),
             water_index=0
         )
-        # array([[0.95, 0.75], [0.85, 0.65]])
+        # Output: array([...])
         ```
 
     References:
-        Petters, M. D., & Kreidenweis, S. M. (2007). A single parameter
-        representation of hygroscopic growth and cloud condensation nucleus
-        activity. Atmospheric Chemistry and Physics, 7(8), 1961-1971.
-        DOI: https://doi.org/10.5194/acp-7-1961-2007
+        - Petters, M. D., & Kreidenweis, S. M. (2007). "A single parameter
+          representation of hygroscopic growth and cloud condensation nucleus
+          activity," Atmospheric Chemistry and Physics, 7(8), 1961-1971.
+          DOI: https://doi.org/10.5194/acp-7-1961-2007.
     """
 
     volume_fractions = convert_mass_concentration.to_volume_fraction(
@@ -223,23 +235,25 @@ def get_surface_partial_pressure(
     activity: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the partial pressure of a species based on its activity and pure
-        vapor pressure.
+    Compute the partial pressure from activity and pure vapor pressure.
 
-    Args:
-        pure_vapor_pressure (float or NDArray[np.float64]): Pure vapor pressure
-            of the species in pascals (Pa).
-        activity (float or NDArray[np.float64]): Activity of the species,
-            unitless.
+    This function calculates the partial pressure (pᵢ) of a species, given its
+    activity (aᵢ) and pure vapor pressure (pᵢ*). It follows:
+
+    - pᵢ = aᵢ × pᵢ*
+
+    Arguments:
+        - pure_vapor_pressure : Pure vapor pressure of the species in Pa.
+        - activity : Activity of the species, dimensionless.
 
     Returns:
-        float or NDArray[np.float64]: Partial pressure of the species in
-        pascals (Pa).
+        - Partial pressure of the species in Pa.
 
-    Example:
+    Examples:
         ``` py title="Example"
-        calculate_partial_pressure(1000.0, 0.95)
-        # 950.0
+        from particula.particles.properties.activity_module import get_surface_partial_pressure
+        get_surface_partial_pressure(1000.0, 0.95)
+        # Output: 950.0
         ```
     """
     return pure_vapor_pressure * activity
