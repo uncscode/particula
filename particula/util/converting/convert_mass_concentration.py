@@ -23,13 +23,19 @@ def to_mole_fraction(
     row-wise.
 
     Args:
-        mass_concentrations: A list or ndarray of mass concentrations
+        mass_concentrations : A list or ndarray of mass concentrations
             (SI, kg/m^3).
-        molar_masses: A list or ndarray of molecular weights
+        molar_masses : A list or ndarray of molecular weights
             (SI, kg/mol).
 
     Returns:
         An ndarray of mole fractions. Zero total moles yield zero fractions.
+
+    Equation:
+        - xᵢ = nᵢ / nₜₒₜₐₗ
+        - xᵢ: Mole fraction of component i
+        - nᵢ: Moles of component i
+        - nₜₒₜₐₗ: Total moles of all components
 
     Reference:
         The mole fraction of a component is given by the ratio of its molar
