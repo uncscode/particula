@@ -63,11 +63,11 @@ from particula.particles.properties.lognormal_size_distribution import (
     lognormal_sample_distribution,
 )
 from particula.particles.properties.activity_module import (
-    ideal_activity_mass,
-    ideal_activity_molar,
-    ideal_activity_volume,
-    kappa_activity,
-    calculate_partial_pressure,
+    get_ideal_activity_mass,
+    get_ideal_activity_molar,
+    get_ideal_activity_volume,
+    get_kappa_activity,
+    get_surface_partial_pressure,
 )
 from particula.particles.properties.reynolds_number import (
     get_particle_reynolds_number,
