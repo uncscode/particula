@@ -14,47 +14,46 @@ def debye_function(
     n: int = 1,
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the Debye function for a given variable.
+    Calculate the generalized Debye function for a given input.
 
-    The generalized Debye function where `x` is a dimensionless variable
-    and `n` is an integer exponent. By default, `n` is 1,
-    which corresponds to the most common form of the Debye function.
+    The Debye function can be expressed as follows:
+
+    - Dₙ(x) = (n / xⁿ) ∫[tⁿ / (exp(t) - 1)] dt  from t = 0 to x
+        - x is a dimensionless variable.
+        - n is the exponent (default is 1).
 
     Arguments:
-        variable: The upper limit of integration. Can be a float or a
-            numpy array. If a numpy array is provided, the function will
-            return an array of Debye function values.
-        integration_points: The number of points to use in the numerical
-            integration. Default is 1000.
-        n: The exponent in the Debye function. Default is 1.
+        - variable : Upper limit of integration; can be float or NDArray.
+        - integration_points : Number of points for numerical integration
+          (default 1000).
+        - n : Exponent in the Debye function formula (default 1).
 
     Returns:
-        The value of the Debye function evaluation for the given input.
-        If the input is a float, a float is returned. If the input is an array,
-        an array of the same shape is returned.
+        - Debye function value(s). If the input is a float, returns a float.
+          If the input is an array, returns an array of the same shape.
 
     Examples:
-        ``` py title="Dubye function with n=1 for a single float value"
+        ``` py title="Debye function with n=1 for a single float value"
         out = debye_function(1.0)
         print(out)
         # Output: 0.7765038970390566
         ```
 
-        ``` py title="Dubye function with n=2 for a single float value"
+        ``` py title="Debye function with n=2 for a single float value"
         out = debye_function(1.0, n=2)
         print(out)
         # Output: 0.6007582206816492
         ```
 
-        ``` py title="Dubye function with n=1 for a numpy array"
+        ``` py title="Debye function with n=1 for a numpy array"
         out = debye_function(np.array([1.0, 2.0, 3.0]))
         print(out)
         # Output: [0.84140566 0.42278434 0.28784241]
         ```
 
     References:
-        - https://en.wikipedia.org/wiki/Debye_function
-        - https://mathworld.wolfram.com/DebyeFunctions.html
+        - Debye function, https://en.wikipedia.org/wiki/Debye_function
+        - Wolfram MathWorld: Debye Functions, https://mathworld.wolfram.com/DebyeFunctions.html
     """
     array = np.linspace(0, variable, integration_points)
     exp_array = safe_exp(array[1:])
