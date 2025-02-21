@@ -1,19 +1,22 @@
 """Kinematic viscosity for fluids.
 
-The kinematic viscosity is the ratio of the dynamic viscosity to the density
-of a fluid. It is a measure of the fluid's resistance to flow
-under the influence of gravity.
+Long Description:
+    The kinematic viscosity (ν) is the ratio of the dynamic viscosity (μ)
+    to the density (ρ).
 
-v = mu / rho
+Equation:
+    - ν = μ / ρ
 
 Where:
-    - v : Kinematic viscosity [m^2/s].
-    - mu : Dynamic viscosity [Pa*s].
-    - rho : Density of the fluid [kg/m^3].
+    - ν : Kinematic viscosity [m²/s].
+    - μ : Dynamic viscosity [Pa·s].
+    - ρ : Fluid density [kg/m³].
 
 References:
-https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
-https://en.wikipedia.org/wiki/Viscosity#Kinematic_viscosity
+    - "Viscosity Conversion Formula," Wolfram Formula Repository, 
+      https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula
+    - Wikipedia contributors, "Viscosity," Wikipedia,
+      https://en.wikipedia.org/wiki/Viscosity#Kinematic_viscosity
 
 """
 
@@ -32,15 +35,25 @@ def get_kinematic_viscosity(
     """
     Calculate the kinematic viscosity of a fluid.
 
+    Long Description:
+        The function calculates ν by dividing the dynamic viscosity (μ)
+        by the fluid density (ρ).
+
     Equation:
         ν = μ / ρ
 
     Arguments:
-        dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].
-        fluid_density : Density of the fluid [kg/m³].
+        - dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].
+        - fluid_density : Density of the fluid [kg/m³].
 
     Returns:
-        Kinematic viscosity of the fluid [m²/s].
+        - The kinematic viscosity [m²/s].
+
+    Examples:
+        ```py title="Example usage"
+        nu = get_kinematic_viscosity(1.8e-5, 1.2)
+        # Output: ~1.5e-5
+        ```
 
     References:
         - "Viscosity Conversion Formula," Wolfram Formula Repository.
