@@ -11,7 +11,7 @@ from particula.util.validate_inputs import validate_inputs
 
 @validate_inputs(
     {
-        "particle_radius": "positive",
+        "particle_radius": "nonnegative",
         "particle_density": "positive",
         "fluid_density": "positive",
         "kinematic_viscosity": "positive",
@@ -26,8 +26,8 @@ def get_particle_inertia_time(
     """
     Compute the particle inertia time (τ_p).
 
-    The particle inertia time represents the response time of a particle to changes
-    in fluid velocity, given by:
+    The particle inertia time represents the response time of a particle to
+    changes in fluid velocity, given by:
 
     - τ_p = (2 / 9) × (ρ_p / ρ_f) × (r² / ν)
         - τ_p is the particle inertia time in seconds (s).
@@ -43,29 +43,27 @@ def get_particle_inertia_time(
         - kinematic_viscosity : Kinematic viscosity of the fluid in m²/s.
 
     Returns:
-        - The particle inertia time in seconds (s). Returned as either a float or
-          NDArray[np.float64].
+        - The particle inertia time in seconds (s). Returned as either a float
+            or NDArray[np.float64].
 
     Examples:
         ```py title="Example"
-        from particula.particles.properties.inertia_time import get_particle_inertia_time
-        tau_p = get_particle_inertia_time(
+        import particula as par
+        par.particles.get_particle_inertia_time(
             particle_radius=1e-6,
             particle_density=1000.0,
             fluid_density=1.225,
             kinematic_viscosity=1.5e-5
         )
-        print(tau_p)
         # Output: ...
         ```
 
     References:
-        - Ayala, O., Rosa, B., & Wang, L. P. (2008). "Effects of turbulence on the
-          geometric collision rate of sedimenting droplets. Part 2. Theory and
-          parameterization." New Journal of Physics, 10.
+        - Ayala, O., Rosa, B., & Wang, L. P. (2008). "Effects of turbulence on
+          the geometric collision rate of sedimenting droplets. Part 2. Theory
+          and parameterization." New Journal of Physics, 10.
           https://doi.org/10.1088/1367-2630/10/7/075016
     """
-
     return (
         (2 / 9)
         * (particle_density / fluid_density)
