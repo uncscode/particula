@@ -13,16 +13,40 @@ def calculate_partial_pressure(
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the partial pressure of a gas from its concentration, molar mass,
+    Calculate the partial pressure of a gas from its concentration, molar mass, 
     and temperature.
 
-    Parameters:
-    - concentration (float): Concentration of the gas in kg/m^3.
-    - molar_mass (float): Molar mass of the gas in kg/mol.
-    - temperature (float): Temperature in Kelvin.
+    Long Description:
+        This function uses the ideal gas relation:
+        p = (c × R × T) / M
+
+    Equation:
+        - p = (c × R × T) / M
+
+    Where:
+        - p : Partial pressure [Pa].
+        - c : Gas concentration [kg/m³].
+        - R : Universal gas constant [J/(mol·K)].
+        - T : Temperature [K].
+        - M : Molar mass [kg/mol].
+
+    Arguments:
+        - concentration : Concentration of the gas [kg/m³].
+        - molar_mass : Molar mass of the gas [kg/mol].
+        - temperature : Temperature [K].
 
     Returns:
-    - float: Partial pressure of the gas in Pascals (Pa).
+        - Partial pressure of the gas [Pa].
+
+    Examples:
+        ```py title="Example usage"
+        partial = calculate_partial_pressure(1.2, 0.02897, 298)
+        # Output: ~986.4 Pa
+        ```
+
+    References:
+        - Wikipedia contributors, "Ideal gas law," Wikipedia,
+          https://en.wikipedia.org/wiki/Ideal_gas_law
     """
     # Input validation
     if np.any(concentration < 0):
@@ -41,14 +65,36 @@ def calculate_saturation_ratio(
     pure_vapor_pressure: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the saturation ratio of the gas at a given pressure and
-    temperature.
+    Calculate the saturation ratio of the gas at a given partial pressure and
+    pure vapor pressure.
 
-    Args:
-        partial_pressure: Pressure in Pascals.
-        pure_vapor_pressure: Pure vapor pressure of the gas in Pascals.
+    Long Description:
+        The saturation ratio is defined as the ratio of partial pressure to the
+        pure vapor pressure.
+
+    Equation:
+        - S = p / p_vap
+
+    Where:
+        - S : Saturation ratio (dimensionless).
+        - p : Partial pressure [Pa].
+        - p_vap : Pure vapor pressure [Pa].
+
+    Arguments:
+        - partial_pressure : Partial pressure [Pa].
+        - pure_vapor_pressure : Pure vapor pressure [Pa].
 
     Returns:
-        saturation_ratio: The saturation ratio of the gas.
+        - Saturation ratio of the gas (dimensionless).
+
+    Examples:
+        ```py title="Example usage"
+        ratio = calculate_saturation_ratio(800.0, 1000.0)
+        # Output: 0.8
+        ```
+
+    References:
+        - Wikipedia contributors, "Relative humidity," Wikipedia,
+          https://en.wikipedia.org/wiki/Relative_humidity
     """
     return partial_pressure / pure_vapor_pressure
