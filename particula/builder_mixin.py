@@ -70,7 +70,9 @@ class BuilderSurfaceTensionMixin:
         if surface_tension_units == "N/m":
             self.surface_tension = surface_tension
         else:
-            self.surface_tension = surface_tension * convert_units(surface_tension_units, "N/m")
+            self.surface_tension = (
+                surface_tension * convert_units(surface_tension_units, "N/m")
+            )
         return self
 
 
@@ -100,7 +102,9 @@ class BuilderMolarMassMixin:
         if molar_mass_units == "kg/mol":
             self.molar_mass = molar_mass
         else:
-            self.molar_mass = molar_mass * convert_units(molar_mass_units, "kg/mol")
+            self.molar_mass = (
+                molar_mass * convert_units(molar_mass_units, "kg/mol")
+            )
         return self
 
 
@@ -137,7 +141,9 @@ class BuilderConcentrationMixin:
         if concentration_units == self.default_units:
             self.concentration = concentration
         else:
-            self.concentration = concentration * convert_units(concentration_units, self.default_units)
+            self.concentration = (
+                concentration * convert_units(concentration_units, self.default_units)
+            )
         return self
 
 
@@ -301,7 +307,9 @@ class BuilderTemperatureMixin:
         if temperature_units == "K":
             self.temperature = temperature
         else:
-            self.temperature = temperature * convert_units(temperature_units, "K")
+            self.temperature = (
+                temperature * convert_units(temperature_units, "K")
+            )
         return self
 
 
