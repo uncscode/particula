@@ -19,7 +19,6 @@ More details to follow.
 
 from particula import gas
 from particula import dynamics
-from particula import particle
 
 from particula.logger_setup import setup
 
