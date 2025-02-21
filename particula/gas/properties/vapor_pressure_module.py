@@ -5,10 +5,19 @@ Vapor pressure modules for calculating the vapor pressure of a gas.
 from typing import Union
 import numpy as np
 from numpy.typing import NDArray
+
 from particula.util.constants import GAS_CONSTANT
+from particula.util.validate_inputs import validate_inputs
 
 
-# Antoine equation function
+@validate_inputs(
+    {
+        "a": "finite",
+        "b": "finite",
+        "c": "finite",
+        "temperature": "positive",
+    }
+)
 def get_antoine_vapor_pressure(
     a: Union[float, NDArray[np.float64]],
     b: Union[float, NDArray[np.float64]],
@@ -18,17 +27,16 @@ def get_antoine_vapor_pressure(
     """
     Calculate vapor pressure using the Antoine equation.
 
-    Long Description:
-        The Antoine equation relates the logarithm of vapor pressure to
-        temperature for a pure substance.
+    The Antoine equation relates the logarithm of vapor pressure to
+    temperature for a pure substance.
 
     Equation:
         - P = 10^(a - b / (T - c)) × 133.322
 
     Where:
-        - P : Vapor pressure [Pa].
-        - a, b, c : Antoine equation parameters (dimensionless).
-        - T : Temperature [K].
+        - P is Vapor pressure [Pa].
+        - a, b, c is Antoine equation parameters (dimensionless).
+        - T is Temperature [K].
 
     Arguments:
         - a : Antoine parameter a (dimensionless).
@@ -41,12 +49,13 @@ def get_antoine_vapor_pressure(
 
     Examples:
         ```py title="Example usage"
-        p_antoine = get_antoine_vapor_pressure(8.07131, 1730.63, 233.426, 373.15)
+        p_antoine = get_antoine_vapor_pressure(
+            8.07131, 1730.63, 233.426, 373.15
+        )
         # Output: ~101325 Pa (roughly 1 atm)
         ```
 
     References:
-        - Equation: log10(P) = a - b / (T - c)
         - https://en.wikipedia.org/wiki/Antoine_equation
         - Kelvin conversion details:
           https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781118135341.app1
@@ -56,7 +65,14 @@ def get_antoine_vapor_pressure(
     return vapor_pressure * 133.32238741499998  # Convert mmHg to Pa
 
 
-# Clausius-Clapeyron equation function
+@validate_inputs(
+    {
+        "latent_heat": "positive",
+        "temperature_initial": "positive",
+        "pressure_initial": "nonnegative",
+        "temperature": "positive",
+    }
+)
 def get_clausius_clapeyron_vapor_pressure(
     latent_heat: Union[float, NDArray[np.float64]],
     temperature_initial: Union[float, NDArray[np.float64]],
@@ -67,21 +83,20 @@ def get_clausius_clapeyron_vapor_pressure(
     """
     Calculate vapor pressure using Clausius-Clapeyron equation.
 
-    Long Description:
-        This function calculates the final vapor pressure based on an initial
-        temperature/pressure pair and the latent heat of vaporization,
-        assuming ideal gas behavior.
+    This function calculates the final vapor pressure based on an initial
+    temperature/pressure pair and the latent heat of vaporization,
+    assuming ideal gas behavior.
 
     Equation:
         - P_final = P_initial × exp( (L / R) × (1 / T_initial - 1 / T_final) )
 
     Where:
-        - P_final : Final vapor pressure [Pa].
-        - P_initial : Initial vapor pressure [Pa].
-        - L : Latent heat of vaporization [J/mol].
-        - R : Universal gas constant [J/(mol·K)].
-        - T_initial : Initial temperature [K].
-        - T_final : Final temperature [K].
+        - P_final is Final vapor pressure [Pa].
+        - P_initial is Initial vapor pressure [Pa].
+        - L is Latent heat of vaporization [J/mol].
+        - R is Universal gas constant [J/(mol·K)].
+        - T_initial is Initial temperature [K].
+        - T_final is Final temperature [K].
 
     Arguments:
         - latent_heat : Latent heat of vaporization [J/mol].
@@ -110,26 +125,29 @@ def get_clausius_clapeyron_vapor_pressure(
     )
 
 
-# Buck equation function
+@validate_inputs(
+    {
+        "temperature": "positive",
+    }
+)
 def get_buck_vapor_pressure(
     temperature: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
     Calculate vapor pressure using the Buck equation for water vapor.
 
-    Long Description:
-        Uses separate empirical formulas below 0 °C and above 0 °C to compute
-        water vapor pressure.
+    Uses separate empirical formulas below 0 °C and above 0 °C to compute
+    water vapor pressure.
 
     Equation:
-        For T < 0 °C:
-            - p = 6.1115 × exp( (23.036 - T/333.7) × T / (279.82 + T ) ) × 100
-        For T ≥ 0 °C:
-            - p = 6.1121 × exp( (18.678 - T/234.5) × T / (257.14 + T ) ) × 100
+        - For T < 0 °C, as
+            p = 6.1115 × exp( (23.036 - T/333.7) × T / (279.82 + T ) ) × 100
+        - For T ≥ 0 °C, as
+            p = 6.1121 × exp( (18.678 - T/234.5) × T / (257.14 + T ) ) × 100
 
     Where:
-        - p : Vapor pressure [Pa].
-        - T : Temperature in Celsius [°C] (converted internally from Kelvin).
+        - p is Vapor pressure [Pa].
+        - T is Temperature in Celsius [°C] (converted internally from Kelvin).
 
     Arguments:
         - temperature : Temperature in Kelvin [K].
