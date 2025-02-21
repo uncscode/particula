@@ -20,30 +20,37 @@ def get_stokes_number(
     kolmogorov_time: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the Stokes number.
+    Compute the Stokes number (St) to measure particle inertia relative to fluid flow.
 
-    The Stokes number (St) is a dimensionless [-] parameter representing the
-    relative importance of particle inertia in a fluid flow. A high Stokes
-    number indicates that a particle resists following fluid motion, while a
-    low Stokes number means the particle closely follows the flow. Given by:
+    The Stokes number is a dimensionless parameter reflecting how much a particle 
+    resists following changes in the fluid’s motion. If St >> 1, particle inertia 
+    dominates; if St << 1, the particle closely follows fluid flow.
 
-        St = τ_p / τ_k
+    Mathematically:
 
-    - St : Stokes number [-]
-    - τ_p (particle_inertia_time) : Particle inertia time [s]
-    - τ_k (kolmogorov_time) : Kolmogorov timescale of turbulence [s]
+    - St = τ_p / τ_k
+        - St : Stokes number (dimensionless),
+        - τ_p : Particle inertia time [s],
+        - τ_k : Kolmogorov timescale [s].
 
     Arguments:
-    ----------
-        - particle_inertia_time : Particle inertia time [s]
-        - kolmogorov_time : Kolmogorov timescale [s]
+        - particle_inertia_time : Particle inertia time in seconds (s).
+        - kolmogorov_time : Kolmogorov timescale in seconds (s).
 
     Returns:
-    --------
-        - Stokes number [-]
+        - Dimensionless Stokes number (float or NDArray[np.float64]).
+
+    Examples:
+        ``` py title="Example"
+        from particula.particles.properties.stokes_number import get_stokes_number
+        st_value = get_stokes_number(1e-3, 2e-3)
+        # Output: 0.5
+        ```
 
     References:
-    -----------
-        - Wikipedia https://en.wikipedia.org/wiki/Stokes_number
+        - "Stokes number," Wikipedia, 
+          https://en.wikipedia.org/wiki/Stokes_number
+        - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and 
+          Physics, 3rd ed., Wiley-Interscience.
     """
     return particle_inertia_time / kolmogorov_time
