@@ -19,6 +19,7 @@ from particula.gas.properties.integral_scale_module import (
 )
 from particula.gas.properties.kinematic_viscosity import (
     get_kinematic_viscosity,
+    get_kinematic_viscosity_via_system_state,
 )
 from particula.gas.properties.kolmogorov_module import (
     get_kolmogorov_length,
@@ -33,6 +34,7 @@ from particula.gas.properties.normalize_accel_variance import (
 )
 from particula.gas.properties.pressure_function import (
     get_partial_pressure,
+    get_saturation_ratio_from_concentration,
 )
 from particula.gas.properties.taylor_microscale_module import (
     get_lagrangian_taylor_microscale_time,
