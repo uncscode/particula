@@ -7371,8 +7371,13 @@
 <p>Calculate the normalized acceleration variance in isotropic turbulence.</p>
 <p>This coefficient describes the statistical behavior of acceleration
 fluctuations in turbulent flows.</p>
-<p>Equation:
-    - a_o = (11 + 7 R_λ) / (205 + R_λ)</p>
+<ul>
+<li>a_o = (11 + 7 R_λ) / (205 + R_λ)<ul>
+<li>a_o is Normalized acceleration variance in isotropic turbulence [-].</li>
+<li>R_λ is Taylor-microscale Reynolds number [-].</li>
+</ul>
+</li>
+</ul>
 <p>Where:
     - a_o (accel_variance) is Normalized acceleration variance in isotropic
       turbulence [-].
@@ -7388,7 +7393,8 @@ fluctuations in turbulent flows.</p>
 <li>accel_variance : Normalized acceleration variance [-]</li>
 </ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="n">result</span> <span class="o">=</span> <span class="n">get_normalized_accel_variance_ao2008</span><span class="p">(</span><span class="mf">500.0</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_normalized_accel_variance_ao2008</span><span class="p">(</span><span class="mf">500.0</span><span class="p">)</span>
 <span class="c1"># Output: ~0.05</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>

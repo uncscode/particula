@@ -7487,17 +7487,19 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/integral_scale_module.py">particula.gas.properties.integral_scale_module</a> module.</p>
 </blockquote>
 <h2 id="get_eulerian_integral_length">get_eulerian_integral_length<a class="headerlink" href="#get_eulerian_integral_length" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/integral_scale_module.py#L53">Show source in integral_scale_module.py:53</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/integral_scale_module.py#L54">Show source in integral_scale_module.py:54</a></p>
 <p>Calculate the Eulerian integral length scale.</p>
 <p>The Eulerian integral length scale is a measure of the size of the largest
 turbulent eddies in a fluid flow.</p>
-<p>Equation:
-    - L_e = 0.5 × (u'³) / ε</p>
-<p>Where:
-    - L_e is Eulerian integral length scale [m].
-    - fluid_rms_velocity (u') is Fluid RMS fluctuation velocity [m/s].
-    - turbulent_dissipation (ε) is Turbulent energy dissipation rate
-        [m²/s³].</p>
+<ul>
+<li>L_e = 0.5 × (u'³) / ε<ul>
+<li>L_e is Eulerian integral length scale [m].</li>
+<li>fluid_rms_velocity (u') is Fluid RMS fluctuation velocity [m/s].</li>
+<li>turbulent_dissipation (ε) is Turbulent energy dissipation rate
+    [m²/s³].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
 <li>fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].</li>
@@ -7509,7 +7511,8 @@ turbulent eddies in a fluid flow.</p>
 <li>Eulerian integral length scale [m].</li>
 </ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">length_scale</span> <span class="o">=</span> <span class="n">get_eulerian_integral_length</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_eulerian_integral_length</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">)</span>
 <span class="c1"># Output: 1350.0</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
@@ -7549,7 +7552,8 @@ a fluid particle to travel a distance equal to the integral length scale.</p>
 <li>Lagrangian integral timescale [s].</li>
 </ul>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">timescale</span> <span class="o">=</span> <span class="n">get_lagrangian_integral_time</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_lagrangian_integral_time</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">)</span>
 <span class="c1"># Output: 900.0</span>
 </code></pre></div>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>

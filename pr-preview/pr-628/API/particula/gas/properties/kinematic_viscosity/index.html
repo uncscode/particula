@@ -7510,7 +7510,12 @@
 <p>The function calculates ν by dividing the dynamic viscosity (μ)
 by the fluid density (ρ).</p>
 <ul>
-<li>ν = μ / ρ</li>
+<li>ν = μ / ρ<ul>
+<li>ν is Kinematic viscosity [m²/s].</li>
+<li>μ is Dynamic viscosity [Pa·s].</li>
+<li>ρ is Fluid density [kg/m³].</li>
+</ul>
+</li>
 </ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7522,7 +7527,8 @@ by the fluid density (ρ).</p>
 <li>The kinematic viscosity [m²/s].</li>
 </ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="n">nu</span> <span class="o">=</span> <span class="n">get_kinematic_viscosity</span><span class="p">(</span><span class="mf">1.8e-5</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_kinematic_viscosity</span><span class="p">(</span><span class="mf">1.8e-5</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)</span>
 <span class="c1"># Output: ~1.5e-5</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
@@ -7535,13 +7541,19 @@ by the fluid density (ρ).</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kinematic_viscosity</span><span class="p">(</span><span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_kinematic_viscosity_via_system_state">get_kinematic_viscosity_via_system_state<a class="headerlink" href="#get_kinematic_viscosity_via_system_state" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kinematic_viscosity.py#L66">Show source in kinematic_viscosity.py:66</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kinematic_viscosity.py#L70">Show source in kinematic_viscosity.py:70</a></p>
 <p>Calculate the kinematic viscosity of air by first computing its dynamic
 viscosity.</p>
 <p>This function uses get_dynamic_viscosity(...) and divides by the given
 fluid_density to get the kinematic viscosity.</p>
-<p>Equation:
-    - ν = μ / ρ</p>
+<ul>
+<li>ν = μ / ρ<ul>
+<li>ν is Kinematic viscosity [m²/s].</li>
+<li>μ is Dynamic viscosity [Pa·s].</li>
+<li>ρ is Fluid density [kg/m³].</li>
+</ul>
+</li>
+</ul>
 <p>Where:
     - ν is Kinematic viscosity [m²/s].
     - μ is Dynamic viscosity [Pa·s].
@@ -7558,7 +7570,8 @@ fluid_density to get the kinematic viscosity.</p>
 <li>The kinematic viscosity of air [m²/s].</li>
 </ul>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="n">nu_air</span> <span class="o">=</span> <span class="n">get_kinematic_viscosity_via_system_state</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_kinematic_viscosity_via_system_state</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)</span>
 <span class="c1"># Output: ~1.5e-5</span>
 </code></pre></div>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>

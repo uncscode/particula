@@ -7629,12 +7629,14 @@
 <p>Calculate vapor pressure using the Antoine equation.</p>
 <p>The Antoine equation relates the logarithm of vapor pressure to
 temperature for a pure substance.</p>
-<p>Equation:
-    - P = 10^(a - b / (T - c)) × 133.322</p>
-<p>Where:
-    - P is Vapor pressure [Pa].
-    - a, b, c is Antoine equation parameters (dimensionless).
-    - T is Temperature [K].</p>
+<ul>
+<li>P = 10^(a - b / (T - c)) × 133.322<ul>
+<li>P is Vapor pressure [Pa].</li>
+<li>a, b, c is Antoine equation parameters (dimensionless).</li>
+<li>T is Temperature [K].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
 <li>a : Antoine parameter a (dimensionless).</li>
@@ -7647,7 +7649,8 @@ temperature for a pure substance.</p>
 <li>Vapor pressure in Pascals [Pa].</li>
 </ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="n">p_antoine</span> <span class="o">=</span> <span class="n">get_antoine_vapor_pressure</span><span class="p">(</span>
+<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_antoine_vapor_pressure</span><span class="p">(</span>
     <span class="mf">8.07131</span><span class="p">,</span> <span class="mf">1730.63</span><span class="p">,</span> <span class="mf">233.426</span><span class="p">,</span> <span class="mf">373.15</span>
 <span class="p">)</span>
 <span class="c1"># Output: ~101325 Pa (roughly 1 atm)</span>
@@ -7670,15 +7673,16 @@ temperature for a pure substance.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_buck_vapor_pressure">get_buck_vapor_pressure<a class="headerlink" href="#get_buck_vapor_pressure" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/vapor_pressure_module.py#L128">Show source in vapor_pressure_module.py:128</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/vapor_pressure_module.py#L124">Show source in vapor_pressure_module.py:124</a></p>
 <p>Calculate vapor pressure using the Buck equation for water vapor.</p>
 <p>Uses separate empirical formulas below 0 °C and above 0 °C to compute
 water vapor pressure.</p>
-<p>Equation:
-    - For T &lt; 0 °C, as
-        p = 6.1115 × exp( (23.036 - T/333.7) × T / (279.82 + T ) ) × 100
-    - For T ≥ 0 °C, as
-        p = 6.1121 × exp( (18.678 - T/234.5) × T / (257.14 + T ) ) × 100</p>
+<ul>
+<li>For T &lt; 0 °C, as
+    p = 6.1115 × exp( (23.036 - T/333.7) × T / (279.82 + T ) ) × 100</li>
+<li>For T ≥ 0 °C, as
+    p = 6.1121 × exp( (18.678 - T/234.5) × T / (257.14 + T ) ) × 100</li>
+</ul>
 <p>Where:
     - p is Vapor pressure [Pa].
     - T is Temperature in Celsius [°C] (converted internally from Kelvin).</p>
@@ -7691,12 +7695,13 @@ water vapor pressure.</p>
 <li>Vapor pressure in Pascals [Pa].</li>
 </ul>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="n">p_buck</span> <span class="o">=</span> <span class="n">get_buck_vapor_pressure</span><span class="p">(</span><span class="mf">273.15</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_buck_vapor_pressure</span><span class="p">(</span><span class="mf">273.15</span><span class="p">)</span>
 <span class="c1"># Output: ~611 Pa (around ice point)</span>
 </code></pre></div>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li>Buck, A. L., (1981) ...</li>
+<li>Buck, A. L., (1981)</li>
 <li>https://en.wikipedia.org/wiki/Arden_Buck_equation</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
@@ -7706,20 +7711,22 @@ water vapor pressure.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_clausius_clapeyron_vapor_pressure">get_clausius_clapeyron_vapor_pressure<a class="headerlink" href="#get_clausius_clapeyron_vapor_pressure" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/vapor_pressure_module.py#L68">Show source in vapor_pressure_module.py:68</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/vapor_pressure_module.py#L66">Show source in vapor_pressure_module.py:66</a></p>
 <p>Calculate vapor pressure using Clausius-Clapeyron equation.</p>
 <p>This function calculates the final vapor pressure based on an initial
 temperature/pressure pair and the latent heat of vaporization,
 assuming ideal gas behavior.</p>
-<p>Equation:
-    - P_final = P_initial × exp( (L / R) × (1 / T_initial - 1 / T_final) )</p>
-<p>Where:
-    - P_final is Final vapor pressure [Pa].
-    - P_initial is Initial vapor pressure [Pa].
-    - L is Latent heat of vaporization [J/mol].
-    - R is Universal gas constant [J/(mol·K)].
-    - T_initial is Initial temperature [K].
-    - T_final is Final temperature [K].</p>
+<ul>
+<li>P_final = P_initial × exp( (L / R) × (1 / T_initial - 1 / T_final) )<ul>
+<li>P_final is Final vapor pressure [Pa].</li>
+<li>P_initial is Initial vapor pressure [Pa].</li>
+<li>L is Latent heat of vaporization [J/mol].</li>
+<li>R is Universal gas constant [J/(mol·K)].</li>
+<li>T_initial is Initial temperature [K].</li>
+<li>T_final is Final temperature [K].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>latent_heat : Latent heat of vaporization [J/mol].</li>
@@ -7733,7 +7740,8 @@ assuming ideal gas behavior.</p>
 <li>Pure vapor pressure [Pa].</li>
 </ul>
 <h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="n">p_final</span> <span class="o">=</span> <span class="n">get_clausius_clapeyron_vapor_pressure</span><span class="p">(</span>
+<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_clausius_clapeyron_vapor_pressure</span><span class="p">(</span>
     <span class="mi">40660</span><span class="p">,</span> <span class="mf">373.15</span><span class="p">,</span> <span class="mi">101325</span><span class="p">,</span> <span class="mi">300</span>
 <span class="p">)</span>
 <span class="c1"># Output: ~35307 Pa</span>

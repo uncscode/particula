@@ -7373,11 +7373,13 @@
 Based on a simplified linear relation from atmospheric science literature.
 Only valid for temperatures within the range typically found on
 Earth's surface.</p>
-<p>Equation:
-    - k(T) = 1e-3 × (4.39 + 0.071 × T)</p>
-<p>Where:
-    - k(T) is Thermal conductivity [W/(m·K)].
-    - T is Temperature [K].</p>
+<ul>
+<li>k(T) = 1e-3 × (4.39 + 0.071 × T)<ul>
+<li>k(T) is Thermal conductivity [W/(m·K)].</li>
+<li>T is Temperature [K].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
 <li>temperature : The temperature in Kelvin (K).</li>
@@ -7387,7 +7389,8 @@ Earth's surface.</p>
 <li>The thermal conductivity [W/(m·K)] or [J/(m·s·K)].</li>
 </ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">k_300K</span> <span class="o">=</span> <span class="n">get_thermal_conductivity</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_thermal_conductivity</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
 <span class="c1"># ~0.449 W/(m·K)</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>

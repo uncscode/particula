@@ -3130,13 +3130,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#get_saturation_ratio_from_concentration" class="md-nav__link">
+  <a href="#get_saturation_ratio_from_pressure" class="md-nav__link">
     <span class="md-ellipsis">
-      get_saturation_ratio_from_concentration
+      get_saturation_ratio_from_pressure
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="get_saturation_ratio_from_concentration">
+    <nav class="md-nav" aria-label="get_saturation_ratio_from_pressure">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7403,13 +7403,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#get_saturation_ratio_from_concentration" class="md-nav__link">
+  <a href="#get_saturation_ratio_from_pressure" class="md-nav__link">
     <span class="md-ellipsis">
-      get_saturation_ratio_from_concentration
+      get_saturation_ratio_from_pressure
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="get_saturation_ratio_from_concentration">
+    <nav class="md-nav" aria-label="get_saturation_ratio_from_pressure">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7490,14 +7490,16 @@
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/pressure_function.py#L11">Show source in pressure_function.py:11</a></p>
 <p>Calculate the partial pressure of a gas from its concentration, molar mass,
 and temperature.</p>
-<p>Equation:
-    - p = (c × R × T) / M</p>
-<p>Where:
-    - p is Partial pressure [Pa].
-    - c is Gas concentration [kg/m³].
-    - R is Universal gas constant [J/(mol·K)].
-    - T is Temperature [K].
-    - M is Molar mass [kg/mol].</p>
+<ul>
+<li>p = (c × R × T) / M<ul>
+<li>p is Partial pressure [Pa].</li>
+<li>c is Gas concentration [kg/m³].</li>
+<li>R is Universal gas constant [J/(mol·K)].</li>
+<li>T is Temperature [K].</li>
+<li>M is Molar mass [kg/mol].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
 <li>concentration : Concentration of the gas [kg/m³].</li>
@@ -7509,7 +7511,8 @@ and temperature.</p>
 <li>Partial pressure of the gas [Pa].</li>
 </ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="n">partial</span> <span class="o">=</span> <span class="n">calculate_partial_pressure</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.02897</span><span class="p">,</span> <span class="mi">298</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_partial_pressure</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.02897</span><span class="p">,</span> <span class="mi">298</span><span class="p">)</span>
 <span class="c1"># Output: ~986.4 Pa</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
@@ -7527,18 +7530,20 @@ and temperature.</p>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
-<h2 id="get_saturation_ratio_from_concentration">get_saturation_ratio_from_concentration<a class="headerlink" href="#get_saturation_ratio_from_concentration" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/pressure_function.py#L59">Show source in pressure_function.py:59</a></p>
+<h2 id="get_saturation_ratio_from_pressure">get_saturation_ratio_from_pressure<a class="headerlink" href="#get_saturation_ratio_from_pressure" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/pressure_function.py#L57">Show source in pressure_function.py:57</a></p>
 <p>Calculate the saturation ratio of the gas at a given partial pressure and
 pure vapor pressure.</p>
 <p>The saturation ratio is defined as the ratio of partial pressure to the
 pure vapor pressure.</p>
-<p>Equation:
-    - S = p / p_vap</p>
-<p>Where:
-    - S is Saturation ratio (dimensionless).
-    - p is Partial pressure [Pa].
-    - p_vap is Pure vapor pressure [Pa].</p>
+<ul>
+<li>S = p / p_vap<ul>
+<li>S is Saturation ratio (dimensionless).</li>
+<li>p is Partial pressure [Pa].</li>
+<li>p_vap is Pure vapor pressure [Pa].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>partial_pressure : Partial pressure [Pa].</li>
@@ -7549,7 +7554,8 @@ pure vapor pressure.</p>
 <li>Saturation ratio of the gas (dimensionless).</li>
 </ul>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="n">ratio</span> <span class="o">=</span> <span class="n">calculate_saturation_ratio</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_saturation_ratio_from_pressure</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">)</span>
 <span class="c1"># Output: 0.8</span>
 </code></pre></div>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
@@ -7559,7 +7565,7 @@ pure vapor pressure.</p>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;partial_pressure&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;pure_vapor_pressure&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_saturation_ratio_from_concentration</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_saturation_ratio_from_pressure</span><span class="p">(</span>
     <span class="n">partial_pressure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">pure_vapor_pressure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
