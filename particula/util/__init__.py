@@ -6,8 +6,6 @@ Module for utility functions.
 # flake8: noqa
 # pyright: basic
 
-from particula.util.converting import *  # imports the init file from converting
-
 from particula.util.arbitrary_round import (
     get_arbitrary_round,
 )
@@ -23,11 +21,6 @@ from particula.util.reduced_quantity import (
 )
 from particula.util.refractive_index_mixing import (
     get_effective_refractive_index,
-)
-from particula.util.surface_tension import (
-    get_surface_tension_film_coating,
-    get_surface_tension_volume_mix,
-    get_surface_tension_water,
 )
 from particula.util.converting.convert_dtypes import (
     get_coerced_type,
@@ -49,7 +42,7 @@ from particula.util.converting.convert_mass_concentration import (
 from particula.util.converting.convert_mole_fraction import (
     get_mass_fractions_from_moles,
 )
-from particula.util.converting.convert_shapes import (
+from private_dev.readd.convert_shapes import (
     get_length_from_volume,
     get_volume_from_length,
 )

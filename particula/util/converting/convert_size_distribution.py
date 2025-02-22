@@ -344,7 +344,6 @@ def get_conversion_strategy(
 def get_distribution_in_dn(
     diameter: np.ndarray, dn_dlogdp: np.ndarray, inverse: bool = False
 ) -> np.ndarray:
-    # pylint: disable=duplicate-code
     """
     Convert the sizer data between dn/dlogdp and d_num formats.
 
@@ -407,7 +406,6 @@ def get_distribution_in_dn(
 def get_pdf_distribution_in_pmf(
     x_array: np.ndarray, distribution: np.ndarray, to_pdf: bool = True
 ) -> np.ndarray:
-    # pylint: disable=duplicate-code
     """
     Convert the distribution data between a probability density function (PDF) and
     a probability mass spectrum (PMF).
