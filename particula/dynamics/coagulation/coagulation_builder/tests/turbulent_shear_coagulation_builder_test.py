@@ -7,10 +7,8 @@ Tests for the TurbulentShearCoagulationBuilder class.
 import pytest
 
 # pylint: disable=line-too-long
-from particula.dynamics.coagulation.coagulation_builder.turbulent_shear_coagulation_builder import (
+from particula.dynamics import (
     TurbulentShearCoagulationBuilder,
-)
-from particula.dynamics.coagulation.coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
 )
 

@@ -3,11 +3,9 @@ Tests for the BrownianCoagulationBuilder class.
 """
 
 import pytest
-from particula.dynamics.coagulation.coagulation_builder.brownian_coagulation_builder import (
-    BrownianCoagulationBuilder,
-)
-from particula.dynamics.coagulation.coagulation_strategy import (
+from particula.dynamics import (
     BrownianCoagulationStrategy,
+    BrownianCoagulationBuilder,
 )
 
 

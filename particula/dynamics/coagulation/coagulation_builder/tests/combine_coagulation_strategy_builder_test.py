@@ -4,20 +4,11 @@ Tests for the CombineCoagulationStrategyBuilder class.
 
 import pytest
 
-# pylint: disable=line-too-long
-from particula.dynamics.coagulation.coagulation_builder.combine_coagulation_strategy_builder import (
+from particula.dynamics import (
     CombineCoagulationStrategyBuilder,
-)
-from particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy import (
     CombineCoagulationStrategy,
-)
-from particula.dynamics.coagulation.coagulation_builder.brownian_coagulation_builder import (
     BrownianCoagulationBuilder,
-)
-from particula.dynamics.coagulation.coagulation_builder.charged_coagulation_builder import (
     ChargedCoagulationBuilder,
-)
-from particula.dynamics.coagulation.charged_kernel_strategy import (
     HardSphereKernelStrategy,
 )
 
