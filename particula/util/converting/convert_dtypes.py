@@ -6,8 +6,7 @@ arrays with matching time steps and headers.
 References:
     - NumPy Documentation: https://numpy.org/doc/
 
-Notes: I {Kyle} think this is only for particula_beta, but will leave it here
-for now.
+To be removed, likely particula_beta only. -kyle
 """
 
 from typing import Any, Dict, List

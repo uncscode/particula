@@ -25,11 +25,11 @@ def get_safe_exp(value: ArrayLike) -> np.ndarray:
 
     Examples:
         ``` py title="Example Usage"
-        from particula.util.machine_limit import safe_exp
         import numpy as np
+        import particula as par
 
         arr = np.array([0, 10, 1000])
-        print(safe_exp(arr))
+        print(par.get_safe_exp(arr))
         # Output: [1.00000000e+000 2.20264658e+004 1.79769313e+308]
         ```
 
@@ -57,11 +57,11 @@ def get_safe_log(value: ArrayLike) -> np.ndarray:
 
     Examples:
         ``` py title="Example Usage"
-        from particula.util.machine_limit import safe_log
         import numpy as np
+        import particula as par
 
         arr = np.array([1e-320, 1.0, 10.0])
-        print(safe_log(arr))
+        print(get_safe_log(arr))
         # Output: [-7.40545337e+02  0.00000000e+00  2.30258509e+00]
         ```
 
@@ -89,11 +89,11 @@ def get_safe_log10(value: ArrayLike) -> np.ndarray:
 
     Examples:
         ``` py title="Example Usage"
-        from particula.util.machine_limit import safe_log10
         import numpy as np
+        import particula as par
 
         arr = np.array([1e-320, 1.0, 1000.0])
-        print(safe_log10(arr))
+        print(par.get_safe_log10(arr))
         # Output: [-320.           0.           3.        ]
         ```
 

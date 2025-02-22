@@ -39,6 +39,8 @@ References:
     - Kalová, J., & Mareš, R. (2018). "Surface tension of water."
       Journal of Chemical Physics, 149(8), 084501.
     - AIOMFAC Model: http://aiomfac.caltech.edu/
+
+To be moved to particle.properties. -kyle
 """
 
 # pylint: disable=too-many-positional-arguments, too-many-arguments
