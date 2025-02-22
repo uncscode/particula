@@ -23,6 +23,25 @@ ColorScale = namedtuple(
     ],
 )
 
+from collections import namedtuple
+
+
+ColorScale = namedtuple(
+    "ColorScale",
+    [
+        "_50",
+        "_100",
+        "_200",
+        "_300",
+        "_400",
+        "_500",
+        "_600",
+        "_700",
+        "_800",
+        "_900",
+    ],
+)
+
 # Tailwind CSS Colors
 # https://tailwindcss.com/docs/customizing-colors#default-color-palette
 
