@@ -5,19 +5,13 @@ the appropriate ValueError.
 """
 
 import pytest
-from particula.dynamics.coagulation.coagulation_factories import (
+from particula.dynamics import (
     CoagulationFactory,
-)
-
-
-from particula.dynamics.coagulation.coagulation_strategy import (
     BrownianCoagulationStrategy,
     ChargedCoagulationStrategy,
     TurbulentShearCoagulationStrategy,
     TurbulentDNSCoagulationStrategy,
     CombineCoagulationStrategy,
-)
-from particula.dynamics.coagulation.charged_kernel_strategy import (
     HardSphereKernelStrategy,
 )
 

@@ -3,13 +3,9 @@ Tests for the ChargedCoagulationBuilder class.
 """
 
 import pytest
-from particula.dynamics.coagulation.coagulation_builder.charged_coagulation_builder import (
+from particula.dynamics import (
     ChargedCoagulationBuilder,
-)
-from particula.dynamics.coagulation.coagulation_strategy import (
     ChargedCoagulationStrategy,
-)
-from particula.dynamics.coagulation.charged_kernel_strategy import (
     HardSphereKernelStrategy,
 )
 
