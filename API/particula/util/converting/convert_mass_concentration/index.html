@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -7499,56 +7499,63 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mass_concentration.py">particula.util.converting.convert_mass_concentration</a> module.</p>
 </blockquote>
 <h2 id="to_mass_fraction">to_mass_fraction<a class="headerlink" href="#to_mass_fraction" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mass_concentration.py#L97">Show source in convert_mass_concentration.py:97</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mass_concentration.py#L142">Show source in convert_mass_concentration.py:142</a></p>
 <p>Convert mass concentrations to mass fractions for N components.</p>
 <p>If inputs are one-dimensional or float, the summation is done over the
-entire array. If mass_concentration is a 2D array, the summation is done
-row-wise.</p>
+entire array. If <code>mass_concentrations</code> is a 2D array, the summation is
+done row-wise.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
 <li><code>mass_concentrations</code> - A list or ndarray of mass concentrations
     (SI, kg/m^3).</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>An ndarray of mass fractions.</p>
+<p>An ndarray of mass fractions. Zero total mass yields zero fractions.</p>
 <p>Reference:
     The mass fraction of a component is calculated by dividing the mass
     concentration of that component by the total mass concentration of
     all components.
     - https://en.wikipedia.org/wiki/Mass_fraction_(chemistry)</p>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_mass_fraction</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;mass_concentrations&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_mass_fraction</span><span class="p">(</span>
     <span class="n">mass_concentrations</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="to_mole_fraction">to_mole_fraction<a class="headerlink" href="#to_mole_fraction" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mass_concentration.py#L7">Show source in convert_mass_concentration.py:7</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mass_concentration.py#L9">Show source in convert_mass_concentration.py:9</a></p>
 <p>Convert mass concentrations to mole fractions for N components.</p>
-<p>If the input mass_concentrations is 1D, the summation is performed over the
-entire array. If mass_concentrations is 2D, the summation is done row-wise.</p>
+<p>If the input <code>mass_concentrations</code> is 1D, the summation is performed over
+the entire array. If <code>mass_concentrations</code> is 2D, the summation is done
+row-wise.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<ul>
-<li><code>mass_concentrations</code> - A list or ndarray of mass concentrations
-    (SI, kg/m^3).</li>
-<li><code>molar_masses</code> - A list or ndarray of molecular weights (SI, kg/mol).</li>
-</ul>
+<p>mass_concentrations : A list or ndarray of mass concentrations
+    (SI, kg/m^3).
+molar_masses : A list or ndarray of molecular weights
+    (SI, kg/mol).</p>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<p>An ndarray of mole fractions.</p>
+<p>An ndarray of mole fractions. Zero total moles yield zero fractions.</p>
+<p>Equation:
+    - xᵢ = nᵢ / nₜₒₜₐₗ
+    - <code>-</code> <em>xᵢ</em> - Mole fraction of component i
+    - <code>-</code> <em>nᵢ</em> - Moles of component i
+    - <code>-</code> <em>nₜₒₜₐₗ</em> - Total moles of all components</p>
 <p>Reference:
     The mole fraction of a component is given by the ratio of its molar
     concentration to the total molar concentration of all components.
     - https://en.wikipedia.org/wiki/Mole_fraction</p>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_mole_fraction</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;mass_concentrations&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span> <span class="s2">&quot;molar_masses&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_mole_fraction</span><span class="p">(</span>
     <span class="n">mass_concentrations</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">molar_masses</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="to_volume_fraction">to_volume_fraction<a class="headerlink" href="#to_volume_fraction" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mass_concentration.py#L51">Show source in convert_mass_concentration.py:51</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mass_concentration.py#L78">Show source in convert_mass_concentration.py:78</a></p>
 <p>Convert mass concentrations to volume fractions for N components.</p>
-<p>If inputs are the one dimensional or float, the summation is done over the
-the whole array. It mass_concentration is a 2D array, the summation is done
-row-wise.</p>
+<p>If inputs are one dimensional (1D) or floating-point scalars, the summation
+is done over the entire array. If <code>mass_concentrations</code> is 2D, the
+summation is done row-wise.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li><code>mass_concentrations</code> - A list or ndarray of mass concentrations
@@ -7557,14 +7564,15 @@ row-wise.</p>
     (SI, kg/m^3).</li>
 </ul>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
-<p>An ndarray of volume fractions.</p>
+<p>An ndarray of volume fractions. Zero volumes yield zero fractions.</p>
 <p>Reference:
     The volume fraction of a component is calculated by dividing the volume
     of that component (derived from mass concentration and density) by the
     total volume of all components.
     - https://en.wikipedia.org/wiki/Volume_fraction</p>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_volume_fraction</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;mass_concentrations&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span> <span class="s2">&quot;densities&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_volume_fraction</span><span class="p">(</span>
     <span class="n">mass_concentrations</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">densities</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>

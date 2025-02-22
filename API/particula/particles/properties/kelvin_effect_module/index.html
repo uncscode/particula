@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3840,13 +3840,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#kelvin_radius" class="md-nav__link">
+  <a href="#get_kelvin_radius" class="md-nav__link">
     <span class="md-ellipsis">
-      kelvin_radius
+      get_kelvin_radius
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="kelvin_radius">
+    <nav class="md-nav" aria-label="get_kelvin_radius">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3862,6 +3862,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -3891,13 +3900,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#kelvin_term" class="md-nav__link">
+  <a href="#get_kelvin_term" class="md-nav__link">
     <span class="md-ellipsis">
-      kelvin_term
+      get_kelvin_term
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="kelvin_term">
+    <nav class="md-nav" aria-label="get_kelvin_term">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3913,6 +3922,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7325,13 +7343,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#kelvin_radius" class="md-nav__link">
+  <a href="#get_kelvin_radius" class="md-nav__link">
     <span class="md-ellipsis">
-      kelvin_radius
+      get_kelvin_radius
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="kelvin_radius">
+    <nav class="md-nav" aria-label="get_kelvin_radius">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7347,6 +7365,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7376,13 +7403,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#kelvin_term" class="md-nav__link">
+  <a href="#get_kelvin_term" class="md-nav__link">
     <span class="md-ellipsis">
-      kelvin_term
+      get_kelvin_term
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="kelvin_term">
+    <nav class="md-nav" aria-label="get_kelvin_term">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7398,6 +7425,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7450,64 +7486,107 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/kelvin_effect_module.py">particula.particles.properties.kelvin_effect_module</a> module.</p>
 </blockquote>
-<h2 id="kelvin_radius">kelvin_radius<a class="headerlink" href="#kelvin_radius" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/kelvin_effect_module.py#L10">Show source in kelvin_effect_module.py:10</a></p>
-<p>Calculate the Kelvin radius which determines the curvature effect on
-vapor pressure.</p>
-<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
+<h2 id="get_kelvin_radius">get_kelvin_radius<a class="headerlink" href="#get_kelvin_radius" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/kelvin_effect_module.py#L12">Show source in kelvin_effect_module.py:12</a></p>
+<p>Compute the Kelvin radius (rₖ) to account for curvature effects on vapor
+pressure.</p>
+<p>The Kelvin radius is defined by:</p>
 <ul>
-<li>surface_tension (float or NDArray[float]): Surface tension of the
-mixture [N/m].</li>
-<li>molar_mass (float or NDArray[float]): Molar mass of the species
-[kg/mol].</li>
-<li>mass_concentration (float or NDArray[float]): Concentration of the
-species [kg/m^3].</li>
-<li>temperature (float): Temperature of the system [K].</li>
+<li>rₖ = (2 × σ × M) / (R × T × ρ)<ul>
+<li>rₖ is Kelvin radius in meters (m).</li>
+<li>σ is the effective surface tension in N/m.</li>
+<li>M is the molar mass in kg/mol.</li>
+<li>R is the universal gas constant in J/(mol·K).</li>
+<li>T is the temperature in Kelvin (K).</li>
+<li>ρ is the effective density in kg/m³.</li>
+</ul>
+</li>
+</ul>
+<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
+<ul>
+<li>effective_surface_tension : Surface tension of the mixture (N/m).</li>
+<li>effective_density : Effective density of the mixture (kg/m³).</li>
+<li>molar_mass : Molar mass (kg/mol).</li>
+<li>temperature : Temperature of the system (K).</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>float or NDArray[float]: Kelvin radius [m].</li>
+<li>Kelvin radius in meters (float or NDArray[np.float64]).</li>
 </ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_kelvin_radius</span><span class="p">(</span>
+    <span class="n">effective_surface_tension</span><span class="o">=</span><span class="mf">0.072</span><span class="p">,</span>
+    <span class="n">effective_density</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
+    <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.018</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span>
+<span class="p">)</span>
+<span class="c1"># Output: ...</span>
+</code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>Based on Neil Donahue's approach to the Kelvin equation:
-r = 2 * surface_tension * molar_mass / (R * T * density)</li>
-<li><code>See</code> <em>more</em> - https://en.wikipedia.org/wiki/Kelvin_equation</li>
+<li>"Kelvin equation," Wikipedia,
+  https://en.wikipedia.org/wiki/Kelvin_equation</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kelvin_radius</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;effective_surface_tension&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;effective_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;molar_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_kelvin_radius</span><span class="p">(</span>
     <span class="n">effective_surface_tension</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">effective_density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
-<h2 id="kelvin_term">kelvin_term<a class="headerlink" href="#kelvin_term" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/kelvin_effect_module.py#L45">Show source in kelvin_effect_module.py:45</a></p>
-<p>Calculate the Kelvin term, which quantifies the effect of particle
-curvature on vapor pressure.</p>
-<h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<hr />
+<h2 id="get_kelvin_term">get_kelvin_term<a class="headerlink" href="#get_kelvin_term" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/kelvin_effect_module.py#L71">Show source in kelvin_effect_module.py:71</a></p>
+<p>Compute the Kelvin exponential term to account for curvature effects.</p>
+<p>The Kelvin term (K) is given by:</p>
 <ul>
-<li>radius (float or NDArray[float]): Radius of the particle [m].</li>
-<li>kelvin_radius (float or NDArray[float]): Kelvin radius [m].</li>
+<li>K = exp(rₖ / rₚ)<ul>
+<li>K is dimensionless.</li>
+<li>rₖ is the Kelvin radius (m).</li>
+<li>rₚ is the particle radius (m).</li>
+</ul>
+</li>
+</ul>
+<h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>particle_radius : Radius of the particle (m).</li>
+<li>kelvin_radius_value : Precomputed Kelvin radius (m).</li>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>float or NDArray[float]: The exponential factor adjusting vapor
-pressure due to curvature.</li>
+<li>Dimensionless exponential factor adjusting vapor pressure.</li>
 </ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_kelvin_term</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">kelvin_radius_value</span><span class="o">=</span><span class="mf">2e-7</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">kv_term</span><span class="p">)</span>
+<span class="c1"># Output: ...</span>
+</code></pre></div>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
-<p>Based on Neil Donahue's collection of terms in the Kelvin equation:
-exp(kelvin_radius / particle_radius)
-- <code>See</code> <em>more</em> - https://en.wikipedia.org/wiki/Kelvin_equation</p>
+<ul>
+<li>Donahue, N. M., et al. (2013). "How do organic vapors contribute to
+  new-particle formation?" Faraday Discussions, 165, 91–104.
+  https://doi.org/10.1039/C3FD00046J. [check]</li>
+</ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kelvin_term</span><span class="p">(</span>
-    <span class="n">radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span> <span class="s2">&quot;kelvin_radius_value&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_kelvin_term</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">kelvin_radius_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>

@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3142,9 +3142,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#raises" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
-      Raises
+      Examples
     </span>
   </a>
   
@@ -7311,9 +7311,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#raises" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
-      Raises
+      Examples
     </span>
   </a>
   
@@ -7367,35 +7367,39 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/thermal_conductivity.py">particula.gas.properties.thermal_conductivity</a> module.</p>
 </blockquote>
 <h2 id="get_thermal_conductivity">get_thermal_conductivity<a class="headerlink" href="#get_thermal_conductivity" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/thermal_conductivity.py#L11">Show source in thermal_conductivity.py:11</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/thermal_conductivity.py#L13">Show source in thermal_conductivity.py:13</a></p>
+<p>Thermal conductivity of air as a function of temperature.</p>
 <p>Calculate the thermal conductivity of air as a function of temperature.
 Based on a simplified linear relation from atmospheric science literature.
 Only valid for temperatures within the range typically found on
 Earth's surface.</p>
-<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>temperature (Union[float, NDArray[np.float64]]): The temperature at which
-the thermal conductivity of air is to be calculated, in Kelvin (K).</li>
+<li>k(T) = 1e-3 × (4.39 + 0.071 × T)<ul>
+<li>k(T) is Thermal conductivity [W/(m·K)].</li>
+<li>T is Temperature [K].</li>
+</ul>
+</li>
+</ul>
+<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
+<ul>
+<li>temperature : The temperature in Kelvin (K).</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>Union[float, NDArray[np.float64]]: The thermal conductivity of air at the
-specified temperature in Watts per meter-Kelvin (W/m·K) or J/(m s K).</li>
+<li>The thermal conductivity [W/(m·K)] or [J/(m·s·K)].</li>
 </ul>
-<h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
-<hr />
-<ul>
-<li><code>-</code> <em>ValueError</em> - If the temperature is below absolute zero (0 K).</li>
-</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_thermal_conductivity</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
+<span class="c1"># ~0.449 W/(m·K)</span>
+</code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
 <li>Seinfeld and Pandis, "Atmospheric Chemistry and Physics", Equation 17.54.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_thermal_conductivity</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_thermal_conductivity</span><span class="p">(</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>

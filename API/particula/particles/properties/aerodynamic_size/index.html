@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3686,13 +3686,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#get_aerodynamic_shape_factor" class="md-nav__link">
+  <a href="#get_aerodynamic_length" class="md-nav__link">
     <span class="md-ellipsis">
-      get_aerodynamic_shape_factor
+      get_aerodynamic_length
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="get_aerodynamic_shape_factor">
+    <nav class="md-nav" aria-label="get_aerodynamic_length">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3723,9 +3723,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#raises" class="md-nav__link">
+  <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
-      Raises
+      References
     </span>
   </a>
   
@@ -3746,13 +3746,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#particle_aerodynamic_length" class="md-nav__link">
+  <a href="#get_aerodynamic_shape_factor" class="md-nav__link">
     <span class="md-ellipsis">
-      particle_aerodynamic_length
+      get_aerodynamic_shape_factor
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="particle_aerodynamic_length">
+    <nav class="md-nav" aria-label="get_aerodynamic_shape_factor">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3783,7 +3783,16 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
+  <a href="#raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references_1" class="md-nav__link">
     <span class="md-ellipsis">
       References
     </span>
@@ -7343,13 +7352,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#get_aerodynamic_shape_factor" class="md-nav__link">
+  <a href="#get_aerodynamic_length" class="md-nav__link">
     <span class="md-ellipsis">
-      get_aerodynamic_shape_factor
+      get_aerodynamic_length
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="get_aerodynamic_shape_factor">
+    <nav class="md-nav" aria-label="get_aerodynamic_length">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7380,9 +7389,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#raises" class="md-nav__link">
+  <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
-      Raises
+      References
     </span>
   </a>
   
@@ -7403,13 +7412,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#particle_aerodynamic_length" class="md-nav__link">
+  <a href="#get_aerodynamic_shape_factor" class="md-nav__link">
     <span class="md-ellipsis">
-      particle_aerodynamic_length
+      get_aerodynamic_shape_factor
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="particle_aerodynamic_length">
+    <nav class="md-nav" aria-label="get_aerodynamic_shape_factor">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7440,7 +7449,16 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
+  <a href="#raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references_1" class="md-nav__link">
     <span class="md-ellipsis">
       References
     </span>
@@ -7486,55 +7504,42 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_size.py">particula.particles.properties.aerodynamic_size</a> module.</p>
 </blockquote>
-<h2 id="get_aerodynamic_shape_factor">get_aerodynamic_shape_factor<a class="headerlink" href="#get_aerodynamic_shape_factor" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_size.py#L81">Show source in aerodynamic_size.py:81</a></p>
-<p>Retrieve the aerodynamic shape factor for a given particle shape.</p>
+<h2 id="get_aerodynamic_length">get_aerodynamic_length<a class="headerlink" href="#get_aerodynamic_length" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_size.py#L24">Show source in aerodynamic_size.py:24</a></p>
+<p>Calculate the aerodynamic length scale of a particle for a given shape.</p>
+<p>The aerodynamic length (d_a) is determined by:</p>
+<ul>
+<li>d_a = d_p × √( (C_p / C_a) × (ρ / (ρ₀ × χ)) )<ul>
+<li>d_a is the aerodynamic size (m).</li>
+<li>d_p is the physical size (m).</li>
+<li>C_p is the slip correction factor for the physical size.</li>
+<li>C_a is the slip correction factor for the aerodynamic size.</li>
+<li>ρ is the particle density (kg/m³).</li>
+<li>ρ₀ is the reference density (kg/m³).</li>
+<li>χ is the shape factor (dimensionless).</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<ul>
-<li>shape_key : The shape of the particle as a string. Options include:
-    sphere, cube, cylinder_avg_aspect_2, cylinder_avg_aspect_5,
-    cylinder_avg_aspect_10, spheres_cluster_3, spheres_cluster_4,
-    bituminous_coal, quartz, sand, talc</li>
-</ul>
-<h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>The shape factor of the particle as a float.</p>
-<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="n">shape_factor</span> <span class="o">=</span> <span class="n">get_aerodynamic_shape_factor</span><span class="p">(</span><span class="s2">&quot;sand&quot;</span><span class="p">)</span>
-<span class="c1"># shape_factor = 1.57</span>
-</code></pre></div>
-<h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
-<ul>
-<li>ValueError : If the shape is not found in the predefined shape
-    factor dictionary.</li>
-</ul>
-<h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_aerodynamic_shape_factor</span><span class="p">(</span><span class="n">shape_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
-</code></pre></div>
-<h2 id="particle_aerodynamic_length">particle_aerodynamic_length<a class="headerlink" href="#particle_aerodynamic_length" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_size.py#L25">Show source in aerodynamic_size.py:25</a></p>
-<p>Calculate the aerodynamic length scale of a particle.</p>
-<p>The aerodynamic size is used to compare the aerodynamic properties of
-particles with their physical properties, particularly when interpreting
-aerodynamic particle sizer measurements. This is either the aerodynamic
-diameter or radius, depending on length scale input.</p>
-<h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>physical_length : Physical length scale of the particle (m).</li>
 <li>physical_slip_correction_factor : Slip correction factor for the
-     particle's physical radius in the fluid (dimensionless).</li>
+    particle's physical size (dimensionless).</li>
 <li>aerodynamic_slip_correction_factor : Slip correction factor for the
-     particle's aerodynamic radius in the fluid (dimensionless).</li>
-<li>density : Density of the particle (kg/m^3).</li>
-<li>reference_density : Reference density for the particle, typically
-     the density of water (1000 kg/m^3 by default).</li>
-<li>aerodynamic_shape_factor : Shape factor of the particle, accounting
-     for non-sphericity (dimensionless, default is 1.0 for spherical
-     particles).</li>
+    particle's aerodynamic size (dimensionless).</li>
+<li>density : Density of the particle in kg/m³.</li>
+<li>reference_density : Reference density in kg/m³, typically water
+    (1000 by default).</li>
+<li>aerodynamic_shape_factor : Shape factor
+    (dimensionless, 1.0 for spheres).</li>
 </ul>
-<h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<p>Aerodynamic radius of the particle (m).</p>
-<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="n">aerodynamic_length</span> <span class="o">=</span> <span class="n">particle_aerodynamic_length</span><span class="p">(</span>
+<h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Aerodynamic length scale (m).</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_aerodynamic_length</span><span class="p">(</span>
     <span class="n">physical_length</span><span class="o">=</span><span class="mf">0.00005</span><span class="p">,</span>
     <span class="n">physical_slip_correction_factor</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span>
     <span class="n">aerodynamic_slip_correction_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
@@ -7542,16 +7547,26 @@ diameter or radius, depending on length scale input.</p>
     <span class="n">reference_density</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
     <span class="n">aerodynamic_shape_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="c1"># Output: ...</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
 <ul>
-<li>https://en.wikipedia.org/wiki/Aerosol#Aerodynamic_diameter</li>
-<li>Hinds, W.C. (1998) Aerosol Technology: Properties, behavior, and
-    measurement of airborne particles. Wiley-Interscience, New York.
-    pp 51-53, section 3.6.</li>
+<li><code>-</code> <em>"Aerosol</em> - Aerodynamic diameter," Wikipedia,
+  https://en.wikipedia.org/wiki/Aerosol#Aerodynamic_diameter</li>
+<li>Hinds, W.C. (1998). Aerosol Technology: Properties, behavior, and
+  measurement of airborne particles (2<sup>nd</sup> ed.). Wiley-Interscience.
+  (pp. 51–53, Section 3.6).</li>
 </ul>
-<h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">particle_aerodynamic_length</span><span class="p">(</span>
+<h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;physical_length&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;physical_slip_correction_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;aerodynamic_slip_correction_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_aerodynamic_length</span><span class="p">(</span>
     <span class="n">physical_length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">physical_slip_correction_factor</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">aerodynamic_slip_correction_factor</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
@@ -7559,6 +7574,38 @@ diameter or radius, depending on length scale input.</p>
     <span class="n">reference_density</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
     <span class="n">aerodynamic_shape_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
+</code></pre></div>
+<h2 id="get_aerodynamic_shape_factor">get_aerodynamic_shape_factor<a class="headerlink" href="#get_aerodynamic_shape_factor" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_size.py#L97">Show source in aerodynamic_size.py:97</a></p>
+<p>Retrieve the aerodynamic shape factor for a given particle shape.</p>
+<p>The shape factor (χ) accounts for non-sphericity in aerodynamic
+calculations. For spheres, χ=1.0. Larger values indicate more deviation
+from spherical shape.</p>
+<h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>shape_key : String representing the particle's shape
+    (e.g. "sphere", "sand").</li>
+</ul>
+<h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>The shape factor (dimensionless).</li>
+</ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="n">shape_factor</span> <span class="o">=</span> <span class="n">get_aerodynamic_shape_factor</span><span class="p">(</span><span class="s2">&quot;sand&quot;</span><span class="p">)</span>
+<span class="c1"># shape_factor = 1.57</span>
+</code></pre></div>
+<h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
+<ul>
+<li>ValueError : If the shape key is not found in the predefined
+    dictionary.</li>
+</ul>
+<h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Hinds, W.C. (1998). Aerosol Technology: Properties, behavior, and
+  measurement of airborne particles (2<sup>nd</sup> ed.). Wiley-Interscience.</li>
+</ul>
+<h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_aerodynamic_shape_factor</span><span class="p">(</span><span class="n">shape_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 
 

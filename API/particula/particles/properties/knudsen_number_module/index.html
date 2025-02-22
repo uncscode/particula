@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3862,13 +3862,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#calculate_knudsen_number" class="md-nav__link">
+  <a href="#get_knudsen_number" class="md-nav__link">
     <span class="md-ellipsis">
-      calculate_knudsen_number
+      get_knudsen_number
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="calculate_knudsen_number">
+    <nav class="md-nav" aria-label="get_knudsen_number">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3884,6 +3884,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7274,13 +7283,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#calculate_knudsen_number" class="md-nav__link">
+  <a href="#get_knudsen_number" class="md-nav__link">
     <span class="md-ellipsis">
-      calculate_knudsen_number
+      get_knudsen_number
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="calculate_knudsen_number">
+    <nav class="md-nav" aria-label="get_knudsen_number">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7296,6 +7305,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7348,32 +7366,43 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/knudsen_number_module.py">particula.particles.properties.knudsen_number_module</a> module.</p>
 </blockquote>
-<h2 id="calculate_knudsen_number">calculate_knudsen_number<a class="headerlink" href="#calculate_knudsen_number" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/knudsen_number_module.py#L12">Show source in knudsen_number_module.py:12</a></p>
-<p>Calculate the Knudsen number using the mean free path of the gas and the
-radius of the particle. The Knudsen number is a dimensionless number that
-indicates the regime of gas flow relative to the size of particles.</p>
-<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
+<h2 id="get_knudsen_number">get_knudsen_number<a class="headerlink" href="#get_knudsen_number" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/knudsen_number_module.py#L13">Show source in knudsen_number_module.py:13</a></p>
+<p>Calculate the Knudsen number (Kn) from the gas mean free path and particle
+radius.</p>
+<p>The Knudsen number (Kn) indicates whether a flow is in the continuum
+regime or the free molecular regime. It is computed by:</p>
 <ul>
-<li>mean_free_path (Union[float, NDArray[np.float64]]): The mean free path of
-the gas molecules [meters (m)].</li>
-<li>particle_radius (Union[float, NDArray[np.float64]]): The radius of the
-particle [meters (m)].</li>
+<li>Kn = λ / r<ul>
+<li>Kn is the Knudsen number (dimensionless),</li>
+<li>λ is the mean free path in meters (m),</li>
+<li>r is the particle radius in meters (m).</li>
+</ul>
+</li>
+</ul>
+<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
+<ul>
+<li>mean_free_path : Mean free path of the gas molecules in meters (m).</li>
+<li>particle_radius : Radius of the particle in meters (m).</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>Union[float, NDArray[np.float64]]: The Knudsen number, which is the
-ratio of the mean free path to the particle radius.</li>
+<li>The Knudsen number, which is the ratio of the mean free path to the
+    particle radius.</li>
 </ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_knudsen_number</span><span class="p">(</span><span class="mf">6.5e-8</span><span class="p">,</span> <span class="mf">1.0e-7</span><span class="p">)</span>
+<span class="c1"># Output: 0.65</span>
+</code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>For more information at https://en.wikipedia.org/wiki/Knudsen_number</li>
+<li>Knudsen number, Wikipedia,
+  https://en.wikipedia.org/wiki/Knudsen_number</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">calculate_knudsen_number</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;mean_free_path&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span> <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_knudsen_number</span><span class="p">(</span>
     <span class="n">mean_free_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>

@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -7807,7 +7807,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py">particula.runnable</a> module.</p>
 </blockquote>
 <h2 id="runnable_1">Runnable<a class="headerlink" href="#runnable_1" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L10">Show source in runnable.py:10</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L9">Show source in runnable.py:9</a></p>
 <p>Runnable process that can modify an aerosol instance.</p>
 <p>Parameters: None</p>
 <h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
@@ -7820,13 +7820,13 @@
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Runnable</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="runnableor">Runnable().<strong>or</strong><a class="headerlink" href="#runnableor" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L45">Show source in runnable.py:45</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L44">Show source in runnable.py:44</a></p>
 <p>Chain this process with another process using the | operator.</p>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Runnable&quot;</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="runnableexecute">Runnable().execute<a class="headerlink" href="#runnableexecute" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L28">Show source in runnable.py:28</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L27">Show source in runnable.py:27</a></p>
 <p>Execute the process and modify the aerosol instance.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7845,7 +7845,7 @@
 <li><a href="../aerosol/#aerosol">Aerosol</a></li>
 </ul>
 <h3 id="runnablerate">Runnable().rate<a class="headerlink" href="#runnablerate" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L21">Show source in runnable.py:21</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L20">Show source in runnable.py:20</a></p>
 <p>Return the rate of the process.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7860,7 +7860,7 @@
 <li><a href="../aerosol/#aerosol">Aerosol</a></li>
 </ul>
 <h2 id="runnablesequence">RunnableSequence<a class="headerlink" href="#runnablesequence" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L54">Show source in runnable.py:54</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L53">Show source in runnable.py:53</a></p>
 <p>A sequence of processes to be executed in order.</p>
 <h4 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7877,7 +7877,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="runnablesequenceor">RunnableSequence().<strong>or</strong><a class="headerlink" href="#runnablesequenceor" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L80">Show source in runnable.py:80</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L79">Show source in runnable.py:79</a></p>
 <p>Add a runnable to the sequence using the | operator.</p>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">:</span> <span class="n">Runnable</span><span class="p">):</span> <span class="o">...</span>
@@ -7887,7 +7887,7 @@
 <li><a href="#runnable">Runnable</a></li>
 </ul>
 <h3 id="runnablesequenceadd_process">RunnableSequence().add_process<a class="headerlink" href="#runnablesequenceadd_process" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L69">Show source in runnable.py:69</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L68">Show source in runnable.py:68</a></p>
 <p>Add a process to the sequence.</p>
 <h4 id="signature_6">Signature<a class="headerlink" href="#signature_6" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">:</span> <span class="n">Runnable</span><span class="p">):</span> <span class="o">...</span>
@@ -7897,7 +7897,7 @@
 <li><a href="#runnable">Runnable</a></li>
 </ul>
 <h3 id="runnablesequenceexecute">RunnableSequence().execute<a class="headerlink" href="#runnablesequenceexecute" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L73">Show source in runnable.py:73</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/runnable.py#L72">Show source in runnable.py:72</a></p>
 <p>Execute the sequence of runnables on an aerosol instance.</p>
 <h4 id="signature_7">Signature<a class="headerlink" href="#signature_7" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aerosol</span><span class="p">:</span> <span class="n">Aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aerosol</span><span class="p">:</span> <span class="o">...</span>

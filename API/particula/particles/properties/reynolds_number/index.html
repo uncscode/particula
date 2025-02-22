@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3978,6 +3978,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7302,6 +7311,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7350,42 +7368,57 @@
 </blockquote>
 <h2 id="get_particle_reynolds_number">get_particle_reynolds_number<a class="headerlink" href="#get_particle_reynolds_number" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/reynolds_number.py#L12">Show source in reynolds_number.py:12</a></p>
-<p>Calculate the particle Reynolds number.</p>
-<p>The particle Reynolds number (Re_p) characterizes the flow behavior around
-a particle in a fluid and is given by:</p>
-<p>Re_p = (2 a v_p) / ν</p>
+<p>Calculate the Reynolds number (Reₚ) of a particle in a fluid.</p>
+<p>This dimensionless quantity characterizes the flow regime:</p>
 <ul>
-<li>Re_p : Particle Reynolds number [-]</li>
-<li>a (particle_radius) : Particle radius [m]</li>
-<li>v_p (particle_velocity) : Particle velocity relative to the fluid
-    [m/s]</li>
-<li>ν (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]</li>
+<li>Reₚ = (2 × a × vₚ) / ν<ul>
+<li>a is the particle radius in meters (m).</li>
+<li>vₚ is the particle velocity in meters/second (m/s).</li>
+<li>ν is the kinematic viscosity in square meters/second (m²/s).</li>
+</ul>
+</li>
 </ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li>particle_radius : Radius of the particle [m]</li>
-<li>particle_velocity : Particle velocity relative to the fluid [m/s]</li>
-<li>kinematic_viscosity : Kinematic viscosity of the surrounding fluid
-    [m²/s]</li>
+<li>particle_radius : Particle radius (m).</li>
+<li>particle_velocity : Particle velocity relative to the fluid (m/s).</li>
+<li>kinematic_viscosity : Kinematic viscosity of the fluid (m²/s).</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Particle Reynolds number [-]
+<ul>
+<li>Dimensionless Reynolds number (float or NDArray[np.float64]).</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_particle_reynolds_number</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+    <span class="n">particle_velocity</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">kinematic_viscosity</span><span class="o">=</span><span class="mf">1.5e-5</span>
+<span class="p">)</span>
+<span class="c1"># Output: ...</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Wikipedia https://en.wikipedia.org/wiki/Reynolds_number
-- **Stokes Flow (Viscous Dominated, Re_p &lt; 1)**:
-    - Particles follow the fluid closely (e.g., aerosols).
-- **Transitional Flow (1 &lt; Re_p &lt; 1000)**:
-    - Both **viscous and inertial forces** contribute to flow behavior.
-    - Intermediate drag corrections apply.
-- **Turbulent Flow (Re_p &gt; 1000)**:
-    - **Inertial forces dominate**, resulting in vortex shedding and
-        wake formation.
-    - Applies to **large, fast-moving particles**
-        (e.g., raindrops, large sediment).
-</code></pre></div>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Reynolds_number">Reynolds number, Wikipedia</a></li>
+<li>Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric Chemistry and
+    Physics,</li>
+<li><strong>Stokes Flow (Viscous Dominated, Re_p &lt; 1)</strong>:<ul>
+<li>Particles follow the fluid closely (e.g., aerosols).</li>
+</ul>
+</li>
+<li><strong>Transitional Flow (1 &lt; Re_p &lt; 1000)</strong>:<ul>
+<li>Both <strong>viscous and inertial forces</strong> contribute to flow behavior.</li>
+<li>Intermediate drag corrections apply.</li>
+</ul>
+</li>
+<li><strong>Turbulent Flow (Re_p &gt; 1000)</strong>:<ul>
+<li><strong>Inertial forces dominate</strong>, resulting in vortex shedding and
+    wake formation.</li>
+<li>Applies to <strong>large, fast-moving particles</strong>
+    (e.g., raindrops, large sediment).</li>
+</ul>
+</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>

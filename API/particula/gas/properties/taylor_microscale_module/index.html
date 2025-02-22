@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3111,6 +3111,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
@@ -3162,6 +3171,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -3207,6 +3225,15 @@
   <a href="#returns_2" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7386,6 +7413,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
@@ -7437,6 +7473,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7482,6 +7527,15 @@
   <a href="#returns_2" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7540,25 +7594,32 @@
 <p>The Lagrangian Taylor microscale time (τ_T) represents the characteristic
 time for the decay of turbulent velocity correlations. It provides insight
 into the memory of turbulent fluid elements. It is given by:</p>
-<p>τ_T = τ_k * (2 R_λ / (15^(&frac12;) a_o))^(&frac12;)</p>
 <ul>
-<li>τ_T : Lagrangian Taylor microscale time [s]</li>
-<li>τ_k (kolmogorov_time) : Kolmogorov time scale [s]</li>
-<li>R_λ (re_lambda) : Taylor-microscale Reynolds number [-]</li>
-<li>a_o (accel_variance) : Normalized acceleration variance in isotropic
+<li>τ_T = τ_k * (2 R_λ / (15^(&frac12;) a_o))^(&frac12;)<ul>
+<li>τ_T is Lagrangian Taylor microscale time [s]</li>
+<li>τ_k (kolmogorov_time) is Kolmogorov time scale [s]</li>
+<li>R_λ (re_lambda) is Taylor-microscale Reynolds number [-]</li>
+<li>a_o (accel_variance) is Normalized acceleration variance in isotropic
     turbulence [-]</li>
 </ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- kolmogorov_time : Kolmogorov time scale [s]
-- re_lambda : Taylor-microscale Reynolds number [-]
-- accel_variance : Normalized acceleration variance in isotropic
-    turbulence [-]
+<ul>
+<li>kolmogorov_time : Kolmogorov time scale [s]</li>
+<li>re_lambda : Taylor-microscale Reynolds number [-]</li>
+<li>accel_variance : Normalized acceleration variance in isotropic
+    turbulence [-]</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_lagrangian_taylor_microscale_time</span><span class="p">(</span><span class="mf">0.387</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="c1"># Output: 0.3872983346207417</span>
 </code></pre></div>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Lagrangian Taylor microscale time [s]
-</code></pre></div>
+<ul>
+<li>Lagrangian Taylor microscale time [s]</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
@@ -7574,35 +7635,42 @@ into the memory of turbulent fluid elements. It is given by:</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_taylor_microscale">get_taylor_microscale<a class="headerlink" href="#get_taylor_microscale" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/taylor_microscale_module.py#L56">Show source in taylor_microscale_module.py:56</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/taylor_microscale_module.py#L59">Show source in taylor_microscale_module.py:59</a></p>
 <p>Calculate the Taylor microscale.</p>
 <p>The Taylor microscale (λ) represents an intermediate length scale in
 turbulence, linking the dissipative and energy-containing ranges of
 turbulence. It characterizes the smoothness of velocity fluctuations
 in turbulent flows. It is given by:</p>
-<p>λ = u' * (15 ν² / ε)^(&frac12;)</p>
 <ul>
-<li>λ : Taylor microscale [m]</li>
-<li>u' (rms_velocity) : Fluid RMS fluctuation velocity [m/s]</li>
-<li>v (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]</li>
-<li>ε (turbulent_dissipation) : Turbulent kinetic energy dissipation
+<li>λ = u' * (15 ν² / ε)^(&frac12;)<ul>
+<li>λ is Taylor microscale [m]</li>
+<li>u' (rms_velocity) is Fluid RMS fluctuation velocity [m/s]</li>
+<li>v (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s]</li>
+<li>ε (turbulent_dissipation) is Turbulent kinetic energy dissipation
     rate [m²/s³]</li>
 </ul>
+</li>
+</ul>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]
-- kinematic_viscosity : Kinematic viscosity of the fluid [m²/s]
-- turbulent_dissipation : Turbulent kinetic energy dissipation rate
-    [m²/s³]
-</code></pre></div>
+<ul>
+<li>fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]</li>
+<li>kinematic_viscosity : Kinematic viscosity of the fluid [m²/s]</li>
+<li>turbulent_dissipation : Turbulent kinetic energy dissipation rate
+    [m²/s³]</li>
+</ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Taylor microscale [m]
+<ul>
+<li>Taylor microscale [m]</li>
+</ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_taylor_microscale</span><span class="p">(</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">1.5e-5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="c1"># Output: 0.00021081851067789195</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- https://en.wikipedia.org/wiki/Taylor_microscale
-</code></pre></div>
+<ul>
+<li>https://en.wikipedia.org/wiki/Taylor_microscale</li>
+</ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
@@ -7618,32 +7686,38 @@ in turbulent flows. It is given by:</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_taylor_microscale_reynolds_number">get_taylor_microscale_reynolds_number<a class="headerlink" href="#get_taylor_microscale_reynolds_number" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/taylor_microscale_module.py#L104">Show source in taylor_microscale_module.py:104</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/taylor_microscale_module.py#L110">Show source in taylor_microscale_module.py:110</a></p>
 <p>Compute the Taylor-microscale Reynolds number (Re_λ).</p>
 <p>The Taylor-scale micro Reynolds number is a dimensionless quantity used in
 turbulence studies to characterize the relative importance of inertial and
 viscous forces at the Taylor microscale.</p>
-<p>The function is given by:</p>
-<p>Re_λ = (u' λ) / ν</p>
 <ul>
-<li>u' (fluid_rms_velocity) : Fluid (RMS) velocity fluctuation [m/s].</li>
-<li>λ (taylor_microscale) : Taylor microscale [m].</li>
-<li>ν (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s].</li>
+<li>Re_λ = (u' λ) / ν<ul>
+<li>u' (fluid_rms_velocity) is Fluid (RMS) velocity fluctuation [m/s].</li>
+<li>λ (taylor_microscale) is Taylor microscale [m].</li>
+<li>ν (kinematic_viscosity) is Kinematic viscosity of the fluid [m²/s].</li>
+</ul>
+</li>
 </ul>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- fluid_rms_velocity : Fluid RMS velocity fluctuation [m/s].
-- taylor_microscale : Taylor microscale [m].
-- kinematic_viscosity : Kinematic viscosity of the fluid [m²/s].
-</code></pre></div>
+<ul>
+<li>fluid_rms_velocity : Fluid RMS velocity fluctuation [m/s].</li>
+<li>taylor_microscale : Taylor microscale [m].</li>
+<li>kinematic_viscosity : Kinematic viscosity of the fluid [m²/s].</li>
+</ul>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Re_λ : Taylor-microscale Reynolds number [-].
+<ul>
+<li>Taylor-microscale Reynolds number [dimensionless].</li>
+</ul>
+<h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_taylor_microscale_reynolds_number</span><span class="p">(</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.00021</span><span class="p">,</span> <span class="mf">1.5e-5</span><span class="p">)</span>
+<span class="c1"># Output: 500.0</span>
 </code></pre></div>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- https://en.wikipedia.org/wiki/Taylor_microscale
-</code></pre></div>
+<ul>
+<li>https://en.wikipedia.org/wiki/Taylor_microscale</li>
+</ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>

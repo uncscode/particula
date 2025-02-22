@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3010,6 +3010,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -3061,9 +3070,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#raises" class="md-nav__link">
+  <a href="#examples_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Raises
+      Examples
     </span>
   </a>
   
@@ -7371,6 +7380,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7422,9 +7440,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#raises" class="md-nav__link">
+  <a href="#examples_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Raises
+      Examples
     </span>
   </a>
   
@@ -7487,47 +7505,82 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kinematic_viscosity.py">particula.gas.properties.kinematic_viscosity</a> module.</p>
 </blockquote>
 <h2 id="get_kinematic_viscosity">get_kinematic_viscosity<a class="headerlink" href="#get_kinematic_viscosity" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kinematic_viscosity.py#L28">Show source in kinematic_viscosity.py:28</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kinematic_viscosity.py#L31">Show source in kinematic_viscosity.py:31</a></p>
 <p>Calculate the kinematic viscosity of a fluid.</p>
-<p>The kinematic viscosity is the ratio of the dynamic viscosity to the
-density of a fluid. It is a measure of the fluid's resistance to flow
-under the influence of gravity.</p>
+<p>The function calculates ν by dividing the dynamic viscosity (μ)
+by the fluid density (ρ).</p>
+<ul>
+<li>ν = μ / ρ<ul>
+<li>ν is Kinematic viscosity [m²/s].</li>
+<li>μ is Dynamic viscosity [Pa·s].</li>
+<li>ρ is Fluid density [kg/m³].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<p>dynamic_viscosity : Dynamic viscosity of the fluid [Pa*s].
-fluid_density : Density of the fluid [kg/m³].</p>
+<ul>
+<li>dynamic_viscosity : Dynamic viscosity of the fluid [Pa·s].</li>
+<li>fluid_density : Density of the fluid [kg/m³].</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>Kinematic viscosity of the fluid [m^2/s].</p>
-<p>Equation:
-- v = mu / rho
-    - v : Kinematic viscosity [m^2/s].
-    - mu : Dynamic viscosity [Pa*s].
-    - rho : Density of the fluid [kg/m^3].</p>
+<ul>
+<li>The kinematic viscosity [m²/s].</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_kinematic_viscosity</span><span class="p">(</span><span class="mf">1.8e-5</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)</span>
+<span class="c1"># Output: ~1.5e-5</span>
+</code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<p>https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula</p>
+<ul>
+<li>"Viscosity Conversion Formula," Wolfram Formula Repository.
+  https://resources.wolframcloud.com/FormulaRepository/resources/Viscosity-Conversion-Formula</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_kinematic_viscosity</span><span class="p">(</span><span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;dynamic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;fluid_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_kinematic_viscosity</span><span class="p">(</span><span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_kinematic_viscosity_via_system_state">get_kinematic_viscosity_via_system_state<a class="headerlink" href="#get_kinematic_viscosity_via_system_state" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kinematic_viscosity.py#L57">Show source in kinematic_viscosity.py:57</a></p>
-<p>Calculate the kinematic viscosity of air by calculating dynamic
-viscosity of air.</p>
-<h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<p>temperature : Desired air temperature [K]. Must be greater than 0.
-fluid_density : Density of the fluid [kg/m³].
-reference_viscosity : Gas viscosity [Pa*s] at the reference temperature
-    (default is STP).
-reference_temperature : Gas temperature [K] for the reference viscosity
-    (default is STP).</p>
-<h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<p>The kinematic viscosity of air at the given temperature [m^2/s].</p>
-<h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kinematic_viscosity.py#L70">Show source in kinematic_viscosity.py:70</a></p>
+<p>Calculate the kinematic viscosity of air by first computing its dynamic
+viscosity.</p>
+<p>This function uses get_dynamic_viscosity(...) and divides by the given
+fluid_density to get the kinematic viscosity.</p>
 <ul>
-<li>ValueError : If the temperature is less than or equal to 0.</li>
+<li>ν = μ / ρ<ul>
+<li>ν is Kinematic viscosity [m²/s].</li>
+<li>μ is Dynamic viscosity [Pa·s].</li>
+<li>ρ is Fluid density [kg/m³].</li>
 </ul>
+</li>
+</ul>
+<p>Where:
+    - ν is Kinematic viscosity [m²/s].
+    - μ is Dynamic viscosity [Pa·s].
+    - ρ is Fluid density [kg/m³].</p>
+<h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>temperature : Desired air temperature [K]. Must be &gt; 0.</li>
+<li>fluid_density : Density of the fluid [kg/m³].</li>
+<li>reference_viscosity : Reference dynamic viscosity [Pa·s].</li>
+<li>reference_temperature : Reference temperature [K].</li>
+</ul>
+<h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>The kinematic viscosity of air [m²/s].</li>
+</ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_kinematic_viscosity_via_system_state</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)</span>
+<span class="c1"># Output: ~1.5e-5</span>
+</code></pre></div>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
-<p>https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula</p>
+<ul>
+<li>"Sutherland's Formula," Wolfram Formula Repository,
+  https://resources.wolframcloud.com/FormulaRepository/resources/Sutherlands-Formula</li>
+</ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;fluid_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_kinematic_viscosity_via_system_state</span><span class="p">(</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>

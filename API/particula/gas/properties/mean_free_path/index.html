@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3026,13 +3026,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#molecule_mean_free_path" class="md-nav__link">
+  <a href="#get_molecule_mean_free_path" class="md-nav__link">
     <span class="md-ellipsis">
-      molecule_mean_free_path
+      get_molecule_mean_free_path
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="molecule_mean_free_path">
+    <nav class="md-nav" aria-label="get_molecule_mean_free_path">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3048,6 +3048,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7283,13 +7292,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#molecule_mean_free_path" class="md-nav__link">
+  <a href="#get_molecule_mean_free_path" class="md-nav__link">
     <span class="md-ellipsis">
-      molecule_mean_free_path
+      get_molecule_mean_free_path
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="molecule_mean_free_path">
+    <nav class="md-nav" aria-label="get_molecule_mean_free_path">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7305,6 +7314,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7366,35 +7384,47 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/mean_free_path.py">particula.gas.properties.mean_free_path</a> module.</p>
 </blockquote>
-<h2 id="molecule_mean_free_path">molecule_mean_free_path<a class="headerlink" href="#molecule_mean_free_path" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/mean_free_path.py#L27">Show source in mean_free_path.py:27</a></p>
-<p>Calculate the mean free path of a gas molecule in air based on the
-temperature, pressure, and molar mass of the gas. The mean free path
-is the average distance traveled by a molecule between collisions with
-other molecules present in a medium (air).</p>
-<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
+<h2 id="get_molecule_mean_free_path">get_molecule_mean_free_path<a class="headerlink" href="#get_molecule_mean_free_path" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/mean_free_path.py#L30">Show source in mean_free_path.py:30</a></p>
+<p>Calculate the mean free path of a gas molecule in air.</p>
+<p>This function calculates λ based on the input conditions. If
+dynamic_viscosity is not provided, it is computed via
+get_dynamic_viscosity(temperature).</p>
 <ul>
-<li>molar_mass (Union[float, NDArray[np.float64]]): The molar mass
-of the gas molecule [kg/mol]. Default is the molecular weight of air.</li>
-<li>temperature (float): The temperature of the gas [K]. Default is 298.15 K.</li>
-<li>pressure (float): The pressure of the gas [Pa]. Default is 101325 Pa.</li>
-<li>dynamic_viscosity (Optional[float]): The dynamic viscosity of the gas
-[Pa*s]. If not provided, it will be calculated based on the temperature.</li>
+<li>λ = (2 × μ / P) / √(8 × M / (π × R × T))<ul>
+<li>λ is Mean free path [m].</li>
+<li>μ is Dynamic viscosity [Pa·s].</li>
+<li>P is Gas pressure [Pa].</li>
+<li>M is Molar mass [kg/mol].</li>
+<li>R is Universal gas constant [J/(mol·K)].</li>
+<li>T is Gas temperature [K].</li>
+</ul>
+</li>
+</ul>
+<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
+<ul>
+<li>molar_mass : The molar mass of the gas molecule [kg/mol].</li>
+<li>temperature : The temperature of the gas [K].</li>
+<li>pressure : The pressure of the gas [Pa].</li>
+<li>dynamic_viscosity : The dynamic viscosity of the gas [Pa·s].
+    If None, it will be calculated based on the temperature.</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>Union[float, NDArray[np.float64]]: The mean free path of the gas molecule
-in meters (m).</li>
+<li>Mean free path of the gas molecule in meters (m).</li>
 </ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_molecule_mean_free_path</span><span class="p">()</span>
+<span class="c1"># Returns mean free path at ~298K and 101325Pa, ~6.5e-8 m</span>
+</code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>https://en.wikipedia.org/wiki/Mean_free_path</li>
+<li>"Mean Free Path," Wikipedia, The Free Encyclopedia.
+  https://en.wikipedia.org/wiki/Mean_free_path</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">molecule_mean_free_path</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_molecule_mean_free_path</span><span class="p">(</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">ignore</span> <span class="o">=</span> <span class="n">MOLECULAR_WEIGHT_AIR</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">298.15</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">101325</span><span class="p">,</span>

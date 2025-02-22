@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3906,24 +3906,25 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#mean_thermal_speed" class="md-nav__link">
+  <a href="#get_mean_thermal_speed" class="md-nav__link">
     <span class="md-ellipsis">
-      mean_thermal_speed
+      get_mean_thermal_speed
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_mean_thermal_speed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Arguments
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#args" class="md-nav__link">
-    <span class="md-ellipsis">
-      Args
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
@@ -3931,16 +3932,24 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="References">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
@@ -7274,24 +7283,25 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#mean_thermal_speed" class="md-nav__link">
+  <a href="#get_mean_thermal_speed" class="md-nav__link">
     <span class="md-ellipsis">
-      mean_thermal_speed
+      get_mean_thermal_speed
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get_mean_thermal_speed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Arguments
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#args" class="md-nav__link">
-    <span class="md-ellipsis">
-      Args
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
@@ -7299,16 +7309,24 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="References">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
@@ -7348,22 +7366,44 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/mean_thermal_speed_module.py">particula.particles.properties.mean_thermal_speed_module</a> module.</p>
 </blockquote>
-<h2 id="mean_thermal_speed">mean_thermal_speed<a class="headerlink" href="#mean_thermal_speed" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/mean_thermal_speed_module.py#L11">Show source in mean_thermal_speed_module.py:11</a></p>
-<p>Returns the particles mean thermal speed. Due to the the impact
-of air molecules on the particles, the particles will have a mean
-thermal speed.</p>
-<h2 id="args">Args<a class="headerlink" href="#args" title="Permanent link">&para;</a></h2>
-<p>mass : The per particle mass of the particles [kg].
-temperature : The temperature of the air [K].</p>
-<h2 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h2>
-<p>The mean thermal speed of the particles [m/s].</p>
-<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
-<p>Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry and
-physics, Section 9.5.3 Mean Free Path of an Aerosol Particle Equation 9.87.</p>
+<h2 id="get_mean_thermal_speed">get_mean_thermal_speed<a class="headerlink" href="#get_mean_thermal_speed" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/mean_thermal_speed_module.py#L14">Show source in mean_thermal_speed_module.py:14</a></p>
+<p>Calculate the mean thermal speed of a particle in a fluid.</p>
+<p>The mean thermal speed (v) is derived from kinetic theory and is given by:</p>
+<ul>
+<li>v = √( (8 × k_B × T) / (π × m) )<ul>
+<li>v is the mean thermal speed in m/s,</li>
+<li>k_B is the Boltzmann constant in J/K,</li>
+<li>T is the temperature in Kelvin (K),</li>
+<li>m is the particle mass in kilograms (kg).</li>
+</ul>
+</li>
+</ul>
+<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
+<ul>
+<li>particle_mass : The mass of the particle(s) in kg.</li>
+<li>temperature : The temperature of the system in Kelvin (K).</li>
+</ul>
+<h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
+<ul>
+<li>The mean thermal speed in m/s, as either a float or an
+    NDArray[np.float64].</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_mean_thermal_speed</span><span class="p">(</span><span class="mf">1e-17</span><span class="p">,</span> <span class="mi">298</span><span class="p">)</span>
+<span class="c1"># Output: ...</span>
+</code></pre></div>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric Chemistry and
+  Physics, Section 9.5.3 Mean Free Path of an Aerosol Particle,
+  Equation 9.87.</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean_thermal_speed</span><span class="p">(</span>
-    <span class="n">mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;particle_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span> <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_mean_thermal_speed</span><span class="p">(</span>
+    <span class="n">particle_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>

@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3774,13 +3774,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#diffusive_knudsen_number" class="md-nav__link">
+  <a href="#get_diffusive_knudsen_number" class="md-nav__link">
     <span class="md-ellipsis">
-      diffusive_knudsen_number
+      get_diffusive_knudsen_number
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="diffusive_knudsen_number">
+    <nav class="md-nav" aria-label="get_diffusive_knudsen_number">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3796,6 +3796,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7274,13 +7283,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#diffusive_knudsen_number" class="md-nav__link">
+  <a href="#get_diffusive_knudsen_number" class="md-nav__link">
     <span class="md-ellipsis">
-      diffusive_knudsen_number
+      get_diffusive_knudsen_number
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="diffusive_knudsen_number">
+    <nav class="md-nav" aria-label="get_diffusive_knudsen_number">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7296,6 +7305,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7348,43 +7366,82 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/diffusive_knudsen_module.py">particula.particles.properties.diffusive_knudsen_module</a> module.</p>
 </blockquote>
-<h2 id="diffusive_knudsen_number">diffusive_knudsen_number<a class="headerlink" href="#diffusive_knudsen_number" title="Permanent link">&para;</a></h2>
+<h2 id="get_diffusive_knudsen_number">get_diffusive_knudsen_number<a class="headerlink" href="#get_diffusive_knudsen_number" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/diffusive_knudsen_module.py#L13">Show source in diffusive_knudsen_module.py:13</a></p>
-<p>Diffusive Knudsen number. The <em>diffusive</em> Knudsen number is different
-from Knudsen number. Ratio of: mean persistence of one particle to the
-effective length scale of particle--particle Coulombic interaction</p>
-<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
+<p>Compute the diffusive Knudsen number for particle-particle interactions.</p>
+<p>The <em>diffusive</em> Knudsen number (Kn_d) differs from the standard Knudsen
+number. It represents the ratio of the mean particle persistence
+distance to the effective Coulombic interaction scale. Mathematically:</p>
 <ul>
-<li><code>-</code> <em>radius</em> - The radius of the particle [m].</li>
-<li><code>-</code> <em>mass_particle</em> - The mass of the particle [kg].</li>
-<li><code>-</code> <em>friction_factor</em> - The friction factor of the particle [dimensionless].</li>
-<li><code>-</code> <em>coulomb_potential_ratio</em> - The Coulomb potential ratio, zero if
- no charges [dimensionless].</li>
-<li><code>-</code> <em>temperature</em> - The temperature of the system [K].</li>
+<li>Kn_d = [ √(k_B × T × μ_red) / f_red ] / [ (rᵢ + rⱼ) × (Γ_c / Γ_k) ]<ul>
+<li>k_B is the Boltzmann constant (J/K).</li>
+<li>T is the temperature (K).</li>
+<li>μ_red is the reduced mass of particles (kg).</li>
+<li>f_red is the reduced friction factor (dimensionless).</li>
+<li>rᵢ + rⱼ is the sum of radii for the interacting particles (m).</li>
+<li>Γ_c is the continuum-limit Coulomb enhancement factor(dimensionless).</li>
+<li>Γ_k is the kinetic-limit Coulomb enhancement factor (dimensionless).</li>
+</ul>
+</li>
+</ul>
+<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
+<ul>
+<li>particle_radius : Radius of the particle(s) in meters (m).</li>
+<li>particle_mass : Mass of the particle(s) in kilograms (kg).</li>
+<li>friction_factor : Friction factor(s) (dimensionless).</li>
+<li>coulomb_potential_ratio : Coulomb potential ratio (dimensionless),
+  zero if no charge.</li>
+<li>temperature : Temperature of the system in Kelvin (K).</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<p>The diffusive Knudsen number [dimensionless], as a square matrix, of all
-particle-particle interactions.</p>
-<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>Equation 5 in, with charges:
-Chahl, H. S., &amp; Gopalakrishnan, R. (2019). High potential, near free
-molecular regime Coulombic collisions in aerosols and dusty plasmas.
-Aerosol Science and Technology, 53(8), 933-957.
-https://doi.org/10.1080/02786826.2019.1614522</li>
-<li>Equation 3b in, no charges:
-Gopalakrishnan, R., &amp; Hogan, C. J. (2012). Coulomb-influenced collisions
-in aerosols and dusty plasmas. Physical Review E - Statistical,
-Nonlinear, and Soft Matter Physics, 85(2).
-https://doi.org/10.1103/PhysRevE.85.026410</li>
+<li>The diffusive Knudsen number, either a float or NDArray[np.float64].</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Single Particle Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_diffusive_knudsen_number</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">particle_mass</span><span class="o">=</span><span class="mf">1e-17</span><span class="p">,</span>
+    <span class="n">friction_factor</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">300</span>
+<span class="p">)</span>
+<span class="c1"># Output: 0.12...</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">Multiple Particles Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="c1"># Multiple particles example</span>
+<span class="n">radius_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-7</span><span class="p">,</span> <span class="mf">2e-7</span><span class="p">])</span>
+<span class="n">mass_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-17</span><span class="p">,</span> <span class="mf">2e-17</span><span class="p">])</span>
+<span class="n">friction_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">])</span>
+<span class="n">potential_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">par</span><span class="o">.</span><span class="n">get_diffusive_knudsen_number</span><span class="p">(</span>
+    <span class="n">radius_arr</span><span class="p">,</span> <span class="n">mass_arr</span><span class="p">,</span> <span class="n">friction_arr</span><span class="p">,</span> <span class="n">potential_arr</span>
+<span class="p">)</span>
+<span class="c1"># Output: array([...])</span>
+</code></pre></div>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Chahl, H. S., &amp; Gopalakrishnan, R. (2019). "High potential, near free
+  molecular regime Coulombic collisions in aerosols and dusty plasmas."
+  Aerosol Science and Technology, 53(8), 933-957.
+  https://doi.org/10.1080/02786826.2019.1614522</li>
+<li>Gopalakrishnan, R., &amp; Hogan, C. J. (2012). "Coulomb-influenced
+  collisions in aerosols and dusty plasmas." Physical Review E, 85(2).
+  https://doi.org/10.1103/PhysRevE.85.026410</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">diffusive_knudsen_number</span><span class="p">(</span>
-    <span class="n">radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">mass_particle</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;particle_mass&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;friction_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_diffusive_knudsen_number</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">particle_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">friction_factor</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">298.15</span><span class="p">,</span>

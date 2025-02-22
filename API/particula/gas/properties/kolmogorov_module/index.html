@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3032,6 +3032,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -3083,6 +3092,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references_1" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -3128,6 +3146,15 @@
   <a href="#returns_2" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7404,6 +7431,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7449,6 +7485,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7506,6 +7551,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references_2" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7553,28 +7607,44 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kolmogorov_module.py">particula.gas.properties.kolmogorov_module</a> module.</p>
 </blockquote>
 <h2 id="get_kolmogorov_length">get_kolmogorov_length<a class="headerlink" href="#get_kolmogorov_length" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kolmogorov_module.py#L53">Show source in kolmogorov_module.py:53</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kolmogorov_module.py#L59">Show source in kolmogorov_module.py:59</a></p>
 <p>Calculate the Kolmogorov length scale.</p>
 <p>The Kolmogorov length scale represents the smallest eddies in a turbulent
 flow where viscosity dominates. It is defined as:</p>
-<p>η = (ν³ / ε)^(&frac14;)</p>
+<ul>
+<li>η = (ν³ / ε)^(&frac14;)<ul>
+<li>η is the Kolmogorov length scale [m]</li>
+<li>ν is the kinematic viscosity of the fluid [m^2/s]</li>
+<li>ε is the rate of dissipation of turbulent kinetic energy [m<sup>2/s</sup>3]</li>
+</ul>
+</li>
+</ul>
+<p>Where:
+    - η Kolmogorov length scale [m]
+    - ν Kinematic viscosity of the fluid [m^2/s]
+    - ε Rate of dissipation of turbulent kinetic energy [m<sup>2/s</sup>3]</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- kinematic_viscosity : Kinematic viscosity of the fluid [m^2/s]
-- turbulent_dissipation : Rate of dissipation of turbulent kinetic
-    energy [m^2/s^3]
-</code></pre></div>
+<ul>
+<li>kinematic_viscosity : Kinematic viscosity of the fluid [m^2/s]</li>
+<li>turbulent_dissipation : Rate of dissipation of turbulent kinetic
+    energy [m<sup>2/s</sup>3]</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Kolmogorov length scale [m]
+<ul>
+<li>Kolmogorov length scale [m]</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Kolmogorov length scale of a fluid</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_kolmogorov_length</span><span class="p">(</span><span class="mf">1.5e-5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="c1"># Output: 0.0029154759474226504</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
+<ul>
+<li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
 the geometric collision rate of sedimenting droplets. Part 2. Theory
 and parameterization. New Journal of Physics, 10.
-https://doi.org/10.1088/1367-2630/10/7/075016
-</code></pre></div>
+https://doi.org/10.1088/1367-2630/10/7/075016</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span><span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">}</span>
@@ -7591,24 +7661,35 @@ https://doi.org/10.1088/1367-2630/10/7/075016
 where viscous forces dominate over inertial effects. This timescale
 characterizes the turnover time of the smallest turbulent
 eddies. It is given by:</p>
-<p>τ_K = (v / ε)^(&frac12;)</p>
+<ul>
+<li>τ_K = (v / ε)^(&frac12;)<ul>
+<li>τ_K is the Kolmogorov time [s]</li>
+<li>v is the kinematic viscosity of the fluid [m^2/s]</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- kinematic_viscosity : Kinematic viscosity of the fluid [m^2/s]
-- turbulent_dissipation : Rate of dissipation of turbulent kinetic
-    energy [m^2/s^3]
-</code></pre></div>
+<ul>
+<li>kinematic_viscosity : Kinematic viscosity of the fluid [m^2/s]</li>
+<li>turbulent_dissipation : Rate of dissipation of turbulent kinetic
+    energy [m<sup>2/s</sup>3]</li>
+</ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Kolmogorov time [s]
+<ul>
+<li>Kolmogorov time [s]</li>
+</ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Kolmogorov time of a fluid</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_kolmogorov_time</span><span class="p">(</span><span class="mf">1.5e-5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="c1"># Output: 0.3872983346207417</span>
 </code></pre></div>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
+<ul>
+<li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
 the geometric collision rate of sedimenting droplets. Part 2. Theory
 and parameterization. New Journal of Physics, 10.
-https://doi.org/10.1088/1367-2630/10/7/075016
-</code></pre></div>
+https://doi.org/10.1088/1367-2630/10/7/075016</li>
+</ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span><span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">}</span>
@@ -7619,28 +7700,40 @@ https://doi.org/10.1088/1367-2630/10/7/075016
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_kolmogorov_velocity">get_kolmogorov_velocity<a class="headerlink" href="#get_kolmogorov_velocity" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kolmogorov_module.py#L87">Show source in kolmogorov_module.py:87</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/kolmogorov_module.py#L105">Show source in kolmogorov_module.py:105</a></p>
 <p>Calculate the Kolmogorov velocity scale.</p>
 <p>The Kolmogorov velocity scale characterizes the smallest turbulent velocity
 fluctuations and is given by:</p>
-<p>v_k = (v ε)^(&frac14;)</p>
+<ul>
+<li>v_k = (v ε)^(&frac14;)<ul>
+<li>v_k is the Kolmogorov velocity scale [m/s]</li>
+<li>v is the kinematic viscosity of the fluid [m^2/s]</li>
+<li>ε is the rate of dissipation of turbulent kinetic energy [m<sup>2/s</sup>3]</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- kinematic_viscosity : Kinematic viscosity of the fluid [m^2/s]
-- turbulent_dissipation : Rate of dissipation of turbulent kinetic
-    energy [m^2/s^3]
-</code></pre></div>
+<ul>
+<li>kinematic_viscosity : Kinematic viscosity of the fluid [m^2/s]</li>
+<li>turbulent_dissipation : Rate of dissipation of turbulent kinetic
+    energy [m<sup>2/s</sup>3]</li>
+</ul>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Kolmogorov velocity scale [m/s]
+<ul>
+<li>Kolmogorov velocity scale [m/s]</li>
+</ul>
+<h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Kolmogorov velocity scale of a fluid</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_kolmogorov_velocity</span><span class="p">(</span><span class="mf">1.5e-5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="c1"># Output: 0.3872983346207417</span>
 </code></pre></div>
 <h4 id="references_2">References<a class="headerlink" href="#references_2" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
+<ul>
+<li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
 the geometric collision rate of sedimenting droplets. Part 2. Theory
 and parameterization. New Journal of Physics, 10.
-https://doi.org/10.1088/1367-2630/10/7/075016
-</code></pre></div>
+https://doi.org/10.1088/1367-2630/10/7/075016</li>
+</ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span><span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">}</span>

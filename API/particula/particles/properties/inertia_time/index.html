@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3846,6 +3846,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7302,6 +7311,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7350,44 +7368,52 @@
 </blockquote>
 <h2 id="get_particle_inertia_time">get_particle_inertia_time<a class="headerlink" href="#get_particle_inertia_time" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/inertia_time.py#L12">Show source in inertia_time.py:12</a></p>
-<p>Calculate the particle inertia time.</p>
-<p>The particle inertia time (τ_p) represents the response time of a particle
-to velocity changes in the surrounding fluid and is given by:</p>
-<p>τ_p = (2 / 9) * (ρ_p / ρ_f) * (r² / ν )</p>
+<p>Compute the particle inertia time (τ_p).</p>
+<p>The particle inertia time represents the response time of a particle to
+changes in fluid velocity, given by:</p>
 <ul>
-<li>τ_p : Particle inertia time [s]</li>
-<li>r (particle_radius) : Particle radius [m]</li>
-<li>ρ_p (particle_density) : Particle (e.g., droplet, dust) density [kg/m³]</li>
-<li>ρ_f (fluid_density) : Density of the surrounding fluid (e.g., air, water)
-    [kg/m³]</li>
-<li>ν (kinematic_viscosity) : Kinematic viscosity of the fluid [m²/s]</li>
-<li>f(Re_p) : Drag correction factor based on the particle Reynolds number
-    [-]</li>
+<li>τ_p = (2 / 9) × (ρ_p / ρ_f) × (r² / ν)<ul>
+<li>τ_p is the particle inertia time in seconds (s).</li>
+<li>ρ_p is the particle density (kg/m³).</li>
+<li>ρ_f is the surrounding fluid density (kg/m³).</li>
+<li>r is the particle radius (m).</li>
+<li>ν is the kinematic viscosity of the fluid (m²/s).</li>
+</ul>
+</li>
 </ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- particle_radius : Radius of the particle [m]
-- particle_density : Density of the particle [kg/m³]
-- fluid_density : Density of the surrounding fluid [kg/m³]
-- kinematic_viscosity : Kinematic viscosity of the fluid [m²/s]
-- relative_velocity : Relative velocity between particle and fluid
-    [m/s]
-</code></pre></div>
+<ul>
+<li>particle_radius : Particle radius in meters (m).</li>
+<li>particle_density : Density of the particle in kg/m³.</li>
+<li>fluid_density : Density of the fluid in kg/m³.</li>
+<li>kinematic_viscosity : Kinematic viscosity of the fluid in m²/s.</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Particle inertia time [s]
+<ul>
+<li>The particle inertia time in seconds (s). Returned as either a float
+    or NDArray[np.float64].</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_particle_inertia_time</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+    <span class="n">particle_density</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
+    <span class="n">fluid_density</span><span class="o">=</span><span class="mf">1.225</span><span class="p">,</span>
+    <span class="n">kinematic_viscosity</span><span class="o">=</span><span class="mf">1.5e-5</span>
+<span class="p">)</span>
+<span class="c1"># Output: ...</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
-the geometric collision rate of sedimenting droplets. Part 2. Theory
-and parameterization. New Journal of Physics, 10.
-https://doi.org/10.1088/1367-2630/10/7/075016
-</code></pre></div>
+<ul>
+<li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). "Effects of turbulence on
+  the geometric collision rate of sedimenting droplets. Part 2. Theory
+  and parameterization." New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
     <span class="p">{</span>
-        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
         <span class="s2">&quot;particle_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
         <span class="s2">&quot;fluid_density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
         <span class="s2">&quot;kinematic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>

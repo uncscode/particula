@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3664,13 +3664,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#particle_aerodynamic_mobility" class="md-nav__link">
+  <a href="#get_aerodynamic_mobility" class="md-nav__link">
     <span class="md-ellipsis">
-      particle_aerodynamic_mobility
+      get_aerodynamic_mobility
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="particle_aerodynamic_mobility">
+    <nav class="md-nav" aria-label="get_aerodynamic_mobility">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3695,15 +3695,6 @@
   <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       Examples
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
     </span>
   </a>
   
@@ -7274,13 +7265,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#particle_aerodynamic_mobility" class="md-nav__link">
+  <a href="#get_aerodynamic_mobility" class="md-nav__link">
     <span class="md-ellipsis">
-      particle_aerodynamic_mobility
+      get_aerodynamic_mobility
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="particle_aerodynamic_mobility">
+    <nav class="md-nav" aria-label="get_aerodynamic_mobility">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7305,15 +7296,6 @@
   <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       Examples
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature" class="md-nav__link">
-    <span class="md-ellipsis">
-      Signature
     </span>
   </a>
   
@@ -7348,32 +7330,54 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_mobility_module.py">particula.particles.properties.aerodynamic_mobility_module</a> module.</p>
 </blockquote>
-<h2 id="particle_aerodynamic_mobility">particle_aerodynamic_mobility<a class="headerlink" href="#particle_aerodynamic_mobility" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_mobility_module.py#L12">Show source in aerodynamic_mobility_module.py:12</a></p>
-<p>Calculate the aerodynamic mobility of a particle.</p>
-<p>This is defined as the ratio of the slip correction factor to the product
-of the dynamic viscosity of the fluid, the particle radius, and a slip
-correction constant derived. This mobility quantifies the ease with which
-a particle can move through a fluid.</p>
+<h2 id="get_aerodynamic_mobility">get_aerodynamic_mobility<a class="headerlink" href="#get_aerodynamic_mobility" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/aerodynamic_mobility_module.py#L13">Show source in aerodynamic_mobility_module.py:13</a></p>
+<p>Calculate the aerodynamic mobility of a particle using classical fluid
+mechanics.</p>
+<p>The aerodynamic mobility (B) can be determined by:</p>
+<ul>
+<li>B = C / (6πμr)<ul>
+<li>B is the aerodynamic mobility (m²/s).</li>
+<li>C is the slip correction factor (dimensionless).</li>
+<li>μ is the dynamic viscosity of the fluid (Pa·s).</li>
+<li>r is the radius of the particle (m).</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li>radius : The radius of the particle (m).</li>
-<li>slip_correction_factor : The slip correction factor for the particle
-     in the fluid (dimensionless).</li>
-<li>dynamic_viscosity : The dynamic viscosity of the fluid (Pa.s).</li>
+<li>particle_radius : The radius of the particle in meters.</li>
+<li>slip_correction_factor : Slip correction factor (dimensionless).</li>
+<li>dynamic_viscosity : Dynamic viscosity of the fluid in Pa·s.</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>The particle aerodynamic mobility (m^2/s).</p>
+<ul>
+<li>The particle aerodynamic mobility in m²/s.</li>
+</ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="n">aerodynamic_mobility</span> <span class="o">=</span> <span class="n">particle_aerodynamic_mobility</span><span class="p">(</span>
-    <span class="n">radius</span><span class="o">=</span><span class="mf">0.00005</span><span class="p">,</span>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_particle_aerodynamic_mobility</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="mf">0.00005</span><span class="p">,</span>
     <span class="n">slip_correction_factor</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span>
-    <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="mf">0.0000181</span><span class="p">,</span>
+    <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="mf">0.0000181</span>
 <span class="p">)</span>
-</code></pre></div>
-<h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">particle_aerodynamic_mobility</span><span class="p">(</span>
-    <span class="n">radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+
+<span class="n">References</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">Wikipedia</span> <span class="n">contributors</span><span class="p">,</span> <span class="s2">&quot;Stokes&#39; Law,&quot;</span> <span class="n">Wikipedia</span><span class="p">,</span>
+<span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">en</span><span class="o">.</span><span class="n">wikipedia</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">wiki</span><span class="o">/</span><span class="n">Stokes</span><span class="o">%</span><span class="mi">27</span><span class="n">_law</span><span class="o">.</span>
+
+<span class="c1">#### Signature</span>
+
+<span class="err">```</span><span class="n">python</span>
+<span class="nd">@validate_inputs</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;slip_correction_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dynamic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_aerodynamic_mobility</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">slip_correction_factor</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>

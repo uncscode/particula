@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -2988,6 +2988,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -3024,6 +3042,24 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
     </span>
   </a>
   
@@ -7335,6 +7371,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7371,6 +7425,24 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
     </span>
   </a>
   
@@ -7415,26 +7487,39 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/integral_scale_module.py">particula.gas.properties.integral_scale_module</a> module.</p>
 </blockquote>
 <h2 id="get_eulerian_integral_length">get_eulerian_integral_length<a class="headerlink" href="#get_eulerian_integral_length" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/integral_scale_module.py#L46">Show source in integral_scale_module.py:46</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/integral_scale_module.py#L54">Show source in integral_scale_module.py:54</a></p>
 <p>Calculate the Eulerian integral length scale.</p>
-<p>The Eulerian integral length scale (L_e) represents the characteristic
-size of the largest turbulent eddies and provides insight into the spatial
-correlation of turbulence structures. It is given by:</p>
-<p>L_e = 0.5 * u'^3 / ε</p>
-<p>where:
-    - L_e : Eulerian integral length scale [m]
-    - u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s]
-    - ε (turbulent_dissipation) : Turbulent energy dissipation rate [m²/s³]</p>
+<p>The Eulerian integral length scale is a measure of the size of the largest
+turbulent eddies in a fluid flow.</p>
+<ul>
+<li>L_e = 0.5 × (u'³) / ε<ul>
+<li>L_e is Eulerian integral length scale [m].</li>
+<li>fluid_rms_velocity (u') is Fluid RMS fluctuation velocity [m/s].</li>
+<li>turbulent_dissipation (ε) is Turbulent energy dissipation rate
+    [m²/s³].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]
-- turbulent_dissipation : Turbulent kinetic energy dissipation rate
-    [m²/s³]
-</code></pre></div>
+<ul>
+<li>fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].</li>
+<li>turbulent_dissipation : Turbulent kinetic energy dissipation rate
+    [m²/s³].</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Eulerian integral length scale [m]
+<ul>
+<li>Eulerian integral length scale [m].</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_eulerian_integral_length</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">)</span>
+<span class="c1"># Output: 1350.0</span>
 </code></pre></div>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Hinze, J. O., "Turbulence," McGraw-Hill, 1975. [Check this reference]</li>
+<li>Wikipedia contributors, "Turbulence," Wikipedia.</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;fluid_rms_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_eulerian_integral_length</span><span class="p">(</span>
@@ -7445,24 +7530,38 @@ correlation of turbulence structures. It is given by:</p>
 <h2 id="get_lagrangian_integral_time">get_lagrangian_integral_time<a class="headerlink" href="#get_lagrangian_integral_time" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/integral_scale_module.py#L12">Show source in integral_scale_module.py:12</a></p>
 <p>Calculate the Lagrangian integral timescale.</p>
-<p>The Lagrangian integral scale (T_L) characterizes the timescale of large
-eddies in turbulence. This represents the correlation time of fluid
-elements in turbulent motion. It is given by:</p>
-<p>T_L = u'^2 / ε</p>
-<p>where:
-    - T_L : Lagrangian integral timescale [s]
-    - u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s]
-    - ε (turbulent_dissipation) : Turbulent energy dissipation rate [m²/s³]</p>
+<p>The Lagrangian integral timescale is a measure of the time it takes for
+a fluid particle to travel a distance equal to the integral length scale.</p>
+<ul>
+<li>T_L = (u'²) / ε<ul>
+<li>T_L is Lagrangian integral timescale [s].</li>
+<li>fluid_rms_velocity (u') is Fluid RMS fluctuation velocity [m/s].</li>
+<li>turbulent_dissipation (ε) is Turbulent energy dissipation rate
+    [m²/s³].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s]
-- turbulent_dissipation : Turbulent kinetic energy dissipation rate
-    [m²/s³]
-</code></pre></div>
+<ul>
+<li>fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].</li>
+<li>turbulent_dissipation : Turbulent kinetic energy dissipation rate
+    [m²/s³].</li>
+</ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Lagrangian integral timescale [s]
+<ul>
+<li>Lagrangian integral timescale [s].</li>
+</ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_lagrangian_integral_time</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">)</span>
+<span class="c1"># Output: 900.0</span>
 </code></pre></div>
+<h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Townsend, A. A., "The Structure of Turbulent Shear Flow," 2<sup>nd</sup> ed.,
+  Cambridge University Press, 1976. [Check this reference]</li>
+<li>Wikipedia contributors, "Turbulence," Wikipedia.</li>
+</ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;fluid_rms_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;turbulent_dissipation&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_lagrangian_integral_time</span><span class="p">(</span>

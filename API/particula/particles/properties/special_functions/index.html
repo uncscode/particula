@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -4016,13 +4016,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#debye_function" class="md-nav__link">
+  <a href="#get_debye_function" class="md-nav__link">
     <span class="md-ellipsis">
-      debye_function
+      get_debye_function
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="debye_function">
+    <nav class="md-nav" aria-label="get_debye_function">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7283,13 +7283,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#debye_function" class="md-nav__link">
+  <a href="#get_debye_function" class="md-nav__link">
     <span class="md-ellipsis">
-      debye_function
+      get_debye_function
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="debye_function">
+    <nav class="md-nav" aria-label="get_debye_function">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7366,45 +7366,50 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/special_functions.py">particula.particles.properties.special_functions</a> module.</p>
 </blockquote>
-<h2 id="debye_function">debye_function<a class="headerlink" href="#debye_function" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/special_functions.py#L11">Show source in special_functions.py:11</a></p>
-<p>Calculate the Debye function for a given variable.</p>
-<p>The generalized Debye function where <code>x</code> is a dimensionless variable
-and <code>n</code> is an integer exponent. By default, <code>n</code> is 1,
-which corresponds to the most common form of the Debye function.</p>
+<h2 id="get_debye_function">get_debye_function<a class="headerlink" href="#get_debye_function" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/special_functions.py#L13">Show source in special_functions.py:13</a></p>
+<p>Calculate the generalized Debye function for a given input.</p>
+<p>The Debye function can be expressed as follows:</p>
+<ul>
+<li>Dₙ(x) = (n / xⁿ) ∫[tⁿ / (exp(t) - 1)] dt  from t = 0 to x<ul>
+<li>x is a dimensionless variable.</li>
+<li>n is the exponent (default is 1).</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>variable</code> - The upper limit of integration. Can be a float or a
-    numpy array. If a numpy array is provided, the function will
-    return an array of Debye function values.</li>
-<li><code>integration_points</code> - The number of points to use in the numerical
-    integration. Default is 1000.</li>
-<li><code>n</code> - The exponent in the Debye function. Default is 1.</li>
+<li>variable : Upper limit of integration; can be float or NDArray.</li>
+<li>integration_points : Number of points for numerical integration
+  (default 1000).</li>
+<li>n : Exponent in the Debye function formula (default 1).</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>The value of the Debye function evaluation for the given input.
-If the input is a float, a float is returned. If the input is an array,
-an array of the same shape is returned.</p>
+<ul>
+<li>Debye function value(s). If the input is a float, returns a float.
+  If the input is an array, returns an array of the same shape.</li>
+</ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Dubye function with n=1 for a single float value</span><pre><span></span><code><span class="n">out</span> <span class="o">=</span> <span class="n">debye_function</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Debye function with n=1 for a single float value</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_debye_function</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 <span class="c1"># Output: 0.7765038970390566</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">Dubye function with n=2 for a single float value</span><pre><span></span><code><span class="n">out</span> <span class="o">=</span> <span class="n">debye_function</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Debye function with n=2 for a single float value</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_debye_function</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="c1"># Output: 0.6007582206816492</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">Dubye function with n=1 for a numpy array</span><pre><span></span><code><span class="n">out</span> <span class="o">=</span> <span class="n">debye_function</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]))</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Debye function with n=1 for a numpy array</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_debye_function</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]))</span>
 <span class="c1"># Output: [0.84140566 0.42278434 0.28784241]</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
 <ul>
-<li>https://en.wikipedia.org/wiki/Debye_function</li>
-<li>https://mathworld.wolfram.com/DebyeFunctions.html</li>
+<li><a href="https://en.wikipedia.org/wiki/Debye_function">Debye function</a></li>
+<li><a href="https://mathworld.wolfram.com/DebyeFunctions.html">Wolfram MathWorld: Debye Functions</a></li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">debye_function</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;variable&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_debye_function</span><span class="p">(</span>
     <span class="n">variable</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">integration_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
     <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>

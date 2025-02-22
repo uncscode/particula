@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -2894,19 +2894,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#calculate_concentration" class="md-nav__link">
+  <a href="#get_concentration_from_pressure" class="md-nav__link">
     <span class="md-ellipsis">
-      calculate_concentration
+      get_concentration_from_pressure
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="calculate_concentration">
+    <nav class="md-nav" aria-label="get_concentration_from_pressure">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#arguments" class="md-nav__link">
     <span class="md-ellipsis">
       Arguments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7265,19 +7274,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#calculate_concentration" class="md-nav__link">
+  <a href="#get_concentration_from_pressure" class="md-nav__link">
     <span class="md-ellipsis">
-      calculate_concentration
+      get_concentration_from_pressure
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="calculate_concentration">
+    <nav class="md-nav" aria-label="get_concentration_from_pressure">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#arguments" class="md-nav__link">
     <span class="md-ellipsis">
       Arguments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7330,24 +7348,34 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/concentration_function.py">particula.gas.properties.concentration_function</a> module.</p>
 </blockquote>
-<h2 id="calculate_concentration">calculate_concentration<a class="headerlink" href="#calculate_concentration" title="Permanent link">&para;</a></h2>
+<h2 id="get_concentration_from_pressure">get_concentration_from_pressure<a class="headerlink" href="#get_concentration_from_pressure" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/properties/concentration_function.py#L10">Show source in concentration_function.py:10</a></p>
-<p>Calculate the concentration of a gas from its partial pressure, molar
-mass, and temperature using the ideal gas law.</p>
+<p>Calculate the concentration of a gas using the ideal gas law.</p>
+<p>The concentration is determined from the partial pressure, molar mass,
+and temperature using the ideal gas equation:</p>
+<ul>
+<li>C = (P × M) / (R × T)<ul>
+<li>C is the concentration in kg/m³,</li>
+<li>P is the partial pressure in Pascals (Pa),</li>
+<li>M is the molar mass in kg/mol,</li>
+<li>R is the universal gas constant (J/(mol·K)),</li>
+<li>T is the temperature in Kelvin.</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<ul>
-<li>pressure (float or NDArray[np.float64]): Partial pressure of the gas
-in Pascals (Pa).</li>
-<li>molar_mass (float or NDArray[np.float64]): Molar mass of the gas in kg/mol</li>
-<li>temperature (float or NDArray[np.float64]): Temperature in Kelvin.</li>
-</ul>
+<p>partial_pressure : Partial pressure of the gas in Pascals (Pa).
+molar_mass : Molar mass of the gas in kg/mol.
+temperature : Temperature in Kelvin.</p>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Floating-point Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_concentration_from_pressure</span><span class="p">(</span><span class="mi">101325</span><span class="p">,</span> <span class="mf">0.02897</span><span class="p">,</span> <span class="mf">298.15</span><span class="p">)</span>
+<span class="c1"># Output: 1.184587604735883</span>
+</code></pre></div>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<ul>
-<li>concentration (float or NDArray[np.float64]): Concentration of the gas
-in kg/m^3.</li>
-</ul>
+<p>Concentration of the gas in kg/m³.</p>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">calculate_concentration</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_concentration_from_pressure</span><span class="p">(</span>
     <span class="n">partial_pressure</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">molar_mass</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>

@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -4066,6 +4066,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7302,6 +7311,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7350,30 +7368,40 @@
 </blockquote>
 <h2 id="get_stokes_number">get_stokes_number<a class="headerlink" href="#get_stokes_number" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/stokes_number.py#L12">Show source in stokes_number.py:12</a></p>
-<p>Calculate the Stokes number.</p>
-<p>The Stokes number (St) is a dimensionless [-] parameter representing the
-relative importance of particle inertia in a fluid flow. A high Stokes
-number indicates that a particle resists following fluid motion, while a
-low Stokes number means the particle closely follows the flow. Given by:</p>
-<p>St = τ_p / τ_k</p>
+<p>Compute the Stokes number (St) to measure particle inertia relative to
+fluid flow.</p>
+<p>The Stokes number is a dimensionless parameter reflecting how much a
+particle resists following changes in the fluid’s motion. If St &gt;&gt; 1,
+particle inertia dominates; if St &lt;&lt; 1, the particle closely follows
+fluid flow. Mathematically:</p>
 <ul>
-<li>St : Stokes number [-]</li>
-<li>τ_p (particle_inertia_time) : Particle inertia time [s]</li>
-<li>τ_k (kolmogorov_time) : Kolmogorov timescale of turbulence [s]</li>
+<li>St = τ_p / τ_k<ul>
+<li>St : Stokes number (dimensionless),</li>
+<li>τ_p : Particle inertia time [s],</li>
+<li>τ_k : Kolmogorov timescale [s].</li>
+</ul>
+</li>
 </ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- particle_inertia_time : Particle inertia time [s]
-- kolmogorov_time : Kolmogorov timescale [s]
-</code></pre></div>
+<ul>
+<li>particle_inertia_time : Particle inertia time in seconds (s).</li>
+<li>kolmogorov_time : Kolmogorov timescale in seconds (s).</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Stokes number [-]
+<ul>
+<li>Dimensionless Stokes number (float or NDArray[np.float64]).</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_stokes_number</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="mf">2e-3</span><span class="p">)</span>
+<span class="c1"># Output: 0.5</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Wikipedia https://en.wikipedia.org/wiki/Stokes_number
-</code></pre></div>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Stokes_number">Stokes number, Wikipedia</a></li>
+<li>Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric Chemistry and
+  Physics, 3<sup>rd</sup> ed., Wiley-Interscience.</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;particle_inertia_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;kolmogorov_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_stokes_number</span><span class="p">(</span>

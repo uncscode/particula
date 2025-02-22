@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3994,13 +3994,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#cunningham_slip_correction" class="md-nav__link">
+  <a href="#get_cunningham_slip_correction" class="md-nav__link">
     <span class="md-ellipsis">
-      cunningham_slip_correction
+      get_cunningham_slip_correction
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="cunningham_slip_correction">
+    <nav class="md-nav" aria-label="get_cunningham_slip_correction">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -4021,20 +4021,23 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reference" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
-      Reference:
+      Examples
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Reference:">
-      <ul class="md-nav__list">
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
@@ -7280,13 +7283,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#cunningham_slip_correction" class="md-nav__link">
+  <a href="#get_cunningham_slip_correction" class="md-nav__link">
     <span class="md-ellipsis">
-      cunningham_slip_correction
+      get_cunningham_slip_correction
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="cunningham_slip_correction">
+    <nav class="md-nav" aria-label="get_cunningham_slip_correction">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7307,20 +7310,23 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reference" class="md-nav__link">
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
-      Reference:
+      Examples
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Reference:">
-      <ul class="md-nav__list">
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
@@ -7360,35 +7366,40 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/slip_correction_module.py">particula.particles.properties.slip_correction_module</a> module.</p>
 </blockquote>
-<h2 id="cunningham_slip_correction">cunningham_slip_correction<a class="headerlink" href="#cunningham_slip_correction" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/slip_correction_module.py#L9">Show source in slip_correction_module.py:9</a></p>
-<p>Calculate the Cunningham slip correction factor. Accounts for
-non-continuum effects on small particles.</p>
-<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
+<h2 id="get_cunningham_slip_correction">get_cunningham_slip_correction<a class="headerlink" href="#get_cunningham_slip_correction" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/slip_correction_module.py#L11">Show source in slip_correction_module.py:11</a></p>
+<p>Calculate the Cunningham slip correction factor for small particles in a
+fluid.</p>
+<p>The slip correction factor (C_c) accounts for non-continuum effects on
+small particles, correcting for the no-slip assumption used in Stokes'
+law. It is calculated using:</p>
 <ul>
-<li><code>-</code> <em>knudsen_number</em> - Knudsen number [unitless].</li>
+<li>C_c = 1 + Kn × (1.257 + 0.4 × exp(-1.1 / Kn))<ul>
+<li>Kn is the dimensionless Knudsen number.</li>
+</ul>
+</li>
+</ul>
+<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
+<ul>
+<li>knudsen_number : Knudsen number (dimensionless).</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>Slip correction factor [unitless].</li>
+<li>Slip correction factor (dimensionless).</li>
 </ul>
-<h2 id="reference">Reference:<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h2>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_cunningham_slip_correction</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="c1"># Output: ...</span>
+</code></pre></div>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
 <ul>
-<li>Dimensionless quantity accounting for non-continuum effects
-on small particles. It is a deviation from Stokes' Law.
-Stokes assumes a no-slip condition that is not correct at
-high Knudsen numbers. The slip correction factor is used to
-calculate the friction factor.
-Thus, the slip correction factor is about unity (1) for larger
-particles (Kn -&gt; 0). Its behavior on the other end of the
-spectrum (smaller particles; Kn -&gt; inf) is more nuanced, though
-it tends to scale linearly on a log-log scale, log Cc vs log Kn.</li>
-<li>https://en.wikipedia.org/wiki/Cunningham_correction_factor</li>
+<li>"Cunningham correction factor," Wikipedia,
+  https://en.wikipedia.org/wiki/Cunningham_correction_factor</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cunningham_slip_correction</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;knudsen_number&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_cunningham_slip_correction</span><span class="p">(</span>
     <span class="n">knudsen_number</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>

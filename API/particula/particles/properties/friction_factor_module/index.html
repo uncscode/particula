@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
     
     
       
@@ -3796,13 +3796,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#friction_factor" class="md-nav__link">
+  <a href="#get_friction_factor" class="md-nav__link">
     <span class="md-ellipsis">
-      friction_factor
+      get_friction_factor
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="friction_factor">
+    <nav class="md-nav" aria-label="get_friction_factor">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3818,6 +3818,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7274,13 +7283,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#friction_factor" class="md-nav__link">
+  <a href="#get_friction_factor" class="md-nav__link">
     <span class="md-ellipsis">
-      friction_factor
+      get_friction_factor
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="friction_factor">
+    <nav class="md-nav" aria-label="get_friction_factor">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7296,6 +7305,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7348,41 +7366,59 @@
 <blockquote>
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/friction_factor_module.py">particula.particles.properties.friction_factor_module</a> module.</p>
 </blockquote>
-<h2 id="friction_factor">friction_factor<a class="headerlink" href="#friction_factor" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/friction_factor_module.py#L15">Show source in friction_factor_module.py:15</a></p>
-<p>Returns a particle's friction factor. Property of the particle's size and
-surrounding medium. Multiplying the friction factor by the fluid velocity
-yields the drag force on the particle.</p>
-<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
+<h2 id="get_friction_factor">get_friction_factor<a class="headerlink" href="#get_friction_factor" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/properties/friction_factor_module.py#L18">Show source in friction_factor_module.py:18</a></p>
+<p>Calculate the friction factor for a particle in a fluid.</p>
+<p>This friction factor (f) is the proportionality constant between
+the fluid velocity and the resulting drag force on the particle.
+The formula used is:</p>
 <ul>
-<li>radius : The radius of the particle [m].</li>
-<li>dynamic_viscosity : The dynamic viscosity of the fluid [Pa s].</li>
-<li>slip_correction : The slip correction factor [unitless].</li>
+<li>f = (6πμ r) / C<ul>
+<li>f is the friction factor (N·s/m),</li>
+<li>μ is the dynamic viscosity of the fluid (Pa·s),</li>
+<li>r is the radius of the particle (m),</li>
+<li>C is the slip correction factor (dimensionless).</li>
+</ul>
+</li>
+</ul>
+<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
+<ul>
+<li>particle_radius : Radius of the particle in meters (m).</li>
+<li>dynamic_viscosity : Dynamic viscosity of the fluid in Pa·s.</li>
+<li>slip_correction : Slip correction factor (dimensionless).</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<p>The friction factor of the particle [N s/m].</p>
+<ul>
+<li>The friction factor of the particle in N·s/m.</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_friction_factor</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="mf">1.8e-5</span><span class="p">,</span>
+    <span class="n">slip_correction</span><span class="o">=</span><span class="mf">1.1</span>
+<span class="p">)</span>
+<span class="c1"># Output: ...</span>
+</code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
-<p>It is best thought of as an inverse of mobility or the ratio between
-thermal energy and diffusion coefficient. The modified Stoke's diffusion
-coefficient is defined as
-kT / (6 * np.pi * dyn_vis_air * radius / slip_corr)
-and thus the friction factor can be defined as
-(6 * np.pi * dyn_vis_air * radius / slip_corr).</p>
-<p>In the continuum limit (Kn -&gt; 0; Cc -&gt; 1):
-6 * np.pi * dyn_vis_air * radius</p>
-<p>In the kinetic limit (Kn -&gt; inf):
-8.39 * (dyn_vis_air/mfp_air) * const * radius**2</p>
-<p>Zhang, C., Thajudeen, T., Larriba, C., Schwartzentruber, T. E., &amp;
-Hogan, C. J. (2012). Determination of the Scalar Friction Factor for
-Nonspherical Particles and Aggregates Across the Entire Knudsen Number
-Range by Direct Simulation Monte Carlo (DSMC). Aerosol Science and
-Technology, 46(10), 1065-1078. https://doi.org/10.1080/02786826.2012.690543</p>
+<ul>
+<li>Zhang, C., Thajudeen, T., Larriba, C., Schwartzentruber, T. E.,
+  &amp; Hogan, C. J. (2012). "Determination of the Scalar Friction Factor
+  for Nonspherical Particles and Aggregates Across the Entire Knudsen
+  Number Range by Direct Simulation Monte Carlo (DSMC)."
+  Aerosol Science and Technology, 46(10), 1065-1078.
+  https://doi.org/10.1080/02786826.2012.690543</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">friction_factor</span><span class="p">(</span>
-    <span class="n">radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dynamic_viscosity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;slip_correction&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_friction_factor</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">slip_correction</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">):</span> <span class="o">...</span>
