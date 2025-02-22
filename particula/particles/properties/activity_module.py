@@ -4,7 +4,11 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.converting import convert_mass_concentration
+from particula.util.converting.convert_mass_concentration import (
+    get_volume_fraction_from_mass,
+    get_mass_fraction_from_mass,
+    get_mole_fraction_from_mass
+)
 from particula.util.validate_inputs import validate_inputs
 
 
@@ -50,7 +54,7 @@ def get_ideal_activity_molar(
     """
     if isinstance(mass_concentration, float):
         return 1.0
-    return convert_mass_concentration.get_mole_fraction_from_mass(
+    return get_mole_fraction_from_mass(
         mass_concentrations=mass_concentration,  # type: ignore
         molar_masses=molar_mass,  # type: ignore
     )
@@ -98,7 +102,7 @@ def get_ideal_activity_volume(
     """
     if isinstance(mass_concentration, float):
         return 1.0
-    return convert_mass_concentration.get_volume_fraction_from_mass(
+    return get_volume_fraction_from_mass(
         mass_concentrations=mass_concentration,  # type: ignore
         densities=density,  # type: ignore
     )
@@ -140,7 +144,7 @@ def get_ideal_activity_mass(
     """
     if isinstance(mass_concentration, float):
         return 1.0
-    return convert_mass_concentration.get_mass_fraction_from_mass(
+    return get_mass_fraction_from_mass(
         mass_concentrations=mass_concentration  # type: ignore
     )
 
@@ -204,12 +208,12 @@ def get_kappa_activity(
     """
 
     volume_fractions = (
-        convert_mass_concentration.get_volume_fraction_from_mass(
+        get_volume_fraction_from_mass(
             mass_concentrations=mass_concentration, densities=density
         )
     )
     # other species activity based on mole fraction
-    activity = convert_mass_concentration.get_mole_fraction_from_mass(
+    activity = get_mole_fraction_from_mass(
         mass_concentrations=mass_concentration, molar_masses=molar_mass
     )
 
