@@ -9,7 +9,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
-from particula.util.converting.units import convert_units
+from particula.util.converting.convert_units import get_unit_conversion
 
 logger = logging.getLogger("particula")
 
@@ -40,7 +40,7 @@ class BuilderDensityMixin:
         if density_units == "kg/m^3":
             self.density = density
             return self
-        self.density = density * convert_units(density_units, "kg/m^3")
+        self.density = density * get_unit_conversion(density_units, "kg/m^3")
         return self
 
 
@@ -69,7 +69,7 @@ class BuilderSurfaceTensionMixin:
         if surface_tension_units == "N/m":
             self.surface_tension = surface_tension
             return self
-        self.surface_tension = surface_tension * convert_units(
+        self.surface_tension = surface_tension * get_unit_conversion(
             surface_tension_units, "N/m"
         )
         return self
@@ -101,7 +101,7 @@ class BuilderMolarMassMixin:
         if molar_mass_units == "kg/mol":
             self.molar_mass = molar_mass
             return self
-        self.molar_mass = molar_mass * convert_units(
+        self.molar_mass = molar_mass * get_unit_conversion(
             molar_mass_units, "kg/mol"
         )
         return self
@@ -140,7 +140,7 @@ class BuilderConcentrationMixin:
         if concentration_units == self.default_units:
             self.concentration = concentration
             return self
-        self.concentration = concentration * convert_units(
+        self.concentration = concentration * get_unit_conversion(
             concentration_units, self.default_units
         )
         return self
@@ -198,7 +198,7 @@ class BuilderMassMixin:
         if mass_units == "kg":
             self.mass = mass
             return self
-        self.mass = mass * convert_units(mass_units, "kg")
+        self.mass = mass * get_unit_conversion(mass_units, "kg")
         return self
 
 
@@ -227,7 +227,7 @@ class BuilderVolumeMixin:
         if volume_units == "m^3":
             self.volume = volume
             return self
-        self.volume = volume * convert_units(volume_units, "m^3")
+        self.volume = volume * get_unit_conversion(volume_units, "m^3")
         return self
 
 
@@ -256,7 +256,7 @@ class BuilderRadiusMixin:
         if radius_units == "m":
             self.radius = radius
             return self
-        self.radius = radius * convert_units(radius_units, "m")
+        self.radius = radius * get_unit_conversion(radius_units, "m")
         return self
 
 
@@ -291,7 +291,9 @@ class BuilderTemperatureMixin:
         if temperature_units == "K":
             self.temperature = temperature
             return self
-        self.temperature = temperature * convert_units(temperature_units, "K")
+        self.temperature = temperature * get_unit_conversion(
+            temperature_units, "K"
+        )
         return self
 
 
@@ -324,7 +326,7 @@ class BuilderPressureMixin:
         if pressure_units == "Pa":
             self.pressure = pressure
             return self
-        self.pressure = pressure * convert_units(pressure_units, "Pa")
+        self.pressure = pressure * get_unit_conversion(pressure_units, "Pa")
         return self
 
 
@@ -359,7 +361,7 @@ class BuilderLognormalMixin:
         if mode_units == "m":
             self.mode = mode
             return self
-        self.mode = mode * convert_units(mode_units, "m")
+        self.mode = mode * get_unit_conversion(mode_units, "m")
         return self
 
     @validate_inputs({"geometric_standard_deviation": "positive"})
@@ -397,7 +399,7 @@ class BuilderLognormalMixin:
         if number_concentration_units == "1/m^3":
             self.number_concentration = number_concentration
             return self
-        self.number_concentration = number_concentration * convert_units(
+        self.number_concentration = number_concentration * get_unit_conversion(
             number_concentration_units, "1/m^3"
         )
         return self

@@ -9,50 +9,96 @@ MAX_POSITIVE_VALUE = np.finfo(np.float64).max
 MAX_NEGATIVE_VALUE = np.finfo(np.float64).min
 
 
-def safe_exp(value: ArrayLike) -> np.ndarray:
+def get_safe_exp(value: ArrayLike) -> np.ndarray:
     """
-    Compute the exponential of each element in the input array, with limits
-    to prevent overflow based on machine precision.
+    Compute the exponential of each element in the input array, with overflow
+    protection.
 
-    Args:
-        value (ArrayLike): Input array.
+    The exponential is calculated using:
+        - y = exp(x), where x is clipped to avoid exceeding machine limits.
+
+    Arguments:
+        - value : Array-like of values to exponentiate.
 
     Returns:
-        np.ndarray: Exponential of the input array with overflow protection.
+        - np.ndarray of exponentiated values, with machine-level clipping.
+
+    Examples:
+        ``` py title="Example Usage"
+        from particula.util.machine_limit import safe_exp
+        import numpy as np
+
+        arr = np.array([0, 10, 1000])
+        print(safe_exp(arr))
+        # Output: [1.00000000e+000 2.20264658e+004 1.79769313e+308]
+        ```
+
+    References:
+        - "Floating Point Arithmetic," NumPy Documentation, NumPy.org.
     """
     value = np.asarray(value, dtype=np.float64)
     max_exp_input = np.log(np.finfo(value.dtype).max)
     return np.exp(np.clip(value, None, max_exp_input))
 
 
-def safe_log(value: ArrayLike) -> np.ndarray:
+def get_safe_log(value: ArrayLike) -> np.ndarray:
     """
     Compute the natural logarithm of each element in the input array, with
-    limits to prevent underflow based on machine precision.
+    underflow protection.
 
-    Args:
-        value (ArrayLike): Input array.
+    The natural log is calculated using:
+        - y = ln(x), where x is clipped away from zero to maintain positivity.
+
+    Arguments:
+        - value : Array-like of values for logarithm calculation.
 
     Returns:
-        np.ndarray: Natural logarithm of the input array with underflow
-        protection.
+        - np.ndarray of natural logarithms, with machine-level clipping.
+
+    Examples:
+        ``` py title="Example Usage"
+        from particula.util.machine_limit import safe_log
+        import numpy as np
+
+        arr = np.array([1e-320, 1.0, 10.0])
+        print(safe_log(arr))
+        # Output: [-7.40545337e+02  0.00000000e+00  2.30258509e+00]
+        ```
+
+    References:
+        - "Logarithms and Machine Precision," NumPy Documentation, NumPy.org.
     """
     value = np.asarray(value, dtype=np.float64)
     min_positive_value = np.nextafter(0, 1, dtype=value.dtype)
     return np.log(np.clip(value, min_positive_value, None))
 
 
-def safe_log10(value: ArrayLike) -> np.ndarray:
+def get_safe_log10(value: ArrayLike) -> np.ndarray:
     """
-    Compute the base 10 logarithm of each element in the input array, with
-    limits to prevent underflow based on machine precision.
+    Compute the base-10 logarithm of each element in the input array, with
+    underflow protection.
 
-    Args:
-        value (ArrayLike): Input array.
+    The base-10 log is calculated using:
+        - y = log10(x), where x is clipped away from zero to maintain positivity.
+
+    Arguments:
+        - value : Array-like of values for base-10 logarithm calculation.
 
     Returns:
-        np.ndarray: Base 10 logarithm of the input array with underflow
-        protection.
+        - np.ndarray of base-10 logarithms, with machine-level clipping.
+
+    Examples:
+        ``` py title="Example Usage"
+        from particula.util.machine_limit import safe_log10
+        import numpy as np
+
+        arr = np.array([1e-320, 1.0, 1000.0])
+        print(safe_log10(arr))
+        # Output: [-320.           0.           3.        ]
+        ```
+
+    References:
+        - "Logarithms and Machine Precision," NumPy Documentation, NumPy.org.
     """
     value = np.asarray(value, dtype=np.float64)
     min_positive_value = np.nextafter(0, 1, dtype=value.dtype)

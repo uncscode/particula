@@ -12,7 +12,7 @@ from particula.particles.representation import ParticleRepresentation
 from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
-from particula.util.reduced_quantity import reduced_self_broadcast
+from particula.util.reduced_quantity import get_reduced_self_broadcast
 from particula.dynamics.coagulation.charged_kernel_strategy import (
     ChargedKernelStrategyABC,
 )
@@ -80,9 +80,9 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
         radius = particle.get_radius()
         sum_of_radii = radius[:, np.newaxis] + radius
         # square matrix of mass
-        reduced_mass = reduced_self_broadcast(particle.get_mass())
+        reduced_mass = get_reduced_self_broadcast(particle.get_mass())
         # square matrix of friction factor
-        reduced_friction_factor = reduced_self_broadcast(friction_factor)
+        reduced_friction_factor = get_reduced_self_broadcast(friction_factor)
 
         return self.kernel_strategy.kernel(
             dimensionless_kernel=dimensionless_kernel,

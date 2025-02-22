@@ -6,7 +6,7 @@ import numpy as np
 from particula.util.constants import BOLTZMANN_CONSTANT
 
 from particula.particles.properties import coulomb_enhancement
-from particula.util.reduced_quantity import reduced_self_broadcast
+from particula.util.reduced_quantity import get_reduced_self_broadcast
 from particula.util.validate_inputs import validate_inputs
 
 
@@ -95,13 +95,13 @@ def get_diffusive_knudsen_number(
 
     # Calculate reduced mass
     if isinstance(particle_mass, np.ndarray):
-        reduced_mass = reduced_self_broadcast(particle_mass)
+        reduced_mass = get_reduced_self_broadcast(particle_mass)
     else:
         reduced_mass = particle_mass
 
     # Calculate reduced friction factor
     if isinstance(friction_factor, np.ndarray):
-        reduced_friction_factor = reduced_self_broadcast(friction_factor)
+        reduced_friction_factor = get_reduced_self_broadcast(friction_factor)
     else:
         reduced_friction_factor = friction_factor
 

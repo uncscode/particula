@@ -8,9 +8,9 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.util.convert import (
-    mass_concentration_to_mole_fraction,
-    mass_concentration_to_volume_fraction,
+from particula.util.converting.convert_mass_concentration import (
+    get_mole_fraction_from_mass,
+    get_volume_fraction_from_mass,
 )
 from particula.particles.properties import get_kelvin_radius, get_kelvin_term
 
@@ -163,7 +163,7 @@ class SurfaceStrategyMolar(SurfaceStrategy):
             return self.surface_tension
         return np.sum(
             self.surface_tension
-            * mass_concentration_to_mole_fraction(
+            * get_mole_fraction_from_mass(
                 mass_concentration, self.molar_mass  # type: ignore
             ),
             dtype=np.float64,
@@ -176,7 +176,7 @@ class SurfaceStrategyMolar(SurfaceStrategy):
             return self.density
         return np.sum(
             self.density
-            * mass_concentration_to_mole_fraction(
+            * get_mole_fraction_from_mass(
                 mass_concentration, self.molar_mass  # type: ignore
             ),
             dtype=np.float64,
@@ -255,7 +255,7 @@ class SurfaceStrategyVolume(SurfaceStrategy):
             return self.surface_tension
         return np.sum(
             self.surface_tension
-            * mass_concentration_to_volume_fraction(
+            * get_volume_fraction_from_mass(
                 mass_concentration, self.density  # type: ignore
             ),
             dtype=np.float64,
@@ -268,7 +268,7 @@ class SurfaceStrategyVolume(SurfaceStrategy):
             return self.density
         return np.sum(
             self.density
-            * mass_concentration_to_volume_fraction(
+            * get_volume_fraction_from_mass(
                 mass_concentration, self.density  # type: ignore
             ),
             dtype=np.float64,

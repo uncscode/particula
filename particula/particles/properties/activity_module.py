@@ -50,7 +50,7 @@ def get_ideal_activity_molar(
     """
     if isinstance(mass_concentration, float):
         return 1.0
-    return convert_mass_concentration.to_mole_fraction(
+    return convert_mass_concentration.get_mole_fraction_from_mass(
         mass_concentrations=mass_concentration,  # type: ignore
         molar_masses=molar_mass,  # type: ignore
     )
@@ -98,7 +98,7 @@ def get_ideal_activity_volume(
     """
     if isinstance(mass_concentration, float):
         return 1.0
-    return convert_mass_concentration.to_volume_fraction(
+    return convert_mass_concentration.get_volume_fraction_from_mass(
         mass_concentrations=mass_concentration,  # type: ignore
         densities=density,  # type: ignore
     )
@@ -140,7 +140,7 @@ def get_ideal_activity_mass(
     """
     if isinstance(mass_concentration, float):
         return 1.0
-    return convert_mass_concentration.to_mass_fraction(
+    return convert_mass_concentration.get_mass_fraction_from_mass(
         mass_concentrations=mass_concentration  # type: ignore
     )
 
@@ -203,11 +203,13 @@ def get_kappa_activity(
           DOI: https://doi.org/10.5194/acp-7-1961-2007.
     """
 
-    volume_fractions = convert_mass_concentration.to_volume_fraction(
-        mass_concentrations=mass_concentration, densities=density
+    volume_fractions = (
+        convert_mass_concentration.get_volume_fraction_from_mass(
+            mass_concentrations=mass_concentration, densities=density
+        )
     )
     # other species activity based on mole fraction
-    activity = convert_mass_concentration.to_mole_fraction(
+    activity = convert_mass_concentration.get_mole_fraction_from_mass(
         mass_concentrations=mass_concentration, molar_masses=molar_mass
     )
 

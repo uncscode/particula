@@ -37,7 +37,7 @@ def test_mass_concentration_to_mole_fraction(
     mass_concentrations, molar_masses, expected
 ):
     """Test mass_concentration_to_mole_fraction function"""
-    mole_fractions = convert_mass_concentration.to_mole_fraction(
+    mole_fractions = convert_mass_concentration.get_mole_fraction_from_mass(
         mass_concentrations, molar_masses
     )
     np.testing.assert_allclose(mole_fractions, expected, rtol=1e-5)
@@ -64,8 +64,10 @@ def test_mass_concentration_to_volume_fraction(
     mass_concentrations, densities, expected
 ):
     """Test mass_concentration_to_volume_fraction function"""
-    volume_fractions = convert_mass_concentration.to_volume_fraction(
-        mass_concentrations, densities
+    volume_fractions = (
+        convert_mass_concentration.get_volume_fraction_from_mass(
+            mass_concentrations, densities
+        )
     )
     np.testing.assert_allclose(volume_fractions, expected, rtol=1e-5)
 
@@ -84,7 +86,7 @@ def test_mass_concentration_to_volume_fraction(
 def test_error_handling_mass_to_mole(mass_concentrations, molar_masses):
     """Test error handling for mass_concentration_to_mole_fraction function"""
     with pytest.raises(Exception):
-        convert_mass_concentration.to_mole_fraction(
+        convert_mass_concentration.get_mole_fraction_from_mass(
             mass_concentrations, molar_masses
         )
 
@@ -104,6 +106,6 @@ def test_error_handling_mass_to_volume(mass_concentrations, densities):
     """Test error handling for mass_concentration_to_volume_fraction
     function"""
     with pytest.raises(Exception):
-        convert_mass_concentration.to_volume_fraction(
+        convert_mass_concentration.get_volume_fraction_from_mass(
             mass_concentrations, densities
         )

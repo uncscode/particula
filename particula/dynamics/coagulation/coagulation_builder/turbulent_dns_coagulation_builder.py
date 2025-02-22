@@ -8,7 +8,7 @@ import logging
 from particula.abc_builder import BuilderABC
 
 from particula.util.validate_inputs import validate_inputs
-from particula.util.converting.units import convert_units
+from particula.util.converting.convert_units import get_unit_conversion
 
 from particula.dynamics.coagulation.coagulation_strategy import (
     CoagulationStrategyABC,
@@ -97,7 +97,7 @@ class TurbulentDNSCoagulationBuilder(
         if relative_velocity_units == "m/s":
             self.relative_velocity = relative_velocity
             return self
-        self.relative_velocity = relative_velocity * convert_units(
+        self.relative_velocity = relative_velocity * get_unit_conversion(
             relative_velocity_units, "m/s"
         )
         return self

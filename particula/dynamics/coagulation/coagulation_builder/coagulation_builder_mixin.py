@@ -14,7 +14,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
-from particula.util.converting.units import convert_units
+from particula.util.converting.convert_units import get_unit_conversion
 
 logger = logging.getLogger("particula")
 
@@ -97,8 +97,9 @@ class BuilderTurbulentDissipationMixin:
         if turbulent_dissipation_units == "m^2/s^3":
             self.turbulent_dissipation = turbulent_dissipation
             return self
-        self.turbulent_dissipation = turbulent_dissipation * convert_units(
-            turbulent_dissipation_units, "m^2/s^3"
+        self.turbulent_dissipation = (
+            turbulent_dissipation
+            * get_unit_conversion(turbulent_dissipation_units, "m^2/s^3")
         )
         return self
 
@@ -129,7 +130,7 @@ class BuilderFluidDensityMixin:
         if fluid_density_units == "kg/m^3":
             self.fluid_density = fluid_density
             return self
-        self.fluid_density = fluid_density * convert_units(
+        self.fluid_density = fluid_density * get_unit_conversion(
             fluid_density_units, "kg/m^3"
         )
         return self

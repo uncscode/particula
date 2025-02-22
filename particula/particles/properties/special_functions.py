@@ -6,7 +6,7 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.machine_limit import safe_exp
+from particula.util.machine_limit import get_safe_exp
 from particula.util.validate_inputs import validate_inputs
 
 
@@ -63,7 +63,7 @@ def get_debye_function(
         - [Wolfram MathWorld: Debye Functions](https://mathworld.wolfram.com/DebyeFunctions.html)
     """
     array = np.linspace(0, variable, integration_points)
-    exp_array = safe_exp(array[1:])
+    exp_array = get_safe_exp(array[1:])
 
     if n == 1:
         integral = np.trapezoid(array[1:] / (exp_array - 1), array[1:], axis=0)

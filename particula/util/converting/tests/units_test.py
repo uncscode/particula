@@ -3,7 +3,7 @@ Tests for Converting Units
 """
 
 import unittest
-from particula.util.converting.units import convert_units
+from particula.util.converting.convert_units import get_unit_conversion
 
 # flake8: noqa
 try:
@@ -30,7 +30,7 @@ class TestUnitConversion(unittest.TestCase):
         """
         if not IS_PINT_AVAILABE:
             with self.assertRaises(ImportError):
-                convert_units("degC", "degF")
+                get_unit_conversion("degC", "degF")
         else:
             self.skipTest("Pint installed. Skipping import warning test.")
 
@@ -39,7 +39,7 @@ class TestUnitConversion(unittest.TestCase):
         Test for example conversion when pint is installed
         """
         if IS_PINT_AVAILABE:
-            result = convert_units("ug/m^3", "kg/m^3")
+            result = get_unit_conversion("ug/m^3", "kg/m^3")
             self.assertAlmostEqual(result, 1e-9)
         else:
             self.skipTest("Pint not installed. Skipping conversion test.")
