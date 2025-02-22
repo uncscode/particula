@@ -23,19 +23,6 @@ Where:
 - T is the temperature
 - molar massᵢ is the molar mass of species 
 
-- m is the mass of the droplet
-- radius_wet is the wet radius of the droplet
-- Dᵢ is the vapor diffusion coefficient of species i
-- pᵢ, gas is the partial pressure of species i in the gas phase
-- pᵢ, particle surface is the partial pressure of species i at the surface of the particle, accounting for Kelvin effect and activity coefficients.
-- Lᵢ is the latent heat of vaporization of species i
-- κ is the thermal conductivity of air
-- T is the temperature
-- R is the ideal gas constant
-- Rᵢ is the specific gas constant for species i (R / molar massᵢ)
-- dm/dt is the rate of change of mass of species i in the particle phasei
-- dmi/dt is the rate of change of mass of species i in the particle phase
-
 The first order condensation coefficient is defined as:
 
 k_cond = 4π × radius_particle × Dᵢ × f(Kn, α)
