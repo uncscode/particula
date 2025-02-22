@@ -42,10 +42,6 @@ from particula.util.converting.convert_mass_concentration import (
 from particula.util.converting.convert_mole_fraction import (
     get_mass_fractions_from_moles,
 )
-from private_dev.readd.convert_shapes import (
-    get_length_from_volume,
-    get_volume_from_length,
-)
 from particula.util.converting.convert_size_distribution import (
     get_conversion_strategy,
     get_distribution_in_dn,
