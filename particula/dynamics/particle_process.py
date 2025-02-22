@@ -11,7 +11,7 @@ from particula.aerosol import Aerosol
 from particula.dynamics.condensation.condensation_strategies import (
     CondensationStrategy,
 )
-from particula.dynamics.coagulation.coagulation_strategy import (
+from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
 

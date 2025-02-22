@@ -4,8 +4,10 @@ CoagulationBuilder for Turbulent Shear Coagulation.
 
 from particula.abc_builder import BuilderABC
 
-from particula.dynamics.coagulation.coagulation_strategy import (
+from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
+)
+from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy import (
     TurbulentShearCoagulationStrategy,
 )
 from particula.dynamics.coagulation.coagulation_builder.coagulation_builder_mixin import (
