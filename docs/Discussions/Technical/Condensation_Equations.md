@@ -66,7 +66,7 @@ The condensation or evaporation process accounting for latent heat is defined by
 
 dm/dt = numerator / denominator
 
-numerator = 4π × radius_wet × Dᵢ × (pᵢ, gas − pᵢ, particle surface)
+numerator = N × 4π × radius_wet × Dᵢ × (pᵢ, gas − pᵢ, particle surface)
 
 denominator = [Dᵢ × Lᵢ × pᵢ] / [κ × T] × [(Lᵢ / (R × T)) − 1] + Rᵢ × T
 
