@@ -2,7 +2,7 @@
 
 Isothermal and non-isothermal condensation processes are fundamental in aerosol dynamics. Condensation involves the transfer of gas-phase species to the particle phase, which can be reversible when the species evaporates back into the gas phase. This process is pivotal in the formation of cloud droplets and the growth of atmospheric particles, influencing climate and air quality.
 
-## Condensation Equations (Isothermal)
+## Condensation Isothermal
 
 In the isothermal case, we consider condensation processes where the temperature remains constant, and the latent heat of vaporization is neglected. This approximation is valid when the heat released or absorbed during condensation or evaporation is insufficient to cause significant temperature changes.
 
@@ -28,6 +28,37 @@ dmi/dt = N × k_cond × (pᵢ, gas − pᵢ, particle surface) × (molar massᵢ
 **Description:**
 
 This equation quantifies the net mass flux of species **i** from the gas phase to the particle phase (or vice versa) due to condensation or evaporation. The driving force is the difference in partial pressures (**pᵢ, gas − pᵢ, particle surface**), and it's scaled by the molar mass and thermodynamic constants to yield a mass rate.
+
+## Condensation with Latent Heat
+
+When condensation results in significant heat release or absorption, the latent heat of vaporization must be considered. This scenario is critical in cloud droplet formation, where the heat effects can influence the condensation rate and local temperature.
+
+Derivation from Topping, D., & Bane, M. (2022) equation 2.36.
+
+**Equation 5: Rate of Mass Change with Latent Heat**
+
+dm/dt = [N × 4 × π × radius_wet × Dᵢ × (pᵢ, gas − pᵢ, particle surface)] / { [ (Dᵢ × Lᵢ × pᵢ) / (κ × T) ] × [ (Lᵢ / (R × T)) − 1 ] + Rᵢ × T }
+
+**Where:**
+
+- **dm/dt**: Rate of change of mass of the droplet.
+- **m**: Mass of the droplet.
+- **radius_wet**: Wet radius of the droplet.
+- **Dᵢ**: Diffusion coefficient of species **i**.
+- **pᵢ, gas**: Partial pressure of species **i** in the gas phase.
+- **pᵢ, particle surface**: Partial pressure at the particle surface.
+- **Lᵢ**: Latent heat of vaporization for species **i**.
+- **κ**: Thermal conductivity of air.
+- **T**: Temperature.
+- **Rᵢ**: Specific gas constant for species **i** (**R / molar massᵢ**).
+
+**Description:**
+
+This equation modifies the isothermal rate to include thermal effects due to latent heat. The denominator accounts for the additional resistance to mass transfer caused by the temperature gradient established from heat release or absorption during phase change.
+
+
+## Additional Parameters
+
 
 ### First-Order Condensation Coefficient
 
@@ -73,34 +104,6 @@ Kn = λᵢ / radius_particle
 
 The correction factor **f(Kn, αᵢ)** adjusts the condensation coefficient to account for the finite mean free path of gas molecules relative to the particle size. It ensures accurate depiction of mass transfer in both the free-molecular (high Kn) and continuum (low Kn) regimes.
 
-## Condensation Equations (Latent Heat)
-
-## Condensation Equations (Latent Heat)
-
-When condensation results in significant heat release or absorption, the latent heat of vaporization must be considered. This scenario is critical in cloud droplet formation, where the heat effects can influence the condensation rate and local temperature.
-
-**Equation 5: Rate of Mass Change with Latent Heat**
-
-dm/dt = [N × 4 × π × radius_wet × Dᵢ × (pᵢ, gas − pᵢ, particle surface)] / { [ (Dᵢ × Lᵢ × pᵢ) / (κ × T) ] × [ (Lᵢ / (R × T)) − 1 ] + Rᵢ × T }
-
-**Where:**
-
-- **dm/dt**: Rate of change of mass of the droplet.
-- **m**: Mass of the droplet.
-- **radius_wet**: Wet radius of the droplet.
-- **Dᵢ**: Diffusion coefficient of species **i**.
-- **pᵢ, gas**: Partial pressure of species **i** in the gas phase.
-- **pᵢ, particle surface**: Partial pressure at the particle surface.
-- **Lᵢ**: Latent heat of vaporization for species **i**.
-- **κ**: Thermal conductivity of air.
-- **T**: Temperature.
-- **Rᵢ**: Specific gas constant for species **i** (**R / molar massᵢ**).
-
-**Description:**
-
-This equation modifies the isothermal rate to include thermal effects due to latent heat. The denominator accounts for the additional resistance to mass transfer caused by the temperature gradient established from heat release or absorption during phase change.
-
-### Partial Pressures
 
 ### Partial Pressures
 
@@ -139,7 +142,6 @@ pᵢ, particle surface = pᵢ^pure × γᵢ × xᵢ × kᵢ, Kelvin
 
 This equation adjusts the pure saturation vapor pressure to account for solution non-idealities (via **γᵢ** and **xᵢ**) and curvature effects (via **kᵢ, Kelvin**).
 
----
 
 ### Kelvin Effect Correction Factor
 
@@ -163,7 +165,8 @@ kᵢ, Kelvin radius = [2 × σ_surface × molar massᵢ] / [ R × T × density ]
 **Description:**
 
 The Kelvin effect expresses how vapor pressure over a curved surface differs from that over a flat surface. Small particles exhibit increased vapor pressure due to curvature, influencing condensation and evaporation rates.
-### Additional Descriptive Text
+
+## Variable Descriptions
 
 **Understanding the Parameters:**
 
@@ -239,18 +242,16 @@ The Kelvin effect expresses how vapor pressure over a curved surface differs fro
 
 ---
 
-**Conclusion**
+## Conclusion
 
 By reviewing the equations and expanding on the descriptions, we enhance the understanding of condensation processes in aerosol dynamics. The interplay between mass transfer, thermodynamics, and kinetics is critical for accurately modeling aerosol behavior. Recognizing the importance of each parameter and the assumptions inherent in these equations allows for more informed application and interpretation in research and environmental modeling.
 
 ---
 
-**References**
+## References
 
 1. **Topping, D., & Bane, M. (2022).** *Introduction to Aerosol Modelling*. Wiley. DOI: [10.1002/9781119625728](https://doi.org/10.1002/9781119625728)
 
 2. **Seinfeld, J. H., & Pandis, S. N. (2016).** *Atmospheric Chemistry and Physics: From Air Pollution to Climate Change* (3rd ed.). Wiley.
 
----
 
-*Note:* All mathematical expressions have been formatted using Unicode symbols for clarity and to align with the requested guidelines.
