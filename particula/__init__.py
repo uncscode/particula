@@ -17,6 +17,17 @@ More details to follow.
 # flake8: noqa
 # pyright: basic
 
+from particula import (
+    gas,
+    particles,
+    util,
+    dynamics,
+    activity,
+    equilibria,
+)
+from particula.aerosol import Aerosol
+
+
 
 from particula.logger_setup import setup
 
