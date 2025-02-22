@@ -10,74 +10,100 @@ This follows Chapter 2 (EQ 2.41) by Topping, D., & Bane, M. (2022). Introduction
 
 The isothermal condensation or evaporation process is defined by the following equation:
 
-$$
-\frac{dm_{i}}{dt} = N \frac{k_{cond} (p_{i, gas} - p_{i, particle~surface})}{RT/ molar~mass_{i}}
-$$
+dmi/dt = N × [k_cond × (pᵢ, gas − pᵢ, particle surface)] × [molar massᵢ / (R × T)]
 
 Where:
 
-- $m_{i}$ is the mass of species $i$ in the particle phase, of a specific bin
-- $N$ is the number of particles
-- $k_{cond}$ is the per-particle for order condensation coefficient
-- $p_{i, gas}$ is the partial pressure of species $i$ in the gas phase
-- $p_{i, particle~surface}$ is the partial pressure of species $i$ at the surface of the particle, acounting for Kelvin effect and activity coefficients.
-- $R$ is the ideal gas constant
-- $T$ is the temperature
-- $molar mass_{i}$ is the molar mass of species $i$
-- $dm_{i}/dt$ is the rate of change of mass of species $i$ in the particle phase
+- mᵢ is the mass of species i in the particle phase, of a specific bin
+- N is the number of particles
+- k_cond is the per-particle for order condensation coefficient
+- pᵢ, gas is the partial pressure of species i in the gas phase
+- pᵢ, particle surface is the partial pressure of species i at the surface of the particle, accounting for Kelvin effect and activity coefficients.
+- R is the ideal gas constant
+- T is the temperature
+- molar massᵢ is the molar mass of species 
+
+- m is the mass of the droplet
+- radius_wet is the wet radius of the droplet
+- Dᵢ is the vapor diffusion coefficient of species i
+- pᵢ, gas is the partial pressure of species i in the gas phase
+- pᵢ, particle surface is the partial pressure of species i at the surface of the particle, accounting for Kelvin effect and activity coefficients.
+- Lᵢ is the latent heat of vaporization of species i
+- κ is the thermal conductivity of air
+- T is the temperature
+- R is the ideal gas constant
+- Rᵢ is the specific gas constant for species i (R / molar massᵢ)
+- dm/dt is the rate of change of mass of species i in the particle phasei
+- dmi/dt is the rate of change of mass of species i in the particle phase
 
 The first order condensation coefficient is defined as:
 
-$$
-k_{cond} = 4 \pi~radius_{particle}~D_{i}~f(Kn, \alpha)
-$$
+k_cond = 4π × radius_particle × Dᵢ × f(Kn, α)
 
 Where:
 
-- $radius_{particle}$ is the radius of the particle
-- $D_{i}$ is the vapor diffusion coefficient of species $i$
-- $f(Kn, \alpha)$ is the correction factor for the molecular regime to continuum regime transition. This is a function of the Knudsen number and the accommodation coefficient.
+- radius_particle is the radius of the particle
+- Dᵢ is the vapor diffusion coefficient of species i
+- f(Kn, α) is the correction factor for the molecular regime to continuum regime transition. This is a function of the Knudsen number and the accommodation coefficient.
 
 The correction factor is defined as:
 
-$$
-f(Kn, \alpha_{i, accom.}) = \frac{0.75 \alpha_{i, accom.} (1 + Kn)}{
-    (Kn^2 + Kn) + 0.283 \alpha_{i, accom.} Kn + 0.75 \alpha_{i, accom.}}
-$$
+f(Kn, αᵢ) = [0.75 × αᵢ × (1 + Kn)] / [(Kn² + Kn) + 0.283 × αᵢ × Kn + 0.75 × αᵢ]
 
 Where:
 
-- $\alpha_{i, accom.}$ is the accommodation coefficient of species $i$
-- $Kn$ is the Knudsen number
-- $Kn = \frac{\lambda_{i}}{radius_{particle}}$
-  - $\lambda$ is the mean free path of the gas molecules of species $i$
-  - $radius$ is the radius of the particle
+- αᵢ is the accommodation coefficient of species i
+- Kn is the Knudsen number
+- Kn = λᵢ / radius_particle
+  - λ is the mean free path of the gas molecules of species i
+  - radius is the radius of the particle
 
+## Condensation Equations (Latent Heat)
+
+The condensation process now includes the latent heat of vaporization, which is significant in cloud droplet formation.
+
+The condensation or evaporation process accounting for latent heat is defined by the following equation:
+
+dm/dt = numerator / denominator
+
+numerator = 4π × radius_wet × Dᵢ × (pᵢ, gas − pᵢ, particle surface)
+
+denominator = [Dᵢ × Lᵢ × pᵢ] / [κ × T] × [(Lᵢ / (R × T)) − 1] + Rᵢ × T
+
+Where:
+
+- dm/dt is the rate of change of mass of species i in the particle phase
+- m is the mass of the droplet
+- radius_wet is the wet radius of the droplet
+- Dᵢ is the vapor diffusion coefficient of species i
+- pᵢ, gas is the partial pressure of species i in the gas phase
+- pᵢ, particle surface is the partial pressure of species i at the surface of the particle, accounting for Kelvin effect and activity coefficients.
+- Lᵢ is the latent heat of vaporization of species i
+- κ is the thermal conductivity of air
+- T is the temperature
+- R is the ideal gas constant
+- Rᵢ is the specific gas constant for species i (R / molar massᵢ)
 
 ### Partial Pressures
 
 The partial pressures of species $i$ in the gas phase and at the surface of the particle are defined as:
 
-$$
-p_{i, gas} = conc_{i, gas} RT/molar~mass_{i}
-$$
+pᵢ, gas = concᵢ, gas × (R × T) / molar massᵢ
 
 Where:
-- $conc_{i, gas}$ is the concentration of species $i$ in the gas phase
+- concᵢ, gas is the concentration of species i in the gas phase
 
 At the surface of the particle, the partial pressure is defined as:
 
-$$
-p_{i, particle~surface} = p^{pure}_{i} \gamma_{i} x_{i} k_{i,Kelvin}
-$$
+pᵢ, particle surface = pᵢ^pure × γᵢ × xᵢ × kᵢ, Kelvin
 
 Where:
 
-- $p^{pure}_{i}$ is the saturation vapor pressure of species $i$, sometimes called $p^{sat}_{i}$, $p^{vap}_{i}$, or $p^{0}_{i}$
-- $\gamma_{i}$ is the activity coefficient of species $i$
-- $x_{i}$ is the mole fraction of species $i$ in the particle phase
-- $k_{i,Kelvin}$ is the Kelvin effect correction factor
-  - $k_{i,Kelvin} = exp(k_{i, Kelvin~radius}/radius_{particle})$
-  - $k_{i, Kelvin~radius} = 2 \sigma_{surface}~molar~mass_{i} / (R  T ~ density)$
-    - $\sigma_{surface}$ is the effective surface tension of the particle.
-    - $density$ is the effective density of the particle.
+- pᵢ^pure is the saturation vapor pressure of species i, sometimes called pᵢ^sat, pᵢ^vap, or pᵢ^0
+- γᵢ is the activity coefficient of species i
+- xᵢ is the mole fraction of species i in the particle phase
+- kᵢ, Kelvin is the Kelvin effect correction factor
+  - kᵢ, Kelvin = exp(kᵢ, Kelvin radius / radius_particle)
+  - kᵢ, Kelvin radius = [2 × σ_surface × molar massᵢ ] / [R × T × density]
+    - σ_surface is the effective surface tension of the particle.
+    - density is the effective density of the particle.
