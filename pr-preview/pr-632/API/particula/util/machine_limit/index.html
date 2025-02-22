@@ -7739,11 +7739,11 @@ protection.</p>
 <li>np.ndarray of exponentiated values, with machine-level clipping.</li>
 </ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.machine_limit</span><span class="w"> </span><span class="kn">import</span> <span class="n">safe_exp</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">safe_exp</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_safe_exp</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
 <span class="c1"># Output: [1.00000000e+000 2.20264658e+004 1.79769313e+308]</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
@@ -7768,11 +7768,11 @@ underflow protection.</p>
 <li>np.ndarray of natural logarithms, with machine-level clipping.</li>
 </ul>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.machine_limit</span><span class="w"> </span><span class="kn">import</span> <span class="n">safe_log</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-320</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">safe_log</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">get_safe_log</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
 <span class="c1"># Output: [-7.40545337e+02  0.00000000e+00  2.30258509e+00]</span>
 </code></pre></div>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
@@ -7797,11 +7797,11 @@ underflow protection.</p>
 <li>np.ndarray of base-10 logarithms, with machine-level clipping.</li>
 </ul>
 <h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.machine_limit</span><span class="w"> </span><span class="kn">import</span> <span class="n">safe_log10</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
 <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-320</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">safe_log10</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">get_safe_log10</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
 <span class="c1"># Output: [-320.           0.           3.        ]</span>
 </code></pre></div>
 <h4 id="references_2">References<a class="headerlink" href="#references_2" title="Permanent link">&para;</a></h4>

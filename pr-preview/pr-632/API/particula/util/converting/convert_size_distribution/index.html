@@ -8753,7 +8753,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py">particula.util.converting.convert_size_distribution</a> module.</p>
 </blockquote>
 <h2 id="conversionstrategy">ConversionStrategy<a class="headerlink" href="#conversionstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L37">Show source in convert_size_distribution.py:37</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L39">Show source in convert_size_distribution.py:39</a></p>
 <p>Defines an interface for conversion strategies between particle size
 distribution formats.</p>
 <p>All subclasses must implement the convert method to perform the actual
@@ -8768,7 +8768,7 @@ conversion logic.</p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ConversionStrategy</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="conversionstrategyconvert">ConversionStrategy().convert<a class="headerlink" href="#conversionstrategyconvert" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L54">Show source in convert_size_distribution.py:54</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L56">Show source in convert_size_distribution.py:56</a></p>
 <p>Convert distribution data from one scale to another.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
@@ -8791,7 +8791,7 @@ conversion logic.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="dndlogdptopdfconversionstrategy">DNdlogDPtoPDFConversionStrategy<a class="headerlink" href="#dndlogdptopdfconversionstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L185">Show source in convert_size_distribution.py:185</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L187">Show source in convert_size_distribution.py:187</a></p>
 <p>Conversion strategy for converting between dn/dlogdp and PDF formats,
 possibly through an intermediate PMF conversion.</p>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
@@ -8807,7 +8807,7 @@ possibly through an intermediate PMF conversion.</p>
 <li><a href="#conversionstrategy">ConversionStrategy</a></li>
 </ul>
 <h3 id="dndlogdptopdfconversionstrategyconvert">DNdlogDPtoPDFConversionStrategy().convert<a class="headerlink" href="#dndlogdptopdfconversionstrategyconvert" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L198">Show source in convert_size_distribution.py:198</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L200">Show source in convert_size_distribution.py:200</a></p>
 <p>Convert between dn/dlogdp and PDF formats through an intermediate
 PMF step.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
@@ -8827,7 +8827,7 @@ PMF step.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="dndlogdptopmfconversionstrategy">DNdlogDPtoPMFConversionStrategy<a class="headerlink" href="#dndlogdptopmfconversionstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L115">Show source in convert_size_distribution.py:115</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L117">Show source in convert_size_distribution.py:117</a></p>
 <p>Conversion strategy for converting between dn/dlogdp and PMF formats.</p>
 <h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="n">strategy</span> <span class="o">=</span> <span class="n">DNdlogDPtoPMFConversionStrategy</span><span class="p">()</span>
@@ -8842,7 +8842,7 @@ PMF step.</p>
 <li><a href="#conversionstrategy">ConversionStrategy</a></li>
 </ul>
 <h3 id="dndlogdptopmfconversionstrategyconvert">DNdlogDPtoPMFConversionStrategy().convert<a class="headerlink" href="#dndlogdptopmfconversionstrategyconvert" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L127">Show source in convert_size_distribution.py:127</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L129">Show source in convert_size_distribution.py:129</a></p>
 <p>Perform the conversion between dn/dlogdp and PMF formats.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <ul>
@@ -8861,7 +8861,7 @@ PMF step.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="pmftopdfconversionstrategy">PMFtoPDFConversionStrategy<a class="headerlink" href="#pmftopdfconversionstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L150">Show source in convert_size_distribution.py:150</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L152">Show source in convert_size_distribution.py:152</a></p>
 <p>Conversion strategy for converting between PMF and PDF formats.</p>
 <h4 id="examples_3">Examples<a class="headerlink" href="#examples_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="n">strategy</span> <span class="o">=</span> <span class="n">PMFtoPDFConversionStrategy</span><span class="p">()</span>
@@ -8876,7 +8876,7 @@ PMF step.</p>
 <li><a href="#conversionstrategy">ConversionStrategy</a></li>
 </ul>
 <h3 id="pmftopdfconversionstrategyconvert">PMFtoPDFConversionStrategy().convert<a class="headerlink" href="#pmftopdfconversionstrategyconvert" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L162">Show source in convert_size_distribution.py:162</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L164">Show source in convert_size_distribution.py:164</a></p>
 <p>Perform the conversion between PMF and PDF formats.</p>
 <h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
 <ul>
@@ -8895,7 +8895,7 @@ PMF step.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="samescaleconversionstrategy">SameScaleConversionStrategy<a class="headerlink" href="#samescaleconversionstrategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L80">Show source in convert_size_distribution.py:80</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L82">Show source in convert_size_distribution.py:82</a></p>
 <p>Conversion strategy that returns the input concentration unchanged.</p>
 <p>No conversion is performed because the input and output scales are the
 same.</p>
@@ -8912,7 +8912,7 @@ same.</p>
 <li><a href="#conversionstrategy">ConversionStrategy</a></li>
 </ul>
 <h3 id="samescaleconversionstrategyconvert">SameScaleConversionStrategy().convert<a class="headerlink" href="#samescaleconversionstrategyconvert" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L95">Show source in convert_size_distribution.py:95</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L97">Show source in convert_size_distribution.py:97</a></p>
 <p>Return the concentration unchanged, since no conversion is needed.</p>
 <h4 id="arguments_4">Arguments<a class="headerlink" href="#arguments_4" title="Permanent link">&para;</a></h4>
 <ul>
@@ -8930,7 +8930,7 @@ same.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="sizerconverter">SizerConverter<a class="headerlink" href="#sizerconverter" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L233">Show source in convert_size_distribution.py:233</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L235">Show source in convert_size_distribution.py:235</a></p>
 <p>A converter that composes a ConversionStrategy to transform
 particle size distribution data between formats.
 [might not be needed or used, -kyle]</p>
@@ -8951,7 +8951,7 @@ particle size distribution data between formats.
 <li><a href="#conversionstrategy">ConversionStrategy</a></li>
 </ul>
 <h3 id="sizerconverterconvert">SizerConverter().convert<a class="headerlink" href="#sizerconverterconvert" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L258">Show source in convert_size_distribution.py:258</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L260">Show source in convert_size_distribution.py:260</a></p>
 <p>Convert the particle size distribution data using the assigned
 strategy.</p>
 <h4 id="arguments_5">Arguments<a class="headerlink" href="#arguments_5" title="Permanent link">&para;</a></h4>
@@ -8971,7 +8971,7 @@ strategy.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_conversion_strategy">get_conversion_strategy<a class="headerlink" href="#get_conversion_strategy" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L280">Show source in convert_size_distribution.py:280</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L282">Show source in convert_size_distribution.py:282</a></p>
 <p>Factory function to obtain a conversion strategy based on the input and
 output scales.</p>
 <h4 id="arguments_6">Arguments<a class="headerlink" href="#arguments_6" title="Permanent link">&para;</a></h4>
@@ -9004,7 +9004,7 @@ output scales.</p>
 <li><a href="#conversionstrategy">ConversionStrategy</a></li>
 </ul>
 <h2 id="get_distribution_in_dn">get_distribution_in_dn<a class="headerlink" href="#get_distribution_in_dn" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L342">Show source in convert_size_distribution.py:342</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L344">Show source in convert_size_distribution.py:344</a></p>
 <p>Convert the sizer data between dn/dlogdp and d_num formats.</p>
 <p>If inverse=False, this function applies:
 - d_num = dn_dlogdp × (log10(upper / lower))
@@ -9045,7 +9045,7 @@ output scales.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_pdf_distribution_in_pmf">get_pdf_distribution_in_pmf<a class="headerlink" href="#get_pdf_distribution_in_pmf" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L405">Show source in convert_size_distribution.py:405</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L407">Show source in convert_size_distribution.py:407</a></p>
 <p>Convert the distribution data between a probability density function (PDF) and
 a probability mass spectrum (PMF).</p>
 <p>The conversion uses:
