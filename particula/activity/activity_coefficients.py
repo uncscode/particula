@@ -11,7 +11,7 @@ https://doi.org/10.5194/acp-19-13383-2019
 from typing import Optional, Union, Tuple, List
 import numpy as np
 from numpy.typing import NDArray
-from particula.util.machine_limit import safe_exp
+from particula.util.machine_limit import get_safe_exp
 from particula.util.validate_inputs import validate_inputs
 
 from particula.activity.gibbs_mixing import gibbs_mix_weight
@@ -75,8 +75,8 @@ def bat_activity_coefficients(
     ln_gamma_water = gibbs_mix - organic_mole_fraction * derivative_gibbs
     ln_gamma_org = gibbs_mix + (1.0 - organic_mole_fraction) * derivative_gibbs
 
-    gamma_water = safe_exp(ln_gamma_water)
-    gamma_organic = safe_exp(ln_gamma_org)
+    gamma_water = get_safe_exp(ln_gamma_water)
+    gamma_organic = get_safe_exp(ln_gamma_org)
 
     activity_water = gamma_water * (1.0 - organic_mole_fraction)
     activity_organic = gamma_organic * organic_mole_fraction

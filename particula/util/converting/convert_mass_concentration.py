@@ -12,7 +12,7 @@ from particula.util.validate_inputs import validate_inputs
         "molar_masses": "positive",
     }
 )
-def to_mole_fraction(
+def get_mole_fraction_from_mass(
     mass_concentrations: NDArray[np.float64], molar_masses: NDArray[np.float64]
 ) -> NDArray[np.float64]:
     """
@@ -37,11 +37,10 @@ def to_mole_fraction(
     Examples:
         ```py
         import numpy as np
-        from particula.util.converting.convert_mass_concentration import to_mole_fraction
-
+        import particula as par
         mass_conc = np.array([0.2, 0.8])  # kg/m³
         mol_masses = np.array([0.018, 0.032])  # kg/mol
-        print(to_mole_fraction(mass_conc, mol_masses))
+        get_mole_fraction_from_mass(mass_conc, mol_masses))
         # Output might be array([0.379..., 0.620...])
         ```
 
@@ -88,7 +87,7 @@ def to_mole_fraction(
         "densities": "positive",
     }
 )
-def to_volume_fraction(
+def get_volume_fraction_from_mass(
     mass_concentrations: NDArray[np.float64], densities: NDArray[np.float64]
 ) -> NDArray[np.float64]:
     """
@@ -116,12 +115,12 @@ def to_volume_fraction(
     Examples:
         ```py
         import numpy as np
-        from particula.util.converting.convert_mass_concentration import to_volume_fraction
+        import particula as par
 
         mass_conc = np.array([[1.0, 2.0], [0.5, 0.5]])  # kg/m³
         dens = np.array([1000.0, 800.0])               # kg/m³
-        print(to_volume_fraction(mass_conc, dens))
-        # Output might be:
+        par.get_volume_fraction_from_mass(mass_conc, dens))
+        # Output:
         # array([[0.444..., 0.555...],
         #        [0.5     , 0.5     ]])
         ```
@@ -168,7 +167,7 @@ def to_volume_fraction(
         "mass_concentrations": "nonnegative",
     }
 )
-def to_mass_fraction(
+def get_mass_fraction_from_mass(
     mass_concentrations: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """
@@ -191,10 +190,10 @@ def to_mass_fraction(
     Examples:
         ```py
         import numpy as np
-        from particula.util.converting.convert_mass_concentration import to_mass_fraction
+        import particula as par
 
         mass_conc = np.array([10.0, 30.0, 60.0])  # kg/m³
-        print(to_mass_fraction(mass_conc))
+        par.get_mass_fraction(mass_conc)
         # Output might be array([0.1, 0.3, 0.6])
         ```
 

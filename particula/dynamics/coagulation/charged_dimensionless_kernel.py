@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.particles.properties import coulomb_enhancement
-from particula.util.machine_limit import safe_exp
+from particula.util.machine_limit import get_safe_exp
 
 
 def get_dimensional_kernel(
@@ -211,7 +211,7 @@ def get_coulomb_kernel_gatti2008(
     factored_term = (pi_sqrt * continuum * coulomb_potential_ratio * 1.22) / (
         2 * kinetic * diffusive_knudsen
     )
-    exponential_decay = safe_exp(-factored_term)
+    exponential_decay = get_safe_exp(-factored_term)
 
     term1 = continuum_limit * (1 - (1 + factored_term) * exponential_decay)
     term2 = (
@@ -330,6 +330,7 @@ def get_coulomb_kernel_chahl2019(
     )
     return np.where(
         bool_mask,
-        safe_exp(correction_mu) * get_hard_sphere_kernel(diffusive_knudsen),
+        get_safe_exp(correction_mu)
+        * get_hard_sphere_kernel(diffusive_knudsen),
         get_hard_sphere_kernel(diffusive_knudsen),
     )

@@ -13,7 +13,7 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.machine_limit import safe_exp, safe_log
+from particula.util.machine_limit import get_safe_exp, get_safe_log
 
 MIN_SPREAD_IN_AW = 10**-6
 Q_ALPHA_AT_1PHASE_AW = 0.99
@@ -44,7 +44,7 @@ def organic_water_single_phase(
     molar_mass_ratio = np.asarray(molar_mass_ratio, dtype=np.float64)
 
     return (
-        0.205 / (1 + safe_exp(26.6 * (molar_mass_ratio - 0.12))) ** 0.843
+        0.205 / (1 + get_safe_exp(26.6 * (molar_mass_ratio - 0.12))) ** 0.843
         + 0.225
     )
 
@@ -275,13 +275,13 @@ def q_alpha(
 
     # calculate curve parameter of sigmoid
     sigmoid_curve_parameter = (
-        safe_log(1 / (1 - Q_ALPHA_AT_1PHASE_AW) - 1) / delta_seperation
+        get_safe_log(1 / (1 - Q_ALPHA_AT_1PHASE_AW) - 1) / delta_seperation
     )
 
     # calculate q_alpha return value
     return 1 - 1 / (
         1
-        + safe_exp(
+        + get_safe_exp(
             sigmoid_curve_parameter
             * (activities - seperation_activity + delta_seperation)
         )

@@ -17,8 +17,6 @@ More details to follow.
 # flake8: noqa
 # pyright: basic
 
-from particula import gas
-from particula import dynamics
 
 from particula.logger_setup import setup
 

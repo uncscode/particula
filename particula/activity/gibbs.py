@@ -7,7 +7,7 @@ from typing import Tuple
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.util.machine_limit import safe_log
+from particula.util.machine_limit import get_safe_log
 
 
 def gibbs_free_engery(
@@ -27,8 +27,8 @@ def gibbs_free_engery(
         - gibbs_real : The real gibbs free energy of mixing.
     """
 
-    gibbs_ideal = (1 - organic_mole_fraction) * safe_log(
+    gibbs_ideal = (1 - organic_mole_fraction) * get_safe_log(
         1 - organic_mole_fraction
-    ) + organic_mole_fraction * safe_log(organic_mole_fraction)
+    ) + organic_mole_fraction * get_safe_log(organic_mole_fraction)
     gibbs_real = gibbs_ideal + gibbs_mix
     return gibbs_ideal, gibbs_real

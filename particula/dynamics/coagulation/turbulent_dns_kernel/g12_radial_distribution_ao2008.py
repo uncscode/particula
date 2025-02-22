@@ -8,12 +8,7 @@ import numpy as np
 
 from particula.util.validate_inputs import validate_inputs
 from particula.util.constants import STANDARD_GRAVITY
-from particula.util.self_broadcast import (
-    get_pairwise_sum_matrix,
-    get_pairwise_max_matrix,
-    get_pairwise_diff_matrix,
-)
-from particula.util.machine_limit import safe_exp
+from particula.util.machine_limit import get_safe_exp
 
 
 @validate_inputs(
@@ -75,9 +70,15 @@ def get_g12_radial_distribution_ao2008(
         Theory and parameterization. New Journal of Physics, 10.
         https://doi.org/10.1088/1367-2630/10/7/075016
     """
-    collision_radius = get_pairwise_sum_matrix(particle_radius)
-    stokes_diff_matrix = get_pairwise_diff_matrix(stokes_number)
-    stokes_max_matrix = get_pairwise_max_matrix(stokes_number)
+    collision_radius = (
+        particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]
+    )
+    stokes_diff_matrix = (
+        stokes_number[:, np.newaxis] - stokes_number[np.newaxis, :]
+    )
+    stokes_max_matrix = np.maximum(
+        stokes_number[: np.newaxis], stokes_number[np.newaxis, :]
+    )
 
     c1 = _calculate_c1(
         stokes_max_matrix,
@@ -149,7 +150,7 @@ def _compute_y_stokes(
 
 def _compute_f3_lambda(reynolds_lambda: float) -> float:
     """Compute f_3(R_lambda), an empirical turbulence factor."""
-    return 0.1886 * safe_exp(20.306 / reynolds_lambda)
+    return 0.1886 * get_safe_exp(20.306 / reynolds_lambda)
 
 
 def _calculate_rc(

@@ -11,7 +11,7 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.util.machine_limit import safe_exp
+from particula.util.machine_limit import get_safe_exp
 from particula.util.validate_inputs import validate_inputs
 from particula.util.constants import (
     BOLTZMANN_CONSTANT,
@@ -137,7 +137,7 @@ def get_coulomb_kinetic_limit(
     return np.where(
         coulomb_potential >= 0,
         1 + coulomb_potential,
-        safe_exp(coulomb_potential),
+        get_safe_exp(coulomb_potential),
     )
 
 
@@ -179,7 +179,7 @@ def get_coulomb_continuum_limit(
           Coulomb-influenced collisions in aerosols and dusty plasmas.
           Physical Review E, 85(2). https://doi.org/10.1103/PhysRevE.85.026410
     """
-    denominator = 1 - safe_exp(-1 * coulomb_potential)
+    denominator = 1 - get_safe_exp(-1 * coulomb_potential)
     return np.divide(
         coulomb_potential,
         denominator,

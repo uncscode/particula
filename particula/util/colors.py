@@ -1,5 +1,24 @@
 """Color Hex Codes"""
 
+from collections import namedtuple
+
+
+ColorScale = namedtuple(
+    "ColorScale",
+    [
+        "_50",
+        "_100",
+        "_200",
+        "_300",
+        "_400",
+        "_500",
+        "_600",
+        "_700",
+        "_800",
+        "_900",
+    ],
+)
+
 # Tailwind CSS Colors
 # https://tailwindcss.com/docs/customizing-colors#default-color-palette
 
@@ -268,4 +287,20 @@ TAILWIND = {
         "800": "#9f1239",
         "900": "#881337",
     },
+}
+
+TAILWIND_NT = {
+    color_name: ColorScale(
+        _50=color_values["50"],
+        _100=color_values["100"],
+        _200=color_values["200"],
+        _300=color_values["300"],
+        _400=color_values["400"],
+        _500=color_values["500"],
+        _600=color_values["600"],
+        _700=color_values["700"],
+        _800=color_values["800"],
+        _900=color_values["900"],
+    )
+    for color_name, color_values in TAILWIND.items()
 }
