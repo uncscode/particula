@@ -12,7 +12,7 @@ The isothermal condensation or evaporation process is defined by the following e
 
 **Equation 1: Rate of Mass Change**
 
-\[ \text{d}m_i/\text{d}t = N × k_{\text{cond}} × (pᵢ, \text{gas} − pᵢ, \text{particle surface}) × (\text{molar mass}_i / (R × T)) \]
+dmi/dt = N × k_cond × (pᵢ, gas − pᵢ, particle surface) × (molar massᵢ / (R × T))
 
 **Where:**
 
@@ -33,7 +33,7 @@ This equation quantifies the net mass flux of species **i** from the gas phase t
 
 **Equation 2: Condensation Coefficient**
 
-\[ k_{\text{cond}} = 4 × π × \text{radius}_{\text{particle}} × Dᵢ × f(\text{Kn}, αᵢ) \]
+k_cond = 4 × π × radius_particle × Dᵢ × f(Kn, αᵢ)
 
 **Where:**
 
@@ -51,9 +51,7 @@ The condensation coefficient **k_cond** represents the flux of molecules to the 
 
 **Equation 3: Correction Factor**
 
-\[
-f = \frac{0.75 × αᵢ × (1 + \text{Kn})}{\text{Kn}² + \text{Kn} + 0.283 × αᵢ × \text{Kn} + 0.75 × αᵢ}
-\]
+f = [0.75 × αᵢ × (1 + Kn)] / [Kn² + Kn + 0.283 × αᵢ × Kn + 0.75 × αᵢ]
 
 **Where:**
 
@@ -64,9 +62,7 @@ f = \frac{0.75 × αᵢ × (1 + \text{Kn})}{\text{Kn}² + \text{Kn} + 0.283 × �
 
 **Equation 4: Knudsen Number**
 
-\[
-\text{Kn} = λᵢ / \text{radius}_{\text{particle}}
-\]
+Kn = λᵢ / radius_particle
 
 **Where:**
 
@@ -85,9 +81,7 @@ When condensation results in significant heat release or absorption, the latent 
 
 **Equation 5: Rate of Mass Change with Latent Heat**
 
-\[
-\frac{\text{d}m}{\text{d}t} = \frac{N × 4 × π × \text{radius}_{\text{wet}} × Dᵢ × (pᵢ, \text{gas} − pᵢ, \text{particle surface})}{\left[ \frac{Dᵢ × Lᵢ × pᵢ}{κ × T} × \left( \frac{Lᵢ}{R × T} − 1 \right) \right] + Rᵢ × T}
-\]
+dm/dt = [N × 4 × π × radius_wet × Dᵢ × (pᵢ, gas − pᵢ, particle surface)] / { [ (Dᵢ × Lᵢ × pᵢ) / (κ × T) ] × [ (Lᵢ / (R × T)) − 1 ] + Rᵢ × T }
 
 **Where:**
 
@@ -116,9 +110,7 @@ Understanding the partial pressures in the gas phase and at the particle surface
 
 **Equation 6: Gas Phase Partial Pressure**
 
-\[
-pᵢ, \text{gas} = \text{concᵢ, gas} × \frac{R × T}{\text{molar massᵢ}}
-\]
+pᵢ, gas = concᵢ, gas × (R × T) / molar massᵢ
 
 **Where:**
 
@@ -134,9 +126,7 @@ This equation relates the concentration of a gas-phase species to its partial pr
 
 **Equation 7: Particle Surface Partial Pressure**
 
-\[
-pᵢ, \text{particle surface} = pᵢ^{\text{pure}} × γᵢ × xᵢ × kᵢ, \text{Kelvin}
-\]
+pᵢ, particle surface = pᵢ^pure × γᵢ × xᵢ × kᵢ, Kelvin
 
 **Where:**
 
@@ -155,9 +145,7 @@ This equation adjusts the pure saturation vapor pressure to account for solution
 
 **Equation 8: Kelvin Effect**
 
-\[
-kᵢ, \text{Kelvin} = \exp\left( \frac{kᵢ, \text{Kelvin radius}}{\text{radius}_{\text{particle}}} \right)
-\]
+kᵢ, Kelvin = exp( kᵢ, Kelvin radius / radius_particle )
 
 **Where:**
 
@@ -165,9 +153,7 @@ kᵢ, \text{Kelvin} = \exp\left( \frac{kᵢ, \text{Kelvin radius}}{\text{radius}
 
 **Equation 9: Kelvin Radius Factor**
 
-\[
-kᵢ, \text{Kelvin radius} = \frac{2 × σ_{\text{surface}} × \text{molar massᵢ}}{R × T × \text{density}}
-\]
+kᵢ, Kelvin radius = [2 × σ_surface × molar massᵢ] / [ R × T × density ]
 
 **Where:**
 
