@@ -26,6 +26,8 @@ Examples:
 
 References:
     - W. C. Hinds, "Aerosol Technology," 2nd ed., Wiley-Interscience, 1999.
+
+To be moved to particle.properties. -kyle
 """
 
 # pylint: disable=too-few-public-methods

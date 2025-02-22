@@ -1,6 +1,8 @@
 """
 Calculate the effective refractive index of a two-solute mixture, using
 volume-weighted molar refraction.
+
+To be removed, likely particula_beta only. -kyle
 """
 
 from typing import Union

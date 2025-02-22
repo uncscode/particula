@@ -23,6 +23,8 @@ Examples:
 
 References:
     - "Volume of a sphere," Wikipedia, The Free Encyclopedia.
+
+To be removed, likely particula_beta only. -kyle
 """
 
 from typing import Union

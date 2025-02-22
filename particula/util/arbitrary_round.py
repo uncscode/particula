@@ -1,5 +1,7 @@
 """
 Rounding function that allows for arbitrary bases and rounding modes.
+
+To be removed, likely particula_beta only. -kyle
 """
 
 from typing import Union
