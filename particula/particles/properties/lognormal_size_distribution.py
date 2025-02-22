@@ -7,7 +7,9 @@ from scipy.stats import lognorm
 import numpy as np
 from numpy.typing import NDArray
 
-from particula.util.convert import distribution_convert_pdf_pms
+from particula.util.converting.convert_size_distribution import (
+    get_pdf_distribution_in_pmf,
+)
 from particula.util.validate_inputs import validate_inputs
 
 
@@ -147,7 +149,7 @@ def get_lognormal_pmf_distribution(
     )
 
     # convert PDF to PMF
-    distribution_pmf = distribution_convert_pdf_pms(
+    distribution_pmf = get_pdf_distribution_in_pmf(
         x_array=x_values,
         distribution=distribution_pdf,
         to_pdf=False,
