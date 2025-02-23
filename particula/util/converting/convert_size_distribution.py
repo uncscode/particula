@@ -407,8 +407,8 @@ def get_pdf_distribution_in_pmf(
     x_array: np.ndarray, distribution: np.ndarray, to_pdf: bool = True
 ) -> np.ndarray:
     """
-    Convert the distribution data between a probability density function (PDF) and
-    a probability mass spectrum (PMF).
+    Convert the distribution data between a probability density function (PDF)
+    and a probability mass spectrum (PMF).
 
     The conversion uses:
     - y_pdf = y_PMF / Δx
