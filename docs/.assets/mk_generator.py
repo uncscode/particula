@@ -17,6 +17,13 @@ path_finder = PathFinder(repo_path)
 # no docs for tests and build
 path_finder.exclude("tests/*", "build/*")
 
+source_paths = path_finder.glob("**/*.py")
+
+source_paths_list = list(source_paths)
+filtered_paths = [
+    p for p in source_paths_list if "particula/particula" in p.as_posix()
+]
+
 # generate folder structure, if needed
 os.makedirs(repo_path / "docs/API/", exist_ok=True)
 
@@ -24,7 +31,7 @@ os.makedirs(repo_path / "docs/API/", exist_ok=True)
 handsdown = MaterialGenerator(
     input_path=repo_path,
     output_path=repo_path / "docs/API",
-    source_paths=path_finder.glob("**/*.py"),
+    source_paths=filtered_paths,
     source_code_url="https://github.com/uncscode/particula/blob/main/",
     docstring_processor=PEP257DocstringProcessor(),
 )
