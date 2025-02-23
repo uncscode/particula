@@ -42,7 +42,7 @@ from particula.util.converting.convert_mass_concentration import (
 from particula.util.converting.convert_mole_fraction import (
     get_mass_fractions_from_moles,
 )
-from particula.util.converting.convert import (
+from particula.util.converting.convert_size_distribution import (
     get_conversion_strategy,
     get_distribution_in_dn,
     get_pdf_distribution_in_pmf,
