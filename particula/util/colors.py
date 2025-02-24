@@ -4,7 +4,7 @@ Color Hex Codes
 to be removed, likely particula_beta only. -kyle
 """
 
-from collections import namedtuple
+# from collections import namedtuple
 
 
 # ColorScale = namedtuple(

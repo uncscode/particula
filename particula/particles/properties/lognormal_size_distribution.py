@@ -223,8 +223,20 @@ def get_lognormal_sample_distribution(
         size=(number_of_samples, number_of_particles.size),
     )
 
-    # clip the distribution
-    distribution = np.clip(distribution, lower_bound, upper_bound)
+    # Truncate samples to the specified bounds
+    distribution = np.where(
+        (distribution > lower_bound) & (distribution <= upper_bound),
+        distribution,
+        np.nan,
+    )
+    # replace nan with random values in the distribution
+    nan_mask = np.isnan(distribution)
+    valid_values = distribution[~nan_mask]
+    replacement_indices = np.random.choice(
+        valid_values.size, size=nan_mask.sum(), replace=True
+    )
+    replacements = valid_values[replacement_indices]
+    distribution[nan_mask] = replacements
 
     # Calculate normalized weights and sample accordingly
     weights = number_of_particles / number_of_particles.sum()
