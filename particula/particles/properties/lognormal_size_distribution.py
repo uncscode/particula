@@ -178,6 +178,8 @@ def get_lognormal_sample_distribution(
     geometric_standard_deviation: NDArray[np.float64],
     number_of_particles: NDArray[np.float64],
     number_of_samples: int,
+    upper_bound: float = np.inf,
+    lower_bound: float = 0,
 ) -> NDArray[np.float64]:
     """
     Generate random samples from a lognormal distribution for given modes.
@@ -220,6 +222,9 @@ def get_lognormal_sample_distribution(
         scale=mode,
         size=(number_of_samples, number_of_particles.size),
     )
+
+    # clip the distribution
+    distribution = np.clip(distribution, lower_bound, upper_bound)
 
     # Calculate normalized weights and sample accordingly
     weights = number_of_particles / number_of_particles.sum()
