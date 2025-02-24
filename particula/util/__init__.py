@@ -54,3 +54,6 @@ from particula.util.converting.convert_size_distribution import (
 from particula.util.converting.convert_units import (
     get_unit_conversion,
 )
+from particula.util.colors import (
+    TAILWIND,
+)
