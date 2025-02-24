@@ -181,6 +181,7 @@ def get_lognormal_sample_distribution(
     upper_bound: float = np.inf,
     lower_bound: float = 0,
 ) -> NDArray[np.float64]:
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
     """
     Generate random samples from a lognormal distribution for given modes.
 
