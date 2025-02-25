@@ -44,7 +44,7 @@ import numpy as np
 # particula imports
 from particula.particles.representation import ParticleRepresentation
 from particula.gas.species import GasSpecies
-from particula.particles.properties import (
+from particula.particles import (
     get_knudsen_number,
     get_vapor_transition_correction,
     get_partial_pressure_delta,
