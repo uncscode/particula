@@ -3,7 +3,9 @@
 from contextlib import nullcontext
 import numpy as np
 import pytest
-from particula.particles.properties import get_aerodynamic_mobility
+from particula.particles.properties.aerodynamic_mobility_module import (
+    get_aerodynamic_mobility
+)
 
 
 def test_particle_aerodynamic_mobility_single_value():

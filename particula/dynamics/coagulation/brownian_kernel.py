@@ -8,11 +8,11 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.util.constants import BOLTZMANN_CONSTANT
-from particula.particles import properties
 from particula.gas.properties import (
     get_dynamic_viscosity,
     get_molecule_mean_free_path,
 )
+import particula as par
 
 
 def get_brownian_kernel(
@@ -118,14 +118,14 @@ def get_brownian_kernel_via_system_state(
         pressure=pressure,
         dynamic_viscosity=dynamic_viscosity,
     )
-    knudsen_number = properties.get_knudsen_number(
+    knudsen_number = par.particles.get_knudsen_number(
         air_mean_free_path,
         particle_radius,
     )
-    slip_correction = properties.get_cunningham_slip_correction(
+    slip_correction = par.particles.get_cunningham_slip_correction(
         knudsen_number=knudsen_number
     )
-    aerodyanmic_mobility = properties.get_aerodynamic_mobility(
+    aerodyanmic_mobility = par.particles.get_aerodynamic_mobility(
         particle_radius, slip_correction, dynamic_viscosity
     )
     particle_diffusivity = _brownian_diffusivity(
@@ -133,7 +133,7 @@ def get_brownian_kernel_via_system_state(
     )
 
     # get thermal speed
-    mean_thermal_speed_particle = properties.get_mean_thermal_speed(
+    mean_thermal_speed_particle = par.particles.get_mean_thermal_speed(
         mass_particle, temperature
     )
 

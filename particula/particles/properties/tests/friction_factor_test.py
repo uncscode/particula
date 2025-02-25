@@ -1,7 +1,7 @@
 """Test the friction_factor function."""
 
 import numpy as np
-from particula.particles.properties import get_friction_factor
+from particula.particles import get_friction_factor
 
 
 def test_friction_factor_scalar():

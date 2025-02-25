@@ -2,7 +2,9 @@
 
 import numpy as np
 import pytest
-from particula.particles.properties import get_cunningham_slip_correction
+from particula.particles.properties.slip_correction_module import (
+    get_cunningham_slip_correction
+)
 
 
 def test_cunningham_slip_correction_basic():

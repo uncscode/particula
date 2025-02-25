@@ -1,7 +1,9 @@
 """Test the vapor transition correction properties."""
 
 import numpy as np
-from particula.particles.properties import get_vapor_transition_correction
+from particula.particles.properties.vapor_correction_module import (
+    get_vapor_transition_correction
+)
 
 
 def test_vapor_transition_correction_scalar():

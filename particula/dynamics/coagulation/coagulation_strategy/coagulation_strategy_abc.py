@@ -8,8 +8,6 @@ import numpy as np
 
 from particula.particles.representation import ParticleRepresentation
 from particula.dynamics.coagulation import coagulation_rate
-from particula.particles import properties
-from particula.gas import properties as gas_properties
 from particula.particles.change_particle_representation import (
     get_particle_resolved_binned_radius,
     get_speciated_mass_representation_from_particle_resolved,
@@ -17,6 +15,7 @@ from particula.particles.change_particle_representation import (
 from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (
     get_particle_resolved_coagulation_step,
 )
+import particula as par
 
 logger = logging.getLogger("particula")
 
@@ -310,7 +309,7 @@ class CoagulationStrategyABC(ABC):
         coulomb_potential_ratio = self.coulomb_potential_ratio(
             particle=particle, temperature=temperature
         )
-        return properties.get_diffusive_knudsen_number(
+        return par.particles.get_diffusive_knudsen_number(
             particle_radius=particle.get_radius(),
             particle_mass=particle.get_mass(),
             friction_factor=friction_factor,
@@ -334,7 +333,7 @@ class CoagulationStrategyABC(ABC):
             The Coulomb potential ratio for the particle
                 [dimensionless].
         """
-        return properties.coulomb_enhancement.get_coulomb_enhancement_ratio(
+        return par.particles.get_coulomb_enhancement_ratio(
             particle_radius=particle.get_radius(),
             charge=particle.get_charge(),
             temperature=temperature,
@@ -359,22 +358,22 @@ class CoagulationStrategyABC(ABC):
         Returns:
             The friction factor for the particle [dimensionless].
         """
-        dynamic_viscosity = gas_properties.get_dynamic_viscosity(
+        dynamic_viscosity = par.gas.get_dynamic_viscosity(
             temperature=temperature  # assume standard atmospheric composition
         )
-        mean_free_path = gas_properties.get_molecule_mean_free_path(
+        mean_free_path = par.gas.get_molecule_mean_free_path(
             temperature=temperature,
             pressure=pressure,
             dynamic_viscosity=dynamic_viscosity,
         )
-        knudsen_number = properties.get_knudsen_number(
+        knudsen_number = par.particles.get_knudsen_number(
             mean_free_path=mean_free_path,
             particle_radius=particle.get_radius(),
         )
-        slip_correction = properties.get_cunningham_slip_correction(
+        slip_correction = par.particles.get_cunningham_slip_correction(
             knudsen_number=knudsen_number
         )
-        return properties.get_friction_factor(
+        return par.particles.get_friction_factor(
             particle_radius=particle.get_radius(),
             dynamic_viscosity=dynamic_viscosity,
             slip_correction=slip_correction,
