@@ -140,7 +140,9 @@ class ClausiusClapeyronBuilder(BuilderABC):
         if latent_heat_units == "J/kg":
             self.latent_heat = latent_heat
             return self
-        self.latent_heat = latent_heat * get_unit_conversion(latent_heat_units, "J/kg")
+        self.latent_heat = latent_heat * get_unit_conversion(
+            latent_heat_units, "J/kg"
+        )
         return self
 
     @validate_inputs({"temperature_initial": "positive"})
@@ -222,6 +224,7 @@ class ConstantBuilder(BuilderABC):
         self.vapor_pressure = vapor_pressure * get_unit_conversion(
             vapor_pressure_units, "Pa"
         )
+        return self
 
     def build(self) -> ConstantVaporPressureStrategy:
         """Build and return a ConstantVaporPressureStrategy object with the set
