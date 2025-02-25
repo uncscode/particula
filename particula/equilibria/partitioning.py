@@ -236,14 +236,14 @@ def get_properties_for_liquid_vapor_partitioning(
             density=density[i],
         )
 
-        gamma_organic_ab[i, 0] = alpha[-1][0]
-        mass_fraction_water_ab[i, 0] = alpha[2][0]
+        gamma_organic_ab[i, 0] = alpha[-1]
+        mass_fraction_water_ab[i, 0] = alpha[2]
         if beta is None:
             gamma_organic_ab[i, 1] = 0
             mass_fraction_water_ab[i, 1] = 0
         else:
-            gamma_organic_ab[i, 1] = beta[-1][0]
-            mass_fraction_water_ab[i, 1] = beta[2][0]
-        q_ab[i, 0] = q_alpha[0]
-        q_ab[i, 1] = 1 - q_alpha[0]
+            gamma_organic_ab[i, 1] = beta[-1]
+            mass_fraction_water_ab[i, 1] = beta[2]
+        q_ab[i, 0] = q_alpha
+        q_ab[i, 1] = 1 - q_alpha
     return gamma_organic_ab, mass_fraction_water_ab, q_ab
