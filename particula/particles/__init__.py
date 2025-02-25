@@ -1,5 +1,4 @@
-"""Import all the particle modules, so they can be accessed from
-
+"""Import all the particle classes and functions, so they can be accessed from
 'from particula import particles'
 """
 

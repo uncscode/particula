@@ -1,5 +1,6 @@
 """
-Module for utility functions.
+Import all the utility classes and functions, so they can be accessed from
+'from particula import util'
 """
 
 # pylint: disable=unused-import
