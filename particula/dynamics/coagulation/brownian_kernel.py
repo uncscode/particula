@@ -8,10 +8,6 @@ from numpy.typing import NDArray
 import numpy as np
 
 from particula.util.constants import BOLTZMANN_CONSTANT
-from particula.gas.properties import (
-    get_dynamic_viscosity,
-    get_molecule_mean_free_path,
-)
 import particula as par
 
 
@@ -112,8 +108,8 @@ def get_brownian_kernel_via_system_state(
         Coefficient K12.
     """
     # calculations to get particle diffusivity
-    dynamic_viscosity = get_dynamic_viscosity(temperature)
-    air_mean_free_path = get_molecule_mean_free_path(
+    dynamic_viscosity = par.gas.get_dynamic_viscosity(temperature)
+    air_mean_free_path = par.gas.get_molecule_mean_free_path(
         temperature=temperature,
         pressure=pressure,
         dynamic_viscosity=dynamic_viscosity,

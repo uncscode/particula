@@ -1,7 +1,7 @@
 """Test dynamic viscosity property functions."""
 
 import pytest
-from particula.gas.properties import get_dynamic_viscosity
+from particula.gas import get_dynamic_viscosity
 
 
 def test_dynamic_viscosity_normal_conditions():
