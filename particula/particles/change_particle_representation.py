@@ -89,7 +89,6 @@ def get_speciated_mass_representation_from_particle_resolved(
     old_concentration = particle.get_concentration()
 
     # get the radius to bin the indexes
-    radius = particle.get_radius()
     bin_indexes = np.digitize(particle.get_radius(), bin_radius)
     # add the distribution by bin_indexes
     old_distribution = particle.get_distribution()
