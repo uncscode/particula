@@ -3,7 +3,7 @@
 from typing import Tuple, Union
 import numpy as np
 from numpy.typing import NDArray
-from scipy.interpolate import RectBivariateSpline  # type: ignore
+from scipy.interpolate import RegularGridInterpolator  # type: ignore
 
 from particula.dynamics.coagulation.particle_resolved_step.super_droplet_method import (
     _bin_particles,
@@ -126,10 +126,7 @@ def get_particle_resolved_coagulation_step(
         # Step 5: Retrieve the maximum kernel value for the current bin pair
         small_sample = np.min(particle_radius[small_indices])
         large_sample = np.max(particle_radius[large_indices])
-        kernel_values = interp_kernel.ev(  # type: ignore
-            np.min(particle_radius[small_indices]),
-            np.max(particle_radius[large_indices]),
-        )
+        kernel_values = interp_kernel(np.array([[small_sample, large_sample]]))
 
         # Step 6: Calculate the number of possible coagulation events
         # between small and large particles
@@ -140,10 +137,7 @@ def get_particle_resolved_coagulation_step(
 
         # Step 7: Determine the number of coagulation tests to run based
         # on kernel value and system parameters
-        tests0 = np.ceil(kernel_values * time_step * events / volume)
-        tests = int(tests0)
-        if tests < 0:  # int overflow
-            tests = np.iinfo(np.int64).max
+        tests = int(np.ceil(kernel_values * time_step * events / volume))
         if tests == 0 or events == 0:
             continue
 
@@ -156,8 +150,10 @@ def get_particle_resolved_coagulation_step(
         large_index = random_generator.choice(large_indices, tests)
 
         # Step 9: Calculate the kernel value for the selected particle pairs
-        kernel_value = interp_kernel.ev(  # type: ignore
-            particle_radius[small_index], particle_radius[large_index]
+        kernel_value = interp_kernel(
+            np.column_stack(
+                (particle_radius[small_index], particle_radius[large_index])
+            )
         )
 
         # Handle diagonal elements if necessary (for single pair coagulation)
@@ -205,9 +201,10 @@ def get_particle_resolved_coagulation_step(
 def _interpolate_kernel(
     kernel: NDArray[np.float64],
     kernel_radius: NDArray[np.float64],
-) -> RectBivariateSpline:
+) -> RegularGridInterpolator:
     """
-    Create a 2D interpolation function for the coagulation kernel.
+    Create an interpolation function for the coagulation kernel with nearest
+    extrapolation for out-of-bound values.
 
     Args:
         kernel (NDArray[np.float64]): Coagulation kernel.
@@ -215,9 +212,18 @@ def _interpolate_kernel(
             bins.
 
     Returns:
-        RectBivariateSpline: Interpolated kernel function.
+        RegularGridInterpolator: Interpolated kernel function.
     """
-    return RectBivariateSpline(x=kernel_radius, y=kernel_radius, z=kernel)
+    grid = (kernel_radius, kernel_radius)
+    # Using 'linear' interpolation inside the domain and 'nearest' method for
+    # out-of-bound points.
+    return RegularGridInterpolator(
+        points=grid,
+        values=kernel,
+        method="linear",
+        bounds_error=False,
+        fill_value=None,  # None uses nearest for out-of-bound if desired
+    )
 
 
 def _calculate_probabilities(

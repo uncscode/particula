@@ -2,7 +2,7 @@
 
 import time
 import numpy as np
-from scipy.interpolate import RectBivariateSpline
+from scipy.interpolate import RegularGridInterpolator
 from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (
     _interpolate_kernel,
     _calculate_probabilities,
@@ -17,7 +17,7 @@ def test_interpolate_kernel():
     kernel = np.random.rand(10, 10)
     kernel_radius = np.linspace(0, 1, 10)
     interp_func = _interpolate_kernel(kernel, kernel_radius)
-    assert isinstance(interp_func, RectBivariateSpline)
+    assert isinstance(interp_func, RegularGridInterpolator)
 
 
 def test_calculate_probabilities():
