@@ -53,7 +53,7 @@ def get_mole_fraction_from_mass(
     moles = mass_concentrations / molar_masses
 
     # Handle 1D arrays
-    if moles.ndim == 1:
+    if isinstance(moles, float) or moles.ndim == 1:
         total_moles = np.sum(moles)
         # If total moles are zero, return an array of zeros
         if total_moles == 0:

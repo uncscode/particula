@@ -36,7 +36,7 @@ class BuilderDistributionTypeMixin:
     def set_distribution_type(
         self,
         distribution_type: str,
-        distribution_type_units: Optional[str] = None,
+        distribution_type_units: str = None,
     ):
         """Set the distribution type.
 
