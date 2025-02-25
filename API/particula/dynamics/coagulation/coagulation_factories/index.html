@@ -1383,6 +1383,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      See also
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#coagulationfactoryget_builders" class="md-nav__link">
     <span class="md-ellipsis">
       CoagulationFactory().get_builders
@@ -7356,6 +7365,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      See also
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#coagulationfactoryget_builders" class="md-nav__link">
     <span class="md-ellipsis">
       CoagulationFactory().get_builders
@@ -7409,7 +7427,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py">particula.dynamics.coagulation.coagulation_factories</a> module.</p>
 </blockquote>
 <h2 id="coagulationfactory">CoagulationFactory<a class="headerlink" href="#coagulationfactory" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py#L19">Show source in coagulation_factories.py:19</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py#L28">Show source in coagulation_factories.py:28</a></p>
 <p>Factory class for creating coagulation strategy instances
 based on a given type string. Supported types include:
     - 'brownian'
@@ -7443,8 +7461,17 @@ based on a given type string. Supported types include:
     <span class="p">]</span>
 <span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
+<h4 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="../coagulation_builder/brownian_coagulation_builder/#browniancoagulationbuilder">BrownianCoagulationBuilder</a></li>
+<li><a href="../coagulation_builder/charged_coagulation_builder/#chargedcoagulationbuilder">ChargedCoagulationBuilder</a></li>
+<li><a href="../coagulation_strategy/coagulation_strategy_abc/#coagulationstrategyabc">CoagulationStrategyABC</a></li>
+<li><a href="../coagulation_builder/combine_coagulation_strategy_builder/#combinecoagulationstrategybuilder">CombineCoagulationStrategyBuilder</a></li>
+<li><a href="../coagulation_builder/turbulent_dns_coagulation_builder/#turbulentdnscoagulationbuilder">TurbulentDNSCoagulationBuilder</a></li>
+<li><a href="../coagulation_builder/turbulent_shear_coagulation_builder/#turbulentshearcoagulationbuilder">TurbulentShearCoagulationBuilder</a></li>
+</ul>
 <h3 id="coagulationfactoryget_builders">CoagulationFactory().get_builders<a class="headerlink" href="#coagulationfactoryget_builders" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py#L50">Show source in coagulation_factories.py:50</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_factories.py#L59">Show source in coagulation_factories.py:59</a></p>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>

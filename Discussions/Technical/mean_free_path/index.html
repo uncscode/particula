@@ -7705,7 +7705,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -7718,14 +7718,11 @@ $$</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.properties</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">molecule_mean_free_path</span><span class="p">,</span>
-    <span class="n">get_dynamic_viscosity</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
-<span class="n">air_dynamic_viscosity</span> <span class="o">=</span> <span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">)</span>
+<span class="n">air_dynamic_viscosity</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">)</span>
 
-<span class="n">mean_free_path</span> <span class="o">=</span> <span class="n">molecule_mean_free_path</span><span class="p">(</span>
+<span class="n">mean_free_path</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_molecule_mean_free_path</span><span class="p">(</span>
     <span class="n">molar_mass</span><span class="o">=</span><span class="mf">28.97e-3</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
     <span class="n">pressure</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span>
@@ -7734,14 +7731,11 @@ $$</p>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mean free path is </span><span class="si">{</span><span class="n">mean_free_path</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>  <span class="c1"># will produce approx 66.5 nm</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from particula.gas.properties import (
-    molecule_mean_free_path,
-    get_dynamic_viscosity,
-)
+<div class="clipboard-copy-txt" id="cell-1">import particula as par
 
-air_dynamic_viscosity = get_dynamic_viscosity(temperature=298.15)
+air_dynamic_viscosity = par.gas.get_dynamic_viscosity(temperature=298.15)
 
-mean_free_path = molecule_mean_free_path(
+mean_free_path = par.gas.get_molecule_mean_free_path(
     molar_mass=28.97e-3,
     temperature=298.15,
     pressure=101325,

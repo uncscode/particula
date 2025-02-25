@@ -7861,14 +7861,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics</span><span class="w"> </span><span class="kn">import</span> <span class="n">dilution</span><span class="p">,</span> <span class="n">coagulation</span><span class="p">,</span> <span class="n">wall_loss</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties</span><span class="w"> </span><span class="kn">import</span> <span class="n">lognormal_pmf_distribution</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 from matplotlib import pyplot as plt
 
-from particula.dynamics import dilution, coagulation, wall_loss
-from particula.particles.properties import lognormal_pmf_distribution</div>
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -7926,7 +7924,7 @@ from particula.particles.properties import lognormal_pmf_distribution</div>
 
 <span class="c1"># Create particle distribution using the defined parameters</span>
 
-<span class="n">concentraiton_pmf</span> <span class="o">=</span> <span class="n">lognormal_pmf_distribution</span><span class="p">(</span>
+<span class="n">concentraiton_pmf</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_pmf_distribution</span><span class="p">(</span>
     <span class="n">x_values</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
     <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">geometric_standard_deviation</span><span class="p">,</span>
@@ -7960,7 +7958,7 @@ radius_bins = np.logspace(-8, -5, 250)
 
 # Create particle distribution using the defined parameters
 
-concentraiton_pmf = lognormal_pmf_distribution(
+concentraiton_pmf = par.particles.get_lognormal_pmf_distribution(
     x_values=radius_bins,
     mode=mode,
     geometric_standard_deviation=geometric_standard_deviation,
@@ -8016,7 +8014,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -8035,18 +8033,18 @@ plt.show()</div>
     <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_bins</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1000</span>
 <span class="p">)</span>  <span class="c1"># mass of the particles in kg</span>
 
-<span class="n">kernel</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">brownian_coagulation_kernel_via_system_state</span><span class="p">(</span>
+<span class="n">kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_brownian_kernel_via_system_state</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">mass_particle</span><span class="o">=</span><span class="n">mass_particle</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">293.15</span><span class="p">,</span>
     <span class="n">pressure</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span>
     <span class="n">alpha_collision_efficiency</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">coagulation_loss</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span>
+<span class="n">coagulation_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">concentraiton_pmf</span><span class="p">,</span>
     <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">coagulation_gain</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span>
+<span class="n">coagulation_gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
     <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">concentraiton_pmf</span><span class="p">,</span>
     <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
@@ -8054,17 +8052,17 @@ plt.show()</div>
 <span class="n">coagulation_net</span> <span class="o">=</span> <span class="n">coagulation_gain</span> <span class="o">-</span> <span class="n">coagulation_loss</span>
 
 <span class="c1"># dilution rate</span>
-<span class="n">dilution_coefficent</span> <span class="o">=</span> <span class="n">dilution</span><span class="o">.</span><span class="n">volume_dilution_coefficient</span><span class="p">(</span>
+<span class="n">dilution_coefficent</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_volume_dilution_coefficient</span><span class="p">(</span>
     <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># m^3</span>
     <span class="n">input_flow_rate</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="mf">1e-6</span><span class="p">,</span>  <span class="c1"># m^3/s</span>
 <span class="p">)</span>
-<span class="n">dilution_loss</span> <span class="o">=</span> <span class="n">dilution</span><span class="o">.</span><span class="n">dilution_rate</span><span class="p">(</span>
+<span class="n">dilution_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_dilution_rate</span><span class="p">(</span>
     <span class="n">coefficient</span><span class="o">=</span><span class="n">dilution_coefficent</span><span class="p">,</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">concentraiton_pmf</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># wall loss rate</span>
-<span class="n">chamber_wall_loss_rate</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">rectangle_wall_loss_rate</span><span class="p">(</span>
+<span class="n">chamber_wall_loss_rate</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_rectangle_wall_loss_rate</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
     <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">particle_density</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
@@ -8111,18 +8109,18 @@ mass_particle = (
     4 / 3 * np.pi * radius_bins**3 * 1000
 )  # mass of the particles in kg
 
-kernel = coagulation.brownian_coagulation_kernel_via_system_state(
+kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
     mass_particle=mass_particle,
     temperature=293.15,
     pressure=101325,
     alpha_collision_efficiency=1,
 )
-coagulation_loss = coagulation.discrete_loss(
+coagulation_loss = par.dynamics.get_coagulation_loss_rate_discrete(
     concentration=concentraiton_pmf,
     kernel=kernel,
 )
-coagulation_gain = coagulation.discrete_gain(
+coagulation_gain = par.dynamics.get_coagulation_gain_rate_discrete(
     radius=radius_bins,
     concentration=concentraiton_pmf,
     kernel=kernel,
@@ -8130,17 +8128,17 @@ coagulation_gain = coagulation.discrete_gain(
 coagulation_net = coagulation_gain - coagulation_loss
 
 # dilution rate
-dilution_coefficent = dilution.volume_dilution_coefficient(
+dilution_coefficent = par.dynamics.get_volume_dilution_coefficient(
     volume=1,  # m^3
     input_flow_rate=2 * 1e-6,  # m^3/s
 )
-dilution_loss = dilution.dilution_rate(
+dilution_loss = par.dynamics.get_dilution_rate(
     coefficient=dilution_coefficent,
     concentration=concentraiton_pmf,
 )
 
 # wall loss rate
-chamber_wall_loss_rate = wall_loss.rectangle_wall_loss_rate(
+chamber_wall_loss_rate = par.dynamics.get_rectangle_wall_loss_rate(
     wall_eddy_diffusivity=0.1,
     particle_radius=radius_bins,
     particle_density=1000,
@@ -8214,7 +8212,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -8240,7 +8238,7 @@ plt.show()</div>
 <span class="c1"># set the initial concentration</span>
 <span class="n">concentration_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">concentraiton_pmf</span>
 
-<span class="n">kernel</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">brownian_coagulation_kernel_via_system_state</span><span class="p">(</span>
+<span class="n">kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_brownian_kernel_via_system_state</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">mass_particle</span><span class="o">=</span><span class="n">mass_particle</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">293.15</span><span class="p">,</span>
@@ -8251,11 +8249,11 @@ plt.show()</div>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">time</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time_array</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 
     <span class="c1"># calculate the coagulation rate</span>
-    <span class="n">coagulation_loss</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span>
+    <span class="n">coagulation_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span>
         <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_matrix</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:],</span>
         <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">coagulation_gain</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span>
+    <span class="n">coagulation_gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
         <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
         <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_matrix</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:],</span>
         <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
@@ -8263,17 +8261,17 @@ plt.show()</div>
     <span class="n">coagulation_net</span> <span class="o">=</span> <span class="n">coagulation_gain</span> <span class="o">-</span> <span class="n">coagulation_loss</span>
 
     <span class="c1"># calculate the dilution rate</span>
-    <span class="n">dilution_coefficent</span> <span class="o">=</span> <span class="n">dilution</span><span class="o">.</span><span class="n">volume_dilution_coefficient</span><span class="p">(</span>
+    <span class="n">dilution_coefficent</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_volume_dilution_coefficient</span><span class="p">(</span>
         <span class="n">volume</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># m^3</span>
         <span class="n">input_flow_rate</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="mf">1e-6</span><span class="p">,</span>  <span class="c1"># m^3/s</span>
     <span class="p">)</span>
-    <span class="n">dilution_loss</span> <span class="o">=</span> <span class="n">dilution</span><span class="o">.</span><span class="n">dilution_rate</span><span class="p">(</span>
+    <span class="n">dilution_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_dilution_rate</span><span class="p">(</span>
         <span class="n">coefficient</span><span class="o">=</span><span class="n">dilution_coefficent</span><span class="p">,</span>
         <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_matrix</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:],</span>
     <span class="p">)</span>
 
     <span class="c1"># calculate the wall loss rate</span>
-    <span class="n">chamber_wall_loss_rate</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">rectangle_wall_loss_rate</span><span class="p">(</span>
+    <span class="n">chamber_wall_loss_rate</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_rectangle_wall_loss_rate</span><span class="p">(</span>
         <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
         <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
         <span class="n">particle_density</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
@@ -8309,7 +8307,7 @@ chamber_wall_loss_rate_matrix = np.zeros((len(time_array), len(radius_bins)))
 # set the initial concentration
 concentration_matrix[0, :] = concentraiton_pmf
 
-kernel = coagulation.brownian_coagulation_kernel_via_system_state(
+kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
     mass_particle=mass_particle,
     temperature=293.15,
@@ -8320,11 +8318,11 @@ kernel = coagulation.brownian_coagulation_kernel_via_system_state(
 for i, time in enumerate(time_array[1:], start=1):
 
     # calculate the coagulation rate
-    coagulation_loss = coagulation.discrete_loss(
+    coagulation_loss = par.dynamics.get_coagulation_loss_rate_discrete(
         concentration=concentration_matrix[i - 1, :],
         kernel=kernel,
     )
-    coagulation_gain = coagulation.discrete_gain(
+    coagulation_gain = par.dynamics.get_coagulation_gain_rate_discrete(
         radius=radius_bins,
         concentration=concentration_matrix[i - 1, :],
         kernel=kernel,
@@ -8332,17 +8330,17 @@ for i, time in enumerate(time_array[1:], start=1):
     coagulation_net = coagulation_gain - coagulation_loss
 
     # calculate the dilution rate
-    dilution_coefficent = dilution.volume_dilution_coefficient(
+    dilution_coefficent = par.dynamics.get_volume_dilution_coefficient(
         volume=1,  # m^3
         input_flow_rate=2 * 1e-6,  # m^3/s
     )
-    dilution_loss = dilution.dilution_rate(
+    dilution_loss = par.dynamics.get_dilution_rate(
         coefficient=dilution_coefficent,
         concentration=concentration_matrix[i - 1, :],
     )
 
     # calculate the wall loss rate
-    chamber_wall_loss_rate = wall_loss.rectangle_wall_loss_rate(
+    chamber_wall_loss_rate = par.dynamics.get_rectangle_wall_loss_rate(
         wall_eddy_diffusivity=0.1,
         particle_radius=radius_bins,
         particle_density=1000,
@@ -8485,7 +8483,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
