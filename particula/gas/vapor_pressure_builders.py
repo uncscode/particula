@@ -11,6 +11,7 @@ from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
 )
 from particula.util.validate_inputs import validate_inputs
+from particula.util import get_unit_conversion
 
 logger = logging.getLogger("particula")
 
@@ -139,7 +140,8 @@ class ClausiusClapeyronBuilder(BuilderABC):
         if latent_heat_units == "J/kg":
             self.latent_heat = latent_heat
             return self
-        raise ValueError("Only J/kg units are supported for latent heat.")
+        self.latent_heat = latent_heat * get_unit_conversion(latent_heat_units, "J/kg")
+        return self
 
     @validate_inputs({"temperature_initial": "positive"})
     def set_temperature_initial(
@@ -149,7 +151,10 @@ class ClausiusClapeyronBuilder(BuilderABC):
         if temperature_initial_units == "K":
             self.temperature_initial = temperature_initial
             return self
-        raise ValueError("Only K units are supported for initial temperature.")
+        self.temperature_initial = get_unit_conversion(
+            temperature_initial_units, "K", temperature_initial
+        )
+        return self
 
     @validate_inputs({"pressure_initial": "positive"})
     def set_pressure_initial(
@@ -159,7 +164,10 @@ class ClausiusClapeyronBuilder(BuilderABC):
         if pressure_initial_units == "Pa":
             self.pressure_initial = pressure_initial
             return self
-        raise ValueError("Only Pa units are supported for initial pressure.")
+        self.pressure_initial = pressure_initial * get_unit_conversion(
+            pressure_initial_units, "Pa"
+        )
+        return self
 
     def build(self) -> ClausiusClapeyronStrategy:
         """Build and return a ClausiusClapeyronStrategy object with the set
@@ -211,7 +219,9 @@ class ConstantBuilder(BuilderABC):
         if vapor_pressure_units == "Pa":
             self.vapor_pressure = vapor_pressure
             return self
-        raise ValueError("Only Pa units are supported for vapor pressure.")
+        self.vapor_pressure = vapor_pressure * get_unit_conversion(
+            vapor_pressure_units, "Pa"
+        )
 
     def build(self) -> ConstantVaporPressureStrategy:
         """Build and return a ConstantVaporPressureStrategy object with the set
