@@ -291,8 +291,8 @@ class BuilderTemperatureMixin:
         if temperature_units == "K":
             self.temperature = temperature
             return self
-        self.temperature = temperature * get_unit_conversion(
-            temperature_units, "K"
+        self.temperature = get_unit_conversion(
+            temperature_units, "K", temperature
         )
         return self
 

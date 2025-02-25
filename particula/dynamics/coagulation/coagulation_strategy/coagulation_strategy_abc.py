@@ -236,7 +236,7 @@ class CoagulationStrategyABC(ABC):
 
         if self.distribution_type in ["discrete", "continuous_pdf"]:
             particle.add_concentration(
-                self.net_rate(  # type: ignore
+                self.net_rate(
                     particle=particle,
                     temperature=temperature,
                     pressure=pressure,
@@ -273,7 +273,8 @@ class CoagulationStrategyABC(ABC):
                 time_step=time_step,
                 random_generator=self.random_generator,
             )
-            return particle.collide_pairs(loss_gain_indices)
+            particle.collide_pairs(loss_gain_indices)
+            return particle
 
         raise ValueError(
             "Invalid distribution type. "

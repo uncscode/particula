@@ -124,6 +124,8 @@ def get_particle_resolved_coagulation_step(
             continue
 
         # Step 5: Retrieve the maximum kernel value for the current bin pair
+        small_sample = np.min(particle_radius[small_indices])
+        large_sample = np.max(particle_radius[large_indices])
         kernel_values = interp_kernel.ev(  # type: ignore
             np.min(particle_radius[small_indices]),
             np.max(particle_radius[large_indices]),
@@ -138,8 +140,10 @@ def get_particle_resolved_coagulation_step(
 
         # Step 7: Determine the number of coagulation tests to run based
         # on kernel value and system parameters
-        tests = int(np.ceil(kernel_values * time_step * events / volume))
-
+        tests0 = np.ceil(kernel_values * time_step * events / volume)
+        tests = int(tests0)
+        if tests < 0:  # int overflow
+            tests = np.iinfo(np.int64).max
         if tests == 0 or events == 0:
             continue
 
