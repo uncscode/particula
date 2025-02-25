@@ -2,7 +2,7 @@
 
 import pytest
 import numpy as np
-from particula.gas.properties import get_molecule_mean_free_path
+from particula.gas import get_molecule_mean_free_path
 
 
 def test_molecule_mean_free_path():

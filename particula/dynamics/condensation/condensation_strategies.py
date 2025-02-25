@@ -49,7 +49,7 @@ from particula.particles import (
     get_vapor_transition_correction,
     get_partial_pressure_delta,
 )
-from particula.gas.properties import get_molecule_mean_free_path
+from particula.gas import get_molecule_mean_free_path
 from particula.dynamics.condensation.mass_transfer import (
     first_order_mass_transport_k,
     mass_transfer_rate,
