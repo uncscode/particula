@@ -1,4 +1,4 @@
-"""Import all the gas modules, so they can be accessed from
+"""Import all the gas classes and functions, so they can be accessed from
 particula.next import gas
 """
 
