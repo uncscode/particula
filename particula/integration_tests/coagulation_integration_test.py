@@ -1,3 +1,9 @@
+"""
+Integration tests for the coagulation processes in Particula.
+This module uses unittest to verify correct creation of particle
+distributions (PMF, PDF, resolved) and their evolution with a
+Brownian coagulation strategy.
+"""
 import unittest
 import numpy as np
 
@@ -6,12 +12,13 @@ import particula as par
 
 class TestCoagulationIntegration(unittest.TestCase):
     def setUp(self):
-        """
-        Mimics the original notebook's setup:
-         - define mode, geometric standard deviations, number_of_particles, etc.
-         - create your atmosphere
-         - define radius bins, volume
-         - set up number_of_samples, etc.
+        """Set up common test parameters for various coagulation tests.
+
+        This includes defining:
+          - mode and geometric_standard_deviation for lognormal sampling
+          - number_of_particles and total number_of_samples
+          - density, volume, and radius_bins
+          - a default atmosphere with preset gas species
         """
         self.mode = np.array([100e-9, 300e-9])  # m
         self.geometric_standard_deviation = np.array([1.3, 1.3])
@@ -29,13 +36,12 @@ class TestCoagulationIntegration(unittest.TestCase):
         )
 
     def test_pmf_initial_distribution(self):
-        """
-        Test the PMF distribution creation step from the notebook.
+        """Test creation of a Particulate Mass Function (PMF) distribution.
 
-        Build and verify:
-         - The PMF-based particle builder
-         - The aerosol with PMF distribution
-         - Check that the PMF distribution variables match expected shapes, sums, etc.
+        Verifies that the PMF-based particle builder:
+          - properly sets mode, GSD, and number concentrations
+          - correctly assigns a discrete PMF distribution across radius_bins
+          - checks shape integrity of the resulting aerosol's concentration
         """
         number_concentration = self.number_of_particles * np.array(
             [self.number_of_samples / self.volume]
@@ -62,13 +68,12 @@ class TestCoagulationIntegration(unittest.TestCase):
         )
 
     def test_pdf_initial_distribution(self):
-        """
-        Test the PDF distribution creation step from the notebook.
+        """Test creation of a Probability Density Function (PDF) distribution.
 
-        Build and verify:
-         - The PDF-based particle builder
-         - The aerosol with PDF distribution
-         - Check that the PDF distribution variables match expected shapes, sums, etc.
+        Verifies that the PDF-based particle builder:
+          - properly sets mode, GSD, and number concentrations
+          - uses a continuous PDF distribution across radius_bins
+          - checks shape integrity of the resulting aerosol's concentration
         """
         number_concentration = self.number_of_particles * np.array(
             [self.number_of_samples / self.volume]
@@ -96,13 +101,11 @@ class TestCoagulationIntegration(unittest.TestCase):
         )
 
     def test_resolved_initial_distribution(self):
-        """
-        Test the particle-resolved distribution creation step from the notebook.
+        """Test creation of a particle-resolved distribution (no binning).
 
-        Build and verify:
-         - The ResolvedParticleMassRepresentationBuilder
-         - The aerosol with resolved distribution
-         - Check total mass, number of particles, etc.
+        Uses lognormal-sampled radii to create resolved particle masses:
+          - verifies total mass matches expected sum
+          - checks that ParticleResolvedSpeciatedMass is assigned properly
         """
         radii_sample = par.particles.get_lognormal_sample_distribution(
             mode=self.mode,
@@ -135,14 +138,12 @@ class TestCoagulationIntegration(unittest.TestCase):
         )
 
     def test_coagulation_process(self):
-        """
-        Test each coagulation approach (PMF, PDF, resolved) over a few time steps,
-        just like the notebook loop.
+        """Test Brownian coagulation across PMF, PDF, and resolved approaches.
 
-        Verify:
-         - That invoking 'execute()' modifies the aerosol as expected
-         - That total mass is conserved or within tolerance
-         - That number concentration changes in a sensible way
+        Exercises coagulation with small time steps to verify:
+          - aerosol mass is approximately conserved
+          - number concentrations update logically
+          - PMF, PDF, and resolved cases all remain consistent
         """
         coagulation_process_pmf = par.dynamics.Coagulation(
             coagulation_strategy=par.dynamics.BrownianCoagulationStrategy(
@@ -257,9 +258,12 @@ class TestCoagulationIntegration(unittest.TestCase):
         )
 
     def test_final_properties(self):
-        """
-        Check final states, ensuring mass conservation and reasonable number changes.
-        Mimic the final summary checks from the notebook (e.g. total mass, final distribution).
+        """Test final aerosol properties at the end of simulation.
+
+        Verifies:
+          - overall mass conservation
+          - final number concentration changes make sense
+          - final distribution states meet expected criteria
         """
         # This would involve running the full simulation and checking final states
         pass
