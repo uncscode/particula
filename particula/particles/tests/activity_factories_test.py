@@ -24,7 +24,8 @@ def test_mass_ideal_strategy_no_parameters():
 
 def test_molar_ideal_strategy_with_parameters():
     """Test factory function for molar_ideal strategy with parameters."""
-    parameters = {"molar_mass": np.array([100.0, 200.0, 300.0])}
+    parameters = {"molar_mass": np.array([100.0, 200.0, 300.0]),
+                  "molar_mass_units": "kg/mol"}
     strategy = ActivityFactory().get_strategy("molar_ideal", parameters)
     assert isinstance(strategy, ActivityIdealMolar)
     np.testing.assert_allclose(
@@ -41,6 +42,7 @@ def test_kappa_parameter_strategy_with_parameters():
         "density": np.array([1000.0, 2000.0, 3000.0]),
         "density_units": "kg/m^3",
         "molar_mass": np.array([1.0, 2.0, 3.0]),
+        "molar_mass_units": "kg/mol",
         "water_index": 0,
     }
     strategy = ActivityFactory().get_strategy("kappa_parameter", parameters)

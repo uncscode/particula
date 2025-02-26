@@ -535,7 +535,7 @@ class PresetResolvedParticleMassBuilder(
         )
         self.set_density(1000, "kg/m^3")
         self.set_charge(np.zeros(self.particle_resolved_count))
-        self.set_volume(1)
+        self.set_volume(1, "m^3")
 
     def build(self) -> ParticleRepresentation:
         """Validate and return the ParticleRepresentation object.

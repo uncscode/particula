@@ -24,28 +24,16 @@ def test_build_ideal_activity_molar_parameter():
     """Test that providing a negative molar mass raises a ValueError."""
     builder = ActivityIdealMolarBuilder()
     with pytest.raises(ValueError) as excinfo:
-        builder.set_molar_mass(-1)
+        builder.set_molar_mass(-1, "kg/mol")
     assert "Argument 'molar_mass' must be positive." in str(excinfo.value)
 
     # test positive molar mass
-    builder.set_molar_mass(1)
+    builder.set_molar_mass(1, "kg/mol")
     assert builder.molar_mass == 1
 
     # test array of molar masses
-    builder.set_molar_mass(np.array([1, 2, 3]))
+    builder.set_molar_mass(np.array([1, 2, 3]),"kg/mol")
     np.testing.assert_array_equal(builder.molar_mass, np.array([1, 2, 3]))
-
-    # test setting molar mass units
-    builder.set_molar_mass(1e-3, molar_mass_units="kg/mol")
-    assert builder.molar_mass == 1e-3
-
-    # test setting molar mass units for array
-    builder.set_molar_mass(
-        np.array([1, 2, 3]) / 1000, molar_mass_units="kg/mol"
-    )
-    np.testing.assert_array_equal(
-        builder.molar_mass, np.array([1e-3, 2e-3, 3e-3])
-    )
 
 
 def test_build_ideal_activity_molar_dict():
@@ -117,7 +105,7 @@ def test_build_kappa_parameter_activity_set_density():
 def test_build_kappa_parameter_activity_set_molar_mass():
     """Testing setting molar mass parameter."""
     builder = ActivityKappaParameterBuilder()
-    builder.set_molar_mass(1)
+    builder.set_molar_mass(1, "kg/mol")
     assert builder.molar_mass == 1
 
     # test setting molar mass units
@@ -157,6 +145,7 @@ def test_build_kappa_parameter_activity_dict():
         "density": np.array([1, 2, 3]),
         "density_units": "kg/m^3",
         "molar_mass": np.array([1, 2, 3]),
+        "molar_mass_units": "kg/mol",
         "water_index": 1,
     }
     builder_dict.set_parameters(parameters)

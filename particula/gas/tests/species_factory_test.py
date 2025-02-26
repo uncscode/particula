@@ -32,9 +32,11 @@ class TestGasSpeciesFactory(unittest.TestCase):
         parameters = {
             "name": "Oxygen",
             "molar_mass": 0.032,
+            "molar_mass_units": "kg/mol",
             "vapor_pressure_strategy": ConstantVaporPressureStrategy(50),
             "condensable": False,
             "concentration": 1.2,
+            "concentration_units": "kg/m^3",
         }
         gas_species = self.factory.get_strategy("gas_species", parameters)
         self.assertIsInstance(gas_species, GasSpecies)

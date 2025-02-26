@@ -45,15 +45,15 @@ def test_surface_tension_mixin():
 
     # test setting surface tension
     with pytest.raises(ValueError) as excinfo:
-        builder_mixin.set_surface_tension(-1)
+        builder_mixin.set_surface_tension(-1, "N/m")
     assert "Argument 'surface_tension' must be positive." in str(excinfo.value)
 
     # test positive surface tension
-    builder_mixin.set_surface_tension(1)
+    builder_mixin.set_surface_tension(1, "N/m")
     assert builder_mixin.surface_tension == 1
 
     # test array of surface tensions
-    builder_mixin.set_surface_tension(np.array([1, 2, 3]))
+    builder_mixin.set_surface_tension(np.array([1, 2, 3]), "N/m")
     np.testing.assert_allclose(
         builder_mixin.surface_tension, np.array([1, 2, 3])
     )
@@ -76,11 +76,11 @@ def test_molar_mass_mixin():
     builder_mixin = BuilderMolarMassMixin()
 
     # test positive molar mass
-    builder_mixin.set_molar_mass(1)
+    builder_mixin.set_molar_mass(1, "kg/mol")
     assert builder_mixin.molar_mass == 1
 
     # test array of molar masses
-    builder_mixin.set_molar_mass(np.array([1, 2, 3]))
+    builder_mixin.set_molar_mass(np.array([1, 2, 3]), "kg/mol")
     np.testing.assert_allclose(builder_mixin.molar_mass, np.array([1, 2, 3]))
 
     # test setting molar mass units
@@ -100,17 +100,17 @@ def test_concentration_mixin():
 
     # test setting concentration
     with pytest.raises(ValueError) as excinfo:
-        builder_mixin.set_concentration(-1)
+        builder_mixin.set_concentration(-1, "kg/m^3")
     assert "Argument 'concentration' must be nonnegative." in str(
         excinfo.value
     )
 
     # test positive concentration
-    builder_mixin.set_concentration(1)
+    builder_mixin.set_concentration(1, "kg/m^3")
     assert builder_mixin.concentration == 1
 
     # test array of concentrations
-    builder_mixin.set_concentration(np.array([1, 2, 3]))
+    builder_mixin.set_concentration(np.array([1, 2, 3]), "kg/m^3")
     np.testing.assert_allclose(
         builder_mixin.concentration, np.array([1, 2, 3])
     )
@@ -150,11 +150,11 @@ def test_pressure_mixin():
 
     # test setting pressure
     with pytest.raises(ValueError) as excinfo:
-        builder_mixin.set_pressure(-1)
+        builder_mixin.set_pressure(-1, "Pa")
     assert "Argument 'pressure' must be nonnegative." in str(excinfo.value)
 
     # test positive pressure
-    builder_mixin.set_pressure(102000)
+    builder_mixin.set_pressure(102000, "Pa")
     assert builder_mixin.pressure == 102000
 
     # test setting pressure units
@@ -174,26 +174,16 @@ def test_mass_mixin():
 
     # test setting mass
     with pytest.raises(ValueError) as excinfo:
-        builder_mixin.set_mass(-1)
+        builder_mixin.set_mass(-1, "kg")
     assert "Argument 'mass' must be nonnegative." in str(excinfo.value)
 
     # test positive mass
-    builder_mixin.set_mass(1)
+    builder_mixin.set_mass(1, "kg")
     assert builder_mixin.mass == 1
 
     # test array of masses
-    builder_mixin.set_mass(np.array([1, 2, 3]))
+    builder_mixin.set_mass(np.array([1, 2, 3]), "kg")
     np.testing.assert_allclose(builder_mixin.mass, np.array([1, 2, 3]))
-
-    # test setting mass units
-    builder_mixin.set_mass(0.001, mass_units="kg")
-    assert builder_mixin.mass == pytest.approx(1e-3, 1e-6)
-
-    # test setting mass units for array
-    builder_mixin.set_mass(np.array([1, 2, 3]) / 1000, mass_units="kg")
-    np.testing.assert_allclose(
-        builder_mixin.mass, np.array([1e-3, 2e-3, 3e-3]), atol=1e-6
-    )
 
 
 def test_radius_mixin():
@@ -202,26 +192,16 @@ def test_radius_mixin():
 
     # test setting radius
     with pytest.raises(ValueError) as excinfo:
-        builder_mixin.set_radius(-1)
+        builder_mixin.set_radius(-1, "m")
     assert "Argument 'radius' must be nonnegative." in str(excinfo.value)
 
     # test positive radius
-    builder_mixin.set_radius(1)
+    builder_mixin.set_radius(1, "m")
     assert builder_mixin.radius == 1
 
     # test array of radii
-    builder_mixin.set_radius(np.array([1, 2, 3]))
+    builder_mixin.set_radius(np.array([1, 2, 3]), "m")
     np.testing.assert_allclose(builder_mixin.radius, np.array([1, 2, 3]))
-
-    # test setting radius units
-    builder_mixin.set_radius(1 / 100, radius_units="m")
-    assert builder_mixin.radius == pytest.approx(1e-2, 1e-6)
-
-    # test setting radius units for array
-    builder_mixin.set_radius(np.array([1, 2, 3]) / 100, radius_units="m")
-    np.testing.assert_allclose(
-        builder_mixin.radius, np.array([1e-2, 2e-2, 3e-2]), atol=1e-6
-    )
 
 
 def test_charge_mixin():

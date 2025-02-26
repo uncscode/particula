@@ -27,8 +27,8 @@ def test_gas_builder_with_species():
     )
     atmo = (
         AtmosphereBuilder()
-        .set_temperature(298.15)
-        .set_pressure(101325)
+        .set_temperature(298.15, "K")
+        .set_pressure(101325, "Pa")
         .add_species(gas_species_builder_test)
         .build()
     )

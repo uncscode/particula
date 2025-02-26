@@ -17,9 +17,11 @@ def test_build_surface_strategy_molar_dict():
     builder = SurfaceStrategyMolarBuilder()
     parameters = {
         "surface_tension": 0.072,
+        "surface_tension_units": "N/m",
         "density": 1000,
         "density_units": "kg/m^3",
         "molar_mass": 0.01815,
+        "molar_mass_units": "kg/mol",
     }
     builder.set_parameters(parameters)
     assert builder.surface_tension == 0.072
@@ -47,6 +49,7 @@ def test_build_surface_strategy_mass_dict():
     builder = SurfaceStrategyMassBuilder()
     parameters = {
         "surface_tension": 0.072,
+        "surface_tension_units": "N/m",
         "density": 1000,
         "density_units": "kg/m^3",
     }
@@ -74,6 +77,7 @@ def test_build_surface_strategy_volume_dict():
     builder = SurfaceStrategyVolumeBuilder()
     parameters = {
         "surface_tension": 0.072,
+        "surface_tension_units": "N/m",
         "density": 1000,
         "density_units": "kg/m^3",
     }
