@@ -4,6 +4,7 @@ This module uses unittest to verify correct creation of particle
 distributions (PMF, PDF, resolved) and their evolution with a
 Brownian coagulation strategy.
 """
+
 import unittest
 import numpy as np
 
