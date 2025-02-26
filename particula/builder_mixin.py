@@ -89,7 +89,7 @@ class BuilderMolarMassMixin:
     def set_molar_mass(
         self,
         molar_mass: Union[float, NDArray[np.float64]],
-        molar_mass_units: str = "kg/mol",
+        molar_mass_units: str,
     ):
         """
         Set the molar mass of the particle in kg/mol.
@@ -185,7 +185,7 @@ class BuilderMassMixin:
     def set_mass(
         self,
         mass: Union[float, NDArray[np.float64]],
-        mass_units: str = "kg",
+        mass_units: str,
     ):
         """Set the mass of the particle in kg.
 
@@ -214,7 +214,7 @@ class BuilderVolumeMixin:
     def set_volume(
         self,
         volume: Union[float, NDArray[np.float64]],
-        volume_units: str = "m^3",
+        volume_units: str,
     ):
         """Set the volume in m^3.
 
@@ -243,7 +243,7 @@ class BuilderRadiusMixin:
     def set_radius(
         self,
         radius: Union[float, NDArray[np.float64]],
-        radius_units: str = "m",
+        radius_units: str,
     ):
         """Set the radius of the particle in meters.
 
@@ -309,7 +309,7 @@ class BuilderPressureMixin:
     def set_pressure(
         self,
         pressure: Union[float, NDArray[np.float64]],
-        pressure_units: str = "Pa",
+        pressure_units: str,
     ):
         """Set the total pressure of the atmosphere.
 
@@ -348,7 +348,7 @@ class BuilderLognormalMixin:
     def set_mode(
         self,
         mode: NDArray[np.float64],
-        mode_units: str = "m",
+        mode_units: str,
     ):
         """Set the mode for distribution.
 
@@ -385,7 +385,7 @@ class BuilderLognormalMixin:
     def set_number_concentration(
         self,
         number_concentration: NDArray[np.float64],
-        number_concentration_units: str = "1/m^3",
+        number_concentration_units: str,
     ):
         """Set the number concentration for the distribution.
 

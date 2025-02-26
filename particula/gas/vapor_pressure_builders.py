@@ -134,7 +134,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
 
     @validate_inputs({"latent_heat": "positive"})
     def set_latent_heat(
-        self, latent_heat: float, latent_heat_units: str = "J/kg"
+        self, latent_heat: float, latent_heat_units: str
     ) -> "ClausiusClapeyronBuilder":
         """Set the latent heat of vaporization: Default units J/kg."""
         if latent_heat_units == "J/kg":
@@ -147,7 +147,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
 
     @validate_inputs({"temperature_initial": "positive"})
     def set_temperature_initial(
-        self, temperature_initial: float, temperature_initial_units: str = "K"
+        self, temperature_initial: float, temperature_initial_units: str
     ) -> "ClausiusClapeyronBuilder":
         """Set the initial temperature. Default units: K."""
         if temperature_initial_units == "K":
@@ -160,7 +160,7 @@ class ClausiusClapeyronBuilder(BuilderABC):
 
     @validate_inputs({"pressure_initial": "positive"})
     def set_pressure_initial(
-        self, pressure_initial: float, pressure_initial_units: str = "Pa"
+        self, pressure_initial: float, pressure_initial_units: str
     ) -> "ClausiusClapeyronBuilder":
         """Set the initial pressure. Default units: Pa."""
         if pressure_initial_units == "Pa":
@@ -215,7 +215,7 @@ class ConstantBuilder(BuilderABC):
 
     @validate_inputs({"vapor_pressure": "positive"})
     def set_vapor_pressure(
-        self, vapor_pressure: float, vapor_pressure_units: str = "Pa"
+        self, vapor_pressure: float, vapor_pressure_units: str
     ) -> "ConstantBuilder":
         """Set the constant vapor pressure."""
         if vapor_pressure_units == "Pa":

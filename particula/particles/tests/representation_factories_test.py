@@ -24,10 +24,12 @@ def test_mass_based_build():
         "distribution_strategy": MassBasedMovingBin(),
         "activity_strategy": ActivityIdealMass(),
         "surface_strategy": SurfaceStrategyVolume(),
-        "mass": np.array([1.0, 2.0, 3.0]),
+        "mass": np.array([1.0, 2.0, 3.0]), 
+        "mass_units": "kg",
         "density": np.array([1.0, 2.0, 3.0]),
         "density_units": "kg/m^3",
         "concentration": np.array([10, 20, 30]),
+        "concentration_units": "1/m^3",
         "charge": 1.0,
     }
     particle_rep = ParticleRepresentationFactory().get_strategy(
@@ -49,9 +51,11 @@ def test_radii_based_build():
         "activity_strategy": ActivityIdealMass(),
         "surface_strategy": SurfaceStrategyVolume(),
         "radius": np.array([1.0, 2.0, 3.0]),
+        "radius_units": "m",
         "density": np.array([1.0, 2.0, 3.0]),
         "density_units": "kg/m^3",
         "concentration": np.array([10, 20, 30]),
+        "concentration_units": "1/m^3",
         "charge": np.array([1.0, 2.0, 3.0]),
     }
     strategy = ParticleRepresentationFactory().get_strategy(
@@ -76,9 +80,11 @@ def test_limited_radius_build():
 
     # set values
     parameters = {
-        "mode": np.array([100, 2000]),
+        "mode": np.array([100, 2000])*1e-9,
+        "mode_units": "m",
         "geometric_standard_deviation": np.array([1.4, 1.5]),
         "number_concentration": np.array([1e3, 1e3]),
+        "number_concentration_units": "1/m^3",
     }
     particle_rep = ParticleRepresentationFactory().get_strategy(
         "preset_radius", parameters
@@ -93,10 +99,12 @@ def test_resolved_mass_build():
         "activity_strategy": ActivityIdealMass(),
         "surface_strategy": SurfaceStrategyVolume(),
         "mass": np.array([1.0, 2.0, 3.0]),
+        "mass_units": "kg",
         "density": np.array([1.0, 2.0, 3.0]),
         "density_units": "kg/m^3",
         "charge": 1.0,
         "volume": 1,
+        "volume_units": "m^3",
     }
     particle_rep = ParticleRepresentationFactory().get_strategy(
         "resolved_mass", parameters
@@ -118,9 +126,12 @@ def test_preset_resolved_mass_build():
 
     parameters = {
         "volume": 1,
-        "mode": np.array([100, 2000]),
+        "volume_units": "m^3",
+        "mode": np.array([100, 2000])*1e-9,
+        "mode_units": "m",
         "geometric_standard_deviation": np.array([1.4, 1.5]),
         "number_concentration": np.array([1e3, 1e3]),
+        "number_concentration_units": "1/m^3",
         "particle_resolved_count": 1000,
     }
     particle_rep = ParticleRepresentationFactory().get_strategy(

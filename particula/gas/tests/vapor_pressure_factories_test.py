@@ -13,7 +13,8 @@ from particula.gas.vapor_pressure_factories import VaporPressureFactory
 def test_factory_with_constant_strategy():
     """Test factory creates a ConstantVaporPressureStrategy correctly."""
     strategy = VaporPressureFactory().get_strategy(
-        strategy_type="constant", parameters={"vapor_pressure": 101325}
+        strategy_type="constant", parameters={"vapor_pressure": 101325,
+                                              "vapor_pressure_units": "Pa"}
     )
     assert isinstance(strategy, ConstantVaporPressureStrategy)
 
@@ -31,8 +32,11 @@ def test_factory_with_clausius_clapeyron_strategy():
     """Test factory creates a ClausiusClapeyronStrategy correctly."""
     parameters = {
         "latent_heat": 2260,
+        "latent_heat_units": "J/kg",
         "temperature_initial": 300,
+        "temperature_initial_units": "K",
         "pressure_initial": 101325,
+        "pressure_initial_units": "Pa",
     }
     strategy = VaporPressureFactory().get_strategy(
         strategy_type="clausius_clapeyron", parameters=parameters

@@ -53,7 +53,7 @@ class TestTurbulentShearCoagulationStrategy(unittest.TestCase):
         )
 
         self.particle_resolved = (
-            PresetResolvedParticleMassBuilder().set_volume(1e-6).build()
+            PresetResolvedParticleMassBuilder().set_volume(1e-6, "m^3").build()
         )
         self.strategy_particle_resolved = TurbulentShearCoagulationStrategy(
             distribution_type="particle_resolved",
