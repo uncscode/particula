@@ -166,7 +166,8 @@ class TestCoagulationIntegration(unittest.TestCase):
         initial_mass_pmf = aerosol_pmf.particles[0].get_mass_concentration(
             clone=True
         )
-        aerosol_pmf = coagulation_process_pmf.execute(aerosol_pmf, 100, 1)
+        for _ in range(3):
+            aerosol_pmf = coagulation_process_pmf.execute(aerosol_pmf, 100, 1)
         self.assertAlmostEqual(
             initial_mass_pmf,
             aerosol_pmf.particles[0].get_mass_concentration(),
@@ -202,7 +203,8 @@ class TestCoagulationIntegration(unittest.TestCase):
         initial_mass_pdf = aerosol_pdf.particles[0].get_mass_concentration(
             clone=True
         )
-        aerosol_pdf = coagulation_process_pdf.execute(aerosol_pdf, 100, 2)
+        for _ in range(3):
+            aerosol_pdf = coagulation_process_pdf.execute(aerosol_pdf, 100, 2)
         self.assertAlmostEqual(
             initial_mass_pdf,
             aerosol_pdf.particles[0].get_mass_concentration(),
@@ -242,15 +244,10 @@ class TestCoagulationIntegration(unittest.TestCase):
         initial_mass_resolved = aerosol_resolved.particles[
             0
         ].get_mass_concentration()
-        # step 1
-        aerosol_resolved = coagulation_process_resolved.execute(
-            aerosol_resolved, 100, 1
-        )
-        # step 2
-        aerosol_resolved = coagulation_process_resolved.execute(
-            aerosol_resolved, 100, 1
-        )
-        # step 3
+        for _ in range(3):
+            aerosol_resolved = coagulation_process_resolved.execute(
+                aerosol_resolved, 100, 1
+            )
         aerosol_resolved = coagulation_process_resolved.execute(
             aerosol_resolved, 100, 1
         )
