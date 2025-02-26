@@ -28,7 +28,6 @@ from particula import (
 from particula.aerosol import Aerosol
 
 
-
 from particula.logger_setup import setup
 
 __version__ = "0.1.3"

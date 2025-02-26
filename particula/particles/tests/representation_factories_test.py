@@ -24,7 +24,7 @@ def test_mass_based_build():
         "distribution_strategy": MassBasedMovingBin(),
         "activity_strategy": ActivityIdealMass(),
         "surface_strategy": SurfaceStrategyVolume(),
-        "mass": np.array([1.0, 2.0, 3.0]), 
+        "mass": np.array([1.0, 2.0, 3.0]),
         "mass_units": "kg",
         "density": np.array([1.0, 2.0, 3.0]),
         "density_units": "kg/m^3",
@@ -80,7 +80,7 @@ def test_limited_radius_build():
 
     # set values
     parameters = {
-        "mode": np.array([100, 2000])*1e-9,
+        "mode": np.array([100, 2000]) * 1e-9,
         "mode_units": "m",
         "geometric_standard_deviation": np.array([1.4, 1.5]),
         "number_concentration": np.array([1e3, 1e3]),
@@ -127,7 +127,7 @@ def test_preset_resolved_mass_build():
     parameters = {
         "volume": 1,
         "volume_units": "m^3",
-        "mode": np.array([100, 2000])*1e-9,
+        "mode": np.array([100, 2000]) * 1e-9,
         "mode_units": "m",
         "geometric_standard_deviation": np.array([1.4, 1.5]),
         "number_concentration": np.array([1e3, 1e3]),

@@ -13,8 +13,8 @@ from particula.gas.vapor_pressure_factories import VaporPressureFactory
 def test_factory_with_constant_strategy():
     """Test factory creates a ConstantVaporPressureStrategy correctly."""
     strategy = VaporPressureFactory().get_strategy(
-        strategy_type="constant", parameters={"vapor_pressure": 101325,
-                                              "vapor_pressure_units": "Pa"}
+        strategy_type="constant",
+        parameters={"vapor_pressure": 101325, "vapor_pressure_units": "Pa"},
     )
     assert isinstance(strategy, ConstantVaporPressureStrategy)
 

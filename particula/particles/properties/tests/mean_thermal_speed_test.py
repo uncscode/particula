@@ -3,7 +3,7 @@
 import pytest
 import numpy as np
 from particula.particles.properties.mean_thermal_speed_module import (
-    get_mean_thermal_speed
+    get_mean_thermal_speed,
 )
 from particula.util.constants import BOLTZMANN_CONSTANT
 

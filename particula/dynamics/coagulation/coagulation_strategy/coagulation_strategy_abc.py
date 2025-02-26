@@ -260,14 +260,21 @@ class CoagulationStrategyABC(ABC):
                     bin_radius=kernel_radius,
                 )
             )
+            kernel_radius = kernel_particle.get_radius()
+            if min(kernel_radius) == 0:
+                raise ValueError(
+                    "The kernel radius cannot be zero. "
+                    "Check the particle representation."
+                )
+            kernel = self.kernel(
+                particle=kernel_particle,
+                temperature=temperature,
+                pressure=pressure,
+            )
             # calculate step
             loss_gain_indices = get_particle_resolved_coagulation_step(
                 particle_radius=particle.get_radius(),
-                kernel=self.kernel(
-                    particle=kernel_particle,
-                    temperature=temperature,
-                    pressure=pressure,
-                ),
+                kernel=kernel,
                 kernel_radius=kernel_radius,
                 volume=particle.get_volume(),
                 time_step=time_step,

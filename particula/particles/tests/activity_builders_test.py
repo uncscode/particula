@@ -32,7 +32,7 @@ def test_build_ideal_activity_molar_parameter():
     assert builder.molar_mass == 1
 
     # test array of molar masses
-    builder.set_molar_mass(np.array([1, 2, 3]),"kg/mol")
+    builder.set_molar_mass(np.array([1, 2, 3]), "kg/mol")
     np.testing.assert_array_equal(builder.molar_mass, np.array([1, 2, 3]))
 
 
