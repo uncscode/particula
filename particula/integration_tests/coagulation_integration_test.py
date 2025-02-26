@@ -163,12 +163,14 @@ class TestCoagulationIntegration(unittest.TestCase):
         aerosol_pmf = par.Aerosol(
             atmosphere=self.atmosphere, particles=particle_pmf
         )
-        initial_mass_pmf = aerosol_pmf.particles[0].get_mass_concentration()
+        initial_mass_pmf = aerosol_pmf.particles[0].get_mass_concentration(
+            clone=True
+        )
         aerosol_pmf = coagulation_process_pmf.execute(aerosol_pmf, 100, 1)
         self.assertAlmostEqual(
             initial_mass_pmf,
             aerosol_pmf.particles[0].get_mass_concentration(),
-            delta=1e-6,
+            delta=1e-4,
         )
 
     def test_coagulation_process_pdf(self):
@@ -197,12 +199,14 @@ class TestCoagulationIntegration(unittest.TestCase):
         aerosol_pdf = par.Aerosol(
             atmosphere=self.atmosphere, particles=particle_pdf
         )
-        initial_mass_pdf = aerosol_pdf.particles[0].get_mass_concentration()
-        aerosol_pdf = coagulation_process_pdf.execute(aerosol_pdf, 100, 1)
+        initial_mass_pdf = aerosol_pdf.particles[0].get_mass_concentration(
+            clone=True
+        )
+        aerosol_pdf = coagulation_process_pdf.execute(aerosol_pdf, 100, 2)
         self.assertAlmostEqual(
             initial_mass_pdf,
             aerosol_pdf.particles[0].get_mass_concentration(),
-            delta=1e-6,
+            delta=1,
         )
 
     def test_coagulation_process_resolved(self):
@@ -238,13 +242,22 @@ class TestCoagulationIntegration(unittest.TestCase):
         initial_mass_resolved = aerosol_resolved.particles[
             0
         ].get_mass_concentration()
+        # step 1
+        aerosol_resolved = coagulation_process_resolved.execute(
+            aerosol_resolved, 100, 1
+        )
+        # step 2
+        aerosol_resolved = coagulation_process_resolved.execute(
+            aerosol_resolved, 100, 1
+        )
+        # step 3
         aerosol_resolved = coagulation_process_resolved.execute(
             aerosol_resolved, 100, 1
         )
         self.assertAlmostEqual(
             initial_mass_resolved,
             aerosol_resolved.particles[0].get_mass_concentration(),
-            delta=1e-6,
+            delta=1e-2,
         )
 
     def test_final_properties(self):

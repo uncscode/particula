@@ -24,8 +24,10 @@ def test_mass_ideal_strategy_no_parameters():
 
 def test_molar_ideal_strategy_with_parameters():
     """Test factory function for molar_ideal strategy with parameters."""
-    parameters = {"molar_mass": np.array([100.0, 200.0, 300.0]),
-                  "molar_mass_units": "kg/mol"}
+    parameters = {
+        "molar_mass": np.array([100.0, 200.0, 300.0]),
+        "molar_mass_units": "kg/mol",
+    }
     strategy = ActivityFactory().get_strategy("molar_ideal", parameters)
     assert isinstance(strategy, ActivityIdealMolar)
     np.testing.assert_allclose(

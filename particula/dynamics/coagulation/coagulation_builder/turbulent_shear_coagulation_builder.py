@@ -7,6 +7,7 @@ from particula.abc_builder import BuilderABC
 from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
+
 # pylint: disable=line-too-long
 from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagulation_strategy import (
     TurbulentShearCoagulationStrategy,

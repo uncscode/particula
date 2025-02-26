@@ -8,7 +8,7 @@ the knudsen number goes like:
 import pytest
 import numpy as np
 from particula.particles.properties.knudsen_number_module import (
-    get_knudsen_number
+    get_knudsen_number,
 )
 
 

@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 from particula.util.converting.convert_mass_concentration import (
     get_volume_fraction_from_mass,
     get_mass_fraction_from_mass,
-    get_mole_fraction_from_mass
+    get_mole_fraction_from_mass,
 )
 from particula.util.validate_inputs import validate_inputs
 
@@ -207,10 +207,8 @@ def get_kappa_activity(
           DOI: https://doi.org/10.5194/acp-7-1961-2007.
     """
 
-    volume_fractions = (
-        get_volume_fraction_from_mass(
-            mass_concentrations=mass_concentration, densities=density
-        )
+    volume_fractions = get_volume_fraction_from_mass(
+        mass_concentrations=mass_concentration, densities=density
     )
     # other species activity based on mole fraction
     activity = get_mole_fraction_from_mass(

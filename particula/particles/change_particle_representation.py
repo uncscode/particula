@@ -43,8 +43,10 @@ def get_particle_resolved_binned_radius(
         return bin_radius
     # else find the non-zero min and max radii, the log space them
     particle_radius = particle.get_radius()
-    min_radius = np.min(particle_radius[particle_radius > 0])
-    max_radius = np.max(particle_radius[particle_radius > 0])
+    min_radius = np.min(particle_radius[particle_radius > 0]) * 0.5
+    max_radius = np.max(particle_radius[particle_radius > 0]) * 2
+    if min_radius == 0:
+        raise ValueError("Particle radius must be positive., change")
     if total_bins is not None:
         return np.logspace(
             np.log10(min_radius),

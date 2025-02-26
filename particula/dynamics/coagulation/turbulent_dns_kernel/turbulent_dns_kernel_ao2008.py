@@ -170,10 +170,10 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
     )
 
     # 2. Slip correction factors
-    knudsen_number =particles.get_knudsen_number(
+    knudsen_number = particles.get_knudsen_number(
         mean_free_path=mean_free_path, particle_radius=particle_radius
     )
-    slip_correction_factor =particles.get_cunningham_slip_correction(
+    slip_correction_factor = particles.get_cunningham_slip_correction(
         knudsen_number
     )
 
@@ -185,14 +185,14 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
     )
 
     # 3. Particle inertia and settling velocity
-    particle_inertia_time =particles.get_particle_inertia_time(
+    particle_inertia_time = particles.get_particle_inertia_time(
         particle_radius=particle_radius,
         particle_density=particle_density,
         fluid_density=fluid_density,
         kinematic_viscosity=kinematic_viscosity,
     )
     particle_settling_velocity = (
-       particles.get_particle_settling_velocity_with_drag(
+        particles.get_particle_settling_velocity_with_drag(
             particle_radius=particle_radius,
             particle_density=particle_density,
             fluid_density=fluid_density,
@@ -228,7 +228,7 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    stokes_number =particles.get_stokes_number(
+    stokes_number = particles.get_stokes_number(
         particle_inertia_time=particle_inertia_time,
         kolmogorov_time=kolmogorov_time,
     )
@@ -236,15 +236,13 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
         kinematic_viscosity=kinematic_viscosity,
         turbulent_dissipation=turbulent_dissipation,
     )
-    reynolds_lambda =particles.get_particle_reynolds_number(
+    reynolds_lambda = particles.get_particle_reynolds_number(
         particle_radius=particle_radius,
         particle_velocity=particle_settling_velocity,
         kinematic_viscosity=kinematic_viscosity,
     )
-    normalized_accel_variance = (
-        gas.get_normalized_accel_variance_ao2008(
-            re_lambda=re_lambda,
-        )
+    normalized_accel_variance = gas.get_normalized_accel_variance_ao2008(
+        re_lambda=re_lambda,
     )
     kolmogorov_velocity = gas.get_kolmogorov_velocity(
         kinematic_viscosity=kinematic_viscosity,

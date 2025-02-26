@@ -13,7 +13,8 @@ from particula.util.converting.convert_mass_concentration import (
     get_volume_fraction_from_mass,
 )
 from particula.particles.properties.kelvin_effect_module import (
-    get_kelvin_radius, get_kelvin_term
+    get_kelvin_radius,
+    get_kelvin_term,
 )
 
 
