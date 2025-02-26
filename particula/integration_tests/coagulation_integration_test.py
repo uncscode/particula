@@ -133,7 +133,7 @@ class TestCoagulationIntegration(unittest.TestCase):
         )
         self.assertIsNotNone(aerosol_resolved)
         self.assertAlmostEqual(
-            np.sum(particle_mass_sample),
+            np.sum(particle_mass_sample)/self.volume,
             aerosol_resolved.particles[0].get_mass_concentration(),
             delta=1e-6,
         )
