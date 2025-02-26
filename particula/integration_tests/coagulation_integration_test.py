@@ -138,55 +138,49 @@ class TestCoagulationIntegration(unittest.TestCase):
             delta=1e-6,
         )
 
-    def test_coagulation_process(self):
-        """Test Brownian coagulation across PMF, PDF, and resolved approaches.
-
-        Exercises coagulation with small time steps to verify:
-          - aerosol mass is approximately conserved
-          - number concentrations update logically
-          - PMF, PDF, and resolved cases all remain consistent
-        """
+    def test_coagulation_process_pmf(self):
+        """Test Brownian coagulation for a PMF-based distribution."""
         coagulation_process_pmf = par.dynamics.Coagulation(
             coagulation_strategy=par.dynamics.BrownianCoagulationStrategy(
                 distribution_type="discrete"
             )
         )
-        coagulation_process_resolved = par.dynamics.Coagulation(
-            coagulation_strategy=par.dynamics.BrownianCoagulationStrategy(
-                distribution_type="particle_resolved"
-            )
-        )
-        coagulation_process_pdf = par.dynamics.Coagulation(
-            coagulation_strategy=par.dynamics.BrownianCoagulationStrategy(
-                distribution_type="continuous_pdf"
-            )
-        )
-        # Setup initial aerosols
         number_concentration = self.number_of_particles * np.array(
             [self.number_of_samples / self.volume]
         )
         particle_pmf = (
             par.particles.PresetParticleRadiusBuilder()
             .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(
-                self.geometric_standard_deviation
-            )
+            .set_geometric_standard_deviation(self.geometric_standard_deviation)
             .set_number_concentration(number_concentration, "m^-3")
             .set_distribution_type("pmf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
             .set_density(self.density, "kg/m^3")
             .build()
         )
-        aerosol_pmf = par.Aerosol(
-            atmosphere=self.atmosphere, particles=particle_pmf
+        aerosol_pmf = par.Aerosol(atmosphere=self.atmosphere, particles=particle_pmf)
+        initial_mass_pmf = aerosol_pmf.particles[0].get_mass_concentration()
+        aerosol_pmf = coagulation_process_pmf.execute(aerosol_pmf, 100, 1)
+        self.assertAlmostEqual(
+            initial_mass_pmf,
+            aerosol_pmf.particles[0].get_mass_concentration(),
+            delta=1e-6,
         )
 
+    def test_coagulation_process_pdf(self):
+        """Test Brownian coagulation for a PDF-based distribution."""
+        coagulation_process_pdf = par.dynamics.Coagulation(
+            coagulation_strategy=par.dynamics.BrownianCoagulationStrategy(
+                distribution_type="continuous_pdf"
+            )
+        )
+        number_concentration = self.number_of_particles * np.array(
+            [self.number_of_samples / self.volume]
+        )
         particle_pdf = (
             par.particles.PresetParticleRadiusBuilder()
             .set_mode(self.mode, mode_units="m")
-            .set_geometric_standard_deviation(
-                self.geometric_standard_deviation
-            )
+            .set_geometric_standard_deviation(self.geometric_standard_deviation)
             .set_number_concentration(number_concentration, "m^-3")
             .set_distribution_type("pdf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
@@ -194,10 +188,22 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_charge(np.zeros_like(self.radius_bins))
             .build()
         )
-        aerosol_pdf = par.Aerosol(
-            atmosphere=self.atmosphere, particles=particle_pdf
+        aerosol_pdf = par.Aerosol(atmosphere=self.atmosphere, particles=particle_pdf)
+        initial_mass_pdf = aerosol_pdf.particles[0].get_mass_concentration()
+        aerosol_pdf = coagulation_process_pdf.execute(aerosol_pdf, 100, 1)
+        self.assertAlmostEqual(
+            initial_mass_pdf,
+            aerosol_pdf.particles[0].get_mass_concentration(),
+            delta=1e-6,
         )
 
+    def test_coagulation_process_resolved(self):
+        """Test Brownian coagulation for a particle-resolved distribution."""
+        coagulation_process_resolved = par.dynamics.Coagulation(
+            coagulation_strategy=par.dynamics.BrownianCoagulationStrategy(
+                distribution_type="particle_resolved"
+            )
+        )
         radii_sample = par.particles.get_lognormal_sample_distribution(
             mode=self.mode,
             geometric_standard_deviation=self.geometric_standard_deviation,
@@ -207,9 +213,7 @@ class TestCoagulationIntegration(unittest.TestCase):
         particle_mass_sample = 4 / 3 * np.pi * radii_sample**3 * self.density
         resolved_masses = (
             par.particles.ResolvedParticleMassRepresentationBuilder()
-            .set_distribution_strategy(
-                par.particles.ParticleResolvedSpeciatedMass()
-            )
+            .set_distribution_strategy(par.particles.ParticleResolvedSpeciatedMass())
             .set_activity_strategy(par.particles.ActivityIdealMass())
             .set_surface_strategy(par.particles.SurfaceStrategyVolume())
             .set_mass(particle_mass_sample, "kg")
@@ -221,37 +225,8 @@ class TestCoagulationIntegration(unittest.TestCase):
         aerosol_resolved = par.Aerosol(
             atmosphere=self.atmosphere, particles=resolved_masses
         )
-
-        # Simulate a few steps
-        time_step = 100
-        sub_steps = 1
-
-        initial_mass_pmf = aerosol_pmf.particles[0].get_mass_concentration()
-        initial_mass_pdf = aerosol_pdf.particles[0].get_mass_concentration()
-        initial_mass_resolved = aerosol_resolved.particles[
-            0
-        ].get_mass_concentration()
-
-        aerosol_pmf = coagulation_process_pmf.execute(
-            aerosol_pmf, time_step, sub_steps
-        )
-        aerosol_pdf = coagulation_process_pdf.execute(
-            aerosol_pdf, time_step, sub_steps
-        )
-        aerosol_resolved = coagulation_process_resolved.execute(
-            aerosol_resolved, time_step, sub_steps
-        )
-
-        self.assertAlmostEqual(
-            initial_mass_pmf,
-            aerosol_pmf.particles[0].get_mass_concentration(),
-            delta=1e-6,
-        )
-        self.assertAlmostEqual(
-            initial_mass_pdf,
-            aerosol_pdf.particles[0].get_mass_concentration(),
-            delta=1e-6,
-        )
+        initial_mass_resolved = aerosol_resolved.particles[0].get_mass_concentration()
+        aerosol_resolved = coagulation_process_resolved.execute(aerosol_resolved, 100, 1)
         self.assertAlmostEqual(
             initial_mass_resolved,
             aerosol_resolved.particles[0].get_mass_concentration(),
