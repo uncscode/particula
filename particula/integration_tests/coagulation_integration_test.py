@@ -270,7 +270,3 @@ class TestCoagulationIntegration(unittest.TestCase):
         """
         # This would involve running the full simulation and checking final states
         pass
-
-
-if __name__ == "__main__":
-    unittest.main()
