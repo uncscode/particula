@@ -39,14 +39,17 @@ def get_particle_resolved_binned_radius(
     Returns:
         The kernel radius for the particle [m].
     """
-    if bin_radius is not None:
-        return bin_radius
     # else find the non-zero min and max radii, the log space them
     particle_radius = particle.get_radius()
     min_radius = np.min(particle_radius[particle_radius > 0]) * 0.5
     max_radius = np.max(particle_radius[particle_radius > 0]) * 2
+    if ~np.isfinite(min_radius) or ~np.isfinite(max_radius):
+        raise ValueError(
+            "Particle radius must be finite. Check the particles,"
+            "they may all be zero and the kernel cannot be calculated."
+        )
     if min_radius == 0:
-        raise ValueError("Particle radius must be positive., change")
+        min_radius = 1e-10
     if total_bins is not None:
         return np.logspace(
             np.log10(min_radius),
@@ -121,43 +124,22 @@ def get_speciated_mass_representation_from_particle_resolved(
         new_concentration[index] = np.sum(
             old_concentration[bin_indexes == index]
         )
-    # check for nans in the new distribution
-    if np.any(np.isnan(new_distribution)):
-        # interpolate the nans
-        if new_distribution.ndim == 1:
-            mask_nan_zeros = np.isnan(new_distribution) | (
-                new_distribution == 0
-            )
-            new_distribution = np.interp(
-                bin_radius,
-                bin_radius[~mask_nan_zeros],
-                new_distribution[~mask_nan_zeros],
-                # left=np.min(new_distribution[~mask_nan_zeros]),
-                # right=np.max(new_distribution[~mask_nan_zeros]),
-            )
-        else:
-            # loop through the columns and interpolate
-            for i in range(np.shape(new_distribution)[1]):
-                mask_nan_zeros = np.isnan(new_distribution[:, i]) | (
-                    new_distribution[:, i] == 0
-                )
-                new_distribution[:, i] = np.interp(
-                    bin_radius,
-                    bin_radius[~np.isnan(new_distribution[:, i])],
-                    new_distribution[~np.isnan(new_distribution[:, i]), i],
-                    left=np.min(
-                        new_distribution[~np.isnan(new_distribution[:, i]), i]
-                    ),
-                    right=np.max(
-                        new_distribution[~np.isnan(new_distribution[:, i]), i]
-                    ),
-                )
-    # set the new distribution
-    # if np.any(new_distribution == 0):
+    # check for nans and all zeros in the new distribution
+    mask_nan_zeros = np.isnan(new_distribution) | (new_distribution == 0)
 
-    new_particle.distribution = new_distribution
-    new_particle.charge = np.where(np.isnan(new_charge), 0, new_charge)
-    new_particle.concentration = np.where(
+    new_charge = np.where(np.isnan(new_charge), 0, new_charge)
+    new_concentration = np.where(
         np.isnan(new_concentration), 0, new_concentration
     )
+
+    # filter out the nans and zeros
+    if new_distribution.ndim == 1:
+        new_particle.distribution = new_distribution[~mask_nan_zeros]
+        new_particle.charge = new_charge[~mask_nan_zeros]
+        new_particle.concentration = new_concentration[~mask_nan_zeros]
+        return new_particle
+    mask_nan_zeros = np.any(mask_nan_zeros, axis=1)
+    new_particle.distribution = new_distribution[~mask_nan_zeros, :]
+    new_particle.charge = new_charge[~mask_nan_zeros]
+    new_particle.concentration = new_concentration[~mask_nan_zeros]
     return new_particle
