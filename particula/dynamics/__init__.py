@@ -120,4 +120,5 @@ from particula.dynamics.coagulation.coagulation_builder.combine_coagulation_stra
 # particula.dynamics.coagulation.particle_resolved_step
 from particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method import (
     get_particle_resolved_coagulation_step,
+    get_particle_resolved_update_step,
 )
