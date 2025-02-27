@@ -6,11 +6,11 @@ including condensation, coagulation, and special customizations.
 
 ## Condensation
 
+These notebooks demonstrate bin-based and fully resolved approaches to modeling condensation.
+
 - [Condensation 1: Bins](Condensation/Condensation_1_Bin.ipynb)
 - [Condensation 2: Masses Binned](Condensation/Condensation_2_MassBin.ipynb)
 - [Condensation 3: Masses Resolved](Condensation/Condensation_3_MassResolved.ipynb)
-
-(These notebooks demonstrate bin-based and fully resolved approaches to modeling condensation.)
 
 ## Coagulation
 
@@ -20,12 +20,11 @@ including condensation, coagulation, and special customizations.
 
 ### Functional
 
+These illustrate functional approaches to coagulation, comparing PMF- and PDF-based methods against particle-resolved methods.
+
 - [Coagulation 1: Probability Mass Function](Coagulation/Functional/Coagulation_Basic_1_PMF.ipynb)
 - [Coagulation Tutorial: Basic 2-PDF](Coagulation/Functional/Coagulation_Basic_2_PDF.ipynb)
 - [Coagulation Tutorial: Basic 3-Compared](Coagulation/Functional/Coagulation_Basic_3_compared.ipynb)
-- [Coagulation Tutorial: Basic 4-Particle Resolved](Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.ipynb)
-
-(These illustrate functional approaches to coagulation, comparing PMF- and PDF-based methods against particle-resolved methods.)
 
 ### Charge
 

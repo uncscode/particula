@@ -25,14 +25,14 @@ class TestCoagulationIntegration(unittest.TestCase):
         self.geometric_standard_deviation = np.array([1.3, 1.3])
         self.number_of_particles = np.array([0.75, 0.25])
         self.density = np.array([1.0e3])
-        self.volume = 1 * par.util.get_unit_conversion("cm^3", "m^3")
+        self.volume = 1 * 1e-6  # m^3
         self.number_of_samples = 100_000
         self.radius_bins = np.logspace(-8, -6, 250)
         self.atmosphere = (
             par.gas.AtmosphereBuilder()
             .add_species(par.gas.PresetGasSpeciesBuilder().build())
-            .set_temperature(25, temperature_units="degC")
-            .set_pressure(1, pressure_units="atm")
+            .set_temperature(273, temperature_units="K")
+            .set_pressure(101325, pressure_units="Pa")
             .build()
         )
 
