@@ -60,6 +60,7 @@ from particula.dynamics.coagulation.coagulation_rate import (
     get_coagulation_gain_rate_continuous,
 )
 from particula.dynamics.coagulation.charged_dimensionless_kernel import (
+    get_dimensional_kernel,
     get_hard_sphere_kernel,
     get_coulomb_kernel_dyachkov2007,
     get_coulomb_kernel_gatti2008,
