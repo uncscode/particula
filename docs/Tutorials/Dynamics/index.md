@@ -1,5 +1,8 @@
 # Dynamics
 
+Here we collect tutorials on the dynamic processes that can affect aerosol populations, 
+including condensation, coagulation, and special customizations.
+
 
 ## Condensation
 
@@ -7,11 +10,13 @@
 - [Condensation 2: Masses Binned](Condensation/Condensation_2_MassBin.ipynb)
 - [Condensation 3: Masses Resolved](Condensation/Condensation_3_MassResolved.ipynb)
 
+(These notebooks demonstrate bin-based and fully resolved approaches to modeling condensation.)
+
 ## Coagulation
 
-- [Coagulation 1: PMF Pattern](Coagulation/Coagulation_1_PMF_Pattern.ipynb)
-- [Coagulation 3: Particle Resolved](Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb)
-- [Coagulation 4: Methods Compared](Coagulation/Coagulation_4_Compared.ipynb)
+- [Coagulation 1: PMF Pattern](Coagulation/Coagulation_1_PMF_Pattern.ipynb) – Shows probability mass function approach.
+- [Coagulation 3: Particle Resolved](Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb) – Demonstrates a particle-resolved approach.
+- [Coagulation 4: Methods Compared](Coagulation/Coagulation_4_Compared.ipynb) – Compares multiple coagulation strategies.
 
 ### Functional
 
@@ -20,13 +25,16 @@
 - [Coagulation Tutorial: Basic 3-Compared](Coagulation/Functional/Coagulation_Basic_3_compared.ipynb)
 - [Coagulation Tutorial: Basic 4-Particle Resolved](Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.ipynb)
 
+(These illustrate functional approaches to coagulation, comparing PMF- and PDF-based methods against particle-resolved methods.)
+
 ### Charge
 
-How to get the charge dependent coagulation kernel.
+Here we show how to include charge effects in the coagulation kernel:
 
 - [Coagulation Charges via functions](Coagulation/Charge/Coagulation_with_Charge_functional.ipynb)
 - [Coagulation Charges via objects](Coagulation/Charge/Coagulation_with_Charge_objects.ipynb)
 
 ## Customization
 
-- [Adding Particles During Simulation](Customization/Adding_Particles_During_Simulation.ipynb)
+- [Adding Particles During Simulation](Customization/Adding_Particles_During_Simulation.ipynb) – 
+  Demonstrates customizing the simulation by injecting new particles.
