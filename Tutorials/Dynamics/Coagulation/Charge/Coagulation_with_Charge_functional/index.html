@@ -6301,8 +6301,6 @@
       
         
       
-        
-      
     
     
       
@@ -6415,28 +6413,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -7973,57 +7949,13 @@ We import standard libraries like <code>numpy</code> and <code>matplotlib</code>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="c1"># particula imports</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">brownian_kernel</span><span class="p">,</span> <span class="n">rate</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties.lognormal_size_distribution</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">lognormal_pmf_distribution</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation.transition_regime</span><span class="w"> </span><span class="kn">import</span> <span class="n">coulomb_chahl2019</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">coulomb_enhancement</span><span class="p">,</span>
-    <span class="n">diffusive_knudsen_number</span><span class="p">,</span>
-    <span class="n">friction_factor</span><span class="p">,</span>
-    <span class="n">cunningham_slip_correction</span><span class="p">,</span>
-    <span class="n">calculate_knudsen_number</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.properties</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">get_dynamic_viscosity</span><span class="p">,</span>
-    <span class="n">molecule_mean_free_path</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.reduced_quantity</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduced_self_broadcast</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">kernel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">rate</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties.lognormal_size_distribution</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">lognormal_pmf_distribution</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
 # particula imports
-from particula.dynamics.coagulation import brownian_kernel, rate
-from particula.particles.properties.lognormal_size_distribution import (
-    lognormal_pmf_distribution,
-)
-from particula.dynamics.coagulation.transition_regime import coulomb_chahl2019
-from particula.particles.properties import (
-    coulomb_enhancement,
-    diffusive_knudsen_number,
-    friction_factor,
-    cunningham_slip_correction,
-    calculate_knudsen_number,
-)
-from particula.gas.properties import (
-    get_dynamic_viscosity,
-    molecule_mean_free_path,
-)
-from particula.util.reduced_quantity import reduced_self_broadcast
-
-from particula.dynamics.coagulation import kernel
-from particula.dynamics.coagulation import rate
-from particula.particles.properties.lognormal_size_distribution import (
-    lognormal_pmf_distribution,
-)</div>
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -8213,7 +8145,7 @@ temperature = 298.15</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -8226,55 +8158,55 @@ temperature = 298.15</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">coulomb_potential_ratio</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">ratio</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">coulomb_potential_ratio</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_coulomb_enhancement_ratio</span><span class="p">(</span>
     <span class="n">radius_bins</span><span class="p">,</span> <span class="n">charge_array</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span>
 <span class="p">)</span>
-<span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
-<span class="n">mol_free_path</span> <span class="o">=</span> <span class="n">molecule_mean_free_path</span><span class="p">(</span>
+<span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
+<span class="n">mol_free_path</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_molecule_mean_free_path</span><span class="p">(</span>
     <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span>
 <span class="p">)</span>
-<span class="n">knudsen_number</span> <span class="o">=</span> <span class="n">calculate_knudsen_number</span><span class="p">(</span>
+<span class="n">knudsen_number</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_knudsen_number</span><span class="p">(</span>
     <span class="n">mean_free_path</span><span class="o">=</span><span class="n">mol_free_path</span><span class="p">,</span> <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span>
 <span class="p">)</span>
-<span class="n">slip_correction</span> <span class="o">=</span> <span class="n">cunningham_slip_correction</span><span class="p">(</span><span class="n">knudsen_number</span><span class="o">=</span><span class="n">knudsen_number</span><span class="p">)</span>
+<span class="n">slip_correction</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_cunningham_slip_correction</span><span class="p">(</span><span class="n">knudsen_number</span><span class="o">=</span><span class="n">knudsen_number</span><span class="p">)</span>
 
 
-<span class="n">friction_factor_value</span> <span class="o">=</span> <span class="n">friction_factor</span><span class="p">(</span>
-    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
+<span class="n">friction_factor_value</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_friction_factor</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span><span class="p">,</span>
     <span class="n">slip_correction</span><span class="o">=</span><span class="n">slip_correction</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">diffusive_knudsen_values</span> <span class="o">=</span> <span class="n">diffusive_knudsen_number</span><span class="p">(</span>
-    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
-    <span class="n">mass_particle</span><span class="o">=</span><span class="n">mass_bins</span><span class="p">,</span>
+<span class="n">diffusive_knudsen_values</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_diffusive_knudsen_number</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
+    <span class="n">particle_mass</span><span class="o">=</span><span class="n">mass_bins</span><span class="p">,</span>
     <span class="n">friction_factor</span><span class="o">=</span><span class="n">friction_factor_value</span><span class="p">,</span>
     <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">coulomb_potential_ratio = coulomb_enhancement.ratio(
+<div class="clipboard-copy-txt" id="cell-4">coulomb_potential_ratio = par.particles.get_coulomb_enhancement_ratio(
     radius_bins, charge_array, temperature=temperature
 )
-dynamic_viscosity = get_dynamic_viscosity(temperature=temperature)
-mol_free_path = molecule_mean_free_path(
+dynamic_viscosity = par.gas.get_dynamic_viscosity(temperature=temperature)
+mol_free_path = par.gas.get_molecule_mean_free_path(
     temperature=temperature, dynamic_viscosity=dynamic_viscosity
 )
-knudsen_number = calculate_knudsen_number(
+knudsen_number = par.particles.get_knudsen_number(
     mean_free_path=mol_free_path, particle_radius=radius_bins
 )
-slip_correction = cunningham_slip_correction(knudsen_number=knudsen_number)
+slip_correction = par.particles.get_cunningham_slip_correction(knudsen_number=knudsen_number)
 
 
-friction_factor_value = friction_factor(
-    radius=radius_bins,
+friction_factor_value = par.particles.get_friction_factor(
+    particle_radius=radius_bins,
     dynamic_viscosity=dynamic_viscosity,
     slip_correction=slip_correction,
 )
 
-diffusive_knudsen_values = diffusive_knudsen_number(
-    radius=radius_bins,
-    mass_particle=mass_bins,
+diffusive_knudsen_values = par.particles.get_diffusive_knudsen_number(
+    particle_radius=radius_bins,
+    particle_mass=mass_bins,
     friction_factor=friction_factor_value,
     coulomb_potential_ratio=coulomb_potential_ratio,
     temperature=temperature,
@@ -8301,7 +8233,7 @@ diffusive_knudsen_values = diffusive_knudsen_number(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -8314,12 +8246,12 @@ diffusive_knudsen_values = diffusive_knudsen_number(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">non_dimensional_kernel</span> <span class="o">=</span> <span class="n">coulomb_chahl2019</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">non_dimensional_kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coulomb_kernel_chahl2019</span><span class="p">(</span>
     <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen_values</span><span class="p">,</span>
     <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">non_dimensional_kernel = coulomb_chahl2019(
+<div class="clipboard-copy-txt" id="cell-5">non_dimensional_kernel = par.dynamics.get_coulomb_kernel_chahl2019(
     diffusive_knudsen=diffusive_knudsen_values,
     coulomb_potential_ratio=coulomb_potential_ratio,
 )</div>
@@ -8349,7 +8281,7 @@ diffusive_knudsen_values = diffusive_knudsen_number(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -8362,21 +8294,21 @@ diffusive_knudsen_values = diffusive_knudsen_number(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">coulomb_kinetic_limit</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">kinetic</span><span class="p">(</span><span class="n">coulomb_potential_ratio</span><span class="p">)</span>
-<span class="n">coulomb_continuum_limit</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">continuum</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">coulomb_kinetic_limit</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_coulomb_kinetic_limit</span><span class="p">(</span><span class="n">coulomb_potential_ratio</span><span class="p">)</span>
+<span class="n">coulomb_continuum_limit</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_coulomb_continuum_limit</span><span class="p">(</span>
     <span class="n">coulomb_potential_ratio</span>
 <span class="p">)</span>
 
 <span class="n">sum_of_radii</span> <span class="o">=</span> <span class="n">radius_bins</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">radius_bins</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
-<span class="n">reduced_mass</span> <span class="o">=</span> <span class="n">reduced_self_broadcast</span><span class="p">(</span><span class="n">mass_bins</span><span class="p">)</span>
+<span class="n">reduced_mass</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_reduced_self_broadcast</span><span class="p">(</span><span class="n">mass_bins</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">coulomb_kinetic_limit = coulomb_enhancement.kinetic(coulomb_potential_ratio)
-coulomb_continuum_limit = coulomb_enhancement.continuum(
+<div class="clipboard-copy-txt" id="cell-6">coulomb_kinetic_limit = par.particles.get_coulomb_kinetic_limit(coulomb_potential_ratio)
+coulomb_continuum_limit = par.particles.get_coulomb_continuum_limit(
     coulomb_potential_ratio
 )
 
 sum_of_radii = radius_bins[:, np.newaxis] + radius_bins[np.newaxis, :]
-reduced_mass = reduced_self_broadcast(mass_bins)</div>
+reduced_mass = par.util.get_reduced_self_broadcast(mass_bins)</div>
 </div>
 </div>
 </div>
@@ -8399,7 +8331,7 @@ reduced_mass = reduced_self_broadcast(mass_bins)</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
@@ -8449,7 +8381,7 @@ reduced_mass = reduced_self_broadcast(mass_bins)</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
@@ -8559,7 +8491,7 @@ make a number concentration distribution</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">
@@ -8572,38 +8504,38 @@ make a number concentration distribution</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">number_concentration</span> <span class="o">=</span> <span class="n">lognormal_pmf_distribution</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">number_concentration</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_pmf_distribution</span><span class="p">(</span>
     <span class="n">x_values</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">10e-9</span><span class="p">,</span> <span class="mf">200e-9</span><span class="p">,</span> <span class="mf">1000e-9</span><span class="p">]),</span>  <span class="c1"># m</span>
     <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.8</span><span class="p">]),</span>
     <span class="n">number_of_particles</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e12</span><span class="p">,</span> <span class="mf">1e12</span><span class="p">,</span> <span class="mf">1e12</span><span class="p">]),</span>  <span class="c1"># per m^3</span>
 <span class="p">)</span>
 
-<span class="n">gain_rate</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span>
+<span class="n">gain_rate</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
     <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">number_concentration</span><span class="p">,</span>
     <span class="n">kernel</span><span class="o">=</span><span class="n">dimensional_kernel</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">loss_rate</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span>
+<span class="n">loss_rate</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">number_concentration</span><span class="p">,</span>
     <span class="n">kernel</span><span class="o">=</span><span class="n">dimensional_kernel</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">net_rate</span> <span class="o">=</span> <span class="n">gain_rate</span> <span class="o">-</span> <span class="n">loss_rate</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-9">number_concentration = lognormal_pmf_distribution(
+<div class="clipboard-copy-txt" id="cell-9">number_concentration = par.particles.get_lognormal_pmf_distribution(
     x_values=radius_bins,
     mode=np.array([10e-9, 200e-9, 1000e-9]),  # m
     geometric_standard_deviation=np.array([1.4, 1.5, 1.8]),
     number_of_particles=np.array([1e12, 1e12, 1e12]),  # per m^3
 )
 
-gain_rate = rate.discrete_gain(
+gain_rate = par.dynamics.get_coagulation_gain_rate_discrete(
     radius=radius_bins,
     concentration=number_concentration,
     kernel=dimensional_kernel,
 )
-loss_rate = rate.discrete_loss(
+loss_rate = par.dynamics.get_coagulation_loss_rate_discrete(
     concentration=number_concentration,
     kernel=dimensional_kernel,
 )
@@ -8635,7 +8567,7 @@ net_rate = gain_rate - loss_rate</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-10">

@@ -6234,8 +6234,6 @@
       
         
       
-        
-      
     
     
       
@@ -6348,28 +6346,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../Dynamics/Coagulation/Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -7823,24 +7799,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">PresetParticleRadiusBuilder</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AtmosphereBuilder</span><span class="p">,</span>
-    <span class="n">VaporPressureFactory</span><span class="p">,</span>
-    <span class="n">GasSpeciesBuilder</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.aerosol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aerosol</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
-from particula.particles import PresetParticleRadiusBuilder
-from particula.gas import (
-    AtmosphereBuilder,
-    VaporPressureFactory,
-    GasSpeciesBuilder,
-)
-from particula.aerosol import Aerosol</div>
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -7887,7 +7851,7 @@ from particula.aerosol import Aerosol</div>
     <span class="s2">"pressure_initial"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
     <span class="s2">"pressure_initial_units"</span><span class="p">:</span> <span class="s2">"mmHg"</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="n">vapor_pressure_strategy</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+<span class="n">vapor_pressure_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="s2">"clausius_clapeyron"</span><span class="p">,</span> <span class="n">parameters_clausius</span>
 <span class="p">)</span>
 
@@ -7898,7 +7862,7 @@ from particula.aerosol import Aerosol</div>
 
 <span class="n">sat_factor</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># 50% of saturation concentration</span>
 <span class="n">glycerol_gas</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">GasSpeciesBuilder</span><span class="p">()</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpeciesBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">molar_mass_glycerol</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">vapor_pressure_strategy</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">sat_concentration</span> <span class="o">*</span> <span class="n">sat_factor</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
@@ -7909,7 +7873,7 @@ from particula.aerosol import Aerosol</div>
 <span class="nb">print</span><span class="p">(</span><span class="n">glycerol_gas</span><span class="p">)</span>
 
 <span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">AtmosphereBuilder</span><span class="p">()</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">glycerol_gas</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s2">"atm"</span><span class="p">)</span>
@@ -7919,7 +7883,7 @@ from particula.aerosol import Aerosol</div>
 
 <span class="c1"># Glycerol particle distribution</span>
 <span class="n">lognormal_rep</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">]),</span> <span class="s2">"nm"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_geometric_standard_deviation</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">]))</span>
     <span class="o">.</span><span class="n">set_number_concentration</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e4</span><span class="p">]),</span> <span class="s2">"1/cm^3"</span><span class="p">)</span>
@@ -7937,7 +7901,7 @@ parameters_clausius = {
     "pressure_initial": 1,
     "pressure_initial_units": "mmHg",
 }
-vapor_pressure_strategy = VaporPressureFactory().get_strategy(
+vapor_pressure_strategy = par.gas.VaporPressureFactory().get_strategy(
     "clausius_clapeyron", parameters_clausius
 )
 
@@ -7948,7 +7912,7 @@ print(f"Saturation concentration: {sat_concentration:.2e} kg/m^3")
 
 sat_factor = 0.5  # 50% of saturation concentration
 glycerol_gas = (
-    GasSpeciesBuilder()
+    par.gas.GasSpeciesBuilder()
     .set_molar_mass(molar_mass_glycerol, "kg/mol")
     .set_vapor_pressure_strategy(vapor_pressure_strategy)
     .set_concentration(sat_concentration * sat_factor, "kg/m^3")
@@ -7959,7 +7923,7 @@ glycerol_gas = (
 print(glycerol_gas)
 
 atmosphere = (
-    AtmosphereBuilder()
+    par.gas.AtmosphereBuilder()
     .add_species(glycerol_gas)
     .set_temperature(25, temperature_units="degC")
     .set_pressure(1, pressure_units="atm")
@@ -7969,7 +7933,7 @@ print(atmosphere)
 
 # Glycerol particle distribution
 lognormal_rep = (
-    PresetParticleRadiusBuilder()
+    par.particles.PresetParticleRadiusBuilder()
     .set_mode(np.array([100]), "nm")
     .set_geometric_standard_deviation(np.array([1.5]))
     .set_number_concentration(np.array([1e4]), "1/cm^3")
@@ -8026,11 +7990,11 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Glycerol']
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">aerosol</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="o">=</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="o">=</span><span class="n">lognormal_rep</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">aerosol</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="o">=</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="o">=</span><span class="n">lognormal_rep</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">aerosol</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">aerosol = Aerosol(atmosphere=atmosphere, particles=lognormal_rep)
+<div class="clipboard-copy-txt" id="cell-3">aerosol = par.Aerosol(atmosphere=atmosphere, particles=lognormal_rep)
 
 print(aerosol)</div>
 </div>

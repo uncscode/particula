@@ -6710,8 +6710,6 @@
       
         
       
-        
-      
     
     
       
@@ -6824,28 +6822,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../Tutorials/Dynamics/Coagulation/Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -8424,7 +8400,7 @@ parameters.</p>
 <h4 id="signature_7">Signature<a class="headerlink" href="#signature_7" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;latent_heat&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_latent_heat</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">latent_heat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">latent_heat_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;J/kg&quot;</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">latent_heat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">latent_heat_units</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ClausiusClapeyronBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="clausiusclapeyronbuilderset_pressure_initial">ClausiusClapeyronBuilder().set_pressure_initial<a class="headerlink" href="#clausiusclapeyronbuilderset_pressure_initial" title="Permanent link">&para;</a></h3>
@@ -8433,7 +8409,7 @@ parameters.</p>
 <h4 id="signature_8">Signature<a class="headerlink" href="#signature_8" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;pressure_initial&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_pressure_initial</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">pressure_initial</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pressure_initial_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Pa&quot;</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">pressure_initial</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pressure_initial_units</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ClausiusClapeyronBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="clausiusclapeyronbuilderset_temperature_initial">ClausiusClapeyronBuilder().set_temperature_initial<a class="headerlink" href="#clausiusclapeyronbuilderset_temperature_initial" title="Permanent link">&para;</a></h3>
@@ -8442,7 +8418,7 @@ parameters.</p>
 <h4 id="signature_9">Signature<a class="headerlink" href="#signature_9" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;temperature_initial&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_temperature_initial</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">temperature_initial</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">temperature_initial_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;K&quot;</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">temperature_initial</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">temperature_initial_units</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ClausiusClapeyronBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="constantbuilder">ConstantBuilder<a class="headerlink" href="#constantbuilder" title="Permanent link">&para;</a></h2>
@@ -8492,7 +8468,7 @@ parameters.</p>
 <h4 id="signature_12">Signature<a class="headerlink" href="#signature_12" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;vapor_pressure&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_vapor_pressure</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">vapor_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">vapor_pressure_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Pa&quot;</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">vapor_pressure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">vapor_pressure_units</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ConstantBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="waterbuckbuilder">WaterBuckBuilder<a class="headerlink" href="#waterbuckbuilder" title="Permanent link">&para;</a></h2>

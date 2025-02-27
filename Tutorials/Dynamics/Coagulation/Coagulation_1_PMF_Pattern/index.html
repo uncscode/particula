@@ -6254,8 +6254,6 @@
       
         
       
-        
-      
     
     
       
@@ -6368,28 +6366,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -7850,7 +7826,7 @@ The coagulation process is modeled using a discrete bin approach. We define the 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -7866,24 +7842,12 @@ The coagulation process is modeled using a discrete bin approach. We define the 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="c1"># particula imports</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="kn">import</span> <span class="n">particles</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.aerosol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aerosol</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="n">PresetGasSpeciesBuilder</span><span class="p">,</span> <span class="n">AtmosphereBuilder</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics</span><span class="w"> </span><span class="kn">import</span> <span class="n">particle_process</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics</span><span class="w"> </span><span class="kn">import</span> <span class="n">coagulation</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
-# particula imports
-from particula import particles
-from particula.aerosol import Aerosol
-from particula.gas import PresetGasSpeciesBuilder, AtmosphereBuilder
-
-from particula.dynamics import particle_process
-from particula.dynamics import coagulation</div>
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -7926,7 +7890,7 @@ from particula.dynamics import coagulation</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -7942,8 +7906,8 @@ from particula.dynamics import coagulation</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Preset gas species that does not condense in the atmosphere</span>
 <span class="c1"># AtmosphereBuilder constructs the atmosphere with predefined species</span>
 <span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">AtmosphereBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">PresetGasSpeciesBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">())</span>  <span class="c1"># Add a preset gas species</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">PresetGasSpeciesBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">())</span>  <span class="c1"># Add a preset gas species</span>
     <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>  <span class="c1"># Set temperature to 25°C</span>
     <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s2">"atm"</span><span class="p">)</span>  <span class="c1"># Set pressure to 1 atmosphere</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>  <span class="c1"># Finalize the atmosphere object</span>
@@ -7956,7 +7920,7 @@ from particula.dynamics import coagulation</div>
     <span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">250</span>
 <span class="p">)</span>  <span class="c1"># Define the radius bins for the resolved mass representation</span>
 <span class="n">resolved_masses</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">800</span><span class="p">]),</span> <span class="n">mode_units</span><span class="o">=</span><span class="s2">"nm"</span><span class="p">)</span>  <span class="c1"># Set the mode radius</span>
     <span class="o">.</span><span class="n">set_geometric_standard_deviation</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
@@ -7970,7 +7934,7 @@ from particula.dynamics import coagulation</div>
 <span class="p">)</span>
 
 <span class="c1"># Create an aerosol object with the defined atmosphere and resolved particles</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="o">=</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="o">=</span><span class="n">resolved_masses</span><span class="p">)</span>
+<span class="n">aerosol</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="o">=</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="o">=</span><span class="n">resolved_masses</span><span class="p">)</span>
 
 <span class="c1"># Print the properties</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">aerosol</span><span class="p">)</span>
@@ -7978,8 +7942,8 @@ from particula.dynamics import coagulation</div>
 <div class="clipboard-copy-txt" id="cell-2"># Preset gas species that does not condense in the atmosphere
 # AtmosphereBuilder constructs the atmosphere with predefined species
 atmosphere = (
-    AtmosphereBuilder()
-    .add_species(PresetGasSpeciesBuilder().build())  # Add a preset gas species
+    par.gas.AtmosphereBuilder()
+    .add_species(par.gas.PresetGasSpeciesBuilder().build())  # Add a preset gas species
     .set_temperature(25, temperature_units="degC")  # Set temperature to 25°C
     .set_pressure(1, pressure_units="atm")  # Set pressure to 1 atmosphere
     .build()  # Finalize the atmosphere object
@@ -7992,7 +7956,7 @@ radius_bins = np.logspace(
     -8, -5, 250
 )  # Define the radius bins for the resolved mass representation
 resolved_masses = (
-    particles.PresetParticleRadiusBuilder()
+    par.particles.PresetParticleRadiusBuilder()
     .set_mode(np.array([100, 800]), mode_units="nm")  # Set the mode radius
     .set_geometric_standard_deviation(
         np.array([1.2, 1.5])
@@ -8006,7 +7970,7 @@ resolved_masses = (
 )
 
 # Create an aerosol object with the defined atmosphere and resolved particles
-aerosol = Aerosol(atmosphere=atmosphere, particles=resolved_masses)
+aerosol = par.Aerosol(atmosphere=atmosphere, particles=resolved_masses)
 
 # Print the properties
 print(aerosol)</div>
@@ -8069,7 +8033,7 @@ print(aerosol)</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -8083,8 +8047,12 @@ print(aerosol)</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Define the coagulation strategy and process</span>
-<span class="n">coagulation_strategy</span> <span class="o">=</span> <span class="n">coagulation</span><span class="o">.</span><span class="n">DiscreteSimple</span><span class="p">()</span>
-<span class="n">coagulation_process</span> <span class="o">=</span> <span class="n">particle_process</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span>
+<span class="n">coagulation_strategy</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="n">distribution_type</span><span class="o">=</span><span class="s2">"discrete"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">coagulation_process</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span>
     <span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">coagulation_strategy</span>
 <span class="p">)</span>
 
@@ -8110,8 +8078,12 @@ print(aerosol)</div>
 <span class="n">concentration_step_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Define the coagulation strategy and process
-coagulation_strategy = coagulation.DiscreteSimple()
-coagulation_process = particle_process.Coagulation(
+coagulation_strategy = (
+    par.dynamics.BrownianCoagulationBuilder()
+    .set_distribution_type(distribution_type="discrete")
+    .build()
+)
+coagulation_process = par.dynamics.Coagulation(
     coagulation_strategy=coagulation_strategy
 )
 
@@ -8174,7 +8146,7 @@ concentration_step_2 = np.copy(aerosol.particles[0].concentration)</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">

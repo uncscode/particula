@@ -6173,8 +6173,6 @@
       
         
       
-        
-      
     
     
       
@@ -6287,28 +6285,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../Dynamics/Coagulation/Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -7893,7 +7869,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -7909,20 +7885,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SurfaceStrategyMolar</span><span class="p">,</span>
-    <span class="n">SurfaceStrategyMassBuilder</span><span class="p">,</span>
-    <span class="n">SurfaceFactory</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
-from particula.particles import (
-    SurfaceStrategyMolar,
-    SurfaceStrategyMassBuilder,
-    SurfaceFactory,
-)</div>
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -7946,7 +7914,7 @@ from particula.particles import (
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -7964,7 +7932,7 @@ from particula.particles import (
 <span class="n">glycerol_surface_tension</span> <span class="o">=</span> <span class="mf">0.063</span>  <span class="c1"># N/m</span>
 
 <span class="c1"># Create a surface strategy</span>
-<span class="n">glycerol_surface_strategy</span> <span class="o">=</span> <span class="n">SurfaceStrategyMolar</span><span class="p">(</span>
+<span class="n">glycerol_surface_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyMolar</span><span class="p">(</span>
     <span class="n">glycerol_molar_mass</span><span class="p">,</span> <span class="n">glycerol_density</span><span class="p">,</span> <span class="n">glycerol_surface_tension</span>
 <span class="p">)</span>
 
@@ -7981,7 +7949,7 @@ glycerol_density = 1261  # kg/m^3
 glycerol_surface_tension = 0.063  # N/m
 
 # Create a surface strategy
-glycerol_surface_strategy = SurfaceStrategyMolar(
+glycerol_surface_strategy = par.particles.SurfaceStrategyMolar(
     glycerol_molar_mass, glycerol_density, glycerol_surface_tension
 )
 
@@ -8028,7 +7996,7 @@ print(f"kelvin radius of glycerol {glycerol_kelvin_radius} m")</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -8125,7 +8093,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -8139,7 +8107,7 @@ plt.show()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">squalane_surface</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">SurfaceStrategyMassBuilder</span><span class="p">()</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceStrategyMassBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_density</span><span class="p">(</span><span class="mf">0.81</span><span class="p">,</span> <span class="n">density_units</span><span class="o">=</span><span class="s2">"g/cm^3"</span><span class="p">)</span>  <span class="c1"># call with parameter name</span>
     <span class="o">.</span><span class="n">set_surface_tension</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="s2">"mN/m"</span><span class="p">)</span>  <span class="c1"># call without parameter name</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
@@ -8170,7 +8138,7 @@ plt.show()</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">squalane_surface = (
-    SurfaceStrategyMassBuilder()
+    par.particles.SurfaceStrategyMassBuilder()
     .set_density(0.81, density_units="g/cm^3")  # call with parameter name
     .set_surface_tension(28, "mN/m")  # call without parameter name
     .build()
@@ -8235,7 +8203,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -8250,10 +8218,12 @@ plt.show()</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># glycerol, squalane</span>
     <span class="s2">"density"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1261</span><span class="p">,</span> <span class="mi">810</span><span class="p">]),</span>  <span class="c1"># kg/m^3</span>
+    <span class="s2">"density_units"</span><span class="p">:</span> <span class="s2">"kg/m^3"</span><span class="p">,</span>
     <span class="s2">"surface_tension"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.063</span><span class="p">,</span> <span class="mf">0.028</span><span class="p">]),</span>  <span class="c1"># N/m</span>
+    <span class="s2">"surface_tension_units"</span><span class="p">:</span> <span class="s2">"N/m"</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">mixture_surface</span> <span class="o">=</span> <span class="n">SurfaceFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+<span class="n">mixture_surface</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">SurfaceFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"volume"</span><span class="p">,</span>
     <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
 <span class="p">)</span>
@@ -8304,10 +8274,12 @@ plt.show()</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">parameters = {  # glycerol, squalane
     "density": np.array([1261, 810]),  # kg/m^3
+    "density_units": "kg/m^3",
     "surface_tension": np.array([0.063, 0.028]),  # N/m
+    "surface_tension_units": "N/m",
 }
 
-mixture_surface = SurfaceFactory().get_strategy(
+mixture_surface = par.particles.SurfaceFactory().get_strategy(
     strategy_type="volume",
     parameters=parameters,
 )

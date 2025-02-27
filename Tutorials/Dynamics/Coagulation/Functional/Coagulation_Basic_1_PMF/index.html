@@ -6179,8 +6179,6 @@
       
         
       
-        
-      
     
     
       
@@ -6985,28 +6983,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -9083,7 +9059,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -9100,35 +9076,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="c1"># particula imports</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">brownian_kernel</span><span class="p">,</span> <span class="n">rate</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties.lognormal_size_distribution</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">lognormal_pmf_distribution</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># The `brownian_kernel` function calculates the Brownian coagulation kernel,</span>
-<span class="c1"># which determines the rate at which particles coagulate due to random motion.</span>
-<span class="c1"># The `rate` function computes the rate of change in particle concentration</span>
-<span class="c1"># due to the coagulation process.</span>
-<span class="c1"># The `lognormal_pmf_distribution` function generates a probability mass function</span>
-<span class="c1"># based on a lognormal size distribution, commonly used to represent aerosol particles.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# particula imports
-from particula.dynamics.coagulation import brownian_kernel, rate
-from particula.particles.properties.lognormal_size_distribution import (
-    lognormal_pmf_distribution,
-)
-
-# The `brownian_kernel` function calculates the Brownian coagulation kernel,
-# which determines the rate at which particles coagulate due to random motion.
-# The `rate` function computes the rate of change in particle concentration
-# due to the coagulation process.
-# The `lognormal_pmf_distribution` function generates a probability mass function
-# based on a lognormal size distribution, commonly used to represent aerosol particles.</div>
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -9160,7 +9114,7 @@ from particula.particles.properties.lognormal_size_distribution import (
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -9227,7 +9181,7 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -9245,7 +9199,7 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg</div>
 <span class="c1"># The Brownian coagulation kernel is calculated using the `brownian_coagulation_kernel_via_system_state` function.</span>
 <span class="c1"># This function takes into account the particle size, mass, temperature, pressure, and collision efficiency</span>
 <span class="c1"># to compute the coagulation rates between particles of different sizes.</span>
-<span class="n">kernel</span> <span class="o">=</span> <span class="n">brownian_kernel</span><span class="o">.</span><span class="n">brownian_coagulation_kernel_via_system_state</span><span class="p">(</span>
+<span class="n">kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_brownian_kernel_via_system_state</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">mass_particle</span><span class="o">=</span><span class="n">mass_bins</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">293.15</span><span class="p">,</span>  <span class="c1"># Temperature in Kelvin (20°C)</span>
@@ -9272,7 +9226,7 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg</div>
 # The Brownian coagulation kernel is calculated using the `brownian_coagulation_kernel_via_system_state` function.
 # This function takes into account the particle size, mass, temperature, pressure, and collision efficiency
 # to compute the coagulation rates between particles of different sizes.
-kernel = brownian_kernel.brownian_coagulation_kernel_via_system_state(
+kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
     mass_particle=mass_bins,
     temperature=293.15,  # Temperature in Kelvin (20°C)
@@ -9309,7 +9263,7 @@ df_kernel.head(5)
 </div>
 </div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[18]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -9442,7 +9396,7 @@ df_kernel.head(5)
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -9546,7 +9500,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -9666,7 +9620,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -9684,8 +9638,8 @@ plt.show()</div>
 <span class="c1"># Calculate the gain, loss, and net change in particle concentration due to coagulation</span>
 <span class="c1"># `discrete_gain`: Calculates the rate at which particles are gained due to coagulation</span>
 <span class="c1"># `discrete_loss`: Calculates the rate at which particles are lost due to coagulation</span>
-<span class="n">gain_0</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss_0</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span><span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain_0</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">loss_0</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 <span class="n">net_0</span> <span class="o">=</span> <span class="n">gain_0</span> <span class="o">-</span> <span class="n">loss_0</span>  <span class="c1"># Net change in concentration</span>
 
 <span class="c1"># Create a DataFrame to display the gain, loss, and net coagulation rates</span>
@@ -9702,8 +9656,8 @@ plt.show()</div>
 # Calculate the gain, loss, and net change in particle concentration due to coagulation
 # `discrete_gain`: Calculates the rate at which particles are gained due to coagulation
 # `discrete_loss`: Calculates the rate at which particles are lost due to coagulation
-gain_0 = rate.discrete_gain(radius_bins, concentration_0, kernel)
-loss_0 = rate.discrete_loss(concentration_0, kernel)
+gain_0 = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_0, kernel)
+loss_0 = par.dynamics.get_coagulation_loss_rate_discrete(concentration_0, kernel)
 net_0 = gain_0 - loss_0  # Net change in concentration
 
 # Create a DataFrame to display the gain, loss, and net coagulation rates
@@ -9723,7 +9677,7 @@ df.head(5)</div>
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[21]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -9816,7 +9770,7 @@ df.head(5)</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
@@ -9947,7 +9901,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
@@ -9968,8 +9922,8 @@ plt.show()</div>
 <span class="c1"># Time step 1: Calculate the gain, loss, and net rate, then update concentration</span>
 
 <span class="c1"># Calculate the rate of change in concentration (gain and loss) for the initial concentration</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span><span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>  <span class="c1"># Net rate of change</span>
 
 <span class="c1"># Update the concentration for the next time step</span>
@@ -9978,8 +9932,8 @@ plt.show()</div>
 <span class="c1"># Time step 2: Recalculate rates with the updated concentration and update again</span>
 
 <span class="c1"># Recalculate gain and loss based on the updated concentration from time step 1</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_1</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span><span class="n">concentration_1</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_1</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_1</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 
 <span class="c1"># Update the concentration for the next time step</span>
@@ -9988,8 +9942,8 @@ plt.show()</div>
 <span class="c1"># Time step 3: Recalculate rates again and update concentration</span>
 
 <span class="c1"># Recalculate gain and loss based on the updated concentration from time step 2</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span><span class="n">concentration_2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 
 <span class="c1"># Update the concentration for the next time step</span>
@@ -10026,8 +9980,8 @@ TIME_STEP = 0.1  # seconds
 # Time step 1: Calculate the gain, loss, and net rate, then update concentration
 
 # Calculate the rate of change in concentration (gain and loss) for the initial concentration
-gain = rate.discrete_gain(radius_bins, concentration_0, kernel)
-loss = rate.discrete_loss(concentration_0, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_0, kernel)
+loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_0, kernel)
 net = gain - loss  # Net rate of change
 
 # Update the concentration for the next time step
@@ -10036,8 +9990,8 @@ concentration_1 = concentration_0 + net * TIME_STEP
 # Time step 2: Recalculate rates with the updated concentration and update again
 
 # Recalculate gain and loss based on the updated concentration from time step 1
-gain = rate.discrete_gain(radius_bins, concentration_1, kernel)
-loss = rate.discrete_loss(concentration_1, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_1, kernel)
+loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_1, kernel)
 net = gain - loss
 
 # Update the concentration for the next time step
@@ -10046,8 +10000,8 @@ concentration_2 = concentration_1 + net * TIME_STEP
 # Time step 3: Recalculate rates again and update concentration
 
 # Recalculate gain and loss based on the updated concentration from time step 2
-gain = rate.discrete_gain(radius_bins, concentration_2, kernel)
-loss = rate.discrete_loss(concentration_2, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_2, kernel)
+loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_2, kernel)
 net = gain - loss
 
 # Update the concentration for the next time step
@@ -10094,7 +10048,7 @@ Concentration 3 max: 98778247873.61397
 </div>
 </div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[8]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[23]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -10200,7 +10154,7 @@ Concentration 3 max: 98778247873.61397
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">
@@ -10325,7 +10279,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-10">
@@ -10349,7 +10303,7 @@ plt.show()</div>
 <span class="c1"># Generate a lognormal particle size distribution</span>
 <span class="c1"># This distribution is characterized by a mode (most probable size) of 100 nm,</span>
 <span class="c1"># a geometric standard deviation of 1.4, and a total number concentration of 10000 particles per cm^3.</span>
-<span class="n">concentration_lognormal_0</span> <span class="o">=</span> <span class="n">lognormal_pmf_distribution</span><span class="p">(</span>
+<span class="n">concentration_lognormal_0</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_pmf_distribution</span><span class="p">(</span>
     <span class="n">x_values</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">100e-9</span><span class="p">),</span>  <span class="c1"># Mode of the distribution (100 nm)</span>
     <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.4</span><span class="p">),</span>  <span class="c1"># Geometric standard deviation</span>
@@ -10366,7 +10320,7 @@ plt.show()</div>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Particle radius (m)"</span><span class="p">)</span>
 
 <span class="c1"># Label the y-axis to show the concentration in particles per cubic meter</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Concentration $\dfrac</span><span class="si">{1}</span><span class="s2">{m^</span><span class="si">{3}</span><span class="s2">}$"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">"Concentration $\dfrac</span><span class="si">{1}</span><span class="s2">{m^</span><span class="si">{3}</span><span class="s2">}$"</span><span class="p">)</span>
 
 <span class="c1"># Use a logarithmic scale for the x-axis to better visualize the distribution across particle sizes</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
@@ -10388,7 +10342,7 @@ mass_bins = 4 / 3 * np.pi * (radius_bins) ** 3 * 1e3  # kg
 # Generate a lognormal particle size distribution
 # This distribution is characterized by a mode (most probable size) of 100 nm,
 # a geometric standard deviation of 1.4, and a total number concentration of 10000 particles per cm^3.
-concentration_lognormal_0 = lognormal_pmf_distribution(
+concentration_lognormal_0 = par.particles.get_lognormal_pmf_distribution(
     x_values=radius_bins,
     mode=np.array(100e-9),  # Mode of the distribution (100 nm)
     geometric_standard_deviation=np.array(1.4),  # Geometric standard deviation
@@ -10405,7 +10359,7 @@ ax.plot(radius_bins, concentration_lognormal_0)
 ax.set_xlabel("Particle radius (m)")
 
 # Label the y-axis to show the concentration in particles per cubic meter
-ax.set_ylabel("Concentration $\dfrac{1}{m^{3}}$")
+ax.set_ylabel(r"Concentration $\dfrac{1}{m^{3}}$")
 
 # Use a logarithmic scale for the x-axis to better visualize the distribution across particle sizes
 ax.set_xscale("log")
@@ -10423,16 +10377,6 @@ plt.show()</div>
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>&lt;&gt;:29: SyntaxWarning: invalid escape sequence '\d'
-&lt;&gt;:29: SyntaxWarning: invalid escape sequence '\d'
-C:\Users\kkgor\AppData\Local\Temp\ipykernel_19788\2156227153.py:29: SyntaxWarning: invalid escape sequence '\d'
-  ax.set_ylabel("Concentration $\dfrac{1}{m^{3}}$")
-</pre>
-</div>
-</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
@@ -10489,7 +10433,7 @@ C:\Users\kkgor\AppData\Local\Temp\ipykernel_19788\2156227153.py:29: SyntaxWarnin
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-11">
@@ -10508,7 +10452,7 @@ C:\Users\kkgor\AppData\Local\Temp\ipykernel_19788\2156227153.py:29: SyntaxWarnin
 <span class="n">TIME_STEP</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># seconds</span>
 
 <span class="c1"># Calculate the coagulation kernel</span>
-<span class="n">kernel</span> <span class="o">=</span> <span class="n">brownian_kernel</span><span class="o">.</span><span class="n">brownian_coagulation_kernel_via_system_state</span><span class="p">(</span>
+<span class="n">kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_brownian_kernel_via_system_state</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">mass_particle</span><span class="o">=</span><span class="n">mass_bins</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">293.15</span><span class="p">,</span>  <span class="c1"># Temperature in Kelvin</span>
@@ -10517,8 +10461,8 @@ C:\Users\kkgor\AppData\Local\Temp\ipykernel_19788\2156227153.py:29: SyntaxWarnin
 <span class="p">)</span>
 
 <span class="c1"># Time step 1: Calculate gain, loss, and update concentration</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span><span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 <span class="n">concentration_lognormal_1</span> <span class="o">=</span> <span class="n">concentration_lognormal_0</span> <span class="o">+</span> <span class="n">net</span> <span class="o">*</span> <span class="n">TIME_STEP</span>
 <span class="n">concentration_lognormal_1</span><span class="p">[</span><span class="n">concentration_lognormal_1</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -10526,8 +10470,8 @@ C:\Users\kkgor\AppData\Local\Temp\ipykernel_19788\2156227153.py:29: SyntaxWarnin
 <span class="p">)</span>
 
 <span class="c1"># Time step 2: Recalculate rates and update concentration</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span><span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 <span class="n">concentration_lognormal_2</span> <span class="o">=</span> <span class="n">concentration_lognormal_1</span> <span class="o">+</span> <span class="n">net</span> <span class="o">*</span> <span class="n">TIME_STEP</span>
 <span class="n">concentration_lognormal_2</span><span class="p">[</span><span class="n">concentration_lognormal_2</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -10535,8 +10479,8 @@ C:\Users\kkgor\AppData\Local\Temp\ipykernel_19788\2156227153.py:29: SyntaxWarnin
 <span class="p">)</span>
 
 <span class="c1"># Time step 3: Recalculate rates and update concentration</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span><span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 <span class="n">concentration_lognormal_3</span> <span class="o">=</span> <span class="n">concentration_lognormal_2</span> <span class="o">+</span> <span class="n">net</span> <span class="o">*</span> <span class="n">TIME_STEP</span>
 <span class="n">concentration_lognormal_3</span><span class="p">[</span><span class="n">concentration_lognormal_3</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -10563,7 +10507,7 @@ C:\Users\kkgor\AppData\Local\Temp\ipykernel_19788\2156227153.py:29: SyntaxWarnin
 TIME_STEP = 100  # seconds
 
 # Calculate the coagulation kernel
-kernel = brownian_kernel.brownian_coagulation_kernel_via_system_state(
+kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
     mass_particle=mass_bins,
     temperature=293.15,  # Temperature in Kelvin
@@ -10572,8 +10516,8 @@ kernel = brownian_kernel.brownian_coagulation_kernel_via_system_state(
 )
 
 # Time step 1: Calculate gain, loss, and update concentration
-gain = rate.discrete_gain(radius_bins, concentration_lognormal_0, kernel)
-loss = rate.discrete_loss(concentration_lognormal_0, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_lognormal_0, kernel)
+loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_lognormal_0, kernel)
 net = gain - loss
 concentration_lognormal_1 = concentration_lognormal_0 + net * TIME_STEP
 concentration_lognormal_1[concentration_lognormal_1 &lt; 0] = (
@@ -10581,8 +10525,8 @@ concentration_lognormal_1[concentration_lognormal_1 &lt; 0] = (
 )
 
 # Time step 2: Recalculate rates and update concentration
-gain = rate.discrete_gain(radius_bins, concentration_lognormal_1, kernel)
-loss = rate.discrete_loss(concentration_lognormal_1, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_lognormal_1, kernel)
+loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_lognormal_1, kernel)
 net = gain - loss
 concentration_lognormal_2 = concentration_lognormal_1 + net * TIME_STEP
 concentration_lognormal_2[concentration_lognormal_2 &lt; 0] = (
@@ -10590,8 +10534,8 @@ concentration_lognormal_2[concentration_lognormal_2 &lt; 0] = (
 )
 
 # Time step 3: Recalculate rates and update concentration
-gain = rate.discrete_gain(radius_bins, concentration_lognormal_2, kernel)
-loss = rate.discrete_loss(concentration_lognormal_2, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_lognormal_2, kernel)
+loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_lognormal_2, kernel)
 net = gain - loss
 concentration_lognormal_3 = concentration_lognormal_2 + net * TIME_STEP
 concentration_lognormal_3[concentration_lognormal_3 &lt; 0] = (
@@ -10668,7 +10612,7 @@ df_concentration = pd.DataFrame(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-12">
@@ -10770,7 +10714,7 @@ Min concentration at t=3: 0.0
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-13">
@@ -10904,7 +10848,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-14">
@@ -11060,7 +11004,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-15">

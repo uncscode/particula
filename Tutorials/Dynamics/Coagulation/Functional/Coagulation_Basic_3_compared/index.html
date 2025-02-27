@@ -6179,8 +6179,6 @@
       
         
       
-        
-      
     
     
       
@@ -6422,9 +6420,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#add-pmf-simulation-comparison-and-summary" class="md-nav__link">
+  <a href="#comparison-of-different-integration-methods" class="md-nav__link">
     <span class="md-ellipsis">
-      Add PMF simulation, comparison, and summary
+      Comparison of Different Integration Methods
     </span>
   </a>
   
@@ -6451,28 +6449,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -7529,9 +7505,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#add-pmf-simulation-comparison-and-summary" class="md-nav__link">
+  <a href="#comparison-of-different-integration-methods" class="md-nav__link">
     <span class="md-ellipsis">
-      Add PMF simulation, comparison, and summary
+      Comparison of Different Integration Methods
     </span>
   </a>
   
@@ -8047,25 +8023,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">trapezoid</span><span class="p">,</span>
 <span class="p">)</span>  <span class="c1"># For numerical integration using the trapezoidal rule</span>
 
-<span class="c1"># Import specific modules from the particula package</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">brownian_kernel</span><span class="p">,</span> <span class="n">rate</span>
-
-<span class="c1"># The 'brownian_kernel' module calculates the Brownian coagulation kernel,</span>
-<span class="c1"># which is used to determine coagulation rates between particles.</span>
-<span class="c1"># The 'rate' module includes functions for calculating gain and loss rates during coagulation.</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties.lognormal_size_distribution</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">lognormal_pmf_distribution</span><span class="p">,</span>
-    <span class="n">lognormal_pdf_distribution</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># The 'lognormal_pmf_distribution' function generates a lognormal distribution</span>
-<span class="c1"># represented as a Probability Mass Function (PMF).</span>
-<span class="c1"># The 'lognormal_pdf_distribution' function generates a lognormal distribution</span>
-<span class="c1"># represented as a Probability Density Function (PDF).</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.convert</span><span class="w"> </span><span class="kn">import</span> <span class="n">distribution_convert_pdf_pms</span>
-
-<span class="c1"># The 'distribution_convert_pdf_pms' function is used to convert PDF distributions</span>
-<span class="c1"># to PMS (Particle Mass Spectrum) or vice versa for comparison purposes.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># Import necessary libraries
 
@@ -8076,25 +8034,7 @@ from scipy.integrate import (
     trapezoid,
 )  # For numerical integration using the trapezoidal rule
 
-# Import specific modules from the particula package
-from particula.dynamics.coagulation import brownian_kernel, rate
-
-# The 'brownian_kernel' module calculates the Brownian coagulation kernel,
-# which is used to determine coagulation rates between particles.
-# The 'rate' module includes functions for calculating gain and loss rates during coagulation.
-from particula.particles.properties.lognormal_size_distribution import (
-    lognormal_pmf_distribution,
-    lognormal_pdf_distribution,
-)
-
-# The 'lognormal_pmf_distribution' function generates a lognormal distribution
-# represented as a Probability Mass Function (PMF).
-# The 'lognormal_pdf_distribution' function generates a lognormal distribution
-# represented as a Probability Density Function (PDF).
-from particula.util.convert import distribution_convert_pdf_pms
-
-# The 'distribution_convert_pdf_pms' function is used to convert PDF distributions
-# to PMS (Particle Mass Spectrum) or vice versa for comparison purposes.</div>
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -8154,7 +8094,7 @@ from particula.util.convert import distribution_convert_pdf_pms
 <span class="n">radius_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">start</span><span class="o">=-</span><span class="mi">9</span><span class="p">,</span> <span class="n">stop</span><span class="o">=-</span><span class="mi">4</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 
 <span class="c1"># Create the lognormal PDF distribution</span>
-<span class="n">distribution_pdf</span> <span class="o">=</span> <span class="n">lognormal_pdf_distribution</span><span class="p">(</span>
+<span class="n">distribution_pdf</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_pdf_distribution</span><span class="p">(</span>
     <span class="n">x_values</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
     <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">std</span><span class="p">,</span>
@@ -8162,7 +8102,7 @@ from particula.util.convert import distribution_convert_pdf_pms
 <span class="p">)</span>
 
 <span class="c1"># Create the lognormal PMF distribution</span>
-<span class="n">distribution_pmf</span> <span class="o">=</span> <span class="n">lognormal_pmf_distribution</span><span class="p">(</span>
+<span class="n">distribution_pmf</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_pmf_distribution</span><span class="p">(</span>
     <span class="n">x_values</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
     <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">std</span><span class="p">,</span>
@@ -8193,7 +8133,7 @@ number = np.array([1e6]) * 1e6  # 1e6 particles per cm^3 converted to m^3
 radius_bins = np.logspace(start=-9, stop=-4, num=500)
 
 # Create the lognormal PDF distribution
-distribution_pdf = lognormal_pdf_distribution(
+distribution_pdf = par.particles.get_lognormal_pdf_distribution(
     x_values=radius_bins,
     mode=mode,
     geometric_standard_deviation=std,
@@ -8201,7 +8141,7 @@ distribution_pdf = lognormal_pdf_distribution(
 )
 
 # Create the lognormal PMF distribution
-distribution_pmf = lognormal_pmf_distribution(
+distribution_pmf = par.particles.get_lognormal_pmf_distribution(
     x_values=radius_bins,
     mode=mode,
     geometric_standard_deviation=std,
@@ -8258,7 +8198,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -8272,7 +8212,7 @@ plt.show()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Rescale the PDF to PMF</span>
-<span class="n">distribution_pdf_rescaled</span> <span class="o">=</span> <span class="n">distribution_convert_pdf_pms</span><span class="p">(</span>
+<span class="n">distribution_pdf_rescaled</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_pdf_distribution_in_pmf</span><span class="p">(</span>
     <span class="n">x_array</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">distribution</span><span class="o">=</span><span class="n">distribution_pdf</span><span class="p">,</span>
     <span class="n">to_pdf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Convert PDF to PMF</span>
@@ -8290,7 +8230,7 @@ plt.show()</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Rescale the PDF to PMF
-distribution_pdf_rescaled = distribution_convert_pdf_pms(
+distribution_pdf_rescaled = par.util.get_pdf_distribution_in_pmf(
     x_array=radius_bins,
     distribution=distribution_pdf,
     to_pdf=False,  # Convert PDF to PMF
@@ -8356,7 +8296,7 @@ plt.show()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Rescale the PMF to PDF</span>
-<span class="n">distribution_pmf_rescaled</span> <span class="o">=</span> <span class="n">distribution_convert_pdf_pms</span><span class="p">(</span>
+<span class="n">distribution_pmf_rescaled</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_pdf_distribution_in_pmf</span><span class="p">(</span>
     <span class="n">x_array</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">distribution</span><span class="o">=</span><span class="n">distribution_pmf</span><span class="p">,</span>
     <span class="n">to_pdf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Convert PMF to PDF</span>
@@ -8373,7 +8313,7 @@ plt.show()</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># Rescale the PMF to PDF
-distribution_pmf_rescaled = distribution_convert_pdf_pms(
+distribution_pmf_rescaled = par.util.get_pdf_distribution_in_pmf(
     x_array=radius_bins,
     distribution=distribution_pmf,
     to_pdf=True,  # Convert PMF to PDF
@@ -8396,16 +8336,6 @@ plt.show()</div>
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>&lt;&gt;:13: SyntaxWarning: invalid escape sequence '\d'
-&lt;&gt;:13: SyntaxWarning: invalid escape sequence '\d'
-C:\Users\kkgor\AppData\Local\Temp\ipykernel_4148\1848083778.py:13: SyntaxWarning: invalid escape sequence '\d'
-  plt.ylabel("Concentration $\dfrac{1}{m^3 \cdot m}$")
-</pre>
-</div>
-</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
@@ -8645,7 +8575,7 @@ $$</p>
 <span class="n">mass_bins</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_bins</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mf">1e3</span>  <span class="c1"># kg</span>
 
 <span class="c1"># Calculate the Brownian coagulation kernel matrix</span>
-<span class="n">kernel</span> <span class="o">=</span> <span class="n">brownian_kernel</span><span class="o">.</span><span class="n">brownian_coagulation_kernel_via_system_state</span><span class="p">(</span>
+<span class="n">kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_brownian_kernel_via_system_state</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">mass_particle</span><span class="o">=</span><span class="n">mass_bins</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">293.15</span><span class="p">,</span>  <span class="c1"># Temperature in Kelvin (20°C)</span>
@@ -8657,7 +8587,7 @@ $$</p>
 mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 
 # Calculate the Brownian coagulation kernel matrix
-kernel = brownian_kernel.brownian_coagulation_kernel_via_system_state(
+kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
     mass_particle=mass_bins,
     temperature=293.15,  # Temperature in Kelvin (20°C)
@@ -8711,12 +8641,12 @@ $$</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">concentration_0</span> <span class="o">=</span> <span class="n">distribution_pdf</span>
 
 <span class="c1"># Calculate gain and loss rates for the PDF</span>
-<span class="n">gain_pdf</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_gain</span><span class="p">(</span>
+<span class="n">gain_pdf</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_continuous</span><span class="p">(</span>
     <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_0</span><span class="p">,</span>
     <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">loss_pdf</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_loss</span><span class="p">(</span>
+<span class="n">loss_pdf</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_continuous</span><span class="p">(</span>
     <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span>
 <span class="p">)</span>
 <span class="n">net_pdf</span> <span class="o">=</span> <span class="n">gain_pdf</span> <span class="o">-</span> <span class="n">loss_pdf</span>
@@ -8739,12 +8669,12 @@ $$</p>
 <div class="clipboard-copy-txt" id="cell-8">concentration_0 = distribution_pdf
 
 # Calculate gain and loss rates for the PDF
-gain_pdf = rate.continuous_gain(
+gain_pdf = par.dynamics.get_coagulation_gain_rate_continuous(
     radius=radius_bins,
     concentration=concentration_0,
     kernel=kernel,
 )
-loss_pdf = rate.continuous_loss(
+loss_pdf = par.dynamics.get_coagulation_loss_rate_continuous(
     radius=radius_bins, concentration=concentration_0, kernel=kernel
 )
 net_pdf = gain_pdf - loss_pdf
@@ -8820,12 +8750,14 @@ Net total volume: -5.9390447229141716e-15
 <span class="n">concentration_0_pmf</span> <span class="o">=</span> <span class="n">distribution_pmf</span>
 
 <span class="c1"># Calculate gain and loss rates for the PMF</span>
-<span class="n">gain_pmf</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span>
+<span class="n">gain_pmf</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
     <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_0_pmf</span><span class="p">,</span>
     <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">loss_pmf</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span><span class="n">concentration</span><span class="o">=</span><span class="n">concentration_0_pmf</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">)</span>
+<span class="n">loss_pmf</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span>
+    <span class="n">concentration</span><span class="o">=</span><span class="n">concentration_0_pmf</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span>
+<span class="p">)</span>
 <span class="n">net_pmf</span> <span class="o">=</span> <span class="n">gain_pmf</span> <span class="o">-</span> <span class="n">loss_pmf</span>
 
 <span class="c1"># Convert gain, loss, and net rates to volume distribution</span>
@@ -8847,12 +8779,14 @@ Net total volume: -5.9390447229141716e-15
 concentration_0_pmf = distribution_pmf
 
 # Calculate gain and loss rates for the PMF
-gain_pmf = rate.discrete_gain(
+gain_pmf = par.dynamics.get_coagulation_gain_rate_discrete(
     radius=radius_bins,
     concentration=concentration_0_pmf,
     kernel=kernel,
 )
-loss_pmf = rate.discrete_loss(concentration=concentration_0_pmf, kernel=kernel)
+loss_pmf = par.dynamics.get_coagulation_loss_rate_discrete(
+    concentration=concentration_0_pmf, kernel=kernel
+)
 net_pmf = gain_pmf - loss_pmf
 
 # Convert gain, loss, and net rates to volume distribution
@@ -8938,10 +8872,10 @@ Net total volume PMF: -7.758929966665061e-13
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Convert PMF gain and loss rates to PDF</span>
-<span class="n">gain_pmf_to_pdf</span> <span class="o">=</span> <span class="n">distribution_convert_pdf_pms</span><span class="p">(</span>
+<span class="n">gain_pmf_to_pdf</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_pdf_distribution_in_pmf</span><span class="p">(</span>
     <span class="n">x_array</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">distribution</span><span class="o">=</span><span class="n">gain_pmf</span><span class="p">,</span> <span class="n">to_pdf</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
-<span class="n">loss_pmf_to_pdf</span> <span class="o">=</span> <span class="n">distribution_convert_pdf_pms</span><span class="p">(</span>
+<span class="n">loss_pmf_to_pdf</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_pdf_distribution_in_pmf</span><span class="p">(</span>
     <span class="n">x_array</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">distribution</span><span class="o">=</span><span class="n">loss_pmf</span><span class="p">,</span> <span class="n">to_pdf</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 <span class="n">net_pmf_to_pdf</span> <span class="o">=</span> <span class="n">gain_pmf_to_pdf</span> <span class="o">-</span> <span class="n">loss_pmf_to_pdf</span>
@@ -8978,10 +8912,10 @@ Net total volume PMF: -7.758929966665061e-13
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-10"># Convert PMF gain and loss rates to PDF
-gain_pmf_to_pdf = distribution_convert_pdf_pms(
+gain_pmf_to_pdf = par.util.get_pdf_distribution_in_pmf(
     x_array=radius_bins, distribution=gain_pmf, to_pdf=True
 )
-loss_pmf_to_pdf = distribution_convert_pdf_pms(
+loss_pmf_to_pdf = par.util.get_pdf_distribution_in_pmf(
     x_array=radius_bins, distribution=loss_pmf, to_pdf=True
 )
 net_pmf_to_pdf = gain_pmf_to_pdf - loss_pmf_to_pdf
@@ -9024,20 +8958,6 @@ plt.show()</div>
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>&lt;&gt;:22: SyntaxWarning: invalid escape sequence '\d'
-&lt;&gt;:33: SyntaxWarning: invalid escape sequence '\d'
-&lt;&gt;:22: SyntaxWarning: invalid escape sequence '\d'
-&lt;&gt;:33: SyntaxWarning: invalid escape sequence '\d'
-C:\Users\kkgor\AppData\Local\Temp\ipykernel_4148\3143149477.py:22: SyntaxWarning: invalid escape sequence '\d'
-  plt.ylabel("Rate $\dfrac{1}{m^3 s \cdot m}$")
-C:\Users\kkgor\AppData\Local\Temp\ipykernel_4148\3143149477.py:33: SyntaxWarning: invalid escape sequence '\d'
-  plt.ylabel("Rate $\dfrac{1}{m^3 s \cdot m}$")
-</pre>
-</div>
-</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
@@ -9107,12 +9027,12 @@ C:\Users\kkgor\AppData\Local\Temp\ipykernel_4148\3143149477.py:33: SyntaxWarning
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dpa</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time_array</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># Calculate coagulation gain and loss at the current time step</span>
-        <span class="n">coag_gain_i</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_gain</span><span class="p">(</span>
+        <span class="n">coag_gain_i</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_continuous</span><span class="p">(</span>
             <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
             <span class="n">concentration</span><span class="o">=</span><span class="n">distribution_i</span><span class="p">,</span>
             <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">coag_loss_i</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_loss</span><span class="p">(</span>
+        <span class="n">coag_loss_i</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_continuous</span><span class="p">(</span>
             <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">distribution_i</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span>
         <span class="p">)</span>
 
@@ -9145,12 +9065,12 @@ distribution_time = np.zeros([len(time_array), len(distribution_0)])
 for i, dpa in enumerate(time_array):
     if i &gt; 0:
         # Calculate coagulation gain and loss at the current time step
-        coag_gain_i = rate.continuous_gain(
+        coag_gain_i = par.dynamics.get_coagulation_gain_rate_continuous(
             radius=radius_bins,
             concentration=distribution_i,
             kernel=kernel,
         )
-        coag_loss_i = rate.continuous_loss(
+        coag_loss_i = par.dynamics.get_coagulation_loss_rate_continuous(
             radius=radius_bins, concentration=distribution_i, kernel=kernel
         )
 
@@ -9409,7 +9329,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-14">
@@ -9427,7 +9347,7 @@ plt.show()</div>
 
 
 <span class="c1"># Define the coagulation ODE system</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">coagulation_ode</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">distribution</span><span class="p">,</span> <span class="n">radius_bins</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">rate</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">coagulation_ode</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">distribution</span><span class="p">,</span> <span class="n">radius_bins</span><span class="p">,</span> <span class="n">kernel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the derivative of the distribution with respect to time</span>
 <span class="sd">    (i.e., the rate of change due to coagulation).</span>
@@ -9437,15 +9357,14 @@ plt.show()</div>
 <span class="sd">        distribution: The current particle size distribution (array).</span>
 <span class="sd">        radius_bins: The bins for the particle radius.</span>
 <span class="sd">        kernel: The coagulation kernel.</span>
-<span class="sd">        rate: The object with methods for calculating coagulation gain and loss.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The time derivative of the particle distribution.</span>
 <span class="sd">    """</span>
-    <span class="n">coag_gain</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_gain</span><span class="p">(</span>
+    <span class="n">coag_gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_continuous</span><span class="p">(</span>
         <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">distribution</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span>
     <span class="p">)</span>
-    <span class="n">coag_loss</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">continuous_loss</span><span class="p">(</span>
+    <span class="n">coag_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_continuous</span><span class="p">(</span>
         <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="n">distribution</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span>
     <span class="p">)</span>
 
@@ -9472,7 +9391,6 @@ plt.show()</div>
     <span class="n">args</span><span class="o">=</span><span class="p">(</span>
         <span class="n">radius_bins</span><span class="p">,</span>
         <span class="n">kernel</span><span class="p">,</span>
-        <span class="n">rate</span><span class="p">,</span>
     <span class="p">),</span>  <span class="c1"># Additional arguments to coagulation_ode</span>
     <span class="n">method</span><span class="o">=</span><span class="s2">"BDF"</span><span class="p">,</span>  <span class="c1"># Integration method (default)</span>
     <span class="n">max_step</span><span class="o">=</span><span class="mf">1e2</span><span class="p">,</span>
@@ -9486,7 +9404,7 @@ import numpy as np
 
 
 # Define the coagulation ODE system
-def coagulation_ode(t, distribution, radius_bins, kernel, rate):
+def coagulation_ode(t, distribution, radius_bins, kernel):
     """
     Compute the derivative of the distribution with respect to time
     (i.e., the rate of change due to coagulation).
@@ -9496,15 +9414,14 @@ def coagulation_ode(t, distribution, radius_bins, kernel, rate):
         distribution: The current particle size distribution (array).
         radius_bins: The bins for the particle radius.
         kernel: The coagulation kernel.
-        rate: The object with methods for calculating coagulation gain and loss.
 
     Returns:
         The time derivative of the particle distribution.
     """
-    coag_gain = rate.continuous_gain(
+    coag_gain = par.dynamics.get_coagulation_gain_rate_continuous(
         radius=radius_bins, concentration=distribution, kernel=kernel
     )
-    coag_loss = rate.continuous_loss(
+    coag_loss = par.dynamics.get_coagulation_loss_rate_continuous(
         radius=radius_bins, concentration=distribution, kernel=kernel
     )
 
@@ -9531,7 +9448,6 @@ solution = solve_ivp(
     args=(
         radius_bins,
         kernel,
-        rate,
     ),  # Additional arguments to coagulation_ode
     method="BDF",  # Integration method (default)
     max_step=1e2,
@@ -9551,7 +9467,7 @@ distribution_solver = solution.y.T  # Transpose to match original format</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="add-pmf-simulation-comparison-and-summary">Add PMF simulation, comparison, and summary<a class="anchor-link" href="#add-pmf-simulation-comparison-and-summary">¶</a></h2>
+<h2 id="comparison-of-different-integration-methods">Comparison of Different Integration Methods<a class="anchor-link" href="#comparison-of-different-integration-methods">¶</a></h2>
 </div>
 </div>
 </div>
@@ -9561,7 +9477,7 @@ distribution_solver = solution.y.T  # Transpose to match original format</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-15">

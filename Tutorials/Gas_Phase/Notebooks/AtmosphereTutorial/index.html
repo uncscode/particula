@@ -6173,8 +6173,6 @@
       
         
       
-        
-      
     
     
       
@@ -6287,28 +6285,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../Dynamics/Coagulation/Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -7940,7 +7916,7 @@ present.</li>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -7956,28 +7932,14 @@ present.</li>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="c1"># From particula</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AtmosphereBuilder</span><span class="p">,</span>
-    <span class="n">VaporPressureFactory</span><span class="p">,</span>
-    <span class="n">GasSpeciesBuilder</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># from particula.gas.vapor_pressure_factories import VaporPressureFactory</span>
-<span class="c1"># from particula.gas.species_builders import GasSpeciesBuilder</span>
+<span class="c1"># import particula</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
-# From particula
-from particula.gas import (
-    AtmosphereBuilder,
-    VaporPressureFactory,
-    GasSpeciesBuilder,
-)
-
-# from particula.gas.vapor_pressure_factories import VaporPressureFactory
-# from particula.gas.species_builders import GasSpeciesBuilder</div>
+# import particula
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -8000,7 +7962,7 @@ from particula.gas import (
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -8015,26 +7977,26 @@ from particula.gas import (
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Define the coefficients for Butanol using the Antoine equation.</span>
 <span class="n">butanol_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"a"</span><span class="p">:</span> <span class="mf">7.838</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mf">1558.19</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">:</span> <span class="mf">196.881</span><span class="p">}</span>
-<span class="n">butanol_antione</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+<span class="n">butanol_antione</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="s2">"antoine"</span><span class="p">,</span> <span class="n">butanol_coefficients</span>
 <span class="p">)</span>
 <span class="n">styrene_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"a"</span><span class="p">:</span> <span class="mf">6.924</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">1420</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">:</span> <span class="mi">226</span><span class="p">}</span>
-<span class="n">styrene_antione</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+<span class="n">styrene_antione</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="s2">"antoine"</span><span class="p">,</span> <span class="n">styrene_coefficients</span>
 <span class="p">)</span>
 
 <span class="c1"># Water uses a different model for vapor pressure calculation called the Buck equation.</span>
-<span class="n">water_buck</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"water_buck"</span><span class="p">)</span>
+<span class="n">water_buck</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">"water_buck"</span><span class="p">)</span>
 
 <span class="c1"># Create the GasSpecies using the GasSpeciesBuilder</span>
 <span class="c1"># water species</span>
 <span class="n">water_species</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">GasSpeciesBuilder</span><span class="p">()</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpeciesBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="s2">"water"</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">18.01528e-3</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">18.01528e-3</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">water_buck</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_condensable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
@@ -8044,12 +8006,12 @@ from particula.gas import (
 <span class="n">organic_concentration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2e-6</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">])</span>
 <span class="n">organic_names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">"butanol"</span><span class="p">,</span> <span class="s2">"styrene"</span><span class="p">])</span>
 <span class="n">organic_species</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">GasSpeciesBuilder</span><span class="p">()</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpeciesBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="n">organic_names</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">organic_molar_mass</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">organic_molar_mass</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">organic_vapor_pressure</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_condensable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">organic_concentration</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">organic_concentration</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
@@ -8059,26 +8021,26 @@ from particula.gas import (
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2"># Define the coefficients for Butanol using the Antoine equation.
 butanol_coefficients = {"a": 7.838, "b": 1558.19, "c": 196.881}
-butanol_antione = VaporPressureFactory().get_strategy(
+butanol_antione = par.gas.VaporPressureFactory().get_strategy(
     "antoine", butanol_coefficients
 )
 styrene_coefficients = {"a": 6.924, "b": 1420, "c": 226}
-styrene_antione = VaporPressureFactory().get_strategy(
+styrene_antione = par.gas.VaporPressureFactory().get_strategy(
     "antoine", styrene_coefficients
 )
 
 # Water uses a different model for vapor pressure calculation called the Buck equation.
-water_buck = VaporPressureFactory().get_strategy("water_buck")
+water_buck = par.gas.VaporPressureFactory().get_strategy("water_buck")
 
 # Create the GasSpecies using the GasSpeciesBuilder
 # water species
 water_species = (
-    GasSpeciesBuilder()
+    par.gas.GasSpeciesBuilder()
     .set_name("water")
-    .set_molar_mass(18.01528e-3)
+    .set_molar_mass(18.01528e-3, "kg/mol")
     .set_vapor_pressure_strategy(water_buck)
     .set_condensable(True)
-    .set_concentration(1e-3)
+    .set_concentration(1e-3, "kg/m^3")
     .build()
 )
 
@@ -8088,12 +8050,12 @@ organic_vapor_pressure = [butanol_antione, styrene_antione]
 organic_concentration = np.array([2e-6, 1e-9])
 organic_names = np.array(["butanol", "styrene"])
 organic_species = (
-    GasSpeciesBuilder()
+    par.gas.GasSpeciesBuilder()
     .set_name(organic_names)
-    .set_molar_mass(organic_molar_mass)
+    .set_molar_mass(organic_molar_mass, "kg/mol")
     .set_vapor_pressure_strategy(organic_vapor_pressure)
     .set_condensable(True)
-    .set_concentration(organic_concentration)
+    .set_concentration(organic_concentration, "kg/m^3")
     .build()
 )
 
@@ -8142,7 +8104,7 @@ print(organic_species)</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -8156,7 +8118,7 @@ print(organic_species)</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">gas_mixture</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">AtmosphereBuilder</span><span class="p">()</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">water_species</span><span class="p">)</span>
     <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">organic_species</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>
@@ -8168,7 +8130,7 @@ print(organic_species)</div>
 <span class="nb">print</span><span class="p">(</span><span class="n">gas_mixture</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">gas_mixture = (
-    AtmosphereBuilder()
+    par.gas.AtmosphereBuilder()
     .add_species(water_species)
     .add_species(organic_species)
     .set_temperature(25, temperature_units="degC")
@@ -8247,7 +8209,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">

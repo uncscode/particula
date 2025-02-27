@@ -6173,8 +6173,6 @@
       
         
       
-        
-      
     
     
       
@@ -6287,28 +6285,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../Dynamics/Coagulation/Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -7886,20 +7862,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MassBasedMovingBin</span><span class="p">,</span>
-    <span class="n">RadiiBasedMovingBinBuilder</span><span class="p">,</span>
-    <span class="n">DistributionFactory</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
-from particula.particles import (
-    MassBasedMovingBin,
-    RadiiBasedMovingBinBuilder,
-    DistributionFactory,
-)</div>
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -7943,10 +7911,12 @@ $$</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">mass_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># kg</span>
 <span class="n">density</span> <span class="o">=</span> <span class="mi">1000</span>  <span class="c1"># kg/m^3</span>
 
-<span class="n">radius</span> <span class="o">=</span> <span class="n">MassBasedMovingBin</span><span class="p">()</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">mass_distribution</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
+<span class="n">radius</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">MassBasedMovingBin</span><span class="p">()</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span>
+    <span class="n">mass_distribution</span><span class="p">,</span> <span class="n">density</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Radius of the particles: </span><span class="si">{</span><span class="n">radius</span><span class="si">}</span><span class="s2"> m"</span><span class="p">)</span>
 
-<span class="n">total_mass</span> <span class="o">=</span> <span class="n">MassBasedMovingBin</span><span class="p">()</span><span class="o">.</span><span class="n">get_total_mass</span><span class="p">(</span>
+<span class="n">total_mass</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">MassBasedMovingBin</span><span class="p">()</span><span class="o">.</span><span class="n">get_total_mass</span><span class="p">(</span>
     <span class="n">mass_distribution</span><span class="p">,</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">mass_distribution</span><span class="p">),</span>
     <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">,</span>
@@ -7957,10 +7927,12 @@ $$</p>
 <div class="clipboard-copy-txt" id="cell-2">mass_distribution = np.linspace(0, 10, 5)  # kg
 density = 1000  # kg/m^3
 
-radius = MassBasedMovingBin().get_radius(mass_distribution, density)
+radius = par.particles.MassBasedMovingBin().get_radius(
+    mass_distribution, density
+)
 print(f"Radius of the particles: {radius} m")
 
-total_mass = MassBasedMovingBin().get_total_mass(
+total_mass = par.particles.MassBasedMovingBin().get_total_mass(
     mass_distribution,
     concentration=np.ones_like(mass_distribution),
     density=density,
@@ -8025,7 +7997,7 @@ $$</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">radii_distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># m</span>
 <span class="n">density</span> <span class="o">=</span> <span class="mi">1000</span>  <span class="c1"># kg/m^3</span>
 
-<span class="n">radii_strategy</span> <span class="o">=</span> <span class="n">RadiiBasedMovingBinBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="n">radii_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">RadiiBasedMovingBinBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 
 <span class="n">mass_distribution</span> <span class="o">=</span> <span class="n">radii_strategy</span><span class="o">.</span><span class="n">get_mass</span><span class="p">(</span><span class="n">radii_distribution</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Mass of the particles: </span><span class="si">{</span><span class="n">mass_distribution</span><span class="si">}</span><span class="s2"> kg"</span><span class="p">)</span>
@@ -8040,7 +8012,7 @@ $$</p>
 <div class="clipboard-copy-txt" id="cell-3">radii_distribution = np.linspace(0, 0.1, 5)  # m
 density = 1000  # kg/m^3
 
-radii_strategy = RadiiBasedMovingBinBuilder().build()
+radii_strategy = par.particles.RadiiBasedMovingBinBuilder().build()
 
 mass_distribution = radii_strategy.get_mass(radii_distribution, density)
 print(f"Mass of the particles: {mass_distribution} kg")
@@ -8105,7 +8077,7 @@ Total mass of the particles: 6.544984694978737 kg
 <span class="n">masses_combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">mass_distribution1</span><span class="p">,</span> <span class="n">mass_distribution2</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
 <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">2000.0</span><span class="p">])</span>  <span class="c1"># kg/m^3</span>
 
-<span class="n">speciated_mass</span> <span class="o">=</span> <span class="n">DistributionFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+<span class="n">speciated_mass</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">DistributionFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="s2">"speciated_mass_moving_bin"</span>
 <span class="p">)</span>
 
@@ -8125,7 +8097,7 @@ mass_distribution2 = np.linspace(0, 10, 5)  # kg
 masses_combined = np.vstack((mass_distribution1, mass_distribution2)).T
 density = np.array([1000.0, 2000.0])  # kg/m^3
 
-speciated_mass = DistributionFactory().get_strategy(
+speciated_mass = par.particles.DistributionFactory().get_strategy(
     "speciated_mass_moving_bin"
 )
 

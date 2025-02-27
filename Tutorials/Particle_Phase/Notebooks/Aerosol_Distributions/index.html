@@ -6173,8 +6173,6 @@
       
         
       
-        
-      
     
     
       
@@ -6287,28 +6285,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../Dynamics/Coagulation/Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -7031,21 +7007,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Summary of PDF vs. PMF in Aerosol Distributions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#looking-ahead" class="md-nav__link">
-    <span class="md-ellipsis">
-      Looking Ahead
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
     </ul>
@@ -7517,21 +7478,6 @@
       Summary of PDF vs. PMF in Aerosol Distributions
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Summary of PDF vs. PMF in Aerosol Distributions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#looking-ahead" class="md-nav__link">
-    <span class="md-ellipsis">
-      Looking Ahead
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -8006,7 +7952,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -8023,19 +7969,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">lognormal_pdf_distribution</span><span class="p">,</span>
-    <span class="n">lognormal_pmf_distribution</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># %%
 import numpy as np
 import matplotlib.pyplot as plt
 
-from particula.particles.properties import (
-    lognormal_pdf_distribution,
-    lognormal_pmf_distribution,
-)</div>
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -8085,7 +8025,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -8125,7 +8065,7 @@ x_values = np.logspace(-3, 1, 2000)  # From 0.001 to 10 microns</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -8144,7 +8084,7 @@ x_values = np.logspace(-3, 1, 2000)  # From 0.001 to 10 microns</div>
 <span class="n">single_mode</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.02</span><span class="p">])</span>
 <span class="n">single_mode_nparticles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e3</span><span class="p">])</span>
 
-<span class="n">single_mode_distribution</span> <span class="o">=</span> <span class="n">lognormal_pdf_distribution</span><span class="p">(</span>
+<span class="n">single_mode_distribution</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_pdf_distribution</span><span class="p">(</span>
     <span class="n">x_values</span><span class="p">,</span> <span class="n">single_mode</span><span class="p">,</span> <span class="n">single_mode_gsd</span><span class="p">,</span> <span class="n">single_mode_nparticles</span>
 <span class="p">)</span>
 </pre></div>
@@ -8154,7 +8094,7 @@ single_mode_gsd = np.array([1.4])
 single_mode = np.array([0.02])
 single_mode_nparticles = np.array([1e3])
 
-single_mode_distribution = lognormal_pdf_distribution(
+single_mode_distribution = par.particles.get_lognormal_pdf_distribution(
     x_values, single_mode, single_mode_gsd, single_mode_nparticles
 )</div>
 </div>
@@ -8179,7 +8119,7 @@ single_mode_distribution = lognormal_pdf_distribution(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -8198,7 +8138,7 @@ single_mode_distribution = lognormal_pdf_distribution(
 <span class="n">multi_mode</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
 <span class="n">multi_mode_nparticles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">])</span>
 
-<span class="n">multi_mode_distribution</span> <span class="o">=</span> <span class="n">lognormal_pdf_distribution</span><span class="p">(</span>
+<span class="n">multi_mode_distribution</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_pdf_distribution</span><span class="p">(</span>
     <span class="n">x_values</span><span class="p">,</span> <span class="n">multi_mode</span><span class="p">,</span> <span class="n">multi_mode_gsd</span><span class="p">,</span> <span class="n">multi_mode_nparticles</span>
 <span class="p">)</span>
 </pre></div>
@@ -8208,7 +8148,7 @@ multi_mode_gsd = np.array([1.4, 1.8])
 multi_mode = np.array([0.02, 1.0])
 multi_mode_nparticles = np.array([1e3, 1e3])
 
-multi_mode_distribution = lognormal_pdf_distribution(
+multi_mode_distribution = par.particles.get_lognormal_pdf_distribution(
     x_values, multi_mode, multi_mode_gsd, multi_mode_nparticles
 )</div>
 </div>
@@ -8233,7 +8173,7 @@ multi_mode_distribution = lognormal_pdf_distribution(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -8303,7 +8243,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -8380,7 +8320,7 @@ Total Concentration for Multi Mode: 2000.000000000001
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
@@ -8393,17 +8333,17 @@ Total Concentration for Multi Mode: 2000.000000000001
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">single_pmf_distribution</span> <span class="o">=</span> <span class="n">lognormal_pmf_distribution</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">single_pmf_distribution</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_pmf_distribution</span><span class="p">(</span>
     <span class="n">x_values</span><span class="p">,</span> <span class="n">single_mode</span><span class="p">,</span> <span class="n">single_mode_gsd</span><span class="p">,</span> <span class="n">single_mode_nparticles</span>
 <span class="p">)</span>
-<span class="n">multi_pmf_distribution</span> <span class="o">=</span> <span class="n">lognormal_pmf_distribution</span><span class="p">(</span>
+<span class="n">multi_pmf_distribution</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_pmf_distribution</span><span class="p">(</span>
     <span class="n">x_values</span><span class="p">,</span> <span class="n">multi_mode</span><span class="p">,</span> <span class="n">multi_mode_gsd</span><span class="p">,</span> <span class="n">multi_mode_nparticles</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">single_pmf_distribution = lognormal_pmf_distribution(
+<div class="clipboard-copy-txt" id="cell-7">single_pmf_distribution = par.particles.get_lognormal_pmf_distribution(
     x_values, single_mode, single_mode_gsd, single_mode_nparticles
 )
-multi_pmf_distribution = lognormal_pmf_distribution(
+multi_pmf_distribution = par.particles.get_lognormal_pmf_distribution(
     x_values, multi_mode, multi_mode_gsd, multi_mode_nparticles
 )</div>
 </div>
@@ -8428,7 +8368,7 @@ multi_pmf_distribution = lognormal_pmf_distribution(
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
@@ -8496,7 +8436,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">
@@ -8560,7 +8500,6 @@ Total Concentration for Multi Mode: 2000.0
 </li>
 </ul>
 <p>Both methods play critical roles in aerosol science, each complementing the other by offering different perspectives on particle size distributions. Understanding when to use each can significantly enhance the accuracy and relevance of aerosol studies.</p>
-<h3 id="looking-ahead">Looking Ahead<a class="anchor-link" href="#looking-ahead">¶</a></h3><p>In the upcoming tutorial, we will delve into another essential concept in aerosol science: the scaling and measurement of aerosol distributions using ( \frac{dN}{d\log D_p} ) (number concentration per unit of log-diameter interval). This approach provides a deeper understanding of how particle sizes are distributed across logarithmic size intervals, which is crucial for comparing aerosol measurements obtained from different instruments and studies. Stay tuned to explore how this scaling method enhances our ability to characterize and compare aerosol distributions effectively.</p>
 </div>
 </div>
 </div>

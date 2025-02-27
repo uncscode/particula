@@ -6173,8 +6173,6 @@
       
         
       
-        
-      
     
     
       
@@ -6287,28 +6285,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../Dynamics/Coagulation/Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -7937,7 +7913,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -7953,20 +7929,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ActivityIdealMass</span><span class="p">,</span>
-    <span class="n">ActivityIdealMolarBuilder</span><span class="p">,</span>
-    <span class="n">ActivityFactory</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
-from particula.particles import (
-    ActivityIdealMass,
-    ActivityIdealMolarBuilder,
-    ActivityFactory,
-)</div>
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -7990,7 +7958,7 @@ from particula.particles import (
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -8003,7 +7971,7 @@ from particula.particles import (
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">activity_mass</span> <span class="o">=</span> <span class="n">ActivityIdealMass</span><span class="p">()</span>  <span class="c1"># no parameters needed</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">activity_mass</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMass</span><span class="p">()</span>  <span class="c1"># no parameters needed</span>
 
 <span class="c1"># mixture</span>
 <span class="n">mass_mixture</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">])</span>  <span class="c1"># water, sucrose</span>
@@ -8019,7 +7987,7 @@ from particula.particles import (
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Partial pressures: </span><span class="si">{</span><span class="n">partial_pressures</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">activity_mass = ActivityIdealMass()  # no parameters needed
+<div class="clipboard-copy-txt" id="cell-2">activity_mass = par.particles.ActivityIdealMass()  # no parameters needed
 
 # mixture
 mass_mixture = np.array([0.2, 0.8])  # water, sucrose
@@ -8071,7 +8039,7 @@ Partial pressures: [20.  8.]
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -8085,8 +8053,10 @@ Partial pressures: [20.  8.]
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">activity_molar</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">ActivityIdealMolarBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.01528</span><span class="p">,</span> <span class="mf">342.29648</span><span class="p">]))</span>  <span class="c1"># water, sucrose</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityIdealMolarBuilder</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.01528</span><span class="p">,</span> <span class="mf">342.29648</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="s2">"kg/mol"</span>
+    <span class="p">)</span>  <span class="c1"># water, sucrose</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
@@ -8103,8 +8073,10 @@ Partial pressures: [20.  8.]
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Partial pressures: </span><span class="si">{</span><span class="n">partial_pressures</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">activity_molar = (
-    ActivityIdealMolarBuilder()
-    .set_molar_mass(np.array([18.01528, 342.29648]))  # water, sucrose
+    par.particles.ActivityIdealMolarBuilder()
+    .set_molar_mass(
+        np.array([18.01528, 342.29648]) * 1e-3, "kg/mol"
+    )  # water, sucrose
     .build()
 )
 
@@ -8155,7 +8127,7 @@ Partial pressures: [82.6089542   1.73910458]
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -8172,13 +8144,14 @@ Partial pressures: [82.6089542   1.73910458]
     <span class="s2">"density"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1500</span><span class="p">]</span>
     <span class="p">),</span>  <span class="c1"># water, sucrose, kg/m^3 are the base SI default units</span>
+    <span class="s2">"density_units"</span><span class="p">:</span> <span class="s2">"kg/m^3"</span><span class="p">,</span>  <span class="c1"># this tells the factory what the input units are so it can convert to kg/m^3</span>
     <span class="s2">"molar_mass"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">18.01528</span><span class="p">,</span> <span class="mf">342.29648</span><span class="p">]),</span>  <span class="c1"># water, sucrose</span>
     <span class="s2">"molar_mass_units"</span><span class="p">:</span> <span class="s2">"g/mol"</span><span class="p">,</span>  <span class="c1"># this tells the factory what the input units are so it can convert to kg/mol</span>
     <span class="s2">"kappa"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]),</span>  <span class="c1"># water, sucrose</span>
     <span class="s2">"water_index"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># water is the first component</span>
 <span class="p">}</span>
 
-<span class="n">activity_kappa</span> <span class="o">=</span> <span class="n">ActivityFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+<span class="n">activity_kappa</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ActivityFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"kappa"</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters_input</span>
 <span class="p">)</span>
 
@@ -8198,13 +8171,14 @@ Partial pressures: [82.6089542   1.73910458]
     "density": np.array(
         [1000, 1500]
     ),  # water, sucrose, kg/m^3 are the base SI default units
+    "density_units": "kg/m^3",  # this tells the factory what the input units are so it can convert to kg/m^3
     "molar_mass": np.array([18.01528, 342.29648]),  # water, sucrose
     "molar_mass_units": "g/mol",  # this tells the factory what the input units are so it can convert to kg/mol
     "kappa": np.array([0, 0.3]),  # water, sucrose
     "water_index": 0,  # water is the first component
 }
 
-activity_kappa = ActivityFactory().get_strategy(
+activity_kappa = par.particles.ActivityFactory().get_strategy(
     strategy_type="kappa", parameters=parameters_input
 )
 
@@ -8256,7 +8230,7 @@ Partial pressures: [55.55555556  1.73910458]
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">

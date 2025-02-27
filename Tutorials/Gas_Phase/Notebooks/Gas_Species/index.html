@@ -6173,8 +6173,6 @@
       
         
       
-        
-      
     
     
       
@@ -6287,28 +6285,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../Dynamics/Coagulation/Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -7975,7 +7951,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -7992,13 +7968,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="c1"># Particula imports</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas</span><span class="w"> </span><span class="kn">import</span> <span class="n">VaporPressureFactory</span><span class="p">,</span> <span class="n">GasSpeciesBuilder</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
 # Particula imports
-from particula.gas import VaporPressureFactory, GasSpeciesBuilder</div>
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -8026,7 +8002,7 @@ from particula.gas import VaporPressureFactory, GasSpeciesBuilder</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -8043,7 +8019,7 @@ from particula.gas import VaporPressureFactory, GasSpeciesBuilder</div>
 <span class="c1"># 'a', 'b', and 'c' are coefficients specific to the Antoine equation used to calculate vapor pressure.</span>
 <span class="n">butanol_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"a"</span><span class="p">:</span> <span class="mf">7.838</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mf">1558.19</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">:</span> <span class="mf">196.881</span><span class="p">}</span>
 <span class="c1"># Create a vapor pressure strategy for Butanol using the Antoine equation.</span>
-<span class="n">butanol_antione</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+<span class="n">butanol_antione</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"antoine"</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">butanol_coefficients</span>
 <span class="p">)</span>
 
@@ -8051,7 +8027,7 @@ from particula.gas import VaporPressureFactory, GasSpeciesBuilder</div>
 <span class="c1"># Antoine equation.</span>
 <span class="n">styrene_coefficients</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"a"</span><span class="p">:</span> <span class="mf">6.924</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">1420</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">:</span> <span class="mi">226</span><span class="p">}</span>
 <span class="c1"># Create a vapor pressure strategy for Styrene using the Antoine equation.</span>
-<span class="n">styrene_antione</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+<span class="n">styrene_antione</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
     <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"antoine"</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">styrene_coefficients</span>
 <span class="p">)</span>
 
@@ -8059,13 +8035,15 @@ from particula.gas import VaporPressureFactory, GasSpeciesBuilder</div>
 <span class="c1"># The Buck equation is particularly suited for water vapor calculations.</span>
 <span class="c1"># No additional parameters are required to be passed for the Buck equation</span>
 <span class="c1"># in this instance.</span>
-<span class="n">water_buck</span> <span class="o">=</span> <span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="n">strategy_type</span><span class="o">=</span><span class="s2">"water_buck"</span><span class="p">)</span>
+<span class="n">water_buck</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">VaporPressureFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
+    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">"water_buck"</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2"># Define the coefficients for Butanol using the Antoine equation.
 # 'a', 'b', and 'c' are coefficients specific to the Antoine equation used to calculate vapor pressure.
 butanol_coefficients = {"a": 7.838, "b": 1558.19, "c": 196.881}
 # Create a vapor pressure strategy for Butanol using the Antoine equation.
-butanol_antione = VaporPressureFactory().get_strategy(
+butanol_antione = par.gas.VaporPressureFactory().get_strategy(
     strategy_type="antoine", parameters=butanol_coefficients
 )
 
@@ -8073,7 +8051,7 @@ butanol_antione = VaporPressureFactory().get_strategy(
 # Antoine equation.
 styrene_coefficients = {"a": 6.924, "b": 1420, "c": 226}
 # Create a vapor pressure strategy for Styrene using the Antoine equation.
-styrene_antione = VaporPressureFactory().get_strategy(
+styrene_antione = par.gas.VaporPressureFactory().get_strategy(
     strategy_type="antoine", parameters=styrene_coefficients
 )
 
@@ -8081,7 +8059,9 @@ styrene_antione = VaporPressureFactory().get_strategy(
 # The Buck equation is particularly suited for water vapor calculations.
 # No additional parameters are required to be passed for the Buck equation
 # in this instance.
-water_buck = VaporPressureFactory().get_strategy(strategy_type="water_buck")</div>
+water_buck = par.gas.VaporPressureFactory().get_strategy(
+    strategy_type="water_buck"
+)</div>
 </div>
 </div>
 </div>
@@ -8113,7 +8093,7 @@ water_buck = VaporPressureFactory().get_strategy(strategy_type="water_buck")</di
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -8128,7 +8108,7 @@ water_buck = VaporPressureFactory().get_strategy(strategy_type="water_buck")</di
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Configure the builder with the necessary properties</span>
 <span class="n">water_species</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">GasSpeciesBuilder</span><span class="p">()</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpeciesBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="s2">"Water"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="mf">18.01528</span><span class="p">,</span> <span class="n">molar_mass_units</span><span class="o">=</span><span class="s2">"g/mol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">water_buck</span><span class="p">)</span>
@@ -8150,7 +8130,7 @@ water_buck = VaporPressureFactory().get_strategy(strategy_type="water_buck")</di
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Configure the builder with the necessary properties
 water_species = (
-    GasSpeciesBuilder()
+    par.gas.GasSpeciesBuilder()
     .set_name("Water")
     .set_molar_mass(18.01528, molar_mass_units="g/mol")
     .set_vapor_pressure_strategy(water_buck)
@@ -8207,7 +8187,7 @@ Also the units of the molar mass are now in kg/mol: 0.01801528
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -8242,12 +8222,12 @@ Also the units of the molar mass are now in kg/mol: 0.01801528
 <span class="c1"># Using GasSpeciesBuilder to construct a GasSpecies object for organics.</span>
 <span class="c1"># Notice how we can directly use arrays to set properties for multiple species.</span>
 <span class="n">organic_species</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">GasSpeciesBuilder</span><span class="p">()</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpeciesBuilder</span><span class="p">()</span>
     <span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="n">organic_names</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">organic_molar_mass</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_molar_mass</span><span class="p">(</span><span class="n">organic_molar_mass</span><span class="p">,</span> <span class="s2">"kg/mol"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_vapor_pressure_strategy</span><span class="p">(</span><span class="n">organic_vapor_pressure</span><span class="p">)</span>
     <span class="o">.</span><span class="n">set_condensable</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span>
-    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">organic_concentration</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_concentration</span><span class="p">(</span><span class="n">organic_concentration</span><span class="p">,</span> <span class="s2">"kg/m^3"</span><span class="p">)</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="p">)</span>
 
@@ -8277,12 +8257,12 @@ organic_names = np.array(["butanol", "styrene"])
 # Using GasSpeciesBuilder to construct a GasSpecies object for organics.
 # Notice how we can directly use arrays to set properties for multiple species.
 organic_species = (
-    GasSpeciesBuilder()
+    par.gas.GasSpeciesBuilder()
     .set_name(organic_names)
-    .set_molar_mass(organic_molar_mass)
+    .set_molar_mass(organic_molar_mass, "kg/mol")
     .set_vapor_pressure_strategy(organic_vapor_pressure)
     .set_condensable([True, True])
-    .set_concentration(organic_concentration)
+    .set_concentration(organic_concentration, "kg/m^3")
     .build()
 )
 
@@ -8324,7 +8304,7 @@ print(organic_species)</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -8427,7 +8407,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">

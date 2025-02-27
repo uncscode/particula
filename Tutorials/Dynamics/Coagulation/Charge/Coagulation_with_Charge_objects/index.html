@@ -6328,8 +6328,6 @@
       
         
       
-        
-      
     
     
       
@@ -6442,28 +6440,6 @@
   
   <span class="md-ellipsis">
     Coagulation Basic 4: Particle Resolved
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../Functional/Coagulation_Basic_5_SDM/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Coagulation Basic 5: Super Droplet Method
     
   </span>
   
@@ -8026,47 +8002,13 @@ We will:</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="c1"># Particula imports</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties.lognormal_size_distribution</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">lognormal_pmf_distribution</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles.properties</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">coulomb_enhancement</span><span class="p">,</span>
-    <span class="n">diffusive_knudsen_number</span><span class="p">,</span>
-    <span class="n">friction_factor</span><span class="p">,</span>
-    <span class="n">cunningham_slip_correction</span><span class="p">,</span>
-    <span class="n">calculate_knudsen_number</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gas.properties</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">get_dynamic_viscosity</span><span class="p">,</span>
-    <span class="n">molecule_mean_free_path</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.util.reduced_quantity</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduced_self_broadcast</span>
-
-<span class="c1"># Import kernel strategies</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">kernel</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 import matplotlib.pyplot as plt
 
 # Particula imports
-from particula.particles.properties.lognormal_size_distribution import (
-    lognormal_pmf_distribution,
-)
-from particula.particles.properties import (
-    coulomb_enhancement,
-    diffusive_knudsen_number,
-    friction_factor,
-    cunningham_slip_correction,
-    calculate_knudsen_number,
-)
-from particula.gas.properties import (
-    get_dynamic_viscosity,
-    molecule_mean_free_path,
-)
-from particula.util.reduced_quantity import reduced_self_broadcast
-
-# Import kernel strategies
-from particula.dynamics.coagulation import kernel</div>
+import particula as par</div>
 </div>
 </div>
 </div>
@@ -8102,17 +8044,13 @@ from particula.dynamics.coagulation import kernel</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %%</span>
-
-<span class="c1"># Define the bins for particle radius using a logarithmic scale</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Define the bins for particle radius using a logarithmic scale</span>
 <span class="n">radius_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">start</span><span class="o">=-</span><span class="mi">9</span><span class="p">,</span> <span class="n">stop</span><span class="o">=-</span><span class="mi">4</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>  <span class="c1"># m (1 nm to 100 μm)</span>
 
 <span class="c1"># Calculate the mass of particles for each size bin</span>
 <span class="n">mass_bins</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_bins</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mf">1e3</span>  <span class="c1"># kg</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2"># %%
-
-# Define the bins for particle radius using a logarithmic scale
+<div class="clipboard-copy-txt" id="cell-2"># Define the bins for particle radius using a logarithmic scale
 radius_bins = np.logspace(start=-9, stop=-4, num=250)  # m (1 nm to 100 μm)
 
 # Calculate the mass of particles for each size bin
@@ -8154,9 +8092,7 @@ We then plot the charge distribution against the particle radius.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %%</span>
-
-<span class="c1"># Determine the number of radius bins</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Determine the number of radius bins</span>
 <span class="n">n_bins</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">)</span>
 
 <span class="c1"># Define the split index where charges transition from negative to positive</span>
@@ -8188,9 +8124,7 @@ We then plot the charge distribution against the particle radius.</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">"both"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3"># %%
-
-# Determine the number of radius bins
+<div class="clipboard-copy-txt" id="cell-3"># Determine the number of radius bins
 n_bins = len(radius_bins)
 
 # Define the split index where charges transition from negative to positive
@@ -8264,7 +8198,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -8277,40 +8211,38 @@ plt.show()</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %%</span>
-
-<span class="n">temperature</span> <span class="o">=</span> <span class="mf">298.15</span>  <span class="c1"># Temperature in Kelvin</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">temperature</span> <span class="o">=</span> <span class="mf">298.15</span>  <span class="c1"># Temperature in Kelvin</span>
 
 <span class="c1"># Calculate Coulomb potential ratio</span>
-<span class="n">coulomb_potential_ratio</span> <span class="o">=</span> <span class="n">coulomb_enhancement</span><span class="o">.</span><span class="n">ratio</span><span class="p">(</span>
+<span class="n">coulomb_potential_ratio</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_coulomb_enhancement_ratio</span><span class="p">(</span>
     <span class="n">radius_bins</span><span class="p">,</span> <span class="n">charge_array</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span>
 <span class="p">)</span>
 
 <span class="c1"># Calculate gas properties</span>
-<span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
-<span class="n">mol_free_path</span> <span class="o">=</span> <span class="n">molecule_mean_free_path</span><span class="p">(</span>
+<span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
+<span class="n">mol_free_path</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_molecule_mean_free_path</span><span class="p">(</span>
     <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span>
 <span class="p">)</span>
 
 <span class="c1"># Calculate Knudsen number</span>
-<span class="n">knudsen_number</span> <span class="o">=</span> <span class="n">calculate_knudsen_number</span><span class="p">(</span>
+<span class="n">knudsen_number</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_knudsen_number</span><span class="p">(</span>
     <span class="n">mean_free_path</span><span class="o">=</span><span class="n">mol_free_path</span><span class="p">,</span> <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span>
 <span class="p">)</span>
 
 <span class="c1"># Calculate slip correction factor</span>
-<span class="n">slip_correction</span> <span class="o">=</span> <span class="n">cunningham_slip_correction</span><span class="p">(</span><span class="n">knudsen_number</span><span class="o">=</span><span class="n">knudsen_number</span><span class="p">)</span>
+<span class="n">slip_correction</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_cunningham_slip_correction</span><span class="p">(</span><span class="n">knudsen_number</span><span class="o">=</span><span class="n">knudsen_number</span><span class="p">)</span>
 
 <span class="c1"># Calculate friction factor</span>
-<span class="n">friction_factor_value</span> <span class="o">=</span> <span class="n">friction_factor</span><span class="p">(</span>
-    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
+<span class="n">friction_factor_value</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_friction_factor</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span><span class="p">,</span>
     <span class="n">slip_correction</span><span class="o">=</span><span class="n">slip_correction</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># Calculate diffusive Knudsen number</span>
-<span class="n">diffusive_knudsen_values</span> <span class="o">=</span> <span class="n">diffusive_knudsen_number</span><span class="p">(</span>
-    <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
-    <span class="n">mass_particle</span><span class="o">=</span><span class="n">mass_bins</span><span class="p">,</span>
+<span class="n">diffusive_knudsen_values</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_diffusive_knudsen_number</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
+    <span class="n">particle_mass</span><span class="o">=</span><span class="n">mass_bins</span><span class="p">,</span>
     <span class="n">friction_factor</span><span class="o">=</span><span class="n">friction_factor_value</span><span class="p">,</span>
     <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
@@ -8318,7 +8250,7 @@ plt.show()</div>
 
 <span class="c1"># Prepare quantities for kernel calculations</span>
 <span class="n">sum_of_radii</span> <span class="o">=</span> <span class="n">radius_bins</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">radius_bins</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
-<span class="n">reduced_mass</span> <span class="o">=</span> <span class="n">reduced_self_broadcast</span><span class="p">(</span><span class="n">mass_bins</span><span class="p">)</span>
+<span class="n">reduced_mass</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_reduced_self_broadcast</span><span class="p">(</span><span class="n">mass_bins</span><span class="p">)</span>
 <span class="n">reduced_friction_factor</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">friction_factor_value</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
     <span class="o">*</span> <span class="n">friction_factor_value</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
@@ -8328,40 +8260,38 @@ plt.show()</div>
     <span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4"># %%
-
-temperature = 298.15  # Temperature in Kelvin
+<div class="clipboard-copy-txt" id="cell-4">temperature = 298.15  # Temperature in Kelvin
 
 # Calculate Coulomb potential ratio
-coulomb_potential_ratio = coulomb_enhancement.ratio(
+coulomb_potential_ratio = par.particles.get_coulomb_enhancement_ratio(
     radius_bins, charge_array, temperature=temperature
 )
 
 # Calculate gas properties
-dynamic_viscosity = get_dynamic_viscosity(temperature=temperature)
-mol_free_path = molecule_mean_free_path(
+dynamic_viscosity = par.gas.get_dynamic_viscosity(temperature=temperature)
+mol_free_path = par.gas.get_molecule_mean_free_path(
     temperature=temperature, dynamic_viscosity=dynamic_viscosity
 )
 
 # Calculate Knudsen number
-knudsen_number = calculate_knudsen_number(
+knudsen_number = par.particles.get_knudsen_number(
     mean_free_path=mol_free_path, particle_radius=radius_bins
 )
 
 # Calculate slip correction factor
-slip_correction = cunningham_slip_correction(knudsen_number=knudsen_number)
+slip_correction = par.particles.get_cunningham_slip_correction(knudsen_number=knudsen_number)
 
 # Calculate friction factor
-friction_factor_value = friction_factor(
-    radius=radius_bins,
+friction_factor_value = par.particles.get_friction_factor(
+    particle_radius=radius_bins,
     dynamic_viscosity=dynamic_viscosity,
     slip_correction=slip_correction,
 )
 
 # Calculate diffusive Knudsen number
-diffusive_knudsen_values = diffusive_knudsen_number(
-    radius=radius_bins,
-    mass_particle=mass_bins,
+diffusive_knudsen_values = par.particles.get_diffusive_knudsen_number(
+    particle_radius=radius_bins,
+    particle_mass=mass_bins,
     friction_factor=friction_factor_value,
     coulomb_potential_ratio=coulomb_potential_ratio,
     temperature=temperature,
@@ -8369,7 +8299,7 @@ diffusive_knudsen_values = diffusive_knudsen_number(
 
 # Prepare quantities for kernel calculations
 sum_of_radii = radius_bins[:, np.newaxis] + radius_bins[np.newaxis, :]
-reduced_mass = reduced_self_broadcast(mass_bins)
+reduced_mass = par.util.get_reduced_self_broadcast(mass_bins)
 reduced_friction_factor = (
     friction_factor_value[:, np.newaxis]
     * friction_factor_value[np.newaxis, :]
@@ -8404,7 +8334,7 @@ reduced_friction_factor = (
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -8417,10 +8347,8 @@ reduced_friction_factor = (
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %%</span>
-
-<span class="c1"># Instantiate the Hard Sphere kernel strategy</span>
-<span class="n">kernel_strategy_hs</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">HardSphere</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Instantiate the Hard Sphere kernel strategy</span>
+<span class="n">kernel_strategy_hs</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">HardSphereKernelStrategy</span><span class="p">()</span>
 
 <span class="c1"># Compute the dimensionless kernel</span>
 <span class="n">dimensionless_kernel_hs</span> <span class="o">=</span> <span class="n">kernel_strategy_hs</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">(</span>
@@ -8450,10 +8378,9 @@ reduced_friction_factor = (
 <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"log10(Kernel) (m³/s)"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5"># %%
-
+<div class="clipboard-copy-txt" id="cell-5">
 # Instantiate the Hard Sphere kernel strategy
-kernel_strategy_hs = kernel.HardSphere()
+kernel_strategy_hs = par.dynamics.HardSphereKernelStrategy()
 
 # Compute the dimensionless kernel
 dimensionless_kernel_hs = kernel_strategy_hs.dimensionless(
@@ -8520,7 +8447,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -8536,7 +8463,7 @@ plt.show()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %%</span>
 
 <span class="c1"># Instantiate the Coulomb Dyachkov 2007 kernel strategy</span>
-<span class="n">kernel_strategy_dyachkov</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">CoulombDyachkov2007</span><span class="p">()</span>
+<span class="n">kernel_strategy_dyachkov</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CoulombDyachkov2007KernelStrategy</span><span class="p">()</span>
 
 <span class="c1"># Compute the dimensionless kernel</span>
 <span class="n">dimensionless_kernel_dyachkov</span> <span class="o">=</span> <span class="n">kernel_strategy_dyachkov</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">(</span>
@@ -8572,7 +8499,7 @@ plt.show()</div>
 <div class="clipboard-copy-txt" id="cell-6"># %%
 
 # Instantiate the Coulomb Dyachkov 2007 kernel strategy
-kernel_strategy_dyachkov = kernel.CoulombDyachkov2007()
+kernel_strategy_dyachkov = par.dynamics.CoulombDyachkov2007KernelStrategy()
 
 # Compute the dimensionless kernel
 dimensionless_kernel_dyachkov = kernel_strategy_dyachkov.dimensionless(
@@ -8642,7 +8569,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
@@ -8658,7 +8585,7 @@ plt.show()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %%</span>
 
 <span class="c1"># Instantiate the Coulomb Gatti 2008 kernel strategy</span>
-<span class="n">kernel_strategy_gatti</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">CoulombGatti2008</span><span class="p">()</span>
+<span class="n">kernel_strategy_gatti</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CoulombGatti2008KernelStrategy</span><span class="p">()</span>
 
 <span class="c1"># Compute the dimensionless kernel</span>
 <span class="n">dimensionless_kernel_gatti</span> <span class="o">=</span> <span class="n">kernel_strategy_gatti</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">(</span>
@@ -8694,7 +8621,7 @@ plt.show()</div>
 <div class="clipboard-copy-txt" id="cell-7"># %%
 
 # Instantiate the Coulomb Gatti 2008 kernel strategy
-kernel_strategy_gatti = kernel.CoulombGatti2008()
+kernel_strategy_gatti = par.dynamics.CoulombGatti2008KernelStrategy()
 
 # Compute the dimensionless kernel
 dimensionless_kernel_gatti = kernel_strategy_gatti.dimensionless(
@@ -8764,7 +8691,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
@@ -8777,10 +8704,8 @@ plt.show()</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %%</span>
-
-<span class="c1"># Instantiate the Coulomb Gopalakrishnan 2012 kernel strategy</span>
-<span class="n">kernel_strategy_gopalakrishnan</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">CoulombGopalakrishnan2012</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Instantiate the Coulomb Gopalakrishnan 2012 kernel strategy</span>
+<span class="n">kernel_strategy_gopalakrishnan</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CoulombGopalakrishnan2012KernelStrategy</span><span class="p">()</span>
 
 <span class="c1"># Compute the dimensionless kernel</span>
 <span class="n">dimensionless_kernel_gopalakrishnan</span> <span class="o">=</span> <span class="p">(</span>
@@ -8815,10 +8740,9 @@ plt.show()</div>
 <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Kernel (m³/s)"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8"># %%
-
+<div class="clipboard-copy-txt" id="cell-8">
 # Instantiate the Coulomb Gopalakrishnan 2012 kernel strategy
-kernel_strategy_gopalakrishnan = kernel.CoulombGopalakrishnan2012()
+kernel_strategy_gopalakrishnan = par.dynamics.CoulombGopalakrishnan2012KernelStrategy()
 
 # Compute the dimensionless kernel
 dimensionless_kernel_gopalakrishnan = (
@@ -8891,7 +8815,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">
@@ -8907,7 +8831,7 @@ plt.show()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %%</span>
 
 <span class="c1"># Instantiate the Coulomb Chahl 2019 kernel strategy</span>
-<span class="n">kernel_strategy_chahl</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">CoulumbChahl2019</span><span class="p">()</span>
+<span class="n">kernel_strategy_chahl</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CoulumbChahl2019KernelStrategy</span><span class="p">()</span>
 
 <span class="c1"># Compute the dimensionless kernel</span>
 <span class="n">dimensionless_kernel_chahl</span> <span class="o">=</span> <span class="n">kernel_strategy_chahl</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">(</span>
@@ -8943,7 +8867,7 @@ plt.show()</div>
 <div class="clipboard-copy-txt" id="cell-9"># %%
 
 # Instantiate the Coulomb Chahl 2019 kernel strategy
-kernel_strategy_chahl = kernel.CoulumbChahl2019()
+kernel_strategy_chahl = par.dynamics.CoulumbChahl2019KernelStrategy()
 
 # Compute the dimensionless kernel
 dimensionless_kernel_chahl = kernel_strategy_chahl.dimensionless(
@@ -9010,7 +8934,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-10">
@@ -9155,7 +9079,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-11">
@@ -9300,7 +9224,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-12">
@@ -9456,7 +9380,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-13">
@@ -9469,13 +9393,8 @@ plt.show()</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %%</span>
-
-<span class="c1"># Import rate calculation functions</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">rate</span>
-
-<span class="c1"># Make a number concentration distribution</span>
-<span class="n">number_concentration</span> <span class="o">=</span> <span class="n">lognormal_pmf_distribution</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Make a number concentration distribution</span>
+<span class="n">number_concentration</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_pmf_distribution</span><span class="p">(</span>
     <span class="n">x_values</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">10e-9</span><span class="p">,</span> <span class="mf">200e-9</span><span class="p">,</span> <span class="mf">1000e-9</span><span class="p">]),</span>  <span class="c1"># m</span>
     <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.8</span><span class="p">]),</span>
@@ -9483,25 +9402,20 @@ plt.show()</div>
 <span class="p">)</span>
 
 <span class="c1"># Calculate gain and loss rates</span>
-<span class="n">gain_rate</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_gain</span><span class="p">(</span>
+<span class="n">gain_rate</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
     <span class="n">radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">number_concentration</span><span class="p">,</span>
     <span class="n">kernel</span><span class="o">=</span><span class="n">dimensional_kernel_chahl</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">loss_rate</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">discrete_loss</span><span class="p">(</span>
+<span class="n">loss_rate</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">number_concentration</span><span class="p">,</span>
     <span class="n">kernel</span><span class="o">=</span><span class="n">dimensional_kernel_chahl</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">net_rate</span> <span class="o">=</span> <span class="n">gain_rate</span> <span class="o">-</span> <span class="n">loss_rate</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-13"># %%
-
-# Import rate calculation functions
-from particula.dynamics.coagulation import rate
-
-# Make a number concentration distribution
-number_concentration = lognormal_pmf_distribution(
+<div class="clipboard-copy-txt" id="cell-13"># Make a number concentration distribution
+number_concentration = par.particles.get_lognormal_pmf_distribution(
     x_values=radius_bins,
     mode=np.array([10e-9, 200e-9, 1000e-9]),  # m
     geometric_standard_deviation=np.array([1.4, 1.5, 1.8]),
@@ -9509,12 +9423,12 @@ number_concentration = lognormal_pmf_distribution(
 )
 
 # Calculate gain and loss rates
-gain_rate = rate.discrete_gain(
+gain_rate = par.dynamics.get_coagulation_gain_rate_discrete(
     radius=radius_bins,
     concentration=number_concentration,
     kernel=dimensional_kernel_chahl,
 )
-loss_rate = rate.discrete_loss(
+loss_rate = par.dynamics.get_coagulation_loss_rate_discrete(
     concentration=number_concentration,
     kernel=dimensional_kernel_chahl,
 )
@@ -9546,7 +9460,7 @@ net_rate = gain_rate - loss_rate</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-14">
@@ -9559,9 +9473,7 @@ net_rate = gain_rate - loss_rate</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %%</span>
-
-<span class="c1"># Plot the number concentration</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Plot the number concentration</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">number_concentration</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"green"</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
@@ -9585,9 +9497,7 @@ net_rate = gain_rate - loss_rate</div>
 <span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">"both"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-14"># %%
-
-# Plot the number concentration
+<div class="clipboard-copy-txt" id="cell-14"># Plot the number concentration
 fig, ax1 = plt.subplots()
 ax1.plot(radius_bins, number_concentration, color="green")
 ax1.set_xscale("log")
