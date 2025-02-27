@@ -20,7 +20,6 @@
 - [Coagulation Tutorial: Basic 2-PDF](Coagulation/Functional/Coagulation_Basic_2_PDF.ipynb)
 - [Coagulation Tutorial: Basic 3-Compared](Coagulation/Functional/Coagulation_Basic_3_compared.ipynb)
 - [Coagulation Tutorial: Basic 4-Particle Resolved](Coagulation/Functional/Coagulation_Basic_4_ParticleResolved.ipynb)
-- [Coagulation Tutorial: Basic 5-Super Droplet Method](Coagulation/Functional/Coagulation_Basic_5_SDM.ipynb)
 
 ### Charge
 
