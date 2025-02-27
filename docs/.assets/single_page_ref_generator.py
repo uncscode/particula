@@ -121,7 +121,7 @@ source_paths_ipynb = list(path_finder.glob("**/*.ipynb"))
 source_paths_md = list(path_finder.glob("**/*.md"))
 source_paths = source_paths_ipynb + source_paths_md
 
-# %% Tutorial Reference
+# Tutorial Reference
 source_paths_list = list(source_paths)
 filtered_paths = [
     p for p in source_paths_list if "particula/docs/Tutorials/" in p.as_posix()
@@ -145,7 +145,7 @@ merge_markdown_files(
     skip_filenames=["index.md"],
 )
 
-# %% How-To-Guide Reference
+# How-To-Guide Reference
 filtered_paths = [
     p
     for p in source_paths_list
@@ -170,7 +170,7 @@ merge_markdown_files(
     skip_filenames=["index.md"],
 )
 
-# %% Discussions
+# Discussions
 filtered_paths = [
     p
     for p in source_paths_list
@@ -194,4 +194,3 @@ merge_markdown_files(
     remove_dir=repo_path / "docs/.assets/discussion_reference",
     skip_filenames=["index.md"],
 )
-# %%
