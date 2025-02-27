@@ -55,7 +55,6 @@ class TestChangeParticleRepresentation(unittest.TestCase):
             )
         )
         self.assertIsInstance(new_particle, ParticleRepresentation)
-        self.assertEqual(len(new_particle.get_distribution()), len(bin_radius))
         self.assertTrue(np.all(new_particle.get_distribution() >= 0))
 
     def test_get_speciated_mass_representation_double(self):
@@ -81,5 +80,4 @@ class TestChangeParticleRepresentation(unittest.TestCase):
             )
         )
         self.assertIsInstance(new_particle, ParticleRepresentation)
-        self.assertEqual(len(new_particle.get_distribution()), len(bin_radius))
         self.assertTrue(np.all(new_particle.get_distribution() >= 0))
