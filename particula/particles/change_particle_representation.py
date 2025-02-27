@@ -39,6 +39,9 @@ def get_particle_resolved_binned_radius(
     Returns:
         The kernel radius for the particle [m].
     """
+    # if the bin radius is set, return it
+    if bin_radius is not None:
+        return bin_radius
     # else find the non-zero min and max radii, the log space them
     particle_radius = particle.get_radius()
     min_radius = np.min(particle_radius[particle_radius > 0]) * 0.5
