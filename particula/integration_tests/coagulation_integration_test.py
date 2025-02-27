@@ -53,7 +53,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_geometric_standard_deviation(
                 self.geometric_standard_deviation
             )
-            .set_number_concentration(number_concentration, "m^-3")
+            .set_number_concentration(number_concentration, "1/m^3")
             .set_distribution_type("pmf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
             .set_density(self.density, "kg/m^3")
@@ -85,7 +85,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_geometric_standard_deviation(
                 self.geometric_standard_deviation
             )
-            .set_number_concentration(number_concentration, "m^-3")
+            .set_number_concentration(number_concentration, "1/m^3")
             .set_distribution_type("pdf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
             .set_density(self.density, "kg/m^3")
@@ -154,7 +154,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_geometric_standard_deviation(
                 self.geometric_standard_deviation
             )
-            .set_number_concentration(number_concentration, "m^-3")
+            .set_number_concentration(number_concentration, "1/m^3")
             .set_distribution_type("pmf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
             .set_density(self.density, "kg/m^3")
@@ -190,7 +190,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_geometric_standard_deviation(
                 self.geometric_standard_deviation
             )
-            .set_number_concentration(number_concentration, "m^-3")
+            .set_number_concentration(number_concentration, "1/m^3")
             .set_distribution_type("pdf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
             .set_density(self.density, "kg/m^3")
@@ -281,7 +281,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_geometric_standard_deviation(
                 self.geometric_standard_deviation
             )
-            .set_number_concentration(number_concentration, "m^-3")
+            .set_number_concentration(number_concentration, "1/m^3")
             .set_distribution_type("pmf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
             .set_density(self.density, "kg/m^3")
@@ -308,7 +308,7 @@ class TestCoagulationIntegration(unittest.TestCase):
             .set_geometric_standard_deviation(
                 self.geometric_standard_deviation
             )
-            .set_number_concentration(number_concentration, "m^-3")
+            .set_number_concentration(number_concentration, "1/m^3")
             .set_distribution_type("pdf")
             .set_radius_bins(self.radius_bins, radius_bins_units="m")
             .set_density(self.density, "kg/m^3")
