@@ -8,6 +8,7 @@ from handsdown.generators.material import MaterialGenerator
 from handsdown.processors.pep257 import PEP257DocstringProcessor
 from handsdown.utils.path_finder import PathFinder
 
+
 repo_path = Path.cwd()
 
 # this little tool works like `pathlib.Path.glob` with some extra magic
