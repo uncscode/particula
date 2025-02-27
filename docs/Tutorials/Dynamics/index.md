@@ -10,7 +10,6 @@
 ## Coagulation
 
 - [Coagulation 1: PMF Pattern](Coagulation/Coagulation_1_PMF_Pattern.ipynb)
-<!-- - [Coagulation 2: PDF Pattern](Coagulation/Coagulation_2_PDF_Pattern.ipynb) -->
 - [Coagulation 3: Particle Resolved](Coagulation/Coagulation_3_Particle_Resolved_Pattern.ipynb)
 - [Coagulation 4: Methods Compared](Coagulation/Coagulation_4_Compared.ipynb)
 
