@@ -394,7 +394,7 @@ class BuilderLognormalMixin:
             number_concentration_units : The units for the number
                 concentration, "1/m^3".
         """
-        if number_concentration_units in ("1/m^3", "m^-3"):
+        if number_concentration_units in {"1/m^3", "m^-3"}:
             self.number_concentration = number_concentration
             return self
         self.number_concentration = number_concentration * get_unit_conversion(

@@ -261,7 +261,7 @@ class CoagulationStrategyABC(ABC):
                 )
             )
             kernel_radius = kernel_particle.get_radius()
-            if min(kernel_radius) == 0:
+            if np.any(kernel_radius) == 0:
                 raise ValueError(
                     "The kernel radius cannot be zero. "
                     "Check the particle representation."

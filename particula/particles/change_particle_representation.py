@@ -46,7 +46,7 @@ def get_particle_resolved_binned_radius(
     particle_radius = particle.get_radius()
     min_radius = np.min(particle_radius[particle_radius > 0]) * 0.5
     max_radius = np.max(particle_radius[particle_radius > 0]) * 2
-    if ~np.isfinite(min_radius) or ~np.isfinite(max_radius):
+    if not np.isfinite(min_radius) or not np.isfinite(max_radius):
         raise ValueError(
             "Particle radius must be finite. Check the particles,"
             "they may all be zero and the kernel cannot be calculated."
