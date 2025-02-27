@@ -7,7 +7,7 @@ are passed to the coagulation strategy.
 
 # pylint: disable=too-few-public-methods
 
-from typing import Optional, Union
+from typing import Union
 import logging
 
 import numpy as np
