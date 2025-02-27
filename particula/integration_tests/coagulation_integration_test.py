@@ -5,6 +5,8 @@ distributions (PMF, PDF, resolved) and their evolution with a
 Brownian coagulation strategy.
 """
 
+# pylint: disable=too-many-instance-attributes, too-many-locals
+
 import unittest
 import numpy as np
 
@@ -12,6 +14,7 @@ import particula as par
 
 
 class TestCoagulationIntegration(unittest.TestCase):
+    """Integration tests for the coagulation processes in Particula."""
     def setUp(self):
         """Set up common test parameters for various coagulation tests.
 
