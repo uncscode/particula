@@ -121,7 +121,7 @@ def test_build_kappa_parameter_activity_set_molar_mass():
     )
 
     # test negative molar mass
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError):
         builder.set_molar_mass(-1, "kg/mol")
 
 
