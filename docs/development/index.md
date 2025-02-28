@@ -1,13 +1,11 @@
 
-# Particula Core Development
+# Particula Development
+
+[**Offline Documentation and Large Language Models**](\single_page_reference.md)
 
 ## Continuous Particle PDF and PMF
 
 - [ ] Bin Remapping after condensation and evaporation is needed, or dr/dt method
-
-## Scavenging
-
-- [ ] Scavenging needs to be implemented for Particle Resolved
 
 ## Activity Coefficients
 
