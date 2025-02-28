@@ -30,6 +30,7 @@ filtered_paths = [
 
 # Generate folder structure, if needed
 os.makedirs(repo_path / "docs/.assets/api_reference", exist_ok=True)
+os.makedirs(repo_path / "docs/.assets/single_page_reference", exist_ok=True)
 
 # Initialize Handsdown generator
 handsdown = MaterialGenerator(

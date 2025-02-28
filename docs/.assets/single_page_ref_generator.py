@@ -129,6 +129,7 @@ filtered_paths = [
 
 # Generate folder structure, if needed
 os.makedirs(repo_path / "docs/.assets/tutorial_reference", exist_ok=True)
+os.makedirs(repo_path / "docs/.assets/single_page_reference", exist_ok=True)
 
 # Convert Notebooks to Markdown
 convert_notebooks_to_markdown(
