@@ -1,7 +1,7 @@
 
 # Particula Development
 
-[**Offline Documentation and Large Language Models**](\single_page_reference.md)
+## [**Offline Documentation and Large Language Models**](single_page_reference.md)
 
 ## Continuous Particle PDF and PMF
 
