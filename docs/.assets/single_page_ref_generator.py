@@ -129,7 +129,7 @@ filtered_paths = [
 
 # Generate folder structure, if needed
 os.makedirs(repo_path / "docs/.assets/tutorial_reference", exist_ok=True)
-os.makedirs(repo_path / "docs/.assets/single_page_reference", exist_ok=True)
+os.makedirs(repo_path / "docs/assets/single_page_reference", exist_ok=True)
 
 # Convert Notebooks to Markdown
 convert_notebooks_to_markdown(
@@ -141,7 +141,7 @@ convert_notebooks_to_markdown(
 merge_markdown_files(
     input_glob=str(repo_path / "docs/.assets/tutorial_reference/**/*.md"),
     output_file=repo_path
-    / "docs/.assets/single_page_reference/Particula_Tutorial_Reference.md",
+    / "docs/assets/single_page_reference/Particula_Tutorial_Reference.md",
     remove_dir=repo_path / "docs/.assets/tutorial_reference",
     skip_filenames=["index.md"],
 )
@@ -166,7 +166,7 @@ convert_notebooks_to_markdown(
 merge_markdown_files(
     input_glob=str(repo_path / "docs/.assets/how_to_guide_reference/**/*.md"),
     output_file=repo_path
-    / "docs/.assets/single_page_reference/Particula_How-To-Guide_Reference.md",
+    / "docs/assets/single_page_reference/Particula_How-To-Guide_Reference.md",
     remove_dir=repo_path / "docs/.assets/how_to_guide_reference",
     skip_filenames=["index.md"],
 )
@@ -191,7 +191,7 @@ convert_notebooks_to_markdown(
 merge_markdown_files(
     input_glob=str(repo_path / "docs/.assets/discussion_reference/**/*.md"),
     output_file=repo_path
-    / "docs/.assets/single_page_reference/Particula_Discussion_Reference.md",
+    / "docs/assets/single_page_reference/Particula_Discussion_Reference.md",
     remove_dir=repo_path / "docs/.assets/discussion_reference",
     skip_filenames=["index.md"],
 )
