@@ -30,7 +30,9 @@ filtered_paths = [
 
 # Generate folder structure, if needed
 os.makedirs(repo_path / "docs/.assets/api_reference", exist_ok=True)
-os.makedirs(repo_path / "docs/.assets/single_page_reference", exist_ok=True)
+os.makedirs(
+    repo_path / "docs/development/single_page_reference", exist_ok=True
+)
 
 # Initialize Handsdown generator
 handsdown = MaterialGenerator(
@@ -54,7 +56,8 @@ all_md_files = glob.glob(
 )
 
 output_file = (
-    repo_path / "docs/.assets/single_page_reference/Particula_API_reference.md"
+    repo_path
+    / "docs/development/single_page_reference/Particula_API_reference.md"
 )
 
 with open(output_file, "w", encoding="utf-8") as merged:
