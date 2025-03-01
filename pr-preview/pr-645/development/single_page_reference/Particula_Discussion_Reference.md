@@ -3450,13 +3450,9 @@ plt.show()
 
 ```
 
-    C:\GitHub\particula\particula\dynamics\coagulation\charged_dimensionless_kernel.py:269: RuntimeWarning: divide by zero encountered in divide
-      3 * diffusive_knudsen / (2 * coulomb_potential_ratio),
-
-
 
     
-![png](output_5_1.png)
+![png](output_5_0.png)
     
 
 
