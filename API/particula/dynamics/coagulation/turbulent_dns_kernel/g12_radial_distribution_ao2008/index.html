@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
     
     
       
@@ -7716,7 +7716,7 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py">particula.dynamics.coagulation.turbulent_dns_kernel.g12_radial_distribution_ao2008</a> module.</p>
 </blockquote>
 <h2 id="_calculate_c1">_calculate_c1<a class="headerlink" href="#_calculate_c1" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L104">Show source in g12_radial_distribution_ao2008.py:104</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L102">Show source in g12_radial_distribution_ao2008.py:102</a></p>
 <p>Compute C_1 based on Stokes number and turbulence properties.</p>
 <p>C_1 is given by:</p>
 <p>C_1 = y(St) / (|g| / (v_k / τ_k))^f_3(R_λ)</p>
@@ -7736,7 +7736,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="_calculate_rc">_calculate_rc<a class="headerlink" href="#_calculate_rc" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L156">Show source in g12_radial_distribution_ao2008.py:156</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L154">Show source in g12_radial_distribution_ao2008.py:154</a></p>
 <p>Compute r_c, the turbulence-driven correction to the collision kernel.</p>
 <p>The equation is:</p>
 <p>(r_c / η)^2 = |St_2 - St_1| * F(a_Og, R_λ)</p>
@@ -7751,7 +7751,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="_compute_a_og">_compute_a_og<a class="headerlink" href="#_compute_a_og" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L183">Show source in g12_radial_distribution_ao2008.py:183</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L181">Show source in g12_radial_distribution_ao2008.py:181</a></p>
 <p>Compute aOg, which accounts for the effect of gravity on
 turbulence-driven clustering.</p>
 <ul>
@@ -7763,7 +7763,7 @@ turbulence-driven clustering.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="_compute_f">_compute_f<a class="headerlink" href="#_compute_f" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L200">Show source in g12_radial_distribution_ao2008.py:200</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L198">Show source in g12_radial_distribution_ao2008.py:198</a></p>
 <p>Compute F(aOg, R_lambda), an empirical scaling factor for
 turbulence effects.</p>
 <ul>
@@ -7773,13 +7773,13 @@ turbulence effects.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_compute_f</span><span class="p">(</span><span class="n">a_og</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">reynolds_lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="_compute_f3_lambda">_compute_f3_lambda<a class="headerlink" href="#_compute_f3_lambda" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L151">Show source in g12_radial_distribution_ao2008.py:151</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L149">Show source in g12_radial_distribution_ao2008.py:149</a></p>
 <p>Compute f_3(R_lambda), an empirical turbulence factor.</p>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_compute_f3_lambda</span><span class="p">(</span><span class="n">reynolds_lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="_compute_y_stokes">_compute_y_stokes<a class="headerlink" href="#_compute_y_stokes" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L132">Show source in g12_radial_distribution_ao2008.py:132</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L130">Show source in g12_radial_distribution_ao2008.py:130</a></p>
 <p>Compute y(St), ensuring values remain non-negative.</p>
 <p>y(St) = -0.1988 St^4 + 1.5275 St^3 - 4.2942 St^2 + 5.3406 St</p>
 <p>Ensures y(St) ≥ 0 (if negative, sets to 0).</p>
@@ -7803,7 +7803,6 @@ in a turbulent flow and is given by:</p>
 <li>g (gravitational_acceleration) : Gravitational acceleration [m/s²]</li>
 </ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
 <li>particle_radius : Array of particle radii [m]</li>
 <li>stokes_number : Array of Stokes numbers of particles [-]</li>
@@ -7814,7 +7813,6 @@ in a turbulent flow and is given by:</p>
 <li>kolmogorov_time : Kolmogorov timescale [s]</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
 <li>Radial distribution function g_{12} [-]</li>
 </ul>

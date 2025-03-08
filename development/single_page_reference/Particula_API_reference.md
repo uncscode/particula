@@ -681,7 +681,7 @@ def gibbs_free_engery(
 
 ## _calculate_gibbs_mix_single
 
-[Show source in gibbs_mixing.py:157](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L157)
+[Show source in gibbs_mixing.py:160](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L160)
 
 Calculate Gibbs free energy of mixing for a single set of inputs.
 
@@ -716,7 +716,7 @@ def _calculate_gibbs_mix_single(
 
 ## gibbs_mix_weight
 
-[Show source in gibbs_mixing.py:96](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L96)
+[Show source in gibbs_mixing.py:99](https://github.com/uncscode/particula/blob/main/particula/activity/gibbs_mixing.py#L99)
 
 Gibbs free energy of mixing, see Gorkowski (2019), with weighted
 oxygen2carbon regions. Only can run one compound at a time.
@@ -4285,7 +4285,7 @@ def set_turbulent_dissipation(self, turbulent_dissipation: float): ...
 
 ## _calculate_probabilities
 
-[Show source in particle_resolved_method.py:229](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L229)
+[Show source in particle_resolved_method.py:231](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L231)
 
 Calculate coagulation probabilities based on kernel values and system
 parameters.
@@ -4318,7 +4318,7 @@ def _calculate_probabilities(
 
 ## _final_coagulation_state
 
-[Show source in particle_resolved_method.py:253](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L253)
+[Show source in particle_resolved_method.py:255](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L255)
 
 Resolve the final state of particles that have undergone multiple
 coagulation events.
@@ -4348,7 +4348,7 @@ def _final_coagulation_state(
 
 ## _interpolate_kernel
 
-[Show source in particle_resolved_method.py:201](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L201)
+[Show source in particle_resolved_method.py:203](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L203)
 
 Create an interpolation function for the coagulation kernel with nearest
 extrapolation for out-of-bound values.
@@ -5054,7 +5054,7 @@ def get_sedimentation_kernel_sp2016_via_system_state(
 
 ## _calculate_c1
 
-[Show source in g12_radial_distribution_ao2008.py:104](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L104)
+[Show source in g12_radial_distribution_ao2008.py:102](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L102)
 
 Compute C_1 based on Stokes number and turbulence properties.
 
@@ -5083,7 +5083,7 @@ def _calculate_c1(
 
 ## _calculate_rc
 
-[Show source in g12_radial_distribution_ao2008.py:156](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L156)
+[Show source in g12_radial_distribution_ao2008.py:154](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L154)
 
 Compute r_c, the turbulence-driven correction to the collision kernel.
 
@@ -5108,7 +5108,7 @@ def _calculate_rc(
 
 ## _compute_a_og
 
-[Show source in g12_radial_distribution_ao2008.py:183](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L183)
+[Show source in g12_radial_distribution_ao2008.py:181](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L181)
 
 Compute aOg, which accounts for the effect of gravity on
 turbulence-driven clustering.
@@ -5127,7 +5127,7 @@ def _compute_a_og(
 
 ## _compute_f
 
-[Show source in g12_radial_distribution_ao2008.py:200](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L200)
+[Show source in g12_radial_distribution_ao2008.py:198](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L198)
 
 Compute F(aOg, R_lambda), an empirical scaling factor for
 turbulence effects.
@@ -5144,7 +5144,7 @@ def _compute_f(a_og: float, reynolds_lambda: float) -> float: ...
 
 ## _compute_f3_lambda
 
-[Show source in g12_radial_distribution_ao2008.py:151](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L151)
+[Show source in g12_radial_distribution_ao2008.py:149](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L149)
 
 Compute f_3(R_lambda), an empirical turbulence factor.
 
@@ -5158,7 +5158,7 @@ def _compute_f3_lambda(reynolds_lambda: float) -> float: ...
 
 ## _compute_y_stokes
 
-[Show source in g12_radial_distribution_ao2008.py:132](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L132)
+[Show source in g12_radial_distribution_ao2008.py:130](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L130)
 
 Compute y(St), ensuring values remain non-negative.
 
@@ -5196,7 +5196,6 @@ g_{12} = ((η² + r_c²) / (R² + r_c²))^(C_1/2)
 
 #### Arguments
 
-----------
 - particle_radius : Array of particle radii [m]
 - stokes_number : Array of Stokes numbers of particles [-]
 - kolmogorov_length_scale : Kolmogorov length scale [m]
@@ -5207,7 +5206,6 @@ g_{12} = ((η² + r_c²) / (R² + r_c²))^(C_1/2)
 
 #### Returns
 
---------
 - Radial distribution function g_{12} [-]
 
 #### References
@@ -18431,7 +18429,7 @@ def lf2013_coag_full(
 
 ## get_safe_exp
 
-[Show source in machine_limit.py:12](https://github.com/uncscode/particula/blob/main/particula/util/machine_limit.py#L12)
+[Show source in machine_limit.py:13](https://github.com/uncscode/particula/blob/main/particula/util/machine_limit.py#L13)
 
 Compute the exponential of each element in the input array, with overflow
 protection.
@@ -18472,7 +18470,7 @@ def get_safe_exp(value: ArrayLike) -> np.ndarray: ...
 
 ## get_safe_log
 
-[Show source in machine_limit.py:44](https://github.com/uncscode/particula/blob/main/particula/util/machine_limit.py#L44)
+[Show source in machine_limit.py:45](https://github.com/uncscode/particula/blob/main/particula/util/machine_limit.py#L45)
 
 Compute the natural logarithm of each element in the input array, with
 underflow protection.
@@ -18513,7 +18511,7 @@ def get_safe_log(value: ArrayLike) -> np.ndarray: ...
 
 ## get_safe_log10
 
-[Show source in machine_limit.py:76](https://github.com/uncscode/particula/blob/main/particula/util/machine_limit.py#L76)
+[Show source in machine_limit.py:77](https://github.com/uncscode/particula/blob/main/particula/util/machine_limit.py#L77)
 
 Compute the base-10 logarithm of each element in the input array, with
 underflow protection.
@@ -18548,6 +18546,51 @@ print(par.get_safe_log10(arr))
 
 ```python
 def get_safe_log10(value: ArrayLike) -> np.ndarray: ...
+```
+
+
+
+## get_safe_power
+
+[Show source in machine_limit.py:109](https://github.com/uncscode/particula/blob/main/particula/util/machine_limit.py#L109)
+
+Compute the power (base ** exponent) with overflow protection.
+
+The power is computed as: result = exp(exponent * log(base))
+where the intermediate value is clipped to avoid overflow beyond the
+machine limits. This function assumes that `base` contains positive values.
+The behavior for non-positive bases is undefined.
+
+#### Arguments
+
+- base : Array-like of positive base values.
+- exponent : Array-like of exponents.
+
+#### Returns
+
+- np.ndarray of power values, computed with machine-level clipping.
+
+#### Examples
+
+``` py title="Example Usage"
+import numpy as np
+import particula as par
+
+base = np.array([1, 2, 3])
+exponent = np.array([1, 2, 3])
+print(par.get_safe_power(base, exponent))
+# Output: [ 1.  4. 27.]
+```
+
+#### References
+
+- "Floating Point Arithmetic," NumPy Documentation, NumPy.org.
+
+#### Signature
+
+```python
+@validate_inputs({"base": "positive"})
+def get_safe_power(base: ArrayLike, exponent: ArrayLike) -> np.ndarray: ...
 ```
 
 
