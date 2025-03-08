@@ -81,8 +81,11 @@ def gibbs_of_mixing(
     sum1 = c1 + c2 * (1 - 2 * phi2)
     gibbs_mix = phi2 * (1.0 - phi2) * sum1
 
-    dphi2dx2 = (scaled_molar_mass_ratio / rhor) * (
-        phi2 / organic_mole_fraction
+    # Initialize result with zeros
+    dphi2dx2 = np.zeros_like(organic_mole_fraction)
+    non_zero = organic_mole_fraction != 0
+    dphi2dx2[non_zero] = (scaled_molar_mass_ratio / rhor) * (
+        phi2[non_zero] / organic_mole_fraction[non_zero]
     ) ** 2
 
     derivative_gibbs_mix = (
