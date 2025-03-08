@@ -25,26 +25,48 @@ def get_spherical_wall_loss_rate(
     """
     Calculate the wall loss rate of particles in a spherical chamber.
 
-    This function computes the rate at which particles are lost to the walls
-    of a spherical chamber, based on the system state. It uses the wall eddy
-    diffusivity, particle properties (radius, density, concentration), and
-    environmental conditions (temperature, pressure) to determine the loss
-    rate.
+    This function calculates the rate at which particles deposit onto the
+    walls of a spherical chamber. The calculation is based on the wall eddy
+    diffusivity and key particle properties (radius, density, concentration),
+    together with environmental conditions (temperature, pressure).
+    The loss rate is determined via:
+
+    - L = -(k × c)
+        - L is the wall loss rate [#/m³·s],
+        - k is the wall loss coefficient [1/s] from the system state,
+        - c is the particle concentration [#/m³].
 
     Arguments:
-        wall_eddy_diffusivity: The rate of wall eddy diffusivity in inverse
-            seconds (s⁻¹).
-        particle_radius: The radius of the particle in meters (m).
-        particle_density: The density of the particle in kilograms per cubic
-            meter (kg/m³).
-        particle_concentration: The concentration of particles in the chamber
-            in particles per cubic meter (#/m³).
-        temperature: The temperature of the system in Kelvin (K).
-        pressure: The pressure of the system in Pascals (Pa).
-        chamber_radius: The radius of the spherical chamber in meters (m).
+        - wall_eddy_diffusivity : Wall eddy diffusivity in s⁻¹.
+        - particle_radius : Particle radius in m.
+        - particle_density : Particle density in kg/m³.
+        - particle_concentration : Particle concentration in #/m³.
+        - temperature : System temperature in K.
+        - pressure : System pressure in Pa.
+        - chamber_radius : Radius of the spherical chamber in m.
 
     Returns:
-        The wall loss rate of the particles in the chamber.
+        - The wall loss rate (float or NDArray[np.float64]) in #/m³·s.
+
+    Examples:
+        ```py title="Example"
+        import particula as par
+        rate = par.dynamics.wall_loss.get_spherical_wall_loss_rate(
+            wall_eddy_diffusivity=1e-3,
+            particle_radius=1e-7,
+            particle_density=1000,
+            particle_concentration=1e11,
+            temperature=298,
+            pressure=101325,
+            chamber_radius=0.5
+        )
+        print(rate)
+        # Example output: -1.2e8
+        ```
+
+    References:
+        - Wikipedia contributors, "Aerosol dynamics," Wikipedia,
+          https://en.wikipedia.org/wiki/Aerosol.
     """
 
     # Step 1: Calculate the wall loss coefficient
@@ -74,28 +96,47 @@ def get_rectangle_wall_loss_rate(
     """
     Calculate the wall loss rate of particles in a rectangular chamber.
 
-    This function computes the rate at which particles are lost to the walls
-    of a rectangular chamber, based on the system state. It uses the wall eddy
-    diffusivity, particle properties (radius, density, concentration), and
-    environmental conditions (temperature, pressure) to determine the loss
-    rate. The chamber dimensions (length, width, height) are also taken
-    into account.
+    This function calculates the rate of particle deposition onto the walls
+    of a rectangular chamber, given the wall eddy diffusivity, particle
+    properties (radius, density, concentration), and environmental conditions
+    (temperature, pressure). The final loss rate is computed via:
+
+    - L = -(k × c)
+        - L is the wall loss rate [#/m³·s],
+        - k is the wall loss coefficient [1/s],
+        - c is the particle concentration [#/m³].
 
     Arguments:
-        wall_eddy_diffusivity: The rate of wall eddy diffusivity in inverse
-            seconds (s⁻¹).
-        particle_radius: The radius of the particle in meters (m).
-        particle_density: The density of the particle in kilograms per cubic
-            meter (kg/m³).
-        particle_concentration: The concentration of particles in the chamber
-            in particles per cubic meter (#/m³).
-        temperature: The temperature of the system in Kelvin (K).
-        pressure: The pressure of the system in Pascals (Pa).
-        chamber_dimensions: A tuple containing the length, width, and height
-            of the rectangular chamber in meters (m).
+        - wall_eddy_diffusivity : Wall eddy diffusivity in s⁻¹.
+        - particle_radius : Particle radius in m.
+        - particle_density : Particle density in kg/m³.
+        - particle_concentration : Particle concentration in #/m³.
+        - temperature : System temperature in K.
+        - pressure : System pressure in Pa.
+        - chamber_dimensions : (length, width, height) of the
+            rectangular chamber in m.
 
     Returns:
-        The wall loss rate of the particles in the chamber.
+        - The wall loss rate (float or NDArray[np.float64]) in #/m³·s.
+
+    Examples:
+        ```py title="Example"
+        import particula as par
+        loss_rate = par.dynamics.wall_loss.get_rectangle_wall_loss_rate(
+            wall_eddy_diffusivity=1e-4,
+            particle_radius=5e-8,
+            particle_density=1200,
+            particle_concentration=2e10,
+            temperature=300,
+            pressure=101325,
+            chamber_dimensions=(1.0, 0.5, 0.5)
+        )
+        print(loss_rate)
+        # Example output: -4.6e7
+        ```
+
+    References:
+        - J. Hinds, "Aerosol Technology," 2nd ed., John Wiley & Sons, 1999.
     """
 
     # Step 1: Calculate the wall loss coefficient
