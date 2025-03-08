@@ -33,40 +33,60 @@ def get_g12_radial_distribution_ao2008(
 ) -> NDArray[np.float64]:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
     """
-    Compute the radial distribution function g_{12}.
+    Compute the radial distribution function g₁₂ for particles in a
+    turbulent flow.
 
-    The radial distribution function describes the clustering of particles
-    in a turbulent flow and is given by:
+    This function describes the clustering of particles in a turbulent flow.
+    The equation is:
 
-        g_{12} = ((η² + r_c²) / (R² + r_c²))^(C_1/2)
-
-    - η (kolmogorov_length_scale) : Kolmogorov length scale [m]
-    - R (collision_radius) : Collision radius (sum of particle radii) [m]
-    - Stokes_1, Stokes_2 : Stokes numbers of the two particles [-]
-    - R_λ (reynolds_lambda) : Taylor-microscale Reynolds number [-]
-    - a_o (normalized_accel_variance) : Normalized acceleration variance [-]
-    - v_k (kolmogorov_velocity) : Kolmogorov velocity scale [m/s]
-    - τ_k (kolmogorov_time) : Kolmogorov timescale [s]
-    - g (gravitational_acceleration) : Gravitational acceleration [m/s²]
+    - g₁₂ = ((η² + r_c²) / (R² + r_c²))^(C₁/2)
+        - g₁₂ is the radial distribution function (dimensionless),
+        - η is the Kolmogorov length scale (m),
+        - r_c is the turbulence-driven correction length (m),
+        - R is the collision radius (sum of the two particle radii) (m),
+        - C₁ is a dimensionless function dependent on the Stokes numbers,
+          Reynolds number, etc.
 
     Arguments:
-        - particle_radius : Array of particle radii [m]
-        - stokes_number : Array of Stokes numbers of particles [-]
-        - kolmogorov_length_scale : Kolmogorov length scale [m]
-        - reynolds_lambda : Taylor-microscale Reynolds number [-]
-        - normalized_accel_variance : Normalized acceleration variance [-]
-        - kolmogorov_velocity : Kolmogorov velocity scale [m/s]
-        - kolmogorov_time : Kolmogorov timescale [s]
+        - particle_radius : Array of particle radii in meters.
+        - stokes_number : Array of particle Stokes numbers (dimensionless).
+        - kolmogorov_length_scale : Kolmogorov length scale in meters.
+        - reynolds_lambda : Taylor-microscale Reynolds number (dimensionless).
+        - normalized_accel_variance : Normalized acceleration variance
+            (dimensionless).
+        - kolmogorov_velocity : Kolmogorov velocity scale in m/s.
+        - kolmogorov_time : Kolmogorov timescale in seconds.
 
     Returns:
-        - Radial distribution function g_{12} [-]
+        - The radial distribution function g₁₂ (dimensionless).
+
+    Examples:
+        ```py title="Example Usage"
+        import numpy as np
+        from particula.dynamics.coagulation.turbulent_dns_kernel
+            .g12_radial_distribution_ao2008 import (
+                get_g12_radial_distribution_ao2008,
+            )
+
+        radii = np.array([1e-7, 1e-6])
+        stks = np.array([0.1, 0.2])
+        result = get_g12_radial_distribution_ao2008(
+            particle_radius=radii,
+            stokes_number=stks,
+            kolmogorov_length_scale=1e-4,
+            reynolds_lambda=100,
+            normalized_accel_variance=0.5,
+            kolmogorov_velocity=0.1,
+            kolmogorov_time=0.001,
+        )
+        print(result)
+        ```
 
     References:
-    -----------
-    - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-        the geometric collision rate of sedimenting droplets. Part 2.
-        Theory and parameterization. New Journal of Physics, 10.
-        https://doi.org/10.1088/1367-2630/10/7/075016
+        - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
+          the geometric collision rate of sedimenting droplets. Part 2.
+          Theory and parameterization. New Journal of Physics, 10.
+          https://doi.org/10.1088/1367-2630/10/7/075016
     """
     collision_radius = (
         particle_radius[:, np.newaxis] + particle_radius[np.newaxis, :]

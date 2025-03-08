@@ -15,6 +15,7 @@ import particula as par
 
 class TestCoagulationIntegration(unittest.TestCase):
     """Integration tests for the coagulation processes in Particula."""
+
     def setUp(self):
         """Set up common test parameters for various coagulation tests.
 

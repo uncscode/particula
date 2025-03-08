@@ -44,9 +44,15 @@ def get_turbulent_dns_kernel_ao2008(
     kolmogorov_time: float,
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
-    """
-    Get the geometric collision kernel Γ₁₂, derived from direct numerical
-    simulations.
+    """Compute the geometric collision kernel Γ₁₂ from DNS simulations.
+
+    Where the equation is
+
+    - Γ₁₂ = 2π R² ⟨|wᵣ|⟩ g₁₂
+        - Γ₁₂ is collision kernel [m³/s].
+        - R is collision radius [m].
+        - wᵣ is radial relative velocity [m/s].
+        - g₁₂ is radial distribution function [dimensionless].
 
     Arguments:
         - particle_radius : Particle radius [m].
@@ -62,16 +68,7 @@ def get_turbulent_dns_kernel_ao2008(
     Returns:
         - Collision kernel Γ₁₂ [m³/s].
 
-    Equations:
-    - Γ₁₂ = 2π R² ⟨ |w_r| ⟩ g₁₂
-    - R = a₁ + a₂ (collision radius)
-    - ⟨ |w_r| ⟩ : Radial relative velocity, computed using
-        `get_radial_relative_velocity_ao2008`
-    - g₁₂ : Radial distribution function, computed using
-        `g12_radial_distribution`
-    - radius << η (Kolmogorov length scale)
-    - ρ_w >> ρ (water density much greater than air density)
-    - Sv > 1 (Stokes number sufficiently large)
+
 
     References:
     - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
@@ -114,8 +111,8 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
 ) -> Union[float, NDArray[np.float64]]:
     # pylint: disable=too-many-arguments, too-many-positional-arguments
     # pylint: disable=too-many-locals
-    """
-    Compute the geometric collision kernel (Γ₁₂) under the AO2008 formulation.
+    """Compute the geometric collision kernel Γ₁₂ using AO2008 for system.
+
     This function orchestrates the calculation of the geometric collision
     kernel by deriving necessary fluid, turbulence, and particle parameters
     from the provided system state. The returned value (or array) represents
@@ -137,28 +134,27 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
             [m²/s³].
 
     Returns:
-        - The geometric collision kernel Γ₁₂ [m³/s]. If inputs are scalars,
-            returns a float. If inputs are arrays, returns a numpy array of
-            collision kernels.
+        - Collision kernel Γ₁₂ [m³/s].
 
-    Notes:
-    - This function does the following:
-    1. Calculates fluid properties (dynamic, kinematic viscosity,
-        mean free path).
-    2. Determines slip correction factors (Knudsen number, Cunningham factor).
-    3. Computes particle inertia times and settling velocities.
-    4. Estimates relevant turbulence scales (Kolmogorov, Taylor,
-        integral scales).
-    5. Calculates velocity variance and auxiliary terms, e.g. Stokes number.
-    6. Calls `get_kernel_ao2008` with all the necessary inputs to get the final
-       collision kernel.
+    Examples:
+        ```py
+        kernel_via_state = get_turbulent_dns_kernel_ao2008_via_system_state(
+            particle_radius=np.array([1e-6, 2e-6]),
+            particle_density=1000.0,
+            fluid_density=1.225,
+            temperature=298.15,
+            re_lambda=100.0,
+            relative_velocity=0.1,
+            turbulent_dissipation=0.01,
+        )
+        # Output: array([...])
+        ```
 
     References:
-    - `get_turbulent_dns_kernel_ao2008` : Computes the kernel.
-    - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-        the geometric collision rate of sedimenting droplets. Part 2.
-        Theory and parameterization. New Journal of Physics, 10.
-        https://doi.org/10.1088/1367-2630/10/7/075016
+        - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
+          the geometric collision rate of sedimenting droplets. Part 2.
+          Theory and parameterization. New Journal of Physics, 10.
+          https://doi.org/10.1088/1367-2630/10/7/075016
     """
     # 1. Basic fluid properties
     dynamic_viscosity = gas.get_dynamic_viscosity(temperature)

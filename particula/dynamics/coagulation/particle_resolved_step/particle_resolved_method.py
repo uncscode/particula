@@ -19,19 +19,46 @@ def get_particle_resolved_update_step(
     large_index: NDArray[np.int64],
 ) -> Tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     """
-    Update the particle radii and concentrations after coagulation events.
+    Update particle radii and track lost/gained particles after coagulation
+    events.
 
-    Args:
-        particle_radius (NDArray[float64]): Array of particle radii.
-        small_index (NDArray[int64]): Indices corresponding to smaller
-            particles.
-        large_index (NDArray[int64]): Indices corresponding to larger
-            particles.
+    This function simulates the immediate effect of coagulation on particle
+    radii, marking smaller particles as lost and updating the larger particles
+    to the new radius computed from volume conservation. The calculation is:
+
+    - r_new = cbrt(r_small³ + r_large³)
+        - r_new is the new radius in meters,
+        - r_small is the smaller particle's radius in meters,
+        - r_large is the larger particle's radius in meters.
+
+    Arguments:
+        - particle_radius : Array of particle radii.
+        - loss : Array to store lost particle radii.
+        - gain : Array to store gained particle radii.
+        - small_index : Indices of smaller particles.
+        - large_index : Indices of larger particles.
 
     Returns:
-        - Updated array of particle radii.
+        - Updated array of particle radii after coagulation events.
         - Updated array for the radii of particles that were lost.
         - Updated array for the radii of particles that were gained.
+
+    Examples:
+        ```py title="Example Usage"
+        import numpy as np
+        from particula.dynamics.coagulation.particle_resolved_step import
+            particle_resolved_method
+
+        r = np.array([1e-9, 2e-9, 3e-9, 1e-9])
+        lost = np.zeros_like(r)
+        gained = np.zeros_like(r)
+        s_idx = np.array([0, 1])
+        l_idx = np.array([2, 3])
+        updated_r, lost_r, gained_r = (
+            particle_resolved_method.get_particle_resolved_update_step(
+                r, lost, gained, s_idx, l_idx
+            ))
+        # updated_r now has coagulated radii, lost_r and gained_r are tracked.
     """
     # Step 1: Calculate the summed volumes of the smaller and larger particles
     # The volumes are obtained by cubing the radii of the particles.
@@ -68,24 +95,61 @@ def get_particle_resolved_coagulation_step(
 ) -> NDArray[np.int64]:
     """
     Perform a single step of particle coagulation, updating particle radii
-    based on coagulation events.
+    with a stochastic approach.
 
-    Args:
-        particle_radius (NDArray[np.float64]): Array of particle radii.
-        kernel (NDArray[np.float64]): Coagulation kernel as a 2D array where
-            each element represents the probability of coagulation between
-            particles of corresponding sizes.
-        kernel_radius (NDArray[np.float64]): Array of radii corresponding to
-            the kernel bins.
-        volume (float): Volume of the system in which coagulation occurs.
-        time_step (float): Time step over which coagulation is calculated.
-        random_generator (np.random.Generator): Random number generator for
-            stochastic processes.
+    This function models collisions between particles based on a given
+    coagulation kernel. It identifies potential collision pairs, randomly
+    selects which collisions occur according to a probability derived from the
+    kernel value, and then tracks which particles have coagulated.
+
+    The main calculation for the probability of coagulation is:
+
+    - Probability = K × Δt × (possible collisions) / (tests × volume)
+        - K is the interpolated kernel value,
+        - Δt is the timestep,
+        - volume is the system volume.
+
+    Arguments:
+        - particle_radius : Array of particle radii.
+        - kernel : 2D coagulation kernel matrix matching the size of
+            kernel_radius.
+        - kernel_radius : Radii used to index or interpolate the kernel.
+        - volume : Volume of the system in m³.
+        - time_step : Time step for each coagulation iteration in seconds.
+        - random_generator : Random number generator for the stochastic
+            approach.
 
     Returns:
-        NDArray[np.int64]: Array of indices corresponding to the coagulation
-            events, where each element is a pair of indices corresponding to
-            the coagulating particles [loss, gain].
+        - An array of shape (N, 2), where each row contains
+            [small_index, large_index] for coagulation events.
+
+    Examples:
+        ```py title="Example Usage"
+        import numpy as np
+        from particula.dynamics.coagulation.particle_resolved_step import
+            particle_resolved_method
+
+        r = np.array([1e-9, 2e-9, 3e-9])
+        kernel_values = np.ones((50, 50))
+        kernel_r = np.linspace(1e-10, 1e-7, 50)
+        vol = 1e-3
+        dt = 0.01
+        rng = np.random.default_rng(42)
+        event_pairs =
+        particle_resolved_method.get_particle_resolved_coagulation_step(
+            particle_radius=r,
+            kernel=kernel_values,
+            kernel_radius=kernel_r,
+            volume=vol,
+            time_step=dt,
+            random_generator=rng
+        )
+        # event_pairs contains the pairs of [small, large] indices that
+        # coagulated.
+
+    References:
+        - Seinfeld, J. H., & Pandis, S. N. *Atmospheric Chemistry and Physics*,
+          Wiley, 2016.
     """
 
     # Step 1: Bin the particles based on their radii into corresponding kernel
@@ -205,16 +269,33 @@ def _interpolate_kernel(
     kernel_radius: NDArray[np.float64],
 ) -> RegularGridInterpolator:
     """
-    Create an interpolation function for the coagulation kernel with nearest
-    extrapolation for out-of-bound values.
+    Create an interpolation function for the coagulation kernel with
+    out-of-bounds handling.
 
-    Args:
-        kernel (NDArray[np.float64]): Coagulation kernel.
-        kernel_radius (NDArray[np.float64]): Radii corresponding to kernel
-            bins.
+    This function returns a RegularGridInterpolator that performs linear
+    interpolation for values within the domain of the kernel and clamps to the
+    nearest value outside of it.
+
+    Arguments:
+        - kernel : 2D coagulation kernel values.
+        - kernel_radius : Radii corresponding to kernel bins.
 
     Returns:
-        RegularGridInterpolator: Interpolated kernel function.
+        - A RegularGridInterpolator object for retrieving kernel values based
+            on radius pairs.
+
+    Examples:
+        ```py
+        import numpy as np
+        from particula.dynamics.coagulation.particle_resolved_step import
+            particle_resolved_method
+        kernel_vals = np.random.rand(10,10)
+        rad = np.linspace(1e-9, 1e-7, 10)
+        interpolator = particle_resolved_method._interpolate_kernel(
+            kernel_vals, rad
+        )
+        # Use interpolator([[r_small, r_large]]) to get kernel value
+        ```
     """
     grid = (kernel_radius, kernel_radius)
     # Using 'linear' interpolation inside the domain and 'nearest' method for
@@ -239,15 +320,27 @@ def _calculate_probabilities(
     Calculate coagulation probabilities based on kernel values and system
     parameters.
 
-    Args:
-        kernel_values (float): Interpolated kernel value for a particle pair.
-        time_step (float): The time step over which coagulation occurs.
-        events (int): Number of possible coagulation events.
-        tests (int): Number of tests (or trials) for coagulation.
-        volume (float): Volume of the system.
+    This function multiplies the kernel values by the time step and a factor
+    derived from the ratio of (events / tests) over the volume to obtain the
+    probability of coagulation.
+
+    Arguments:
+        - kernel_values : Interpolated kernel values for a given particle pair,
+          may be scalar or array.
+        - time_step : Duration of one coagulation step in seconds.
+        - events : Number of possible collisions for the pair(s).
+        - tests : Number of trials for the random selection procedure.
+        - volume : System volume in m³.
 
     Returns:
-        float: Coagulation probability.
+        - The probability (or array of probabilities) that a collision occurs
+          during this time step.
+
+    Examples:
+        ```py
+        prob = _calculate_probabilities(0.5, 1.0, 20, 10, 1e-3)
+        # prob ~ 0.5 * 1.0 * 20 / (10 * 1e-3) = 1000
+        ```
     """
     return kernel_values * time_step * events / (tests * volume)
 
@@ -261,14 +354,28 @@ def _final_coagulation_state(
     Resolve the final state of particles that have undergone multiple
     coagulation events.
 
-    Args:
-        small_indices (NDArray[np.int64]): Indices of smaller particles.
-        large_indices (NDArray[np.int64]): Indices of larger particles.
-        particle_radius (NDArray[np.float64]): Radii of particles.
+    This function ensures that each small particle index merges correctly to
+    a final large particle index, preventing logical conflicts (e.g., a single
+    particle merging into multiple large particles in the same step).
+
+    Arguments:
+        - small_indices : Array of smaller particle indices in coagulation.
+        - large_indices : Array of larger particle indices in coagulation.
+        - particle_radius : Array of current particle radii.
 
     Returns:
-        Tuple[NDArray[np.int64], NDArray[np.int64]]: Updated small and large
-        indices.
+        - A tuple (updated_small_indices, updated_large_indices) that resolves
+          multiple merges for the same particle.
+
+    Examples:
+        ```py
+        import numpy as np
+        small = np.array([0, 1, 2])
+        large = np.array([2, 3, 4])
+        r = np.array([1e-9, 1.5e-9, 2e-9, 3e-9, 4e-9])
+        s_final, l_final = _final_coagulation_state(small, large, r)
+        # ensures each index in s_final merges to a single large index
+        ```
     """
     # Find common indices that appear in both small and large arrays
     commons, small_common, large_common = np.intersect1d(

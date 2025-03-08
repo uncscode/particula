@@ -1,7 +1,8 @@
 """
 Super droplet method for coagulation dynamics.
 
-Need to validate the code.
+This module implements a Super Droplet Method for coagulation
+dynamics, used to simulate how particles grow through collisions.
 """
 
 from itertools import combinations_with_replacement
@@ -19,23 +20,39 @@ def _super_droplet_update_step(
     large_index: NDArray[np.int64],
 ) -> Tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.int64]]:
     """
-    Update the particle radii and concentrations after coagulation events.
+    Update particle radii and concentrations when two particles coagulate.
 
-    Args:
-        particle_radius (NDArray[float64]): Array of particle radii.
-        concentration (NDArray[float64]): Array representing the concentration
-            of particles.
-        single_event_counter (NDArray[int64]): Tracks the number of
-            coagulation events for each particle.
-        small_index (NDArray[int64]): Indices corresponding to smaller
-            particles.
-        large_index (NDArray[int64]): Indices corresponding to larger
-            particles.
+    This function merges smaller and larger particles by combining their
+    volumes and redistributing particle concentrations. The resulting
+    radii are computed via volume conservation, and an event counter
+    tracks how many coagulation events each particle has undergone.
+
+    Arguments:
+        - particle_radius : Array of particle radii (m).
+        - concentration : Array representing the concentration of each
+          particle (number or mass, depending on usage).
+        - single_event_counter : Tracks the number of coagulation events
+          each particle has experienced in the current iteration.
+        - small_index : Indices for smaller particles in a coagulation event.
+        - large_index : Indices for larger particles in a coagulation event.
 
     Returns:
-        - Updated array of particle radii.
-        - Updated array representing the concentration of particles.
-        - Updated array tracking the number of coagulation events.
+        - An updated array of particle radii (m) following coagulation.
+        - An updated array representing the concentration of particles.
+        - An updated array tracking the index-wise number of events.
+
+    Examples:
+        ```py
+        import numpy as np
+        r = np.array([1e-9, 2e-9, 3e-9])
+        conc = np.array([100., 50., 75.])
+        events = np.zeros_like(r, dtype=int)
+        s_idx = np.array([0])
+        l_idx = np.array([2])
+        out_r, out_c, out_ev = _super_droplet_update_step(
+            r, conc, events, s_idx, l_idx)
+        # out_r[0] is updated via volume combination with out_r[2].
+        ```
     """
 
     # Step 1: Calculate the summed volumes of the smaller and larger particles
@@ -105,17 +122,33 @@ def _event_pairs(
     kernel_max: Union[float, NDArray[np.float64]],
     number_in_bins: Union[NDArray[np.float64], NDArray[np.int64]],
 ) -> float:
-    """Calculate the number of particle pairs based on kernel value.
+    """
+    Calculate an approximate count of particle-pair interactions.
 
-    Args:
-        lower_bin: Lower bin index.
-        upper_bin: Upper bin index.
-        kernel_max: Maximum value of the kernel.
-        number_in_bins: Number of particles in each bin.
+    This function estimates the number of collisions or interactions
+    that might occur between two bins of particles, given a maximum
+    kernel value and the current population of each bin. When the bins
+    are the same, a correction factor is applied to avoid double-counting
+    pairs.
+
+    Arguments:
+        - lower_bin : Index of the lower bin in the distribution.
+        - upper_bin : Index of the upper bin in the distribution.
+        - kernel_max : Maximum kernel value used to weight collisions.
+        - number_in_bins : The population of particles per bin.
 
     Returns:
-        The number of particle pairs events based on the kernel and
-        number of particles in the bins.
+        - A float representing the expected number of particle-pair
+          collision events.
+
+    Examples:
+        ```py
+        max_kernel = 1.0e-9
+        n_bins = np.array([100, 150, 200])
+        # lower_bin=0, upper_bin=1 => collisions between bin 0 and bin 1
+        events_est = _event_pairs(0, 1, max_kernel, n_bins)
+        # events_est is ~ 1.0e-9 * 100 * 150
+        ```
     """
     # Calculate the number of particle pairs based on the kernel value
     if lower_bin != upper_bin:
@@ -137,22 +170,33 @@ def _sample_events(
     generator: np.random.Generator,
 ) -> int:
     """
-    Sample the number of coagulation events from a Poisson distribution.
+    Determine how many collisions actually occur using a Poisson draw.
 
-    This function calculates the expected number of coagulation events based on
-    the number of particle pairs, the simulation volume, and the time step. It
-    then samples the actual number of events using a Poisson distribution.
+    This function uses the expected collision count (`events`) and normalizes
+    by system `volume` to compute an effective collision rate. It then
+    samples from a Poisson distribution to obtain the actual number of
+    collisions happening within the current `time_step`.
 
-    Args:
-        events: The calculated number of particle pairs that could
-            interact.
-        volume: The volume of the simulation space.
-        time_step: The time step over which the events are being simulated.
-        generator: A NumPy random generator used to sample from the Poisson
-            distribution.
+    Arguments:
+        - events : The calculated number of particle pairs that could
+          interact.
+        - volume : The volume of the simulation space (m³).
+        - time_step : The time span (seconds) over which collisions are
+          considered.
+        - generator : A NumPy random Generator to sample the Poisson
+          distribution.
 
     Returns:
-        The sampled number of coagulation events as an integer.
+        - The sampled number of coagulation events as an integer.
+
+    Examples:
+        ```py
+        from numpy.random import default_rng
+        rng = default_rng(42)
+        collisions = _sample_events(events=5e3, volume=0.1, time_step=0.01,
+            generator=rng)
+        # collisions might be ~ Poisson( 5e3 / 0.1 * 0.01 ) => Poisson(5)
+        ```
     """
     # Calculate the expected number of events
     events_exact = events / volume
@@ -171,40 +215,35 @@ def random_choice_indices(
     generator: np.random.Generator,
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
     """
-    Filter valid indices and select random indices for coagulation events.
+    Select valid particle indices in two bins for coagulation events.
 
-    This function filters particle indices based on bin indices and ensures
-    the selected particles have a positive radius. It then randomly selects
-    indices from both a lower bin and an upper bin for a given number of
-    events.
+    This function tries to choose `events` valid indices from
+    `lower_bin` and `upper_bin`, discarding any particles with radius ≤ 0.
+    It uses the provided random generator to perform the sampling
+    with replacement if needed.
 
-    Args:
-        lower_bin: The index of the lower bin to filter particles from.
-        upper_bin: The index of the upper bin to filter particles from.
-        events: Number of events (indices) to sample for each bin.
-        particle_radius: A NumPy array of particle radii. Only particles with
-            radius > 0 are considered.
-        bin_indices: A NumPy array of bin indices corresponding to each
-            particle.
-        generator: A NumPy random generator used to sample indices.
+    Arguments:
+        - lower_bin : Index of the lower bin to filter particles from.
+        - upper_bin : Index of the upper bin to filter particles from.
+        - events : Number of events (indices) to sample for each bin.
+        - particle_radius : Array of particle radii; only those > 0
+          are considered valid.
+        - bin_indices : Array of bin labels corresponding to each particle.
+        - generator : Random number generator used for index selection.
 
     Returns:
-        Tuple:
-            - Indices of particles from the lower bin.
-            - Indices of particles from the upper bin.
+        - Indices of particles from the lower bin.
+        - Indices of particles from the upper bin.
 
-    Example:
-        ``` py title="Example choice indices (update)"
-        rng = np.random.default_rng()
-        particle_radius = np.array([0.5, 0.0, 1.2, 0.3, 0.9])
-        bin_indices = np.array([1, 1, 1, 2, 2])
-        lower_bin = 1
-        upper_bin = 2
-        events = 2
-        lower_indices, upper_indices = random_choice_indices(
-            lower_bin, upper_bin, events, particle_radius, bin_indices, rng)
-        # lower_indices: array([0, 4])
-        # upper_indices: array([0, 1])
+    Examples:
+        ```py
+        import numpy as np
+        rng = np.random.default_rng(123)
+        radius = np.array([0.3, 0.1, 0.0, 0.5])
+        bins = np.array([0, 0, 1, 1])
+        lw_bin, up_bin = random_choice_indices(0, 1, 2, radius, bins, rng)
+        # lw_bin -> array of valid picks from bin 0
+        # up_bin -> array of valid picks from bin 1
         ```
     """
     try:
@@ -233,25 +272,38 @@ def _select_random_indices(
     generator: np.random.Generator,
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
     """
-    Select random indices for particles involved in coagulation events.
+    Randomly choose indices within each bin to represent collision partners.
 
-    This function generates random indices for particles in the specified bins
-    (`lower_bin` and `upper_bin`) that are involved in a specified number of
-    events. The indices are selected based on the number of particles in
-    each bin.
+    This function picks `events` indices from the population of the
+    `lower_bin` and `upper_bin`, ignoring any radius or event-limit checks
+    (those may happen later). The result is two arrays of equal size,
+    each containing random picks within the respective bins.
 
-    Args:
-        lower_bin: Index of the bin containing smaller particles.
-        upper_bin: Index of the bin containing larger particles.
-        events: The number of events to sample indices for.
-        number_in_bins: Array representing the number of particles in
-            each bin.
-        generator: A NumPy random generator used to sample indices.
+    Arguments:
+        - lower_bin : Index for the "smaller" bin.
+        - upper_bin : Index for the "larger" bin.
+        - events : How many pairs to select.
+        - number_in_bins : Array with the count of particles in each bin.
+        - generator : Random number generator to draw the indices.
 
     Returns:
-        Tuple:
-            - Indices of particles from `lower_bin`.
-            - Indices of particles from `upper_bin`.
+        - An array of size `events` with random picks from `lower_bin`.
+        - An array of size `events` with random picks from `upper_bin`.
+
+    Examples:
+        ```py
+        import numpy as np
+        rng = np.random.default_rng(42)
+        n_in_bins = np.array([5, 10, 7])
+        i_lw, i_up = _select_random_indices(
+            lower_bin=0,
+            upper_bin=2,
+            events=3,
+            number_in_bins=n_in_bins,
+            generator=rng
+        )
+        # i_lw -> random indices in [0..4]
+        # i_up -> random indices in [0..6]
     """
     # Select random indices for particles in the lower_bin
     lower_indices = generator.integers(  # type: ignore
@@ -280,27 +332,38 @@ def _bin_to_particle_indices(
     bin_indices: NDArray[np.int64],
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
     """
-    Convert bin indices to actual particle indices in the particle array.
+    Map bin-relative indices back to absolute positions in the particle array.
 
-    This function calculates the actual indices in the particle array
-    corresponding to the bins specified by `lower_bin` and `upper_bin`.
-    The function adjusts the provided bin-relative indices to reflect
-    their position in the full particle array.
+    This function adjusts the offsets for each bin so that the pairwise
+    indices used for collision are mapped onto the actual sorted particle
+    array. For instance, if `lower_indices` are all within bin 0, and bin 0
+    particles occupy positions [0..9], this method adds that offset to
+    each index in `lower_indices`.
 
-    Args:
-        lower_indices: Array of indices relative to the start of
-            the `lower_bin`.
-        upper_indices: Array of indices relative to the start of
-            the `upper_bin`.
-        lower_bin: Index of the bin containing smaller particles.
-        upper_bin: Index of the bin containing larger particles.
-        bin_indices: Array containing the start indices of each bin in the
-            particle array.
+    Arguments:
+        - lower_indices : Relative indices (local to the bin) of smaller
+            particles.
+        - upper_indices : Relative indices (local to the bin) of larger
+            particles.
+        - lower_bin : The bin representing the smaller particles.
+        - upper_bin : The bin representing the larger particles.
+        - bin_indices : Cumulative offsets to determine where each bin begins.
 
     Returns:
-        Tuple:
-            - `small_index`: Indices of particles from the `lower_bin`.
-            - `large_index`: Indices of particles from the `upper_bin`.
+        - `small_index` : Absolute positions of smaller particles in the
+          sorted particle array.
+        - `large_index` : Absolute positions of the larger particles in
+          the sorted array.
+
+    Examples:
+        ```py
+        bins = np.array([0, 10, 20])
+        lw_rel = np.array([0, 1])
+        up_rel = np.array([2, 3])
+        # Convert these local indices for bin 1 (start=10) and bin 2 (start=20)
+        s_idx, l_idx = _bin_to_particle_indices(lw_rel, up_rel, 1, 2, bins)
+        # s_idx -> [10, 11]
+        # l_idx -> [22, 23]
     """
     # Get the start index in the particle array for the lower_bin
     start_index_lower_bin = np.searchsorted(bin_indices, lower_bin)
@@ -321,25 +384,37 @@ def _filter_valid_indices(
     single_event_counter: Optional[NDArray[np.int64]] = None,
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
     """
-    Filter particles indices based on particle radius and event counters.
+    Remove invalid pairs of particles based on radius and optional event limit.
 
-    This function filters out particle indices that are considered invalid
-    based on two criteria:
-    1. The particle radius must be greater than zero.
-    2. If provided, the single event counter must be less than one.
+    This function checks each pair of `(small_index, large_index)` to ensure
+    both have radius > 0. If `single_event_counter` is provided, it further
+    enforces that each particle has had < 1 event so far (or you can
+    define your own threshold). The pairs failing these checks are removed.
 
-    Args:
-        small_index: Array of indices for particles in the smaller bin.
-        large_index: Array of indices for particles in the larger bin.
-        particle_radius: Array containing the radii of particles.
-        single_event_counter (Optional): Optional array tracking the
-            number of events for each particle. If provided, only particles
-            with a counter value less than one are valid.
+    Arguments:
+        - small_index : Indices for the smaller particles in each pair.
+        - large_index : Indices for the larger particles in each pair.
+        - particle_radius : Array of radii for each particle.
+        - single_event_counter : Optional array counting how many events
+          each particle has undergone. If provided, only particles with
+          counter < 1 pass the filter.
 
     Returns:
-        Tuple:
-            - Filtered `small_index` array containing only valid indices.
-            - Filtered `large_index` array containing only valid indices.
+        - Filtered `small_index` with only valid pairs.
+        - Filtered `large_index` that corresponds to valid pairs.
+
+    Examples:
+        ```py
+        r = np.array([0.1, 0.0, 0.08, 0.02])
+        c = np.array([0, 0, 0, 0])
+        small_i = np.array([0, 1, 2])
+        large_i = np.array([3, 0, 1])
+        # Filter out pairs with radius <= 0 or event_counter >= 1
+        s_valid, l_valid = _filter_valid_indices(
+            small_i, large_i, r, single_event_counter=c
+        )
+        # Indices with r>0 remain in s_valid, l_valid
+        ```
     """
     if single_event_counter is not None:
         # Both particle radius and event counter are used to determine
@@ -368,30 +443,35 @@ def _coagulation_events(
     generator: np.random.Generator,
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
     """
-    Calculate coagulation probabilities and filter events based on them.
+    Stochastically pick which collisions (among possible pairs) actually happen.
 
-    This function calculates the probability of coagulation events occurring
-    between pairs of particles, based on the ratio of the kernel value for
-    each pair to the maximum kernel value for the bins. The function then
-    randomly determines which events occur using these probabilities.
+    This function computes a collision probability for each `(small_index,
+    large_index)` pair by taking the ratio of `kernel_values / kernel_max`.
+    Next, a random uniform draw decides if each collision occurs.
 
-    Args:
-        small_index: Array of indices for the first set of particles
-            (smaller particles) involved in the events.
-        large_index: Array of indices for the second set of particles
-            (larger particles) involved in the events.
-        kernel_values: Array of kernel values corresponding to the
-            particle pairs.
-        kernel_max: The maximum kernel value used for normalization
-            of probabilities.
-        generator: A NumPy random generator used to sample random numbers.
+    Arguments:
+        - small_index : Array of indices representing smaller particles.
+        - large_index : Array of indices representing larger particles.
+        - kernel_values : Collision kernel values for each pair.
+        - kernel_max : A maximum kernel value used for normalization.
+        - generator : Random generator to compare probabilities vs.
+          uniform draws.
 
     Returns:
-        Tuple:
-            - Filtered `small_index` array containing indices where
-                coagulation events occurred.
-            - Filtered `large_index` array containing indices where
-                coagulation events occurred.
+        - Filtered `small_index` containing only those that coagulated.
+        - Filtered `large_index` containing only those that coagulated.
+
+    Examples:
+        ```py
+        rng = np.random.default_rng(999)
+        s_idx = np.array([0, 1, 2])
+        l_idx = np.array([3, 4, 5])
+        kv = np.array([0.5, 1.0, 0.1])
+        kmax = 1.0
+        s_new, l_new = _coagulation_events(s_idx, l_idx, kv, kmax, rng)
+        # Each pair has probability kv/kmax => [0.5, 1.0, 0.1]
+        # The final s_new, l_new depends on random draws
+        ```
     """
     # Calculate the coagulation probabilities for each particle pair
     coagulation_probabilities = kernel_values / kernel_max
@@ -415,20 +495,32 @@ def _sort_particles(
     NDArray[np.int64], NDArray[np.float64], Optional[NDArray[np.float64]]
 ]:
     """
-    Sort particles by size and optionally sort their concentrations.
+    Sort particle radii (and optionally concentrations) in ascending order.
 
-    Args:
-        particle_radius: Array of particle radii.
-        particle_concentration: Optional array of particle concentrations
-            corresponding to each radius. If provided, it will be sorted to
-            match the sorted radii.
+    The function returns an array of `unsort_indices` that can be used
+    to restore the particles to their original order after manipulations.
+
+    Arguments:
+        - particle_radius : 1D NumPy array of particle radii.
+        - particle_concentration : Optional array of corresponding
+          concentrations.
 
     Returns:
-        Tuple:
-            - `unsort_indices`: Array of indices to revert the sorting.
-            - `sorted_radius`: Array of sorted particle radii.
-            - `sorted_concentration`: Optional array of sorted particle
-                concentrations (or `None` if not provided).
+        - `unsort_indices` : Indices to revert sorting to the original order.
+        - `sorted_radius` : Sorted array of radii in ascending order.
+        - `sorted_concentration` : Sorted array of concentrations, if
+          provided; otherwise `None`.
+
+    Examples:
+        ```py
+        import numpy as np
+        r = np.array([0.3, 0.1, 0.5])
+        c = np.array([10, 30, 20])
+        u_idx, s_r, s_c = _sort_particles(r, c)
+        # s_r -> [0.1, 0.3, 0.5]
+        # s_c -> [30, 10, 20]
+        # u_idx can be used to get them back in [0.3, 0.1, 0.5] order
+        ```
     """
     # Sort the particle radii and get the sorted indices
     sorted_indices = np.argsort(particle_radius)
@@ -451,16 +543,31 @@ def _bin_particles(
     radius_bins: NDArray[np.float64],
 ) -> Tuple[NDArray[np.int64], NDArray[np.int64]]:
     """
-    Bin particles by size and return the number of particles in each bin.
+    Divide the sorted particle radii into bins and count how many fall into
+    each bin.
 
-    Args:
-        particle_radius: Array of sorted particle radii.
-        radius_bins: Array defining the bin edges for particle radii.
+    This function uses `radius_bins` as edges and assigns each particle
+    radius to a bin index via `np.digitize`. The result is (1) a histogram
+    with the number of particles in each bin, and (2) an array of per-particle
+    bin indices.
+
+    Arguments:
+        - particle_radius : Array of sorted particle radii.
+        - radius_bins : Edges used to define the bins.
 
     Returns:
-        Tuple:
-            - Array of the number of particles in each bin.
-            - Array of bin indices for each particle.
+        - `number_in_bins` : Counts of how many radii lie in each bin.
+        - `bin_indices` : The bin index assigned to each particle.
+
+    Examples:
+        ```py
+        import numpy as np
+        rad = np.array([1e-9, 1.5e-9, 2e-9, 5e-9])
+        bin_edges = np.array([1e-9, 2e-9, 3e-9, 1e-8])
+        n_in_bins, bin_idx = _bin_particles(rad, bin_edges)
+        # n_in_bins -> [1, 2, 1]
+        # bin_idx might be [0, 1, 1, 2]
+        ```
     """
     number_in_bins, bins = np.histogram(particle_radius, bins=radius_bins)
     bin_indices = np.digitize(particle_radius, bins, right=True)
@@ -477,13 +584,27 @@ def _get_bin_pairs(
     bin_indices: NDArray[np.int64],
 ) -> list[Tuple[int, int]]:
     """
-    Pre-compute the unique bin pairs for vectorized operations.
+    Produce the list of all unique (binA, binB) pairs using combinations
+    with replacement.
 
-    Args:
-        bin_indices: Array of bin indices.
+    This function is useful when we want to iterate over all bin pairs
+    (including binA == binB) for collision computations. The combination
+    ensures each pair is returned only once.
+
+    Arguments:
+        - bin_indices : Array of bin indices for each particle (though
+          only the unique values matter).
 
     Returns:
-        Unique bin pairs for vectorized operations.
+        - A list of (lower_bin, upper_bin) pairs covering all unique
+          bins in `bin_indices`.
+
+    Examples:
+        ```py
+        bins = np.array([0, 0, 1, 2, 2])
+        pairs = _get_bin_pairs(bins)
+        # pairs -> [(0, 0), (0, 1), (0, 2), (1, 1), (1, 2), (2, 2)]
+        ```
     """
     unique_bins = np.unique(bin_indices)
     return list(combinations_with_replacement(unique_bins, 2))
@@ -495,15 +616,32 @@ def _calculate_concentration_in_bins(
     number_in_bins: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """
-    Calculate the concentration of particles in each bin.
+    Sum the particle concentrations in each bin.
 
-    Args:
-        bin_indices: Array of bin indices for each particle.
-        particle_concentration: Array of sorted particle concentrations.
-        number_in_bins : Array of the number of particles in each bin.
+    Given per-particle `bin_indices` and `particle_concentration`, this
+    function accumulates the total concentration of all particles that
+    fall into each bin. The `number_in_bins` array is used mainly for
+    shape reference but can also confirm the count of particles.
+
+    Arguments:
+        - bin_indices : Array of bin indices for each particle.
+        - particle_concentration : 1D array of concentrations matching
+          each particle.
+        - number_in_bins : Array with the count of particles in each bin.
 
     Returns:
-        The total concentration in each bin.
+        - A 1D array whose length is the number of unique bins, containing
+          the summed concentration per bin.
+
+    Examples:
+        ```py
+        import numpy as np
+        b_idx = np.array([0, 0, 1, 1, 2])
+        conc = np.array([10., 5., 2., 3., 4.])
+        n_in_bins = np.array([2, 2, 1])  # might match the bin partition
+        bin_c = _calculate_concentration_in_bins(b_idx, conc, n_in_bins)
+        # bin_c -> [15., 5., 4.]
+        ```
     """
     concentration_in_bins = np.zeros_like(number_in_bins, dtype=np.float64)
     unique_bins = np.unique(bin_indices)
@@ -527,29 +665,46 @@ def get_super_droplet_coagulation_step(
     random_generator: np.random.Generator,
 ) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
     """
-    Perform a single step of the Super Droplet coagulation process.
+    Carry out one time-step of super-droplet-based coagulation.
 
-    This function processes particles by sorting them, binning by size,
-    computing coagulation events based on the coagulation kernel, and
-    updating particle properties accordingly.
+    This function sorts particles by radius, bins them, and then stochastically
+    computes collision events according to the coagulation kernel. It updates
+    the particle radii/concentrations, then unsorts them back to the original
+    order.
 
-    Args:
-        particle_radius: Array of particle radii.
-        particle_concentration: Array of particle concentrations
-            corresponding to each radius.
-        kernel: 2D array representing the coagulation kernel values between
-            different bins.
-        kernel_radius: Array defining the radii corresponding to the
-            kernel bins.
-        volume: Volume of the system or relevant scaling factor.
-        time_step: Duration of the current time step.
-        random_generator : A NumPy random number generator for
-            stochastic processes.
+    Arguments:
+        - particle_radius : Array of particle radii (m).
+        - particle_concentration : Array of per-particle concentration.
+        - kernel : 2D matrix of coagulation kernel values, dimension
+          ~ len(kernel_radius) × len(kernel_radius).
+        - kernel_radius : Array of radius points defining the kernel dimension.
+        - volume : System volume or domain size in m³.
+        - time_step : The length of this coagulation iteration in seconds.
+        - random_generator : Random number generator for sampling collisions.
 
     Returns:
-        Tuple:
-            - Updated array of particle radii after coagulation.
-            - Updated array of particle concentrations after coagulation.
+        - Updated radii array after processing coagulation.
+        - Updated concentrations array after processing coagulation.
+
+    Examples:
+        ```py
+        import numpy as np
+        from numpy.random import default_rng
+        radius = np.array([1e-9, 2e-9, 5e-9])
+        conc = np.array([100., 50., 10.])
+        ker_vals = np.ones((3,3))
+        ker_r = np.array([1e-9, 2e-9, 5e-9])
+        rng = default_rng(42)
+        r_new, c_new = get_super_droplet_coagulation_step(
+            radius, conc, ker_vals, ker_r, 1e-3, 1.0, rng)
+        # r_new, c_new have updated values after one super droplet
+        # coagulation step.
+
+    References:
+        - E. W. Tedford and L. A. Perugini, "Superdroplet method
+          in cloud microphysics simulations," J. Atmos. Sci., 2020.
+        - Seinfeld, J. H., & Pandis, S. N. *Atmospheric Chemistry and Physics*,
+          Wiley, 2016.
     """
     # Step 1: Sort particles by size and obtain indices to revert sorting later
     unsort_indices, sorted_radius, sorted_concentration = _sort_particles(
