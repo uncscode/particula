@@ -115,18 +115,23 @@ def get_speciated_mass_representation_from_particle_resolved(
 
     # loop through the bins and get the median
     for index, _ in enumerate(bin_radius):
-        if old_distribution.ndim == 1:
-            new_distribution[index] = np.median(
-                old_distribution[bin_indexes == index]
-            )
+        mask = bin_indexes == index
+        if np.any(mask):
+            if old_distribution.ndim == 1:
+                new_distribution[index] = np.median(old_distribution[mask])
+            else:
+                new_distribution[index, :] = np.mean(old_distribution[mask, :])
+            new_charge[index] = np.median(old_charge[mask])
+            new_concentration[index] = np.sum(old_concentration[mask])
         else:
-            new_distribution[index, :] = np.mean(
-                old_distribution[bin_indexes == index, :]
-            )
-        new_charge[index] = np.median(old_charge[bin_indexes == index])
-        new_concentration[index] = np.sum(
-            old_concentration[bin_indexes == index]
-        )
+            # Default behavior when the bin is empty:
+            if old_distribution.ndim == 1:
+                new_distribution[index] = np.nan
+            else:
+                new_distribution[index, :] = np.nan
+            new_charge[index] = np.nan
+            new_concentration[index] = 0
+
     # check for nans and all zeros in the new distribution
     mask_nan_zeros = np.isnan(new_distribution) | (new_distribution == 0)
 
