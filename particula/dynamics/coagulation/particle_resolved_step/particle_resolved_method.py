@@ -137,7 +137,9 @@ def get_particle_resolved_coagulation_step(
 
         # Step 7: Determine the number of coagulation tests to run based
         # on kernel value and system parameters
-        tests = int(np.ceil(kernel_values * time_step * events / volume))
+        tests = int(
+            np.ceil(kernel_values.item() * time_step * events / volume)
+        )
         if tests == 0 or events == 0:
             continue
 
