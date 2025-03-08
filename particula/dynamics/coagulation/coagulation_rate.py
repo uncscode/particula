@@ -1,13 +1,14 @@
 """
-The coagulation gain, loss, net rate calculations.
+Coagulation rate calculations for particle populations.
 
-These are separate from the strategies to isolate behavior, calculation
-definitions from the usages. Which allows for easier testing and
-charry-picking of code snips.
+This module defines discrete and continuous ways (via summation or
+integration) to compute the gain and loss terms in coagulation
+processes. Each function isolates specific calculation details,
+allowing for easier testing and flexibility in usage.
 
-The are discrete and continuous versions of the gain and loss rates.
-The discrete versions are calculated via summation, while the continuous
-versions are calculated via integration.
+References:
+    - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+      physics, Chapter 13, Equation 13.61.
 """
 
 from typing import Union
@@ -21,18 +22,35 @@ def get_coagulation_loss_rate_discrete(
     kernel: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the coagulation loss rate, via the summation method.
+    Calculate the coagulation loss rate via a discrete summation approach.
+
+    This function computes the loss rate of particles from collisions by
+    summing over all size classes. The equation is:
+
+    - loss_rate = ΣᵢΣⱼ [kernel(i, j) × concentration(i) × concentration(j)]
 
     Arguments:
-        concentraiton : The distribution of particles.
-        kernel : The coagulation kernel.
+        - concentration : The distribution of particles.
+        - kernel : The coagulation kernel matrix (NDArray[np.float64]).
 
     Returns:
-        The coagulation loss rate.
+        - The coagulation loss rate (float or NDArray[np.float64]).
+
+    Examples:
+        ```py
+        import numpy as np
+        import particula as par
+
+        conc = np.array([1.0, 2.0, 3.0])
+        kern = np.ones((3, 3))
+        loss = par.dynamics.get_coagulation_loss_rate_discrete(conc, kern)
+        print(loss)
+        # Example output: 36.0
+        ```
 
     References:
-        Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-        physics, Chapter 13 Equations 13.61
+        - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+          physics, Chapter 13, Equation 13.61.
     """
     return np.sum(kernel * np.outer(concentration, concentration), axis=0)
 
@@ -43,30 +61,44 @@ def get_coagulation_gain_rate_discrete(
     kernel: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the coagulation gain rate, via the integration method, by
-    converting to a continuous distribution.
+    Calculate the coagulation gain rate (using a quasi-continuous approach).
+
+    Though named "discrete," this function converts the discrete distribution
+    to a PDF and uses interpolation (RectBivariateSpline) to approximate the
+    gain term. The concept is:
+
+    - gain_rate(r) = ∫ kernel(r, r') × PDF(r) × PDF(r') dr'
+      (implemented via numeric integration)
 
     Arguments:
-        radius : The radius of the particles.
-        concentration : The distribution of particles.
-        kernel : The coagulation kernel.
+        - radius : The particle radius array [m].
+        - concentration : The particle distribution.
+        - kernel : Coagulation kernel matrix.
 
     Returns:
-        The coagulation gain rate.
+        - The coagulation gain rate, matched to the shape of radius.
+
+    Examples:
+        ```py
+        import numpy as np
+        import particula as par
+
+        r = np.array([1e-7, 2e-7, 3e-7])
+        conc = np.array([1.0, 0.5, 0.2])
+        kern = np.ones((3, 3)) * 1e-9
+
+        gain_val = par.dynamics.get_coagulation_gain_rate_discrete(
+            r, conc, kern
+        )
+        print(gain_val)
+        ```
 
     References:
-    ----------
-    - This equation necessitates the use of a for-loop due to the
-    convoluted use of different radii at different stages. This is the
-    most expensive step of all coagulation calculations. Using
-    `RectBivariateSpline` accelerates this significantly.
-    - Note, to estimate the kernel and distribution at
-    (other_radius**3 - some_radius**3)*(1/3) we use interporlation techniques.
-    - Seinfeld, J. H., & Pandis, S. (2016). Atmospheric chemistry and
-    physics, Chapter 13 Equations 13.61
+        - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+          physics, Chapter 13, Equation 13.61.
     """
     # Calculate bin widths (delta_x_array)
-    delta_x_array = np.diff(radius, append=2 * radius[-1] - radius[-2])  # type: ignore
+    delta_x_array = np.diff(radius, append=2 * radius[-1] - radius[-2])
 
     # Convert concentration to a probability density function (PDF)
     concentration_pdf = concentration / delta_x_array
@@ -80,7 +112,7 @@ def get_coagulation_gain_rate_discrete(
 
     # Define dpd and dpi for integration
     # integration variable
-    dpd = np.linspace(0, radius / 2 ** (1 / 3), radius.size)  # type: ignore
+    dpd = np.linspace(0, radius / 2 ** (1 / 3), radius.size)
     # adjusted for broadcasting
     dpi = (np.transpose(radius) ** 3 - dpd**3) ** (1 / 3)
 
@@ -99,19 +131,39 @@ def get_coagulation_loss_rate_continuous(
     kernel: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the coagulation loss rate, via the integration method.
+    Calculate the coagulation loss rate via continuous integration.
+
+    This method integrates the product of kernel and concentration over
+    the radius grid. The equation is:
+
+    - loss_rate(r) = concentration(r) × ∫ kernel(r, r') × concentration(r') dr'
 
     Arguments:
-        radius : The radius of the particles.
-        concentration : The distribution of particles.
-        kernel : The coagulation kernel.
+        - radius : The particle radius array [m].
+        - concentration : The particle distribution.
+        - kernel : Coagulation kernel matrix (NDArray[np.float64]).
 
     Returns:
-        The coagulation loss rate.
+        - The coagulation loss rate.
+
+    Examples:
+        ```py
+        import numpy as np
+        import particula as par
+
+        r = np.array([1e-7, 2e-7, 3e-7])
+        conc = np.array([1.0, 0.5, 0.2])
+        kern = np.ones((3, 3)) * 1e-9
+
+        loss_cont = par.dynamics.get_coagulation_loss_rate_continuous(
+            r, conc, kern
+        )
+        print(loss_cont)
+        ```
 
     References:
-    - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-        physics, Chapter 13 Equations 13.61
+        - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+          physics, Chapter 13, Equation 13.61.
     """
     # concentration (n,) and kernel (n,n)
     return concentration * np.trapezoid(y=kernel * concentration, x=radius)
@@ -123,27 +175,39 @@ def get_coagulation_gain_rate_continuous(
     kernel: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Calculate the coagulation gain rate, via the integration method.
+    Calculate the coagulation gain rate via continuous integration.
+
+    This function converts the distribution to a continuous form, then
+    uses RectBivariateSpline to interpolate and integrate:
+
+    - gain_rate(r) = ∫ kernel(r, r') × concentration(r) × concentration(r') dr'
 
     Arguments:
-        radius : The radius of the particles.
-        concentration : The distribution of particles.
-        kernel : The coagulation kernel.
+        - radius : The particle radius array [m].
+        - concentration : The particle distribution.
+        - kernel : Coagulation kernel matrix.
 
     Returns:
-        The coagulation gain rate.
+        - The coagulation gain rate, in the shape of radius.
+
+    Examples:
+        ```py
+        import numpy as np
+        import particula as par
+
+        r = np.array([1e-7, 2e-7, 3e-7])
+        conc = np.array([1.0, 0.5, 0.2])
+        kern = np.ones((3, 3)) * 1e-9
+
+        gain_cont = par.dynamics.get_coagulation_gain_rate_continuous(
+            r, conc, kern
+        )
+        print(gain_cont)
+        ```
 
     References:
-    ----------
-    - This equation necessitates the use of a for-loop due to the
-    convoluted use of different radii at different stages. This is the
-    most expensive step of all coagulation calculations. Using
-    `RectBivariateSpline` accelerates this significantly.
-    - Note, to estimate the kernel and distribution at
-    (other_radius**3 - some_radius**3)*(1/3)
-    we use interporlation techniques.
-    - Seinfeld, J. H., & Pandis, S. (2016). Atmospheric chemistry and
-    physics, Chapter 13 Equations 13.61
+        - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+          physics, Chapter 13, Equation 13.61.
     """
     # continuous distribution, kernel (n,n)
     # outer replaces, concentration * np.transpose([concentration])

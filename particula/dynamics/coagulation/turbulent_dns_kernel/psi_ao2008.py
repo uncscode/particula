@@ -26,35 +26,46 @@ def get_psi_ao2008(
     """
     Compute the function Ψ(α, φ) for the k-th droplet.
 
-    The function Ψ(α, φ) is defined as:
+    This function calculates Ψ(α, φ) for the droplet collision kernel in the
+    turbulent DNS model. The equation is:
 
-        Ψ(α, φ) = 1 / ((1/τ_pk) + (1/α) + (v_pk/φ))
-                - (v_pk / (2φ ((1/τ_pk) + (1/α) + (v_pk/φ))^2))
-
-    - τ_pk (particle_inertia_time) : Inertia timescale of the k-th droplet
-        [s].
-    - α : A parameter related to turbulence and droplet interactions [-].
-    - φ : A characteristic velocity or timescale parameter [m/s].
-    - v_pk (particle_velocity) : Velocity of the k-th droplet [m/s].
+    - Ψ(α, φ) = 1 / ((1/τₚₖ) + (1/α) + (vₚₖ/φ))
+                - (vₚₖ / (2φ ((1/τₚₖ) + (1/α) + (vₚₖ/φ))²))
+        - τₚₖ is the inertia timescale of the droplet (s),
+        - α is a parameter related to turbulence (dimensionless),
+        - φ is a characteristic velocity/timescale parameter (m/s),
+        - vₚₖ is the droplet velocity (m/s).
 
     Arguments:
-    ----------
-        - alpha : A parameter related to turbulence and droplet interactions
-            [-].
-        - phi : A characteristic velocity or timescale parameter [m/s].
-        - particle_inertia_time : Inertia timescale of the droplet τ_pk [s].
-        - particle_velocity : Velocity of the droplet v_pk [m/s].
+        - alpha : Parameter related to turbulence (dimensionless).
+        - phi : Characteristic velocity or timescale parameter (m/s).
+        - particle_inertia_time : Inertia timescale of the droplet τₚₖ (s).
+        - particle_velocity : Velocity of the droplet vₚₖ (m/s).
 
     Returns:
-    --------
-        - Ψ(α, φ) value [-].
+        - The value of Ψ(α, φ) (dimensionless).
+
+    Examples:
+        ``` py
+        import numpy as np
+        import particula as par
+
+        alpha = 0.5
+        phi = 0.2
+        particle_inertia_time = 0.05
+        particle_velocity = 0.3
+
+        psi_value = par.dyanmics.get_psi_ao2008(
+            alpha, phi, particle_inertia_time, particle_velocity
+        )
+        print(psi_value)
+        ```
 
     References:
-    -----------
-    - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-        the geometric collision rate of sedimenting droplets. Part 2.
-        Theory and parameterization. New Journal of Physics, 10.
-        https://doi.org/10.1088/1367-2630/10/7/075016
+        - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
+          the geometric collision rate of sedimenting droplets. Part 2.
+          Theory and parameterization. New Journal of Physics, 10.
+          https://doi.org/10.1088/1367-2630/10/7/075016
     """
     denominator = (
         (1 / particle_inertia_time) + (1 / alpha) + (particle_velocity / phi)

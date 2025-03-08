@@ -1,38 +1,26 @@
 """
-Particle Vapor Equilibrium, condensation and evaporation
-based on partial pressures to get dm/dt or other forms of
-particle growth and decay.
+Particle Vapor Equilibrium, condensation, and evaporation based on partial
+pressures to calculate dm/dt or other forms of particle growth and decay.
 
-From Seinfeld and Pandas: The Condensation (chapter 13) Equation 13.3
-This function calculates the rate of change of the mass of an aerosol
-particle with diameter Dp.
+Equation:
+    - dm/dt = 4π × radius × Di × Mi × f(Kn, α) × delta_pi / (R × T)
+      - radius : The particle radius in m.
+      - Di : The diffusion coefficient of species i in m²/s.
+      - Mi : The molar mass of species i in kg/mol.
+      - f(Kn, α) : Transition function based on Knudsen number and
+          accommodation coefficient.
+      - delta_pi : Difference in partial pressures between gas and particle
+          phases in Pa.
+      - R : Gas constant in J/(mol·K).
+      - T : Temperature in K.
 
-The rate of change of mass, dm, is given by the formula:
-    dm/dt = 4π * radius * Di * Mi * f(Kn, alpha) * delta_pi / RT
-where:
-    radius is the radius of the particle,
-    Di is the diffusion coefficient of species i,
-    Mi is the molar mass of species i,
-    f(Kn, alpha) is a transition function of the Knudsen number (Kn) and the
-    mass accommodation coefficient (alpha),
-    delta_pi is the partial pressure of species i in the gas phase vs the
-    particle phase.
-    R is the gas constant,
-    T is the temperature.
-
-    An additional denominator term is added to acount for temperature changes,
-    which is need for cloud droplets, but can be used in general too.
-
-This is also in Aerosol Modeling Chapter 2 Equation 2.40
-
-Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and Physics:
-From Air Pollution to Climate Change. In Wiley (3rd ed.).
-John Wiley & Sons, Inc.
-
-Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling
-(D. Topping & M. Bane, Eds.). Wiley. https://doi.org/10.1002/9781119625728
-
-Units are all Base SI units.
+References:
+    - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and
+      Physics: From Air Pollution to Climate Change (3rd ed.). John
+      Wiley & Sons, Inc.
+    - Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling
+      (D. Topping & M. Bane, Eds.). Wiley. https://doi.org/10.1002/9781119625728
+    - Aerosol Modeling: Chapter 2, Equation 2.40
 """
 
 from typing import Union
@@ -54,43 +42,50 @@ def first_order_mass_transport_k(
     vapor_transition: Union[float, NDArray[np.float64]],
     diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
 ) -> Union[float, NDArray[np.float64]]:
-    """First-order mass transport coefficient per particle.
+    """
+    Calculate the first-order mass transport coefficient per particle.
 
-    Calculate the first-order mass transport coefficient, K, for a given radius
-    diffusion coefficient, and vapor transition correction factor. For a
-    single particle.
+    This function computes the coefficient K that governs how fast mass is
+    transported to or from a particle in a vapor. The equation is:
 
-    Args:
+    - K = 4π × radius × D × X
+        - K : Mass transport coefficient [m³/s].
+        - radius : Particle radius [m].
+        - D : Diffusion coefficient of the vapor [m²/s].
+        - X : Vapor transition correction factor [unitless].
+
+    Arguments:
         - radius : The radius of the particle [m].
-        - diffusion_coefficient : The diffusion coefficient of the vapor
-            [m^2/s], default to air.
-        - vapor_transition : The vapor transition correction factor. [unitless]
+        - vapor_transition : The vapor transition correction factor [unitless].
+        - diffusion_coefficient : The diffusion coefficient of the vapor [m²/s].
+          Defaults to 2e-5 (approx. air).
 
     Returns:
-        The first-order mass transport coefficient per particle (m^3/s).
+        - The first-order mass transport coefficient per particle [m³/s].
 
     Examples:
-        ``` py title="Float input"
+        ```py title="Float input"
         first_order_mass_transport_k(
             radius=1e-6,
             vapor_transition=0.6,
             diffusion_coefficient=2e-9
-            )
+        )
         # Output: 1.5079644737231005e-14
         ```
 
-        ``` py title="Array input"
-        first_order_mass_transport_k
+        ```py title="Array input"
+        first_order_mass_transport_k(
             radius=np.array([1e-6, 2e-6]),
             vapor_transition=np.array([0.6, 0.6]),
             diffusion_coefficient=2e-9
-            )
+        )
         # Output: array([1.50796447e-14, 6.03185789e-14])
         ```
+
     References:
-        - Aerosol Modeling: Chapter 2, Equation 2.49 (excluding number)
-        - Mass Diffusivity:
-            [Wikipedia](https://en.wikipedia.org/wiki/Mass_diffusivity)
+        - Aerosol Modeling: Chapter 2, Equation 2.49
+        - Wikipedia contributors, "Mass diffusivity,"
+          https://en.wikipedia.org/wiki/Mass_diffusivity
     """
     if (
         isinstance(vapor_transition, np.ndarray)
@@ -115,25 +110,32 @@ def mass_transfer_rate(
     temperature: Union[float, NDArray[np.float64]],
     molar_mass: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """Calculate the mass transfer rate for a particle.
+    """
+    Calculate the mass transfer rate for a particle.
 
-    Calculate the mass transfer rate based on the difference in partial
-    pressure and the first-order mass transport coefficient.
+    This function calculates the mass transfer rate dm/dt, leveraging the
+    difference in partial pressure (pressure_delta) and the first-order
+    mass transport coefficient (K). The equation is:
 
-    Args:
-        - pressure_delta : The difference in partial pressure between the gas
-            phase and the particle phase.
-        - first_order_mass_transport : The first-order mass transport
-            coefficient per particle.
-        - temperature : The temperature at which the mass transfer rate is to
-            be calculated.
-        - molar_mass : The molar mass of the species [kg/mol].
+    - dm/dt = (K × Δp × M) / (R × T)
+        - dm/dt : Mass transfer rate [kg/s].
+        - K : First-order mass transport coefficient [m³/s].
+        - Δp : Partial pressure difference [Pa].
+        - M : Molar mass [kg/mol].
+        - R : Universal gas constant [J/(mol·K)].
+        - T : Temperature [K].
+
+    Arguments:
+        - pressure_delta : The difference in partial pressure [Pa].
+        - first_order_mass_transport : The mass transport coefficient [m³/s].
+        - temperature : The temperature [K].
+        - molar_mass : The molar mass [kg/mol].
 
     Returns:
-        The mass transfer rate for the particle [kg/s].
+        - The mass transfer rate [kg/s].
 
     Examples:
-        ``` py title="Single value input"
+        ```py title="Single value input"
         mass_transfer_rate(
             pressure_delta=10.0,
             first_order_mass_transport=1e-17,
@@ -143,7 +145,7 @@ def mass_transfer_rate(
         # Output: 1.16143004e-21
         ```
 
-        ``` py title="Array input"
+        ```py title="Array input"
         mass_transfer_rate(
             pressure_delta=np.array([10.0, 15.0]),
             first_order_mass_transport=np.array([1e-17, 2e-17]),
@@ -152,9 +154,10 @@ def mass_transfer_rate(
         )
         # Output: array([1.16143004e-21, 3.48429013e-21])
         ```
+
     References:
-        - Aerosol Modeling Chapter 2, Equation 2.41 (excluding particle number)
-        - Seinfeld and Pandis: "Atmospheric Chemistry and Physics",
+        - Aerosol Modeling: Chapter 2, Equation 2.41
+        - Seinfeld and Pandis, "Atmospheric Chemistry and Physics,"
             Equation 13.3
     """
     return np.array(
@@ -174,21 +177,28 @@ def radius_transfer_rate(
     radius: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
-    """Convert mass rate to radius transfer rate.
+    """
+    Convert mass rate to radius growth/evaporation rate.
 
-    Convert the mass rate to a radius transfer rate based on the
-    volume of the particle.
+    This function converts the mass transfer rate (dm/dt) into a radius
+    change rate (dr/dt). The equation is:
 
-    Args:
-        - mass_rate : The mass transfer rate for the particle [kg/s].
+    - dr/dt = (1 / 4πr²ρ) × dm/dt
+        - dr/dt : Radius change rate [m/s].
+        - r : Particle radius [m].
+        - ρ : Particle density [kg/m³].
+        - dm/dt : Mass change rate [kg/s].
+
+    Arguments:
+        - mass_rate : The mass transfer rate [kg/s].
         - radius : The radius of the particle [m].
-        - density : The density of the particle [kg/m^3].
+        - density : The density of the particle [kg/m³].
 
     Returns:
-        The radius growth rate for the particle [m/s].
+        - The radius growth (or evaporation) rate [m/s].
 
     Examples:
-        ``` py title="Single value input"
+        ```py title="Single value input"
         radius_transfer_rate(
             mass_rate=1e-21,
             radius=1e-6,
@@ -197,7 +207,7 @@ def radius_transfer_rate(
         # Output: 7.95774715e-14
         ```
 
-        ``` py title="Array input"
+        ```py title="Array input"
         radius_transfer_rate(
             mass_rate=np.array([1e-21, 2e-21]),
             radius=np.array([1e-6, 2e-6]),
@@ -228,23 +238,27 @@ def calculate_mass_transfer(
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """
-    Helper function that routes the mass transfer calculation to either the
-    single-species or multi-species calculation functions based on the input
-    dimensions of gas_mass.
+    Route mass transfer calculation to single or multiple-species routines.
 
-    Args:
-        - mass_rate : The rate of mass transfer per particle (kg/s).
-        - time_step : The time step for the mass transfer calculation (sec).
-        - gas_mass : The available mass of gas species (kg).
-        - particle_mass : The mass of each particle (kg).
-        - particle_concentration : The concentration of particles (number/m^3).
+    Depending on whether gas_mass represents one or multiple species, this
+    function calls either calculate_mass_transfer_single_species or
+    calculate_mass_transfer_multiple_species. The primary calculation
+    involves:
+
+    - mass_to_change = mass_rate × time_step × particle_concentration
+
+    Arguments:
+        - mass_rate : The rate of mass transfer per particle [kg/s].
+        - time_step : The time step for the mass transfer calculation [s].
+        - gas_mass : The available mass of gas species [kg].
+        - particle_mass : The mass of each particle [kg].
+        - particle_concentration : The concentration of particles [#/m³].
 
     Returns:
-        The amount of mass transferred, accounting for gas and particle
-            limitations.
+        - The mass transferred (array with the same shape as particle_mass).
 
     Examples:
-        ``` py title="Single species input"
+        ```py title="Single species input"
         calculate_mass_transfer(
             mass_rate=np.array([0.1, 0.5]),
             time_step=10,
@@ -254,7 +268,7 @@ def calculate_mass_transfer(
         )
         ```
 
-        ``` py title="Multiple species input"
+        ```py title="Multiple species input"
         calculate_mass_transfer(
             mass_rate=np.array([[0.1, 0.05, 0.03], [0.2, 0.15, 0.07]]),
             time_step=10,
@@ -299,20 +313,29 @@ def calculate_mass_transfer_single_species(
     particle_concentration: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """
-    Calculate mass transfer for a single gas species (m=1).
+    Calculate mass transfer for a single gas species.
 
-    Args:
-        - mass_rate : The rate of mass transfer per particle (number*kg/s).
-        - time_step : The time step for the mass transfer calculation (sec).
-        - gas_mass : The available mass of gas species (kg).
-        - particle_mass : The mass of each particle (kg).
-        - particle_concentration : The concentration of particles (number/m^3).
+    This function assumes gas_mass has a size of 1 (single species).
+    It first computes the total mass_to_change per particle:
+
+    - mass_to_change = mass_rate × time_step × particle_concentration
+
+    Then it scales or limits that mass based on available gas mass and
+    particle mass.
+
+    Arguments:
+        - mass_rate : Mass transfer rate per particle [kg/s].
+        - time_step : The time step [s].
+        - gas_mass : Total available mass of the gas species [kg].
+        - particle_mass : The mass of each particle [kg].
+        - particle_concentration : Particle concentration [#/m³].
 
     Returns:
-        The amount of mass transferred for a single gas species.
+        - The amount of mass transferred for the single gas species, shaped
+          like particle_mass.
 
     Examples:
-        ``` py title="Single species input"
+        ```py title="Single species input"
         calculate_mass_transfer_single_species(
             mass_rate=np.array([0.1, 0.5]),
             time_step=10,
@@ -320,6 +343,7 @@ def calculate_mass_transfer_single_species(
             particle_mass=np.array([1.0, 50]),
             particle_concentration=np.array([1, 0.5])
         )
+        # Output: array([...])
         ```
     """
     # Step 1: Calculate the total mass to be transferred
@@ -365,20 +389,28 @@ def calculate_mass_transfer_multiple_species(
     """
     Calculate mass transfer for multiple gas species.
 
-    Args:
-        - mass_rate : The rate of mass transfer per particle for each gas
-            species (kg/s).
-        - time_step : The time step for the mass transfer calculation (sec).
-        - gas_mass : The available mass of each gas species (kg).
-        - particle_mass : The mass of each particle for each gas species (kg).
-        - particle_concentration : The concentration of particles for each gas
-            species (number/m^3).
+    Here, gas_mass has multiple elements (each species). For each species,
+    this function calculates mass_to_change for all particle bins:
+
+    - mass_to_change = mass_rate × time_step × particle_concentration
+
+    Then it limits or scales that mass based on available gas mass and
+    particle mass in each species bin.
+
+    Arguments:
+        - mass_rate : The mass transfer rate per particle for each gas
+            species [kg/s].
+        - time_step : The time step [s].
+        - gas_mass : The available mass of each gas species [kg].
+        - particle_mass : The mass of each particle for each gas species [kg].
+        - particle_concentration : The concentration of particles [#/m³].
 
     Returns:
-        The amount of mass transferred for multiple gas species.
+        - The mass transferred for multiple gas species, matching the shape
+          of (particle_mass).
 
     Examples:
-        ``` py title="Multiple species input"
+        ```py title="Multiple species input"
         calculate_mass_transfer_multiple_species(
             mass_rate=np.array([[0.1, 0.05, 0.03], [0.2, 0.15, 0.07]]),
             time_step=10,
@@ -386,6 +418,7 @@ def calculate_mass_transfer_multiple_species(
             particle_mass=np.array([[1.0, 0.9, 0.8], [1.2, 1.0, 0.7]]),
             particle_concentration=np.array([5, 4])
         )
+        # Output: array([...])
         ```
     """
     # Step 1: Calculate the total mass to change

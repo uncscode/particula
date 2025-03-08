@@ -74,6 +74,7 @@ from particula.dynamics.coagulation.turbulent_dns_kernel.turbulent_dns_kernel_ao
     get_turbulent_dns_kernel_ao2008,
     get_turbulent_dns_kernel_ao2008_via_system_state,
 )
+from particula.dynamics.coagulation import turbulent_dns_kernel
 from particula.dynamics.coagulation.coagulation_factories import (
     CoagulationFactory,
 )

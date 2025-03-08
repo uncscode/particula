@@ -35,11 +35,13 @@ def get_phi_ao2008(
     particle_velocity: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Compute the function Φ(α, φ) for the given particle properties.
+    Compute the function Φ(α, φ) for the given particle properties using
+    Ayala et al. (2008).
 
-    The function Φ(α, φ), when vₚ₁>vₚ₂, is defined as:
+    This function calculates Φ(α, φ) when vₚ₁ > vₚ₂ by considering the
+    velocities (vₚ₁, vₚ₂) and inertia times (τₚ₁, τₚ₂). The equation is:
 
-        Φ(α, φ) =
+    Φ(α, φ), for vₚ₁ > vₚ₂ =
         {  1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )\
         -  1 / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) ) }\
         ×  ( vₚ₁ - vₚ₂ ) / ( 2 φ ( (vₚ₁ - vₚ₂ / φ) + (1 / τₚ₁) + (1 / τₚ₂) )² )
@@ -56,26 +58,39 @@ def get_phi_ao2008(
         +  vₚ₂ / ( ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )² )  }\
         ×  1 / ( 2φ ( (vₚ₁ - vₚ₂ / φ) + (1 / τₚ₁) + (1 / τₚ₂) ) )
 
+      - v₁ and v₂: Velocities of particles 1 and 2 in m/s.
+      - τ₁ and τ₂: Inertia timescales of particles 1 and 2 in s.
+      - α: Turbulent interaction parameter (dimensionless).
+      - φ: Characteristic velocity (m/s).
+
     Arguments:
-    ----------
-        - alpha : A parameter related to turbulence and droplet interactions
-            [-].
-        - phi : A characteristic velocity or timescale parameter [m/s].
-        - particle_inertia_time : Inertia timescale of particle 1 τₚ₁,
-            particle 2 τₚ₂ [s].
-        - particle_velocity : Velocity of particle 1 vₚ₁,
-            particle 2 vₚ₂ [m/s].
+        - alpha : Turbulence/droplet interaction parameter (dimensionless).
+        - phi : Characteristic velocity parameter (m/s).
+        - particle_inertia_time : Inertia timescales τₚ₁ and τₚ₂ (s).
+        - particle_velocity : Velocities vₚ₁ and vₚ₂ (m/s).
 
     Returns:
-    --------
-        - Φ(α, φ) value [-].
+        - The computed Φ(α, φ) (dimensionless).
+
+    Examples:
+        ```py
+        import numpy as np
+        from particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008
+            import get_phi_ao2008
+
+        alpha_val = 0.3
+        phi_val = 0.1
+        inertia_times = np.array([0.05, 0.06])
+        velocities = np.array([0.2, 0.18])
+        result = get_phi_ao2008(alpha_val, phi_val, inertia_times, velocities)
+        print(result)
+        ```
 
     References:
-    -----------
-    - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-        the geometric collision rate of sedimenting droplets. Part 2.
-        Theory and parameterization. New Journal of Physics, 10.
-        https://doi.org/10.1088/1367-2630/10/7/075016
+        - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
+          the geometric collision rate of sedimenting droplets. Part 2.
+          Theory and parameterization. New Journal of Physics, 10.
+          https://doi.org/10.1088/1367-2630/10/7/075016
     """
     # valid for v1 > v2, in pairwise comparison
     v1 = np.maximum(

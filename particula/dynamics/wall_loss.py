@@ -137,6 +137,7 @@ def get_rectangle_wall_loss_rate(
 
     References:
         - J. Hinds, "Aerosol Technology," 2nd ed., John Wiley & Sons, 1999.
+        [check]
     """
 
     # Step 1: Calculate the wall loss coefficient

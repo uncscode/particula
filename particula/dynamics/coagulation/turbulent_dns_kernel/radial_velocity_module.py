@@ -22,31 +22,39 @@ def get_radial_relative_velocity_dz2002(
     particle_inertia_time: NDArray[np.float64],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Compute the radial relative velocity based on the Dodin and Elperin (2002)
-    formulation.
+    Compute the radial relative velocity based on Dodin and Elperin (2002).
 
-    The relative velocity is given by:
+    This function calculates the radial relative velocity between pairs of
+    particles under turbulent conditions, capturing the effects of different
+    inertia timescales. The equation is:
 
-        ⟨ |w_r| ⟩ = sqrt(2 / π) * σ * f(b)
-
-    - f(b) = (1/2) sqrt(π) (b + 0.5 / b) erf(b) + (1/2) exp(-b^2)
-    - b = g |τ_p1 - τ_p2| / (sqrt(2) σ)
-    - σ : Turbulence velocity dispersion [m/s]
-    - τ_p1, τ_p2 : Inertia timescale of particles 1 and 2 [s]
-    - g : Gravitational acceleration [m/s²]
+    - ⟨|wᵣ|⟩ = √(2/π) × σ × f(b)
+        - wᵣ is the radial relative velocity in m/s,
+        - σ is the turbulence velocity dispersion in m/s,
+        - b = (g × |τₚᵢ - τₚⱼ|) / (√2 × σ),
+        - f(b) = ½√π (b + 0.5 / b) erf(b) + ½ exp(-b²).
 
     Arguments:
-    ----------
-        - velocity_dispersion : Turbulence velocity dispersion (σ) [m/s].
-        - particle_inertia_time : Inertia timescale of particles (τ_p) [s].
+        - velocity_dispersion : Turbulence velocity dispersion (σ) in m/s.
+        - particle_inertia_time : Inertia timescale(s) (τₚ) in seconds.
 
     Returns:
-    --------
-        - Radial relative velocity ⟨ |w_r| ⟩ [m/s].
+        - The radial relative velocity ⟨|wᵣ|⟩ in m/s.
+
+    Examples:
+        ```py
+        import numpy as np
+        import particula as par
+
+        # Example with an array of inertia times
+        result = par.dynamics.get_radial_relative_velocity_dz2002(
+            1.0, np.array([0.1, 0.2, 0.3])
+        )
+        print(result)
+        ```
 
     References:
-    -----------
-    - Dodin, Z., & Elperin, T. (2002). Phys. Fluids, 14, 2921-24.
+        - Dodin, Z., & Elperin, T. (2002). Phys. Fluids, 14, 2921–2924.
     """
     tau_diff = np.abs(
         particle_inertia_time[:, np.newaxis]
@@ -77,33 +85,43 @@ def get_radial_relative_velocity_ao2008(
     particle_inertia_time: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]:
     """
-    Compute the radial relative velocity based on the Ayala et al. (2008)
-    formulation.
+    Compute the radial relative velocity based on Ayala et al. (2008).
 
-    The relative velocity is given by:
+    This function estimates the radial relative velocity between pairs of
+    particles considering both turbulent velocity dispersion and gravitational
+    acceleration. The conceptual form is:
 
-        ⟨ |w_r| ⟩ = sqrt(2 / π) * sqrt(σ² + (π/8) * (τ_p1 - τ_p2)² * |g|²)
-
-    - σ : Turbulence velocity dispersion [m/s]
-    - τ_p1, τ_p2 : Inertia timescale of particles 1 and 2 [s]
-    - g : Gravitational acceleration [m/s²]
-
+    - ⟨|wᵣ|⟩ = √(2/π) × √(σ² + (π/8) × (τₚ₁ - τₚ₂)² × g²)
+        - wᵣ is the radial relative velocity in m/s,
+        - σ is the turbulence velocity dispersion in m/s,
+        - τₚ₁, τₚ₂ are the inertia timescales (s),
+        - g is the gravitational acceleration (m/s²).
 
     Arguments:
-    ----------
-        - velocity_dispersion : Turbulence velocity dispersion (σ) [m/s].
-        - particle_inertia_time : Inertia timescale of particle 1 (τ_p1) [s].
+        - velocity_dispersion : Turbulence velocity dispersion (σ) in m/s.
+        - particle_inertia_time : Inertia timescale(s) of the particle(s) in seconds.
 
     Returns:
-    --------
-        - Radial relative velocity ⟨ |w_r| ⟩ [m/s].
+        - The radial relative velocity ⟨|wᵣ|⟩ in m/s.
+
+    Examples:
+        ```py
+        import numpy as np
+        import particula as par
+
+        # Example usage (currently raises NotImplementedError)
+        try:
+            rv = par.dynamics.get_radial_relative_velocity_ao2008(
+                1.0, np.array([0.05, 0.1])
+            )
+        except NotImplementedError as e:
+            print(e)
+        ```
 
     References:
-    -----------
-    - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-        the geometric collision rate of sedimenting droplets. Part 2.
-        Theory and parameterization. New Journal of Physics, 10.
-        https://doi.org/10.1088/1367-2630/10/7/075016
+        - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
+          the geometric collision rate of sedimenting droplets. Part 2. Theory
+          and parameterization. New Journal of Physics, 10.
     """
     # tau_delta = (
     #     particle_inertia_time[:, np.newaxis]
