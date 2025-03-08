@@ -7936,7 +7936,9 @@ The <code>Aerosol</code> object brings together the atmosphere and the resolved 
 <span class="c1"># AtmosphereBuilder constructs the atmosphere with predefined species</span>
 <span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">PresetGasSpeciesBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">())</span>  <span class="c1"># Add a preset gas species</span>
+    <span class="o">.</span><span class="n">add_species</span><span class="p">(</span>
+        <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">PresetGasSpeciesBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="p">)</span>  <span class="c1"># Add a preset gas species</span>
     <span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">temperature_units</span><span class="o">=</span><span class="s2">"degC"</span><span class="p">)</span>  <span class="c1"># Set temperature to 25°C</span>
     <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pressure_units</span><span class="o">=</span><span class="s2">"atm"</span><span class="p">)</span>  <span class="c1"># Set pressure to 1 atmosphere</span>
     <span class="o">.</span><span class="n">build</span><span class="p">()</span>  <span class="c1"># Finalize the atmosphere object</span>
@@ -7986,7 +7988,9 @@ The <code>Aerosol</code> object brings together the atmosphere and the resolved 
 # AtmosphereBuilder constructs the atmosphere with predefined species
 atmosphere = (
     par.gas.AtmosphereBuilder()
-    .add_species(par.gas.PresetGasSpeciesBuilder().build())  # Add a preset gas species
+    .add_species(
+        par.gas.PresetGasSpeciesBuilder().build()
+    )  # Add a preset gas species
     .set_temperature(25, temperature_units="degC")  # Set temperature to 25°C
     .set_pressure(1, pressure_units="atm")  # Set pressure to 1 atmosphere
     .build()  # Finalize the atmosphere object

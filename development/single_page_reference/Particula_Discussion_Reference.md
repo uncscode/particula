@@ -3285,6 +3285,7 @@ Each kernel accounts for charge-dependent coagulation efficiencies. This study a
 ```python
 import numpy as np
 from matplotlib import pyplot as plt
+
 # from particula.util.lf2013_coagulation import lf2013_coag_full
 import particula as par
 ```
@@ -3340,26 +3341,64 @@ temperature = 278.0
 pressure = 101325.0
 
 # get each particle properties
-particle_radius = np.array([0.45e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9])
+particle_radius = np.array(
+    [
+        0.45e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+    ]
+)
 charge = np.array([-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
-particle_density = np.array([1860, 1700, 1700, 1700, 1700, 1700, 1700, 1700, 1700, 1700, 1700, 1700, 1700])
+particle_density = np.array(
+    [
+        1860,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+    ]
+)
 
 # calculate mass
-particle_mass = 4/3 * np.pi * particle_radius**3 * particle_density
+particle_mass = 4 / 3 * np.pi * particle_radius**3 * particle_density
 
 # get properties
 dynamic_viscosity = par.gas.get_dynamic_viscosity(temperature=temperature)
 
 # get knudsen number
 knudsen_number = par.particles.get_knudsen_number(
-    mean_free_path=par.gas.get_molecule_mean_free_path(temperature=temperature, dynamic_viscosity=dynamic_viscosity, pressure=pressure),
-    particle_radius=particle_radius
+    mean_free_path=par.gas.get_molecule_mean_free_path(
+        temperature=temperature,
+        dynamic_viscosity=dynamic_viscosity,
+        pressure=pressure,
+    ),
+    particle_radius=particle_radius,
 )
 # get friction factor
 friction_factor = par.particles.get_friction_factor(
     particle_radius=particle_radius,
     dynamic_viscosity=par.gas.get_dynamic_viscosity(temperature=temperature),
-    slip_correction=par.particles.get_cunningham_slip_correction(knudsen_number=knudsen_number),
+    slip_correction=par.particles.get_cunningham_slip_correction(
+        knudsen_number=knudsen_number
+    ),
 )
 
 # get coulomb potential ratio
@@ -3410,44 +3449,69 @@ hard_sphere_dimensionless_kernel = par.dynamics.get_hard_sphere_kernel(
     diffusive_knudsen=diffusive_knudsen,
 )
 # coulomb dimensionless kernel for Dyachkov et al. (2007)
-coulomb_dyachkov2007_dimensionless_kernel = par.dynamics.get_coulomb_kernel_dyachkov2007(
-    diffusive_knudsen=diffusive_knudsen,
-    coulomb_potential_ratio=coulomb_potential_ratio,
+coulomb_dyachkov2007_dimensionless_kernel = (
+    par.dynamics.get_coulomb_kernel_dyachkov2007(
+        diffusive_knudsen=diffusive_knudsen,
+        coulomb_potential_ratio=coulomb_potential_ratio,
+    )
 )
 
 # coulomb dimensionless kernel for Gatti et al. (2008)
-coulomb_gatti2008_dimensionless_kernel = par.dynamics.get_coulomb_kernel_gatti2008(
-    diffusive_knudsen=diffusive_knudsen,
-    coulomb_potential_ratio=coulomb_potential_ratio,
+coulomb_gatti2008_dimensionless_kernel = (
+    par.dynamics.get_coulomb_kernel_gatti2008(
+        diffusive_knudsen=diffusive_knudsen,
+        coulomb_potential_ratio=coulomb_potential_ratio,
+    )
 )
 
 # coulomb dimensionless kernel for Gopalakrishnan et al. (2012)
-coulomb_g2012_dimensionless_kernel = par.dynamics.get_coulomb_kernel_gopalakrishnan2012(
-    diffusive_knudsen=diffusive_knudsen,
-    coulomb_potential_ratio=coulomb_potential_ratio,
+coulomb_g2012_dimensionless_kernel = (
+    par.dynamics.get_coulomb_kernel_gopalakrishnan2012(
+        diffusive_knudsen=diffusive_knudsen,
+        coulomb_potential_ratio=coulomb_potential_ratio,
+    )
 )
 
 # coulomb dimensionless kernel for Chahl et al. (2019)
-coulomb_chahl20019_dimensionless_kernel = par.dynamics.get_coulomb_kernel_chahl2019(
-    diffusive_knudsen=diffusive_knudsen,
-    coulomb_potential_ratio=coulomb_potential_ratio,
+coulomb_chahl20019_dimensionless_kernel = (
+    par.dynamics.get_coulomb_kernel_chahl2019(
+        diffusive_knudsen=diffusive_knudsen,
+        coulomb_potential_ratio=coulomb_potential_ratio,
+    )
 )
 
 # plot the first index ion attachment to the other particles
 fig, ax = plt.subplots()
-ax.plot(charge[1:], hard_sphere_dimensionless_kernel[0, 1:], label='Hard Sphere')
-ax.plot(charge[1:], coulomb_dyachkov2007_dimensionless_kernel[0, 1:], label='Coulomb Dyachkov 2007')
-ax.plot(charge[1:], coulomb_gatti2008_dimensionless_kernel[0, 1:], label='Coulomb Gatti 2008')
-ax.plot(charge[1:], coulomb_g2012_dimensionless_kernel[0, 1:], label='Coulomb Gopalakrishnan 2012')
-ax.plot(charge[1:], coulomb_chahl20019_dimensionless_kernel[0, 1:], label='Coulomb Chahl 2019')
-ax.set_yscale('log')
+ax.plot(
+    charge[1:], hard_sphere_dimensionless_kernel[0, 1:], label="Hard Sphere"
+)
+ax.plot(
+    charge[1:],
+    coulomb_dyachkov2007_dimensionless_kernel[0, 1:],
+    label="Coulomb Dyachkov 2007",
+)
+ax.plot(
+    charge[1:],
+    coulomb_gatti2008_dimensionless_kernel[0, 1:],
+    label="Coulomb Gatti 2008",
+)
+ax.plot(
+    charge[1:],
+    coulomb_g2012_dimensionless_kernel[0, 1:],
+    label="Coulomb Gopalakrishnan 2012",
+)
+ax.plot(
+    charge[1:],
+    coulomb_chahl20019_dimensionless_kernel[0, 1:],
+    label="Coulomb Chahl 2019",
+)
+ax.set_yscale("log")
 ax.set_xlim(-1, 12)
-ax.set_xlabel('Charge')
-ax.set_ylabel('Dimensionless Kernel (unitless)')
-ax.set_title('Dimensionless Kernel for Ion Attachment')
+ax.set_xlabel("Charge")
+ax.set_ylabel("Dimensionless Kernel (unitless)")
+ax.set_title("Dimensionless Kernel for Ion Attachment")
 ax.legend()
 plt.show()
-
 ```
 
 
@@ -3544,16 +3608,32 @@ coulomb_chahl20019_dimensional_kernel = par.dynamics.get_dimensional_kernel(
 
 # plot the first index ion attachment to the other particles
 fig, ax = plt.subplots()
-ax.plot(charge[1:], hard_sphere_dimensional_kernel[0, 1:], label='Hard Sphere')
-ax.plot(charge[1:], coulomb_dyachkov2007_dimensional_kernel[0, 1:], label='Coulomb Dyachkov 2007')
-ax.plot(charge[1:], coulomb_gatti2008_dimensional_kernel[0, 1:], label='Coulomb Gatti 2008')
-ax.plot(charge[1:], coulomb_g2012_dimensional_kernel[0, 1:], label='Coulomb Gopalakrishnan 2012')
-ax.plot(charge[1:], coulomb_chahl20019_dimensional_kernel[0, 1:], label='Coulomb Chahl 2019')
-ax.set_yscale('log')
+ax.plot(charge[1:], hard_sphere_dimensional_kernel[0, 1:], label="Hard Sphere")
+ax.plot(
+    charge[1:],
+    coulomb_dyachkov2007_dimensional_kernel[0, 1:],
+    label="Coulomb Dyachkov 2007",
+)
+ax.plot(
+    charge[1:],
+    coulomb_gatti2008_dimensional_kernel[0, 1:],
+    label="Coulomb Gatti 2008",
+)
+ax.plot(
+    charge[1:],
+    coulomb_g2012_dimensional_kernel[0, 1:],
+    label="Coulomb Gopalakrishnan 2012",
+)
+ax.plot(
+    charge[1:],
+    coulomb_chahl20019_dimensional_kernel[0, 1:],
+    label="Coulomb Chahl 2019",
+)
+ax.set_yscale("log")
 ax.set_xlim(-1, 12)
-ax.set_xlabel('Charge (integer count)')
-ax.set_ylabel(r'Dimensional Kernel $m^3/s$')
-ax.set_title('Dimensional Kernel for Ion Attachment')
+ax.set_xlabel("Charge (integer count)")
+ax.set_ylabel(r"Dimensional Kernel $m^3/s$")
+ax.set_title("Dimensional Kernel for Ion Attachment")
 ax.legend(loc="lower right")
 plt.show()
 ```

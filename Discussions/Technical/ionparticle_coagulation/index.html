@@ -8099,11 +8099,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
 <span class="c1"># from particula.util.lf2013_coagulation import lf2013_coag_full</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import numpy as np
 from matplotlib import pyplot as plt
+
 # from particula.util.lf2013_coagulation import lf2013_coag_full
 import particula as par</div>
 </div>
@@ -8193,26 +8195,64 @@ import particula as par</div>
 <span class="n">pressure</span> <span class="o">=</span> <span class="mf">101325.0</span>
 
 <span class="c1"># get each particle properties</span>
-<span class="n">particle_radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.45e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">])</span>
+<span class="n">particle_radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="mf">0.45e-9</span><span class="p">,</span>
+        <span class="mf">3e-9</span><span class="p">,</span>
+        <span class="mf">3e-9</span><span class="p">,</span>
+        <span class="mf">3e-9</span><span class="p">,</span>
+        <span class="mf">3e-9</span><span class="p">,</span>
+        <span class="mf">3e-9</span><span class="p">,</span>
+        <span class="mf">3e-9</span><span class="p">,</span>
+        <span class="mf">3e-9</span><span class="p">,</span>
+        <span class="mf">3e-9</span><span class="p">,</span>
+        <span class="mf">3e-9</span><span class="p">,</span>
+        <span class="mf">3e-9</span><span class="p">,</span>
+        <span class="mf">3e-9</span><span class="p">,</span>
+        <span class="mf">3e-9</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 <span class="n">charge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">])</span>
-<span class="n">particle_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1860</span><span class="p">,</span> <span class="mi">1700</span><span class="p">,</span> <span class="mi">1700</span><span class="p">,</span> <span class="mi">1700</span><span class="p">,</span> <span class="mi">1700</span><span class="p">,</span> <span class="mi">1700</span><span class="p">,</span> <span class="mi">1700</span><span class="p">,</span> <span class="mi">1700</span><span class="p">,</span> <span class="mi">1700</span><span class="p">,</span> <span class="mi">1700</span><span class="p">,</span> <span class="mi">1700</span><span class="p">,</span> <span class="mi">1700</span><span class="p">,</span> <span class="mi">1700</span><span class="p">])</span>
+<span class="n">particle_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="mi">1860</span><span class="p">,</span>
+        <span class="mi">1700</span><span class="p">,</span>
+        <span class="mi">1700</span><span class="p">,</span>
+        <span class="mi">1700</span><span class="p">,</span>
+        <span class="mi">1700</span><span class="p">,</span>
+        <span class="mi">1700</span><span class="p">,</span>
+        <span class="mi">1700</span><span class="p">,</span>
+        <span class="mi">1700</span><span class="p">,</span>
+        <span class="mi">1700</span><span class="p">,</span>
+        <span class="mi">1700</span><span class="p">,</span>
+        <span class="mi">1700</span><span class="p">,</span>
+        <span class="mi">1700</span><span class="p">,</span>
+        <span class="mi">1700</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 
 <span class="c1"># calculate mass</span>
-<span class="n">particle_mass</span> <span class="o">=</span> <span class="mi">4</span><span class="o">/</span><span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particle_radius</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="n">particle_density</span>
+<span class="n">particle_mass</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">particle_radius</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="n">particle_density</span>
 
 <span class="c1"># get properties</span>
 <span class="n">dynamic_viscosity</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
 
 <span class="c1"># get knudsen number</span>
 <span class="n">knudsen_number</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_knudsen_number</span><span class="p">(</span>
-    <span class="n">mean_free_path</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_molecule_mean_free_path</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">),</span>
-    <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span>
+    <span class="n">mean_free_path</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_molecule_mean_free_path</span><span class="p">(</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">dynamic_viscosity</span><span class="p">,</span>
+        <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># get friction factor</span>
 <span class="n">friction_factor</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_friction_factor</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
     <span class="n">dynamic_viscosity</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">get_dynamic_viscosity</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">),</span>
-    <span class="n">slip_correction</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_cunningham_slip_correction</span><span class="p">(</span><span class="n">knudsen_number</span><span class="o">=</span><span class="n">knudsen_number</span><span class="p">),</span>
+    <span class="n">slip_correction</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_cunningham_slip_correction</span><span class="p">(</span>
+        <span class="n">knudsen_number</span><span class="o">=</span><span class="n">knudsen_number</span>
+    <span class="p">),</span>
 <span class="p">)</span>
 
 <span class="c1"># get coulomb potential ratio</span>
@@ -8236,26 +8276,64 @@ temperature = 278.0
 pressure = 101325.0
 
 # get each particle properties
-particle_radius = np.array([0.45e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9, 3e-9])
+particle_radius = np.array(
+    [
+        0.45e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+        3e-9,
+    ]
+)
 charge = np.array([-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
-particle_density = np.array([1860, 1700, 1700, 1700, 1700, 1700, 1700, 1700, 1700, 1700, 1700, 1700, 1700])
+particle_density = np.array(
+    [
+        1860,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+        1700,
+    ]
+)
 
 # calculate mass
-particle_mass = 4/3 * np.pi * particle_radius**3 * particle_density
+particle_mass = 4 / 3 * np.pi * particle_radius**3 * particle_density
 
 # get properties
 dynamic_viscosity = par.gas.get_dynamic_viscosity(temperature=temperature)
 
 # get knudsen number
 knudsen_number = par.particles.get_knudsen_number(
-    mean_free_path=par.gas.get_molecule_mean_free_path(temperature=temperature, dynamic_viscosity=dynamic_viscosity, pressure=pressure),
-    particle_radius=particle_radius
+    mean_free_path=par.gas.get_molecule_mean_free_path(
+        temperature=temperature,
+        dynamic_viscosity=dynamic_viscosity,
+        pressure=pressure,
+    ),
+    particle_radius=particle_radius,
 )
 # get friction factor
 friction_factor = par.particles.get_friction_factor(
     particle_radius=particle_radius,
     dynamic_viscosity=par.gas.get_dynamic_viscosity(temperature=temperature),
-    slip_correction=par.particles.get_cunningham_slip_correction(knudsen_number=knudsen_number),
+    slip_correction=par.particles.get_cunningham_slip_correction(
+        knudsen_number=knudsen_number
+    ),
 )
 
 # get coulomb potential ratio
@@ -8338,41 +8416,67 @@ diffusive_knudsen = par.particles.get_diffusive_knudsen_number(
     <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># coulomb dimensionless kernel for Dyachkov et al. (2007)</span>
-<span class="n">coulomb_dyachkov2007_dimensionless_kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coulomb_kernel_dyachkov2007</span><span class="p">(</span>
-    <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen</span><span class="p">,</span>
-    <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
+<span class="n">coulomb_dyachkov2007_dimensionless_kernel</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coulomb_kernel_dyachkov2007</span><span class="p">(</span>
+        <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen</span><span class="p">,</span>
+        <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 
 <span class="c1"># coulomb dimensionless kernel for Gatti et al. (2008)</span>
-<span class="n">coulomb_gatti2008_dimensionless_kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coulomb_kernel_gatti2008</span><span class="p">(</span>
-    <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen</span><span class="p">,</span>
-    <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
+<span class="n">coulomb_gatti2008_dimensionless_kernel</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coulomb_kernel_gatti2008</span><span class="p">(</span>
+        <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen</span><span class="p">,</span>
+        <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 
 <span class="c1"># coulomb dimensionless kernel for Gopalakrishnan et al. (2012)</span>
-<span class="n">coulomb_g2012_dimensionless_kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coulomb_kernel_gopalakrishnan2012</span><span class="p">(</span>
-    <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen</span><span class="p">,</span>
-    <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
+<span class="n">coulomb_g2012_dimensionless_kernel</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coulomb_kernel_gopalakrishnan2012</span><span class="p">(</span>
+        <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen</span><span class="p">,</span>
+        <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 
 <span class="c1"># coulomb dimensionless kernel for Chahl et al. (2019)</span>
-<span class="n">coulomb_chahl20019_dimensionless_kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coulomb_kernel_chahl2019</span><span class="p">(</span>
-    <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen</span><span class="p">,</span>
-    <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
+<span class="n">coulomb_chahl20019_dimensionless_kernel</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coulomb_kernel_chahl2019</span><span class="p">(</span>
+        <span class="n">diffusive_knudsen</span><span class="o">=</span><span class="n">diffusive_knudsen</span><span class="p">,</span>
+        <span class="n">coulomb_potential_ratio</span><span class="o">=</span><span class="n">coulomb_potential_ratio</span><span class="p">,</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 
 <span class="c1"># plot the first index ion attachment to the other particles</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">hard_sphere_dimensionless_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Hard Sphere'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">coulomb_dyachkov2007_dimensionless_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Coulomb Dyachkov 2007'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">coulomb_gatti2008_dimensionless_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Coulomb Gatti 2008'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">coulomb_g2012_dimensionless_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Coulomb Gopalakrishnan 2012'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">coulomb_chahl20019_dimensionless_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Coulomb Chahl 2019'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">'log'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">hard_sphere_dimensionless_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Hard Sphere"</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+    <span class="n">coulomb_dyachkov2007_dimensionless_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Coulomb Dyachkov 2007"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+    <span class="n">coulomb_gatti2008_dimensionless_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Coulomb Gatti 2008"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+    <span class="n">coulomb_g2012_dimensionless_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Coulomb Gopalakrishnan 2012"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+    <span class="n">coulomb_chahl20019_dimensionless_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Coulomb Chahl 2019"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Charge'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Dimensionless Kernel (unitless)'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Dimensionless Kernel for Ion Attachment'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Charge"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Dimensionless Kernel (unitless)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Dimensionless Kernel for Ion Attachment"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -8381,44 +8485,69 @@ hard_sphere_dimensionless_kernel = par.dynamics.get_hard_sphere_kernel(
     diffusive_knudsen=diffusive_knudsen,
 )
 # coulomb dimensionless kernel for Dyachkov et al. (2007)
-coulomb_dyachkov2007_dimensionless_kernel = par.dynamics.get_coulomb_kernel_dyachkov2007(
-    diffusive_knudsen=diffusive_knudsen,
-    coulomb_potential_ratio=coulomb_potential_ratio,
+coulomb_dyachkov2007_dimensionless_kernel = (
+    par.dynamics.get_coulomb_kernel_dyachkov2007(
+        diffusive_knudsen=diffusive_knudsen,
+        coulomb_potential_ratio=coulomb_potential_ratio,
+    )
 )
 
 # coulomb dimensionless kernel for Gatti et al. (2008)
-coulomb_gatti2008_dimensionless_kernel = par.dynamics.get_coulomb_kernel_gatti2008(
-    diffusive_knudsen=diffusive_knudsen,
-    coulomb_potential_ratio=coulomb_potential_ratio,
+coulomb_gatti2008_dimensionless_kernel = (
+    par.dynamics.get_coulomb_kernel_gatti2008(
+        diffusive_knudsen=diffusive_knudsen,
+        coulomb_potential_ratio=coulomb_potential_ratio,
+    )
 )
 
 # coulomb dimensionless kernel for Gopalakrishnan et al. (2012)
-coulomb_g2012_dimensionless_kernel = par.dynamics.get_coulomb_kernel_gopalakrishnan2012(
-    diffusive_knudsen=diffusive_knudsen,
-    coulomb_potential_ratio=coulomb_potential_ratio,
+coulomb_g2012_dimensionless_kernel = (
+    par.dynamics.get_coulomb_kernel_gopalakrishnan2012(
+        diffusive_knudsen=diffusive_knudsen,
+        coulomb_potential_ratio=coulomb_potential_ratio,
+    )
 )
 
 # coulomb dimensionless kernel for Chahl et al. (2019)
-coulomb_chahl20019_dimensionless_kernel = par.dynamics.get_coulomb_kernel_chahl2019(
-    diffusive_knudsen=diffusive_knudsen,
-    coulomb_potential_ratio=coulomb_potential_ratio,
+coulomb_chahl20019_dimensionless_kernel = (
+    par.dynamics.get_coulomb_kernel_chahl2019(
+        diffusive_knudsen=diffusive_knudsen,
+        coulomb_potential_ratio=coulomb_potential_ratio,
+    )
 )
 
 # plot the first index ion attachment to the other particles
 fig, ax = plt.subplots()
-ax.plot(charge[1:], hard_sphere_dimensionless_kernel[0, 1:], label='Hard Sphere')
-ax.plot(charge[1:], coulomb_dyachkov2007_dimensionless_kernel[0, 1:], label='Coulomb Dyachkov 2007')
-ax.plot(charge[1:], coulomb_gatti2008_dimensionless_kernel[0, 1:], label='Coulomb Gatti 2008')
-ax.plot(charge[1:], coulomb_g2012_dimensionless_kernel[0, 1:], label='Coulomb Gopalakrishnan 2012')
-ax.plot(charge[1:], coulomb_chahl20019_dimensionless_kernel[0, 1:], label='Coulomb Chahl 2019')
-ax.set_yscale('log')
+ax.plot(
+    charge[1:], hard_sphere_dimensionless_kernel[0, 1:], label="Hard Sphere"
+)
+ax.plot(
+    charge[1:],
+    coulomb_dyachkov2007_dimensionless_kernel[0, 1:],
+    label="Coulomb Dyachkov 2007",
+)
+ax.plot(
+    charge[1:],
+    coulomb_gatti2008_dimensionless_kernel[0, 1:],
+    label="Coulomb Gatti 2008",
+)
+ax.plot(
+    charge[1:],
+    coulomb_g2012_dimensionless_kernel[0, 1:],
+    label="Coulomb Gopalakrishnan 2012",
+)
+ax.plot(
+    charge[1:],
+    coulomb_chahl20019_dimensionless_kernel[0, 1:],
+    label="Coulomb Chahl 2019",
+)
+ax.set_yscale("log")
 ax.set_xlim(-1, 12)
-ax.set_xlabel('Charge')
-ax.set_ylabel('Dimensionless Kernel (unitless)')
-ax.set_title('Dimensionless Kernel for Ion Attachment')
+ax.set_xlabel("Charge")
+ax.set_ylabel("Dimensionless Kernel (unitless)")
+ax.set_title("Dimensionless Kernel for Ion Attachment")
 ax.legend()
-plt.show()
-</div>
+plt.show()</div>
 </div>
 </div>
 </div>
@@ -8555,16 +8684,32 @@ Each dimensional kernel is computed by combining:</p>
 
 <span class="c1"># plot the first index ion attachment to the other particles</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">hard_sphere_dimensional_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Hard Sphere'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">coulomb_dyachkov2007_dimensional_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Coulomb Dyachkov 2007'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">coulomb_gatti2008_dimensional_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Coulomb Gatti 2008'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">coulomb_g2012_dimensional_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Coulomb Gopalakrishnan 2012'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">coulomb_chahl20019_dimensional_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Coulomb Chahl 2019'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">'log'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">hard_sphere_dimensional_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Hard Sphere"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+    <span class="n">coulomb_dyachkov2007_dimensional_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Coulomb Dyachkov 2007"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+    <span class="n">coulomb_gatti2008_dimensional_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Coulomb Gatti 2008"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+    <span class="n">coulomb_g2012_dimensional_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Coulomb Gopalakrishnan 2012"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">charge</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+    <span class="n">coulomb_chahl20019_dimensional_kernel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:],</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Coulomb Chahl 2019"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">"log"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Charge (integer count)'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'Dimensional Kernel $m^3/s$'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Dimensional Kernel for Ion Attachment'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Charge (integer count)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">"Dimensional Kernel $m^3/s$"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Dimensional Kernel for Ion Attachment"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"lower right"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -8619,16 +8764,32 @@ coulomb_chahl20019_dimensional_kernel = par.dynamics.get_dimensional_kernel(
 
 # plot the first index ion attachment to the other particles
 fig, ax = plt.subplots()
-ax.plot(charge[1:], hard_sphere_dimensional_kernel[0, 1:], label='Hard Sphere')
-ax.plot(charge[1:], coulomb_dyachkov2007_dimensional_kernel[0, 1:], label='Coulomb Dyachkov 2007')
-ax.plot(charge[1:], coulomb_gatti2008_dimensional_kernel[0, 1:], label='Coulomb Gatti 2008')
-ax.plot(charge[1:], coulomb_g2012_dimensional_kernel[0, 1:], label='Coulomb Gopalakrishnan 2012')
-ax.plot(charge[1:], coulomb_chahl20019_dimensional_kernel[0, 1:], label='Coulomb Chahl 2019')
-ax.set_yscale('log')
+ax.plot(charge[1:], hard_sphere_dimensional_kernel[0, 1:], label="Hard Sphere")
+ax.plot(
+    charge[1:],
+    coulomb_dyachkov2007_dimensional_kernel[0, 1:],
+    label="Coulomb Dyachkov 2007",
+)
+ax.plot(
+    charge[1:],
+    coulomb_gatti2008_dimensional_kernel[0, 1:],
+    label="Coulomb Gatti 2008",
+)
+ax.plot(
+    charge[1:],
+    coulomb_g2012_dimensional_kernel[0, 1:],
+    label="Coulomb Gopalakrishnan 2012",
+)
+ax.plot(
+    charge[1:],
+    coulomb_chahl20019_dimensional_kernel[0, 1:],
+    label="Coulomb Chahl 2019",
+)
+ax.set_yscale("log")
 ax.set_xlim(-1, 12)
-ax.set_xlabel('Charge (integer count)')
-ax.set_ylabel(r'Dimensional Kernel $m^3/s$')
-ax.set_title('Dimensional Kernel for Ion Attachment')
+ax.set_xlabel("Charge (integer count)")
+ax.set_ylabel(r"Dimensional Kernel $m^3/s$")
+ax.set_title("Dimensional Kernel for Ion Attachment")
 ax.legend(loc="lower right")
 plt.show()</div>
 </div>

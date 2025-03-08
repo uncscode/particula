@@ -1976,6 +1976,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -2012,6 +2021,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -2060,6 +2078,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature_2" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -2102,9 +2129,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#signature_3" class="md-nav__link">
+  <a href="#examples_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Signature
+      Examples
     </span>
   </a>
   
@@ -2144,9 +2171,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#signature_4" class="md-nav__link">
+  <a href="#examples_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Signature
+      Examples
     </span>
   </a>
   
@@ -7540,6 +7567,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7576,6 +7612,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7624,6 +7669,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature_2" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7666,9 +7720,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#signature_3" class="md-nav__link">
+  <a href="#examples_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Signature
+      Examples
     </span>
   </a>
   
@@ -7708,9 +7762,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#signature_4" class="md-nav__link">
+  <a href="#examples_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Signature
+      Examples
     </span>
   </a>
   
@@ -7746,21 +7800,30 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py">particula.dynamics.coagulation.particle_resolved_step.particle_resolved_method</a> module.</p>
 </blockquote>
 <h2 id="_calculate_probabilities">_calculate_probabilities<a class="headerlink" href="#_calculate_probabilities" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L231">Show source in particle_resolved_method.py:231</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L312">Show source in particle_resolved_method.py:312</a></p>
 <p>Calculate coagulation probabilities based on kernel values and system
 parameters.</p>
+<p>This function multiplies the kernel values by the time step and a factor
+derived from the ratio of (events / tests) over the volume to obtain the
+probability of coagulation.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>kernel_values</code> <em>float</em> - Interpolated kernel value for a particle pair.</li>
-<li><code>time_step</code> <em>float</em> - The time step over which coagulation occurs.</li>
-<li><code>events</code> <em>int</em> - Number of possible coagulation events.</li>
-<li><code>tests</code> <em>int</em> - Number of tests (or trials) for coagulation.</li>
-<li><code>volume</code> <em>float</em> - Volume of the system.</li>
+<li>kernel_values : Interpolated kernel values for a given particle pair,
+  may be scalar or array.</li>
+<li>time_step : Duration of one coagulation step in seconds.</li>
+<li>events : Number of possible collisions for the pair(s).</li>
+<li>tests : Number of trials for the random selection procedure.</li>
+<li>volume : System volume in m³.</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>float</code> - Coagulation probability.</li>
+<li>The probability (or array of probabilities) that a collision occurs
+  during this time step.</li>
 </ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="n">prob</span> <span class="o">=</span> <span class="n">_calculate_probabilities</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">)</span>
+<span class="c1"># prob ~ 0.5 * 1.0 * 20 / (10 * 1e-3) = 1000</span>
+</code></pre></div>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_calculate_probabilities</span><span class="p">(</span>
     <span class="n">kernel_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
@@ -7771,20 +7834,31 @@ parameters.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="_final_coagulation_state">_final_coagulation_state<a class="headerlink" href="#_final_coagulation_state" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L255">Show source in particle_resolved_method.py:255</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L348">Show source in particle_resolved_method.py:348</a></p>
 <p>Resolve the final state of particles that have undergone multiple
 coagulation events.</p>
+<p>This function ensures that each small particle index merges correctly to
+a final large particle index, preventing logical conflicts (e.g., a single
+particle merging into multiple large particles in the same step).</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>small_indices</code> <em>NDArray[np.int64]</em> - Indices of smaller particles.</li>
-<li><code>large_indices</code> <em>NDArray[np.int64]</em> - Indices of larger particles.</li>
-<li><code>particle_radius</code> <em>NDArray[np.float64]</em> - Radii of particles.</li>
+<li>small_indices : Array of smaller particle indices in coagulation.</li>
+<li>large_indices : Array of larger particle indices in coagulation.</li>
+<li>particle_radius : Array of current particle radii.</li>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>Tuple[NDArray[np.int64],</code> <em>NDArray[np.int64]]</em> - Updated small and large
-indices.</li>
+<li>A tuple (updated_small_indices, updated_large_indices) that resolves
+  multiple merges for the same particle.</li>
 </ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">small</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">large</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">1.5e-9</span><span class="p">,</span> <span class="mf">2e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">4e-9</span><span class="p">])</span>
+<span class="n">s_final</span><span class="p">,</span> <span class="n">l_final</span> <span class="o">=</span> <span class="n">_final_coagulation_state</span><span class="p">(</span><span class="n">small</span><span class="p">,</span> <span class="n">large</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+<span class="c1"># ensures each index in s_final merges to a single large index</span>
+</code></pre></div>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_final_coagulation_state</span><span class="p">(</span>
     <span class="n">small_indices</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span>
@@ -7793,49 +7867,102 @@ indices.</li>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="_interpolate_kernel">_interpolate_kernel<a class="headerlink" href="#_interpolate_kernel" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L203">Show source in particle_resolved_method.py:203</a></p>
-<p>Create an interpolation function for the coagulation kernel with nearest
-extrapolation for out-of-bound values.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L267">Show source in particle_resolved_method.py:267</a></p>
+<p>Create an interpolation function for the coagulation kernel with
+out-of-bounds handling.</p>
+<p>This function returns a RegularGridInterpolator that performs linear
+interpolation for values within the domain of the kernel and clamps to the
+nearest value outside of it.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>kernel</code> <em>NDArray[np.float64]</em> - Coagulation kernel.</li>
-<li><code>kernel_radius</code> <em>NDArray[np.float64]</em> - Radii corresponding to kernel
-    bins.</li>
+<li>kernel : 2D coagulation kernel values.</li>
+<li>kernel_radius : Radii corresponding to kernel bins.</li>
 </ul>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>RegularGridInterpolator</code> - Interpolated kernel function.</li>
+<li>A RegularGridInterpolator object for retrieving kernel values based
+    on radius pairs.</li>
 </ul>
+<h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation.particle_resolved_step</span><span class="w"> </span><span class="kn">import</span>
+    <span class="n">particle_resolved_method</span>
+<span class="n">kernel_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">1e-7</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">interpolator</span> <span class="o">=</span> <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">_interpolate_kernel</span><span class="p">(</span>
+    <span class="n">kernel_vals</span><span class="p">,</span> <span class="n">rad</span>
+<span class="p">)</span>
+<span class="c1"># Use interpolator([[r_small, r_large]]) to get kernel value</span>
+</code></pre></div>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_interpolate_kernel</span><span class="p">(</span>
     <span class="n">kernel</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">kernel_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RegularGridInterpolator</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_particle_resolved_coagulation_step">get_particle_resolved_coagulation_step<a class="headerlink" href="#get_particle_resolved_coagulation_step" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L61">Show source in particle_resolved_method.py:61</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L88">Show source in particle_resolved_method.py:88</a></p>
 <p>Perform a single step of particle coagulation, updating particle radii
-based on coagulation events.</p>
+with a stochastic approach.</p>
+<p>This function models collisions between particles based on a given
+coagulation kernel. It identifies potential collision pairs, randomly
+selects which collisions occur according to a probability derived from the
+kernel value, and then tracks which particles have coagulated.</p>
+<p>The main calculation for the probability of coagulation is:</p>
+<ul>
+<li>Probability = K × Δt × (possible collisions) / (tests × volume)<ul>
+<li>K is the interpolated kernel value,</li>
+<li>Δt is the timestep,</li>
+<li>volume is the system volume.</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>particle_radius</code> <em>NDArray[np.float64]</em> - Array of particle radii.</li>
-<li><code>kernel</code> <em>NDArray[np.float64]</em> - Coagulation kernel as a 2D array where
-    each element represents the probability of coagulation between
-    particles of corresponding sizes.</li>
-<li><code>kernel_radius</code> <em>NDArray[np.float64]</em> - Array of radii corresponding to
-    the kernel bins.</li>
-<li><code>volume</code> <em>float</em> - Volume of the system in which coagulation occurs.</li>
-<li><code>time_step</code> <em>float</em> - Time step over which coagulation is calculated.</li>
-<li><code>random_generator</code> <em>np.random.Generator</em> - Random number generator for
-    stochastic processes.</li>
+<li>particle_radius : Array of particle radii.</li>
+<li>kernel : 2D coagulation kernel matrix matching the size of
+    kernel_radius.</li>
+<li>kernel_radius : Radii used to index or interpolate the kernel.</li>
+<li>volume : Volume of the system in m³.</li>
+<li>time_step : Time step for each coagulation iteration in seconds.</li>
+<li>random_generator : Random number generator for the stochastic
+    approach.</li>
 </ul>
 <h4 id="returns_3">Returns<a class="headerlink" href="#returns_3" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>NDArray[np.int64]</code> - Array of indices corresponding to the coagulation
-    events, where each element is a pair of indices corresponding to
-    the coagulating particles [loss, gain].</li>
+<li>An array of shape (N, 2), where each row contains
+    [small_index, large_index] for coagulation events.</li>
 </ul>
-<h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_particle_resolved_coagulation_step</span><span class="p">(</span>
+<h4 id="examples_3">Examples<a class="headerlink" href="#examples_3" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation.particle_resolved_step</span><span class="w"> </span><span class="kn">import</span>
+    <span class="n">particle_resolved_method</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">2e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">])</span>
+<span class="n">kernel_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span>
+<span class="n">kernel_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1e-10</span><span class="p">,</span> <span class="mf">1e-7</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">vol</span> <span class="o">=</span> <span class="mf">1e-3</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">event_pairs</span> <span class="o">=</span>
+<span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">get_particle_resolved_coagulation_step</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">r</span><span class="p">,</span>
+    <span class="n">kernel</span><span class="o">=</span><span class="n">kernel_values</span><span class="p">,</span>
+    <span class="n">kernel_radius</span><span class="o">=</span><span class="n">kernel_r</span><span class="p">,</span>
+    <span class="n">volume</span><span class="o">=</span><span class="n">vol</span><span class="p">,</span>
+    <span class="n">time_step</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+    <span class="n">random_generator</span><span class="o">=</span><span class="n">rng</span>
+<span class="p">)</span>
+<span class="c1"># event_pairs contains the pairs of [small, large] indices that</span>
+<span class="c1"># coagulated.</span>
+
+<span class="n">References</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">Seinfeld</span><span class="p">,</span> <span class="n">J</span><span class="o">.</span> <span class="n">H</span><span class="o">.</span><span class="p">,</span> <span class="o">&amp;</span> <span class="n">Pandis</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span> <span class="n">N</span><span class="o">.</span> <span class="o">*</span><span class="n">Atmospheric</span> <span class="n">Chemistry</span> <span class="ow">and</span> <span class="n">Physics</span><span class="o">*</span><span class="p">,</span>
+  <span class="n">Wiley</span><span class="p">,</span> <span class="mf">2016.</span>
+
+<span class="c1">#### Signature</span>
+
+<span class="err">```</span><span class="n">python</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_particle_resolved_coagulation_step</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">kernel</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">kernel_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
@@ -7846,23 +7973,53 @@ based on coagulation events.</p>
 </code></pre></div>
 <h2 id="get_particle_resolved_update_step">get_particle_resolved_update_step<a class="headerlink" href="#get_particle_resolved_update_step" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L14">Show source in particle_resolved_method.py:14</a></p>
-<p>Update the particle radii and concentrations after coagulation events.</p>
+<p>Update particle radii and track lost/gained particles after coagulation
+events.</p>
+<p>This function simulates the immediate effect of coagulation on particle
+radii, marking smaller particles as lost and updating the larger particles
+to the new radius computed from volume conservation. The calculation is:</p>
+<ul>
+<li>r_new = cbrt(r_small³ + r_large³)<ul>
+<li>r_new is the new radius in meters,</li>
+<li>r_small is the smaller particle's radius in meters,</li>
+<li>r_large is the larger particle's radius in meters.</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_4">Arguments<a class="headerlink" href="#arguments_4" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>particle_radius</code> <em>NDArray[float64]</em> - Array of particle radii.</li>
-<li><code>small_index</code> <em>NDArray[int64]</em> - Indices corresponding to smaller
-    particles.</li>
-<li><code>large_index</code> <em>NDArray[int64]</em> - Indices corresponding to larger
-    particles.</li>
+<li>particle_radius : Array of particle radii.</li>
+<li>loss : Array to store lost particle radii.</li>
+<li>gain : Array to store gained particle radii.</li>
+<li>small_index : Indices of smaller particles.</li>
+<li>large_index : Indices of larger particles.</li>
 </ul>
 <h4 id="returns_4">Returns<a class="headerlink" href="#returns_4" title="Permanent link">&para;</a></h4>
 <ul>
-<li>Updated array of particle radii.</li>
+<li>Updated array of particle radii after coagulation events.</li>
 <li>Updated array for the radii of particles that were lost.</li>
 <li>Updated array for the radii of particles that were gained.</li>
 </ul>
-<h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_particle_resolved_update_step</span><span class="p">(</span>
+<h4 id="examples_4">Examples<a class="headerlink" href="#examples_4" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example Usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation.particle_resolved_step</span><span class="w"> </span><span class="kn">import</span>
+    <span class="n">particle_resolved_method</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">2e-9</span><span class="p">,</span> <span class="mf">3e-9</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">])</span>
+<span class="n">lost</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="n">gained</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="n">s_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">l_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">updated_r</span><span class="p">,</span> <span class="n">lost_r</span><span class="p">,</span> <span class="n">gained_r</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">particle_resolved_method</span><span class="o">.</span><span class="n">get_particle_resolved_update_step</span><span class="p">(</span>
+        <span class="n">r</span><span class="p">,</span> <span class="n">lost</span><span class="p">,</span> <span class="n">gained</span><span class="p">,</span> <span class="n">s_idx</span><span class="p">,</span> <span class="n">l_idx</span>
+    <span class="p">))</span>
+<span class="c1"># updated_r now has coagulated radii, lost_r and gained_r are tracked.</span>
+
+<span class="c1">#### Signature</span>
+
+<span class="err">```</span><span class="n">python</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_particle_resolved_update_step</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">loss</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">gain</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>

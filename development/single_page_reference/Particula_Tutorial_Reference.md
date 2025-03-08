@@ -1410,7 +1410,9 @@ Finally, the aerosol system is created by combining the atmospheric conditions a
 # AtmosphereBuilder constructs the atmosphere with predefined species
 atmosphere = (
     par.gas.AtmosphereBuilder()
-    .add_species(par.gas.PresetGasSpeciesBuilder().build())  # Add a preset gas species
+    .add_species(
+        par.gas.PresetGasSpeciesBuilder().build()
+    )  # Add a preset gas species
     .set_temperature(25, temperature_units="degC")  # Set temperature to 25°C
     .set_pressure(1, pressure_units="atm")  # Set pressure to 1 atmosphere
     .build()  # Finalize the atmosphere object
@@ -1616,7 +1618,9 @@ Finally, we print the properties of the `aerosol` object’s atmosphere to verif
 # AtmosphereBuilder constructs the atmosphere with predefined species
 atmosphere = (
     par.gas.AtmosphereBuilder()
-    .add_species(par.gas.PresetGasSpeciesBuilder().build())  # Add a preset gas species
+    .add_species(
+        par.gas.PresetGasSpeciesBuilder().build()
+    )  # Add a preset gas species
     .set_temperature(25, temperature_units="degC")  # Set temperature to 25°C
     .set_pressure(1, pressure_units="atm")  # Set pressure to 1 atmosphere
     .build()  # Finalize the atmosphere object
@@ -2675,8 +2679,12 @@ By analyzing these rates, we can predict the dynamic behavior of the aerosol par
 # Calculate the gain, loss, and net change in particle concentration due to coagulation
 # `discrete_gain`: Calculates the rate at which particles are gained due to coagulation
 # `discrete_loss`: Calculates the rate at which particles are lost due to coagulation
-gain_0 = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_0, kernel)
-loss_0 = par.dynamics.get_coagulation_loss_rate_discrete(concentration_0, kernel)
+gain_0 = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_0, kernel
+)
+loss_0 = par.dynamics.get_coagulation_loss_rate_discrete(
+    concentration_0, kernel
+)
 net_0 = gain_0 - loss_0  # Net change in concentration
 
 # Create a DataFrame to display the gain, loss, and net coagulation rates
@@ -2866,7 +2874,9 @@ TIME_STEP = 0.1  # seconds
 # Time step 1: Calculate the gain, loss, and net rate, then update concentration
 
 # Calculate the rate of change in concentration (gain and loss) for the initial concentration
-gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_0, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_0, kernel
+)
 loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_0, kernel)
 net = gain - loss  # Net rate of change
 
@@ -2876,7 +2886,9 @@ concentration_1 = concentration_0 + net * TIME_STEP
 # Time step 2: Recalculate rates with the updated concentration and update again
 
 # Recalculate gain and loss based on the updated concentration from time step 1
-gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_1, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_1, kernel
+)
 loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_1, kernel)
 net = gain - loss
 
@@ -2886,7 +2898,9 @@ concentration_2 = concentration_1 + net * TIME_STEP
 # Time step 3: Recalculate rates again and update concentration
 
 # Recalculate gain and loss based on the updated concentration from time step 2
-gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_2, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_2, kernel
+)
 loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_2, kernel)
 net = gain - loss
 
@@ -3196,8 +3210,12 @@ kernel = par.dynamics.get_brownian_kernel_via_system_state(
 )
 
 # Time step 1: Calculate gain, loss, and update concentration
-gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_lognormal_0, kernel)
-loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_lognormal_0, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_lognormal_0, kernel
+)
+loss = par.dynamics.get_coagulation_loss_rate_discrete(
+    concentration_lognormal_0, kernel
+)
 net = gain - loss
 concentration_lognormal_1 = concentration_lognormal_0 + net * TIME_STEP
 concentration_lognormal_1[concentration_lognormal_1 < 0] = (
@@ -3205,8 +3223,12 @@ concentration_lognormal_1[concentration_lognormal_1 < 0] = (
 )
 
 # Time step 2: Recalculate rates and update concentration
-gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_lognormal_1, kernel)
-loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_lognormal_1, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_lognormal_1, kernel
+)
+loss = par.dynamics.get_coagulation_loss_rate_discrete(
+    concentration_lognormal_1, kernel
+)
 net = gain - loss
 concentration_lognormal_2 = concentration_lognormal_1 + net * TIME_STEP
 concentration_lognormal_2[concentration_lognormal_2 < 0] = (
@@ -3214,8 +3236,12 @@ concentration_lognormal_2[concentration_lognormal_2 < 0] = (
 )
 
 # Time step 3: Recalculate rates and update concentration
-gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_lognormal_2, kernel)
-loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_lognormal_2, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_lognormal_2, kernel
+)
+loss = par.dynamics.get_coagulation_loss_rate_discrete(
+    concentration_lognormal_2, kernel
+)
 net = gain - loss
 concentration_lognormal_3 = concentration_lognormal_2 + net * TIME_STEP
 concentration_lognormal_3[concentration_lognormal_3 < 0] = (
@@ -3827,7 +3853,7 @@ The resulting distribution is plotted with particle radius on the x-axis and par
 # Generate a lognormal particle size distribution
 # This distribution is characterized by a mode (most probable size) of 100 nm,
 # a geometric standard deviation of 1.4, and a total number concentration of 1e6 particles per cm^3.
-concentration_lognormal_0 =par.particles.get_lognormal_pdf_distribution(
+concentration_lognormal_0 = par.particles.get_lognormal_pdf_distribution(
     x_values=radius_bins,
     mode=np.array(100e-9),  # Mode of the distribution (100 nm)
     geometric_standard_deviation=np.array(1.4),  # Geometric standard deviation
@@ -5027,14 +5053,12 @@ loss_gain_index = par.dynamics.get_particle_resolved_coagulation_step(
     time_step=delta_t,
     random_generator=random_generator,
 )
-particle_radius, gain, loss = (
-    par.dynamics.get_particle_resolved_update_step(
-        particle_radius=particle_radius,
-        gain=np.zeros_like(particle_radius),
-        loss=np.zeros_like(particle_radius),
-        small_index=loss_gain_index[:, 0],
-        large_index=loss_gain_index[:, 1],
-    )
+particle_radius, gain, loss = par.dynamics.get_particle_resolved_update_step(
+    particle_radius=particle_radius,
+    gain=np.zeros_like(particle_radius),
+    loss=np.zeros_like(particle_radius),
+    small_index=loss_gain_index[:, 0],
+    large_index=loss_gain_index[:, 1],
 )
 
 print(loss_gain_index.shape)
@@ -5132,24 +5156,20 @@ particles_matrix = np.zeros([len(time_array), len(particles_0)])
 for i, dpa in enumerate(time_array):
     if i > 0:
 
-        loss_gain_index = (
-            par.dynamics.get_particle_resolved_coagulation_step(
-                particle_radius=particles_i,
-                kernel=kernel,
-                kernel_radius=radius_bins,
-                volume=volume_sim,
-                time_step=time_interval,
-                random_generator=random_generator,
-            )
+        loss_gain_index = par.dynamics.get_particle_resolved_coagulation_step(
+            particle_radius=particles_i,
+            kernel=kernel,
+            kernel_radius=radius_bins,
+            volume=volume_sim,
+            time_step=time_interval,
+            random_generator=random_generator,
         )
-        particles_i, _, _ = (
-            par.dynamics.get_particle_resolved_update_step(
-                particle_radius=particles_i,
-                gain=np.zeros_like(particles_i),
-                loss=np.zeros_like(particles_i),
-                small_index=loss_gain_index[:, 0],
-                large_index=loss_gain_index[:, 1],
-            )
+        particles_i, _, _ = par.dynamics.get_particle_resolved_update_step(
+            particle_radius=particles_i,
+            gain=np.zeros_like(particles_i),
+            loss=np.zeros_like(particles_i),
+            small_index=loss_gain_index[:, 0],
+            large_index=loss_gain_index[:, 1],
         )
 
         # Ensure no negative concentrations (set to zero if less than zero)
@@ -5337,7 +5357,9 @@ mol_free_path = par.gas.get_molecule_mean_free_path(
 knudsen_number = par.particles.get_knudsen_number(
     mean_free_path=mol_free_path, particle_radius=radius_bins
 )
-slip_correction = par.particles.get_cunningham_slip_correction(knudsen_number=knudsen_number)
+slip_correction = par.particles.get_cunningham_slip_correction(
+    knudsen_number=knudsen_number
+)
 
 
 friction_factor_value = par.particles.get_friction_factor(
@@ -5373,7 +5395,9 @@ We compute the Coulomb enhancement factors in both the kinetic and continuum lim
 
 
 ```python
-coulomb_kinetic_limit = par.particles.get_coulomb_kinetic_limit(coulomb_potential_ratio)
+coulomb_kinetic_limit = par.particles.get_coulomb_kinetic_limit(
+    coulomb_potential_ratio
+)
 coulomb_continuum_limit = par.particles.get_coulomb_continuum_limit(
     coulomb_potential_ratio
 )
@@ -5622,7 +5646,9 @@ knudsen_number = par.particles.get_knudsen_number(
 )
 
 # Calculate slip correction factor
-slip_correction = par.particles.get_cunningham_slip_correction(knudsen_number=knudsen_number)
+slip_correction = par.particles.get_cunningham_slip_correction(
+    knudsen_number=knudsen_number
+)
 
 # Calculate friction factor
 friction_factor_value = par.particles.get_friction_factor(
@@ -5660,7 +5686,6 @@ The **Hard Sphere** kernel strategy assumes that particles interact as hard sphe
 
 
 ```python
-
 # Instantiate the Hard Sphere kernel strategy
 kernel_strategy_hs = par.dynamics.HardSphereKernelStrategy()
 
@@ -5806,9 +5831,10 @@ The **Coulomb Gopalakrishnan 2012** kernel strategy accounts for Coulomb-influen
 
 
 ```python
-
 # Instantiate the Coulomb Gopalakrishnan 2012 kernel strategy
-kernel_strategy_gopalakrishnan = par.dynamics.CoulombGopalakrishnan2012KernelStrategy()
+kernel_strategy_gopalakrishnan = (
+    par.dynamics.CoulombGopalakrishnan2012KernelStrategy()
+)
 
 # Compute the dimensionless kernel
 dimensionless_kernel_gopalakrishnan = (

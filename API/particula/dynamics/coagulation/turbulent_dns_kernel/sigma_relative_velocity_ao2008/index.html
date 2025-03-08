@@ -2213,6 +2213,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -2273,6 +2282,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references_1" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -2327,6 +2345,15 @@
   <a href="#returns_2" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7549,6 +7576,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7603,6 +7639,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7669,6 +7714,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references_2" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7716,43 +7770,63 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py">particula.dynamics.coagulation.turbulent_dns_kernel.sigma_relative_velocity_ao2008</a> module.</p>
 </blockquote>
 <h2 id="velocitycorrelationterms">VelocityCorrelationTerms<a class="headerlink" href="#velocitycorrelationterms" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L35">Show source in sigma_relative_velocity_ao2008.py:35</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L37">Show source in sigma_relative_velocity_ao2008.py:37</a></p>
 <p>Parameters from computing velocity correlation terms.</p>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VelocityCorrelationTerms</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="_compute_cross_correlation_velocity">_compute_cross_correlation_velocity<a class="headerlink" href="#_compute_cross_correlation_velocity" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L229">Show source in sigma_relative_velocity_ao2008.py:229</a></p>
-<p>Compute the cross-correlation of the fluctuating velocities of droplets</p>
-<p>The function is given by:</p>
-<p>⟨ v'^(1) v'^(2) ⟩ = (u'² f₂(R) / (τ_p1 τ_p2)) *                            [b₁ d₁ Φ(c₁, e₁) - b₁ d₂ Φ(c₁, e₂)                             - b₂ d₁ Φ(c₂, e₁) + b₂ d₂ Φ(c₂, e₂)]</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L256">Show source in sigma_relative_velocity_ao2008.py:256</a></p>
+<p>Compute cross-correlation of fluctuating velocities for two droplets.</p>
+<p>This function calculates the cross-correlation of the fluctuating
+velocities of two droplets using the following equation:</p>
+<p>Where the equation is</p>
 <ul>
+<li>⟨v'¹ v'²⟩ = (u'² f₂(R) / (τ_p1 τ_p2)) *
+    [b₁ d₁ Φ(c₁, e₁) - b₁ d₂ Φ(c₁, e₂) - b₂ d₁ Φ(c₂, e₁) + b₂ d₂ Φ(c₂, e₂)]<ul>
+<li>v'¹, v'² are the fluctuating velocities for droplets 1 and 2.</li>
 <li>u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s].</li>
 <li>τ_p1, τ_p2 : Inertia timescales of droplets 1 and 2 [s].</li>
 <li>f₂(R) : Longitudinal velocity correlation function.</li>
 <li>Φ(c, e) : Function Φ computed using <code>get_phi_ao2008</code>.</li>
 </ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
-- collisional_radius : Distance between two colliding droplets [m].
-- `-` *particle_inertia_time* - Inertia timescale of droplet 1 [s].
-- `-` *particle_velocity* - Droplet velocity [m/s].
-- taylor_microscale : Taylor microscale [m].
-- eulerian_integral_length : Eulerian integral length scale [m].
-- velocity_correlation_terms : Velocity correlation coefficients [-].
-</code></pre></div>
+<ul>
+<li>fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].</li>
+<li>collisional_radius : Distance between two colliding droplets [m].</li>
+<li>particle_inertia_time : Inertia timescale of droplet 1 [s].</li>
+<li>particle_velocity : Droplet velocity [m/s].</li>
+<li>taylor_microscale : Taylor microscale [m].</li>
+<li>eulerian_integral_length : Eulerian integral length scale [m].</li>
+<li>velocity_correlation_terms : Velocity correlation coefficients [-].</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Cross-correlation velocity ⟨ v&#39;^(1) v&#39;^(2) ⟩ [m²/s²].
+<ul>
+<li>Cross-correlation velocity [m²/s²].</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">ccv</span> <span class="o">=</span> <span class="n">_compute_cross_correlation_velocity</span><span class="p">(</span>
+    <span class="n">fluid_rms_velocity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">collisional_radius</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mf">2e-4</span><span class="p">]),</span>
+    <span class="n">particle_inertia_time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">]),</span>
+    <span class="n">particle_velocity</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]),</span>
+    <span class="n">taylor_microscale</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">eulerian_integral_length</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">velocity_correlation_terms</span><span class="o">=</span><span class="n">VelocityCorrelationTerms</span><span class="p">(</span>
+        <span class="n">b1</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">b2</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">d1</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">d2</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">c1</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">c2</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">e1</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">e2</span><span class="o">=</span><span class="mf">0.8</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+<span class="c1"># Output: array([...])</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016</li>
+<li>Ayala, O. et al. (2008). Effects of turbulence on the geometric
+  collision rate of sedimenting droplets. Part 2. Theory and
+  parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
@@ -7780,33 +7854,51 @@
 <li><a href="#velocitycorrelationterms">VelocityCorrelationTerms</a></li>
 </ul>
 <h2 id="_compute_rms_fluctuation_velocity">_compute_rms_fluctuation_velocity<a class="headerlink" href="#_compute_rms_fluctuation_velocity" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L137">Show source in sigma_relative_velocity_ao2008.py:137</a></p>
-<p>Compute the square of the RMS fluctuation velocity for the k-th droplet.</p>
-<p>The function is given by:</p>
-<p>⟨ (v'^(k))² ⟩ = (u'² / τ_pk) *                        [b₁ d₁ Ψ(c₁, e₁) - b₁ d₂ Ψ(c₁, e₂)                         - b₂ d₁ Ψ(c₂, e₁) + b₂ d₂ Ψ(c₂, e₂)]</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L151">Show source in sigma_relative_velocity_ao2008.py:151</a></p>
+<p>Compute RMS fluctuation velocity for the k-th droplet.</p>
+<p>This function calculates the square of the RMS fluctuation velocity for
+the k-th droplet using the following equation:</p>
+<p>Where the equation is:</p>
 <ul>
+<li>⟨(v'ᵏ)²⟩ = (u'² / τ_pk) * [b₁ d₁ Ψ(c₁, e₁) - b₁ d₂ Ψ(c₁, e₂)</li>
+<li>b₂ d₁ Ψ(c₂, e₁) + b₂ d₂ Ψ(c₂, e₂)]<ul>
+<li>v'ᵏ is the fluctuating velocity for droplet k.</li>
 <li>u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s].</li>
-<li>τ_pk (particle_inertia_time) : Inertia timescale of the droplet k [s].</li>
+<li>τ_pk (particle_inertia_time) : Inertia timescale of the droplet k
+    [s].</li>
 <li>Ψ(c, e) : Function Ψ computed using <code>get_psi_ao2008</code>.</li>
 </ul>
+</li>
+</ul>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
-- particle_inertia_time : Inertia timescale of the droplet k [s].
-- velocity_correlation_terms : Velocity correlation coefficients [-].
-- particle_velocity : Droplet velocity [m/s].
-</code></pre></div>
+<ul>
+<li>fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].</li>
+<li>particle_inertia_time : Inertia timescale of the droplet k [s].</li>
+<li>particle_velocity : Droplet velocity [m/s].</li>
+<li>velocity_correlation_terms : Velocity correlation coefficients [-].</li>
+</ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- RMS fluctuation velocity squared ⟨ (v&#39;^(k))² ⟩ [m²/s²].
+<ul>
+<li>RMS fluctuation velocity [m²/s²].</li>
+</ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">rms_fluct</span> <span class="o">=</span> <span class="n">_compute_rms_fluctuation_velocity</span><span class="p">(</span>
+    <span class="n">fluid_rms_velocity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">particle_inertia_time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">]),</span>
+    <span class="n">particle_velocity</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]),</span>
+    <span class="n">velocity_correlation_terms</span><span class="o">=</span><span class="n">VelocityCorrelationTerms</span><span class="p">(</span>
+        <span class="n">b1</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">b2</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">d1</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">d2</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">c1</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">c2</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">e1</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">e2</span><span class="o">=</span><span class="mf">0.8</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+<span class="c1"># Output: array([...])</span>
 </code></pre></div>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016</li>
+<li>Ayala, O. et al. (2008). Effects of turbulence on the geometric
+  collision rate of sedimenting droplets. Part 2. Theory and
+  parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;fluid_rms_velocity&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;particle_inertia_time&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
@@ -7822,36 +7914,51 @@
 <li><a href="#velocitycorrelationterms">VelocityCorrelationTerms</a></li>
 </ul>
 <h2 id="get_relative_velocity_variance">get_relative_velocity_variance<a class="headerlink" href="#get_relative_velocity_variance" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L48">Show source in sigma_relative_velocity_ao2008.py:48</a></p>
-<p>Compute the variance of particle relative-velocity fluctuation.</p>
-<p>The function is given by:</p>
-<p>σ² = ⟨ (v'^(2))² ⟩ + ⟨ (v'^(1))² ⟩ - 2 ⟨ v'^(1) v'^(2) ⟩</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L50">Show source in sigma_relative_velocity_ao2008.py:50</a></p>
+<p>Compute the variance of particle relative-velocity fluctuations.</p>
+<p>This function calculates the variance of particle relative-velocity
+fluctuations using the following equation:</p>
+<p>Where the equation is:</p>
 <ul>
-<li>⟨ (v'^(k))² ⟩ is the square of the RMS fluctuation velocity for droplet k</li>
-<li>⟨ v'^(1) v'^(2) ⟩ is the cross-correlation of the fluctuating velocities.</li>
+<li>σ² = ⟨(v'²)⟩₁ + ⟨(v'²)⟩₂ - 2⟨v'¹ v'²⟩<ul>
+<li>v'¹, v'² are the fluctuating velocities for droplets 1 and 2.</li>
+</ul>
+</li>
 </ul>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
-- collisional_radius : Distance between two colliding droplets [m].
-- particle_inertia_time : Inertia timescale of droplet 1 [s].
-- particle_velocity : Droplet velocity [m/s].
-- taylor_microscale : Taylor microscale [m].
-- eulerian_integral_length : Eulerian integral length scale [m].
-- lagrangian_integral_time : Lagrangian integral time scale [s].
-</code></pre></div>
+<ul>
+<li>fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].</li>
+<li>collisional_radius : Distance between two colliding droplets [m].</li>
+<li>particle_inertia_time : Inertia timescale of droplet 1 [s].</li>
+<li>particle_velocity : Droplet velocity [m/s].</li>
+<li>taylor_microscale : Taylor microscale [m].</li>
+<li>eulerian_integral_length : Eulerian integral length scale [m].</li>
+<li>lagrangian_integral_time : Lagrangian integral time scale [s].</li>
+</ul>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- σ² : Variance of particle relative-velocity fluctuation,
-    (n, n) matrix where n is number of particles [m²/s²],
+<ul>
+<li>σ² : Variance of the particle relative-velocity fluctuation [m²/s²].</li>
+</ul>
+<h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">sigma_sq</span> <span class="o">=</span> <span class="n">get_relative_velocity_variance</span><span class="p">(</span>
+    <span class="n">fluid_rms_velocity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">collisional_radius</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mf">2e-4</span><span class="p">]),</span>
+    <span class="n">particle_inertia_time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">]),</span>
+    <span class="n">particle_velocity</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]),</span>
+    <span class="n">taylor_microscale</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">eulerian_integral_length</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">lagrangian_integral_time</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">lagrangian_taylor_microscale_time</span><span class="o">=</span><span class="mf">0.05</span>
+<span class="p">)</span>
+<span class="c1"># Output: array([...])</span>
 </code></pre></div>
 <h4 id="references_2">References<a class="headerlink" href="#references_2" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016</li>
+<li>Ayala, O. et al. (2008). Effects of turbulence on the geometric
+  collision rate of sedimenting droplets. Part 2. Theory and
+  parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016</li>
 </ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>

@@ -7954,27 +7954,28 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py">particula.dynamics.coagulation.charged_dimensionless_kernel</a> module.</p>
 </blockquote>
 <h2 id="get_coulomb_kernel_chahl2019">get_coulomb_kernel_chahl2019<a class="headerlink" href="#get_coulomb_kernel_chahl2019" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L282">Show source in charged_dimensionless_kernel.py:282</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L283">Show source in charged_dimensionless_kernel.py:283</a></p>
 <p>Chahl and Gopalakrishnan (2019) approximation for the dimensionless
-coagulation kernel. Accounts for the Coulomb potential between particles.</p>
+coagulation kernel.</p>
+<p>This function accounts for the Coulomb potential between particles using
+the Chahl and Gopalakrishnan (2019) approximation.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li><code>-</code> <em>diffusive_knudsen</em> - The diffusive Knudsen number (K_nD) [dimensionless].</li>
-<li><code>-</code> <em>coulomb_potential_ratio</em> - The Coulomb potential ratio (phi_E)
-[dimensionless].</li>
+<li>diffusive_knudsen : The diffusive Knudsen number (K_nD)
+    [dimensionless].</li>
+<li>coulomb_potential_ratio : The Coulomb potential ratio (phi_E)
+  [dimensionless].</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<p>The dimensionless coagulation kernel (H) [dimensionless].</p>
-<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>Equations X in:
-Chahl, H. S., &amp; Gopalakrishnan, R. (2019). High potential, near free
-molecular regime Coulombic collisions in aerosols and dusty plasmas.
-Aerosol Science and Technology, 53(8), 933-957.
-https://doi.org/10.1080/02786826.2019.1614522</li>
+<li>The dimensionless coagulation kernel (H) [dimensionless].</li>
+</ul>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Chahl, H. S., &amp; Gopalakrishnan, R. (2019). High potential, near free
+  molecular regime Coulombic collisions in aerosols and dusty plasmas.
+  Aerosol Science and Technology, 53(8), 933-957.
+  https://doi.org/10.1080/02786826.2019.1614522</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_coulomb_kernel_chahl2019</span><span class="p">(</span>
@@ -7983,26 +7984,29 @@ https://doi.org/10.1080/02786826.2019.1614522</li>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_coulomb_kernel_dyachkov2007">get_coulomb_kernel_dyachkov2007<a class="headerlink" href="#get_coulomb_kernel_dyachkov2007" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L112">Show source in charged_dimensionless_kernel.py:112</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L110">Show source in charged_dimensionless_kernel.py:110</a></p>
 <p>Dyachkov et al. (2007) approximation for the dimensionless coagulation
-kernel. Accounts for the Coulomb potential between particles.</p>
+kernel.</p>
+<p>This function accounts for the Coulomb potential between particles using
+the Dyachkov et al. (2007) approximation.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li><code>-</code> <em>diffusive_knudsen</em> - The diffusive Knudsen number (K_nD) [dimensionless].</li>
-<li><code>-</code> <em>coulomb_potential_ratio</em> - The Coulomb potential ratio (phi_E)
-[dimensionless].</li>
+<li>diffusive_knudsen : The diffusive Knudsen number (K_nD)
+    [dimensionless].</li>
+<li>coulomb_potential_ratio : The Coulomb potential ratio (phi_E)
+  [dimensionless].</li>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<hr />
-<p>The dimensionless coagulation kernel (H) [dimensionless].</p>
+<ul>
+<li>The dimensionless coagulation kernel (H) [dimensionless].</li>
+</ul>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
-<hr />
-<p>Equations X in:
-- Dyachkov, S. A., Kustova, E. V., &amp; Kustov, A. V. (2007). Coagulation of
-particles in the transition regime: The effect of the Coulomb potential.
-Journal of Chemical Physics, 126(12).
-https://doi.org/10.1063/1.2713719</p>
+<ul>
+<li>Dyachkov, S. A., Kustova, E. V., &amp; Kustov, A. V. (2007). Coagulation of
+  particles in the transition regime: The effect of the Coulomb potential.
+  Journal of Chemical Physics, 126(12).
+  https://doi.org/10.1063/1.2713719</li>
+</ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_coulomb_kernel_dyachkov2007</span><span class="p">(</span>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
@@ -8010,27 +8014,28 @@ https://doi.org/10.1063/1.2713719</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_coulomb_kernel_gatti2008">get_coulomb_kernel_gatti2008<a class="headerlink" href="#get_coulomb_kernel_gatti2008" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L172">Show source in charged_dimensionless_kernel.py:172</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L171">Show source in charged_dimensionless_kernel.py:171</a></p>
 <p>Gatti et al. (2008) approximation for the dimensionless coagulation
-kernel. Accounts for the Coulomb potential between particles.</p>
+kernel.</p>
+<p>This function accounts for the Coulomb potential between particles using
+the Gatti et al. (2008) approximation.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li><code>-</code> <em>diffusive_knudsen</em> - The diffusive Knudsen number (K_nD) [dimensionless].</li>
-<li><code>-</code> <em>coulomb_potential_ratio</em> - The Coulomb potential ratio (phi_E)
-[dimensionless].</li>
+<li>diffusive_knudsen : The diffusive Knudsen number (K_nD)
+    [dimensionless].</li>
+<li>coulomb_potential_ratio : The Coulomb potential ratio (phi_E)
+  [dimensionless].</li>
 </ul>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
-<hr />
-<p>The dimensionless coagulation kernel (H) [dimensionless].</p>
-<h4 id="references_2">References<a class="headerlink" href="#references_2" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>Equations X in:
-Gatti, M., &amp; Kortshagen, U. (2008). Analytical model of particle
-charging in plasmas over a wide range of collisionality. Physical Review
-E - Statistical, Nonlinear, and Soft Matter Physics, 78(4).
-https://doi.org/10.1103/PhysRevE.78.046402</li>
+<li>The dimensionless coagulation kernel (H) [dimensionless].</li>
+</ul>
+<h4 id="references_2">References<a class="headerlink" href="#references_2" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Gatti, M., &amp; Kortshagen, U. (2008). Analytical model of particle
+  charging in plasmas over a wide range of collisionality. Physical Review
+  E - Statistical, Nonlinear, and Soft Matter Physics, 78(4).
+  https://doi.org/10.1103/PhysRevE.78.046402</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_coulomb_kernel_gatti2008</span><span class="p">(</span>
@@ -8041,25 +8046,26 @@ https://doi.org/10.1103/PhysRevE.78.046402</li>
 <h2 id="get_coulomb_kernel_gopalakrishnan2012">get_coulomb_kernel_gopalakrishnan2012<a class="headerlink" href="#get_coulomb_kernel_gopalakrishnan2012" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L241">Show source in charged_dimensionless_kernel.py:241</a></p>
 <p>Gopalakrishnan and Hogan (2012) approximation for the dimensionless
-coagulation kernel. Accounts for the Coulomb potential between particles.</p>
+coagulation kernel.</p>
+<p>This function accounts for the Coulomb potential between particles using
+the Gopalakrishnan and Hogan (2012) approximation.</p>
 <h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li><code>-</code> <em>diffusive_knudsen</em> - The diffusive Knudsen number (K_nD) [dimensionless].</li>
-<li><code>-</code> <em>coulomb_potential_ratio</em> - The Coulomb potential ratio (phi_E)
-[dimensionless].</li>
+<li>diffusive_knudsen : The diffusive Knudsen number (K_nD)
+    [dimensionless].</li>
+<li>coulomb_potential_ratio : The Coulomb potential ratio (phi_E)
+  [dimensionless].</li>
 </ul>
 <h4 id="returns_3">Returns<a class="headerlink" href="#returns_3" title="Permanent link">&para;</a></h4>
-<hr />
-<p>The dimensionless coagulation kernel (H) [dimensionless].</p>
-<h4 id="references_3">References<a class="headerlink" href="#references_3" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li>Equations X in:
-Gopalakrishnan, R., &amp; Hogan, C. J. (2012). Coulomb-influenced collisions
-in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear,
-and Soft Matter Physics, 85(2).
-https://doi.org/10.1103/PhysRevE.85.026410</li>
+<li>The dimensionless coagulation kernel (H) [dimensionless].</li>
+</ul>
+<h4 id="references_3">References<a class="headerlink" href="#references_3" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Gopalakrishnan, R., &amp; Hogan, C. J. (2012). Coulomb-influenced collisions
+  in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear,
+  and Soft Matter Physics, 85(2).
+  https://doi.org/10.1103/PhysRevE.85.026410</li>
 </ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_coulomb_kernel_gopalakrishnan2012</span><span class="p">(</span>
@@ -8068,32 +8074,32 @@ https://doi.org/10.1103/PhysRevE.85.026410</li>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_dimensional_kernel">get_dimensional_kernel<a class="headerlink" href="#get_dimensional_kernel" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L13">Show source in charged_dimensionless_kernel.py:13</a></p>
-<p>The dimensioned coagulation kernel for each particle pair, calculated
-from the dimensionless coagulation kernel and the reduced quantities.
-All inputs are square matrices, for all particle-particle interactions.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L11">Show source in charged_dimensionless_kernel.py:11</a></p>
+<p>Calculate the dimensioned coagulation kernel for each particle pair.</p>
+<p>This function computes the dimensioned coagulation kernel from the
+dimensionless coagulation kernel and the reduced quantities. All inputs
+are square matrices, representing all particle-particle interactions.</p>
 <h4 id="arguments_4">Arguments<a class="headerlink" href="#arguments_4" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li><code>-</code> <em>dimensionless_kernel</em> - The dimensionless coagulation kernel [H]
-    [dimensionless].</li>
-<li><code>-</code> <em>coulomb_potential_ratio</em> - The Coulomb potential ratio [dimensionless].</li>
-<li><code>-</code> <em>sum_of_radii</em> - The sum of the radii of the particles [m].</li>
-<li><code>-</code> <em>reduced_mass</em> - The reduced mass of the particles [kg].</li>
-<li><code>-</code> <em>reduced_friction_factor</em> - The reduced friction factor of the
-    particles [dimensionless].</li>
+<li>dimensionless_kernel : The dimensionless coagulation kernel (H)
+  [dimensionless].</li>
+<li>coulomb_potential_ratio : The Coulomb potential ratio [dimensionless].</li>
+<li>sum_of_radii : The sum of the radii of the particles [m].</li>
+<li>reduced_mass : The reduced mass of the particles [kg].</li>
+<li>reduced_friction_factor : The reduced friction factor of the
+  particles [dimensionless].</li>
 </ul>
 <h4 id="returns_4">Returns<a class="headerlink" href="#returns_4" title="Permanent link">&para;</a></h4>
-<hr />
-<p>The dimensioned coagulation kernel, as a square matrix, of all
-particle-particle interactions [m^3/s].</p>
+<ul>
+<li>The dimensioned coagulation kernel, as a square matrix, of all
+  particle-particle interactions [m³/s].</li>
+</ul>
 <h4 id="references_4">References<a class="headerlink" href="#references_4" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
 <li>Chahl, H. S., &amp; Gopalakrishnan, R. (2019). High potential, near free
-molecular regime Coulombic collisions in aerosols and dusty plasmas.
-Aerosol Science and Technology, 53(8), 933-957.
-https://doi.org/10.1080/02786826.2019.1614522</li>
+  molecular regime Coulombic collisions in aerosols and dusty plasmas.
+  Aerosol Science and Technology, 53(8), 933-957.
+  https://doi.org/10.1080/02786826.2019.1614522</li>
 </ul>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_dimensional_kernel</span><span class="p">(</span>
@@ -8105,28 +8111,31 @@ https://doi.org/10.1080/02786826.2019.1614522</li>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_hard_sphere_kernel">get_hard_sphere_kernel<a class="headerlink" href="#get_hard_sphere_kernel" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L62">Show source in charged_dimensionless_kernel.py:62</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L59">Show source in charged_dimensionless_kernel.py:59</a></p>
 <p>Hard sphere approximation for the dimensionless coagulation kernel.</p>
+<p>This function provides a hard sphere approximation for the dimensionless
+coagulation kernel based on the diffusive Knudsen number.</p>
 <h4 id="arguments_5">Arguments<a class="headerlink" href="#arguments_5" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>-</code> <em>diffusive_knudsen</em> - The diffusive Knudsen number (K_nD)
-    [dimensionless].</li>
+<li>diffusive_knudsen : The diffusive Knudsen number (K_nD)
+  [dimensionless].</li>
 </ul>
 <h4 id="returns_5">Returns<a class="headerlink" href="#returns_5" title="Permanent link">&para;</a></h4>
-<p>The dimensionless coagulation kernel (H) [dimensionless].</p>
-<h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
-<li><code>-</code> <em>ValueError</em> - If diffusive_knudsen contains negative values, NaN, or
-    infinity.</li>
+<li>The dimensionless coagulation kernel (H) [dimensionless].</li>
+</ul>
+<h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
+<ul>
+<li>ValueError : If diffusive_knudsen contains negative values, NaN, or
+  infinity.</li>
 </ul>
 <h4 id="references_5">References<a class="headerlink" href="#references_5" title="Permanent link">&para;</a></h4>
-<hr />
-<p>Equations X in:
-- Dyachkov, S. A., Kustova, E. V., &amp; Kustov, A. V. (2007). Coagulation of
-particles in the transition regime: The effect of the Coulomb potential.
-Journal of Chemical Physics, 126(12).
-https://doi.org/10.1063/1.2713719</p>
+<ul>
+<li>Dyachkov, S. A., Kustova, E. V., &amp; Kustov, A. V. (2007). Coagulation of
+  particles in the transition regime: The effect of the Coulomb potential.
+  Journal of Chemical Physics, 126(12).
+  https://doi.org/10.1063/1.2713719</li>
+</ul>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_hard_sphere_kernel</span><span class="p">(</span>
     <span class="n">diffusive_knudsen</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>

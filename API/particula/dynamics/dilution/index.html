@@ -1179,6 +1179,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -1224,6 +1233,15 @@
   <a href="#examples_1" class="md-nav__link">
     <span class="md-ellipsis">
       Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
     </span>
   </a>
   
@@ -7437,6 +7455,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7488,6 +7515,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#references_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature_1" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7526,34 +7562,46 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py">particula.dynamics.dilution</a> module.</p>
 </blockquote>
 <h2 id="get_dilution_rate">get_dilution_rate<a class="headerlink" href="#get_dilution_rate" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L49">Show source in dilution.py:49</a></p>
-<p>Calculate the dilution rate of a substance.</p>
-<p>The dilution rate quantifies the rate at which the concentration of a
-substance decreases due to dilution, based on the volume dilution
-coefficient and the current concentration of the substance.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L55">Show source in dilution.py:55</a></p>
+<p>Calculate the dilution rate of a substance in a system.</p>
+<p>The dilution rate describes how quickly the concentration of a
+substance decreases due to the volume dilution coefficient and
+the current concentration. The calculation is:</p>
+<ul>
+<li>R = -(α × c)<ul>
+<li>R is the dilution rate [s⁻¹],</li>
+<li>α is the volume dilution coefficient [s⁻¹],</li>
+<li>c is the current concentration [#/m³].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>coefficient</code> - The volume dilution coefficient in inverse seconds (s⁻¹).</li>
-<li><code>concentration</code> - The concentration of the substance in the system
-    in particles per cubic meter (#/m³) or any other relevant units.</li>
+<li>coefficient : The volume dilution coefficient in inverse
+    seconds (s⁻¹).</li>
+<li>concentration : The concentration of the substance in #/m³
+    (or relevant units).</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>The dilution rate, which is the rate of decrease in concentration
-in inverse seconds (s⁻¹). The value is returned as negative, indicating
-a reduction in concentration over time.</p>
+<ul>
+<li>The dilution rate in s⁻¹, returned as a negative value
+  to indicate a decrease in concentration.</li>
+</ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">float input</span><pre><span></span><code><span class="n">dilution_rate</span><span class="p">(</span>
-    <span class="n">coefficient</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
-    <span class="n">concentration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="highlight"><span class="filename">Example (float input)</span><pre><span></span><code><span class="n">get_dilution_rate</span><span class="p">(</span><span class="n">coefficient</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">concentration</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 <span class="c1"># Returns -1.0</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">array input</span><pre><span></span><code><span class="n">dilution_rate</span><span class="p">(</span>
+<div class="highlight"><span class="filename">Example (array input)</span><pre><span></span><code><span class="n">get_dilution_rate</span><span class="p">(</span>
     <span class="n">coefficient</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
     <span class="n">concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">]),</span>
 <span class="p">)</span>
 <span class="c1"># Returns array([-1., -2., -3.])</span>
 </code></pre></div>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
+<ul>
+<li>H. Fogler, "Elements of Chemical Reaction Engineering,"
+  5<sup>th</sup> ed., Prentice Hall, 2016. [check]</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_dilution_rate</span><span class="p">(</span>
     <span class="n">coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
@@ -7563,30 +7611,42 @@ a reduction in concentration over time.</p>
 <h2 id="get_volume_dilution_coefficient">get_volume_dilution_coefficient<a class="headerlink" href="#get_volume_dilution_coefficient" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L10">Show source in dilution.py:10</a></p>
 <p>Calculate the volume dilution coefficient.</p>
-<p>The volume dilution coefficient is a measure of how quickly a substance
-is diluted within a given volume due to an incoming flow. It is defined as
-the ratio of the flow rate to the volume.</p>
+<p>This coefficient represents how quickly a substance is diluted within
+a system of a given volume when a known input flow rate is supplied.
+The equation is:</p>
+<ul>
+<li>α = Q / V<ul>
+<li>α is the volume dilution coefficient [s⁻¹],</li>
+<li>Q is the input flow rate [m³/s],</li>
+<li>V is the system volume [m³].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>volume</code> - The volume of the system in cubic meters (m³).</li>
-<li><code>input_flow_rate</code> - The flow rate of the substance entering the system
-    in cubic meters per second (m³/s).</li>
+<li>volume : The volume of the system in cubic meters (m³).</li>
+<li>input_flow_rate : The flow rate entering the system in
+    cubic meters per second (m³/s).</li>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<p>The volume dilution coefficient in inverse seconds (s⁻¹).</p>
+<ul>
+<li>The volume dilution coefficient in inverse seconds (s⁻¹).</li>
+</ul>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">float input</span><pre><span></span><code><span class="n">volume_dilution_coefficient</span><span class="p">(</span>
-    <span class="n">volume</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">input_flow_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="highlight"><span class="filename">Example (float input)</span><pre><span></span><code><span class="n">get_volume_dilution_coefficient</span><span class="p">(</span><span class="n">volume</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">input_flow_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 <span class="c1"># Returns 0.01</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">array input</span><pre><span></span><code><span class="n">volume_dilution_coefficient</span><span class="p">(</span>
+<div class="highlight"><span class="filename">Example (array input)</span><pre><span></span><code><span class="n">get_volume_dilution_coefficient</span><span class="p">(</span>
     <span class="n">volume</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">]),</span>
     <span class="n">input_flow_rate</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]),</span>
 <span class="p">)</span>
 <span class="c1"># Returns array([0.01, 0.01, 0.01])</span>
 </code></pre></div>
+<h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>O. Levenspiel, "Chemical Reaction Engineering," 3<sup>rd</sup> ed., Wiley, 1999.
+[check]</li>
+</ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_volume_dilution_coefficient</span><span class="p">(</span>
     <span class="n">volume</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>

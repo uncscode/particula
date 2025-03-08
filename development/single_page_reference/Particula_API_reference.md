@@ -1899,26 +1899,35 @@ def set_volume(self, volume: Union[float, NDArray[np.float64]], volume_units: st
 
 ## _brownian_diffusivity
 
-[Show source in brownian_kernel.py:219](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/brownian_kernel.py#L219)
+[Show source in brownian_kernel.py:255](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/brownian_kernel.py#L255)
 
-Returns the diffusivity of the particles due to Brownian motion
+Calculate the diffusivity of particles due to Brownian motion.
 
-THis is just the scaled aerodynamic mobility of the particles.
+This function calculates the diffusivity of particles due to Brownian
+motion, which is essentially the scaled aerodynamic mobility of the
+particles. The equation used is:
 
-Args
-----
+- D = k × T × B
+    - D is the diffusivity of the particles [m²/s].
+    - k is the Boltzmann constant [J/K].
+    - T is the temperature of the air [K].
+    - B is the aerodynamic mobility of the particles [m²/s].
+
+#### Arguments
+
 - temperature : The temperature of the air [K].
-- aerodynamic_mobility : The aerodynamic mobility of the particles [m^2/s].
+- aerodynamic_mobility : The aerodynamic mobility of the particles
+  [m²/s].
 
-Returns
--------
-The diffusivity of the particles due to Brownian motion [m^2/s].
+#### Returns
 
-References
-----------
-Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
-Coefficient K12
+- The diffusivity of the particles due to Brownian motion [m²/s].
+
+#### References
+
+- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+  physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
+  Coefficient K12.
 
 #### Signature
 
@@ -1933,31 +1942,39 @@ def _brownian_diffusivity(
 
 ## _g_collection_term
 
-[Show source in brownian_kernel.py:185](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/brownian_kernel.py#L185)
+[Show source in brownian_kernel.py:216](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/brownian_kernel.py#L216)
 
-Returns the `g` collection term for Brownian coagulation.
+Calculate the `g` collection term for Brownian coagulation.
 
-Defined as the ratio of the mean free path of the particles to the
-radius of the particles.
+This function calculates the `g` collection term for Brownian
+coagulation, defined as the ratio of the mean free path of the particles
+to the radius of the particles. The equation used is:
 
-Args
-----
-mean_free_path_particle : The mean free path of the particles [m].
-particle_radius : The radius of the particles [m].
+- g = ((2r + λ)³ - (4r² + λ²)^(3/2)) / (6rλ) - 2r
+    - g is the collection term for Brownian coagulation [dimensionless].
+    - λ is the mean free path of the particles [m].
+    - r is the radius of the particles [m].
 
-Returns
--------
-The collection term for Brownian coagulation [dimensionless].
+#### Arguments
 
-References
-----------
-Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
-Coefficient K12
+- mean_free_path_particle : The mean free path of the particles [m].
+- particle_radius : The radius of the particles [m].
+
+#### Returns
+
+- The collection term for Brownian coagulation [dimensionless].
+
+#### References
+
+- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+  physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
+  Coefficient K12.
+
+#### Notes
 
 The np.sqrt(2) term appears to be an error in the text, as the term is
-not used in the second edition of the book. And when it it is used, the
-values are too small, by about 2x.
+not used in the second edition of the book. When it is used, the values
+are too small, by about 2x.
 
 #### Signature
 
@@ -1972,33 +1989,37 @@ def _g_collection_term(
 
 ## _mean_free_path_l
 
-[Show source in brownian_kernel.py:154](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/brownian_kernel.py#L154)
+[Show source in brownian_kernel.py:181](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/brownian_kernel.py#L181)
 
 Calculate the mean free path of particles for coagulation.
 
-Calculate the mean free path of particles, defined for Brownian
-coagulation as the ratio of the diffusivity of the particles to their mean
-thermal speed. This parameter is crucial for understanding particle
-dynamics in a fluid.
+Calculate the mean free path of particles for coagulation.
+
+This function calculates the mean free path of particles, defined for
+Brownian coagulation as the ratio of the diffusivity of the particles
+to their mean thermal speed. This parameter is crucial for understanding
+particle dynamics in a fluid. The equation used is:
+
+- λ = (8 × D) / (π × v)
+    - λ is the mean free path of the particles [m].
+    - D is the diffusivity of the particles [m²/s].
+    - v is the mean thermal speed of the particles [m/s].
 
 #### Arguments
 
-----
-- diffusivity_particle : The diffusivity of the particles [m^2/s].
-- mean_thermal_speed_particle : The mean thermal speed of the particles
-[m/s].
+- diffusivity_particle : The diffusivity of the particles [m²/s].
+- mean_thermal_speed_particle : The mean thermal speed of the
+  particles [m/s].
 
 #### Returns
 
--------
-The mean free path of the particles [m].
+- The mean free path of the particles [m].
 
 #### References
 
-----------
-Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
-Coefficient K12.
+- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+  physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
+  Coefficient K12.
 
 #### Signature
 
@@ -2013,30 +2034,44 @@ def _mean_free_path_l(
 
 ## get_brownian_kernel
 
-[Show source in brownian_kernel.py:14](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/brownian_kernel.py#L14)
+[Show source in brownian_kernel.py:17](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/brownian_kernel.py#L17)
 
-Returns the Brownian coagulation kernel for aerosol particles. Defined
-as the product of the diffusivity of the particles, the collection term
-`g`, and the radius of the particles.
+Calculate the Brownian coagulation kernel for aerosol particles.
 
-Args
-----
-particle_radius : The radius of the particles [m].
-diffusivity_particle : The diffusivity of the particles [m^2/s].
-g_collection_term_particle : The collection term for Brownian coagulation
-[dimensionless].
-alpha_collision_efficiency : The collision efficiency of the particles
-[dimensionless].
+This function computes the Brownian coagulation kernel, which is
+defined as the product of the diffusivity of the particles, the
+collection term `g`, and the radius of the particles. The equation
+used is:
 
-Returns
--------
-Square matrix of Brownian coagulation kernel for aerosol particles [m^3/s].
+- K = (4π × D × r) / (r / (r + g) + 4D / (r × v × α))
+    - K is the Brownian coagulation kernel [m³/s].
+    - D is the diffusivity of the particles [m²/s].
+    - r is the radius of the particles [m].
+    - g is the collection term for Brownian coagulation [dimensionless].
+    - v is the mean thermal speed of the particles [m/s].
+    - α is the collision efficiency of the particles [dimensionless].
 
-References
-----------
-Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
-Coefficient K12 (with alpha collision efficiency term 13.56)
+#### Arguments
+
+- particle_radius : The radius of the particles [m].
+- diffusivity_particle : The diffusivity of the particles [m²/s].
+- g_collection_term_particle : The collection term for Brownian
+  coagulation [dimensionless].
+- mean_thermal_speed_particle : The mean thermal speed of the
+  particles [m/s].
+- alpha_collision_efficiency : The collision efficiency of the
+  particles [dimensionless].
+
+#### Returns
+
+- Square matrix of Brownian coagulation kernel for aerosol particles
+  [m³/s].
+
+#### References
+
+- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+  physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
+  Coefficient K12 (with alpha collision efficiency term 13.56).
 
 #### Signature
 
@@ -2054,30 +2089,41 @@ def get_brownian_kernel(
 
 ## get_brownian_kernel_via_system_state
 
-[Show source in brownian_kernel.py:83](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/brownian_kernel.py#L83)
+[Show source in brownian_kernel.py:98](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/brownian_kernel.py#L98)
 
-Returns the Brownian coagulation kernel for aerosol particles,
-calculating the intermediate properties needed.
+Calculate the Brownian coagulation kernel using system state parameters.
+
+This function calculates the Brownian coagulation kernel for aerosol
+particles by determining the necessary intermediate properties such as
+particle diffusivity and mean thermal speed. The equation used is:
+
+- K = (4π × D × r) / (r / (r + g) + 4D / (r × v × α))
+    - K is the Brownian coagulation kernel [m³/s].
+    - D is the diffusivity of the particles [m²/s].
+    - r is the radius of the particles [m].
+    - g is the collection term for Brownian coagulation [dimensionless].
+    - v is the mean thermal speed of the particles [m/s].
+    - α is the collision efficiency of the particles [dimensionless].
 
 #### Arguments
 
-particle_radius : The radius of the particles [m].
-mass_particle : The mass of the particles [kg].
-temperature : The temperature of the air [K].
-pressure : The pressure of the air [Pa].
-alpha_collision_efficiency : The collision efficiency of the particles
-    [dimensionless].
+- particle_radius : The radius of the particles [m].
+- mass_particle : The mass of the particles [kg].
+- temperature : The temperature of the air [K].
+- pressure : The pressure of the air [Pa].
+- alpha_collision_efficiency : The collision efficiency of the
+  particles [dimensionless].
 
 #### Returns
 
-Square matrix of Brownian coagulation kernel for aerosol particles
-    [m^3/s].
+- Square matrix of Brownian coagulation kernel for aerosol particles
+  [m³/s].
 
 #### References
 
-Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
-Coefficient K12.
+- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+  physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
+  Coefficient K12.
 
 #### Signature
 
@@ -2103,31 +2149,31 @@ def get_brownian_kernel_via_system_state(
 
 ## get_coulomb_kernel_chahl2019
 
-[Show source in charged_dimensionless_kernel.py:282](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L282)
+[Show source in charged_dimensionless_kernel.py:283](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L283)
 
 Chahl and Gopalakrishnan (2019) approximation for the dimensionless
-coagulation kernel. Accounts for the Coulomb potential between particles.
+coagulation kernel.
+
+This function accounts for the Coulomb potential between particles using
+the Chahl and Gopalakrishnan (2019) approximation.
 
 #### Arguments
 
------
-- `-` *diffusive_knudsen* - The diffusive Knudsen number (K_nD) [dimensionless].
-- `-` *coulomb_potential_ratio* - The Coulomb potential ratio (phi_E)
-[dimensionless].
+- diffusive_knudsen : The diffusive Knudsen number (K_nD)
+    [dimensionless].
+- coulomb_potential_ratio : The Coulomb potential ratio (phi_E)
+  [dimensionless].
 
 #### Returns
 
---------
-The dimensionless coagulation kernel (H) [dimensionless].
+- The dimensionless coagulation kernel (H) [dimensionless].
 
 #### References
 
------------
-- Equations X in:
-Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
-molecular regime Coulombic collisions in aerosols and dusty plasmas.
-Aerosol Science and Technology, 53(8), 933-957.
-https://doi.org/10.1080/02786826.2019.1614522
+- Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
+  molecular regime Coulombic collisions in aerosols and dusty plasmas.
+  Aerosol Science and Technology, 53(8), 933-957.
+  https://doi.org/10.1080/02786826.2019.1614522
 
 #### Signature
 
@@ -2142,31 +2188,31 @@ def get_coulomb_kernel_chahl2019(
 
 ## get_coulomb_kernel_dyachkov2007
 
-[Show source in charged_dimensionless_kernel.py:112](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L112)
+[Show source in charged_dimensionless_kernel.py:110](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L110)
 
 Dyachkov et al. (2007) approximation for the dimensionless coagulation
-kernel. Accounts for the Coulomb potential between particles.
+kernel.
+
+This function accounts for the Coulomb potential between particles using
+the Dyachkov et al. (2007) approximation.
 
 #### Arguments
 
------
-- `-` *diffusive_knudsen* - The diffusive Knudsen number (K_nD) [dimensionless].
-- `-` *coulomb_potential_ratio* - The Coulomb potential ratio (phi_E)
-[dimensionless].
+- diffusive_knudsen : The diffusive Knudsen number (K_nD)
+    [dimensionless].
+- coulomb_potential_ratio : The Coulomb potential ratio (phi_E)
+  [dimensionless].
 
 #### Returns
 
---------
-The dimensionless coagulation kernel (H) [dimensionless].
+- The dimensionless coagulation kernel (H) [dimensionless].
 
 #### References
 
------------
-Equations X in:
 - Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation of
-particles in the transition regime: The effect of the Coulomb potential.
-Journal of Chemical Physics, 126(12).
-https://doi.org/10.1063/1.2713719
+  particles in the transition regime: The effect of the Coulomb potential.
+  Journal of Chemical Physics, 126(12).
+  https://doi.org/10.1063/1.2713719
 
 #### Signature
 
@@ -2181,31 +2227,31 @@ def get_coulomb_kernel_dyachkov2007(
 
 ## get_coulomb_kernel_gatti2008
 
-[Show source in charged_dimensionless_kernel.py:172](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L172)
+[Show source in charged_dimensionless_kernel.py:171](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L171)
 
 Gatti et al. (2008) approximation for the dimensionless coagulation
-kernel. Accounts for the Coulomb potential between particles.
+kernel.
+
+This function accounts for the Coulomb potential between particles using
+the Gatti et al. (2008) approximation.
 
 #### Arguments
 
------
-- `-` *diffusive_knudsen* - The diffusive Knudsen number (K_nD) [dimensionless].
-- `-` *coulomb_potential_ratio* - The Coulomb potential ratio (phi_E)
-[dimensionless].
+- diffusive_knudsen : The diffusive Knudsen number (K_nD)
+    [dimensionless].
+- coulomb_potential_ratio : The Coulomb potential ratio (phi_E)
+  [dimensionless].
 
 #### Returns
 
---------
-The dimensionless coagulation kernel (H) [dimensionless].
+- The dimensionless coagulation kernel (H) [dimensionless].
 
 #### References
 
------------
-- Equations X in:
-Gatti, M., & Kortshagen, U. (2008). Analytical model of particle
-charging in plasmas over a wide range of collisionality. Physical Review
-E - Statistical, Nonlinear, and Soft Matter Physics, 78(4).
-https://doi.org/10.1103/PhysRevE.78.046402
+- Gatti, M., & Kortshagen, U. (2008). Analytical model of particle
+  charging in plasmas over a wide range of collisionality. Physical Review
+  E - Statistical, Nonlinear, and Soft Matter Physics, 78(4).
+  https://doi.org/10.1103/PhysRevE.78.046402
 
 #### Signature
 
@@ -2223,28 +2269,28 @@ def get_coulomb_kernel_gatti2008(
 [Show source in charged_dimensionless_kernel.py:241](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L241)
 
 Gopalakrishnan and Hogan (2012) approximation for the dimensionless
-coagulation kernel. Accounts for the Coulomb potential between particles.
+coagulation kernel.
+
+This function accounts for the Coulomb potential between particles using
+the Gopalakrishnan and Hogan (2012) approximation.
 
 #### Arguments
 
------
-- `-` *diffusive_knudsen* - The diffusive Knudsen number (K_nD) [dimensionless].
-- `-` *coulomb_potential_ratio* - The Coulomb potential ratio (phi_E)
-[dimensionless].
+- diffusive_knudsen : The diffusive Knudsen number (K_nD)
+    [dimensionless].
+- coulomb_potential_ratio : The Coulomb potential ratio (phi_E)
+  [dimensionless].
 
 #### Returns
 
---------
-The dimensionless coagulation kernel (H) [dimensionless].
+- The dimensionless coagulation kernel (H) [dimensionless].
 
 #### References
 
------------
-- Equations X in:
-Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
-in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear,
-and Soft Matter Physics, 85(2).
-https://doi.org/10.1103/PhysRevE.85.026410
+- Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
+  in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear,
+  and Soft Matter Physics, 85(2).
+  https://doi.org/10.1103/PhysRevE.85.026410
 
 #### Signature
 
@@ -2259,36 +2305,35 @@ def get_coulomb_kernel_gopalakrishnan2012(
 
 ## get_dimensional_kernel
 
-[Show source in charged_dimensionless_kernel.py:13](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L13)
+[Show source in charged_dimensionless_kernel.py:11](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L11)
 
-The dimensioned coagulation kernel for each particle pair, calculated
-from the dimensionless coagulation kernel and the reduced quantities.
-All inputs are square matrices, for all particle-particle interactions.
+Calculate the dimensioned coagulation kernel for each particle pair.
+
+This function computes the dimensioned coagulation kernel from the
+dimensionless coagulation kernel and the reduced quantities. All inputs
+are square matrices, representing all particle-particle interactions.
 
 #### Arguments
 
------
-- `-` *dimensionless_kernel* - The dimensionless coagulation kernel [H]
-    [dimensionless].
-- `-` *coulomb_potential_ratio* - The Coulomb potential ratio [dimensionless].
-- `-` *sum_of_radii* - The sum of the radii of the particles [m].
-- `-` *reduced_mass* - The reduced mass of the particles [kg].
-- `-` *reduced_friction_factor* - The reduced friction factor of the
-    particles [dimensionless].
+- dimensionless_kernel : The dimensionless coagulation kernel (H)
+  [dimensionless].
+- coulomb_potential_ratio : The Coulomb potential ratio [dimensionless].
+- sum_of_radii : The sum of the radii of the particles [m].
+- reduced_mass : The reduced mass of the particles [kg].
+- reduced_friction_factor : The reduced friction factor of the
+  particles [dimensionless].
 
 #### Returns
 
---------
-The dimensioned coagulation kernel, as a square matrix, of all
-particle-particle interactions [m^3/s].
+- The dimensioned coagulation kernel, as a square matrix, of all
+  particle-particle interactions [m³/s].
 
 #### References
 
------------
 - Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
-molecular regime Coulombic collisions in aerosols and dusty plasmas.
-Aerosol Science and Technology, 53(8), 933-957.
-https://doi.org/10.1080/02786826.2019.1614522
+  molecular regime Coulombic collisions in aerosols and dusty plasmas.
+  Aerosol Science and Technology, 53(8), 933-957.
+  https://doi.org/10.1080/02786826.2019.1614522
 
 #### Signature
 
@@ -2306,33 +2351,33 @@ def get_dimensional_kernel(
 
 ## get_hard_sphere_kernel
 
-[Show source in charged_dimensionless_kernel.py:62](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L62)
+[Show source in charged_dimensionless_kernel.py:59](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L59)
 
 Hard sphere approximation for the dimensionless coagulation kernel.
 
+This function provides a hard sphere approximation for the dimensionless
+coagulation kernel based on the diffusive Knudsen number.
+
 #### Arguments
 
-- `-` *diffusive_knudsen* - The diffusive Knudsen number (K_nD)
-    [dimensionless].
+- diffusive_knudsen : The diffusive Knudsen number (K_nD)
+  [dimensionless].
 
 #### Returns
 
-The dimensionless coagulation kernel (H) [dimensionless].
+- The dimensionless coagulation kernel (H) [dimensionless].
 
 #### Raises
 
--------
-- `-` *ValueError* - If diffusive_knudsen contains negative values, NaN, or
-    infinity.
+- ValueError : If diffusive_knudsen contains negative values, NaN, or
+  infinity.
 
 #### References
 
------------
-Equations X in:
 - Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation of
-particles in the transition regime: The effect of the Coulomb potential.
-Journal of Chemical Physics, 126(12).
-https://doi.org/10.1063/1.2713719
+  particles in the transition regime: The effect of the Coulomb potential.
+  Journal of Chemical Physics, 126(12).
+  https://doi.org/10.1063/1.2713719
 
 #### Signature
 
@@ -3269,32 +3314,45 @@ def get_builders(self) -> Dict[str, Any]: ...
 
 ## get_coagulation_gain_rate_continuous
 
-[Show source in coagulation_rate.py:120](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L120)
+[Show source in coagulation_rate.py:172](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L172)
 
-Calculate the coagulation gain rate, via the integration method.
+Calculate the coagulation gain rate via continuous integration.
+
+This function converts the distribution to a continuous form, then
+uses RectBivariateSpline to interpolate and integrate:
+
+- gain_rate(r) = ∫ kernel(r, r') × concentration(r) × concentration(r') dr'
 
 #### Arguments
 
-radius : The radius of the particles.
-concentration : The distribution of particles.
-kernel : The coagulation kernel.
+- radius : The particle radius array [m].
+- concentration : The particle distribution.
+- kernel : Coagulation kernel matrix.
 
 #### Returns
 
-The coagulation gain rate.
+- The coagulation gain rate, in the shape of radius.
+
+#### Examples
+
+```py
+import numpy as np
+import particula as par
+
+r = np.array([1e-7, 2e-7, 3e-7])
+conc = np.array([1.0, 0.5, 0.2])
+kern = np.ones((3, 3)) * 1e-9
+
+gain_cont = par.dynamics.get_coagulation_gain_rate_continuous(
+    r, conc, kern
+)
+print(gain_cont)
+```
 
 #### References
 
-----------
-- This equation necessitates the use of a for-loop due to the
-convoluted use of different radii at different stages. This is the
-most expensive step of all coagulation calculations. Using
-`RectBivariateSpline` accelerates this significantly.
-- Note, to estimate the kernel and distribution at
-(other_radius**3 - some_radius**3)*(1/3)
-we use interporlation techniques.
-- Seinfeld, J. H., & Pandis, S. (2016). Atmospheric chemistry and
-physics, Chapter 13 Equations 13.61
+- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+  physics, Chapter 13, Equation 13.61.
 
 #### Signature
 
@@ -3310,32 +3368,47 @@ def get_coagulation_gain_rate_continuous(
 
 ## get_coagulation_gain_rate_discrete
 
-[Show source in coagulation_rate.py:40](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L40)
+[Show source in coagulation_rate.py:58](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L58)
 
-Calculate the coagulation gain rate, via the integration method, by
-converting to a continuous distribution.
+Calculate the coagulation gain rate (using a quasi-continuous approach).
+
+Though named "discrete," this function converts the discrete distribution
+to a PDF and uses interpolation (RectBivariateSpline) to approximate the
+gain term. The concept is:
+
+- gain_rate(r) = ∫ kernel(r, r') × PDF(r) × PDF(r') dr'
+  (implemented via numeric integration)
 
 #### Arguments
 
-radius : The radius of the particles.
-concentration : The distribution of particles.
-kernel : The coagulation kernel.
+- radius : The particle radius array [m].
+- concentration : The particle distribution.
+- kernel : Coagulation kernel matrix.
 
 #### Returns
 
-The coagulation gain rate.
+- The coagulation gain rate, matched to the shape of radius.
+
+#### Examples
+
+```py
+import numpy as np
+import particula as par
+
+r = np.array([1e-7, 2e-7, 3e-7])
+conc = np.array([1.0, 0.5, 0.2])
+kern = np.ones((3, 3)) * 1e-9
+
+gain_val = par.dynamics.get_coagulation_gain_rate_discrete(
+    r, conc, kern
+)
+print(gain_val)
+```
 
 #### References
 
-----------
-- This equation necessitates the use of a for-loop due to the
-convoluted use of different radii at different stages. This is the
-most expensive step of all coagulation calculations. Using
-`RectBivariateSpline` accelerates this significantly.
-- Note, to estimate the kernel and distribution at
-(other_radius**3 - some_radius**3)*(1/3) we use interporlation techniques.
-- Seinfeld, J. H., & Pandis, S. (2016). Atmospheric chemistry and
-physics, Chapter 13 Equations 13.61
+- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+  physics, Chapter 13, Equation 13.61.
 
 #### Signature
 
@@ -3351,24 +3424,45 @@ def get_coagulation_gain_rate_discrete(
 
 ## get_coagulation_loss_rate_continuous
 
-[Show source in coagulation_rate.py:96](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L96)
+[Show source in coagulation_rate.py:128](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L128)
 
-Calculate the coagulation loss rate, via the integration method.
+Calculate the coagulation loss rate via continuous integration.
+
+This method integrates the product of kernel and concentration over
+the radius grid. The equation is:
+
+- loss_rate(r) = concentration(r) × ∫ kernel(r, r') × concentration(r') dr'
 
 #### Arguments
 
-radius : The radius of the particles.
-concentration : The distribution of particles.
-kernel : The coagulation kernel.
+- radius : The particle radius array [m].
+- concentration : The particle distribution.
+- kernel : Coagulation kernel matrix (NDArray[np.float64]).
 
 #### Returns
 
-The coagulation loss rate.
+- The coagulation loss rate.
+
+#### Examples
+
+```py
+import numpy as np
+import particula as par
+
+r = np.array([1e-7, 2e-7, 3e-7])
+conc = np.array([1.0, 0.5, 0.2])
+kern = np.ones((3, 3)) * 1e-9
+
+loss_cont = par.dynamics.get_coagulation_loss_rate_continuous(
+    r, conc, kern
+)
+print(loss_cont)
+```
 
 #### References
 
 - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-    physics, Chapter 13 Equations 13.61
+  physics, Chapter 13, Equation 13.61.
 
 #### Signature
 
@@ -3384,23 +3478,41 @@ def get_coagulation_loss_rate_continuous(
 
 ## get_coagulation_loss_rate_discrete
 
-[Show source in coagulation_rate.py:19](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L19)
+[Show source in coagulation_rate.py:20](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L20)
 
-Calculate the coagulation loss rate, via the summation method.
+Calculate the coagulation loss rate via a discrete summation approach.
+
+This function computes the loss rate of particles from collisions by
+summing over all size classes. The equation is:
+
+- loss_rate = ΣᵢΣⱼ [kernel(i, j) × concentration(i) × concentration(j)]
 
 #### Arguments
 
-concentraiton : The distribution of particles.
-kernel : The coagulation kernel.
+- concentration : The distribution of particles.
+- kernel : The coagulation kernel matrix (NDArray[np.float64]).
 
 #### Returns
 
-The coagulation loss rate.
+- The coagulation loss rate (float or NDArray[np.float64]).
+
+#### Examples
+
+```py
+import numpy as np
+import particula as par
+
+conc = np.array([1.0, 2.0, 3.0])
+kern = np.ones((3, 3))
+loss = par.dynamics.get_coagulation_loss_rate_discrete(conc, kern)
+print(loss)
+# Example output: 36.0
+```
 
 #### References
 
-Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-physics, Chapter 13 Equations 13.61
+- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+  physics, Chapter 13, Equation 13.61.
 
 #### Signature
 
@@ -4285,22 +4397,35 @@ def set_turbulent_dissipation(self, turbulent_dissipation: float): ...
 
 ## _calculate_probabilities
 
-[Show source in particle_resolved_method.py:231](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L231)
+[Show source in particle_resolved_method.py:312](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L312)
 
 Calculate coagulation probabilities based on kernel values and system
 parameters.
 
+This function multiplies the kernel values by the time step and a factor
+derived from the ratio of (events / tests) over the volume to obtain the
+probability of coagulation.
+
 #### Arguments
 
-- `kernel_values` *float* - Interpolated kernel value for a particle pair.
-- `time_step` *float* - The time step over which coagulation occurs.
-- `events` *int* - Number of possible coagulation events.
-- `tests` *int* - Number of tests (or trials) for coagulation.
-- `volume` *float* - Volume of the system.
+- kernel_values : Interpolated kernel values for a given particle pair,
+  may be scalar or array.
+- time_step : Duration of one coagulation step in seconds.
+- events : Number of possible collisions for the pair(s).
+- tests : Number of trials for the random selection procedure.
+- volume : System volume in m³.
 
 #### Returns
 
-- `float` - Coagulation probability.
+- The probability (or array of probabilities) that a collision occurs
+  during this time step.
+
+#### Examples
+
+```py
+prob = _calculate_probabilities(0.5, 1.0, 20, 10, 1e-3)
+# prob ~ 0.5 * 1.0 * 20 / (10 * 1e-3) = 1000
+```
 
 #### Signature
 
@@ -4318,21 +4443,36 @@ def _calculate_probabilities(
 
 ## _final_coagulation_state
 
-[Show source in particle_resolved_method.py:255](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L255)
+[Show source in particle_resolved_method.py:348](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L348)
 
 Resolve the final state of particles that have undergone multiple
 coagulation events.
 
+This function ensures that each small particle index merges correctly to
+a final large particle index, preventing logical conflicts (e.g., a single
+particle merging into multiple large particles in the same step).
+
 #### Arguments
 
-- `small_indices` *NDArray[np.int64]* - Indices of smaller particles.
-- `large_indices` *NDArray[np.int64]* - Indices of larger particles.
-- `particle_radius` *NDArray[np.float64]* - Radii of particles.
+- small_indices : Array of smaller particle indices in coagulation.
+- large_indices : Array of larger particle indices in coagulation.
+- particle_radius : Array of current particle radii.
 
 #### Returns
 
-- `Tuple[NDArray[np.int64],` *NDArray[np.int64]]* - Updated small and large
-indices.
+- A tuple (updated_small_indices, updated_large_indices) that resolves
+  multiple merges for the same particle.
+
+#### Examples
+
+```py
+import numpy as np
+small = np.array([0, 1, 2])
+large = np.array([2, 3, 4])
+r = np.array([1e-9, 1.5e-9, 2e-9, 3e-9, 4e-9])
+s_final, l_final = _final_coagulation_state(small, large, r)
+# ensures each index in s_final merges to a single large index
+```
 
 #### Signature
 
@@ -4348,20 +4488,38 @@ def _final_coagulation_state(
 
 ## _interpolate_kernel
 
-[Show source in particle_resolved_method.py:203](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L203)
+[Show source in particle_resolved_method.py:267](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L267)
 
-Create an interpolation function for the coagulation kernel with nearest
-extrapolation for out-of-bound values.
+Create an interpolation function for the coagulation kernel with
+out-of-bounds handling.
+
+This function returns a RegularGridInterpolator that performs linear
+interpolation for values within the domain of the kernel and clamps to the
+nearest value outside of it.
 
 #### Arguments
 
-- `kernel` *NDArray[np.float64]* - Coagulation kernel.
-- `kernel_radius` *NDArray[np.float64]* - Radii corresponding to kernel
-    bins.
+- kernel : 2D coagulation kernel values.
+- kernel_radius : Radii corresponding to kernel bins.
 
 #### Returns
 
-- `RegularGridInterpolator` - Interpolated kernel function.
+- A RegularGridInterpolator object for retrieving kernel values based
+    on radius pairs.
+
+#### Examples
+
+```py
+import numpy as np
+from particula.dynamics.coagulation.particle_resolved_step import
+    particle_resolved_method
+kernel_vals = np.random.rand(10,10)
+rad = np.linspace(1e-9, 1e-7, 10)
+interpolator = particle_resolved_method._interpolate_kernel(
+    kernel_vals, rad
+)
+# Use interpolator([[r_small, r_large]]) to get kernel value
+```
 
 #### Signature
 
@@ -4375,29 +4533,67 @@ def _interpolate_kernel(
 
 ## get_particle_resolved_coagulation_step
 
-[Show source in particle_resolved_method.py:61](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L61)
+[Show source in particle_resolved_method.py:88](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L88)
 
 Perform a single step of particle coagulation, updating particle radii
-based on coagulation events.
+with a stochastic approach.
+
+This function models collisions between particles based on a given
+coagulation kernel. It identifies potential collision pairs, randomly
+selects which collisions occur according to a probability derived from the
+kernel value, and then tracks which particles have coagulated.
+
+The main calculation for the probability of coagulation is:
+
+- Probability = K × Δt × (possible collisions) / (tests × volume)
+    - K is the interpolated kernel value,
+    - Δt is the timestep,
+    - volume is the system volume.
 
 #### Arguments
 
-- `particle_radius` *NDArray[np.float64]* - Array of particle radii.
-- `kernel` *NDArray[np.float64]* - Coagulation kernel as a 2D array where
-    each element represents the probability of coagulation between
-    particles of corresponding sizes.
-- `kernel_radius` *NDArray[np.float64]* - Array of radii corresponding to
-    the kernel bins.
-- `volume` *float* - Volume of the system in which coagulation occurs.
-- `time_step` *float* - Time step over which coagulation is calculated.
-- `random_generator` *np.random.Generator* - Random number generator for
-    stochastic processes.
+- particle_radius : Array of particle radii.
+- kernel : 2D coagulation kernel matrix matching the size of
+    kernel_radius.
+- kernel_radius : Radii used to index or interpolate the kernel.
+- volume : Volume of the system in m³.
+- time_step : Time step for each coagulation iteration in seconds.
+- random_generator : Random number generator for the stochastic
+    approach.
 
 #### Returns
 
-- `NDArray[np.int64]` - Array of indices corresponding to the coagulation
-    events, where each element is a pair of indices corresponding to
-    the coagulating particles [loss, gain].
+- An array of shape (N, 2), where each row contains
+    [small_index, large_index] for coagulation events.
+
+#### Examples
+
+```py title="Example Usage"
+import numpy as np
+from particula.dynamics.coagulation.particle_resolved_step import
+    particle_resolved_method
+
+r = np.array([1e-9, 2e-9, 3e-9])
+kernel_values = np.ones((50, 50))
+kernel_r = np.linspace(1e-10, 1e-7, 50)
+vol = 1e-3
+dt = 0.01
+rng = np.random.default_rng(42)
+event_pairs =
+particle_resolved_method.get_particle_resolved_coagulation_step(
+    particle_radius=r,
+    kernel=kernel_values,
+    kernel_radius=kernel_r,
+    volume=vol,
+    time_step=dt,
+    random_generator=rng
+)
+# event_pairs contains the pairs of [small, large] indices that
+# coagulated.
+
+References:
+- Seinfeld, J. H., & Pandis, S. N. *Atmospheric Chemistry and Physics*,
+  Wiley, 2016.
 
 #### Signature
 
@@ -4418,21 +4614,49 @@ def get_particle_resolved_coagulation_step(
 
 [Show source in particle_resolved_method.py:14](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.py#L14)
 
-Update the particle radii and concentrations after coagulation events.
+Update particle radii and track lost/gained particles after coagulation
+events.
+
+This function simulates the immediate effect of coagulation on particle
+radii, marking smaller particles as lost and updating the larger particles
+to the new radius computed from volume conservation. The calculation is:
+
+- r_new = cbrt(r_small³ + r_large³)
+    - r_new is the new radius in meters,
+    - r_small is the smaller particle's radius in meters,
+    - r_large is the larger particle's radius in meters.
 
 #### Arguments
 
-- `particle_radius` *NDArray[float64]* - Array of particle radii.
-- `small_index` *NDArray[int64]* - Indices corresponding to smaller
-    particles.
-- `large_index` *NDArray[int64]* - Indices corresponding to larger
-    particles.
+- particle_radius : Array of particle radii.
+- loss : Array to store lost particle radii.
+- gain : Array to store gained particle radii.
+- small_index : Indices of smaller particles.
+- large_index : Indices of larger particles.
 
 #### Returns
 
-- Updated array of particle radii.
+- Updated array of particle radii after coagulation events.
 - Updated array for the radii of particles that were lost.
 - Updated array for the radii of particles that were gained.
+
+#### Examples
+
+```py title="Example Usage"
+import numpy as np
+from particula.dynamics.coagulation.particle_resolved_step import
+    particle_resolved_method
+
+r = np.array([1e-9, 2e-9, 3e-9, 1e-9])
+lost = np.zeros_like(r)
+gained = np.zeros_like(r)
+s_idx = np.array([0, 1])
+l_idx = np.array([2, 3])
+updated_r, lost_r, gained_r = (
+    particle_resolved_method.get_particle_resolved_update_step(
+        r, lost, gained, s_idx, l_idx
+    ))
+# updated_r now has coagulated radii, lost_r and gained_r are tracked.
 
 #### Signature
 
@@ -4458,20 +4682,36 @@ def get_particle_resolved_update_step(
 
 ## _bin_particles
 
-[Show source in super_droplet_method.py:449](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L449)
+[Show source in super_droplet_method.py:541](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L541)
 
-Bin particles by size and return the number of particles in each bin.
+Divide the sorted particle radii into bins and count how many fall into
+each bin.
+
+This function uses `radius_bins` as edges and assigns each particle
+radius to a bin index via `np.digitize`. The result is (1) a histogram
+with the number of particles in each bin, and (2) an array of per-particle
+bin indices.
 
 #### Arguments
 
-- `particle_radius` - Array of sorted particle radii.
-- `radius_bins` - Array defining the bin edges for particle radii.
+- particle_radius : Array of sorted particle radii.
+- radius_bins : Edges used to define the bins.
 
 #### Returns
 
-Tuple:
-    - Array of the number of particles in each bin.
-    - Array of bin indices for each particle.
+- `number_in_bins` : Counts of how many radii lie in each bin.
+- `bin_indices` : The bin index assigned to each particle.
+
+#### Examples
+
+```py
+import numpy as np
+rad = np.array([1e-9, 1.5e-9, 2e-9, 5e-9])
+bin_edges = np.array([1e-9, 2e-9, 3e-9, 1e-8])
+n_in_bins, bin_idx = _bin_particles(rad, bin_edges)
+# n_in_bins -> [1, 2, 1]
+# bin_idx might be [0, 1, 1, 2]
+```
 
 #### Signature
 
@@ -4485,31 +4725,43 @@ def _bin_particles(
 
 ## _bin_to_particle_indices
 
-[Show source in super_droplet_method.py:275](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L275)
+[Show source in super_droplet_method.py:327](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L327)
 
-Convert bin indices to actual particle indices in the particle array.
+Map bin-relative indices back to absolute positions in the particle array.
 
-This function calculates the actual indices in the particle array
-corresponding to the bins specified by `lower_bin` and `upper_bin`.
-The function adjusts the provided bin-relative indices to reflect
-their position in the full particle array.
+This function adjusts the offsets for each bin so that the pairwise
+indices used for collision are mapped onto the actual sorted particle
+array. For instance, if `lower_indices` are all within bin 0, and bin 0
+particles occupy positions [0..9], this method adds that offset to
+each index in `lower_indices`.
 
 #### Arguments
 
-- `lower_indices` - Array of indices relative to the start of
-    the `lower_bin`.
-- `upper_indices` - Array of indices relative to the start of
-    the `upper_bin`.
-- `lower_bin` - Index of the bin containing smaller particles.
-- `upper_bin` - Index of the bin containing larger particles.
-- `bin_indices` - Array containing the start indices of each bin in the
-    particle array.
+- lower_indices : Relative indices (local to the bin) of smaller
+    particles.
+- upper_indices : Relative indices (local to the bin) of larger
+    particles.
+- lower_bin : The bin representing the smaller particles.
+- upper_bin : The bin representing the larger particles.
+- bin_indices : Cumulative offsets to determine where each bin begins.
 
 #### Returns
 
-Tuple:
-    - `-` *`small_index`* - Indices of particles from the `lower_bin`.
-    - `-` *`large_index`* - Indices of particles from the `upper_bin`.
+- `small_index` : Absolute positions of smaller particles in the
+  sorted particle array.
+- `large_index` : Absolute positions of the larger particles in
+  the sorted array.
+
+#### Examples
+
+```py
+bins = np.array([0, 10, 20])
+lw_rel = np.array([0, 1])
+up_rel = np.array([2, 3])
+# Convert these local indices for bin 1 (start=10) and bin 2 (start=20)
+s_idx, l_idx = _bin_to_particle_indices(lw_rel, up_rel, 1, 2, bins)
+# s_idx -> [10, 11]
+# l_idx -> [22, 23]
 
 #### Signature
 
@@ -4527,19 +4779,37 @@ def _bin_to_particle_indices(
 
 ## _calculate_concentration_in_bins
 
-[Show source in super_droplet_method.py:492](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L492)
+[Show source in super_droplet_method.py:613](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L613)
 
-Calculate the concentration of particles in each bin.
+Sum the particle concentrations in each bin.
+
+Given per-particle `bin_indices` and `particle_concentration`, this
+function accumulates the total concentration of all particles that
+fall into each bin. The `number_in_bins` array is used mainly for
+shape reference but can also confirm the count of particles.
 
 #### Arguments
 
-- `bin_indices` - Array of bin indices for each particle.
-- `particle_concentration` - Array of sorted particle concentrations.
-number_in_bins : Array of the number of particles in each bin.
+- bin_indices : Array of bin indices for each particle.
+- particle_concentration : 1D array of concentrations matching
+  each particle.
+- number_in_bins : Array with the count of particles in each bin.
 
 #### Returns
 
-The total concentration in each bin.
+- A 1D array whose length is the number of unique bins, containing
+  the summed concentration per bin.
+
+#### Examples
+
+```py
+import numpy as np
+b_idx = np.array([0, 0, 1, 1, 2])
+conc = np.array([10., 5., 2., 3., 4.])
+n_in_bins = np.array([2, 2, 1])  # might match the bin partition
+bin_c = _calculate_concentration_in_bins(b_idx, conc, n_in_bins)
+# bin_c -> [15., 5., 4.]
+```
 
 #### Signature
 
@@ -4555,34 +4825,40 @@ def _calculate_concentration_in_bins(
 
 ## _coagulation_events
 
-[Show source in super_droplet_method.py:363](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L363)
+[Show source in super_droplet_method.py:438](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L438)
 
-Calculate coagulation probabilities and filter events based on them.
+Stochastically pick which collisions (among possible pairs) actually happen.
 
-This function calculates the probability of coagulation events occurring
-between pairs of particles, based on the ratio of the kernel value for
-each pair to the maximum kernel value for the bins. The function then
-randomly determines which events occur using these probabilities.
+This function computes a collision probability for each `(small_index,
+large_index)` pair by taking the ratio of `kernel_values / kernel_max`.
+Next, a random uniform draw decides if each collision occurs.
 
 #### Arguments
 
-- `small_index` - Array of indices for the first set of particles
-    (smaller particles) involved in the events.
-- `large_index` - Array of indices for the second set of particles
-    (larger particles) involved in the events.
-- `kernel_values` - Array of kernel values corresponding to the
-    particle pairs.
-- `kernel_max` - The maximum kernel value used for normalization
-    of probabilities.
-- `generator` - A NumPy random generator used to sample random numbers.
+- small_index : Array of indices representing smaller particles.
+- large_index : Array of indices representing larger particles.
+- kernel_values : Collision kernel values for each pair.
+- kernel_max : A maximum kernel value used for normalization.
+- generator : Random generator to compare probabilities vs.
+  uniform draws.
 
 #### Returns
 
-Tuple:
-    - Filtered `small_index` array containing indices where
-        coagulation events occurred.
-    - Filtered `large_index` array containing indices where
-        coagulation events occurred.
+- Filtered `small_index` containing only those that coagulated.
+- Filtered `large_index` containing only those that coagulated.
+
+#### Examples
+
+```py
+rng = np.random.default_rng(999)
+s_idx = np.array([0, 1, 2])
+l_idx = np.array([3, 4, 5])
+kv = np.array([0.5, 1.0, 0.1])
+kmax = 1.0
+s_new, l_new = _coagulation_events(s_idx, l_idx, kv, kmax, rng)
+# Each pair has probability kv/kmax => [0.5, 1.0, 0.1]
+# The final s_new, l_new depends on random draws
+```
 
 #### Signature
 
@@ -4600,21 +4876,37 @@ def _coagulation_events(
 
 ## _event_pairs
 
-[Show source in super_droplet_method.py:102](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L102)
+[Show source in super_droplet_method.py:119](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L119)
 
-Calculate the number of particle pairs based on kernel value.
+Calculate an approximate count of particle-pair interactions.
+
+This function estimates the number of collisions or interactions
+that might occur between two bins of particles, given a maximum
+kernel value and the current population of each bin. When the bins
+are the same, a correction factor is applied to avoid double-counting
+pairs.
 
 #### Arguments
 
-- `lower_bin` - Lower bin index.
-- `upper_bin` - Upper bin index.
-- `kernel_max` - Maximum value of the kernel.
-- `number_in_bins` - Number of particles in each bin.
+- lower_bin : Index of the lower bin in the distribution.
+- upper_bin : Index of the upper bin in the distribution.
+- kernel_max : Maximum kernel value used to weight collisions.
+- number_in_bins : The population of particles per bin.
 
 #### Returns
 
-The number of particle pairs events based on the kernel and
-number of particles in the bins.
+- A float representing the expected number of particle-pair
+  collision events.
+
+#### Examples
+
+```py
+max_kernel = 1.0e-9
+n_bins = np.array([100, 150, 200])
+# lower_bin=0, upper_bin=1 => collisions between bin 0 and bin 1
+events_est = _event_pairs(0, 1, max_kernel, n_bins)
+# events_est is ~ 1.0e-9 * 100 * 150
+```
 
 #### Signature
 
@@ -4631,29 +4923,42 @@ def _event_pairs(
 
 ## _filter_valid_indices
 
-[Show source in super_droplet_method.py:317](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L317)
+[Show source in super_droplet_method.py:380](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L380)
 
-Filter particles indices based on particle radius and event counters.
+Remove invalid pairs of particles based on radius and optional event limit.
 
-This function filters out particle indices that are considered invalid
-based on two criteria:
-1. The particle radius must be greater than zero.
-2. If provided, the single event counter must be less than one.
+This function checks each pair of `(small_index, large_index)` to ensure
+both have radius > 0. If `single_event_counter` is provided, it further
+enforces that each particle has had < 1 event so far (or you can
+define your own threshold). The pairs failing these checks are removed.
 
 #### Arguments
 
-- `small_index` - Array of indices for particles in the smaller bin.
-- `large_index` - Array of indices for particles in the larger bin.
-- `particle_radius` - Array containing the radii of particles.
-- `single_event_counter` *Optional* - Optional array tracking the
-    number of events for each particle. If provided, only particles
-    with a counter value less than one are valid.
+- small_index : Indices for the smaller particles in each pair.
+- large_index : Indices for the larger particles in each pair.
+- particle_radius : Array of radii for each particle.
+- single_event_counter : Optional array counting how many events
+  each particle has undergone. If provided, only particles with
+  counter < 1 pass the filter.
 
 #### Returns
 
-Tuple:
-    - Filtered `small_index` array containing only valid indices.
-    - Filtered `large_index` array containing only valid indices.
+- Filtered `small_index` with only valid pairs.
+- Filtered `large_index` that corresponds to valid pairs.
+
+#### Examples
+
+```py
+r = np.array([0.1, 0.0, 0.08, 0.02])
+c = np.array([0, 0, 0, 0])
+small_i = np.array([0, 1, 2])
+large_i = np.array([3, 0, 1])
+# Filter out pairs with radius <= 0 or event_counter >= 1
+s_valid, l_valid = _filter_valid_indices(
+    small_i, large_i, r, single_event_counter=c
+)
+# Indices with r>0 remain in s_valid, l_valid
+```
 
 #### Signature
 
@@ -4670,17 +4975,32 @@ def _filter_valid_indices(
 
 ## _get_bin_pairs
 
-[Show source in super_droplet_method.py:476](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L476)
+[Show source in super_droplet_method.py:583](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L583)
 
-Pre-compute the unique bin pairs for vectorized operations.
+Produce the list of all unique (binA, binB) pairs using combinations
+with replacement.
+
+This function is useful when we want to iterate over all bin pairs
+(including binA == binB) for collision computations. The combination
+ensures each pair is returned only once.
 
 #### Arguments
 
-- `bin_indices` - Array of bin indices.
+- bin_indices : Array of bin indices for each particle (though
+  only the unique values matter).
 
 #### Returns
 
-Unique bin pairs for vectorized operations.
+- A list of (lower_bin, upper_bin) pairs covering all unique
+  bins in `bin_indices`.
+
+#### Examples
+
+```py
+bins = np.array([0, 0, 1, 2, 2])
+pairs = _get_bin_pairs(bins)
+# pairs -> [(0, 0), (0, 1), (0, 2), (1, 1), (1, 2), (2, 2)]
+```
 
 #### Signature
 
@@ -4692,26 +5012,38 @@ def _get_bin_pairs(bin_indices: NDArray[np.int64]) -> list[Tuple[int, int]]: ...
 
 ## _sample_events
 
-[Show source in super_droplet_method.py:133](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L133)
+[Show source in super_droplet_method.py:166](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L166)
 
-Sample the number of coagulation events from a Poisson distribution.
+Determine how many collisions actually occur using a Poisson draw.
 
-This function calculates the expected number of coagulation events based on
-the number of particle pairs, the simulation volume, and the time step. It
-then samples the actual number of events using a Poisson distribution.
+This function uses the expected collision count (`events`) and normalizes
+by system `volume` to compute an effective collision rate. It then
+samples from a Poisson distribution to obtain the actual number of
+collisions happening within the current `time_step`.
 
 #### Arguments
 
-- `events` - The calculated number of particle pairs that could
-    interact.
-- `volume` - The volume of the simulation space.
-- `time_step` - The time step over which the events are being simulated.
-- `generator` - A NumPy random generator used to sample from the Poisson
-    distribution.
+- events : The calculated number of particle pairs that could
+  interact.
+- volume : The volume of the simulation space (m³).
+- time_step : The time span (seconds) over which collisions are
+  considered.
+- generator : A NumPy random Generator to sample the Poisson
+  distribution.
 
 #### Returns
 
-The sampled number of coagulation events as an integer.
+- The sampled number of coagulation events as an integer.
+
+#### Examples
+
+```py
+from numpy.random import default_rng
+rng = default_rng(42)
+collisions = _sample_events(events=5e3, volume=0.1, time_step=0.01,
+    generator=rng)
+# collisions might be ~ Poisson( 5e3 / 0.1 * 0.01 ) => Poisson(5)
+```
 
 #### Signature
 
@@ -4725,29 +5057,43 @@ def _sample_events(
 
 ## _select_random_indices
 
-[Show source in super_droplet_method.py:228](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L228)
+[Show source in super_droplet_method.py:267](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L267)
 
-Select random indices for particles involved in coagulation events.
+Randomly choose indices within each bin to represent collision partners.
 
-This function generates random indices for particles in the specified bins
-(`lower_bin` and `upper_bin`) that are involved in a specified number of
-events. The indices are selected based on the number of particles in
-each bin.
+This function picks `events` indices from the population of the
+`lower_bin` and `upper_bin`, ignoring any radius or event-limit checks
+(those may happen later). The result is two arrays of equal size,
+each containing random picks within the respective bins.
 
 #### Arguments
 
-- `lower_bin` - Index of the bin containing smaller particles.
-- `upper_bin` - Index of the bin containing larger particles.
-- `events` - The number of events to sample indices for.
-- `number_in_bins` - Array representing the number of particles in
-    each bin.
-- `generator` - A NumPy random generator used to sample indices.
+- lower_bin : Index for the "smaller" bin.
+- upper_bin : Index for the "larger" bin.
+- events : How many pairs to select.
+- number_in_bins : Array with the count of particles in each bin.
+- generator : Random number generator to draw the indices.
 
 #### Returns
 
-Tuple:
-    - Indices of particles from `lower_bin`.
-    - Indices of particles from `upper_bin`.
+- An array of size `events` with random picks from `lower_bin`.
+- An array of size `events` with random picks from `upper_bin`.
+
+#### Examples
+
+```py
+import numpy as np
+rng = np.random.default_rng(42)
+n_in_bins = np.array([5, 10, 7])
+i_lw, i_up = _select_random_indices(
+    lower_bin=0,
+    upper_bin=2,
+    events=3,
+    number_in_bins=n_in_bins,
+    generator=rng
+)
+# i_lw -> random indices in [0..4]
+# i_up -> random indices in [0..6]
 
 #### Signature
 
@@ -4765,24 +5111,37 @@ def _select_random_indices(
 
 ## _sort_particles
 
-[Show source in super_droplet_method.py:411](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L411)
+[Show source in super_droplet_method.py:491](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L491)
 
-Sort particles by size and optionally sort their concentrations.
+Sort particle radii (and optionally concentrations) in ascending order.
+
+The function returns an array of `unsort_indices` that can be used
+to restore the particles to their original order after manipulations.
 
 #### Arguments
 
-- `particle_radius` - Array of particle radii.
-- `particle_concentration` - Optional array of particle concentrations
-    corresponding to each radius. If provided, it will be sorted to
-    match the sorted radii.
+- particle_radius : 1D NumPy array of particle radii.
+- particle_concentration : Optional array of corresponding
+  concentrations.
 
 #### Returns
 
-Tuple:
-    - `-` *`unsort_indices`* - Array of indices to revert the sorting.
-    - `-` *`sorted_radius`* - Array of sorted particle radii.
-    - `-` *`sorted_concentration`* - Optional array of sorted particle
-        concentrations (or `None` if not provided).
+- `unsort_indices` : Indices to revert sorting to the original order.
+- `sorted_radius` : Sorted array of radii in ascending order.
+- `sorted_concentration` : Sorted array of concentrations, if
+  provided; otherwise `None`.
+
+#### Examples
+
+```py
+import numpy as np
+r = np.array([0.3, 0.1, 0.5])
+c = np.array([10, 30, 20])
+u_idx, s_r, s_c = _sort_particles(r, c)
+# s_r -> [0.1, 0.3, 0.5]
+# s_c -> [30, 10, 20]
+# u_idx can be used to get them back in [0.3, 0.1, 0.5] order
+```
 
 #### Signature
 
@@ -4797,27 +5156,44 @@ def _sort_particles(
 
 ## _super_droplet_update_step
 
-[Show source in super_droplet_method.py:14](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L14)
+[Show source in super_droplet_method.py:15](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L15)
 
-Update the particle radii and concentrations after coagulation events.
+Update particle radii and concentrations when two particles coagulate.
+
+This function merges smaller and larger particles by combining their
+volumes and redistributing particle concentrations. The resulting
+radii are computed via volume conservation, and an event counter
+tracks how many coagulation events each particle has undergone.
 
 #### Arguments
 
-- `particle_radius` *NDArray[float64]* - Array of particle radii.
-- `concentration` *NDArray[float64]* - Array representing the concentration
-    of particles.
-- `single_event_counter` *NDArray[int64]* - Tracks the number of
-    coagulation events for each particle.
-- `small_index` *NDArray[int64]* - Indices corresponding to smaller
-    particles.
-- `large_index` *NDArray[int64]* - Indices corresponding to larger
-    particles.
+- particle_radius : Array of particle radii (m).
+- concentration : Array representing the concentration of each
+  particle (number or mass, depending on usage).
+- single_event_counter : Tracks the number of coagulation events
+  each particle has experienced in the current iteration.
+- small_index : Indices for smaller particles in a coagulation event.
+- large_index : Indices for larger particles in a coagulation event.
 
 #### Returns
 
-- Updated array of particle radii.
-- Updated array representing the concentration of particles.
-- Updated array tracking the number of coagulation events.
+- An updated array of particle radii (m) following coagulation.
+- An updated array representing the concentration of particles.
+- An updated array tracking the index-wise number of events.
+
+#### Examples
+
+```py
+import numpy as np
+r = np.array([1e-9, 2e-9, 3e-9])
+conc = np.array([100., 50., 75.])
+events = np.zeros_like(r, dtype=int)
+s_idx = np.array([0])
+l_idx = np.array([2])
+out_r, out_c, out_ev = _super_droplet_update_step(
+    r, conc, events, s_idx, l_idx)
+# out_r[0] is updated via volume combination with out_r[2].
+```
 
 #### Signature
 
@@ -4835,33 +5211,51 @@ def _super_droplet_update_step(
 
 ## get_super_droplet_coagulation_step
 
-[Show source in super_droplet_method.py:520](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L520)
+[Show source in super_droplet_method.py:658](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L658)
 
-Perform a single step of the Super Droplet coagulation process.
+Carry out one time-step of super-droplet-based coagulation.
 
-This function processes particles by sorting them, binning by size,
-computing coagulation events based on the coagulation kernel, and
-updating particle properties accordingly.
+This function sorts particles by radius, bins them, and then stochastically
+computes collision events according to the coagulation kernel. It updates
+the particle radii/concentrations, then unsorts them back to the original
+order.
 
 #### Arguments
 
-- `particle_radius` - Array of particle radii.
-- `particle_concentration` - Array of particle concentrations
-    corresponding to each radius.
-- `kernel` - 2D array representing the coagulation kernel values between
-    different bins.
-- `kernel_radius` - Array defining the radii corresponding to the
-    kernel bins.
-- `volume` - Volume of the system or relevant scaling factor.
-- `time_step` - Duration of the current time step.
-random_generator : A NumPy random number generator for
-    stochastic processes.
+- particle_radius : Array of particle radii (m).
+- particle_concentration : Array of per-particle concentration.
+- kernel : 2D matrix of coagulation kernel values, dimension
+  ~ len(kernel_radius) × len(kernel_radius).
+- kernel_radius : Array of radius points defining the kernel dimension.
+- volume : System volume or domain size in m³.
+- time_step : The length of this coagulation iteration in seconds.
+- random_generator : Random number generator for sampling collisions.
 
 #### Returns
 
-Tuple:
-    - Updated array of particle radii after coagulation.
-    - Updated array of particle concentrations after coagulation.
+- Updated radii array after processing coagulation.
+- Updated concentrations array after processing coagulation.
+
+#### Examples
+
+```py
+import numpy as np
+from numpy.random import default_rng
+radius = np.array([1e-9, 2e-9, 5e-9])
+conc = np.array([100., 50., 10.])
+ker_vals = np.ones((3,3))
+ker_r = np.array([1e-9, 2e-9, 5e-9])
+rng = default_rng(42)
+r_new, c_new = get_super_droplet_coagulation_step(
+    radius, conc, ker_vals, ker_r, 1e-3, 1.0, rng)
+# r_new, c_new have updated values after one super droplet
+# coagulation step.
+
+References:
+- E. W. Tedford and L. A. Perugini, "Superdroplet method
+  in cloud microphysics simulations," J. Atmos. Sci., 2020.
+- Seinfeld, J. H., & Pandis, S. N. *Atmospheric Chemistry and Physics*,
+  Wiley, 2016.
 
 #### Signature
 
@@ -4881,45 +5275,40 @@ def get_super_droplet_coagulation_step(
 
 ## random_choice_indices
 
-[Show source in super_droplet_method.py:165](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L165)
+[Show source in super_droplet_method.py:209](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/particle_resolved_step/super_droplet_method.py#L209)
 
-Filter valid indices and select random indices for coagulation events.
+Select valid particle indices in two bins for coagulation events.
 
-This function filters particle indices based on bin indices and ensures
-the selected particles have a positive radius. It then randomly selects
-indices from both a lower bin and an upper bin for a given number of
-events.
+This function tries to choose `events` valid indices from
+`lower_bin` and `upper_bin`, discarding any particles with radius ≤ 0.
+It uses the provided random generator to perform the sampling
+with replacement if needed.
 
 #### Arguments
 
-- `lower_bin` - The index of the lower bin to filter particles from.
-- `upper_bin` - The index of the upper bin to filter particles from.
-- `events` - Number of events (indices) to sample for each bin.
-- `particle_radius` - A NumPy array of particle radii. Only particles with
-    radius > 0 are considered.
-- `bin_indices` - A NumPy array of bin indices corresponding to each
-    particle.
-- `generator` - A NumPy random generator used to sample indices.
+- lower_bin : Index of the lower bin to filter particles from.
+- upper_bin : Index of the upper bin to filter particles from.
+- events : Number of events (indices) to sample for each bin.
+- particle_radius : Array of particle radii; only those > 0
+  are considered valid.
+- bin_indices : Array of bin labels corresponding to each particle.
+- generator : Random number generator used for index selection.
 
 #### Returns
 
-Tuple:
-    - Indices of particles from the lower bin.
-    - Indices of particles from the upper bin.
+- Indices of particles from the lower bin.
+- Indices of particles from the upper bin.
 
 #### Examples
 
-``` py title="Example choice indices (update)"
-rng = np.random.default_rng()
-particle_radius = np.array([0.5, 0.0, 1.2, 0.3, 0.9])
-bin_indices = np.array([1, 1, 1, 2, 2])
-lower_bin = 1
-upper_bin = 2
-events = 2
-lower_indices, upper_indices = random_choice_indices(
-    lower_bin, upper_bin, events, particle_radius, bin_indices, rng)
-# lower_indices: array([0, 4])
-# upper_indices: array([0, 1])
+```py
+import numpy as np
+rng = np.random.default_rng(123)
+radius = np.array([0.3, 0.1, 0.0, 0.5])
+bins = np.array([0, 0, 1, 1])
+lw_bin, up_bin = random_choice_indices(0, 1, 2, radius, bins, rng)
+# lw_bin -> array of valid picks from bin 0
+# up_bin -> array of valid picks from bin 1
 ```
 
 #### Signature
@@ -4947,20 +5336,35 @@ def random_choice_indices(
 
 ## calculate_collision_efficiency_function
 
-[Show source in sedimentation_kernel.py:16](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L16)
+[Show source in sedimentation_kernel.py:29](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L29)
 
-Placeholder function to calculate collision efficiency.
+Calculate the collision efficiency between two particles (placeholder).
+
+This function calculates the collision efficiency E for two particles
+of radii radius1 and radius2, which can depend on additional factors
+(e.g., fluid flow or electrostatic forces). Currently not implemented.
 
 #### Arguments
 
------
-    - radius1 : Radius of the first particle [m].
-    - radius2 : Radius of the second particle [m].
+- radius1 : The radius of the first particle [m].
+- radius2 : The radius of the second particle [m].
 
 #### Returns
 
---------
-    - Collision efficiency [dimensionless].
+- Collision efficiency [dimensionless].
+
+#### Examples
+
+```py
+# Not implemented
+calculate_collision_efficiency_function(1e-7, 2e-7)
+# Raises NotImplementedError
+```
+
+#### References
+
+- Saffman, P. G., & Turner, J. S. (1956). On the collision of drops
+  in turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
 
 #### Signature
 
@@ -4972,31 +5376,47 @@ def calculate_collision_efficiency_function(radius1: float, radius2: float) -> f
 
 ## get_sedimentation_kernel_sp2016
 
-[Show source in sedimentation_kernel.py:37](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L37)
+[Show source in sedimentation_kernel.py:63](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L63)
 
-Calculate the sedimentation kernel for aerosol particles.
+Calculate the sedimentation kernel for aerosol particles (Equation 13A.4).
 
-Coagulation occurring due to gravitational settling when heavier particles
-settle faster than lighter ones, catching up and colliding with them. The
-coagulation coefficient is proportional to the product of the target area,
-the relative distance swept by the larger particle per unit time, and the
-collision efficiency
+This function computes the coagulation kernel due to gravitational
+settling, where larger particles settle faster and overtake smaller
+ones. The kernel is based on the combined diameters, the settling
+velocity difference, and the collision efficiency.
+
+Equation:
+- K(i, j) = (π / 4) × (Dᵢ + Dⱼ)² × |vᵢ - vⱼ| × Eᵢⱼ
+    - Dᵢ, Dⱼ : diameters of particle i and j [m],
+    - vᵢ, vⱼ : settling velocities [m/s],
+    - Eᵢⱼ : collision efficiency (dimensionless).
 
 #### Arguments
 
 - particle_radius : Array of particle radii [m].
 - settling_velocities : Array of particle settling velocities [m/s].
-- calculate_collision_efficiency : Boolean to calculate collision
-    efficiency or use 1.
+- calculate_collision_efficiency : Whether to calculate collision
+  efficiency or use 1. Defaults to True.
 
 #### Returns
 
-- Sedimentation kernel matrix for aerosol particles [m^3/s].
+- Sedimentation kernel matrix [m³/s], shape (n, n).
+
+#### Examples
+
+```py title="Example"
+import numpy as np
+
+rads = np.array([1e-7, 2e-7])
+vels = np.array([5e-3, 1e-2])
+kernel = get_sedimentation_kernel_sp2016(rads, vels)
+print(kernel)
+```
 
 #### References
 
-- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-    physics, Chapter 13, Equation 13A.4.
+- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry
+  and physics (3rd ed.). John Wiley & Sons. Chapter 13, Equation 13A.4.
 
 #### Signature
 
@@ -5012,22 +5432,46 @@ def get_sedimentation_kernel_sp2016(
 
 ## get_sedimentation_kernel_sp2016_via_system_state
 
-[Show source in sedimentation_kernel.py:87](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L87)
+[Show source in sedimentation_kernel.py:128](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/sedimentation_kernel.py#L128)
 
-Calculate the sedimentation kernel for aerosol particles via system state.
+Calculate the sedimentation kernel (Equation 13A.4) via system state.
+
+This function first derives settling velocities using the system state
+(particle radius, density, temperature, pressure), then calls
+get_sedimentation_kernel_sp2016.
 
 #### Arguments
 
 - particle_radius : Array of particle radii [m].
 - particle_density : Array of particle densities [kg/m³].
-- temperature : Temperature of the system [K].
-- pressure : Pressure of the system [Pa].
-- calculate_collision_efficiency : Boolean to calculate collision
-    efficiency or use 1.
+- temperature : Temperature [K].
+- pressure : Pressure [Pa].
+- calculate_collision_efficiency : Whether to calculate collision
+  efficiency or use 1. Defaults to True.
 
 #### Returns
 
-- Sedimentation kernel matrix for aerosol particles [m^3/s].
+- Sedimentation kernel matrix [m³/s], shape (n, n).
+
+#### Examples
+
+```py title="Example"
+import numpy as np
+rads = np.array([1e-7, 2e-7])
+dens = np.array([1000, 1200])
+kernel = get_sedimentation_kernel_sp2016_via_system_state(
+    particle_radius=rads,
+    particle_density=dens,
+    temperature=298,
+    pressure=101325
+)
+print(kernel)
+```
+
+#### References
+
+- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry
+  and physics (3rd ed.). John Wiley & Sons. Chapter 13, Equation 13A.4.
 
 #### Signature
 
@@ -5054,7 +5498,7 @@ def get_sedimentation_kernel_sp2016_via_system_state(
 
 ## _calculate_c1
 
-[Show source in g12_radial_distribution_ao2008.py:102](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L102)
+[Show source in g12_radial_distribution_ao2008.py:122](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L122)
 
 Compute C_1 based on Stokes number and turbulence properties.
 
@@ -5083,7 +5527,7 @@ def _calculate_c1(
 
 ## _calculate_rc
 
-[Show source in g12_radial_distribution_ao2008.py:154](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L154)
+[Show source in g12_radial_distribution_ao2008.py:174](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L174)
 
 Compute r_c, the turbulence-driven correction to the collision kernel.
 
@@ -5108,7 +5552,7 @@ def _calculate_rc(
 
 ## _compute_a_og
 
-[Show source in g12_radial_distribution_ao2008.py:181](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L181)
+[Show source in g12_radial_distribution_ao2008.py:201](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L201)
 
 Compute aOg, which accounts for the effect of gravity on
 turbulence-driven clustering.
@@ -5127,7 +5571,7 @@ def _compute_a_og(
 
 ## _compute_f
 
-[Show source in g12_radial_distribution_ao2008.py:198](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L198)
+[Show source in g12_radial_distribution_ao2008.py:218](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L218)
 
 Compute F(aOg, R_lambda), an empirical scaling factor for
 turbulence effects.
@@ -5144,7 +5588,7 @@ def _compute_f(a_og: float, reynolds_lambda: float) -> float: ...
 
 ## _compute_f3_lambda
 
-[Show source in g12_radial_distribution_ao2008.py:149](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L149)
+[Show source in g12_radial_distribution_ao2008.py:169](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L169)
 
 Compute f_3(R_lambda), an empirical turbulence factor.
 
@@ -5158,7 +5602,7 @@ def _compute_f3_lambda(reynolds_lambda: float) -> float: ...
 
 ## _compute_y_stokes
 
-[Show source in g12_radial_distribution_ao2008.py:130](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L130)
+[Show source in g12_radial_distribution_ao2008.py:150](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L150)
 
 Compute y(St), ensuring values remain non-negative.
 
@@ -5178,43 +5622,64 @@ def _compute_y_stokes(stokes_number: NDArray[np.float64]) -> NDArray[np.float64]
 
 [Show source in g12_radial_distribution_ao2008.py:14](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/g12_radial_distribution_ao2008.py#L14)
 
-Compute the radial distribution function g_{12}.
+Compute the radial distribution function g₁₂ for particles in a
+turbulent flow.
 
-The radial distribution function describes the clustering of particles
-in a turbulent flow and is given by:
+This function describes the clustering of particles in a turbulent flow.
+The equation is:
 
-g_{12} = ((η² + r_c²) / (R² + r_c²))^(C_1/2)
-
-- η (kolmogorov_length_scale) : Kolmogorov length scale [m]
-- R (collision_radius) : Collision radius (sum of particle radii) [m]
-- Stokes_1, Stokes_2 : Stokes numbers of the two particles [-]
-- R_λ (reynolds_lambda) : Taylor-microscale Reynolds number [-]
-- a_o (normalized_accel_variance) : Normalized acceleration variance [-]
-- v_k (kolmogorov_velocity) : Kolmogorov velocity scale [m/s]
-- τ_k (kolmogorov_time) : Kolmogorov timescale [s]
-- g (gravitational_acceleration) : Gravitational acceleration [m/s²]
+- g₁₂ = ((η² + r_c²) / (R² + r_c²))^(C₁/2)
+    - g₁₂ is the radial distribution function (dimensionless),
+    - η is the Kolmogorov length scale (m),
+    - r_c is the turbulence-driven correction length (m),
+    - R is the collision radius (sum of the two particle radii) (m),
+    - C₁ is a dimensionless function dependent on the Stokes numbers,
+      Reynolds number, etc.
 
 #### Arguments
 
-- particle_radius : Array of particle radii [m]
-- stokes_number : Array of Stokes numbers of particles [-]
-- kolmogorov_length_scale : Kolmogorov length scale [m]
-- reynolds_lambda : Taylor-microscale Reynolds number [-]
-- normalized_accel_variance : Normalized acceleration variance [-]
-- kolmogorov_velocity : Kolmogorov velocity scale [m/s]
-- kolmogorov_time : Kolmogorov timescale [s]
+- particle_radius : Array of particle radii in meters.
+- stokes_number : Array of particle Stokes numbers (dimensionless).
+- kolmogorov_length_scale : Kolmogorov length scale in meters.
+- reynolds_lambda : Taylor-microscale Reynolds number (dimensionless).
+- normalized_accel_variance : Normalized acceleration variance
+    (dimensionless).
+- kolmogorov_velocity : Kolmogorov velocity scale in m/s.
+- kolmogorov_time : Kolmogorov timescale in seconds.
 
 #### Returns
 
-- Radial distribution function g_{12} [-]
+- The radial distribution function g₁₂ (dimensionless).
+
+#### Examples
+
+```py title="Example Usage"
+import numpy as np
+from particula.dynamics.coagulation.turbulent_dns_kernel
+    .g12_radial_distribution_ao2008 import (
+        get_g12_radial_distribution_ao2008,
+    )
+
+radii = np.array([1e-7, 1e-6])
+stks = np.array([0.1, 0.2])
+result = get_g12_radial_distribution_ao2008(
+    particle_radius=radii,
+    stokes_number=stks,
+    kolmogorov_length_scale=1e-4,
+    reynolds_lambda=100,
+    normalized_accel_variance=0.5,
+    kolmogorov_velocity=0.1,
+    kolmogorov_time=0.001,
+)
+print(result)
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016
+  the geometric collision rate of sedimenting droplets. Part 2.
+  Theory and parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016
 
 #### Signature
 
@@ -5267,7 +5732,7 @@ class PhiComputeTerms(NamedTuple): ...
 
 ## _compute_phi_term1
 
-[Show source in phi_ao2008.py:106](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L106)
+[Show source in phi_ao2008.py:121](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L121)
 
 Compute the first term of the Φ function.
 
@@ -5289,7 +5754,7 @@ def _compute_phi_term1(terms: PhiComputeTerms) -> NDArray[np.float64]: ...
 
 ## _compute_phi_term2
 
-[Show source in phi_ao2008.py:131](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L131)
+[Show source in phi_ao2008.py:146](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L146)
 
 Compute the second term of the Φ function.
 
@@ -5312,7 +5777,7 @@ def _compute_phi_term2(terms: PhiComputeTerms) -> NDArray[np.float64]: ...
 
 ## _compute_phi_term3
 
-[Show source in phi_ao2008.py:166](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L166)
+[Show source in phi_ao2008.py:181](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L181)
 
 Compute the third term of the Φ function.
 
@@ -5338,40 +5803,56 @@ def _compute_phi_term3(terms: PhiComputeTerms) -> NDArray[np.float64]: ...
 
 [Show source in phi_ao2008.py:23](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L23)
 
-Compute the function Φ(α, φ) for the given particle properties.
+Compute the function Φ(α, φ) for the given particle properties using
+Ayala et al. (2008).
 
-The function Φ(α, φ), when vₚ₁>vₚ₂, is defined as:
+This function calculates Φ(α, φ) when vₚ₁ > vₚ₂ by considering the
+velocities (vₚ₁, vₚ₂) and inertia times (τₚ₁, τₚ₂). The equation is:
 
-Φ(α, φ) =
-{  1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )        -  1 / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) ) }        ×  ( vₚ₁ - vₚ₂ ) / ( 2 φ ( (vₚ₁ - vₚ₂ / φ) + (1 / τₚ₁) + (1 / τₚ₂) )² )
+Φ(α, φ), for vₚ₁ > vₚ₂ =
+    {  1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )        -  1 / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) ) }        ×  ( vₚ₁ - vₚ₂ ) / ( 2 φ ( (vₚ₁ - vₚ₂ / φ) + (1 / τₚ₁) + (1 / τₚ₂) )² )
 
 + {  4 / ( (vₚ₂ / φ)² - ( (1 / τₚ₂) + (1 / α) )² )        -  1 / ( (vₚ₂ / φ) + (1 / τₚ₂) + (1 / α) )²        -  1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )²  }        ×  ( vₚ₂ / ( 2 φ ( (1 / τₚ₁) - (1 / α)         + ( (1 / τₚ₂) + (1 / α) ) (vₚ₁ / vₚ₂) ) ) )
 
 + {  2φ / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )        -  2φ / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )        -  vₚ₁ / ( ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )² )        +  vₚ₂ / ( ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )² )  }        ×  1 / ( 2φ ( (vₚ₁ - vₚ₂ / φ) + (1 / τₚ₁) + (1 / τₚ₂) ) )
 
+- v₁ and v₂: Velocities of particles 1 and 2 in m/s.
+- τ₁ and τ₂: Inertia timescales of particles 1 and 2 in s.
+- α: Turbulent interaction parameter (dimensionless).
+- φ: Characteristic velocity (m/s).
+
 #### Arguments
 
-----------
-    - alpha : A parameter related to turbulence and droplet interactions
-        [-].
-    - phi : A characteristic velocity or timescale parameter [m/s].
-    - particle_inertia_time : Inertia timescale of particle 1 τₚ₁,
-        particle 2 τₚ₂ [s].
-    - particle_velocity : Velocity of particle 1 vₚ₁,
-        particle 2 vₚ₂ [m/s].
+- alpha : Turbulence/droplet interaction parameter (dimensionless).
+- phi : Characteristic velocity parameter (m/s).
+- particle_inertia_time : Inertia timescales τₚ₁ and τₚ₂ (s).
+- particle_velocity : Velocities vₚ₁ and vₚ₂ (m/s).
 
 #### Returns
 
---------
-    - Φ(α, φ) value [-].
+- The computed Φ(α, φ) (dimensionless).
+
+#### Examples
+
+```py
+import numpy as np
+from particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008
+    import get_phi_ao2008
+
+alpha_val = 0.3
+phi_val = 0.1
+inertia_times = np.array([0.05, 0.06])
+velocities = np.array([0.2, 0.18])
+result = get_phi_ao2008(alpha_val, phi_val, inertia_times, velocities)
+print(result)
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016
+  the geometric collision rate of sedimenting droplets. Part 2.
+  Theory and parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016
 
 #### Signature
 
@@ -5408,38 +5889,50 @@ def get_phi_ao2008(
 
 Compute the function Ψ(α, φ) for the k-th droplet.
 
-The function Ψ(α, φ) is defined as:
+This function calculates Ψ(α, φ) for the droplet collision kernel in the
+turbulent DNS model. The equation is:
 
-Ψ(α, φ) = 1 / ((1/τ_pk) + (1/α) + (v_pk/φ))
-        - (v_pk / (2φ ((1/τ_pk) + (1/α) + (v_pk/φ))^2))
-
-- τ_pk (particle_inertia_time) : Inertia timescale of the k-th droplet
-    [s].
-- α : A parameter related to turbulence and droplet interactions [-].
-- φ : A characteristic velocity or timescale parameter [m/s].
-- v_pk (particle_velocity) : Velocity of the k-th droplet [m/s].
+- Ψ(α, φ) = 1 / ((1/τₚₖ) + (1/α) + (vₚₖ/φ))
+            - (vₚₖ / (2φ ((1/τₚₖ) + (1/α) + (vₚₖ/φ))²))
+    - τₚₖ is the inertia timescale of the droplet (s),
+    - α is a parameter related to turbulence (dimensionless),
+    - φ is a characteristic velocity/timescale parameter (m/s),
+    - vₚₖ is the droplet velocity (m/s).
 
 #### Arguments
 
-----------
-    - alpha : A parameter related to turbulence and droplet interactions
-        [-].
-    - phi : A characteristic velocity or timescale parameter [m/s].
-    - particle_inertia_time : Inertia timescale of the droplet τ_pk [s].
-    - particle_velocity : Velocity of the droplet v_pk [m/s].
+- alpha : Parameter related to turbulence (dimensionless).
+- phi : Characteristic velocity or timescale parameter (m/s).
+- particle_inertia_time : Inertia timescale of the droplet τₚₖ (s).
+- particle_velocity : Velocity of the droplet vₚₖ (m/s).
 
 #### Returns
 
---------
-    - Ψ(α, φ) value [-].
+- The value of Ψ(α, φ) (dimensionless).
+
+#### Examples
+
+``` py
+import numpy as np
+import particula as par
+
+alpha = 0.5
+phi = 0.2
+particle_inertia_time = 0.05
+particle_velocity = 0.3
+
+psi_value = par.dyanmics.get_psi_ao2008(
+    alpha, phi, particle_inertia_time, particle_velocity
+)
+print(psi_value)
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016
+  the geometric collision rate of sedimenting droplets. Part 2.
+  Theory and parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016
 
 #### Signature
 
@@ -5472,37 +5965,49 @@ def get_psi_ao2008(
 
 ## get_radial_relative_velocity_ao2008
 
-[Show source in radial_velocity_module.py:69](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/radial_velocity_module.py#L69)
+[Show source in radial_velocity_module.py:77](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/radial_velocity_module.py#L77)
 
-Compute the radial relative velocity based on the Ayala et al. (2008)
-formulation.
+Compute the radial relative velocity based on Ayala et al. (2008).
 
-The relative velocity is given by:
+This function estimates the radial relative velocity between pairs of
+particles considering both turbulent velocity dispersion and gravitational
+acceleration. The conceptual form is:
 
-⟨ |w_r| ⟩ = sqrt(2 / π) * sqrt(σ² + (π/8) * (τ_p1 - τ_p2)² * |g|²)
-
-- σ : Turbulence velocity dispersion [m/s]
-- τ_p1, τ_p2 : Inertia timescale of particles 1 and 2 [s]
-- g : Gravitational acceleration [m/s²]
+- ⟨|wᵣ|⟩ = √(2/π) × √(σ² + (π/8) × (τₚ₁ - τₚ₂)² × g²)
+    - wᵣ is the radial relative velocity in m/s,
+    - σ is the turbulence velocity dispersion in m/s,
+    - τₚ₁, τₚ₂ are the inertia timescales (s),
+    - g is the gravitational acceleration (m/s²).
 
 #### Arguments
 
-----------
-    - velocity_dispersion : Turbulence velocity dispersion (σ) [m/s].
-    - particle_inertia_time : Inertia timescale of particle 1 (τ_p1) [s].
+- velocity_dispersion : Turbulence velocity dispersion (σ) in m/s.
+- particle_inertia_time : Inertia timescale(s) of the particle(s) in seconds.
 
 #### Returns
 
---------
-    - Radial relative velocity ⟨ |w_r| ⟩ [m/s].
+- The radial relative velocity ⟨|wᵣ|⟩ in m/s.
+
+#### Examples
+
+```py
+import numpy as np
+import particula as par
+
+# Example usage (currently raises NotImplementedError)
+try:
+    rv = par.dynamics.get_radial_relative_velocity_ao2008(
+        1.0, np.array([0.05, 0.1])
+    )
+except NotImplementedError as e:
+    print(e)
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016
+  the geometric collision rate of sedimenting droplets. Part 2. Theory
+  and parameterization. New Journal of Physics, 10.
 
 #### Signature
 
@@ -5522,34 +6027,43 @@ def get_radial_relative_velocity_ao2008(
 
 [Show source in radial_velocity_module.py:14](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/radial_velocity_module.py#L14)
 
-Compute the radial relative velocity based on the Dodin and Elperin (2002)
-formulation.
+Compute the radial relative velocity based on Dodin and Elperin (2002).
 
-The relative velocity is given by:
+This function calculates the radial relative velocity between pairs of
+particles under turbulent conditions, capturing the effects of different
+inertia timescales. The equation is:
 
-⟨ |w_r| ⟩ = sqrt(2 / π) * σ * f(b)
-
-- f(b) = (1/2) sqrt(π) (b + 0.5 / b) erf(b) + (1/2) exp(-b^2)
-- b = g |τ_p1 - τ_p2| / (sqrt(2) σ)
-- σ : Turbulence velocity dispersion [m/s]
-- τ_p1, τ_p2 : Inertia timescale of particles 1 and 2 [s]
-- g : Gravitational acceleration [m/s²]
+- ⟨|wᵣ|⟩ = √(2/π) × σ × f(b)
+    - wᵣ is the radial relative velocity in m/s,
+    - σ is the turbulence velocity dispersion in m/s,
+    - b = (g × |τₚᵢ - τₚⱼ|) / (√2 × σ),
+    - f(b) = ½√π (b + 0.5 / b) erf(b) + ½ exp(-b²).
 
 #### Arguments
 
-----------
-    - velocity_dispersion : Turbulence velocity dispersion (σ) [m/s].
-    - particle_inertia_time : Inertia timescale of particles (τ_p) [s].
+- velocity_dispersion : Turbulence velocity dispersion (σ) in m/s.
+- particle_inertia_time : Inertia timescale(s) (τₚ) in seconds.
 
 #### Returns
 
---------
-    - Radial relative velocity ⟨ |w_r| ⟩ [m/s].
+- The radial relative velocity ⟨|wᵣ|⟩ in m/s.
+
+#### Examples
+
+```py
+import numpy as np
+import particula as par
+
+# Example with an array of inertia times
+result = par.dynamics.get_radial_relative_velocity_dz2002(
+    1.0, np.array([0.1, 0.2, 0.3])
+)
+print(result)
+```
 
 #### References
 
------------
-- Dodin, Z., & Elperin, T. (2002). Phys. Fluids, 14, 2921-24.
+- Dodin, Z., & Elperin, T. (2002). Phys. Fluids, 14, 2921–2924.
 
 #### Signature
 
@@ -5575,7 +6089,7 @@ def get_radial_relative_velocity_dz2002(
 
 ## VelocityCorrelationTerms
 
-[Show source in sigma_relative_velocity_ao2008.py:35](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L35)
+[Show source in sigma_relative_velocity_ao2008.py:37](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L37)
 
 Parameters from computing velocity correlation terms.
 
@@ -5589,42 +6103,61 @@ class VelocityCorrelationTerms(NamedTuple): ...
 
 ## _compute_cross_correlation_velocity
 
-[Show source in sigma_relative_velocity_ao2008.py:229](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L229)
+[Show source in sigma_relative_velocity_ao2008.py:256](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L256)
 
-Compute the cross-correlation of the fluctuating velocities of droplets
+Compute cross-correlation of fluctuating velocities for two droplets.
 
-The function is given by:
+This function calculates the cross-correlation of the fluctuating
+velocities of two droplets using the following equation:
 
-⟨ v'^(1) v'^(2) ⟩ = (u'² f₂(R) / (τ_p1 τ_p2)) *                            [b₁ d₁ Φ(c₁, e₁) - b₁ d₂ Φ(c₁, e₂)                             - b₂ d₁ Φ(c₂, e₁) + b₂ d₂ Φ(c₂, e₂)]
+Where the equation is
 
-- u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s].
-- τ_p1, τ_p2 : Inertia timescales of droplets 1 and 2 [s].
-- f₂(R) : Longitudinal velocity correlation function.
-- Φ(c, e) : Function Φ computed using `get_phi_ao2008`.
+- ⟨v'¹ v'²⟩ = (u'² f₂(R) / (τ_p1 τ_p2)) *
+    [b₁ d₁ Φ(c₁, e₁) - b₁ d₂ Φ(c₁, e₂) - b₂ d₁ Φ(c₂, e₁) + b₂ d₂ Φ(c₂, e₂)]
+    - v'¹, v'² are the fluctuating velocities for droplets 1 and 2.
+    - u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s].
+    - τ_p1, τ_p2 : Inertia timescales of droplets 1 and 2 [s].
+    - f₂(R) : Longitudinal velocity correlation function.
+    - Φ(c, e) : Function Φ computed using `get_phi_ao2008`.
 
 #### Arguments
 
-----------
-    - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
-    - collisional_radius : Distance between two colliding droplets [m].
-    - `-` *particle_inertia_time* - Inertia timescale of droplet 1 [s].
-    - `-` *particle_velocity* - Droplet velocity [m/s].
-    - taylor_microscale : Taylor microscale [m].
-    - eulerian_integral_length : Eulerian integral length scale [m].
-    - velocity_correlation_terms : Velocity correlation coefficients [-].
+- fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
+- collisional_radius : Distance between two colliding droplets [m].
+- particle_inertia_time : Inertia timescale of droplet 1 [s].
+- particle_velocity : Droplet velocity [m/s].
+- taylor_microscale : Taylor microscale [m].
+- eulerian_integral_length : Eulerian integral length scale [m].
+- velocity_correlation_terms : Velocity correlation coefficients [-].
 
 #### Returns
 
---------
-    - Cross-correlation velocity ⟨ v'^(1) v'^(2) ⟩ [m²/s²].
+- Cross-correlation velocity [m²/s²].
+
+#### Examples
+
+```py
+import numpy as np
+ccv = _compute_cross_correlation_velocity(
+    fluid_rms_velocity=0.3,
+    collisional_radius=np.array([1e-4, 2e-4]),
+    particle_inertia_time=np.array([1.0, 1.2]),
+    particle_velocity=np.array([0.1, 0.2]),
+    taylor_microscale=0.01,
+    eulerian_integral_length=0.1,
+    velocity_correlation_terms=VelocityCorrelationTerms(
+        b1=0.1, b2=0.2, d1=0.3, d2=0.4, c1=0.5, c2=0.6, e1=0.7, e2=0.8
+    )
+)
+# Output: array([...])
+```
 
 #### References
 
------------
-- Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016
+- Ayala, O. et al. (2008). Effects of turbulence on the geometric
+  collision rate of sedimenting droplets. Part 2. Theory and
+  parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016
 
 #### Signature
 
@@ -5658,38 +6191,55 @@ def _compute_cross_correlation_velocity(
 
 ## _compute_rms_fluctuation_velocity
 
-[Show source in sigma_relative_velocity_ao2008.py:137](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L137)
+[Show source in sigma_relative_velocity_ao2008.py:151](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L151)
 
-Compute the square of the RMS fluctuation velocity for the k-th droplet.
+Compute RMS fluctuation velocity for the k-th droplet.
 
-The function is given by:
+This function calculates the square of the RMS fluctuation velocity for
+the k-th droplet using the following equation:
 
-⟨ (v'^(k))² ⟩ = (u'² / τ_pk) *                        [b₁ d₁ Ψ(c₁, e₁) - b₁ d₂ Ψ(c₁, e₂)                         - b₂ d₁ Ψ(c₂, e₁) + b₂ d₂ Ψ(c₂, e₂)]
+Where the equation is:
 
-- u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s].
-- τ_pk (particle_inertia_time) : Inertia timescale of the droplet k [s].
-- Ψ(c, e) : Function Ψ computed using `get_psi_ao2008`.
+- ⟨(v'ᵏ)²⟩ = (u'² / τ_pk) * [b₁ d₁ Ψ(c₁, e₁) - b₁ d₂ Ψ(c₁, e₂)
+  - b₂ d₁ Ψ(c₂, e₁) + b₂ d₂ Ψ(c₂, e₂)]
+    - v'ᵏ is the fluctuating velocity for droplet k.
+    - u' (fluid_rms_velocity) : Fluid RMS fluctuation velocity [m/s].
+    - τ_pk (particle_inertia_time) : Inertia timescale of the droplet k
+        [s].
+    - Ψ(c, e) : Function Ψ computed using `get_psi_ao2008`.
 
 #### Arguments
 
-----------
-    - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
-    - particle_inertia_time : Inertia timescale of the droplet k [s].
-    - velocity_correlation_terms : Velocity correlation coefficients [-].
-    - particle_velocity : Droplet velocity [m/s].
+- fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
+- particle_inertia_time : Inertia timescale of the droplet k [s].
+- particle_velocity : Droplet velocity [m/s].
+- velocity_correlation_terms : Velocity correlation coefficients [-].
 
 #### Returns
 
---------
-    - RMS fluctuation velocity squared ⟨ (v'^(k))² ⟩ [m²/s²].
+- RMS fluctuation velocity [m²/s²].
+
+#### Examples
+
+```py
+import numpy as np
+rms_fluct = _compute_rms_fluctuation_velocity(
+    fluid_rms_velocity=0.3,
+    particle_inertia_time=np.array([1.0, 1.2]),
+    particle_velocity=np.array([0.1, 0.2]),
+    velocity_correlation_terms=VelocityCorrelationTerms(
+        b1=0.1, b2=0.2, d1=0.3, d2=0.4, c1=0.5, c2=0.6, e1=0.7, e2=0.8
+    )
+)
+# Output: array([...])
+```
 
 #### References
 
------------
-- Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016
+- Ayala, O. et al. (2008). Effects of turbulence on the geometric
+  collision rate of sedimenting droplets. Part 2. Theory and
+  parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016
 
 #### Signature
 
@@ -5711,41 +6261,55 @@ def _compute_rms_fluctuation_velocity(
 
 ## get_relative_velocity_variance
 
-[Show source in sigma_relative_velocity_ao2008.py:48](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L48)
+[Show source in sigma_relative_velocity_ao2008.py:50](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/sigma_relative_velocity_ao2008.py#L50)
 
-Compute the variance of particle relative-velocity fluctuation.
+Compute the variance of particle relative-velocity fluctuations.
 
-The function is given by:
+This function calculates the variance of particle relative-velocity
+fluctuations using the following equation:
 
-σ² = ⟨ (v'^(2))² ⟩ + ⟨ (v'^(1))² ⟩ - 2 ⟨ v'^(1) v'^(2) ⟩
+Where the equation is:
 
-- ⟨ (v'^(k))² ⟩ is the square of the RMS fluctuation velocity for droplet k
-- ⟨ v'^(1) v'^(2) ⟩ is the cross-correlation of the fluctuating velocities.
+- σ² = ⟨(v'²)⟩₁ + ⟨(v'²)⟩₂ - 2⟨v'¹ v'²⟩
+    - v'¹, v'² are the fluctuating velocities for droplets 1 and 2.
 
 #### Arguments
 
-----------
-    - fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
-    - collisional_radius : Distance between two colliding droplets [m].
-    - particle_inertia_time : Inertia timescale of droplet 1 [s].
-    - particle_velocity : Droplet velocity [m/s].
-    - taylor_microscale : Taylor microscale [m].
-    - eulerian_integral_length : Eulerian integral length scale [m].
-    - lagrangian_integral_time : Lagrangian integral time scale [s].
+- fluid_rms_velocity : Fluid RMS fluctuation velocity [m/s].
+- collisional_radius : Distance between two colliding droplets [m].
+- particle_inertia_time : Inertia timescale of droplet 1 [s].
+- particle_velocity : Droplet velocity [m/s].
+- taylor_microscale : Taylor microscale [m].
+- eulerian_integral_length : Eulerian integral length scale [m].
+- lagrangian_integral_time : Lagrangian integral time scale [s].
 
 #### Returns
 
---------
-    - σ² : Variance of particle relative-velocity fluctuation,
-        (n, n) matrix where n is number of particles [m²/s²],
+- σ² : Variance of the particle relative-velocity fluctuation [m²/s²].
+
+#### Examples
+
+```py
+import numpy as np
+sigma_sq = get_relative_velocity_variance(
+    fluid_rms_velocity=0.3,
+    collisional_radius=np.array([1e-4, 2e-4]),
+    particle_inertia_time=np.array([1.0, 1.2]),
+    particle_velocity=np.array([0.1, 0.2]),
+    taylor_microscale=0.01,
+    eulerian_integral_length=0.1,
+    lagrangian_integral_time=0.5,
+    lagrangian_taylor_microscale_time=0.05
+)
+# Output: array([...])
+```
 
 #### References
 
------------
-- Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016
+- Ayala, O. et al. (2008). Effects of turbulence on the geometric
+  collision rate of sedimenting droplets. Part 2. Theory and
+  parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016
 
 #### Signature
 
@@ -5784,8 +6348,15 @@ def get_relative_velocity_variance(
 
 [Show source in turbulent_dns_kernel_ao2008.py:28](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/turbulent_dns_kernel_ao2008.py#L28)
 
-Get the geometric collision kernel Γ₁₂, derived from direct numerical
-simulations.
+Compute the geometric collision kernel Γ₁₂ from DNS simulations.
+
+Where the equation is
+
+- Γ₁₂ = 2π R² ⟨|wᵣ|⟩ g₁₂
+    - Γ₁₂ is collision kernel [m³/s].
+    - R is collision radius [m].
+    - wᵣ is radial relative velocity [m/s].
+    - g₁₂ is radial distribution function [dimensionless].
 
 #### Arguments
 
@@ -5802,17 +6373,6 @@ simulations.
 #### Returns
 
 - Collision kernel Γ₁₂ [m³/s].
-
-Equations:
-- Γ₁₂ = 2π R² ⟨ |w_r| ⟩ g₁₂
-- R = a₁ + a₂ (collision radius)
-- ⟨ |w_r| ⟩ : Radial relative velocity, computed using
-    `get_radial_relative_velocity_ao2008`
-- g₁₂ : Radial distribution function, computed using
-    `g12_radial_distribution`
-- radius << η (Kolmogorov length scale)
-- ρ_w >> ρ (water density much greater than air density)
-- Sv > 1 (Stokes number sufficiently large)
 
 #### References
 
@@ -5848,9 +6408,10 @@ def get_turbulent_dns_kernel_ao2008(
 
 ## get_turbulent_dns_kernel_ao2008_via_system_state
 
-[Show source in turbulent_dns_kernel_ao2008.py:106](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/turbulent_dns_kernel_ao2008.py#L106)
+[Show source in turbulent_dns_kernel_ao2008.py:103](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/turbulent_dns_kernel_ao2008.py#L103)
 
-Compute the geometric collision kernel (Γ₁₂) under the AO2008 formulation.
+Compute the geometric collision kernel Γ₁₂ using AO2008 for system.
+
 This function orchestrates the calculation of the geometric collision
 kernel by deriving necessary fluid, turbulence, and particle parameters
 from the provided system state. The returned value (or array) represents
@@ -5874,30 +6435,29 @@ under turbulence.
 
 #### Returns
 
-- The geometric collision kernel Γ₁₂ [m³/s]. If inputs are scalars,
-    returns a float. If inputs are arrays, returns a numpy array of
-    collision kernels.
+- Collision kernel Γ₁₂ [m³/s].
 
-#### Notes
+#### Examples
 
-- This function does the following:
-1. Calculates fluid properties (dynamic, kinematic viscosity,
-    mean free path).
-2. Determines slip correction factors (Knudsen number, Cunningham factor).
-3. Computes particle inertia times and settling velocities.
-4. Estimates relevant turbulence scales (Kolmogorov, Taylor,
-    integral scales).
-5. Calculates velocity variance and auxiliary terms, e.g. Stokes number.
-6. Calls `get_kernel_ao2008` with all the necessary inputs to get the final
-   collision kernel.
+```py
+kernel_via_state = get_turbulent_dns_kernel_ao2008_via_system_state(
+    particle_radius=np.array([1e-6, 2e-6]),
+    particle_density=1000.0,
+    fluid_density=1.225,
+    temperature=298.15,
+    re_lambda=100.0,
+    relative_velocity=0.1,
+    turbulent_dissipation=0.01,
+)
+# Output: array([...])
+```
 
 #### References
 
-- [get_turbulent_dns_kernel_ao2008](#get_turbulent_dns_kernel_ao2008) : Computes the kernel.
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016
+  the geometric collision rate of sedimenting droplets. Part 2.
+  Theory and parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016
 
 #### Signature
 
@@ -5927,39 +6487,53 @@ def get_turbulent_dns_kernel_ao2008_via_system_state(
 
 [Show source in velocity_correlation_f2_ao2008.py:16](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_f2_ao2008.py#L16)
 
-Compute the longitudinal two-point velocity correlation function f₂(R).
+Compute the longitudinal velocity correlation function f₂(R) from
+Ayala et al. (2008).
 
 This function describes the correlation of velocity fluctuations as a
 function of collisional radius R between two colliding droplets.
 
-The function is given by:
+Where the equation is:
 
-f₂(R) =  1 / (2 sqrt(1 - 2β²))                 × { (1 + sqrt(1 - 2β²)) exp[-2R / ((1 + sqrt(1 - 2β²)) L_e)]                 - (1 - sqrt(1 - 2β²)) exp[-2R / ((1 - sqrt(1 - 2β²)) L_e)] }
-
-- β = (sqrt(2) * λ) / L_e
-- λ (taylor_microscale) : Taylor microscale [m].
-- L_e (eulerian_integral_length) : Eulerian integral length scale [m].
-- R (collisional_radius) : Distance between colliding droplets [m].
+- f₂(R) = 1 / (2√(1 - 2β²)) × {
+    (1 + √(1 - 2β²)) exp[-2R / ((1 + √(1 - 2β²)) L_e)]
+    - (1 - √(1 - 2β²)) exp[-2R / ((1 - √(1 - 2β²)) L_e)]
+  }
+    - f₂(R) is the longitudinal velocity correlation function [-].
+    - R is the collisional radius [m].
+    - β = (√2 * λ) / L_e
+    - λ (taylor_microscale) : Taylor microscale [m].
+    - L_e (eulerian_integral_length) : Eulerian integral length scale
+      [m].
 
 #### Arguments
 
-----------
-    - collisional_radius : Distance between two colliding droplets [m].
-    - taylor_microscale : Taylor microscale [m].
-    - eulerian_integral_length : Eulerian integral length scale [m].
+- collisional_radius : Distance between two colliding droplets [m].
+- taylor_microscale : Taylor microscale [m].
+- eulerian_integral_length : Eulerian integral length scale [m].
 
 #### Returns
 
---------
-    - f₂(R) value [-].
+- f₂(R) value [dimensionless].
+
+#### Examples
+
+```py
+import numpy as np
+example_f2 = get_f2_longitudinal_velocity_correlation(
+    collisional_radius=np.array([1e-4, 2e-4]),
+    taylor_microscale=1e-3,
+    eulerian_integral_length=1e-2,
+)
+# Output: array([...])
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016
+  the geometric collision rate of sedimenting droplets. Part 2. Theory
+  and parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016
 
 #### Signature
 
@@ -5990,27 +6564,30 @@ def get_f2_longitudinal_velocity_correlation(
 
 ## compute_b1
 
-[Show source in velocity_correlation_terms_ao2008.py:87](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L87)
+[Show source in velocity_correlation_terms_ao2008.py:98](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L98)
 
-Compute b₁, which is defined as:
+Compute b₁, a dimensionless parameter in the Ayala 2008 model.
 
-b₁ = (1 + sqrt(1 - 2z²)) / (2 sqrt(1 - 2z²))
-
-- z : Defined as z = τ_T / T_L.
+- b₁ = (1 + √(1 - 2z²)) / (2 √(1 - 2z²))
+    - z is τ_T / T_L.
 
 #### Arguments
 
-----------
-    - z : A dimensionless parameter related to turbulence [-].
+- z : A dimensionless parameter related to turbulence [-].
 
 #### Returns
 
---------
-    - b₁ value [-].
+- b₁ value [dimensionless].
+
+#### Examples
+
+```py
+b1_val = compute_b1(0.5)
+# Output: 0.866
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
     the geometric collision rate of sedimenting droplets. Part 2.
     Theory and parameterization. New Journal of Physics, 10.
@@ -6029,27 +6606,30 @@ def compute_b1(
 
 ## compute_b2
 
-[Show source in velocity_correlation_terms_ao2008.py:117](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L117)
+[Show source in velocity_correlation_terms_ao2008.py:129](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L129)
 
-Compute b₂, which is defined as:
+Compute b₂, a dimensionless parameter in the Ayala 2008 model.
 
-b₂ = (1 - sqrt(1 - 2z²)) / (2 sqrt(1 - 2z²))
-
-- z : Defined as z = τ_T / T_L.
+- b₂ = (1 - √(1 - 2z²)) / (2 √(1 - 2z²))
+    - z is τ_T / T_L.
 
 #### Arguments
 
-----------
-    - z : A dimensionless parameter related to turbulence [-].
+- z : A dimensionless parameter related to turbulence [-].
 
 #### Returns
 
---------
-    - b₂ value [-].
+- b₂ value [dimensionless].
+
+#### Examples
+
+```py
+b2_val = compute_b2(0.5)
+# Output: 0.134
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
     the geometric collision rate of sedimenting droplets. Part 2.
     Theory and parameterization. New Journal of Physics, 10.
@@ -6068,29 +6648,32 @@ def compute_b2(
 
 ## compute_beta
 
-[Show source in velocity_correlation_terms_ao2008.py:50](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L50)
+[Show source in velocity_correlation_terms_ao2008.py:60](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L60)
 
-Compute β, which is defined as:
+Compute β, the ratio of microscale to integral length scale.
 
-β = (sqrt(2) * λ) / L_e
-
-- λ (taylor_microscale) : Taylor microscale [m].
-- L_e (eulerian_integral_length) : Eulerian integral length scale [m].
+- β = (√2 × λ) / L_e
+    - λ is Taylor microscale [m].
+    - L_e is Eulerian integral length scale [m].
 
 #### Arguments
 
-----------
-    - taylor_microscale : Taylor microscale [m].
-    - eulerian_integral_length : Eulerian integral length scale [m].
+- taylor_microscale : Taylor microscale [m].
+- eulerian_integral_length : Eulerian integral length scale [m].
 
 #### Returns
 
---------
-    - β value [-].
+- β value [dimensionless].
+
+#### Examples
+
+```py
+beta_val = compute_beta(0.001, 0.1)
+# Output: 0.01414
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
     the geometric collision rate of sedimenting droplets. Part 2.
     Theory and parameterization. New Journal of Physics, 10.
@@ -6112,29 +6695,32 @@ def compute_beta(
 
 ## compute_c1
 
-[Show source in velocity_correlation_terms_ao2008.py:147](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L147)
+[Show source in velocity_correlation_terms_ao2008.py:160](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L160)
 
-Compute c₁, which is defined as:
+Compute c₁, a dimensionless timescale factor in the Ayala 2008 model.
 
-c₁ = ((1 + sqrt(1 - 2z²)) * T_L) / 2
-
-- z : Defined as z = τ_T / T_L.
-- T_L (lagrangian_integral_scale) : Lagrangian integral timescale [s].
+- c₁ = ((1 + √(1 - 2z²)) × T_L) / 2
+    - z is τ_T / T_L.
+    - T_L is the Lagrangian integral timescale [s].
 
 #### Arguments
 
-----------
-    - z : A dimensionless parameter related to turbulence [-].
-    - lagrangian_integral_scale : Lagrangian integral timescale [s].
+- z : A dimensionless parameter related to turbulence [-].
+- lagrangian_integral_scale : Lagrangian integral timescale [s].
 
 #### Returns
 
---------
-    - c₁ value [-].
+- c₁ value [dimensionless].
+
+#### Examples
+
+```py
+c1_val = compute_c1(0.5, 1.0)
+# Output: 0.933
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
     the geometric collision rate of sedimenting droplets. Part 2.
     Theory and parameterization. New Journal of Physics, 10.
@@ -6154,29 +6740,32 @@ def compute_c1(
 
 ## compute_c2
 
-[Show source in velocity_correlation_terms_ao2008.py:179](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L179)
+[Show source in velocity_correlation_terms_ao2008.py:193](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L193)
 
-Compute c₂, which is defined as:
+Compute c₂, a dimensionless timescale factor in the Ayala 2008 model.
 
-c₂ = ((1 - sqrt(1 - 2z²)) * T_L) / 2
-
-- z : Defined as z = τ_T / T_L.
-- T_L (lagrangian_integral_scale) : Lagrangian integral timescale [s].
+- c₂ = ((1 - √(1 - 2z²)) × T_L) / 2
+    - z is τ_T / T_L.
+    - T_L is the Lagrangian integral timescale [s].
 
 #### Arguments
 
-----------
-    - z : A dimensionless parameter related to turbulence [-].
-    - lagrangian_integral_scale : Lagrangian integral timescale [s].
+- z : A dimensionless parameter related to turbulence [-].
+- lagrangian_integral_scale : Lagrangian integral timescale [s].
 
 #### Returns
 
---------
-    - c₂ value [-].
+- c₂ value [dimensionless].
+
+#### Examples
+
+```py
+c2_val = compute_c2(0.5, 1.0)
+# Output: 0.067
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
     the geometric collision rate of sedimenting droplets. Part 2.
     Theory and parameterization. New Journal of Physics, 10.
@@ -6196,27 +6785,30 @@ def compute_c2(
 
 ## compute_d1
 
-[Show source in velocity_correlation_terms_ao2008.py:211](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L211)
+[Show source in velocity_correlation_terms_ao2008.py:226](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L226)
 
-Compute d₁, which is defined as:
+Compute d₁, another dimensionless coefficient from Ayala 2008.
 
-d₁ = (1 + sqrt(1 - 2β²)) / (2 sqrt(1 - 2β²))
-
-- β : Defined as β = (sqrt(2) * λ) / L_e.
+- d₁ = (1 + √(1 - 2β²)) / (2 √(1 - 2β²))
+    - β is defined as β = (√2 × λ) / L_e.
 
 #### Arguments
 
-----------
-    - beta : A dimensionless parameter related to turbulence [-].
+- beta : A dimensionless parameter related to turbulence [-].
 
 #### Returns
 
---------
-    - d₁ value [-].
+- d₁ value [dimensionless].
+
+#### Examples
+
+```py
+d1_val = compute_d1(0.5)
+# Output: 0.866
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
     the geometric collision rate of sedimenting droplets. Part 2.
     Theory and parameterization. New Journal of Physics, 10.
@@ -6235,27 +6827,30 @@ def compute_d1(
 
 ## compute_d2
 
-[Show source in velocity_correlation_terms_ao2008.py:241](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L241)
+[Show source in velocity_correlation_terms_ao2008.py:257](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L257)
 
-Compute d₂, which is defined as:
+Compute d₂, another dimensionless coefficient from Ayala 2008.
 
-d₂ = (1 - sqrt(1 - 2β²)) / (2 sqrt(1 - 2β²))
-
-- β : Defined as β = (sqrt(2) * λ) / L_e.
+- d₂ = (1 - √(1 - 2β²)) / (2 √(1 - 2β²))
+    - β is defined as β = (√2 × λ) / L_e.
 
 #### Arguments
 
-----------
-    - beta : A dimensionless parameter related to turbulence [-].
+- beta : A dimensionless parameter related to turbulence [-].
 
 #### Returns
 
---------
-    - d₂ value [-].
+- d₂ value [dimensionless].
+
+#### Examples
+
+```py
+d2_val = compute_d2(0.5)
+# Output: 0.134
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
     the geometric collision rate of sedimenting droplets. Part 2.
     Theory and parameterization. New Journal of Physics, 10.
@@ -6274,29 +6869,32 @@ def compute_d2(
 
 ## compute_e1
 
-[Show source in velocity_correlation_terms_ao2008.py:271](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L271)
+[Show source in velocity_correlation_terms_ao2008.py:288](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L288)
 
-Compute e₁, which is defined as:
+Compute e₁, which scales the integral length by a factor in Ayala 2008.
 
-e₁ = ((1 + sqrt(1 - 2β²)) * L_e) / 2
-
-- β : Defined as β = (sqrt(2) * λ) / L_e.
-- L_e (eulerian_integral_length) : Eulerian integral length scale [m].
+- e₁ = ((1 + √(1 - 2β²)) × L_e) / 2
+    - β is defined as β = (√2 × λ) / L_e.
+    - L_e is the Eulerian integral length scale [m].
 
 #### Arguments
 
-----------
-    - beta : A dimensionless parameter related to turbulence [-].
-    - eulerian_integral_length : Eulerian integral length scale [m].
+- beta : A dimensionless parameter related to turbulence [-].
+- eulerian_integral_length : Eulerian integral length scale [m].
 
 #### Returns
 
---------
-    - e₁ value [-].
+- e₁ value [dimensionless].
+
+#### Examples
+
+```py
+e1_val = compute_e1(0.5, 0.1)
+# Output: 0.0866
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
     the geometric collision rate of sedimenting droplets. Part 2.
     Theory and parameterization. New Journal of Physics, 10.
@@ -6316,29 +6914,32 @@ def compute_e1(
 
 ## compute_e2
 
-[Show source in velocity_correlation_terms_ao2008.py:303](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L303)
+[Show source in velocity_correlation_terms_ao2008.py:321](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L321)
 
-Compute e₂, which is defined as:
+Compute e₂, which scales the integral length by a factor in Ayala 2008.
 
-e₂ = ((1 - sqrt(1 - 2β²)) * L_e) / 2
-
-- β : Defined as β = (sqrt(2) * λ) / L_e.
-- L_e (eulerian_integral_length) : Eulerian integral length scale [m].
+- e₂ = ((1 - √(1 - 2β²)) × L_e) / 2
+    - β is defined as β = (√2 × λ) / L_e.
+    - L_e is the Eulerian integral length scale [m].
 
 #### Arguments
 
-----------
-    - beta : A dimensionless parameter related to turbulence [-].
-    - eulerian_integral_length : Eulerian integral length scale [m].
+- beta : A dimensionless parameter related to turbulence [-].
+- eulerian_integral_length : Eulerian integral length scale [m].
 
 #### Returns
 
---------
-    - e₂ value [-].
+- e₂ value [dimensionless].
+
+#### Examples
+
+```py
+e2_val = compute_e2(0.5, 0.1)
+# Output: 0.0134
+```
 
 #### References
 
------------
 - Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
     the geometric collision rate of sedimenting droplets. Part 2.
     Theory and parameterization. New Journal of Physics, 10.
@@ -6360,25 +6961,38 @@ def compute_e2(
 
 [Show source in velocity_correlation_terms_ao2008.py:18](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_terms_ao2008.py#L18)
 
-Compute z, which is defined as:
+Compute z, the ratio of Taylor microscale time to Lagrangian timescale.
 
-z = τ_T / T_L
-
-- τ_T (lagrangian_taylor_microscale_time) : Lagrangian Taylor
-    microscale time [s].
-- T_L (lagrangian_integral_scale) : Lagrangian integral timescale [s].
+Where the equation is
+- z = τ_T / T_L
+    - τ_T (lagrangian_taylor_microscale_time) is the Lagrangian Taylor
+        microscale time [s].
+    - T_L (lagrangian_integral_scale) is the Lagrangian integral
+        timescale [s].
 
 #### Arguments
 
-----------
-    - lagrangian_taylor_microscale_time : Lagrangian Taylor microscale
-        time [s].
-    - lagrangian_integral_scale : Lagrangian integral timescale [s].
+- lagrangian_taylor_microscale_time : Lagrangian Taylor microscale
+    time [s].
+- lagrangian_integral_scale : Lagrangian integral timescale [s].
 
 #### Returns
 
---------
-    - z value [-].
+- z value [dimensionless].
+
+#### Examples
+
+```py
+example_z = compute_z(0.5, 1.0)
+# Output: 0.5
+```
+
+#### References
+
+- Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
+    the geometric collision rate of sedimenting droplets. Part 2.
+    Theory and parameterization. New Journal of Physics, 10.
+    https://doi.org/10.1088/1367-2630/10/7/075016
 
 #### Signature
 
@@ -6407,32 +7021,51 @@ def compute_z(
 
 ## get_turbulent_shear_kernel_st1956
 
-[Show source in turbulent_shear_kernel.py:26](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_shear_kernel.py#L26)
+[Show source in turbulent_shear_kernel.py:31](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_shear_kernel.py#L31)
 
-Calculate the turbulent shear kernel for coagulation.
+Calculate the turbulent shear kernel (Equation 13A.2, Saffman & Turner,
+1956).
+
+This function implements the formula for collisions induced by turbulent
+shear. The turbulent dissipation rate and kinematic viscosity determine
+how rapidly eddies drive particle collisions.
+
+Equation:
+- K(D₁, D₂) = √(π × eₖ / (120 × ν)) × (D₁ + D₂)³
+    - eₖ : Turbulent kinetic energy dissipation rate [m²/s³],
+    - ν : Kinematic viscosity [m²/s],
+    - D₁, D₂ : diameters of particles [m].
 
 #### Arguments
 
-particle_radius : Array of particle radii [m].
-turbulent_dissipation : Turbulent kinetic energy [m^2/s^2].
-kinematic_viscosity : Kinematic viscosity [m^2/s].
+- particle_radius : Array of particle radii [m].
+- turbulent_dissipation : Turbulent energy dissipation rate [m²/s³].
+- kinematic_viscosity : Kinematic viscosity [m²/s].
 
 #### Returns
 
-Turbulent shear kernel matrix for coagulation [m^3/s].
+- Turbulent shear kernel matrix [m³/s], shape (n, n).
+
+#### Examples
+
+```py title="Example"
+import numpy as np
+
+r = np.array([1e-7, 2e-7])
+k_matrix = get_turbulent_shear_kernel_st1956(
+    particle_radius=r,
+    turbulent_dissipation=1e-3,
+    kinematic_viscosity=1.5e-5
+)
+print(k_matrix)
+```
 
 #### References
 
-- Equation 13A.2 : K(D1, D2) = (pi * e_k / 120 * v)**1/2 * (D1 + D2)**3
-    - K(D1, D2) : Turbulent shear kernel for coagulation [m^3/s].
-    - e_k : Turbulent kinetic energy [m^2/s^2].
-    - v : Kinematic viscosity [m^2/s].
-    - D1, D2 : Particle diameters [m].
-- Saffman, P. G., & Turner, J. S. (1956). On the collision of drops in
-    turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
-    https://doi.org/10.1017/S0022112056000020
+- Saffman, P. G., & Turner, J. S. (1956). On the collision of drops
+  in turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
 - Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-    physics, Chapter 13, Equation 13A.2.
+  physics (3rd ed.). John Wiley & Sons. Chapter 13, Equation 13A.2.
 
 #### Signature
 
@@ -6448,26 +7081,52 @@ def get_turbulent_shear_kernel_st1956(
 
 ## get_turbulent_shear_kernel_st1956_via_system_state
 
-[Show source in turbulent_shear_kernel.py:63](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_shear_kernel.py#L63)
+[Show source in turbulent_shear_kernel.py:86](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_shear_kernel.py#L86)
 
-Calculate the turbulent shear kernel for coagulation via system state.
+Calculate the turbulent shear kernel using system state data.
+
+This version derives the kinematic viscosity from the temperature and
+fluid density, then uses get_turbulent_shear_kernel_st1956 for the
+Saffman & Turner (1956) formula:
+
+Equation:
+    - K(D₁, D₂) = √(π × eₖ / (120 × ν)) × (D₁ + D₂)³
+      - eₖ : Turbulent dissipation rate [m²/s³],
+      - ν : Kinematic viscosity [m²/s],
+      - D₁, D₂ : particle diameters [m].
 
 #### Arguments
 
-particle_radius : Array of particle radii [m].
-turbulent_dissipation : Turbulent kinetic energy [m^2/s^2].
-temperature : Temperature of the system [K].
-fluid_density : Density of the fluid [kg/m^3].
+- particle_radius : Array of particle radii [m].
+- turbulent_dissipation : Turbulent dissipation rate [m²/s³].
+- temperature : Temperature [K].
+- fluid_density : Fluid density [kg/m³].
 
 #### Returns
 
-Turbulent shear kernel matrix for coagulation [m^3/s].
+- Turbulent shear kernel matrix [m³/s], shape (n, n).
+
+#### Examples
+
+```py title="Example"
+import numpy as np
+
+r = np.array([1e-7, 2e-7])
+kernel_matrix = get_turbulent_shear_kernel_st1956_via_system_state(
+    particle_radius=r,
+    turbulent_dissipation=1e-3,
+    temperature=300,
+    fluid_density=1.2
+)
+print(kernel_matrix)
+```
 
 #### References
 
-- Saffman, P. G., & Turner, J. S. (1956). On the collision of drops in
-    turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
-    https://doi.org/10.1017/S0022112056000020
+- Saffman, P. G., & Turner, J. S. (1956). On the collision of drops
+  in turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
+- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
+  physics (3rd ed.). John Wiley & Sons. Chapter 13, Equation 13A.2.
 
 #### Signature
 
@@ -6932,28 +7591,32 @@ def step(
 
 ## calculate_mass_transfer
 
-[Show source in mass_transfer.py:214](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L214)
+[Show source in mass_transfer.py:224](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L224)
 
-Helper function that routes the mass transfer calculation to either the
-single-species or multi-species calculation functions based on the input
-dimensions of gas_mass.
+Route mass transfer calculation to single or multiple-species routines.
+
+Depending on whether gas_mass represents one or multiple species, this
+function calls either calculate_mass_transfer_single_species or
+calculate_mass_transfer_multiple_species. The primary calculation
+involves:
+
+- mass_to_change = mass_rate × time_step × particle_concentration
 
 #### Arguments
 
-- mass_rate : The rate of mass transfer per particle (kg/s).
-- time_step : The time step for the mass transfer calculation (sec).
-- gas_mass : The available mass of gas species (kg).
-- particle_mass : The mass of each particle (kg).
-- particle_concentration : The concentration of particles (number/m^3).
+- mass_rate : The rate of mass transfer per particle [kg/s].
+- time_step : The time step for the mass transfer calculation [s].
+- gas_mass : The available mass of gas species [kg].
+- particle_mass : The mass of each particle [kg].
+- particle_concentration : The concentration of particles [#/m³].
 
 #### Returns
 
-The amount of mass transferred, accounting for gas and particle
-    limitations.
+- The mass transferred (array with the same shape as particle_mass).
 
 #### Examples
 
-``` py title="Single species input"
+```py title="Single species input"
 calculate_mass_transfer(
     mass_rate=np.array([0.1, 0.5]),
     time_step=10,
@@ -6963,7 +7626,7 @@ calculate_mass_transfer(
 )
 ```
 
-``` py title="Multiple species input"
+```py title="Multiple species input"
 calculate_mass_transfer(
     mass_rate=np.array([[0.1, 0.05, 0.03], [0.2, 0.15, 0.07]]),
     time_step=10,
@@ -6998,27 +7661,35 @@ def calculate_mass_transfer(
 
 ## calculate_mass_transfer_multiple_species
 
-[Show source in mass_transfer.py:349](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L349)
+[Show source in mass_transfer.py:373](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L373)
 
 Calculate mass transfer for multiple gas species.
 
+Here, gas_mass has multiple elements (each species). For each species,
+this function calculates mass_to_change for all particle bins:
+
+- mass_to_change = mass_rate × time_step × particle_concentration
+
+Then it limits or scales that mass based on available gas mass and
+particle mass in each species bin.
+
 #### Arguments
 
-- mass_rate : The rate of mass transfer per particle for each gas
-    species (kg/s).
-- time_step : The time step for the mass transfer calculation (sec).
-- gas_mass : The available mass of each gas species (kg).
-- particle_mass : The mass of each particle for each gas species (kg).
-- particle_concentration : The concentration of particles for each gas
-    species (number/m^3).
+- mass_rate : The mass transfer rate per particle for each gas
+    species [kg/s].
+- time_step : The time step [s].
+- gas_mass : The available mass of each gas species [kg].
+- particle_mass : The mass of each particle for each gas species [kg].
+- particle_concentration : The concentration of particles [#/m³].
 
 #### Returns
 
-The amount of mass transferred for multiple gas species.
+- The mass transferred for multiple gas species, matching the shape
+  of (particle_mass).
 
 #### Examples
 
-``` py title="Multiple species input"
+```py title="Multiple species input"
 calculate_mass_transfer_multiple_species(
     mass_rate=np.array([[0.1, 0.05, 0.03], [0.2, 0.15, 0.07]]),
     time_step=10,
@@ -7026,6 +7697,7 @@ calculate_mass_transfer_multiple_species(
     particle_mass=np.array([[1.0, 0.9, 0.8], [1.2, 1.0, 0.7]]),
     particle_concentration=np.array([5, 4])
 )
+# Output: array([...])
 ```
 
 #### Signature
@@ -7053,25 +7725,34 @@ def calculate_mass_transfer_multiple_species(
 
 ## calculate_mass_transfer_single_species
 
-[Show source in mass_transfer.py:285](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L285)
+[Show source in mass_transfer.py:299](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L299)
 
-Calculate mass transfer for a single gas species (m=1).
+Calculate mass transfer for a single gas species.
+
+This function assumes gas_mass has a size of 1 (single species).
+It first computes the total mass_to_change per particle:
+
+- mass_to_change = mass_rate × time_step × particle_concentration
+
+Then it scales or limits that mass based on available gas mass and
+particle mass.
 
 #### Arguments
 
-- mass_rate : The rate of mass transfer per particle (number*kg/s).
-- time_step : The time step for the mass transfer calculation (sec).
-- gas_mass : The available mass of gas species (kg).
-- particle_mass : The mass of each particle (kg).
-- particle_concentration : The concentration of particles (number/m^3).
+- mass_rate : Mass transfer rate per particle [kg/s].
+- time_step : The time step [s].
+- gas_mass : Total available mass of the gas species [kg].
+- particle_mass : The mass of each particle [kg].
+- particle_concentration : Particle concentration [#/m³].
 
 #### Returns
 
-The amount of mass transferred for a single gas species.
+- The amount of mass transferred for the single gas species, shaped
+  like particle_mass.
 
 #### Examples
 
-``` py title="Single species input"
+```py title="Single species input"
 calculate_mass_transfer_single_species(
     mass_rate=np.array([0.1, 0.5]),
     time_step=10,
@@ -7079,6 +7760,7 @@ calculate_mass_transfer_single_species(
     particle_mass=np.array([1.0, 50]),
     particle_concentration=np.array([1, 0.5])
 )
+# Output: array([...])
 ```
 
 #### Signature
@@ -7106,50 +7788,55 @@ def calculate_mass_transfer_single_species(
 
 ## first_order_mass_transport_k
 
-[Show source in mass_transfer.py:47](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L47)
+[Show source in mass_transfer.py:35](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L35)
 
-First-order mass transport coefficient per particle.
+Calculate the first-order mass transport coefficient per particle.
 
-Calculate the first-order mass transport coefficient, K, for a given radius
-diffusion coefficient, and vapor transition correction factor. For a
-single particle.
+This function computes the coefficient K that governs how fast mass is
+transported to or from a particle in a vapor. The equation is:
+
+- K = 4π × radius × D × X
+    - K : Mass transport coefficient [m³/s].
+    - radius : Particle radius [m].
+    - D : Diffusion coefficient of the vapor [m²/s].
+    - X : Vapor transition correction factor [unitless].
 
 #### Arguments
 
 - radius : The radius of the particle [m].
-- diffusion_coefficient : The diffusion coefficient of the vapor
-    [m^2/s], default to air.
-- vapor_transition : The vapor transition correction factor. [unitless]
+- vapor_transition : The vapor transition correction factor [unitless].
+- diffusion_coefficient : The diffusion coefficient of the vapor [m²/s].
+  Defaults to 2e-5 (approx. air).
 
 #### Returns
 
-The first-order mass transport coefficient per particle (m^3/s).
+- The first-order mass transport coefficient per particle [m³/s].
 
 #### Examples
 
-``` py title="Float input"
+```py title="Float input"
 first_order_mass_transport_k(
     radius=1e-6,
     vapor_transition=0.6,
     diffusion_coefficient=2e-9
-    )
+)
 # Output: 1.5079644737231005e-14
 ```
 
-``` py title="Array input"
-first_order_mass_transport_k
+```py title="Array input"
+first_order_mass_transport_k(
     radius=np.array([1e-6, 2e-6]),
     vapor_transition=np.array([0.6, 0.6]),
     diffusion_coefficient=2e-9
-    )
+)
 # Output: array([1.50796447e-14, 6.03185789e-14])
 ```
 
 #### References
 
-- Aerosol Modeling: Chapter 2, Equation 2.49 (excluding number)
-- Mass Diffusivity:
-    [Wikipedia](https://en.wikipedia.org/wiki/Mass_diffusivity)
+- Aerosol Modeling: Chapter 2, Equation 2.49
+- Wikipedia contributors, "Mass diffusivity,"
+  https://en.wikipedia.org/wiki/Mass_diffusivity
 
 #### Signature
 
@@ -7166,30 +7853,36 @@ def first_order_mass_transport_k(
 
 ## mass_transfer_rate
 
-[Show source in mass_transfer.py:104](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L104)
+[Show source in mass_transfer.py:99](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L99)
 
 Calculate the mass transfer rate for a particle.
 
-Calculate the mass transfer rate based on the difference in partial
-pressure and the first-order mass transport coefficient.
+This function calculates the mass transfer rate dm/dt, leveraging the
+difference in partial pressure (pressure_delta) and the first-order
+mass transport coefficient (K). The equation is:
+
+- dm/dt = (K × Δp × M) / (R × T)
+    - dm/dt : Mass transfer rate [kg/s].
+    - K : First-order mass transport coefficient [m³/s].
+    - Δp : Partial pressure difference [Pa].
+    - M : Molar mass [kg/mol].
+    - R : Universal gas constant [J/(mol·K)].
+    - T : Temperature [K].
 
 #### Arguments
 
-- pressure_delta : The difference in partial pressure between the gas
-    phase and the particle phase.
-- first_order_mass_transport : The first-order mass transport
-    coefficient per particle.
-- temperature : The temperature at which the mass transfer rate is to
-    be calculated.
-- molar_mass : The molar mass of the species [kg/mol].
+- pressure_delta : The difference in partial pressure [Pa].
+- first_order_mass_transport : The mass transport coefficient [m³/s].
+- temperature : The temperature [K].
+- molar_mass : The molar mass [kg/mol].
 
 #### Returns
 
-The mass transfer rate for the particle [kg/s].
+- The mass transfer rate [kg/s].
 
 #### Examples
 
-``` py title="Single value input"
+```py title="Single value input"
 mass_transfer_rate(
     pressure_delta=10.0,
     first_order_mass_transport=1e-17,
@@ -7199,7 +7892,7 @@ mass_transfer_rate(
 # Output: 1.16143004e-21
 ```
 
-``` py title="Array input"
+```py title="Array input"
 mass_transfer_rate(
     pressure_delta=np.array([10.0, 15.0]),
     first_order_mass_transport=np.array([1e-17, 2e-17]),
@@ -7211,8 +7904,8 @@ mass_transfer_rate(
 
 #### References
 
-- Aerosol Modeling Chapter 2, Equation 2.41 (excluding particle number)
-- Seinfeld and Pandis: "Atmospheric Chemistry and Physics",
+- Aerosol Modeling: Chapter 2, Equation 2.41
+- Seinfeld and Pandis, "Atmospheric Chemistry and Physics,"
     Equation 13.3
 
 #### Signature
@@ -7238,26 +7931,32 @@ def mass_transfer_rate(
 
 ## radius_transfer_rate
 
-[Show source in mass_transfer.py:169](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L169)
+[Show source in mass_transfer.py:172](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L172)
 
-Convert mass rate to radius transfer rate.
+Convert mass rate to radius growth/evaporation rate.
 
-Convert the mass rate to a radius transfer rate based on the
-volume of the particle.
+This function converts the mass transfer rate (dm/dt) into a radius
+change rate (dr/dt). The equation is:
+
+- dr/dt = (1 / 4πr²ρ) × dm/dt
+    - dr/dt : Radius change rate [m/s].
+    - r : Particle radius [m].
+    - ρ : Particle density [kg/m³].
+    - dm/dt : Mass change rate [kg/s].
 
 #### Arguments
 
-- mass_rate : The mass transfer rate for the particle [kg/s].
+- mass_rate : The mass transfer rate [kg/s].
 - radius : The radius of the particle [m].
-- density : The density of the particle [kg/m^3].
+- density : The density of the particle [kg/m³].
 
 #### Returns
 
-The radius growth rate for the particle [m/s].
+- The radius growth (or evaporation) rate [m/s].
 
 #### Examples
 
-``` py title="Single value input"
+```py title="Single value input"
 radius_transfer_rate(
     mass_rate=1e-21,
     radius=1e-6,
@@ -7266,7 +7965,7 @@ radius_transfer_rate(
 # Output: 7.95774715e-14
 ```
 
-``` py title="Array input"
+```py title="Array input"
 radius_transfer_rate(
     mass_rate=np.array([1e-21, 2e-21]),
     radius=np.array([1e-6, 2e-6]),
@@ -7298,43 +7997,50 @@ def radius_transfer_rate(
 
 ## get_dilution_rate
 
-[Show source in dilution.py:49](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L49)
+[Show source in dilution.py:55](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L55)
 
-Calculate the dilution rate of a substance.
+Calculate the dilution rate of a substance in a system.
 
-The dilution rate quantifies the rate at which the concentration of a
-substance decreases due to dilution, based on the volume dilution
-coefficient and the current concentration of the substance.
+The dilution rate describes how quickly the concentration of a
+substance decreases due to the volume dilution coefficient and
+the current concentration. The calculation is:
+
+- R = -(α × c)
+    - R is the dilution rate [s⁻¹],
+    - α is the volume dilution coefficient [s⁻¹],
+    - c is the current concentration [#/m³].
 
 #### Arguments
 
-- `coefficient` - The volume dilution coefficient in inverse seconds (s⁻¹).
-- `concentration` - The concentration of the substance in the system
-    in particles per cubic meter (#/m³) or any other relevant units.
+- coefficient : The volume dilution coefficient in inverse
+    seconds (s⁻¹).
+- concentration : The concentration of the substance in #/m³
+    (or relevant units).
 
 #### Returns
 
-The dilution rate, which is the rate of decrease in concentration
-in inverse seconds (s⁻¹). The value is returned as negative, indicating
-a reduction in concentration over time.
+- The dilution rate in s⁻¹, returned as a negative value
+  to indicate a decrease in concentration.
 
 #### Examples
 
-``` py title="float input"
-dilution_rate(
-    coefficient=0.01,
-    concentration=100,
-)
+``` py title="Example (float input)"
+get_dilution_rate(coefficient=0.01, concentration=100)
 # Returns -1.0
 ```
 
-``` py title="array input"
-dilution_rate(
+``` py title="Example (array input)"
+get_dilution_rate(
     coefficient=0.01,
     concentration=np.array([100, 200, 300]),
 )
 # Returns array([-1., -2., -3.])
 ```
+
+#### References
+
+- H. Fogler, "Elements of Chemical Reaction Engineering,"
+  5th ed., Prentice Hall, 2016. [check]
 
 #### Signature
 
@@ -7353,37 +8059,44 @@ def get_dilution_rate(
 
 Calculate the volume dilution coefficient.
 
-The volume dilution coefficient is a measure of how quickly a substance
-is diluted within a given volume due to an incoming flow. It is defined as
-the ratio of the flow rate to the volume.
+This coefficient represents how quickly a substance is diluted within
+a system of a given volume when a known input flow rate is supplied.
+The equation is:
+
+- α = Q / V
+    - α is the volume dilution coefficient [s⁻¹],
+    - Q is the input flow rate [m³/s],
+    - V is the system volume [m³].
 
 #### Arguments
 
-- `volume` - The volume of the system in cubic meters (m³).
-- `input_flow_rate` - The flow rate of the substance entering the system
-    in cubic meters per second (m³/s).
+- volume : The volume of the system in cubic meters (m³).
+- input_flow_rate : The flow rate entering the system in
+    cubic meters per second (m³/s).
 
 #### Returns
 
-The volume dilution coefficient in inverse seconds (s⁻¹).
+- The volume dilution coefficient in inverse seconds (s⁻¹).
 
 #### Examples
 
-``` py title="float input"
-volume_dilution_coefficient(
-    volume=10,
-    input_flow_rate=0.1,
-)
+``` py title="Example (float input)"
+get_volume_dilution_coefficient(volume=10, input_flow_rate=0.1)
 # Returns 0.01
 ```
 
-``` py title="array input"
-volume_dilution_coefficient(
+``` py title="Example (array input)"
+get_volume_dilution_coefficient(
     volume=np.array([10, 20, 30]),
     input_flow_rate=np.array([0.1, 0.2, 0.3]),
 )
 # Returns array([0.01, 0.01, 0.01])
 ```
+
+#### References
+
+- O. Levenspiel, "Chemical Reaction Engineering," 3rd ed., Wiley, 1999.
+[check]
 
 #### Signature
 
@@ -7564,38 +8277,52 @@ def rate(self, aerosol: Aerosol) -> Any: ...
 
 ## get_rectangle_wall_loss_coefficient
 
-[Show source in wall_loss_coefficient.py:65](https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L65)
+[Show source in wall_loss_coefficient.py:101](https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L101)
 
-Calculate the wall loss coefficient, β₀, for a rectangular chamber.
+Calculate the particle wall loss coefficient in a rectangular chamber.
 
-This function computes the wall loss coefficient for a rectangular-prism
-chamber, considering the wall eddy diffusivity, particle diffusion
-coefficient, and terminal settling velocity. The chamber dimensions
-(length, width, and height) are used to account for the geometry's impact
-on particle loss.
+This function computes the wall loss coefficient (β₀) for a rectangular
+chamber of length (L), width (W), and height (H). It uses the wall eddy
+diffusivity, particle diffusion coefficient, particle settling velocity,
+and chamber dimensions:
+
+- β₀ ~ (some function of wall_eddy_diffusivity, diffusion_coefficient,
+settling_velocity, and L×W×H)
 
 #### Arguments
 
-- `wall_eddy_diffusivity` - Rate of wall diffusivity parameter in
-    units of inverse seconds (s^-1).
-- `diffusion_coefficient` - The particle diffusion coefficient
-    in units of square meters per second (m²/s).
-- `settling_velocity` - The terminal settling velocity of the
-    particles, in units of meters per second (m/s).
-- `chamber_dimensions` - A tuple of three floats representing the length
-    (L), width (W), and height (H) of the rectangular chamber,
-    in units of meters (m).
+- wall_eddy_diffusivity : Wall eddy diffusivity in s⁻¹.
+- diffusion_coefficient : Particle diffusion coefficient in m²/s.
+- settling_velocity : Particle settling velocity in m/s.
+- chamber_dimensions : A tuple (length, width, height) in m.
 
 #### Returns
 
-The calculated wall loss rate (β₀) for the rectangular chamber.
+- The wall loss coefficient β₀ (float or NDArray[np.float64]), in s⁻¹.
+
+#### Examples
+
+```py title="Example (float inputs)"
+from particula.dynamics.properties.wall_loss_coefficient import (
+    get_rectangle_wall_loss_coefficient
+)
+
+beta_0 = get_rectangle_wall_loss_coefficient(
+    wall_eddy_diffusivity=1e-3,
+    diffusion_coefficient=1e-5,
+    settling_velocity=2e-4,
+    chamber_dimensions=(1.0, 0.5, 0.5)
+)
+print(beta_0)
+# Example output: 0.0009
+```
 
 #### References
 
 - Crump, J. G., & Seinfeld, J. H. (1981). TURBULENT DEPOSITION AND
-    GRAVITATIONAL SEDIMENTATION OF AN AEROSOL IN A VESSEL OF ARBITRARY
-    SHAPE. In J Aerosol Sct (Vol. 12, Issue 5).
-    https://doi.org/10.1016/0021-8502(81)90036-7
+  GRAVITATIONAL SEDIMENTATION OF AN AEROSOL IN A VESSEL OF ARBITRARY
+  SHAPE. J Aerosol Sci, 12(5).
+  https://doi.org/10.1016/0021-8502(81)90036-7
 
 #### Signature
 
@@ -7612,7 +8339,7 @@ def get_rectangle_wall_loss_coefficient(
 
 ## get_rectangle_wall_loss_coefficient_via_system_state
 
-[Show source in wall_loss_coefficient.py:177](https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L177)
+[Show source in wall_loss_coefficient.py:251](https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L251)
 
 Calculate the wall loss coefficient for a rectangular chamber based on
 the system state.
@@ -7663,28 +8390,58 @@ def get_rectangle_wall_loss_coefficient_via_system_state(
 
 ## get_spherical_wall_loss_coefficient
 
-[Show source in wall_loss_coefficient.py:28](https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L28)
+[Show source in wall_loss_coefficient.py:35](https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L35)
 
-Calculate the wall loss coefficient for a spherical chamber
-approximation.
+Calculate the particle wall loss coefficient in a spherical chamber.
+
+This function computes the wall loss coefficient based on a spherical
+chamber approximation. It uses the wall eddy diffusivity, particle
+diffusion coefficient, particle settling velocity, and chamber radius.
+The calculation is:
+
+- k = 6 × √(Dₑ × D) / (π × R) × f + vₛ × (3 / (4 × R))
+    - k is the wall loss coefficient [s⁻¹],
+    - Dₑ is the wall eddy diffusivity [m²/s or effective rate],
+    - D is the particle diffusion coefficient [m²/s],
+    - f is the Debye function evaluation (unitless),
+    - vₛ is the settling velocity [m/s],
+    - R is the chamber radius [m].
 
 #### Arguments
 
-- `wall_eddy_diffusivity` - Rate of the wall eddy diffusivity.
-- `diffusion_coefficient` - Diffusion coefficient of the
-    particle.
-- `settling_velocity` - Settling velocity of the particle.
-- `chamber_radius` - Radius of the chamber.
+- wall_eddy_diffusivity : The wall eddy diffusivity (or rate) in s⁻¹.
+- diffusion_coefficient : The diffusion coefficient of the particle
+    in m²/s.
+- settling_velocity : The particle settling velocity in m/s.
+- chamber_radius : The spherical chamber radius in m.
 
 #### Returns
 
-The calculated wall loss rate for a spherical chamber.
+- The wall loss coefficient k, in inverse seconds
+   (float or NDArray[np.float64]).
+
+#### Examples
+
+```py title="Example (float inputs)"
+from particula.dynamics.properties.wall_loss_coefficient import (
+    get_spherical_wall_loss_coefficient
+)
+
+k_value = get_spherical_wall_loss_coefficient(
+    wall_eddy_diffusivity=1e-2,
+    diffusion_coefficient=5e-6,
+    settling_velocity=1e-4,
+    chamber_radius=0.5
+)
+print(k_value)
+# Example output: 0.0012
+```
 
 #### References
 
 - Crump, J. G., Flagan, R. C., & Seinfeld, J. H. (1982). Particle wall
-    loss rates in vessels. Aerosol Science and Technology, 2(3),
-    303-309. https://doi.org/10.1080/02786828308958636
+  loss rates in vessels. Aerosol Science and Technology, 2(3), 303-309.
+  https://doi.org/10.1080/02786828308958636
 
 #### Signature
 
@@ -7701,30 +8458,59 @@ def get_spherical_wall_loss_coefficient(
 
 ## get_spherical_wall_loss_coefficient_via_system_state
 
-[Show source in wall_loss_coefficient.py:120](https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L120)
+[Show source in wall_loss_coefficient.py:169](https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L169)
 
-Calculate the wall loss coefficient for a spherical chamber based on the
-system state.
+Calculate the spherical chamber wall loss coefficient via system state.
 
-This function computes the wall loss coefficient for a spherical chamber
-using the system's physical state, including the wall eddy diffusivity,
-particle properties (radius, density), and environmental conditions
-(temperature, pressure). The chamber radius is also taken into account.
+This version uses the system's physical conditions (particle radius, density,
+temperature, pressure) to compute the needed diffusion and settling velocity
+before calculating the spherical wall loss coefficient:
+
+- k = f(
+    wall_eddy_diffusivity,
+    diffusion_coefficient_via_system_state,
+    settling_velocity_via_system_state,
+    chamber_radius
+)
 
 #### Arguments
 
-- `wall_eddy_diffusivity` - The rate of wall eddy diffusivity in inverse
-    seconds (s⁻¹).
-- `particle_radius` - The radius of the particle in meters (m).
-- `particle_density` - The density of the particle in kilograms per cubic
-    meter (kg/m³).
-- `temperature` - The temperature of the system in Kelvin (K).
-- `pressure` - The pressure of the system in Pascals (Pa).
-- `chamber_radius` - The radius of the spherical chamber in meters (m).
+- wall_eddy_diffusivity : Wall eddy diffusivity in s⁻¹.
+- particle_radius : Particle radius in m.
+- particle_density : Particle density in kg/m³.
+- temperature : System temperature in K.
+- pressure : System pressure in Pa.
+- chamber_radius : Chamber radius in m.
 
 #### Returns
 
-The calculated wall loss coefficient for the spherical chamber.
+- The computed wall loss coefficient k (float or NDArray[np.float64])
+    in s⁻¹.
+
+#### Examples
+
+```py title="Example"
+from particula.dynamics.properties.wall_loss_coefficient import (
+    get_spherical_wall_loss_coefficient_via_system_state
+)
+
+k_value = get_spherical_wall_loss_coefficient_via_system_state(
+    wall_eddy_diffusivity=1e-2,
+    particle_radius=1e-7,
+    particle_density=1000,
+    temperature=298,
+    pressure=101325,
+    chamber_radius=0.5
+)
+print(k_value)
+# Example output: 0.0018
+```
+
+#### References
+
+- Crump, J. G., Flagan, R. C., & Seinfeld, J. H. (1982). Particle wall
+  loss rates in vessels. Aerosol Science and Technology, 2(3), 303-309.
+  https://doi.org/10.1080/02786828308958636
 
 #### Signature
 
@@ -7751,34 +8537,56 @@ def get_spherical_wall_loss_coefficient_via_system_state(
 
 ## get_rectangle_wall_loss_rate
 
-[Show source in wall_loss.py:65](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss.py#L65)
+[Show source in wall_loss.py:87](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss.py#L87)
 
 Calculate the wall loss rate of particles in a rectangular chamber.
 
-This function computes the rate at which particles are lost to the walls
-of a rectangular chamber, based on the system state. It uses the wall eddy
-diffusivity, particle properties (radius, density, concentration), and
-environmental conditions (temperature, pressure) to determine the loss
-rate. The chamber dimensions (length, width, height) are also taken
-into account.
+This function calculates the rate of particle deposition onto the walls
+of a rectangular chamber, given the wall eddy diffusivity, particle
+properties (radius, density, concentration), and environmental conditions
+(temperature, pressure). The final loss rate is computed via:
+
+- L = -(k × c)
+    - L is the wall loss rate [#/m³·s],
+    - k is the wall loss coefficient [1/s],
+    - c is the particle concentration [#/m³].
 
 #### Arguments
 
-- `wall_eddy_diffusivity` - The rate of wall eddy diffusivity in inverse
-    seconds (s⁻¹).
-- `particle_radius` - The radius of the particle in meters (m).
-- `particle_density` - The density of the particle in kilograms per cubic
-    meter (kg/m³).
-- `particle_concentration` - The concentration of particles in the chamber
-    in particles per cubic meter (#/m³).
-- `temperature` - The temperature of the system in Kelvin (K).
-- `pressure` - The pressure of the system in Pascals (Pa).
-- `chamber_dimensions` - A tuple containing the length, width, and height
-    of the rectangular chamber in meters (m).
+- wall_eddy_diffusivity : Wall eddy diffusivity in s⁻¹.
+- particle_radius : Particle radius in m.
+- particle_density : Particle density in kg/m³.
+- particle_concentration : Particle concentration in #/m³.
+- temperature : System temperature in K.
+- pressure : System pressure in Pa.
+- chamber_dimensions : (length, width, height) of the
+    rectangular chamber in m.
 
 #### Returns
 
-The wall loss rate of the particles in the chamber.
+- The wall loss rate (float or NDArray[np.float64]) in #/m³·s.
+
+#### Examples
+
+```py title="Example"
+import particula as par
+loss_rate = par.dynamics.wall_loss.get_rectangle_wall_loss_rate(
+    wall_eddy_diffusivity=1e-4,
+    particle_radius=5e-8,
+    particle_density=1200,
+    particle_concentration=2e10,
+    temperature=300,
+    pressure=101325,
+    chamber_dimensions=(1.0, 0.5, 0.5)
+)
+print(loss_rate)
+# Example output: -4.6e7
+```
+
+#### References
+
+- J. Hinds, "Aerosol Technology," 2nd ed., John Wiley & Sons, 1999.
+[check]
 
 #### Signature
 
@@ -7802,28 +8610,52 @@ def get_rectangle_wall_loss_rate(
 
 Calculate the wall loss rate of particles in a spherical chamber.
 
-This function computes the rate at which particles are lost to the walls
-of a spherical chamber, based on the system state. It uses the wall eddy
-diffusivity, particle properties (radius, density, concentration), and
-environmental conditions (temperature, pressure) to determine the loss
-rate.
+This function calculates the rate at which particles deposit onto the
+walls of a spherical chamber. The calculation is based on the wall eddy
+diffusivity and key particle properties (radius, density, concentration),
+together with environmental conditions (temperature, pressure).
+The loss rate is determined via:
+
+- L = -(k × c)
+    - L is the wall loss rate [#/m³·s],
+    - k is the wall loss coefficient [1/s] from the system state,
+    - c is the particle concentration [#/m³].
 
 #### Arguments
 
-- `wall_eddy_diffusivity` - The rate of wall eddy diffusivity in inverse
-    seconds (s⁻¹).
-- `particle_radius` - The radius of the particle in meters (m).
-- `particle_density` - The density of the particle in kilograms per cubic
-    meter (kg/m³).
-- `particle_concentration` - The concentration of particles in the chamber
-    in particles per cubic meter (#/m³).
-- `temperature` - The temperature of the system in Kelvin (K).
-- `pressure` - The pressure of the system in Pascals (Pa).
-- `chamber_radius` - The radius of the spherical chamber in meters (m).
+- wall_eddy_diffusivity : Wall eddy diffusivity in s⁻¹.
+- particle_radius : Particle radius in m.
+- particle_density : Particle density in kg/m³.
+- particle_concentration : Particle concentration in #/m³.
+- temperature : System temperature in K.
+- pressure : System pressure in Pa.
+- chamber_radius : Radius of the spherical chamber in m.
 
 #### Returns
 
-The wall loss rate of the particles in the chamber.
+- The wall loss rate (float or NDArray[np.float64]) in #/m³·s.
+
+#### Examples
+
+```py title="Example"
+import particula as par
+rate = par.dynamics.wall_loss.get_spherical_wall_loss_rate(
+    wall_eddy_diffusivity=1e-3,
+    particle_radius=1e-7,
+    particle_density=1000,
+    particle_concentration=1e11,
+    temperature=298,
+    pressure=101325,
+    chamber_radius=0.5
+)
+print(rate)
+# Example output: -1.2e8
+```
+
+#### References
+
+- Wikipedia contributors, "Aerosol dynamics," Wikipedia,
+  https://en.wikipedia.org/wiki/Aerosol.
 
 #### Signature
 

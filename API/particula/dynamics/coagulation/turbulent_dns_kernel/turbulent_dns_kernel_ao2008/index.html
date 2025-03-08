@@ -2262,9 +2262,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#notes" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
-      Notes
+      Examples
     </span>
   </a>
   
@@ -7492,9 +7492,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#notes" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
-      Notes
+      Examples
     </span>
   </a>
   
@@ -7549,8 +7549,17 @@
 </blockquote>
 <h2 id="get_turbulent_dns_kernel_ao2008">get_turbulent_dns_kernel_ao2008<a class="headerlink" href="#get_turbulent_dns_kernel_ao2008" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/turbulent_dns_kernel_ao2008.py#L28">Show source in turbulent_dns_kernel_ao2008.py:28</a></p>
-<p>Get the geometric collision kernel Γ₁₂, derived from direct numerical
-simulations.</p>
+<p>Compute the geometric collision kernel Γ₁₂ from DNS simulations.</p>
+<p>Where the equation is</p>
+<ul>
+<li>Γ₁₂ = 2π R² ⟨|wᵣ|⟩ g₁₂<ul>
+<li>Γ₁₂ is collision kernel [m³/s].</li>
+<li>R is collision radius [m].</li>
+<li>wᵣ is radial relative velocity [m/s].</li>
+<li>g₁₂ is radial distribution function [dimensionless].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
 <li>particle_radius : Particle radius [m].</li>
@@ -7567,16 +7576,6 @@ simulations.</p>
 <ul>
 <li>Collision kernel Γ₁₂ [m³/s].</li>
 </ul>
-<p>Equations:
-- Γ₁₂ = 2π R² ⟨ |w_r| ⟩ g₁₂
-- R = a₁ + a₂ (collision radius)
-- ⟨ |w_r| ⟩ : Radial relative velocity, computed using
-    <code>get_radial_relative_velocity_ao2008</code>
-- g₁₂ : Radial distribution function, computed using
-    <code>g12_radial_distribution</code>
-- radius &lt;&lt; η (Kolmogorov length scale)
-- ρ_w &gt;&gt; ρ (water density much greater than air density)
-- Sv &gt; 1 (Stokes number sufficiently large)</p>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
 <ul>
 <li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
@@ -7605,9 +7604,9 @@ simulations.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_turbulent_dns_kernel_ao2008_via_system_state">get_turbulent_dns_kernel_ao2008_via_system_state<a class="headerlink" href="#get_turbulent_dns_kernel_ao2008_via_system_state" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/turbulent_dns_kernel_ao2008.py#L106">Show source in turbulent_dns_kernel_ao2008.py:106</a></p>
-<p>Compute the geometric collision kernel (Γ₁₂) under the AO2008 formulation.
-This function orchestrates the calculation of the geometric collision
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/turbulent_dns_kernel_ao2008.py#L103">Show source in turbulent_dns_kernel_ao2008.py:103</a></p>
+<p>Compute the geometric collision kernel Γ₁₂ using AO2008 for system.</p>
+<p>This function orchestrates the calculation of the geometric collision
 kernel by deriving necessary fluid, turbulence, and particle parameters
 from the provided system state. The returned value (or array) represents
 the collision kernel, Γ₁₂ [m³/s], which describes collision frequency
@@ -7629,30 +7628,26 @@ under turbulence.</p>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li>The geometric collision kernel Γ₁₂ [m³/s]. If inputs are scalars,
-    returns a float. If inputs are arrays, returns a numpy array of
-    collision kernels.</li>
+<li>Collision kernel Γ₁₂ [m³/s].</li>
 </ul>
-<h4 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">&para;</a></h4>
-<ul>
-<li>This function does the following:</li>
-<li>Calculates fluid properties (dynamic, kinematic viscosity,
-    mean free path).</li>
-<li>Determines slip correction factors (Knudsen number, Cunningham factor).</li>
-<li>Computes particle inertia times and settling velocities.</li>
-<li>Estimates relevant turbulence scales (Kolmogorov, Taylor,
-    integral scales).</li>
-<li>Calculates velocity variance and auxiliary terms, e.g. Stokes number.</li>
-<li>Calls <code>get_kernel_ao2008</code> with all the necessary inputs to get the final
-   collision kernel.</li>
-</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="n">kernel_via_state</span> <span class="o">=</span> <span class="n">get_turbulent_dns_kernel_ao2008_via_system_state</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">2e-6</span><span class="p">]),</span>
+    <span class="n">particle_density</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
+    <span class="n">fluid_density</span><span class="o">=</span><span class="mf">1.225</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
+    <span class="n">re_lambda</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+    <span class="n">relative_velocity</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">turbulent_dissipation</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># Output: array([...])</span>
+</code></pre></div>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><a href="#get_turbulent_dns_kernel_ao2008">get_turbulent_dns_kernel_ao2008</a> : Computes the kernel.</li>
 <li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016</li>
+  the geometric collision rate of sedimenting droplets. Part 2.
+  Theory and parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_turbulent_dns_kernel_ao2008_via_system_state</span><span class="p">(</span>

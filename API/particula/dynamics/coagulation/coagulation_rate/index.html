@@ -1405,6 +1405,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -1450,6 +1459,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -1507,6 +1525,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references_2" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -1552,6 +1579,15 @@
   <a href="#returns_3" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7532,6 +7568,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7577,6 +7622,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7634,6 +7688,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references_2" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7679,6 +7742,15 @@
   <a href="#returns_3" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7732,26 +7804,40 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py">particula.dynamics.coagulation.coagulation_rate</a> module.</p>
 </blockquote>
 <h2 id="get_coagulation_gain_rate_continuous">get_coagulation_gain_rate_continuous<a class="headerlink" href="#get_coagulation_gain_rate_continuous" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L120">Show source in coagulation_rate.py:120</a></p>
-<p>Calculate the coagulation gain rate, via the integration method.</p>
-<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<p>radius : The radius of the particles.
-concentration : The distribution of particles.
-kernel : The coagulation kernel.</p>
-<h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>The coagulation gain rate.</p>
-<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L172">Show source in coagulation_rate.py:172</a></p>
+<p>Calculate the coagulation gain rate via continuous integration.</p>
+<p>This function converts the distribution to a continuous form, then
+uses RectBivariateSpline to interpolate and integrate:</p>
 <ul>
-<li>This equation necessitates the use of a for-loop due to the
-convoluted use of different radii at different stages. This is the
-most expensive step of all coagulation calculations. Using
-<code>RectBivariateSpline</code> accelerates this significantly.</li>
-<li>Note, to estimate the kernel and distribution at
-(other_radius**3 - some_radius**3)*(&#8531;)
-we use interporlation techniques.</li>
-<li>Seinfeld, J. H., &amp; Pandis, S. (2016). Atmospheric chemistry and
-physics, Chapter 13 Equations 13.61</li>
+<li>gain_rate&reg; = ∫ kernel(r, r') × concentration&reg; × concentration(r') dr'</li>
+</ul>
+<h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
+<ul>
+<li>radius : The particle radius array [m].</li>
+<li>concentration : The particle distribution.</li>
+<li>kernel : Coagulation kernel matrix.</li>
+</ul>
+<h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
+<ul>
+<li>The coagulation gain rate, in the shape of radius.</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-7</span><span class="p">,</span> <span class="mf">2e-7</span><span class="p">,</span> <span class="mf">3e-7</span><span class="p">])</span>
+<span class="n">conc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">])</span>
+<span class="n">kern</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="mf">1e-9</span>
+
+<span class="n">gain_cont</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_continuous</span><span class="p">(</span>
+    <span class="n">r</span><span class="p">,</span> <span class="n">conc</span><span class="p">,</span> <span class="n">kern</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">gain_cont</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry and
+  physics, Chapter 13, Equation 13.61.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_coagulation_gain_rate_continuous</span><span class="p">(</span>
@@ -7761,26 +7847,42 @@ physics, Chapter 13 Equations 13.61</li>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_coagulation_gain_rate_discrete">get_coagulation_gain_rate_discrete<a class="headerlink" href="#get_coagulation_gain_rate_discrete" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L40">Show source in coagulation_rate.py:40</a></p>
-<p>Calculate the coagulation gain rate, via the integration method, by
-converting to a continuous distribution.</p>
-<h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
-<p>radius : The radius of the particles.
-concentration : The distribution of particles.
-kernel : The coagulation kernel.</p>
-<h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<p>The coagulation gain rate.</p>
-<h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
-<hr />
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L58">Show source in coagulation_rate.py:58</a></p>
+<p>Calculate the coagulation gain rate (using a quasi-continuous approach).</p>
+<p>Though named "discrete," this function converts the discrete distribution
+to a PDF and uses interpolation (RectBivariateSpline) to approximate the
+gain term. The concept is:</p>
 <ul>
-<li>This equation necessitates the use of a for-loop due to the
-convoluted use of different radii at different stages. This is the
-most expensive step of all coagulation calculations. Using
-<code>RectBivariateSpline</code> accelerates this significantly.</li>
-<li>Note, to estimate the kernel and distribution at
-(other_radius**3 - some_radius**3)*(&#8531;) we use interporlation techniques.</li>
-<li>Seinfeld, J. H., &amp; Pandis, S. (2016). Atmospheric chemistry and
-physics, Chapter 13 Equations 13.61</li>
+<li>gain_rate&reg; = ∫ kernel(r, r') × PDF&reg; × PDF(r') dr'
+  (implemented via numeric integration)</li>
+</ul>
+<h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>radius : The particle radius array [m].</li>
+<li>concentration : The particle distribution.</li>
+<li>kernel : Coagulation kernel matrix.</li>
+</ul>
+<h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>The coagulation gain rate, matched to the shape of radius.</li>
+</ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-7</span><span class="p">,</span> <span class="mf">2e-7</span><span class="p">,</span> <span class="mf">3e-7</span><span class="p">])</span>
+<span class="n">conc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">])</span>
+<span class="n">kern</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="mf">1e-9</span>
+
+<span class="n">gain_val</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
+    <span class="n">r</span><span class="p">,</span> <span class="n">conc</span><span class="p">,</span> <span class="n">kern</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">gain_val</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry and
+  physics, Chapter 13, Equation 13.61.</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
@@ -7790,18 +7892,40 @@ physics, Chapter 13 Equations 13.61</li>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_coagulation_loss_rate_continuous">get_coagulation_loss_rate_continuous<a class="headerlink" href="#get_coagulation_loss_rate_continuous" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L96">Show source in coagulation_rate.py:96</a></p>
-<p>Calculate the coagulation loss rate, via the integration method.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L128">Show source in coagulation_rate.py:128</a></p>
+<p>Calculate the coagulation loss rate via continuous integration.</p>
+<p>This method integrates the product of kernel and concentration over
+the radius grid. The equation is:</p>
+<ul>
+<li>loss_rate&reg; = concentration&reg; × ∫ kernel(r, r') × concentration(r') dr'</li>
+</ul>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
-<p>radius : The radius of the particles.
-concentration : The distribution of particles.
-kernel : The coagulation kernel.</p>
+<ul>
+<li>radius : The particle radius array [m].</li>
+<li>concentration : The particle distribution.</li>
+<li>kernel : Coagulation kernel matrix (NDArray[np.float64]).</li>
+</ul>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
-<p>The coagulation loss rate.</p>
+<ul>
+<li>The coagulation loss rate.</li>
+</ul>
+<h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-7</span><span class="p">,</span> <span class="mf">2e-7</span><span class="p">,</span> <span class="mf">3e-7</span><span class="p">])</span>
+<span class="n">conc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">])</span>
+<span class="n">kern</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="mf">1e-9</span>
+
+<span class="n">loss_cont</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_continuous</span><span class="p">(</span>
+    <span class="n">r</span><span class="p">,</span> <span class="n">conc</span><span class="p">,</span> <span class="n">kern</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">loss_cont</span><span class="p">)</span>
+</code></pre></div>
 <h4 id="references_2">References<a class="headerlink" href="#references_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry and
-    physics, Chapter 13 Equations 13.61</li>
+  physics, Chapter 13, Equation 13.61.</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_coagulation_loss_rate_continuous</span><span class="p">(</span>
@@ -7811,16 +7935,37 @@ kernel : The coagulation kernel.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_coagulation_loss_rate_discrete">get_coagulation_loss_rate_discrete<a class="headerlink" href="#get_coagulation_loss_rate_discrete" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L19">Show source in coagulation_rate.py:19</a></p>
-<p>Calculate the coagulation loss rate, via the summation method.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_rate.py#L20">Show source in coagulation_rate.py:20</a></p>
+<p>Calculate the coagulation loss rate via a discrete summation approach.</p>
+<p>This function computes the loss rate of particles from collisions by
+summing over all size classes. The equation is:</p>
+<ul>
+<li>loss_rate = ΣᵢΣⱼ [kernel(i, j) × concentration(i) × concentration(j)]</li>
+</ul>
 <h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
-<p>concentraiton : The distribution of particles.
-kernel : The coagulation kernel.</p>
+<ul>
+<li>concentration : The distribution of particles.</li>
+<li>kernel : The coagulation kernel matrix (NDArray[np.float64]).</li>
+</ul>
 <h4 id="returns_3">Returns<a class="headerlink" href="#returns_3" title="Permanent link">&para;</a></h4>
-<p>The coagulation loss rate.</p>
+<ul>
+<li>The coagulation loss rate (float or NDArray[np.float64]).</li>
+</ul>
+<h4 id="examples_3">Examples<a class="headerlink" href="#examples_3" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+
+<span class="n">conc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">])</span>
+<span class="n">kern</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">conc</span><span class="p">,</span> <span class="n">kern</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+<span class="c1"># Example output: 36.0</span>
+</code></pre></div>
 <h4 id="references_3">References<a class="headerlink" href="#references_3" title="Permanent link">&para;</a></h4>
-<p>Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry and
-physics, Chapter 13 Equations 13.61</p>
+<ul>
+<li>Seinfeld, J. H., &amp; Pandis, S. N. (2016). Atmospheric chemistry and
+  physics, Chapter 13, Equation 13.61.</li>
+</ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_coagulation_loss_rate_discrete</span><span class="p">(</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">kernel</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>

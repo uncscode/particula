@@ -2463,6 +2463,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -2565,6 +2574,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references_2" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -2610,6 +2628,24 @@
   <a href="#returns_3" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
     </span>
   </a>
   
@@ -7523,6 +7559,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7625,6 +7670,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references_2" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7676,6 +7730,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature_3" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7714,33 +7786,47 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py">particula.dynamics.properties.wall_loss_coefficient</a> module.</p>
 </blockquote>
 <h2 id="get_rectangle_wall_loss_coefficient">get_rectangle_wall_loss_coefficient<a class="headerlink" href="#get_rectangle_wall_loss_coefficient" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L65">Show source in wall_loss_coefficient.py:65</a></p>
-<p>Calculate the wall loss coefficient, β₀, for a rectangular chamber.</p>
-<p>This function computes the wall loss coefficient for a rectangular-prism
-chamber, considering the wall eddy diffusivity, particle diffusion
-coefficient, and terminal settling velocity. The chamber dimensions
-(length, width, and height) are used to account for the geometry's impact
-on particle loss.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L101">Show source in wall_loss_coefficient.py:101</a></p>
+<p>Calculate the particle wall loss coefficient in a rectangular chamber.</p>
+<p>This function computes the wall loss coefficient (β₀) for a rectangular
+chamber of length (L), width (W), and height (H). It uses the wall eddy
+diffusivity, particle diffusion coefficient, particle settling velocity,
+and chamber dimensions:</p>
+<ul>
+<li>β₀ ~ (some function of wall_eddy_diffusivity, diffusion_coefficient,
+settling_velocity, and L×W×H)</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>wall_eddy_diffusivity</code> - Rate of wall diffusivity parameter in
-    units of inverse seconds (s^-1).</li>
-<li><code>diffusion_coefficient</code> - The particle diffusion coefficient
-    in units of square meters per second (m²/s).</li>
-<li><code>settling_velocity</code> - The terminal settling velocity of the
-    particles, in units of meters per second (m/s).</li>
-<li><code>chamber_dimensions</code> - A tuple of three floats representing the length
-    (L), width (W), and height (H) of the rectangular chamber,
-    in units of meters (m).</li>
+<li>wall_eddy_diffusivity : Wall eddy diffusivity in s⁻¹.</li>
+<li>diffusion_coefficient : Particle diffusion coefficient in m²/s.</li>
+<li>settling_velocity : Particle settling velocity in m/s.</li>
+<li>chamber_dimensions : A tuple (length, width, height) in m.</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>The calculated wall loss rate (β₀) for the rectangular chamber.</p>
+<ul>
+<li>The wall loss coefficient β₀ (float or NDArray[np.float64]), in s⁻¹.</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example (float inputs)</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.properties.wall_loss_coefficient</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_rectangle_wall_loss_coefficient</span>
+<span class="p">)</span>
+
+<span class="n">beta_0</span> <span class="o">=</span> <span class="n">get_rectangle_wall_loss_coefficient</span><span class="p">(</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+    <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>
+    <span class="n">settling_velocity</span><span class="o">=</span><span class="mf">2e-4</span><span class="p">,</span>
+    <span class="n">chamber_dimensions</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">beta_0</span><span class="p">)</span>
+<span class="c1"># Example output: 0.0009</span>
+</code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
 <ul>
 <li>Crump, J. G., &amp; Seinfeld, J. H. (1981). TURBULENT DEPOSITION AND
-    GRAVITATIONAL SEDIMENTATION OF AN AEROSOL IN A VESSEL OF ARBITRARY
-    SHAPE. In J Aerosol Sct (Vol. 12, Issue 5).
-    https://doi.org/10.1016/0021-8502(81)90036-7</li>
+  GRAVITATIONAL SEDIMENTATION OF AN AEROSOL IN A VESSEL OF ARBITRARY
+  SHAPE. J Aerosol Sci, 12(5).
+  https://doi.org/10.1016/0021-8502(81)90036-7</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_rectangle_wall_loss_coefficient</span><span class="p">(</span>
@@ -7751,7 +7837,7 @@ on particle loss.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_rectangle_wall_loss_coefficient_via_system_state">get_rectangle_wall_loss_coefficient_via_system_state<a class="headerlink" href="#get_rectangle_wall_loss_coefficient_via_system_state" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L177">Show source in wall_loss_coefficient.py:177</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L251">Show source in wall_loss_coefficient.py:251</a></p>
 <p>Calculate the wall loss coefficient for a rectangular chamber based on
 the system state.</p>
 <p>This function computes the wall loss coefficient for a rectangular chamber
@@ -7791,24 +7877,55 @@ are also considered.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_spherical_wall_loss_coefficient">get_spherical_wall_loss_coefficient<a class="headerlink" href="#get_spherical_wall_loss_coefficient" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L28">Show source in wall_loss_coefficient.py:28</a></p>
-<p>Calculate the wall loss coefficient for a spherical chamber
-approximation.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L35">Show source in wall_loss_coefficient.py:35</a></p>
+<p>Calculate the particle wall loss coefficient in a spherical chamber.</p>
+<p>This function computes the wall loss coefficient based on a spherical
+chamber approximation. It uses the wall eddy diffusivity, particle
+diffusion coefficient, particle settling velocity, and chamber radius.
+The calculation is:</p>
+<ul>
+<li>k = 6 × √(Dₑ × D) / (π × R) × f + vₛ × (3 / (4 × R))<ul>
+<li>k is the wall loss coefficient [s⁻¹],</li>
+<li>Dₑ is the wall eddy diffusivity [m²/s or effective rate],</li>
+<li>D is the particle diffusion coefficient [m²/s],</li>
+<li>f is the Debye function evaluation (unitless),</li>
+<li>vₛ is the settling velocity [m/s],</li>
+<li>R is the chamber radius [m].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>wall_eddy_diffusivity</code> - Rate of the wall eddy diffusivity.</li>
-<li><code>diffusion_coefficient</code> - Diffusion coefficient of the
-    particle.</li>
-<li><code>settling_velocity</code> - Settling velocity of the particle.</li>
-<li><code>chamber_radius</code> - Radius of the chamber.</li>
+<li>wall_eddy_diffusivity : The wall eddy diffusivity (or rate) in s⁻¹.</li>
+<li>diffusion_coefficient : The diffusion coefficient of the particle
+    in m²/s.</li>
+<li>settling_velocity : The particle settling velocity in m/s.</li>
+<li>chamber_radius : The spherical chamber radius in m.</li>
 </ul>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
-<p>The calculated wall loss rate for a spherical chamber.</p>
+<ul>
+<li>The wall loss coefficient k, in inverse seconds
+   (float or NDArray[np.float64]).</li>
+</ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example (float inputs)</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.properties.wall_loss_coefficient</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_spherical_wall_loss_coefficient</span>
+<span class="p">)</span>
+
+<span class="n">k_value</span> <span class="o">=</span> <span class="n">get_spherical_wall_loss_coefficient</span><span class="p">(</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
+    <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">5e-6</span><span class="p">,</span>
+    <span class="n">settling_velocity</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
+    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">k_value</span><span class="p">)</span>
+<span class="c1"># Example output: 0.0012</span>
+</code></pre></div>
 <h4 id="references_2">References<a class="headerlink" href="#references_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>Crump, J. G., Flagan, R. C., &amp; Seinfeld, J. H. (1982). Particle wall
-    loss rates in vessels. Aerosol Science and Technology, 2(3),
-    303-309. https://doi.org/10.1080/02786828308958636</li>
+  loss rates in vessels. Aerosol Science and Technology, 2(3), 303-309.
+  https://doi.org/10.1080/02786828308958636</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_spherical_wall_loss_coefficient</span><span class="p">(</span>
@@ -7819,26 +7936,55 @@ approximation.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_spherical_wall_loss_coefficient_via_system_state">get_spherical_wall_loss_coefficient_via_system_state<a class="headerlink" href="#get_spherical_wall_loss_coefficient_via_system_state" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L120">Show source in wall_loss_coefficient.py:120</a></p>
-<p>Calculate the wall loss coefficient for a spherical chamber based on the
-system state.</p>
-<p>This function computes the wall loss coefficient for a spherical chamber
-using the system's physical state, including the wall eddy diffusivity,
-particle properties (radius, density), and environmental conditions
-(temperature, pressure). The chamber radius is also taken into account.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/properties/wall_loss_coefficient.py#L169">Show source in wall_loss_coefficient.py:169</a></p>
+<p>Calculate the spherical chamber wall loss coefficient via system state.</p>
+<p>This version uses the system's physical conditions (particle radius, density,
+temperature, pressure) to compute the needed diffusion and settling velocity
+before calculating the spherical wall loss coefficient:</p>
+<ul>
+<li>k = f(
+    wall_eddy_diffusivity,
+    diffusion_coefficient_via_system_state,
+    settling_velocity_via_system_state,
+    chamber_radius
+)</li>
+</ul>
 <h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>wall_eddy_diffusivity</code> - The rate of wall eddy diffusivity in inverse
-    seconds (s⁻¹).</li>
-<li><code>particle_radius</code> - The radius of the particle in meters (m).</li>
-<li><code>particle_density</code> - The density of the particle in kilograms per cubic
-    meter (kg/m³).</li>
-<li><code>temperature</code> - The temperature of the system in Kelvin (K).</li>
-<li><code>pressure</code> - The pressure of the system in Pascals (Pa).</li>
-<li><code>chamber_radius</code> - The radius of the spherical chamber in meters (m).</li>
+<li>wall_eddy_diffusivity : Wall eddy diffusivity in s⁻¹.</li>
+<li>particle_radius : Particle radius in m.</li>
+<li>particle_density : Particle density in kg/m³.</li>
+<li>temperature : System temperature in K.</li>
+<li>pressure : System pressure in Pa.</li>
+<li>chamber_radius : Chamber radius in m.</li>
 </ul>
 <h4 id="returns_3">Returns<a class="headerlink" href="#returns_3" title="Permanent link">&para;</a></h4>
-<p>The calculated wall loss coefficient for the spherical chamber.</p>
+<ul>
+<li>The computed wall loss coefficient k (float or NDArray[np.float64])
+    in s⁻¹.</li>
+</ul>
+<h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.properties.wall_loss_coefficient</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_spherical_wall_loss_coefficient_via_system_state</span>
+<span class="p">)</span>
+
+<span class="n">k_value</span> <span class="o">=</span> <span class="n">get_spherical_wall_loss_coefficient_via_system_state</span><span class="p">(</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">particle_density</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span>
+    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">k_value</span><span class="p">)</span>
+<span class="c1"># Example output: 0.0018</span>
+</code></pre></div>
+<h4 id="references_3">References<a class="headerlink" href="#references_3" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Crump, J. G., Flagan, R. C., &amp; Seinfeld, J. H. (1982). Particle wall
+  loss rates in vessels. Aerosol Science and Technology, 2(3), 303-309.
+  https://doi.org/10.1080/02786828308958636</li>
+</ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_spherical_wall_loss_coefficient_via_system_state</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>

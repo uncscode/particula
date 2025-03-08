@@ -2145,6 +2145,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7381,6 +7390,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7430,35 +7448,49 @@
 <h2 id="get_psi_ao2008">get_psi_ao2008<a class="headerlink" href="#get_psi_ao2008" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/psi_ao2008.py#L12">Show source in psi_ao2008.py:12</a></p>
 <p>Compute the function Ψ(α, φ) for the k-th droplet.</p>
-<p>The function Ψ(α, φ) is defined as:</p>
-<p>Ψ(α, φ) = 1 / ((1/τ_pk) + (1/α) + (v_pk/φ))
-        - (v_pk / (2φ ((1/τ_pk) + (1/α) + (v_pk/φ))^2))</p>
+<p>This function calculates Ψ(α, φ) for the droplet collision kernel in the
+turbulent DNS model. The equation is:</p>
 <ul>
-<li>τ_pk (particle_inertia_time) : Inertia timescale of the k-th droplet
-    [s].</li>
-<li>α : A parameter related to turbulence and droplet interactions [-].</li>
-<li>φ : A characteristic velocity or timescale parameter [m/s].</li>
-<li>v_pk (particle_velocity) : Velocity of the k-th droplet [m/s].</li>
+<li>Ψ(α, φ) = 1 / ((1/τₚₖ) + (1/α) + (vₚₖ/φ))
+            - (vₚₖ / (2φ ((1/τₚₖ) + (1/α) + (vₚₖ/φ))²))<ul>
+<li>τₚₖ is the inertia timescale of the droplet (s),</li>
+<li>α is a parameter related to turbulence (dimensionless),</li>
+<li>φ is a characteristic velocity/timescale parameter (m/s),</li>
+<li>vₚₖ is the droplet velocity (m/s).</li>
+</ul>
+</li>
 </ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- alpha : A parameter related to turbulence and droplet interactions
-    [-].
-- phi : A characteristic velocity or timescale parameter [m/s].
-- particle_inertia_time : Inertia timescale of the droplet τ_pk [s].
-- particle_velocity : Velocity of the droplet v_pk [m/s].
-</code></pre></div>
+<ul>
+<li>alpha : Parameter related to turbulence (dimensionless).</li>
+<li>phi : Characteristic velocity or timescale parameter (m/s).</li>
+<li>particle_inertia_time : Inertia timescale of the droplet τₚₖ (s).</li>
+<li>particle_velocity : Velocity of the droplet vₚₖ (m/s).</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Ψ(α, φ) value [-].
+<ul>
+<li>The value of Ψ(α, φ) (dimensionless).</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">phi</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">particle_inertia_time</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">particle_velocity</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+<span class="n">psi_value</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dyanmics</span><span class="o">.</span><span class="n">get_psi_ao2008</span><span class="p">(</span>
+    <span class="n">alpha</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">particle_inertia_time</span><span class="p">,</span> <span class="n">particle_velocity</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">psi_value</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
 <li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016</li>
+  the geometric collision rate of sedimenting droplets. Part 2.
+  Theory and parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>

@@ -8060,14 +8060,12 @@ particles_original = particle_radius.copy()</div>
     <span class="n">time_step</span><span class="o">=</span><span class="n">delta_t</span><span class="p">,</span>
     <span class="n">random_generator</span><span class="o">=</span><span class="n">random_generator</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">particle_radius</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_particle_resolved_update_step</span><span class="p">(</span>
-        <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
-        <span class="n">gain</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">),</span>
-        <span class="n">loss</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">),</span>
-        <span class="n">small_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
-        <span class="n">large_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
-    <span class="p">)</span>
+<span class="n">particle_radius</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_particle_resolved_update_step</span><span class="p">(</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">particle_radius</span><span class="p">,</span>
+    <span class="n">gain</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">),</span>
+    <span class="n">loss</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particle_radius</span><span class="p">),</span>
+    <span class="n">small_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="n">large_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">loss_gain_index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -8088,14 +8086,12 @@ loss_gain_index = par.dynamics.get_particle_resolved_coagulation_step(
     time_step=delta_t,
     random_generator=random_generator,
 )
-particle_radius, gain, loss = (
-    par.dynamics.get_particle_resolved_update_step(
-        particle_radius=particle_radius,
-        gain=np.zeros_like(particle_radius),
-        loss=np.zeros_like(particle_radius),
-        small_index=loss_gain_index[:, 0],
-        large_index=loss_gain_index[:, 1],
-    )
+particle_radius, gain, loss = par.dynamics.get_particle_resolved_update_step(
+    particle_radius=particle_radius,
+    gain=np.zeros_like(particle_radius),
+    loss=np.zeros_like(particle_radius),
+    small_index=loss_gain_index[:, 0],
+    large_index=loss_gain_index[:, 1],
 )
 
 print(loss_gain_index.shape)
@@ -8323,24 +8319,20 @@ plt.show()</div>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dpa</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time_array</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 
-        <span class="n">loss_gain_index</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_particle_resolved_coagulation_step</span><span class="p">(</span>
-                <span class="n">particle_radius</span><span class="o">=</span><span class="n">particles_i</span><span class="p">,</span>
-                <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
-                <span class="n">kernel_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
-                <span class="n">volume</span><span class="o">=</span><span class="n">volume_sim</span><span class="p">,</span>
-                <span class="n">time_step</span><span class="o">=</span><span class="n">time_interval</span><span class="p">,</span>
-                <span class="n">random_generator</span><span class="o">=</span><span class="n">random_generator</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="n">loss_gain_index</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_particle_resolved_coagulation_step</span><span class="p">(</span>
+            <span class="n">particle_radius</span><span class="o">=</span><span class="n">particles_i</span><span class="p">,</span>
+            <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
+            <span class="n">kernel_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
+            <span class="n">volume</span><span class="o">=</span><span class="n">volume_sim</span><span class="p">,</span>
+            <span class="n">time_step</span><span class="o">=</span><span class="n">time_interval</span><span class="p">,</span>
+            <span class="n">random_generator</span><span class="o">=</span><span class="n">random_generator</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">particles_i</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_particle_resolved_update_step</span><span class="p">(</span>
-                <span class="n">particle_radius</span><span class="o">=</span><span class="n">particles_i</span><span class="p">,</span>
-                <span class="n">gain</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particles_i</span><span class="p">),</span>
-                <span class="n">loss</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particles_i</span><span class="p">),</span>
-                <span class="n">small_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
-                <span class="n">large_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
-            <span class="p">)</span>
+        <span class="n">particles_i</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_particle_resolved_update_step</span><span class="p">(</span>
+            <span class="n">particle_radius</span><span class="o">=</span><span class="n">particles_i</span><span class="p">,</span>
+            <span class="n">gain</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particles_i</span><span class="p">),</span>
+            <span class="n">loss</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">particles_i</span><span class="p">),</span>
+            <span class="n">small_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">large_index</span><span class="o">=</span><span class="n">loss_gain_index</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
         <span class="p">)</span>
 
         <span class="c1"># Ensure no negative concentrations (set to zero if less than zero)</span>
@@ -8368,24 +8360,20 @@ particles_matrix = np.zeros([len(time_array), len(particles_0)])
 for i, dpa in enumerate(time_array):
     if i &gt; 0:
 
-        loss_gain_index = (
-            par.dynamics.get_particle_resolved_coagulation_step(
-                particle_radius=particles_i,
-                kernel=kernel,
-                kernel_radius=radius_bins,
-                volume=volume_sim,
-                time_step=time_interval,
-                random_generator=random_generator,
-            )
+        loss_gain_index = par.dynamics.get_particle_resolved_coagulation_step(
+            particle_radius=particles_i,
+            kernel=kernel,
+            kernel_radius=radius_bins,
+            volume=volume_sim,
+            time_step=time_interval,
+            random_generator=random_generator,
         )
-        particles_i, _, _ = (
-            par.dynamics.get_particle_resolved_update_step(
-                particle_radius=particles_i,
-                gain=np.zeros_like(particles_i),
-                loss=np.zeros_like(particles_i),
-                small_index=loss_gain_index[:, 0],
-                large_index=loss_gain_index[:, 1],
-            )
+        particles_i, _, _ = par.dynamics.get_particle_resolved_update_step(
+            particle_radius=particles_i,
+            gain=np.zeros_like(particles_i),
+            loss=np.zeros_like(particles_i),
+            small_index=loss_gain_index[:, 0],
+            large_index=loss_gain_index[:, 1],
         )
 
         # Ensure no negative concentrations (set to zero if less than zero)

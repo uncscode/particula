@@ -2246,6 +2246,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7627,6 +7636,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7680,7 +7698,7 @@
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">PhiComputeTerms</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="_compute_phi_term1">_compute_phi_term1<a class="headerlink" href="#_compute_phi_term1" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L106">Show source in phi_ao2008.py:106</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L121">Show source in phi_ao2008.py:121</a></p>
 <p>Compute the first term of the Φ function.</p>
 <p>term_1 = {
     1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )        -  1 / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )
@@ -7693,7 +7711,7 @@
 <li><a href="#phicomputeterms">PhiComputeTerms</a></li>
 </ul>
 <h2 id="_compute_phi_term2">_compute_phi_term2<a class="headerlink" href="#_compute_phi_term2" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L131">Show source in phi_ao2008.py:131</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L146">Show source in phi_ao2008.py:146</a></p>
 <p>Compute the second term of the Φ function.</p>
 <p>term₂ =
 {
@@ -7707,7 +7725,7 @@
 <li><a href="#phicomputeterms">PhiComputeTerms</a></li>
 </ul>
 <h2 id="_compute_phi_term3">_compute_phi_term3<a class="headerlink" href="#_compute_phi_term3" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L166">Show source in phi_ao2008.py:166</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L181">Show source in phi_ao2008.py:181</a></p>
 <p>Compute the third term of the Φ function.</p>
 <p>term_3 =
 {
@@ -7723,10 +7741,12 @@
 </ul>
 <h2 id="get_phi_ao2008">get_phi_ao2008<a class="headerlink" href="#get_phi_ao2008" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/phi_ao2008.py#L23">Show source in phi_ao2008.py:23</a></p>
-<p>Compute the function Φ(α, φ) for the given particle properties.</p>
-<p>The function Φ(α, φ), when vₚ₁&gt;vₚ₂, is defined as:</p>
-<p>Φ(α, φ) =
-{  1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )        -  1 / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) ) }        ×  ( vₚ₁ - vₚ₂ ) / ( 2 φ ( (vₚ₁ - vₚ₂ / φ) + (1 / τₚ₁) + (1 / τₚ₂) )² )</p>
+<p>Compute the function Φ(α, φ) for the given particle properties using
+Ayala et al. (2008).</p>
+<p>This function calculates Φ(α, φ) when vₚ₁ &gt; vₚ₂ by considering the
+velocities (vₚ₁, vₚ₂) and inertia times (τₚ₁, τₚ₂). The equation is:</p>
+<p>Φ(α, φ), for vₚ₁ &gt; vₚ₂ =
+    {  1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )        -  1 / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) ) }        ×  ( vₚ₁ - vₚ₂ ) / ( 2 φ ( (vₚ₁ - vₚ₂ / φ) + (1 / τₚ₁) + (1 / τₚ₂) )² )</p>
 <ul>
 <li>
 <p>{  4 / ( (vₚ₂ / φ)² - ( (1 / τₚ₂) + (1 / α) )² )        -  1 / ( (vₚ₂ / φ) + (1 / τₚ₂) + (1 / α) )²        -  1 / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )²  }        ×  ( vₚ₂ / ( 2 φ ( (1 / τₚ₁) - (1 / α)         + ( (1 / τₚ₂) + (1 / α) ) (vₚ₁ / vₚ₂) ) ) )</p>
@@ -7734,28 +7754,42 @@
 <li>
 <p>{  2φ / ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )        -  2φ / ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )        -  vₚ₁ / ( ( (vₚ₁ / φ) + (1 / τₚ₁) + (1 / α) )² )        +  vₚ₂ / ( ( (vₚ₂ / φ) - (1 / τₚ₂) - (1 / α) )² )  }        ×  1 / ( 2φ ( (vₚ₁ - vₚ₂ / φ) + (1 / τₚ₁) + (1 / τₚ₂) ) )</p>
 </li>
+<li>
+<p>v₁ and v₂: Velocities of particles 1 and 2 in m/s.</p>
+</li>
+<li>τ₁ and τ₂: Inertia timescales of particles 1 and 2 in s.</li>
+<li>α: Turbulent interaction parameter (dimensionless).</li>
+<li>φ: Characteristic velocity (m/s).</li>
 </ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- alpha : A parameter related to turbulence and droplet interactions
-    [-].
-- phi : A characteristic velocity or timescale parameter [m/s].
-- particle_inertia_time : Inertia timescale of particle 1 τₚ₁,
-    particle 2 τₚ₂ [s].
-- particle_velocity : Velocity of particle 1 vₚ₁,
-    particle 2 vₚ₂ [m/s].
-</code></pre></div>
+<ul>
+<li>alpha : Turbulence/droplet interaction parameter (dimensionless).</li>
+<li>phi : Characteristic velocity parameter (m/s).</li>
+<li>particle_inertia_time : Inertia timescales τₚ₁ and τₚ₂ (s).</li>
+<li>particle_velocity : Velocities vₚ₁ and vₚ₂ (m/s).</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- Φ(α, φ) value [-].
+<ul>
+<li>The computed Φ(α, φ) (dimensionless).</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.dynamics.coagulation.turbulent_dns_kernel.phi_ao2008</span>
+<span class="w">    </span><span class="kn">import</span> <span class="n">get_phi_ao2008</span>
+
+<span class="n">alpha_val</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">phi_val</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">inertia_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">])</span>
+<span class="n">velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.18</span><span class="p">])</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">get_phi_ao2008</span><span class="p">(</span><span class="n">alpha_val</span><span class="p">,</span> <span class="n">phi_val</span><span class="p">,</span> <span class="n">inertia_times</span><span class="p">,</span> <span class="n">velocities</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
 <li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016</li>
+  the geometric collision rate of sedimenting droplets. Part 2.
+  Theory and parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016</li>
 </ul>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>

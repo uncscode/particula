@@ -9667,8 +9667,12 @@ plt.show()</div>
 <span class="c1"># Calculate the gain, loss, and net change in particle concentration due to coagulation</span>
 <span class="c1"># `discrete_gain`: Calculates the rate at which particles are gained due to coagulation</span>
 <span class="c1"># `discrete_loss`: Calculates the rate at which particles are lost due to coagulation</span>
-<span class="n">gain_0</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss_0</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain_0</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
+    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="p">)</span>
+<span class="n">loss_0</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span>
+    <span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="p">)</span>
 <span class="n">net_0</span> <span class="o">=</span> <span class="n">gain_0</span> <span class="o">-</span> <span class="n">loss_0</span>  <span class="c1"># Net change in concentration</span>
 
 <span class="c1"># Create a DataFrame to display the gain, loss, and net coagulation rates</span>
@@ -9685,8 +9689,12 @@ plt.show()</div>
 # Calculate the gain, loss, and net change in particle concentration due to coagulation
 # `discrete_gain`: Calculates the rate at which particles are gained due to coagulation
 # `discrete_loss`: Calculates the rate at which particles are lost due to coagulation
-gain_0 = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_0, kernel)
-loss_0 = par.dynamics.get_coagulation_loss_rate_discrete(concentration_0, kernel)
+gain_0 = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_0, kernel
+)
+loss_0 = par.dynamics.get_coagulation_loss_rate_discrete(
+    concentration_0, kernel
+)
 net_0 = gain_0 - loss_0  # Net change in concentration
 
 # Create a DataFrame to display the gain, loss, and net coagulation rates
@@ -9951,7 +9959,9 @@ plt.show()</div>
 <span class="c1"># Time step 1: Calculate the gain, loss, and net rate, then update concentration</span>
 
 <span class="c1"># Calculate the rate of change in concentration (gain and loss) for the initial concentration</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
+    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="p">)</span>
 <span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>  <span class="c1"># Net rate of change</span>
 
@@ -9961,7 +9971,9 @@ plt.show()</div>
 <span class="c1"># Time step 2: Recalculate rates with the updated concentration and update again</span>
 
 <span class="c1"># Recalculate gain and loss based on the updated concentration from time step 1</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_1</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
+    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_1</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="p">)</span>
 <span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_1</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 
@@ -9971,7 +9983,9 @@ plt.show()</div>
 <span class="c1"># Time step 3: Recalculate rates again and update concentration</span>
 
 <span class="c1"># Recalculate gain and loss based on the updated concentration from time step 2</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
+    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_2</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="p">)</span>
 <span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 
@@ -10009,7 +10023,9 @@ TIME_STEP = 0.1  # seconds
 # Time step 1: Calculate the gain, loss, and net rate, then update concentration
 
 # Calculate the rate of change in concentration (gain and loss) for the initial concentration
-gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_0, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_0, kernel
+)
 loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_0, kernel)
 net = gain - loss  # Net rate of change
 
@@ -10019,7 +10035,9 @@ concentration_1 = concentration_0 + net * TIME_STEP
 # Time step 2: Recalculate rates with the updated concentration and update again
 
 # Recalculate gain and loss based on the updated concentration from time step 1
-gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_1, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_1, kernel
+)
 loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_1, kernel)
 net = gain - loss
 
@@ -10029,7 +10047,9 @@ concentration_2 = concentration_1 + net * TIME_STEP
 # Time step 3: Recalculate rates again and update concentration
 
 # Recalculate gain and loss based on the updated concentration from time step 2
-gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_2, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_2, kernel
+)
 loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_2, kernel)
 net = gain - loss
 
@@ -10490,8 +10510,12 @@ plt.show()</div>
 <span class="p">)</span>
 
 <span class="c1"># Time step 1: Calculate gain, loss, and update concentration</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
+    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span>
+    <span class="n">concentration_lognormal_0</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 <span class="n">concentration_lognormal_1</span> <span class="o">=</span> <span class="n">concentration_lognormal_0</span> <span class="o">+</span> <span class="n">net</span> <span class="o">*</span> <span class="n">TIME_STEP</span>
 <span class="n">concentration_lognormal_1</span><span class="p">[</span><span class="n">concentration_lognormal_1</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -10499,8 +10523,12 @@ plt.show()</div>
 <span class="p">)</span>
 
 <span class="c1"># Time step 2: Recalculate rates and update concentration</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
+    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span>
+    <span class="n">concentration_lognormal_1</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 <span class="n">concentration_lognormal_2</span> <span class="o">=</span> <span class="n">concentration_lognormal_1</span> <span class="o">+</span> <span class="n">net</span> <span class="o">*</span> <span class="n">TIME_STEP</span>
 <span class="n">concentration_lognormal_2</span><span class="p">[</span><span class="n">concentration_lognormal_2</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -10508,8 +10536,12 @@ plt.show()</div>
 <span class="p">)</span>
 
 <span class="c1"># Time step 3: Recalculate rates and update concentration</span>
-<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span><span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span><span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+<span class="n">gain</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_gain_rate_discrete</span><span class="p">(</span>
+    <span class="n">radius_bins</span><span class="p">,</span> <span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_coagulation_loss_rate_discrete</span><span class="p">(</span>
+    <span class="n">concentration_lognormal_2</span><span class="p">,</span> <span class="n">kernel</span>
+<span class="p">)</span>
 <span class="n">net</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">-</span> <span class="n">loss</span>
 <span class="n">concentration_lognormal_3</span> <span class="o">=</span> <span class="n">concentration_lognormal_2</span> <span class="o">+</span> <span class="n">net</span> <span class="o">*</span> <span class="n">TIME_STEP</span>
 <span class="n">concentration_lognormal_3</span><span class="p">[</span><span class="n">concentration_lognormal_3</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -10545,8 +10577,12 @@ kernel = par.dynamics.get_brownian_kernel_via_system_state(
 )
 
 # Time step 1: Calculate gain, loss, and update concentration
-gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_lognormal_0, kernel)
-loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_lognormal_0, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_lognormal_0, kernel
+)
+loss = par.dynamics.get_coagulation_loss_rate_discrete(
+    concentration_lognormal_0, kernel
+)
 net = gain - loss
 concentration_lognormal_1 = concentration_lognormal_0 + net * TIME_STEP
 concentration_lognormal_1[concentration_lognormal_1 &lt; 0] = (
@@ -10554,8 +10590,12 @@ concentration_lognormal_1[concentration_lognormal_1 &lt; 0] = (
 )
 
 # Time step 2: Recalculate rates and update concentration
-gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_lognormal_1, kernel)
-loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_lognormal_1, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_lognormal_1, kernel
+)
+loss = par.dynamics.get_coagulation_loss_rate_discrete(
+    concentration_lognormal_1, kernel
+)
 net = gain - loss
 concentration_lognormal_2 = concentration_lognormal_1 + net * TIME_STEP
 concentration_lognormal_2[concentration_lognormal_2 &lt; 0] = (
@@ -10563,8 +10603,12 @@ concentration_lognormal_2[concentration_lognormal_2 &lt; 0] = (
 )
 
 # Time step 3: Recalculate rates and update concentration
-gain = par.dynamics.get_coagulation_gain_rate_discrete(radius_bins, concentration_lognormal_2, kernel)
-loss = par.dynamics.get_coagulation_loss_rate_discrete(concentration_lognormal_2, kernel)
+gain = par.dynamics.get_coagulation_gain_rate_discrete(
+    radius_bins, concentration_lognormal_2, kernel
+)
+loss = par.dynamics.get_coagulation_loss_rate_discrete(
+    concentration_lognormal_2, kernel
+)
 net = gain - loss
 concentration_lognormal_3 = concentration_lognormal_2 + net * TIME_STEP
 concentration_lognormal_3[concentration_lognormal_3 &lt; 0] = (

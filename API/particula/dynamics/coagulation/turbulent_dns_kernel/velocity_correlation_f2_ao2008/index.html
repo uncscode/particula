@@ -2233,6 +2233,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7381,6 +7390,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       References
@@ -7429,34 +7447,50 @@
 </blockquote>
 <h2 id="get_f2_longitudinal_velocity_correlation">get_f2_longitudinal_velocity_correlation<a class="headerlink" href="#get_f2_longitudinal_velocity_correlation" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/turbulent_dns_kernel/velocity_correlation_f2_ao2008.py#L16">Show source in velocity_correlation_f2_ao2008.py:16</a></p>
-<p>Compute the longitudinal two-point velocity correlation function f₂(R).</p>
+<p>Compute the longitudinal velocity correlation function f₂(R) from
+Ayala et al. (2008).</p>
 <p>This function describes the correlation of velocity fluctuations as a
 function of collisional radius R between two colliding droplets.</p>
-<p>The function is given by:</p>
-<p>f₂(R) =  1 / (2 sqrt(1 - 2β²))                 × { (1 + sqrt(1 - 2β²)) exp[-2R / ((1 + sqrt(1 - 2β²)) L_e)]                 - (1 - sqrt(1 - 2β²)) exp[-2R / ((1 - sqrt(1 - 2β²)) L_e)] }</p>
+<p>Where the equation is:</p>
 <ul>
-<li>β = (sqrt(2) * λ) / L_e</li>
+<li>f₂(R) = 1 / (2√(1 - 2β²)) × {
+    (1 + √(1 - 2β²)) exp[-2R / ((1 + √(1 - 2β²)) L_e)]<ul>
+<li>(1 - √(1 - 2β²)) exp[-2R / ((1 - √(1 - 2β²)) L_e)]
+  }</li>
+<li>f₂(R) is the longitudinal velocity correlation function [-].</li>
+<li>R is the collisional radius [m].</li>
+<li>β = (√2 * λ) / L_e</li>
 <li>λ (taylor_microscale) : Taylor microscale [m].</li>
-<li>L_e (eulerian_integral_length) : Eulerian integral length scale [m].</li>
-<li>R (collisional_radius) : Distance between colliding droplets [m].</li>
+<li>L_e (eulerian_integral_length) : Eulerian integral length scale
+  [m].</li>
+</ul>
+</li>
 </ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- collisional_radius : Distance between two colliding droplets [m].
-- taylor_microscale : Taylor microscale [m].
-- eulerian_integral_length : Eulerian integral length scale [m].
-</code></pre></div>
+<ul>
+<li>collisional_radius : Distance between two colliding droplets [m].</li>
+<li>taylor_microscale : Taylor microscale [m].</li>
+<li>eulerian_integral_length : Eulerian integral length scale [m].</li>
+</ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<hr />
-<div class="highlight"><pre><span></span><code>- f₂(R) value [-].
+<ul>
+<li>f₂(R) value [dimensionless].</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">example_f2</span> <span class="o">=</span> <span class="n">get_f2_longitudinal_velocity_correlation</span><span class="p">(</span>
+    <span class="n">collisional_radius</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mf">2e-4</span><span class="p">]),</span>
+    <span class="n">taylor_microscale</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+    <span class="n">eulerian_integral_length</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># Output: array([...])</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
-<hr />
 <ul>
 <li>Ayala, O., Rosa, B., &amp; Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016</li>
+  the geometric collision rate of sedimenting droplets. Part 2. Theory
+  and parameterization. New Journal of Physics, 10.
+  https://doi.org/10.1088/1367-2630/10/7/075016</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>

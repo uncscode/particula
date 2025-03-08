@@ -8714,7 +8714,7 @@ df_kernel.head(5)
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Generate a lognormal particle size distribution</span>
 <span class="c1"># This distribution is characterized by a mode (most probable size) of 100 nm,</span>
 <span class="c1"># a geometric standard deviation of 1.4, and a total number concentration of 1e6 particles per cm^3.</span>
-<span class="n">concentration_lognormal_0</span> <span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_pdf_distribution</span><span class="p">(</span>
+<span class="n">concentration_lognormal_0</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_lognormal_pdf_distribution</span><span class="p">(</span>
     <span class="n">x_values</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
     <span class="n">mode</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">100e-9</span><span class="p">),</span>  <span class="c1"># Mode of the distribution (100 nm)</span>
     <span class="n">geometric_standard_deviation</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.4</span><span class="p">),</span>  <span class="c1"># Geometric standard deviation</span>
@@ -8745,7 +8745,7 @@ df_kernel.head(5)
 <div class="clipboard-copy-txt" id="cell-4"># Generate a lognormal particle size distribution
 # This distribution is characterized by a mode (most probable size) of 100 nm,
 # a geometric standard deviation of 1.4, and a total number concentration of 1e6 particles per cm^3.
-concentration_lognormal_0 =par.particles.get_lognormal_pdf_distribution(
+concentration_lognormal_0 = par.particles.get_lognormal_pdf_distribution(
     x_values=radius_bins,
     mode=np.array(100e-9),  # Mode of the distribution (100 nm)
     geometric_standard_deviation=np.array(1.4),  # Geometric standard deviation

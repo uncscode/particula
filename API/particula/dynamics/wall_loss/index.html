@@ -1214,6 +1214,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -1250,6 +1268,24 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
     </span>
   </a>
   
@@ -7410,6 +7446,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7446,6 +7500,24 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
     </span>
   </a>
   
@@ -7490,30 +7562,54 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss.py">particula.dynamics.wall_loss</a> module.</p>
 </blockquote>
 <h2 id="get_rectangle_wall_loss_rate">get_rectangle_wall_loss_rate<a class="headerlink" href="#get_rectangle_wall_loss_rate" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss.py#L65">Show source in wall_loss.py:65</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss.py#L87">Show source in wall_loss.py:87</a></p>
 <p>Calculate the wall loss rate of particles in a rectangular chamber.</p>
-<p>This function computes the rate at which particles are lost to the walls
-of a rectangular chamber, based on the system state. It uses the wall eddy
-diffusivity, particle properties (radius, density, concentration), and
-environmental conditions (temperature, pressure) to determine the loss
-rate. The chamber dimensions (length, width, height) are also taken
-into account.</p>
+<p>This function calculates the rate of particle deposition onto the walls
+of a rectangular chamber, given the wall eddy diffusivity, particle
+properties (radius, density, concentration), and environmental conditions
+(temperature, pressure). The final loss rate is computed via:</p>
+<ul>
+<li>L = -(k × c)<ul>
+<li>L is the wall loss rate [#/m³·s],</li>
+<li>k is the wall loss coefficient [1/s],</li>
+<li>c is the particle concentration [#/m³].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>wall_eddy_diffusivity</code> - The rate of wall eddy diffusivity in inverse
-    seconds (s⁻¹).</li>
-<li><code>particle_radius</code> - The radius of the particle in meters (m).</li>
-<li><code>particle_density</code> - The density of the particle in kilograms per cubic
-    meter (kg/m³).</li>
-<li><code>particle_concentration</code> - The concentration of particles in the chamber
-    in particles per cubic meter (#/m³).</li>
-<li><code>temperature</code> - The temperature of the system in Kelvin (K).</li>
-<li><code>pressure</code> - The pressure of the system in Pascals (Pa).</li>
-<li><code>chamber_dimensions</code> - A tuple containing the length, width, and height
-    of the rectangular chamber in meters (m).</li>
+<li>wall_eddy_diffusivity : Wall eddy diffusivity in s⁻¹.</li>
+<li>particle_radius : Particle radius in m.</li>
+<li>particle_density : Particle density in kg/m³.</li>
+<li>particle_concentration : Particle concentration in #/m³.</li>
+<li>temperature : System temperature in K.</li>
+<li>pressure : System pressure in Pa.</li>
+<li>chamber_dimensions : (length, width, height) of the
+    rectangular chamber in m.</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>The wall loss rate of the particles in the chamber.</p>
+<ul>
+<li>The wall loss rate (float or NDArray[np.float64]) in #/m³·s.</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">loss_rate</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">wall_loss</span><span class="o">.</span><span class="n">get_rectangle_wall_loss_rate</span><span class="p">(</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="mf">5e-8</span><span class="p">,</span>
+    <span class="n">particle_density</span><span class="o">=</span><span class="mi">1200</span><span class="p">,</span>
+    <span class="n">particle_concentration</span><span class="o">=</span><span class="mf">2e10</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span>
+    <span class="n">chamber_dimensions</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">loss_rate</span><span class="p">)</span>
+<span class="c1"># Example output: -4.6e7</span>
+</code></pre></div>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
+<ul>
+<li>J. Hinds, "Aerosol Technology," 2<sup>nd</sup> ed., John Wiley &amp; Sons, 1999.
+[check]</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_rectangle_wall_loss_rate</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -7528,26 +7624,52 @@ into account.</p>
 <h2 id="get_spherical_wall_loss_rate">get_spherical_wall_loss_rate<a class="headerlink" href="#get_spherical_wall_loss_rate" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss.py#L16">Show source in wall_loss.py:16</a></p>
 <p>Calculate the wall loss rate of particles in a spherical chamber.</p>
-<p>This function computes the rate at which particles are lost to the walls
-of a spherical chamber, based on the system state. It uses the wall eddy
-diffusivity, particle properties (radius, density, concentration), and
-environmental conditions (temperature, pressure) to determine the loss
-rate.</p>
+<p>This function calculates the rate at which particles deposit onto the
+walls of a spherical chamber. The calculation is based on the wall eddy
+diffusivity and key particle properties (radius, density, concentration),
+together with environmental conditions (temperature, pressure).
+The loss rate is determined via:</p>
+<ul>
+<li>L = -(k × c)<ul>
+<li>L is the wall loss rate [#/m³·s],</li>
+<li>k is the wall loss coefficient [1/s] from the system state,</li>
+<li>c is the particle concentration [#/m³].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>wall_eddy_diffusivity</code> - The rate of wall eddy diffusivity in inverse
-    seconds (s⁻¹).</li>
-<li><code>particle_radius</code> - The radius of the particle in meters (m).</li>
-<li><code>particle_density</code> - The density of the particle in kilograms per cubic
-    meter (kg/m³).</li>
-<li><code>particle_concentration</code> - The concentration of particles in the chamber
-    in particles per cubic meter (#/m³).</li>
-<li><code>temperature</code> - The temperature of the system in Kelvin (K).</li>
-<li><code>pressure</code> - The pressure of the system in Pascals (Pa).</li>
-<li><code>chamber_radius</code> - The radius of the spherical chamber in meters (m).</li>
+<li>wall_eddy_diffusivity : Wall eddy diffusivity in s⁻¹.</li>
+<li>particle_radius : Particle radius in m.</li>
+<li>particle_density : Particle density in kg/m³.</li>
+<li>particle_concentration : Particle concentration in #/m³.</li>
+<li>temperature : System temperature in K.</li>
+<li>pressure : System pressure in Pa.</li>
+<li>chamber_radius : Radius of the spherical chamber in m.</li>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<p>The wall loss rate of the particles in the chamber.</p>
+<ul>
+<li>The wall loss rate (float or NDArray[np.float64]) in #/m³·s.</li>
+</ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">rate</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">wall_loss</span><span class="o">.</span><span class="n">get_spherical_wall_loss_rate</span><span class="p">(</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">particle_density</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">particle_concentration</span><span class="o">=</span><span class="mf">1e11</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span>
+    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+<span class="c1"># Example output: -1.2e8</span>
+</code></pre></div>
+<h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Wikipedia contributors, "Aerosol dynamics," Wikipedia,
+  https://en.wikipedia.org/wiki/Aerosol.</li>
+</ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_spherical_wall_loss_rate</span><span class="p">(</span>
     <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>

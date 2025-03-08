@@ -7972,21 +7972,27 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py">particula.dynamics.condensation.mass_transfer</a> module.</p>
 </blockquote>
 <h2 id="calculate_mass_transfer">calculate_mass_transfer<a class="headerlink" href="#calculate_mass_transfer" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L214">Show source in mass_transfer.py:214</a></p>
-<p>Helper function that routes the mass transfer calculation to either the
-single-species or multi-species calculation functions based on the input
-dimensions of gas_mass.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L224">Show source in mass_transfer.py:224</a></p>
+<p>Route mass transfer calculation to single or multiple-species routines.</p>
+<p>Depending on whether gas_mass represents one or multiple species, this
+function calls either calculate_mass_transfer_single_species or
+calculate_mass_transfer_multiple_species. The primary calculation
+involves:</p>
+<ul>
+<li>mass_to_change = mass_rate × time_step × particle_concentration</li>
+</ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li>mass_rate : The rate of mass transfer per particle (kg/s).</li>
-<li>time_step : The time step for the mass transfer calculation (sec).</li>
-<li>gas_mass : The available mass of gas species (kg).</li>
-<li>particle_mass : The mass of each particle (kg).</li>
-<li>particle_concentration : The concentration of particles (number/m^3).</li>
+<li>mass_rate : The rate of mass transfer per particle [kg/s].</li>
+<li>time_step : The time step for the mass transfer calculation [s].</li>
+<li>gas_mass : The available mass of gas species [kg].</li>
+<li>particle_mass : The mass of each particle [kg].</li>
+<li>particle_concentration : The concentration of particles [#/m³].</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>The amount of mass transferred, accounting for gas and particle
-    limitations.</p>
+<ul>
+<li>The mass transferred (array with the same shape as particle_mass).</li>
+</ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Single species input</span><pre><span></span><code><span class="n">calculate_mass_transfer</span><span class="p">(</span>
     <span class="n">mass_rate</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]),</span>
@@ -8023,20 +8029,29 @@ dimensions of gas_mass.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="calculate_mass_transfer_multiple_species">calculate_mass_transfer_multiple_species<a class="headerlink" href="#calculate_mass_transfer_multiple_species" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L349">Show source in mass_transfer.py:349</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L373">Show source in mass_transfer.py:373</a></p>
 <p>Calculate mass transfer for multiple gas species.</p>
+<p>Here, gas_mass has multiple elements (each species). For each species,
+this function calculates mass_to_change for all particle bins:</p>
+<ul>
+<li>mass_to_change = mass_rate × time_step × particle_concentration</li>
+</ul>
+<p>Then it limits or scales that mass based on available gas mass and
+particle mass in each species bin.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li>mass_rate : The rate of mass transfer per particle for each gas
-    species (kg/s).</li>
-<li>time_step : The time step for the mass transfer calculation (sec).</li>
-<li>gas_mass : The available mass of each gas species (kg).</li>
-<li>particle_mass : The mass of each particle for each gas species (kg).</li>
-<li>particle_concentration : The concentration of particles for each gas
-    species (number/m^3).</li>
+<li>mass_rate : The mass transfer rate per particle for each gas
+    species [kg/s].</li>
+<li>time_step : The time step [s].</li>
+<li>gas_mass : The available mass of each gas species [kg].</li>
+<li>particle_mass : The mass of each particle for each gas species [kg].</li>
+<li>particle_concentration : The concentration of particles [#/m³].</li>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<p>The amount of mass transferred for multiple gas species.</p>
+<ul>
+<li>The mass transferred for multiple gas species, matching the shape
+  of (particle_mass).</li>
+</ul>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Multiple species input</span><pre><span></span><code><span class="n">calculate_mass_transfer_multiple_species</span><span class="p">(</span>
     <span class="n">mass_rate</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">]]),</span>
@@ -8045,6 +8060,7 @@ dimensions of gas_mass.</p>
     <span class="n">particle_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">]]),</span>
     <span class="n">particle_concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
 <span class="p">)</span>
+<span class="c1"># Output: array([...])</span>
 </code></pre></div>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
@@ -8065,18 +8081,28 @@ dimensions of gas_mass.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="calculate_mass_transfer_single_species">calculate_mass_transfer_single_species<a class="headerlink" href="#calculate_mass_transfer_single_species" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L285">Show source in mass_transfer.py:285</a></p>
-<p>Calculate mass transfer for a single gas species (m=1).</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L299">Show source in mass_transfer.py:299</a></p>
+<p>Calculate mass transfer for a single gas species.</p>
+<p>This function assumes gas_mass has a size of 1 (single species).
+It first computes the total mass_to_change per particle:</p>
+<ul>
+<li>mass_to_change = mass_rate × time_step × particle_concentration</li>
+</ul>
+<p>Then it scales or limits that mass based on available gas mass and
+particle mass.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <ul>
-<li>mass_rate : The rate of mass transfer per particle (number*kg/s).</li>
-<li>time_step : The time step for the mass transfer calculation (sec).</li>
-<li>gas_mass : The available mass of gas species (kg).</li>
-<li>particle_mass : The mass of each particle (kg).</li>
-<li>particle_concentration : The concentration of particles (number/m^3).</li>
+<li>mass_rate : Mass transfer rate per particle [kg/s].</li>
+<li>time_step : The time step [s].</li>
+<li>gas_mass : Total available mass of the gas species [kg].</li>
+<li>particle_mass : The mass of each particle [kg].</li>
+<li>particle_concentration : Particle concentration [#/m³].</li>
 </ul>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
-<p>The amount of mass transferred for a single gas species.</p>
+<ul>
+<li>The amount of mass transferred for the single gas species, shaped
+  like particle_mass.</li>
+</ul>
 <h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Single species input</span><pre><span></span><code><span class="n">calculate_mass_transfer_single_species</span><span class="p">(</span>
     <span class="n">mass_rate</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]),</span>
@@ -8085,6 +8111,7 @@ dimensions of gas_mass.</p>
     <span class="n">particle_mass</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">50</span><span class="p">]),</span>
     <span class="n">particle_concentration</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
 <span class="p">)</span>
+<span class="c1"># Output: array([...])</span>
 </code></pre></div>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
@@ -8105,40 +8132,50 @@ dimensions of gas_mass.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="first_order_mass_transport_k">first_order_mass_transport_k<a class="headerlink" href="#first_order_mass_transport_k" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L47">Show source in mass_transfer.py:47</a></p>
-<p>First-order mass transport coefficient per particle.</p>
-<p>Calculate the first-order mass transport coefficient, K, for a given radius
-diffusion coefficient, and vapor transition correction factor. For a
-single particle.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L35">Show source in mass_transfer.py:35</a></p>
+<p>Calculate the first-order mass transport coefficient per particle.</p>
+<p>This function computes the coefficient K that governs how fast mass is
+transported to or from a particle in a vapor. The equation is:</p>
+<ul>
+<li>K = 4π × radius × D × X<ul>
+<li>K : Mass transport coefficient [m³/s].</li>
+<li>radius : Particle radius [m].</li>
+<li>D : Diffusion coefficient of the vapor [m²/s].</li>
+<li>X : Vapor transition correction factor [unitless].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_3">Arguments<a class="headerlink" href="#arguments_3" title="Permanent link">&para;</a></h4>
 <ul>
 <li>radius : The radius of the particle [m].</li>
-<li>diffusion_coefficient : The diffusion coefficient of the vapor
-    [m^2/s], default to air.</li>
-<li>vapor_transition : The vapor transition correction factor. [unitless]</li>
+<li>vapor_transition : The vapor transition correction factor [unitless].</li>
+<li>diffusion_coefficient : The diffusion coefficient of the vapor [m²/s].
+  Defaults to 2e-5 (approx. air).</li>
 </ul>
 <h4 id="returns_3">Returns<a class="headerlink" href="#returns_3" title="Permanent link">&para;</a></h4>
-<p>The first-order mass transport coefficient per particle (m^3/s).</p>
+<ul>
+<li>The first-order mass transport coefficient per particle [m³/s].</li>
+</ul>
 <h4 id="examples_3">Examples<a class="headerlink" href="#examples_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Float input</span><pre><span></span><code><span class="n">first_order_mass_transport_k</span><span class="p">(</span>
     <span class="n">radius</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
     <span class="n">vapor_transition</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-9</span>
-    <span class="p">)</span>
+<span class="p">)</span>
 <span class="c1"># Output: 1.5079644737231005e-14</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">Array input</span><pre><span></span><code><span class="n">first_order_mass_transport_k</span>
+<div class="highlight"><span class="filename">Array input</span><pre><span></span><code><span class="n">first_order_mass_transport_k</span><span class="p">(</span>
     <span class="n">radius</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">2e-6</span><span class="p">]),</span>
     <span class="n">vapor_transition</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]),</span>
     <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-9</span>
-    <span class="p">)</span>
+<span class="p">)</span>
 <span class="c1"># Output: array([1.50796447e-14, 6.03185789e-14])</span>
 </code></pre></div>
 <h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
 <ul>
-<li>Aerosol Modeling: Chapter 2, Equation 2.49 (excluding number)</li>
-<li>Mass Diffusivity:
-    <a href="https://en.wikipedia.org/wiki/Mass_diffusivity">Wikipedia</a></li>
+<li>Aerosol Modeling: Chapter 2, Equation 2.49</li>
+<li>Wikipedia contributors, "Mass diffusivity,"
+  https://en.wikipedia.org/wiki/Mass_diffusivity</li>
 </ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
@@ -8149,22 +8186,33 @@ single particle.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="mass_transfer_rate">mass_transfer_rate<a class="headerlink" href="#mass_transfer_rate" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L104">Show source in mass_transfer.py:104</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L99">Show source in mass_transfer.py:99</a></p>
 <p>Calculate the mass transfer rate for a particle.</p>
-<p>Calculate the mass transfer rate based on the difference in partial
-pressure and the first-order mass transport coefficient.</p>
+<p>This function calculates the mass transfer rate dm/dt, leveraging the
+difference in partial pressure (pressure_delta) and the first-order
+mass transport coefficient (K). The equation is:</p>
+<ul>
+<li>dm/dt = (K × Δp × M) / (R × T)<ul>
+<li>dm/dt : Mass transfer rate [kg/s].</li>
+<li>K : First-order mass transport coefficient [m³/s].</li>
+<li>Δp : Partial pressure difference [Pa].</li>
+<li>M : Molar mass [kg/mol].</li>
+<li>R : Universal gas constant [J/(mol·K)].</li>
+<li>T : Temperature [K].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_4">Arguments<a class="headerlink" href="#arguments_4" title="Permanent link">&para;</a></h4>
 <ul>
-<li>pressure_delta : The difference in partial pressure between the gas
-    phase and the particle phase.</li>
-<li>first_order_mass_transport : The first-order mass transport
-    coefficient per particle.</li>
-<li>temperature : The temperature at which the mass transfer rate is to
-    be calculated.</li>
-<li>molar_mass : The molar mass of the species [kg/mol].</li>
+<li>pressure_delta : The difference in partial pressure [Pa].</li>
+<li>first_order_mass_transport : The mass transport coefficient [m³/s].</li>
+<li>temperature : The temperature [K].</li>
+<li>molar_mass : The molar mass [kg/mol].</li>
 </ul>
 <h4 id="returns_4">Returns<a class="headerlink" href="#returns_4" title="Permanent link">&para;</a></h4>
-<p>The mass transfer rate for the particle [kg/s].</p>
+<ul>
+<li>The mass transfer rate [kg/s].</li>
+</ul>
 <h4 id="examples_4">Examples<a class="headerlink" href="#examples_4" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Single value input</span><pre><span></span><code><span class="n">mass_transfer_rate</span><span class="p">(</span>
     <span class="n">pressure_delta</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
@@ -8184,8 +8232,8 @@ pressure and the first-order mass transport coefficient.</p>
 </code></pre></div>
 <h4 id="references_1">References<a class="headerlink" href="#references_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li>Aerosol Modeling Chapter 2, Equation 2.41 (excluding particle number)</li>
-<li>Seinfeld and Pandis: "Atmospheric Chemistry and Physics",
+<li>Aerosol Modeling: Chapter 2, Equation 2.41</li>
+<li>Seinfeld and Pandis, "Atmospheric Chemistry and Physics,"
     Equation 13.3</li>
 </ul>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
@@ -8205,18 +8253,29 @@ pressure and the first-order mass transport coefficient.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="radius_transfer_rate">radius_transfer_rate<a class="headerlink" href="#radius_transfer_rate" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L169">Show source in mass_transfer.py:169</a></p>
-<p>Convert mass rate to radius transfer rate.</p>
-<p>Convert the mass rate to a radius transfer rate based on the
-volume of the particle.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L172">Show source in mass_transfer.py:172</a></p>
+<p>Convert mass rate to radius growth/evaporation rate.</p>
+<p>This function converts the mass transfer rate (dm/dt) into a radius
+change rate (dr/dt). The equation is:</p>
+<ul>
+<li>dr/dt = (1 / 4πr²ρ) × dm/dt<ul>
+<li>dr/dt : Radius change rate [m/s].</li>
+<li>r : Particle radius [m].</li>
+<li>ρ : Particle density [kg/m³].</li>
+<li>dm/dt : Mass change rate [kg/s].</li>
+</ul>
+</li>
+</ul>
 <h4 id="arguments_5">Arguments<a class="headerlink" href="#arguments_5" title="Permanent link">&para;</a></h4>
 <ul>
-<li>mass_rate : The mass transfer rate for the particle [kg/s].</li>
+<li>mass_rate : The mass transfer rate [kg/s].</li>
 <li>radius : The radius of the particle [m].</li>
-<li>density : The density of the particle [kg/m^3].</li>
+<li>density : The density of the particle [kg/m³].</li>
 </ul>
 <h4 id="returns_5">Returns<a class="headerlink" href="#returns_5" title="Permanent link">&para;</a></h4>
-<p>The radius growth rate for the particle [m/s].</p>
+<ul>
+<li>The radius growth (or evaporation) rate [m/s].</li>
+</ul>
 <h4 id="examples_5">Examples<a class="headerlink" href="#examples_5" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Single value input</span><pre><span></span><code><span class="n">radius_transfer_rate</span><span class="p">(</span>
     <span class="n">mass_rate</span><span class="o">=</span><span class="mf">1e-21</span><span class="p">,</span>

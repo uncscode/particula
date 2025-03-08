@@ -8197,7 +8197,9 @@ temperature = 298.15</div>
 <span class="n">knudsen_number</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_knudsen_number</span><span class="p">(</span>
     <span class="n">mean_free_path</span><span class="o">=</span><span class="n">mol_free_path</span><span class="p">,</span> <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span>
 <span class="p">)</span>
-<span class="n">slip_correction</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_cunningham_slip_correction</span><span class="p">(</span><span class="n">knudsen_number</span><span class="o">=</span><span class="n">knudsen_number</span><span class="p">)</span>
+<span class="n">slip_correction</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_cunningham_slip_correction</span><span class="p">(</span>
+    <span class="n">knudsen_number</span><span class="o">=</span><span class="n">knudsen_number</span>
+<span class="p">)</span>
 
 
 <span class="n">friction_factor_value</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_friction_factor</span><span class="p">(</span>
@@ -8224,7 +8226,9 @@ mol_free_path = par.gas.get_molecule_mean_free_path(
 knudsen_number = par.particles.get_knudsen_number(
     mean_free_path=mol_free_path, particle_radius=radius_bins
 )
-slip_correction = par.particles.get_cunningham_slip_correction(knudsen_number=knudsen_number)
+slip_correction = par.particles.get_cunningham_slip_correction(
+    knudsen_number=knudsen_number
+)
 
 
 friction_factor_value = par.particles.get_friction_factor(
@@ -8323,7 +8327,9 @@ diffusive_knudsen_values = par.particles.get_diffusive_knudsen_number(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">coulomb_kinetic_limit</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_coulomb_kinetic_limit</span><span class="p">(</span><span class="n">coulomb_potential_ratio</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">coulomb_kinetic_limit</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_coulomb_kinetic_limit</span><span class="p">(</span>
+    <span class="n">coulomb_potential_ratio</span>
+<span class="p">)</span>
 <span class="n">coulomb_continuum_limit</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_coulomb_continuum_limit</span><span class="p">(</span>
     <span class="n">coulomb_potential_ratio</span>
 <span class="p">)</span>
@@ -8331,7 +8337,9 @@ diffusive_knudsen_values = par.particles.get_diffusive_knudsen_number(
 <span class="n">sum_of_radii</span> <span class="o">=</span> <span class="n">radius_bins</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">+</span> <span class="n">radius_bins</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
 <span class="n">reduced_mass</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_reduced_self_broadcast</span><span class="p">(</span><span class="n">mass_bins</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">coulomb_kinetic_limit = par.particles.get_coulomb_kinetic_limit(coulomb_potential_ratio)
+<div class="clipboard-copy-txt" id="cell-6">coulomb_kinetic_limit = par.particles.get_coulomb_kinetic_limit(
+    coulomb_potential_ratio
+)
 coulomb_continuum_limit = par.particles.get_coulomb_continuum_limit(
     coulomb_potential_ratio
 )
