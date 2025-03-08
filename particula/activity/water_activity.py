@@ -236,4 +236,8 @@ def fixed_water_activity(
         activities_beta = np.flip(activities_beta)
         q_alpha = np.flip(q_alpha)
 
+    activities_alpha = np.asarray(activities_alpha, dtype=np.float64)
+    activities_beta = np.asarray(activities_beta, dtype=np.float64)
+    q_alpha = np.asarray(q_alpha, dtype=np.float64)
+
     return (activities_alpha, activities_beta, q_alpha)
