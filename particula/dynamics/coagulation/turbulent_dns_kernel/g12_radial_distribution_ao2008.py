@@ -8,7 +8,7 @@ import numpy as np
 
 from particula.util.validate_inputs import validate_inputs
 from particula.util.constants import STANDARD_GRAVITY
-from particula.util.machine_limit import get_safe_exp
+from particula.util.machine_limit import get_safe_exp, get_safe_power
 
 
 @validate_inputs(
@@ -50,18 +50,16 @@ def get_g12_radial_distribution_ao2008(
     - g (gravitational_acceleration) : Gravitational acceleration [m/s²]
 
     Arguments:
-    ----------
-    - particle_radius : Array of particle radii [m]
-    - stokes_number : Array of Stokes numbers of particles [-]
-    - kolmogorov_length_scale : Kolmogorov length scale [m]
-    - reynolds_lambda : Taylor-microscale Reynolds number [-]
-    - normalized_accel_variance : Normalized acceleration variance [-]
-    - kolmogorov_velocity : Kolmogorov velocity scale [m/s]
-    - kolmogorov_time : Kolmogorov timescale [s]
+        - particle_radius : Array of particle radii [m]
+        - stokes_number : Array of Stokes numbers of particles [-]
+        - kolmogorov_length_scale : Kolmogorov length scale [m]
+        - reynolds_lambda : Taylor-microscale Reynolds number [-]
+        - normalized_accel_variance : Normalized acceleration variance [-]
+        - kolmogorov_velocity : Kolmogorov velocity scale [m/s]
+        - kolmogorov_time : Kolmogorov timescale [s]
 
     Returns:
-    --------
-    - Radial distribution function g_{12} [-]
+        - Radial distribution function g_{12} [-]
 
     References:
     -----------
@@ -126,7 +124,7 @@ def _calculate_c1(
         kolmogorov_velocity / kolmogorov_time
     )
 
-    return y_stokes / np.power(gravity_term, f3_lambda)
+    return y_stokes / get_safe_power(gravity_term, f3_lambda)
 
 
 def _compute_y_stokes(

@@ -3,6 +3,7 @@
 from numpy.typing import ArrayLike
 import numpy as np
 
+from particula.util.validate_inputs import validate_inputs
 
 MIN_POSITIVE_VALUE = np.nextafter(0, 1, dtype=np.float64)
 MAX_POSITIVE_VALUE = np.finfo(np.float64).max
@@ -103,3 +104,53 @@ def get_safe_log10(value: ArrayLike) -> np.ndarray:
     value = np.asarray(value, dtype=np.float64)
     min_positive_value = np.nextafter(0, 1, dtype=value.dtype)
     return np.log10(np.clip(value, min_positive_value, None))
+
+
+@validate_inputs(
+    {
+        "base": "positive",
+    }
+)
+def get_safe_power(base: ArrayLike, exponent: ArrayLike) -> np.ndarray:
+    """
+    Compute the power (base ** exponent) with overflow protection.
+
+    The power is computed as: result = exp(exponent * log(base))
+    where the intermediate value is clipped to avoid overflow beyond the
+    machine limits. This function assumes that `base` contains positive values.
+    The behavior for non-positive bases is undefined.
+
+    Arguments:
+        - base : Array-like of positive base values.
+        - exponent : Array-like of exponents.
+
+    Returns:
+        - np.ndarray of power values, computed with machine-level clipping.
+
+    Examples:
+        ``` py title="Example Usage"
+        import numpy as np
+        import particula as par
+
+        base = np.array([1, 2, 3])
+        exponent = np.array([1, 2, 3])
+        print(par.get_safe_power(base, exponent))
+        # Output: [ 1.  4. 27.]
+        ```
+
+    References:
+        - "Floating Point Arithmetic," NumPy Documentation, NumPy.org.
+    """
+    base = np.asarray(base, dtype=np.float64)
+    exponent = np.asarray(exponent, dtype=np.float64)
+
+    # Compute the intermediate value using logarithm.
+    intermediate = exponent * np.log(base)
+
+    # Compute the maximum safe value for the exponent in np.exp.
+    max_exp_input = np.log(MAX_POSITIVE_VALUE)
+
+    # Clip the intermediate result to prevent overflow.
+    intermediate_clipped = np.clip(intermediate, None, max_exp_input)
+
+    return np.exp(intermediate_clipped)
