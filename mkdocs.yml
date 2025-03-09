@@ -5,6 +5,7 @@ edit_uri: edit/main/docs/_builds
 
 theme:
   name: material
+  custom_dir: docs/overrides
   logo: images/icon_light_clear.svg
   features:
     - navigation.tabs
@@ -33,6 +34,8 @@ theme:
       toggle:
         icon: material/brightness-auto
         name: Switch to light mode
+      primary: blue
+      accent: cyan
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -101,10 +104,10 @@ extra_javascript:
 plugins:
   - search
   - social
-  # - mkdocs-jupyter:
-  #     include_source: True  # This enables the download of notebook sources.
-  #     execute: False        # Avoid executing notebooks during the build.
-  #     allow_errors: True    # Allow errors in the notebooks.
+  - mkdocs-jupyter:
+      include_source: True  # This enables the download of notebook sources.
+      execute: False        # Avoid executing notebooks during the build.
+      allow_errors: True    # Allow errors in the notebooks.
 
 extra_css:
   - stylesheets/extra.css
