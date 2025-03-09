@@ -6,6 +6,8 @@ hide:
   - toc
 ---
 
+# Particula
+
 ## What is Particula?
 
 Particula is an open-source, Python-based aerosol simulator that bridges experimental data with computational models. It captures gas-particle interactions, transformations, and dynamics to power **predictive aerosol science**—so you can uncover deeper insights and accelerate progress.
