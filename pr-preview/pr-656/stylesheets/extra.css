@@ -82,7 +82,7 @@
     padding-bottom: 16vw;
     margin-bottom: 10%;
     transform: translateY(40%);
-    font-size: larger;
+    /* font-size: larger; */
   }
 
   .mdx-hero__image {
