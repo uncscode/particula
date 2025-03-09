@@ -12,4 +12,10 @@
     --md-accent-bg-color--light:         hsla(0, 0%, 100%, 0.8);
 
     --md-social-card-background: #075985;
+    --md-social-card-color: #f0f9ff;
+    --md-social-card-link-color: #38bdf8;
+    --md-social-card-link-hover-color: #f0f9ff;
+    --md-social-card-link-hover-background: #38bdf8;
+    --md-social-card-link-hover-background--light: #f0f9ff;
+    --md-social-card-link-hover-color--light: #38bdf8;
   }
