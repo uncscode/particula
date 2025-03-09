@@ -6,27 +6,26 @@ hide:
   - toc
 ---
 
-# What is Particula?
+## What is Particula?
 
-Particula is an open-source, Python-based aerosol particle simulation that connects experimental ideas with computational models. By simulating gas-particle interactions, transformations, and dynamics, Particula powers **predictive aerosol science**, helping you gain deeper insights and move faster.
-
----
-
-### Why Particula?
-
-Aerosols play a vital role in atmospheric science, air quality, and human health. Understanding how they behave is key to pollution control, cloud formation, and indoor air safety. Particula offers a robust, flexible framework to simulate, analyze, and visualize these processes with precision—so you can uncover new findings and drive meaningful progress.
+Particula is an open-source, Python-based aerosol simulator that bridges experimental data with computational models. It captures gas-particle interactions, transformations, and dynamics to power **predictive aerosol science**—so you can uncover deeper insights and accelerate progress.
 
 ---
 
-### How Does Particula Help You?
+## Why Use Particula?
+
+Aerosols influence atmospheric science, air quality, and human health in powerful ways. Gaining insight into how they behave is essential for effective pollution control, accurate cloud formation modeling, and safer indoor environments. Particula provides a robust, flexible framework to simulate, analyze, and visualize aerosol processes with precision—empowering you to make breakthroughs and drive impactful science.
+
+---
+
+## How Does Particula Help You?
 
 Whether you’re a researcher, educator, or industry expert, Particula is designed to **empower your aerosol work** by:
 
-- **Simulating particle behavior** under real-world and controlled conditions.
-- **Providing a Python-based API** for reproducible, adaptable simulations.
-- **Integrating your experimental data** to validate and refine hypotheses.
+- **Harnessing ChatGPT integration** for real-time guidance, troubleshooting, and Q&A, [link](https://chatgpt.com/g/g-67b9dffbaa988191a4c7adfd4f96af65-particula-assistant).
+- **Providing a Python-based API** for reproducible and modular simulations.
+- **Integrating your experimental data** to validate and expand your impact.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
-- **ChatGPT integration** for answering questions and providing guidance, [link](https://chatgpt.com/g/g-67b9dffbaa988191a4c7adfd4f96af65-particula-assistant).
 
 ---
 
