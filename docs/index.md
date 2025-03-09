@@ -52,10 +52,12 @@ pip install particula
 
 We welcome contributions from **scientists, developers, and students**—and anyone curious about aerosol science! Whether you’re looking to **ask questions**, **get help**, or **contribute fresh ideas**, you’ve come to the right place.
 
-- 💬 **Ask questions** or **get help** on [GitHub Discussions](https://github.com/uncscode/particula/discussions) and tag any of the [contributors](https://github.com/uncscode/particula/graphs/contributors), like **@github-handle**.
-- 🌟 **Contribute** to Particula by *submitting pull requests* or *reporting issues* on GitHub
+Get more by posting on [GitHub Discussions](https://github.com/uncscode/particula/discussions) and tag any of the [contributors](https://github.com/uncscode/particula/graphs/contributors), like **@github-handle**.
+
+- 💬 **Ask questions** or **get help**.
 - 🚀 *Share your projects* or *research findings* with the community to inspire others.
 - 📣 *Give us feedback*
+- 🌟 **Contribute** to Particula by *submitting pull requests* or *reporting issues* on GitHub
 - 🔗 Read our [**Contributing Guide**](contribute/CONTRIBUTING.md) to learn how you can make an impact.
 
 We’re excited to **collaborate** with you! ✨
