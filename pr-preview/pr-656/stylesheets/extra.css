@@ -10,4 +10,6 @@
     --md-accent-fg-color--transparent:   #7dd3fc;
     --md-accent-bg-color:                hsla(0, 0%, 100%, 1);
     --md-accent-bg-color--light:         hsla(0, 0%, 100%, 0.8);
+
+    --md-social-card-background: #075985;
   }
