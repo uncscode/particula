@@ -18,12 +18,11 @@
 .mdx-container {
   padding-top: 20px; /* or use rem if desired */
   background:
-    /* url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: hsla(0, 0%, 100%, 1)' /></svg>") no-repeat bottom, */
     linear-gradient(
       to bottom,
       var(--md-primary-fg-color),
-      /* Tweak or replace these colors as you like */
-      var(--md-accent-fg-color) 99%,
+      var(--md-primary-fg-color) 50%,
+      var(--md-accent-fg-color) 95%,
       var(--md-default-bg-color) 99%
     );
 }
@@ -31,11 +30,10 @@
 /* When using the Slate color scheme, adjust the background. */
 [data-md-color-scheme="slate"] .mdx-container {
   background:
-    /* url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1123 258'><path d='M1124,2c0,0 0,256 0,256l-1125,0l0,-48c0,0 16,5 55,5c116,0 197,-92 325,-92c121,0 114,46 254,46c140,0 214,-167 572,-166Z' style='fill: hsla(230, 15%, 14%, 1)' /></svg>") no-repeat bottom, */
     linear-gradient(
       to bottom,
       var(--md-primary-fg-color),
-      /* hsla(230, 15%, 25%, 1) 99%, */
+      var(--md-primary-fg-color) 50%,
       var(--md-default-bg-color) 99%
     );
 }
@@ -124,19 +122,19 @@
 .mdx-hero .md-button {
   margin-top: 10px;
   margin-right: 10px;
-  color: var(--md-primary-fg-color);
+  color: var(--md-primary-fg-color--dark);
 }
 
 .mdx-hero .md-button:hover,
 .mdx-hero .md-button:focus {
   color: var(--md-accent-bg-color);
   background-color: var(--md-accent-fg-color);
-  border-color: var(--md-accent-fg-color);
+  border-color: var(--md-primary-bg-color);
 }
 
 /* Primary-style button variant */
 .mdx-hero .md-button--primary {
   color: var(--md-accent-fg-color);
   background-color: var(--md-accent-bg-color);
-  border-color: var(--md-primary-fg-color);
+  border-color: var(--md-primary-fg-color--dark);
 }
