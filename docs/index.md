@@ -30,7 +30,7 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
 
 ---
 
-### Get Started with Particula
+## Get Started with Particula
 
 [Setup Particula](How-To-Guides/Setup_Particula/index.md){ .md-button .md-button--primary }
 [How to Guides](How-To-Guides/index.md){ .md-button }
@@ -47,7 +47,7 @@ pip install particula
 
 ---
 
-### **Join the Community**
+## Join the Community
 
 We welcome contributions from scientists, developers, and students—and anyone curious about aerosol science! Whether you’re looking to ask questions, get help, or contribute fresh ideas, you’ve come to the right place.
 
@@ -63,7 +63,7 @@ We’re excited to collaborate with you! ✨
 
 ---
 
-### Cite Particula in Your Research
+## Cite Particula in Your Research
 Particula [Computer software]. [DOI: 10.5281/zenodo.6634653](https://doi.org/10.5281/zenodo.6634653)
 <!-- 
 # Particula
