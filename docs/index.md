@@ -6,21 +6,19 @@ hide:
   - toc
 ---
 
-# Particula
+# What is Particula?
 
-*Predict Experiments, Expand Your Insights*
-
-Particula is an open-source, **Python-based aerosol particle simulation** that connects experimental ideas with computational models. By simulating gas-particle interactions, transformations, and dynamics, Particula powers **predictive aerosol science**, helping you **gain deeper insights and move faster.**
+Particula is an open-source, Python-based aerosol particle simulation that connects experimental ideas with computational models. By simulating gas-particle interactions, transformations, and dynamics, Particula powers **predictive aerosol science**, helping you gain deeper insights and move faster.
 
 ---
 
 ### Why Particula?
 
-Aerosols play a vital role in atmospheric science, air quality, and human health. Understanding how they behave is key to pollution control, cloud formation, and indoor air safety. Particula offers a **robust, flexible framework** to **simulate, analyze, and visualize** these processes with precision—so you can uncover new findings and drive meaningful progress.
+Aerosols play a vital role in atmospheric science, air quality, and human health. Understanding how they behave is key to pollution control, cloud formation, and indoor air safety. Particula offers a robust, flexible framework to simulate, analyze, and visualize these processes with precision—so you can uncover new findings and drive meaningful progress.
 
 ---
 
-### How Particula Helps You
+### How Does Particula Help You?
 
 Whether you’re a researcher, educator, or industry expert, Particula is designed to **empower your aerosol work** by:
 
@@ -28,6 +26,7 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
 - **Providing a Python-based API** for reproducible, adaptable simulations.
 - **Integrating your experimental data** to validate and refine hypotheses.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
+- **ChatGPT integration** for answering questions and providing guidance, [link](https://chatgpt.com/g/g-67b9dffbaa988191a4c7adfd4f96af65-particula-assistant).
 
 ---
 
@@ -50,9 +49,9 @@ pip install particula
 
 ### **Join the Community**
 
-We welcome contributions from **scientists, developers, and students**—and anyone curious about aerosol science! Whether you’re looking to **ask questions**, **get help**, or **contribute fresh ideas**, you’ve come to the right place.
+We welcome contributions from scientists, developers, and students—and anyone curious about aerosol science! Whether you’re looking to ask questions, get help, or contribute fresh ideas, you’ve come to the right place.
 
-Get more by posting on [GitHub Discussions](https://github.com/uncscode/particula/discussions) and tag any of the [contributors](https://github.com/uncscode/particula/graphs/contributors), like **@github-handle**.
+Get more by posting on [GitHub Discussions](https://github.com/uncscode/particula/discussions) and tag any of the [contributors](https://github.com/uncscode/particula/graphs/contributors) using `@github-handle`.
 
 - 💬 **Ask questions** or **get help**.
 - 🚀 *Share your projects* or *research findings* with the community to inspire others.
@@ -60,7 +59,7 @@ Get more by posting on [GitHub Discussions](https://github.com/uncscode/particul
 - 🌟 **Contribute** to Particula by *submitting pull requests* or *reporting issues* on GitHub
 - 🔗 Read our [**Contributing Guide**](contribute/CONTRIBUTING.md) to learn how you can make an impact.
 
-We’re excited to **collaborate** with you! ✨
+We’re excited to collaborate with you! ✨
 
 ---
 
