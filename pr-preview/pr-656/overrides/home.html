@@ -84,12 +84,6 @@
       border-color: var(--md-primary-bg-color);
     }
 
-    /* Extra content styling */
-    .hero-extra {
-      width: 100%;
-      margin: 1rem auto 0;
-    }
-
     /* Main content container styling */
     .main-content-container {
       width: 80%;
@@ -110,21 +104,23 @@
         <!-- Text content on the left -->
         <div class="mdx-hero__content">
           <h1>{{ page.title }}</h1>
-          <p><em>Predict Experiments, Expand Your Insights</em></p>
-          {% if page.next_page %}
-            <a
-              href="#pypi-installation"
-              title= "Setup Particula"
-              class="md-button md-button--primary"
-            >
-              Get Started
-            </a>
-          {% endif %}
-          {% if page.meta.extra_hero_content %}
-            <div class="hero-extra">
-              {{ page.meta.extra_hero_content }}
-            </div>
-          {% endif %}
+          <p><em>Predict Experiments, Expand Your Insights.</em></p>
+          <a
+            href="#pypi-installation"
+            title= "Setup Particula"
+            class="md-button md-button--primary"
+          >
+            Get Started
+          </a>
+          <a
+          href="https://chatgpt.com/g/g-67b9dffbaa988191a4c7adfd4f96af65-particula-assistant"
+          title="Setup Particula"
+          class="md-button md-button"
+          target="_blank"
+          rel="noopener noreferrer"
+          >
+            ChatGPT
+          </a>
         </div>
 
         <!-- Image on the right -->
@@ -143,10 +139,7 @@
 {% endblock %}
 
 {% block content %}
-  <div class="main-content-container">
+  <div class="main-content-container" style="max-width: 960px; margin: auto; text-align: left; padding: auto; padding-bottom: 20%;">
     {{ super() }}
   </div>
 {% endblock %}
-
-{% block footer %}{% endblock %}
-
