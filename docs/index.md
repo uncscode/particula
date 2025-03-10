@@ -46,7 +46,7 @@ If your Python environment is already set up, install Particula directly from Py
 pip install particula
 ```
 
-### :simple-conda: Conda Installation
+### :simple-condaforge: Conda Installation
 
 Alternatively, you can install Particula using conda:
 ```bash
