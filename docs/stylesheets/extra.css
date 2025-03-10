@@ -123,6 +123,7 @@
   margin-top: 10px;
   margin-right: 10px;
   color: var(--md-primary-fg-color--dark);
+  background-color: var(--md-accent-fg-color--transparent);
 }
 
 .mdx-hero .md-button:hover,
