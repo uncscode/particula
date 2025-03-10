@@ -75,11 +75,11 @@
   }
 
   .mdx-hero__content {
-    max-width: 380px;
+    max-width: 40%;
     /* margin-top: 10%; */
     padding-bottom: 16vw;
     /* margin-bottom: 10%; */
-    transform: translateY(40%);
+    transform: translateY(20%);
     /* font-size: larger; */
   }
 
