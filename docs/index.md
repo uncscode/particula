@@ -49,7 +49,7 @@ pip install particula
 ### :simple-condaforge: Conda Installation
 
 Alternatively, you can install Particula using conda:
-```bash
+```shell
 conda install -c conda-forge particula
 ```
 
