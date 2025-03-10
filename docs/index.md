@@ -42,7 +42,7 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
 
 ### :simple-pypi: PyPI Installation
 If your Python environment is already set up, install Particula directly from PyPI:
-```bash
+```shell
 pip install particula
 ```
 
