@@ -57,53 +57,115 @@ def convert_notebooks_to_markdown(
             f_out.write(body)
 
 
+def line_stream(all_md_files, skip_filenames):
+    """
+    Yield lines from each Markdown file (plus a heading), skipping certain
+    filenames.
+    """
+    for md_file_path in all_md_files:
+        filename = os.path.basename(md_file_path)
+        if filename in skip_filenames:
+            continue
+
+        # Yield a heading so we know which file's content follows
+        heading = f"\n\n---\n# {filename}\n\n"
+        yield heading
+
+        # Then yield each line of the file
+        with open(md_file_path, "r", encoding="utf-8") as f:
+            for line in f:
+                yield line
+
+
+def chunked_line_stream(line_iter, max_chunk_size):
+    """
+    Group lines from `line_iter` into chunks that stay below `max_chunk_size`
+    bytes.
+    Yields lists of lines, each forming one chunk.
+    """
+    current_chunk = []
+    current_size = 0
+
+    for line in line_iter:
+        line_size = len(line.encode("utf-8"))
+
+        # If adding this line would exceed the chunk size *and* we already
+        # have lines,
+        # yield the current chunk first. Then start a new chunk with this line.
+        if current_size + line_size > max_chunk_size and current_chunk:
+            yield current_chunk
+            current_chunk = [line]
+            current_size = line_size
+        else:
+            # Either the chunk is empty or the line fits
+            current_chunk.append(line)
+            current_size += line_size
+
+    # Yield the final chunk if it has any lines
+    if current_chunk:
+        yield current_chunk
+
+
 def merge_markdown_files(
     input_glob: str,
     output_file: Path,
     remove_dir: Path,
     skip_filenames: list[str] = None,
+    max_chunk_size_kb: int = 250,
 ) -> None:
     """
-    Merge all Markdown files matching `input_glob` into one output file,
-    and then remove the entire directory specified by `remove_dir`.
+    Merge all Markdown files matching `input_glob` into multiple part files
+    (each up to ~max_chunk_size_kb KB), then remove the directory `remove_dir`.
 
-    Arguments:
-       - input_glob : str
-            A glob pattern (including directory path) matching the .md files
-            to merge.
-            Example: 'docs/.assets/api_reference/**/*.md'
-       - output_file : Path
-            The output path for the merged Markdown file.
-       - remove_dir : Path
-            The directory you want to completely remove after merging.
-       - skip_filenames : list[str], optional
-            Filenames to skip (e.g., ['index.md']). Defaults to None.
+    Parameters
+    ----------
+    input_glob : str
+        A glob pattern (including directory path) matching the .md
+        files to merge.
+        Example: 'docs/.assets/api_reference/**/*.md'
+    output_file : Path
+        The *base* output path for the merged Markdown files.
+        Chunked output files will be named like 'BASE_part1.md', 
+        BASE_part2.md', etc.
+    remove_dir : Path
+        The directory you want to remove entirely after merging.
+    skip_filenames : list[str], optional
+        Filenames to skip (e.g., ['index.md']). Defaults to None.
+    max_chunk_size_kb : int, optional
+        Approximate size limit (in kilobytes) for each chunked file,
+        defaults to 250 KB.
     """
     if skip_filenames is None:
         skip_filenames = []
 
+    # Get all matching Markdown files
     all_md_files = glob.glob(input_glob, recursive=True)
+    all_md_files.sort()
 
-    # Ensure the output directory exists
+    # Ensure output directory exists
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(output_file, "w", encoding="utf-8") as merged:
-        for md_file_path in sorted(all_md_files):
-            filename = os.path.basename(md_file_path)
+    max_chunk_size = max_chunk_size_kb * 1024  # convert to bytes
 
-            # Skip certain filenames if needed
-            if filename in skip_filenames:
-                continue
+    # 1) Create a generator that yields lines (including headings) from each
+    # file.
+    lines = line_stream(all_md_files, skip_filenames)
 
-            # Write a separator + the filename as a heading
-            merged.write(f"\n\n---\n# {filename}\n\n")
+    # 2) Chunk those lines so we don't exceed the size limit.
+    chunked_lines = chunked_line_stream(lines, max_chunk_size)
 
-            # Append the contents
-            with open(md_file_path, "r", encoding="utf-8") as f:
-                merged.write(f.read())
+    # 3) Write each chunk into its own file using a 'with' context.
+    part_index = 1
+    for chunk in chunked_lines:
+        chunk_file = (
+            output_file.parent
+            / f"{output_file.stem}_part{part_index}{output_file.suffix}"
+        )
+        with open(chunk_file, "w", encoding="utf-8") as merged:
+            merged.write("".join(chunk))
+        part_index += 1
 
-    # Remove the entire directory containing the merged files
-    # (rather than deleting individual files)
+    # Finally, remove the directory containing the original Markdown files
     shutil.rmtree(remove_dir)
 
 
