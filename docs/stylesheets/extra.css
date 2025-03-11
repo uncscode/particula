@@ -1,13 +1,13 @@
 :root {
-    --md-primary-fg-color:        #38bdf8;
-    --md-primary-fg-color--light: #f0f9ff;
-    --md-primary-fg-color--dark:  #075985;
-    --md-primary-bg-color:               #082f49;
-    --md-primary-bg-color--light:        #075985;
+    --md-primary-fg-color:        #0d9488;
+    --md-primary-fg-color--light: #ccfbf1;
+    --md-primary-fg-color--dark:  #115e59;
+    --md-primary-bg-color:               #042f2e;
+    --md-primary-bg-color--light:        #115e59;
 
   /* Accent color shades */
-    --md-accent-fg-color:                #06b6d4;
-    --md-accent-fg-color--transparent:   #7dd3fc;
+    --md-accent-fg-color:                #99f6e4;
+    --md-accent-fg-color--transparent:   #5eead4;
     --md-accent-bg-color:                hsla(0, 0%, 100%, 1);
     --md-accent-bg-color--light:         hsla(0, 0%, 100%, 0.8);
   }
@@ -21,8 +21,8 @@
     linear-gradient(
       to bottom,
       var(--md-primary-fg-color),
-      var(--md-primary-fg-color) 50%,
-      var(--md-accent-fg-color) 95%,
+      var(--md-primary-fg-color) 60%,
+      /* var(--md-accent-fg-color) 95%, */
       var(--md-default-bg-color) 99%
     );
 }
@@ -33,7 +33,7 @@
     linear-gradient(
       to bottom,
       var(--md-primary-fg-color),
-      var(--md-primary-fg-color) 50%,
+      var(--md-primary-fg-color) 60%,
       var(--md-default-bg-color) 99%
     );
 }
@@ -135,7 +135,7 @@
 
 /* Primary-style button variant */
 .mdx-hero .md-button--primary {
-  color: var(--md-accent-fg-color);
+  color: var(--md-primary-bg-color);
   background-color: var(--md-accent-bg-color);
   border-color: var(--md-primary-fg-color--dark);
 }
