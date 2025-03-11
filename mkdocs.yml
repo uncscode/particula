@@ -17,8 +17,6 @@ theme:
     - navigation.indexes
     - navigation.instant
     - navigation.instant.progress
-    # - navigation.footer
-    # - toc.integrate
     - header.autohide
     - search.suggest
     - search.highlight
@@ -27,7 +25,6 @@ theme:
     - content.code.copy
   language: en
   icon:
-    # repo: fontawesome/brands/github
     logo: images/icon_light_clear.svg
   palette:
     # Palette toggle for automatic mode
@@ -54,11 +51,6 @@ theme:
       primary: custom
       accent: custom
 
-# nav:
-#   - Home: index.md
-#   - Contribute: contribute/index.md
-#   - Examples: examples/index.md
-#   - Code Documentation: Source-Code/README.md
 
 markdown_extensions:
   # Python Markdown
@@ -115,4 +107,4 @@ extra_css:
 
 
 copyright: |
-  &copy; 2024 By particula contributors
+  &copy; 2025 By particula contributors
