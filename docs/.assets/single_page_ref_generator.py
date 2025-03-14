@@ -124,11 +124,11 @@ source_paths = source_paths_ipynb + source_paths_md
 # Tutorial Reference
 source_paths_list = list(source_paths)
 filtered_paths = [
-    p for p in source_paths_list if "particula/docs/Tutorials/" in p.as_posix()
+    p for p in source_paths_list if "particula/docs/Examples/" in p.as_posix()
 ]
 
 # Generate folder structure, if needed
-os.makedirs(repo_path / "docs/.assets/tutorial_reference", exist_ok=True)
+os.makedirs(repo_path / "docs/.assets/examples", exist_ok=True)
 os.makedirs(
     repo_path / "site/development/single_page_reference", exist_ok=True
 )
@@ -136,64 +136,39 @@ os.makedirs(
 # Convert Notebooks to Markdown
 convert_notebooks_to_markdown(
     notebook_paths=filtered_paths,
-    output_dir=repo_path / "docs/.assets/tutorial_reference",
+    output_dir=repo_path / "docs/.assets/examples",
 )
 
 # Merge all Markdown files into one
 merge_markdown_files(
-    input_glob=str(repo_path / "docs/.assets/tutorial_reference/**/*.md"),
+    input_glob=str(repo_path / "docs/.assets/examples/**/*.md"),
     output_file=repo_path
-    / "site/development/single_page_reference/Particula_Tutorial_Reference.md",
-    remove_dir=repo_path / "docs/.assets/tutorial_reference",
+    / "site/development/single_page_reference/Particula_examples.md",
+    remove_dir=repo_path / "docs/.assets/examples",
     skip_filenames=["index.md"],
 )
 
-# How-To-Guide Reference
+# Theory
 filtered_paths = [
     p
     for p in source_paths_list
-    if "particula/docs/How-To-Guides/" in p.as_posix()
+    if "particula/docs/Theory/" in p.as_posix()
 ]
 
 # Generate folder structure, if needed
-os.makedirs(repo_path / "docs/.assets/how_to_guide_reference", exist_ok=True)
+os.makedirs(repo_path / "docs/.assets/theory", exist_ok=True)
 
 # Convert Notebooks to Markdown
 convert_notebooks_to_markdown(
     notebook_paths=filtered_paths,
-    output_dir=repo_path / "docs/.assets/how_to_guide_reference",
+    output_dir=repo_path / "docs/.assets/theory",
 )
 
 # Merge all Markdown files into one
 merge_markdown_files(
-    input_glob=str(repo_path / "docs/.assets/how_to_guide_reference/**/*.md"),
+    input_glob=str(repo_path / "docs/.assets/theory/**/*.md"),
     output_file=repo_path
-    / "site/development/single_page_reference/Particula_How-To-Guide_Reference.md",
-    remove_dir=repo_path / "docs/.assets/how_to_guide_reference",
-    skip_filenames=["index.md"],
-)
-
-# Discussions
-filtered_paths = [
-    p
-    for p in source_paths_list
-    if "particula/docs/Discussions/" in p.as_posix()
-]
-
-# Generate folder structure, if needed
-os.makedirs(repo_path / "docs/.assets/discussion_reference", exist_ok=True)
-
-# Convert Notebooks to Markdown
-convert_notebooks_to_markdown(
-    notebook_paths=filtered_paths,
-    output_dir=repo_path / "docs/.assets/discussion_reference",
-)
-
-# Merge all Markdown files into one
-merge_markdown_files(
-    input_glob=str(repo_path / "docs/.assets/discussion_reference/**/*.md"),
-    output_file=repo_path
-    / "site/development/single_page_reference/Particula_Discussion_Reference.md",
-    remove_dir=repo_path / "docs/.assets/discussion_reference",
+    / "site/development/single_page_reference/Particula_theory.md",
+    remove_dir=repo_path / "docs/.assets/theory",
     skip_filenames=["index.md"],
 )
