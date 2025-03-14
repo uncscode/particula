@@ -1,42 +1,96 @@
 """
 Generate the API reference documentation for the Particula package.
-To be used by GPT Assistants to generate the API reference documentation.
+Outputs line-based JSON where each line = {"function_name": "doc text..."}.
+Headings are matched against Markdown lines that start with '## '.
 """
 
 import os
-# import shutil
+import glob
+import json
+import shutil  # Uncomment if you'd like to remove .md files afterwards
 from pathlib import Path
+
 from handsdown.generators.material import MaterialGenerator
 from handsdown.processors.pep257 import PEP257DocstringProcessor
 from handsdown.utils.path_finder import PathFinder
-# import glob
 
-from single_page_ref_generator import merge_markdown_files
 
-# move to the package folder
+# -----------------------------------------------------------------------------
+# Read the raw Markdown text
+# -----------------------------------------------------------------------------
+def read_md_content(md_file_path: Path) -> str:
+    """Read entire Markdown file as text."""
+    with open(md_file_path, "r", encoding="utf-8") as f:
+        return f.read()
+
+
+# -----------------------------------------------------------------------------
+# Parse out '## FunctionName' headings and their content
+# -----------------------------------------------------------------------------
+def parse_markdown_headings(md_text: str):
+    """
+    Given the text of a Markdown file, find all headings that start with "## ".
+    For each heading:
+      - The heading text (after "## ") = function name
+      - The content extends until the next "## " or end of file.
+    Returns a list of (func_name, doc_content).
+    """
+    lines = md_text.split("\n")
+    results = []
+    current_func_name = None
+    current_content_lines = []
+
+    for line in lines:
+        if line.startswith("## "):
+            # If we were already capturing a previous function, store it
+            if current_func_name is not None:
+                results.append(
+                    (current_func_name, "\n".join(current_content_lines))
+                )
+                current_content_lines = []
+
+            # Start a new function heading
+            current_func_name = line[3:].strip()  # everything after '## '
+        else:
+            # If we are in a heading's content, add this line
+            if current_func_name is not None:
+                current_content_lines.append(line)
+
+    # End of file: store the last one if present
+    if current_func_name is not None:
+        results.append((current_func_name, "\n".join(current_content_lines)))
+
+    return results
+
+
+# -----------------------------------------------------------------------------
+# Path setup and config
+# -----------------------------------------------------------------------------
 repo_path = Path.cwd()
 
-# Initialize path finder and exclude directories
+# Exclude certain directories and gather .py source paths
 path_finder = PathFinder(repo_path)
 path_finder.exclude(
     "tests/*",
     "build/*, docs/*, .venv/**, private_dev/**, .git/*, .vscode/*, .github/*",
 )
 source_paths = path_finder.glob("**/*.py")
-
-
 source_paths_list = list(source_paths)
+
+# Filter only your package .py files
 filtered_paths = [
     p for p in source_paths_list if "particula/particula" in p.as_posix()
 ]
 
-# Generate folder structure, if needed
+# Ensure output directories exist
 os.makedirs(repo_path / "docs/.assets/api_reference", exist_ok=True)
 os.makedirs(
     repo_path / "site/development/single_page_reference", exist_ok=True
 )
 
-# Initialize Handsdown generator
+# -----------------------------------------------------------------------------
+# Handsdown generator
+# -----------------------------------------------------------------------------
 handsdown = MaterialGenerator(
     input_path=repo_path,
     output_path=repo_path / "docs/.assets/api_reference",
@@ -46,95 +100,62 @@ handsdown = MaterialGenerator(
 )
 
 
-# def _chunk_write_content(md_file_path, file_object, max_size, current_size):
-#     """Write file content to file_object chunk-wise without exceeding
-#     max_size.
-#     """
-#     with open(md_file_path, "r", encoding="utf-8") as f:
-#         for line in f:
-#             line_bytes = line.encode("utf-8")
-#             if current_size + len(line_bytes) > max_size:
-#                 # We’ve run out of space in the current file;
-#                 # break, so the caller can start a new file if needed
-#                 break
-#             file_object.write(line)
-#             current_size += len(line_bytes)
-#     return current_size
+# -----------------------------------------------------------------------------
+# Merge subdirectory .md files into line-based JSON
+# -----------------------------------------------------------------------------
+def process_subfolder(md_files, subfolder_name):
+    """
+    For each .md file (including deeper subfolders under <subfolder_name>):
+      1) Parse out headings (## SomeFunction).
+      2) Write a single JSON line for each heading to Particula_API_reference_<subfolder_name>.txt
+         with the key as the function name, value as the doc string block.
+    """
+    output_dir = repo_path / "site/development/single_page_reference"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    out_file_path = (
+        output_dir / f"Particula_API_reference_{subfolder_name}.json"
+    )
+
+    with open(out_file_path, "w", encoding="utf-8") as out_txt:
+        for md_file_path in md_files:
+            md_content = read_md_content(Path(md_file_path))
+            headings = parse_markdown_headings(md_content)
+
+            for func_name, doc_block in headings:
+                # Each line is a JSON object: { "<func_name>": "<doc_block>" }
+                line_data = {func_name: doc_block}
+                out_txt.write(json.dumps(line_data, ensure_ascii=False))
+                out_txt.write("\n")
 
 
-# # 1. Generate docs
-# handsdown.generate_docs()
+# -----------------------------------------------------------------------------
+# 1. Generate Handsdown docs
+# -----------------------------------------------------------------------------
+handsdown.generate_docs()
 
-# # 3. Merge and chunk files
-# max_chunk_size = 250 * 1024  # ~250 KB
-# all_md_files = glob.glob(
-#     str(repo_path / "docs/.assets/api_reference/**/*.md"), recursive=True
-# )
+# -----------------------------------------------------------------------------
+# 2. Identify first-level subdirectories under docs/.assets/api_reference/particula
+# -----------------------------------------------------------------------------
+api_ref_dir = repo_path / "docs/.assets/api_reference/particula"
+subdirectories = [d for d in api_ref_dir.iterdir() if d.is_dir()]
 
-# output_dir = repo_path / "site/development/single_page_reference"
-# output_dir.mkdir(parents=True, exist_ok=True)
+# -----------------------------------------------------------------------------
+# 3. For each subdirectory, gather .md files (recursively), skip index.md,
+#    parse headings, and write them line-by-line as JSON
+# -----------------------------------------------------------------------------
+for subdir in subdirectories:
+    all_md_files = sorted(glob.glob(str(subdir / "**/*.md"), recursive=True))
+    # Optionally skip index.md
+    all_md_files = [f for f in all_md_files if not f.endswith("index.md")]
 
-# Merge all Markdown files into one
-merge_markdown_files(
-    input_glob=str(repo_path / "docs/.assets/api_reference/**/*.md"),
-    output_file=repo_path
-    / "site/development/single_page_reference/Particula_API_reference.md",
-    remove_dir=repo_path / "docs/.assets/api_reference",
-    skip_filenames=["index.md"],
-)
+    if all_md_files:
+        process_subfolder(
+            md_files=all_md_files,
+            subfolder_name=subdir.name,  # e.g. 'xxx', 'yyy'
+        )
 
-
-# def get_output_file_path(index):
-#     return output_dir / f"Particula_API_reference_part{index}.md"
-
-
-# part_index = 1
-# current_size = 0
-
-# # Open the first chunk
-# with open(get_output_file_path(part_index), "w", encoding="utf-8") as merged:
-#     for md_file_path in sorted(all_md_files):
-#         # Optionally skip the main index.md
-#         if md_file_path.endswith("index.md"):
-#             continue
-
-#         md_file_name = os.path.basename(md_file_path)
-#         heading = f"\n\n---\n# {md_file_name}\n\n"
-#         heading_bytes = heading.encode("utf-8")
-#         heading_size = len(heading_bytes)
-
-#         # If adding heading exceeds the limit, start a new part
-#         if current_size + heading_size > max_chunk_size:
-#             # Close the current 'merged' file by exiting its context
-#             # and open a new one in a new context
-#             part_index += 1
-#             with open(
-#                 get_output_file_path(part_index), "w", encoding="utf-8"
-#             ) as new_merged:
-#                 new_merged.write(heading)
-#                 current_size = heading_size
-#                 _chunk_write_content(
-#                     md_file_path, new_merged, max_chunk_size, current_size
-#                 )
-#             # Re-open the chunk file for subsequent iteration
-#             with open(
-#                 get_output_file_path(part_index), "a", encoding="utf-8"
-#             ) as merged_append:
-#                 current_size = os.path.getsize(
-#                     get_output_file_path(part_index)
-#                 )
-#             # Move on to the next .md file
-#             continue
-#         else:
-#             merged.write(heading)
-#             current_size += heading_size
-#             # Write file content chunk-wise
-#             current_size = _chunk_write_content(
-#                 md_file_path,
-#                 merged,
-#                 max_chunk_size,
-#                 current_size,
-#             )
-
-# # Clean up: remove the directory with original .md files
-# shutil.rmtree(repo_path / "docs/.assets/api_reference")
+# -----------------------------------------------------------------------------
+# 4. (Optional) Remove original .md files after generating
+# -----------------------------------------------------------------------------
+# shutil.rmtree(api_ref_dir)
