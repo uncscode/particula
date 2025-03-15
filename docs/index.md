@@ -33,7 +33,7 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
 
 ## Get Started with Particula
 
-[Setup Particula](How-To-Guides/Setup_Particula/index.md){ .md-button .md-button--primary }
+[Setup Particula](How-To-Guides/Examples/Setup_Particula/index.md){ .md-button .md-button--primary }
 [API Reference](API/README.md){ .md-button }
 [Examples](Examples/index.md){ .md-button }
 [Theory](Theory/index.md){ .md-button }
