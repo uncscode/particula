@@ -1,4 +1,6 @@
-"""Dimensionless coagulation for several approximations of the transition regime."""
+"""
+Dimensionless coagulation for several approximations of the transition regime.
+"""
 
 from typing import Union
 from numpy.typing import NDArray

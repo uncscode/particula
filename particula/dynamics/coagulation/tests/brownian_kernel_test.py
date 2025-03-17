@@ -239,7 +239,7 @@ def test_brownian_coagulation_kernel_via_system_state_input_validation():
     with pytest.raises(TypeError):
         brownian_kernel.get_brownian_kernel_via_system_state(
             particle_radius="not a number",
-            mass_particle="not a number",
+            particle_mass="not a number",
             temperature="not a number",
             pressure="not a number",
             alpha_collision_efficiency="not a number",
