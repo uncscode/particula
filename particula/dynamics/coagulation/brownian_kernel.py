@@ -97,7 +97,7 @@ def get_brownian_kernel(
 
 def get_brownian_kernel_via_system_state(
     particle_radius: Union[float, NDArray[np.float64]],
-    mass_particle: Union[float, NDArray[np.float64]],
+    particle_mass: Union[float, NDArray[np.float64]],
     temperature: float,
     pressure: float,
     alpha_collision_efficiency: Union[float, NDArray[np.float64]] = 1.0,
@@ -119,7 +119,7 @@ def get_brownian_kernel_via_system_state(
 
     Arguments:
         - particle_radius : The radius of the particles [m].
-        - mass_particle : The mass of the particles [kg].
+        - particle_mass : The mass of the particles [kg].
         - temperature : The temperature of the air [K].
         - pressure : The pressure of the air [Pa].
         - alpha_collision_efficiency : The collision efficiency of the
@@ -157,7 +157,7 @@ def get_brownian_kernel_via_system_state(
 
     # get thermal speed
     mean_thermal_speed_particle = particles.get_mean_thermal_speed(
-        mass_particle, temperature
+        particle_mass, temperature
     )
 
     # get g collection term

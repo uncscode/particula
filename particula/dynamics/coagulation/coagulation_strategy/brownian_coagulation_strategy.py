@@ -68,7 +68,7 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
 
         return get_brownian_kernel_via_system_state(
             particle_radius=particle.get_radius(),
-            mass_particle=particle.get_mass(),
+            particle_mass=particle.get_mass(),
             temperature=temperature,
             pressure=pressure,
         )
