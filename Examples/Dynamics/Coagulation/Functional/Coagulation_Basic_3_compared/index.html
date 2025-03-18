@@ -8587,7 +8587,7 @@ $$</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
@@ -8606,7 +8606,7 @@ $$</p>
 <span class="c1"># Calculate the Brownian coagulation kernel matrix</span>
 <span class="n">kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_brownian_kernel_via_system_state</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
-    <span class="n">mass_particle</span><span class="o">=</span><span class="n">mass_bins</span><span class="p">,</span>
+    <span class="n">particle_mass</span><span class="o">=</span><span class="n">mass_bins</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">293.15</span><span class="p">,</span>  <span class="c1"># Temperature in Kelvin (20°C)</span>
     <span class="n">pressure</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span>  <span class="c1"># Pressure in Pascals (1 atm)</span>
     <span class="n">alpha_collision_efficiency</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># Assume perfect collision efficiency</span>
@@ -8618,7 +8618,7 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 # Calculate the Brownian coagulation kernel matrix
 kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
-    mass_particle=mass_bins,
+    particle_mass=mass_bins,
     temperature=293.15,  # Temperature in Kelvin (20°C)
     pressure=101325,  # Pressure in Pascals (1 atm)
     alpha_collision_efficiency=1.0,  # Assume perfect collision efficiency

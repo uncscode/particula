@@ -8043,7 +8043,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -8058,13 +8058,13 @@ plt.show()</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># coagulation rate</span>
 
-<span class="n">mass_particle</span> <span class="o">=</span> <span class="p">(</span>
+<span class="n">particle_mass</span> <span class="o">=</span> <span class="p">(</span>
     <span class="mi">4</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">radius_bins</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">1000</span>
 <span class="p">)</span>  <span class="c1"># mass of the particles in kg</span>
 
 <span class="n">kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_brownian_kernel_via_system_state</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
-    <span class="n">mass_particle</span><span class="o">=</span><span class="n">mass_particle</span><span class="p">,</span>
+    <span class="n">particle_mass</span><span class="o">=</span><span class="n">particle_mass</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">293.15</span><span class="p">,</span>
     <span class="n">pressure</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span>
     <span class="n">alpha_collision_efficiency</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -8134,13 +8134,13 @@ plt.show()</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># coagulation rate
 
-mass_particle = (
+particle_mass = (
     4 / 3 * np.pi * radius_bins**3 * 1000
 )  # mass of the particles in kg
 
 kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
-    mass_particle=mass_particle,
+    particle_mass=particle_mass,
     temperature=293.15,
     pressure=101325,
     alpha_collision_efficiency=1,
@@ -8241,7 +8241,7 @@ plt.show()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -8269,7 +8269,7 @@ plt.show()</div>
 
 <span class="n">kernel</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">get_brownian_kernel_via_system_state</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="o">=</span><span class="n">radius_bins</span><span class="p">,</span>
-    <span class="n">mass_particle</span><span class="o">=</span><span class="n">mass_particle</span><span class="p">,</span>
+    <span class="n">particle_mass</span><span class="o">=</span><span class="n">particle_mass</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="mf">293.15</span><span class="p">,</span>
     <span class="n">pressure</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span>
     <span class="n">alpha_collision_efficiency</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -8338,7 +8338,7 @@ concentration_matrix[0, :] = concentraiton_pmf
 
 kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
-    mass_particle=mass_particle,
+    particle_mass=particle_mass,
     temperature=293.15,
     pressure=101325,
     alpha_collision_efficiency=1,

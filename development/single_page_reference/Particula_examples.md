@@ -1437,13 +1437,13 @@ With the initial concentration setup we can now get the rates of change for the 
 ```python
 # coagulation rate
 
-mass_particle = (
+particle_mass = (
     4 / 3 * np.pi * radius_bins**3 * 1000
 )  # mass of the particles in kg
 
 kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
-    mass_particle=mass_particle,
+    particle_mass=particle_mass,
     temperature=293.15,
     pressure=101325,
     alpha_collision_efficiency=1,
@@ -1539,7 +1539,7 @@ concentration_matrix[0, :] = concentraiton_pmf
 
 kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
-    mass_particle=mass_particle,
+    particle_mass=particle_mass,
     temperature=293.15,
     pressure=101325,
     alpha_collision_efficiency=1,
@@ -2758,7 +2758,7 @@ For further analysis or to share with others, the kernel matrix can be saved as 
 # to compute the coagulation rates between particles of different sizes.
 kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
-    mass_particle=mass_bins,
+    particle_mass=mass_bins,
     temperature=293.15,  # Temperature in Kelvin (20°C)
     pressure=101325,  # Pressure in Pascals (1 atm)
     alpha_collision_efficiency=1.0,  # Assume perfect collision efficiency
@@ -3558,7 +3558,7 @@ TIME_STEP = 100  # seconds
 # Calculate the coagulation kernel
 kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
-    mass_particle=mass_bins,
+    particle_mass=mass_bins,
     temperature=293.15,  # Temperature in Kelvin
     pressure=101325,  # Pressure in Pascals (1 atm)
     alpha_collision_efficiency=1.0,  # Assume perfect collision efficiency
@@ -3992,7 +3992,7 @@ It's important to note that the kernel matrix itself remains consistent whether 
 # to compute the coagulation rates between particles of different sizes.
 kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
-    mass_particle=mass_bins,
+    particle_mass=mass_bins,
     temperature=293.15,  # Temperature in Kelvin (20°C)
     pressure=101325,  # Pressure in Pascals (1 atm)
     alpha_collision_efficiency=1.0,  # Assume perfect collision efficiency
@@ -4288,7 +4288,7 @@ TIME_STEP = 100  # seconds
 # Calculate the coagulation kernel
 kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
-    mass_particle=mass_bins,
+    particle_mass=mass_bins,
     temperature=293.15,  # Temperature in Kelvin
     pressure=101325,  # Pressure in Pascals (1 atm)
     alpha_collision_efficiency=1.0,  # Assume perfect collision efficiency
@@ -4857,7 +4857,7 @@ mass_bins = 4 / 3 * np.pi * radius_bins**3 * 1e3  # kg
 # Calculate the Brownian coagulation kernel matrix
 kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
-    mass_particle=mass_bins,
+    particle_mass=mass_bins,
     temperature=293.15,  # Temperature in Kelvin (20°C)
     pressure=101325,  # Pressure in Pascals (1 atm)
     alpha_collision_efficiency=1.0,  # Assume perfect collision efficiency
@@ -5362,7 +5362,7 @@ mass_bins = (
 
 kernel = par.dynamics.get_brownian_kernel_via_system_state(
     particle_radius=radius_bins,
-    mass_particle=mass_bins,
+    particle_mass=mass_bins,
     temperature=298.15,
     pressure=101325,
 )  # Calculate the Brownian coagulation kernel for the radius bins
