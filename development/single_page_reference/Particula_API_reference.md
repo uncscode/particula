@@ -28,6 +28,7 @@ A full list of [Particula](https://github.com/uncscode/particula) project module
     - [Dynamics](particula/dynamics/index.md#dynamics)
         - [Coagulation](particula/dynamics/coagulation/index.md#coagulation)
             - [Brownian Kernel](particula/dynamics/coagulation/brownian_kernel.md#brownian-kernel)
+            - [Charged Dimensional Kernel](particula/dynamics/coagulation/charged_dimensional_kernel.md#charged-dimensional-kernel)
             - [Charged Dimensionless Kernel](particula/dynamics/coagulation/charged_dimensionless_kernel.md#charged-dimensionless-kernel)
             - [Charged Kernel Strategy](particula/dynamics/coagulation/charged_kernel_strategy.md#charged-kernel-strategy)
             - [Coagulation Builder](particula/dynamics/coagulation/coagulation_builder/index.md#coagulation-builder)
@@ -2108,7 +2109,7 @@ particle diffusivity and mean thermal speed. The equation used is:
 #### Arguments
 
 - particle_radius : The radius of the particles [m].
-- mass_particle : The mass of the particles [kg].
+- particle_mass : The mass of the particles [kg].
 - temperature : The temperature of the air [K].
 - pressure : The pressure of the air [Pa].
 - alpha_collision_efficiency : The collision efficiency of the
@@ -2130,11 +2131,333 @@ particle diffusivity and mean thermal speed. The equation used is:
 ```python
 def get_brownian_kernel_via_system_state(
     particle_radius: Union[float, NDArray[np.float64]],
-    mass_particle: Union[float, NDArray[np.float64]],
+    particle_mass: Union[float, NDArray[np.float64]],
     temperature: float,
     pressure: float,
     alpha_collision_efficiency: Union[float, NDArray[np.float64]] = 1.0,
 ) -> Union[float, NDArray[np.float64]]: ...
+```
+
+
+---
+# charged_dimensional_kernel.md
+
+# Charged Dimensional Kernel
+
+[Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Dynamics](../index.md#dynamics) / [Coagulation](./index.md#coagulation) / Charged Dimensional Kernel
+
+> Auto-generated documentation for [particula.dynamics.coagulation.charged_dimensional_kernel](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py) module.
+
+## _system_state_properties
+
+[Show source in charged_dimensional_kernel.py:33](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L33)
+
+Get the system state properties for charged particles.
+
+#### Arguments
+
+- particle_radius : The radius of the particles [m].
+- particle_mass : The mass of the particles [kg].
+- particle_charge : The charge of the particles [C].
+- temperature : The temperature of the system [K].
+- pressure : The pressure of the system [Pa].
+
+#### Returns
+
+- coulomb_potential_ratio : The Coulomb potential ratio
+    [dimensionless].
+- diffusive_knudsen : The diffusive knudsen number [dimensionless].
+- sum_of_radii : The sum of the radii of the particles [m].
+- reduced_mass : The reduced mass of the particles [kg].
+- reduced_friction_factor : The reduced friction factor of the
+    particles [dimensionless].
+
+- `Examples` - (This is an internal helper and typically not called directly.)
+
+#### Signature
+
+```python
+def _system_state_properties(
+    particle_radius: Union[float, NDArray[np.float64]],
+    particle_mass: Union[float, NDArray[np.float64]],
+    particle_charge: Union[float, NDArray[np.float64]],
+    temperature: float,
+    pressure: float,
+) -> tuple[
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+]: ...
+```
+
+
+
+## get_coulomb_kernel_chahl2019_via_system_state
+
+[Show source in charged_dimensional_kernel.py:388](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L388)
+
+The dimensioned coagulation kernel via system state
+using Chahl (2019).
+
+#### Arguments
+
+- particle_radius : The radius of the particles [m].
+- particle_mass : The mass of the particles [kg].
+- particle_charge : The charge of the particles [C].
+- temperature : The temperature of the system [K].
+- pressure : The pressure of the system [Pa].
+
+#### Returns
+
+- The dimensioned coagulation kernel, as a square matrix,
+  [m^3/s].
+
+#### Examples
+
+``` py title="Example Usage"
+import particula as par
+kernel_chahl = ()
+    par.dynamics.get_coulomb_kernel_chahl2019_via_system_state(
+    p_radius, p_mass, p_charge, 298.15, 101325
+    )
+)
+print(kernel_chahl)
+```
+
+#### References
+
+- Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
+    molecular regime Coulombic collisions in aerosols and dusty plasmas.
+    Aerosol Science and Technology, 53(8), 933-957.
+    https://doi.org/10.1080/02786826.2019.1614522
+
+#### Signature
+
+```python
+def get_coulomb_kernel_chahl2019_via_system_state(
+    particle_radius: Union[float, NDArray[np.float64]],
+    particle_mass: Union[float, NDArray[np.float64]],
+    particle_charge: Union[float, NDArray[np.float64]],
+    temperature: float,
+    pressure: float,
+) -> NDArray[np.float64]: ...
+```
+
+
+
+## get_coulomb_kernel_dyachkov2007_via_system_state
+
+[Show source in charged_dimensional_kernel.py:195](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L195)
+
+The dimensioned coagulation kernel via system state using Dyachkov (2007).
+
+#### Arguments
+
+- particle_radius : The radius of the particles [m].
+- particle_mass : The mass of the particles [kg].
+- particle_charge : The charge of the particles [C].
+- temperature : The temperature of the system [K].
+- pressure : The pressure of the system [Pa].
+
+#### Returns
+
+- The dimensioned coagulation kernel, as a square matrix,
+  [m^3/s].
+
+#### Examples
+
+``` py title="Example Usage"
+import particula as par
+kernel_dyachkov = (
+    par.dynamics.get_coulomb_kernel_dyachkov2007_via_system_state(
+        p_radius, p_mass, p_charge, 298.15, 101325
+    )
+)
+print(kernel_dyachkov.shape)
+```
+
+#### References
+
+- Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation of
+  particles in the transition regime: The effect of the Coulomb potential.
+  Journal of Chemical Physics, 126(12).
+  https://doi.org/10.1063/1.2713719
+
+#### Signature
+
+```python
+def get_coulomb_kernel_dyachkov2007_via_system_state(
+    particle_radius: Union[float, NDArray[np.float64]],
+    particle_mass: Union[float, NDArray[np.float64]],
+    particle_charge: Union[float, NDArray[np.float64]],
+    temperature: float,
+    pressure: float,
+) -> NDArray[np.float64]: ...
+```
+
+
+
+## get_coulomb_kernel_gatti2008_via_system_state
+
+[Show source in charged_dimensional_kernel.py:259](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L259)
+
+The dimensioned coagulation kernel via system state using Gatti (2008).
+
+#### Arguments
+
+- particle_radius : The radius of the particles [m].
+- particle_mass : The mass of the particles [kg].
+- particle_charge : The charge of the particles [C].
+- temperature : The temperature of the system [K].
+- pressure : The pressure of the system [Pa].
+
+#### Returns
+
+- The dimensioned coagulation kernel, as a square matrix,
+  [m^3/s].
+
+#### Examples
+
+``` py title="Example Usage"
+import particula as par
+kernel_gatti = (
+    par.dynamics.get_coulomb_kernel_gatti2008_via_system_state(
+        p_radius, p_mass, p_charge, 298.15, 101325
+    )
+)
+print(kernel_gatti)
+```
+
+#### References
+
+- Gatti, M., & Kortshagen, U. (2008). Analytical model of particle
+  charging in plasmas over a wide range of collisionality. Physical Review
+  E - Statistical, Nonlinear, and Soft Matter Physics, 78(4).
+  https://doi.org/10.1103/PhysRevE.78.046402
+
+#### Signature
+
+```python
+def get_coulomb_kernel_gatti2008_via_system_state(
+    particle_radius: Union[float, NDArray[np.float64]],
+    particle_mass: Union[float, NDArray[np.float64]],
+    particle_charge: Union[float, NDArray[np.float64]],
+    temperature: float,
+    pressure: float,
+) -> NDArray[np.float64]: ...
+```
+
+
+
+## get_coulomb_kernel_gopalakrishnan2012_via_system_state
+
+[Show source in charged_dimensional_kernel.py:323](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L323)
+
+The dimensioned coagulation kernel via system state
+using Gopalakrishnan (2012).
+
+#### Arguments
+
+- particle_radius : The radius of the particles [m].
+- particle_mass : The mass of the particles [kg].
+- particle_charge : The charge of the particles [C].
+- temperature : The temperature of the system [K].
+- pressure : The pressure of the system [Pa].
+
+#### Returns
+
+- The dimensioned coagulation kernel, as a square matrix,
+  [m^3/s].
+
+#### Examples
+
+``` py title="Example Usage"
+import particula as par
+kernel_gopal = (
+    par.dyanmics.get_coulomb_kernel_gopalakrishnan2012_via_system_state(
+        p_radius, p_mass, p_charge, 298.15, 101325
+    )
+)
+# kernel_gopal is an N×N matrix [m^3/s]
+```
+
+#### References
+
+- Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
+  in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear
+  and Soft Matter Physics, 85(2).
+  https://doi.org/10.1103/PhysRevE.85.026410
+
+#### Signature
+
+```python
+def get_coulomb_kernel_gopalakrishnan2012_via_system_state(
+    particle_radius: Union[float, NDArray[np.float64]],
+    particle_mass: Union[float, NDArray[np.float64]],
+    particle_charge: Union[float, NDArray[np.float64]],
+    temperature: float,
+    pressure: float,
+) -> NDArray[np.float64]: ...
+```
+
+
+
+## get_hard_sphere_kernel_via_system_state
+
+[Show source in charged_dimensional_kernel.py:121](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L121)
+
+The hard sphere dimensioned coagulation kernel via system state.
+
+For the hard sphere kernel, the dimensionless kernel is computed
+internally based on the diffusive Knudsen number, then converted
+to the dimensioned form using the system state properties
+(particle radius, mass, charge, temperature, pressure).
+coulomb potential ratio, sum of radii, reduced mass...etc are all
+calculated from the system state properties (temperature, pressure, etc.).
+These are used to calculate the dimensionless kernel, which is then
+converted to the dimensioned kernel.
+
+#### Arguments
+
+- particle_radius : The radius of the particles [m].
+- particle_mass : The mass of the particles [kg].
+- particle_charge : The charge of the particles [C].
+- temperature : The temperature of the system [K].
+- pressure : The pressure of the system [Pa].
+
+#### Returns
+
+- The dimensioned coagulation kernel, as a square matrix, of all
+    particle-particle interactions [m^3/s].
+
+#### Examples
+
+``` py title="Example Usage"
+kernel_matrix = get_hard_sphere_kernel_via_system_state(
+    p_radius, p_mass, p_charge, 298.15, 101325
+)
+# kernel_matrix is an N×N array of rates
+```
+
+#### References
+
+- Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation of
+  particles in the transition regime: The effect of the Coulomb potential.
+  Journal of Chemical Physics, 126(12).
+  https://doi.org/10.1063/1.2713719
+
+#### Signature
+
+```python
+def get_hard_sphere_kernel_via_system_state(
+    particle_radius: Union[float, NDArray[np.float64]],
+    particle_mass: Union[float, NDArray[np.float64]],
+    particle_charge: Union[float, NDArray[np.float64]],
+    temperature: float,
+    pressure: float,
+) -> NDArray[np.float64]: ...
 ```
 
 
@@ -2149,7 +2472,7 @@ def get_brownian_kernel_via_system_state(
 
 ## get_coulomb_kernel_chahl2019
 
-[Show source in charged_dimensionless_kernel.py:283](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L283)
+[Show source in charged_dimensionless_kernel.py:291](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L291)
 
 Chahl and Gopalakrishnan (2019) approximation for the dimensionless
 coagulation kernel.
@@ -2188,7 +2511,7 @@ def get_coulomb_kernel_chahl2019(
 
 ## get_coulomb_kernel_dyachkov2007
 
-[Show source in charged_dimensionless_kernel.py:110](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L110)
+[Show source in charged_dimensionless_kernel.py:112](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L112)
 
 Dyachkov et al. (2007) approximation for the dimensionless coagulation
 kernel.
@@ -2227,7 +2550,7 @@ def get_coulomb_kernel_dyachkov2007(
 
 ## get_coulomb_kernel_gatti2008
 
-[Show source in charged_dimensionless_kernel.py:171](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L171)
+[Show source in charged_dimensionless_kernel.py:173](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L173)
 
 Gatti et al. (2008) approximation for the dimensionless coagulation
 kernel.
@@ -2266,7 +2589,7 @@ def get_coulomb_kernel_gatti2008(
 
 ## get_coulomb_kernel_gopalakrishnan2012
 
-[Show source in charged_dimensionless_kernel.py:241](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L241)
+[Show source in charged_dimensionless_kernel.py:243](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L243)
 
 Gopalakrishnan and Hogan (2012) approximation for the dimensionless
 coagulation kernel.
@@ -2288,7 +2611,7 @@ the Gopalakrishnan and Hogan (2012) approximation.
 #### References
 
 - Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
-  in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear,
+  in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear
   and Soft Matter Physics, 85(2).
   https://doi.org/10.1103/PhysRevE.85.026410
 
@@ -2305,7 +2628,7 @@ def get_coulomb_kernel_gopalakrishnan2012(
 
 ## get_dimensional_kernel
 
-[Show source in charged_dimensionless_kernel.py:11](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L11)
+[Show source in charged_dimensionless_kernel.py:13](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L13)
 
 Calculate the dimensioned coagulation kernel for each particle pair.
 
@@ -2351,7 +2674,7 @@ def get_dimensional_kernel(
 
 ## get_hard_sphere_kernel
 
-[Show source in charged_dimensionless_kernel.py:59](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L59)
+[Show source in charged_dimensionless_kernel.py:61](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensionless_kernel.py#L61)
 
 Hard sphere approximation for the dimensionless coagulation kernel.
 
