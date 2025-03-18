@@ -150,9 +150,7 @@ merge_markdown_files(
 
 # Theory
 filtered_paths = [
-    p
-    for p in source_paths_list
-    if "particula/docs/Theory/" in p.as_posix()
+    p for p in source_paths_list if "particula/docs/Theory/" in p.as_posix()
 ]
 
 # Generate folder structure, if needed

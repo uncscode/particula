@@ -262,10 +262,16 @@ def get_coulomb_kernel_gopalakrishnan2012(
 
     References:
     - Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
-      in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear,
+      in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear
       and Soft Matter Physics, 85(2).
       https://doi.org/10.1103/PhysRevE.85.026410
     """
+    # Condition for the transition regime
+    bool_mask = coulomb_potential_ratio > 0.5
+    # Ensure no division by zero
+    coulomb_potential_ratio = np.maximum(coulomb_potential_ratio, 1e-12)
+
+    # Calculate the continuum limit
     continuum_limit = 4 * np.pi * diffusive_knudsen**2
     min_fxn = np.minimum(
         diffusive_knudsen,
@@ -274,9 +280,9 @@ def get_coulomb_kernel_gopalakrishnan2012(
     # Ensure min_fxn does not contain invalid values
     min_fxn = np.maximum(min_fxn, 1e-16)
     # Condition for the transition regime
-    condition = (coulomb_potential_ratio > 0.5) & (min_fxn < 2.5)
+    condition = min_fxn < 2.5
     return np.where(
-        condition,
+        condition & bool_mask,
         continuum_limit / (1 + 1.598 * min_fxn**1.1709),
         get_hard_sphere_kernel(diffusive_knudsen),
     )
