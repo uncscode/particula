@@ -10,14 +10,14 @@ from particula.particles.properties.diffusive_knudsen_module import (
 def test_diffusive_knudsen_number_scalar():
     """Test the diffusive Knudsen number calculation with scalar inputs."""
     radius = 100e-9  # meters
-    mass_particle = 1e-24  # kg
+    particle_mass = 1e-24  # kg
     friction_factor = 1.0  # dimensionless
     coulomb_potential_ratio = 0.5  # dimensionless
     temperature = 298.15  # K
 
     result = get_diffusive_knudsen_number(
         radius,
-        mass_particle,
+        particle_mass,
         friction_factor,
         coulomb_potential_ratio,
         temperature,
@@ -30,14 +30,14 @@ def test_diffusive_knudsen_number_scalar():
 def test_diffusive_knudsen_number_array():
     """Test the diffusive Knudsen number calculation with array inputs."""
     radius = np.array([100e-9, 1e-6])
-    mass_particle = np.array([1e-24, 2e-20])
+    particle_mass = np.array([1e-24, 2e-20])
     friction_factor = np.array([1.0, 1.5])
     coulomb_potential_ratio = np.array([0.5, 0])  # different charges
     temperature = 298.15
 
     result = get_diffusive_knudsen_number(
         radius,
-        mass_particle,
+        particle_mass,
         friction_factor,
         coulomb_potential_ratio,
         temperature,
@@ -53,14 +53,14 @@ def test_with_zero_coulomb_potential_ratio():
     """Test the diffusive Knudsen number calculation with zero Coulomb
     potential ratio."""
     radius = 0.1
-    mass_particle = 1e-18
+    particle_mass = 1e-18
     friction_factor = 1.0
     coulomb_potential_ratio = 0.0  # no charges
     temperature = 298.15
 
     result = get_diffusive_knudsen_number(
         radius,
-        mass_particle,
+        particle_mass,
         friction_factor,
         coulomb_potential_ratio,
         temperature,
