@@ -67,6 +67,13 @@ from particula.dynamics.coagulation.charged_dimensionless_kernel import (
     get_coulomb_kernel_gopalakrishnan2012,
     get_coulomb_kernel_chahl2019,
 )
+from particula.dynamics.coagulation.charged_dimensional_kernel import (
+    get_hard_sphere_kernel_via_system_state,
+    get_coulomb_kernel_dyachkov2007_via_system_state,
+    get_coulomb_kernel_gatti2008_via_system_state,
+    get_coulomb_kernel_gopalakrishnan2012_via_system_state,
+    get_coulomb_kernel_chahl2019_via_system_state,
+)
 from particula.dynamics.coagulation.turbulent_shear_kernel import (
     get_turbulent_shear_kernel_st1956_via_system_state,
 )
