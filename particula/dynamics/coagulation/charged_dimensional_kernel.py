@@ -281,7 +281,7 @@ def get_coulomb_kernel_gatti2008_via_system_state(
         ``` py title="Example Usage"
         import particula as par
         kernel_gatti = (
-            par.dyanmics.get_coulomb_kernel_gatti2008_via_system_state(
+            par.dynamics.get_coulomb_kernel_gatti2008_via_system_state(
                 p_radius, p_mass, p_charge, 298.15, 101325
             )
         )
