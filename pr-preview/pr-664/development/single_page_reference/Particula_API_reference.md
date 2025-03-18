@@ -2150,7 +2150,7 @@ def get_brownian_kernel_via_system_state(
 
 ## _system_state_properties
 
-[Show source in charged_dimensional_kernel.py:32](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L32)
+[Show source in charged_dimensional_kernel.py:33](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L33)
 
 Get the system state properties for charged particles.
 
@@ -2406,7 +2406,7 @@ def get_coulomb_kernel_gopalakrishnan2012_via_system_state(
 
 ## get_hard_sphere_kernel_via_system_state
 
-[Show source in charged_dimensional_kernel.py:120](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L120)
+[Show source in charged_dimensional_kernel.py:121](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L121)
 
 The hard sphere dimensioned coagulation kernel via system state.
 
