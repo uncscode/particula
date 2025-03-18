@@ -200,7 +200,7 @@ def test_brownian_coagulation_kernel_via_system_state_basic():
     """
     # diameters, 2 nm, 1 um, 20 um
     particle_radius = np.array([1e-9, 5e-7, 10e-6])  # radii in meters
-    mass_particle = 4 / 3 * np.pi * particle_radius**3 * 1000  # mass in kg
+    particle_mass = 4 / 3 * np.pi * particle_radius**3 * 1000  # mass in kg
     temperature = 298  # temperature in Kelvin
     pressure = 101325  # pressure in Pascal
     alpha_collision_efficiency = np.array([1.0, 1.0, 1.0])  # dimensionless
@@ -221,7 +221,7 @@ def test_brownian_coagulation_kernel_via_system_state_basic():
     # Call the system function
     result = brownian_kernel.get_brownian_kernel_via_system_state(
         particle_radius,
-        mass_particle,
+        particle_mass,
         temperature,
         pressure,
         alpha_collision_efficiency,
