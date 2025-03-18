@@ -25,6 +25,10 @@ from particula.dynamics.coagulation.charged_dimensional_kernel import (
     ],
 )
 def test_dimensioned_coagulation_kernels_array(kernel_function):
+    """
+    Test the coagulation kernels for charged particles with
+    calls via system state.
+    """
     radii = np.array([1e-9, 2e-9, 5e-9])*10
     mass = np.array([1e-18, 2e-18, 5e-18])
     charge = np.array([-1, 0, 1])

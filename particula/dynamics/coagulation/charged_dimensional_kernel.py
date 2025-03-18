@@ -1,6 +1,7 @@
 """
 Charged dimensional kernel for coagulation calculated from system state.
 """
+# pylint: disable=duplicate-code
 
 from typing import Union
 from numpy.typing import NDArray
@@ -161,7 +162,6 @@ def get_hard_sphere_kernel_via_system_state(
       Journal of Chemical Physics, 126(12).
       https://doi.org/10.1063/1.2713719
     """
-    # pylint: disable=duplicate-code
     # get system state properties
     (
         coulomb_potential_ratio,
