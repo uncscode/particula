@@ -7781,7 +7781,7 @@ ParticleRepresentation object.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="aerosoliterate_gas">Aerosol().iterate_gas<a class="headerlink" href="#aerosoliterate_gas" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L78">Show source in aerosol.py:78</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L76">Show source in aerosol.py:76</a></p>
 <p>Return an iterator over the gas species in the atmosphere.</p>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7800,7 +7800,7 @@ ParticleRepresentation object.</p>
 <li><a href="../gas/species/#gasspecies">GasSpecies</a></li>
 </ul>
 <h3 id="aerosolreplace_atmosphere">Aerosol().replace_atmosphere<a class="headerlink" href="#aerosolreplace_atmosphere" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L94">Show source in aerosol.py:94</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L92">Show source in aerosol.py:92</a></p>
 <p>Replace the current atmosphere with a new Atmosphere instance.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7819,7 +7819,7 @@ ParticleRepresentation object.</p>
 <li><a href="../gas/atmosphere/#atmosphere">Atmosphere</a></li>
 </ul>
 <h3 id="aerosolreplace_particles">Aerosol().replace_particles<a class="headerlink" href="#aerosolreplace_particles" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L110">Show source in aerosol.py:110</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L108">Show source in aerosol.py:108</a></p>
 <p>Replace a particles in the aerosol with a new ParticleRepresentation.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
@@ -7828,7 +7828,7 @@ ParticleRepresentation object.</p>
 <h4 id="examples_3">Examples<a class="headerlink" href="#examples_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Replacing a Particle in the Aerosol</span><pre><span></span><code><span class="n">aerosol_instance</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="p">)</span>
 <span class="n">new_particle</span> <span class="o">=</span> <span class="n">ParticleRepresentation</span><span class="p">()</span>
-<span class="n">aerosol_instance</span><span class="o">.</span><span class="n">replace_particle</span><span class="p">(</span><span class="n">new_particle</span><span class="p">)</span>
+<span class="n">aerosol_instance</span><span class="o">.</span><span class="n">replace_particles</span><span class="p">(</span><span class="n">new_particle</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">replace_particles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particles</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">):</span> <span class="o">...</span>

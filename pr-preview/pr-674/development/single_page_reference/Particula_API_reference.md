@@ -1285,7 +1285,7 @@ def __str__(self) -> str: ...
 
 ### Aerosol().iterate_gas
 
-[Show source in aerosol.py:78](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L78)
+[Show source in aerosol.py:76](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L76)
 
 Return an iterator over the gas species in the atmosphere.
 
@@ -1313,7 +1313,7 @@ def iterate_gas(self) -> Iterator[GasSpecies]: ...
 
 ### Aerosol().replace_atmosphere
 
-[Show source in aerosol.py:94](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L94)
+[Show source in aerosol.py:92](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L92)
 
 Replace the current atmosphere with a new Atmosphere instance.
 
@@ -1341,7 +1341,7 @@ def replace_atmosphere(self, atmosphere: Atmosphere): ...
 
 ### Aerosol().replace_particles
 
-[Show source in aerosol.py:110](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L110)
+[Show source in aerosol.py:108](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L108)
 
 Replace a particles in the aerosol with a new ParticleRepresentation.
 
@@ -1354,7 +1354,7 @@ Replace a particles in the aerosol with a new ParticleRepresentation.
 ```py title="Replacing a Particle in the Aerosol"
 aerosol_instance = Aerosol(atmosphere, particles)
 new_particle = ParticleRepresentation()
-aerosol_instance.replace_particle(new_particle)
+aerosol_instance.replace_particles(new_particle)
 ```
 
 #### Signature
