@@ -89,17 +89,17 @@ class MassCondensation(Runnable):
             # check if gas species is condensable
             if not gas_species.condensable:
                 continue
-            # loop over particles to apply condensation
-            for particle in aerosol.iterate_particle():
-                for _ in range(sub_steps):
-                    # calculate the condensation step for strategy
-                    particle, gas_species = self.condensation_strategy.step(
-                        particle=particle,
+            for _ in range(sub_steps):
+                # calculate the condensation step for strategy
+                aerosol.particles, gas_species = (
+                    self.condensation_strategy.step(
+                        particle=aerosol.particles,
                         gas_species=gas_species,
                         temperature=aerosol.atmosphere.temperature,
                         pressure=aerosol.atmosphere.total_pressure,
                         time_step=time_step / sub_steps,
                     )
+                )
         return aerosol
 
     def rate(self, aerosol: Aerosol) -> Any:
@@ -125,17 +125,15 @@ class MassCondensation(Runnable):
             # Check if the gas species is condensable
             if not gas_species.condensable:
                 continue
-            # Loop over particles to apply condensation
-            for particle in aerosol.iterate_particle():
-                # print(gas_species.name)
-                # Calculate the rate of condensation
-                mass_rate = self.condensation_strategy.rate(
-                    particle=particle,
-                    gas_species=gas_species,
-                    temperature=aerosol.atmosphere.temperature,
-                    pressure=aerosol.atmosphere.total_pressure,
-                )
-                rates = np.append(rates, mass_rate)
+            # print(gas_species.name)
+            # Calculate the rate of condensation
+            mass_rate = self.condensation_strategy.rate(
+                particle=aerosol.particles,
+                gas_species=gas_species,
+                temperature=aerosol.atmosphere.temperature,
+                pressure=aerosol.atmosphere.total_pressure,
+            )
+            rates = np.append(rates, mass_rate)
         return rates
 
 
@@ -205,15 +203,14 @@ class Coagulation(Runnable):
             ```
         """
         # Loop over particles
-        for particle in aerosol.iterate_particle():
-            for _ in range(sub_steps):
-                # Calculate the coagulation step for the particle
-                particle = self.coagulation_strategy.step(
-                    particle=particle,
-                    temperature=aerosol.atmosphere.temperature,
-                    pressure=aerosol.atmosphere.total_pressure,
-                    time_step=time_step / sub_steps,
-                )
+        for _ in range(sub_steps):
+            # Calculate the coagulation step for the particle
+            aerosol.particles = self.coagulation_strategy.step(
+                particle=aerosol.particles,
+                temperature=aerosol.atmosphere.temperature,
+                pressure=aerosol.atmosphere.total_pressure,
+                time_step=time_step / sub_steps,
+            )
         return aerosol
 
     def rate(self, aerosol: Aerosol) -> Any:
@@ -234,13 +231,11 @@ class Coagulation(Runnable):
             ```
         """
         rates = np.array([], dtype=np.float64)
-        # Loop over particles
-        for particle in aerosol.iterate_particle():
-            # Calculate the net coagulation rate for the particle
-            net_rate = self.coagulation_strategy.net_rate(
-                particle=particle,
-                temperature=aerosol.atmosphere.temperature,
-                pressure=aerosol.atmosphere.total_pressure,
-            )
-            rates = np.append(rates, net_rate)
+        # Calculate the net coagulation rate for the particle
+        net_rate = self.coagulation_strategy.net_rate(
+            particle=aerosol.particles,
+            temperature=aerosol.atmosphere.temperature,
+            pressure=aerosol.atmosphere.total_pressure,
+        )
+        rates = np.append(rates, net_rate)
         return rates
