@@ -119,7 +119,7 @@ class Aerosol:
             ```py title="Replacing a Particle in the Aerosol"
             aerosol_instance = Aerosol(atmosphere, particles)
             new_particle = ParticleRepresentation()
-            aerosol_instance.replace_particle(new_particle)
+            aerosol_instance.replace_particles(new_particle)
             ```
         """
         self.particles = particles
