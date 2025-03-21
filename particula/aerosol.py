@@ -70,9 +70,7 @@ class Aerosol:
             print(aerosol_instance)
             ```
         """
-        message = str(self.atmosphere)
-        message += str(self.particles)
-
+        message = str(self.atmosphere) + "\n" + str(self.particles)
         return message
 
     def iterate_gas(self) -> Iterator[GasSpecies]:
