@@ -46,7 +46,7 @@ A full list of [Particula](https://github.com/uncscode/particula) project module
                 - [CoagulationStrategyABC](particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.md#coagulationstrategyabc)
                 - [CombineCoagulationStrategy](particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.md#combinecoagulationstrategy)
                 - [SedimentationCoagulationStrategy](particula/dynamics/coagulation/coagulation_strategy/sedimentation_coagulation_strategy.md#sedimentationcoagulationstrategy)
-                - [Trubulent Dns Coagulation Strategy](particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.md#trubulent-dns-coagulation-strategy)
+                - [TurbulentDNSCoagulationStrategy](particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.md#turbulentdnscoagulationstrategy)
                 - [TurbulentShearCoagulationStrategy](particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.md#turbulentshearcoagulationstrategy)
             - [Particle Resolved Step](particula/dynamics/coagulation/particle_resolved_step/index.md#particle-resolved-step)
                 - [Particle Resolved Method](particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.md#particle-resolved-method)
@@ -3923,7 +3923,7 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
 
 ### CombineCoagulationStrategyBuilder().build
 
-[Show source in combine_coagulation_strategy_builder.py:102](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L102)
+[Show source in combine_coagulation_strategy_builder.py:98](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L98)
 
 Builds and returns the combined coagulation strategy.
 
@@ -3953,7 +3953,7 @@ def build(self) -> CombineCoagulationStrategy: ...
 
 ### CombineCoagulationStrategyBuilder().set_strategies
 
-[Show source in combine_coagulation_strategy_builder.py:73](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L73)
+[Show source in combine_coagulation_strategy_builder.py:69](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L69)
 
 Sets a list of CoagulationStrategyABC objects to be combined.
 
@@ -5508,17 +5508,17 @@ def kernel(
 
 
 ---
-# trubulent_dns_coagulation_strategy.md
+# turbulent_dns_coagulation_strategy.md
 
-# Trubulent Dns Coagulation Strategy
+# TurbulentDNSCoagulationStrategy
 
-[Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Dynamics](../../index.md#dynamics) / [Coagulation](../index.md#coagulation) / [Coagulation Strategy](./index.md#coagulation-strategy) / Trubulent Dns Coagulation Strategy
+[Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Dynamics](../../index.md#dynamics) / [Coagulation](../index.md#coagulation) / [Coagulation Strategy](./index.md#coagulation-strategy) / TurbulentDNSCoagulationStrategy
 
-> Auto-generated documentation for [particula.dynamics.coagulation.coagulation_strategy.trubulent_dns_coagulation_strategy](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py) module.
+> Auto-generated documentation for [particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py) module.
 
 ## TurbulentDNSCoagulationStrategy
 
-[Show source in trubulent_dns_coagulation_strategy.py:26](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py#L26)
+[Show source in turbulent_dns_coagulation_strategy.py:26](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py#L26)
 
 Turbulent DNS coagulation strategy for aerosols.
 
@@ -5593,7 +5593,7 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
 
 ### TurbulentDNSCoagulationStrategy().dimensionless_kernel
 
-[Show source in trubulent_dns_coagulation_strategy.py:165](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py#L165)
+[Show source in turbulent_dns_coagulation_strategy.py:165](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py#L165)
 
 Compute or return the dimensionless kernel (H).
 
@@ -5628,7 +5628,7 @@ def dimensionless_kernel(
 
 ### TurbulentDNSCoagulationStrategy().kernel
 
-[Show source in trubulent_dns_coagulation_strategy.py:196](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py#L196)
+[Show source in turbulent_dns_coagulation_strategy.py:196](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py#L196)
 
 Compute the DNS-based coagulation kernel [m^3/s].
 
@@ -5682,7 +5682,7 @@ def kernel(
 
 ### TurbulentDNSCoagulationStrategy().set_relative_velocity
 
-[Show source in trubulent_dns_coagulation_strategy.py:147](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py#L147)
+[Show source in turbulent_dns_coagulation_strategy.py:147](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py#L147)
 
 Set the relative velocity of the flow [m/s].
 
@@ -5708,7 +5708,7 @@ def set_relative_velocity(self, relative_velocity: float): ...
 
 ### TurbulentDNSCoagulationStrategy().set_reynolds_lambda
 
-[Show source in trubulent_dns_coagulation_strategy.py:129](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py#L129)
+[Show source in turbulent_dns_coagulation_strategy.py:129](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py#L129)
 
 Set the Reynolds lambda value.
 
@@ -5734,7 +5734,7 @@ def set_reynolds_lambda(self, reynolds_lambda: float): ...
 
 ### TurbulentDNSCoagulationStrategy().set_turbulent_dissipation
 
-[Show source in trubulent_dns_coagulation_strategy.py:111](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py#L111)
+[Show source in turbulent_dns_coagulation_strategy.py:111](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py#L111)
 
 Set the turbulent kinetic energy dissipation rate.
 
