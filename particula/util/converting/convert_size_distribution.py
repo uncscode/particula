@@ -38,6 +38,8 @@ import numpy as np
 
 class ConversionStrategy:
     """
+    Methods:
+        - convert: Convert distribution data between input and output scales.
     Defines an interface for conversion strategies between particle size
     distribution formats.
 
@@ -87,7 +89,7 @@ class SameScaleConversionStrategy(ConversionStrategy):
     same.
 
     Examples:
-        ``` py title="Example Usage"
+        ```py title="Example Usage"
         strategy = SameScaleConversionStrategy()
         result = strategy.convert(diameters, concentration)
         # result is identical to concentration
@@ -365,7 +367,7 @@ def get_distribution_in_dn(
         - A np.ndarray of the converted distribution.
 
     Examples:
-        ``` py
+        ```py
         import numpy as np
         from particula.util.size_distribution_convert import convert_sizer_dn
 
@@ -392,10 +394,6 @@ def get_distribution_in_dn(
     lower = diameter - delta / 2
     upper = diameter + delta / 2
 
-    # if dn_dlogdp.ndim == 2:
-    #     # expand diameter by one dimension so it can be broadcast
-    #     lower = np.expand_dims(lower, axis=1)
-    #     upper = np.expand_dims(upper, axis=1)
     if inverse:
         # Convert from dn to dn/dlogdp
         return dn_dlogdp / np.log10(upper / lower)
@@ -424,7 +422,7 @@ def get_pdf_distribution_in_pmf(
         - A np.ndarray of the converted distribution data.
 
     Examples:
-        ``` py
+        ```py
         import numpy as np
         import particula as par
         x_vals = np.array([1.0, 2.0, 3.0])

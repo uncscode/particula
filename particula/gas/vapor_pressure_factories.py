@@ -1,5 +1,7 @@
-"""Factory module to create a concrete VaporPressureStrategy object using
-builders."""
+"""
+Factory module to create a concrete VaporPressureStrategy object using
+builders.
+"""
 
 from typing import Union
 from particula.abc_factory import StrategyFactoryABC
@@ -33,50 +35,59 @@ class VaporPressureFactory(
         ],
     ]
 ):
-    """Factory class to create vapor pressure strategy builders
+    """
+    Factory class to create vapor pressure strategy
+    builders.
 
-    Factory class to create vapor pressure strategy builders for calculating
-    vapor pressure of gas species.
+    This class provides a way to generate multiple vapor pressure calculation
+    strategies (e.g., constant, Antoine, Clausius-Clapeyron, or Water Buck) by
+    commissioning the appropriate builder. It is useful for scenarios requiring
+    a flexible way to switch or extend vapor pressure calculation methods.
+
+    Attributes:
+        - None
 
     Methods:
-        - get_builders : Returns the mapping of strategy types to builder
-            instances.
-        - get_strategy : Gets the strategy instance
-            for the specified strategy type.
-            - strategy_type : Type of vapor pressure strategy to use, can be
-                'constant', 'antoine', 'clausius_clapeyron', or 'water_buck'.
-            - parameters : Parameters required for the
-                builder, dependent on the chosen strategy type.
-                    - constant: constant_vapor_pressure
-                    - antoine: A, B, C
-                    - clausius_clapeyron: A, B, C
-                    - water_buck: No parameters are required.
+    - get_builders : Returns the mapping of strategy types to builder
+      instances.
+    - get_strategy : Returns the selected vapor pressure strategy,
+      given a strategy type and parameters.
 
-    Returns:
-        VaporPressureStrategy : An instance of the specified
-            VaporPressureStrategy.
+    Examples:
+        ```py title="Example VaporPressureFactory usage"
+        import particula as par
 
-    Raises:
-        ValueError : If an unknown strategy type is provided.
-        ValueError : If any required key is missing during check_keys or
-            pre_build_check, or if trying to set an invalid parameter.
-
-    Example:
-        ``` py title="constant vapor pressure strategy"
-        strategy_is = VaporPressureFactory().get_strategy("constant")
-        # returns ConstantVaporPressureStrategy
+        factory = par.gas.VaporPressureFactory()
+        # Create a constant vapor pressure strategy:
+        strategy = factory.get_strategy(
+            "constant", {"constant_vapor_pressure": 101325.0}
+        )
+        # strategy is an instance of ConstantVaporPressureStrategy
         ```
+
+    References:
+        - "Vapor Pressure,"
+        [Wikipedia](https://en.wikipedia.org/wiki/Vapor_pressure).
     """
 
     def get_builders(self):
-        """Returns the mapping of strategy types to builder instances.
+        """
+        Return a dictionary mapping strategy types to builder instances.
 
         Returns:
-            A dictionary mapping strategy types to builder instances.
-                - constant: ConstantBuilder
-                - antoine: AntoineBuilder
-                - clausius_clapeyron: ClausiusClapeyronBuilder
-                - water_buck: WaterBuckBuilder
+            dict:
+                - "constant": ConstantBuilder
+                - "antoine": AntoineBuilder
+                - "clausius_clapeyron": ClausiusClapeyronBuilder
+                - "water_buck": WaterBuckBuilder
+
+        Examples:
+            ```py
+            import particula as par
+            builders_dict = par.gas.VaporPressureFactory().get_builders()
+            builder = builders_dict["constant"]
+            # builder is an instance of ConstantBuilder
+            ```
         """
         return {
             "constant": ConstantBuilder(),

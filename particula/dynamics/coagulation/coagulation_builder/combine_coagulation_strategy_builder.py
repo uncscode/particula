@@ -1,5 +1,10 @@
 """
-CombineCoagulationStrategyBuilder
+Combine Coagulation Strategy Builder Module
+
+Provides a builder for creating `CombineCoagulationStrategy` objects,
+which can merge multiple sub-strategies (e.g., Brownian, Turbulent)
+into a single, combined coagulation approach. This allows flexible,
+modular composition of different coagulation mechanisms.
 
 Creates a combined coagulation strategy from multiple sub-strategies.
 
@@ -20,15 +25,47 @@ logger = logging.getLogger("particula")
 
 
 class CombineCoagulationStrategyBuilder(BuilderABC):
-    """Builder used to create a CombineCoagulationStrategy object.
+    """
+    Builder for a combined coagulation strategy.
+
+    This class constructs a `CombineCoagulationStrategy` from multiple
+    sub-strategies (instances of `CoagulationStrategyABC`), enabling
+    advanced modeling scenarios where different coagulation mechanisms
+    act concurrently. Each sub-strategy's rate calculations are effectively
+    merged to act on the same particle population.
 
     Attributes:
-        strategies (List[CoagulationStrategyABC]):
-            Collection of CoagulationStrategyABC objects to be combined.
+        - strategies : List of `CoagulationStrategyABC` objects to combine.
+
+    Methods:
+    - set_strategies : Set the list of coagulation strategies to combine.
+    - build : Create and return the combined coagulation strategy.
+
+    Examples:
+        ```py title="Combine Coagulation Strategy Example"
+        import particula as par
+        builder = par.dynamics.CombineCoagulationStrategyBuilder()
+        builder.set_strategies([brownian_strategy, turbulent_strategy])
+        combined_strategy = builder.build()
+        ```
     """
 
     def __init__(self):
         """Initializes the builder with the required parameters."""
+        required_parameters = ["strategies"]
+        super().__init__(required_parameters)
+        self.strategies = []
+        """
+        Initialize the CombineCoagulationStrategyBuilder.
+
+        Returns:
+            - None
+
+        Note:
+            The only required parameter is 'strategies'. Attempting to
+            build without setting it triggers an error. Use `set_strategies`
+            before calling `build`.
+        """
         required_parameters = ["strategies"]
         super().__init__(required_parameters)
         self.strategies = []
@@ -43,6 +80,12 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
         Args:
             strategies : A list of coagulation strategies to be combined.
             strategies_units : For interface consistency, not used.
+
+        Examples:
+            ```py title="Set Strategies Example"
+            builder = CombineCoagulationStrategyBuilder()
+            builder.set_strategies([brownian_strategy, turbulent_strategy])
+            ```
 
         Returns:
             CombineCoagulationStrategyBuilder:
@@ -63,6 +106,13 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
             CombineCoagulationStrategy :
                 A strategy that combines all the previously added
                 sub-strategies.
+
+        Examples:
+            ```py title="Build Example with CombineCoagulationStrategy"
+            combined_strategy = builder.build()
+            # Now you can use `combined_strategy.kernel(...)` to calculate
+            # combined coagulation effects from each sub-strategy.
+            ```
         """
         self.pre_build_check()
         return CombineCoagulationStrategy(strategies=self.strategies)

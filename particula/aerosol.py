@@ -13,8 +13,8 @@ from particula.particles.representation import ParticleRepresentation
 
 class Aerosol:
     """
-    One-line description: Represents a collection of Gas and Particle objects 
-    forming an aerosol environment.
+    Represents a collection of Gas and Particle objects forming an aerosol
+    environment.
 
     This class allows for the representation and manipulation of an aerosol,
     which consists of various gases in an Atmosphere object and one or more
@@ -25,10 +25,12 @@ class Aerosol:
         - particles : A list of particles in the aerosol.
 
     Methods:
-        - iterate_gas: Returns an iterator over the gas species in the atmosphere.
-        - iterate_particle: Returns an iterator over ParticleRepresentation objects.
+        - iterate_gas: Returns an iterator over the gas species in atmosphere.
+        - iterate_particle: Returns an iterator over ParticleRepresentation
+            objects.
         - replace_atmosphere: Replaces the current atmosphere with a new one.
-        - add_particle: Adds a new ParticleRepresentation object to the aerosol.
+        - add_particle: Adds a new ParticleRepresentation object to the
+            aerosol.
 
     Examples:
         ```py title="Creating an Aerosol"
@@ -43,9 +45,6 @@ class Aerosol:
         for particle in aerosol_instance.iterate_particle():
             print(particle)
         ```
-
-    References:
-    - No references available yet.
     """
 
     def __init__(
@@ -53,15 +52,13 @@ class Aerosol:
         atmosphere: Atmosphere,
         particles: Union[ParticleRepresentation, List[ParticleRepresentation]],
     ):
-    """
-    Initialize the Aerosol object with an Atmosphere and one or more particles.
+        """
+        Initialize the Aerosol object with an Atmosphere and one or more
+        particles.
 
-    Arguments:
-        - atmosphere : Atmosphere containing one or more gas species.
-        - particles : A single ParticleRepresentation or a list of them.
-
-    Returns:
-        - None
+        Arguments:
+            - atmosphere : Atmosphere containing one or more gas species.
+            - particles : A single ParticleRepresentation or a list of them.
         """
         self.atmosphere = atmosphere
         self.particles: List[ParticleRepresentation] = (
@@ -71,17 +68,17 @@ class Aerosol:
         )
 
     def __str__(self) -> str:
-    """
-    Provide a string representation of the aerosol.
+        """
+        Provide a string representation of the aerosol.
 
-    Returns:
-        - str : A string summarizing the atmosphere and each particle.
+        Returns:
+            - str : A string summarizing the atmosphere and each particle.
 
-    Examples:
-        ```py
-        aerosol_instance = Aerosol(atmosphere, particles)
-        print(aerosol_instance)
-        ```
+        Examples:
+            ```py
+            aerosol_instance = Aerosol(atmosphere, particles)
+            print(aerosol_instance)
+            ```
         """
         message = str(self.atmosphere)
         for index, particle in enumerate(self.particles):
@@ -90,71 +87,66 @@ class Aerosol:
         return message
 
     def iterate_gas(self) -> Iterator[GasSpecies]:
-    """
-    Return an iterator over the gas species in the atmosphere.
+        """
+        Return an iterator over the gas species in the atmosphere.
 
-    Returns:
+        Returns:
         - Iterator[GasSpecies] : An iterator over gas species objects.
 
-    Examples:
-        ```py title="Iterating over aerosol gas"
-        aerosol_instance = Aerosol(atmosphere, particles)
-        for gas in aerosol_instance.iterate_gas():
-            print(gas)
-        ```
+        Examples:
+            ```py title="Iterating over aerosol gas"
+            aerosol_instance = Aerosol(atmosphere, particles)
+            for gas in aerosol_instance.iterate_gas():
+                print(gas)
+            ```
         """
         return iter(self.atmosphere)
 
     def iterate_particle(self) -> Iterator[ParticleRepresentation]:
-    """
-    Return an iterator over the particle representations.
+        """
+        Return an iterator over the particle representations.
 
-    Returns:
-        - Iterator[ParticleRepresentation] : An iterator over particle objects.
+        Returns:
+            - Iterator[ParticleRepresentation] : An iterator over particle
+                objects.
 
-    Examples:
-        ```py title="Iterating over aerosol particles"
-        aerosol_instance = Aerosol(atmosphere, particles)
-        for particle in aerosol_instance.iterate_particle():
-            print(particle)
-        ```
+        Examples:
+            ```py title="Iterating over aerosol particles"
+            aerosol_instance = Aerosol(atmosphere, particles)
+            for particle in aerosol_instance.iterate_particle():
+                print(particle)
+            ```
         """
         return iter(self.particles)
 
     def replace_atmosphere(self, atmosphere: Atmosphere):
-    """
-    Replace the current atmosphere with a new Atmosphere instance.
+        """
+        Replace the current atmosphere with a new Atmosphere instance.
 
-    Arguments:
-        - atmosphere : The new Atmosphere to assign.
+        Arguments:
+            - atmosphere : The new Atmosphere to assign.
 
-    Returns:
-        - None
-
-    Examples:
-        ```py title="Replacing the Atmosphere in the Aerosol"
-        aerosol_instance = Aerosol(atmosphere, particles)
-        new_atmosphere = Atmosphere()
-        aerosol_instance.replace_atmosphere(new_atmosphere)
-        ```
+        Examples:
+            ```py title="Replacing the Atmosphere in the Aerosol"
+            aerosol_instance = Aerosol(atmosphere, particles)
+            new_atmosphere = Atmosphere()
+            aerosol_instance.replace_atmosphere(new_atmosphere)
+            ```
         """
         self.atmosphere = atmosphere
 
     def add_particle(self, particle: ParticleRepresentation):
-    """
-    Add a new ParticleRepresentation to the aerosol.
+        """
+        Add a new ParticleRepresentation to the aerosol.
 
-    Arguments:
-        - particle : The particle instance to add.
+        Arguments:
+            - particle : The particle instance to add.
 
-    Returns:
-        - None
-
-    Examples:
-        ```py title="Adding a Particle to the Aerosol"
-        aerosol_instance = Aerosol(atmosphere, particles)
-        new_particle = ParticleRepresentation()
-        aerosol_instance.add_particle(new_particle)
-        ```
+        Examples:
+            ```py title="Adding a Particle to the Aerosol"
+            aerosol_instance = Aerosol(atmosphere, particles)
+            new_particle = ParticleRepresentation()
+            aerosol_instance.add_particle(new_particle)
+            ```
         """
         self.particles.append(particle)

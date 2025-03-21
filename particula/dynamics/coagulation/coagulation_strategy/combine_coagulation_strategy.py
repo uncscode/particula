@@ -1,6 +1,13 @@
 """
-Combines a list of coagulation strategies. The kernel is the sum of the
-kernels of the strategies. The distribution type must all be the same.
+Combine multiple coagulation strategies into a single, aggregated approach.
+
+The kernel from each strategy is summed to form a unified coagulation
+kernel. All strategies must share the same distribution type.
+
+Classes:
+    - CombineCoagulationStrategy : Inherits from CoagulationStrategyABC
+      and aggregates multiple strategies.
+
 """
 
 from typing import List, Union
@@ -18,23 +25,59 @@ logger = logging.getLogger("particula")
 
 class CombineCoagulationStrategy(CoagulationStrategyABC):
     """
-    Combines multiple coagulation strategies into one.
+    Combine multiple coagulation strategies into one.
 
-    This class takes a list of coagulation strategies and combines their
-    kernels by summing them. All strategies must have the same distribution
-    type.
+    This class takes a list of coagulation strategies and merges their
+    kernels by summing them. Each included strategy must share the same
+    distribution type.
 
-    Arguments:
-        - strategies: A list of coagulation strategies to combine.
+    Attributes:
+        - distribution_type : Matches the distribution_type of the first
+          strategy.
+        - strategies : A list of individual CoagulationStrategyABC instances.
 
     Methods:
-    - kernel: Calculate the combined coagulation kernel.
-    - loss_rate: Calculate the combined coagulation loss rate.
-    - gain_rate: Calculate the combined coagulation gain rate.
-    - net_rate: Calculate the combined net coagulation rate.
+    - dimensionless_kernel : Raises NotImplementedError, as not supported here.
+    - kernel : Compute the sum of all strategy kernels.
+    - loss_rate : Calculate the coagulation loss rate.
+    - gain_rate : Calculate the coagulation gain rate.
+    - net_rate : Get the net coagulation rate (gain - loss).
+    - step : Perform a single step of coagulation.
+    - diffusive_knudsen : Calculate the diffusive Knudsen number.
+    - coulomb_potential_ratio : Compute Coulomb potential ratio.
+    - friction_factor : Compute the effective friction factor.
+
+
+    Examples:
+        ```py title="Example Usage of CombineCoagulationStrategy"
+        import particula as par
+        combined_strategy = par.dynamics.CombineCoagulationStrategy(
+            [strategy1, strategy2]
+        )
+        k_value = combined_strategy.kernel(
+            particle=aerosol, temperature=300, pressure=101325
+        ) # combined kernel value
+        ```
+
+    References:
+        - No specific references. Summation approach is straightforward.
     """
 
     def __init__(self, strategies: List[CoagulationStrategyABC]):
+        """
+        Initialize the combined coagulation strategy.
+
+        Arguments:
+            - strategies : A list of CoagulationStrategyABC instances to
+              combine.
+
+        Returns:
+            - None
+
+        Raises:
+            - ValueError : If no strategies are provided or if they have
+              mismatched distribution types.
+        """
         if not strategies:
             raise ValueError("At least one strategy must be provided.")
 
@@ -53,6 +96,23 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
         diffusive_knudsen: NDArray[np.float64],
         coulomb_potential_ratio: NDArray[np.float64],
     ) -> NDArray[np.float64]:
+        """
+        Raise NotImplementedError for dimensionless kernel in combined
+        strategy.
+
+        Dimensionless kernels must be handled individually by the underlying
+        strategies. This method logs an error and raises NotImplementedError.
+
+        Arguments:
+            - diffusive_knudsen : The diffusive Knudsen number(s)
+              [dimensionless].
+            - coulomb_potential_ratio : The Coulomb potential ratio(s)
+              [dimensionless].
+
+        Raises:
+            - NotImplementedError : This method is not supported in the
+              combined strategy.
+        """
         message = (
             "Dimensionless kernel not implemented in combined "
             + "coagulation strategy."
@@ -66,6 +126,31 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
         temperature: float,
         pressure: float,
     ) -> Union[float, NDArray[np.float64]]:
+        """
+        Compute the total coagulation kernel by summing the kernels from all
+        underlying strategies.
+
+        Arguments:
+            - particle : The ParticleRepresentation instance containing
+              particle data (radii, distribution, etc.).
+            - temperature : The temperature in Kelvin [K].
+            - pressure : The pressure in Pascals [Pa].
+
+        Returns:
+            - float or NDArray[np.float64] : The combined coagulation kernel,
+              equal to the sum of each strategy's kernel.
+
+        Examples:
+            ```py
+            k_combined = combined_strategy.kernel(
+                particle=my_particle,
+                temperature=300.0,
+                pressure=101325
+            )
+            # k_combined is the sum of kernels from each strategy in
+            # combined_strategy
+            ```
+        """
         combined_kernel = 0
         for strategy in self.strategies:
             combined_kernel += strategy.kernel(

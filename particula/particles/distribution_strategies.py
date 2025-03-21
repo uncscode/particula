@@ -1,5 +1,9 @@
 """
-Particle Distribution Strategies, how to represent particles in a distribution.
+Particle Distribution Strategies
+
+Defines various distribution strategies (mass-based, radii-based, etc.)
+for representing particles in a distribution. Each strategy handles
+mass, radius, total mass, and concentration updates differently.
 """
 
 from abc import ABC, abstractmethod
@@ -12,16 +16,19 @@ logger = logging.getLogger("particula")
 
 class DistributionStrategy(ABC):
     """
-    Abstract base class for particle strategy, defining the common
-    interface for mass, radius, and total mass calculations for different
-    particle representations.
+    Abstract base class defining common interfaces for
+    mass, radius, and total mass calculations across
+    different particle distribution representations.
 
     Methods:
-        get_name: Returns the type of the distribution strategy.
-        get_mass: Calculates the mass of particles.
-        get_radius: Calculates the radius of particles.
-        get_total_mass: Calculates the total mass of particles.
-        add_mass: Adds mass to the distribution of particles.
+    - get_name : Return the type of the distribution strategy.
+    - get_species_mass : Calculate the mass per species.
+    - get_mass : Calculate the mass of the particles or bin.
+    - get_total_mass : Calculate the total mass of particles.
+    - get_radius : Calculate the radius of particles.
+    - add_mass : Add mass to the particle distribution.
+    - add_concentration : Add concentration to the distribution.
+    - collide_pairs : Perform collision logic on specified particle pairs.
     """
 
     def get_name(self) -> str:
@@ -32,27 +39,29 @@ class DistributionStrategy(ABC):
     def get_species_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """The mass per species in the particles (or bin).
+        """
+        Return the mass per species in the distribution.
 
-        Args:
-            distribution: The distribution of particle sizes or masses.
-            density: The density of the particles.
+        Arguments:
+            - distribution : The distribution of particle sizes or masses.
+            - density : The density of the particles.
 
         Returns:
-            NDArray[np.float64]: The mass of the particles
+            - The mass of the particles (per species).
         """
 
     def get_mass(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """Calculates the mass of the particles (or bin).
+        """
+        Calculate the mass of the particles or bin.
 
-        Args:
-            distribution: The distribution of particle sizes or masses.
-            density: The density of the particles.
+        Arguments:
+            - distribution : The distribution of particle sizes or masses.
+            - density : The density of the particles.
 
         Returns:
-            NDArray[np.float64]: The mass of the particles.
+            - The mass of the particles.
         """
         # one species present
         if distribution.ndim == 1:
@@ -66,16 +75,17 @@ class DistributionStrategy(ABC):
         concentration: NDArray[np.float64],
         density: NDArray[np.float64],
     ) -> np.float64:
-        """Calculates the total mass of all particles (or bin).
+        """
+        Calculate the total mass of all particles (or bin).
 
-        Args:
-            distribution: The distribution of particle sizes or masses.
-            concentration: The concentration of each particle size or mass in
-            the distribution.
-            density: The density of the particles.
+        Arguments:
+            - distribution : The distribution of particle sizes or masses.
+            - concentration : The concentration of each particle
+              size or mass in the distribution.
+            - density : The density of the particles.
 
         Returns:
-            np.float64: The total mass of the particles.
+            - The total mass of the particles.
         """
         # Calculate the mass of each particle and multiply by the concentration
         masses = self.get_mass(distribution, density)
@@ -85,14 +95,15 @@ class DistributionStrategy(ABC):
     def get_radius(
         self, distribution: NDArray[np.float64], density: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """Calculates the radius of the particles.
+        """
+        Calculate the radius of the particles.
 
-        Args:
-            distribution: The distribution of particle sizes or masses.
-            density: The density of the particles.
+        Arguments:
+            - distribution : The distribution of particle sizes or masses.
+            - density : The density of the particles.
 
         Returns:
-            NDArray[np.float64]: The radius of the particles.
+            - The radius of the particles in meters.
         """
 
     @abstractmethod
@@ -103,18 +114,19 @@ class DistributionStrategy(ABC):
         density: NDArray[np.float64],
         added_mass: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Adds mass to the distribution of particles.
+        """
+        Add mass to the distribution of particles.
 
-        Args:
-            distribution: The distribution of particle sizes or masses.
-            concentration: The concentration of each particle size or mass in
-                the distribution.
-            density: The density of the particles.
-            added_mass: The mass to be added per distribution bin.
+        Arguments:
+            - distribution : The distribution of particle sizes or masses.
+            - concentration : The concentration of each particle
+              size or mass.
+            - density : The density of the particles.
+            - added_mass : The mass to be added per distribution bin.
 
         Returns:
-            (distribution, concentration): The new distribution array and the
-                new concentration array.
+            - The updated distribution array.
+            - The updated concentration array.
         """
 
     @abstractmethod
@@ -125,18 +137,19 @@ class DistributionStrategy(ABC):
         added_distribution: NDArray[np.float64],
         added_concentration: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Adds concentration to the distribution of particles.
+        """
+        Add concentration to the distribution of particles.
 
-        Args:
-            distribution: The distribution of particle sizes or masses.
-            concentration: The concentration of each particle size or mass in
-                the distribution.
-            added_distribution: The distribution to be added.
-            added_concentration: The concentration to be added.
+        Arguments:
+            - distribution : The distribution of particle sizes or masses.
+            - concentration : The concentration of each particle
+              size or mass.
+            - added_distribution : The distribution to be added.
+            - added_concentration : The concentration to be added.
 
         Returns:
-            (distribution, concentration): The new distribution array and the
-                new concentration array.
+            - The updated distribution array
+            - The updated concentration array.
         """
 
     @abstractmethod
@@ -147,27 +160,37 @@ class DistributionStrategy(ABC):
         density: NDArray[np.float64],
         indices: NDArray[np.int64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Collides index pairs.
+        """
+        Collide index pairs in the distribution.
 
-        Args:
-            distribution: The distribution of particle sizes or masses.
-            concentration: The concentration of each particle size or mass in
-                the distribution.
-            density: The density of the particles.
-            indices: The indices of the particles to collide.
+        Arguments:
+            - distribution : The distribution of particle sizes or masses.
+            - concentration : The concentration of each particle size or mass.
+            - density : The density of the particles.
+            - indices : The indices of the particles to collide.
 
         Returns:
-            (distribution, concentration): The new distribution array and the
-                new concentration array.
+            - The updated distribution array
+            - The updated concentration array.
         """
 
 
 class MassBasedMovingBin(DistributionStrategy):
-    """A strategy for particles represented by their mass distribution.
+    """
+    Strategy for particles represented by their mass distribution.
 
-    This strategy calculates particle mass, radius, and total mass based on
-    the particle's mass, number concentration, and density. It also moves the
-    bins when adding mass to the distribution.
+    Calculates particle mass, radius, and total mass based on the
+    particle mass, number concentration, and density. This moving-bin
+    approach adjusts mass bins on mass addition events.
+
+    Methods:
+    - get_name : Return the type of the distribution strategy.
+    - get_species_mass : Calculate the mass per species.
+    - get_mass : Calculate the mass of the particles or bin.
+    - get_total_mass : Calculate the total mass of particles.
+    - get_radius : Calculate the radius of particles.
+    - add_mass : Add mass to the particle distribution.
+    - add_concentration : Add concentration to the distribution.
     """
 
     def get_species_mass(
@@ -246,10 +269,21 @@ class MassBasedMovingBin(DistributionStrategy):
 
 
 class RadiiBasedMovingBin(DistributionStrategy):
-    """A strategy for particles represented by their radius.
+    """
+    Strategy for particles represented by their radius distribution.
 
-    This strategy calculates particle mass, radius, and total mass based on
-    the particle's radius, number concentration, and density.
+    Calculates particle mass, radius, and total mass based on particle
+    radius, number concentration, and density. This moving-bin approach
+    recalculates radii when mass is added.
+
+    Methods:
+    - get_name : Return the type of the distribution strategy.
+    - get_species_mass : Calculate the mass per species.
+    - get_mass : Calculate the mass of the particles or bin.
+    - get_total_mass : Calculate the total mass of particles.
+    - get_radius : Calculate the radius of particles.
+    - add_mass : Add mass to the particle distribution.
+    - add_concentration : Add concentration to the distribution.
     """
 
     def get_species_mass(
@@ -335,13 +369,21 @@ class RadiiBasedMovingBin(DistributionStrategy):
 
 
 class SpeciatedMassMovingBin(DistributionStrategy):
-    """Strategy for particles with speciated mass distribution.
-
+    """
     Strategy for particles with speciated mass distribution.
-    Some particles may have different densities and their mass is
-    distributed across different species. This strategy calculates mass,
-    radius, and total mass based on the species at each mass, density,
-    the particle concentration.
+
+    Each particle may contain multiple species, each with a unique
+    density. This strategy calculates mass, radius, and total mass from
+    the species-level masses and overall particle concentrations.
+
+    Methods:
+    - get_name : Return the type of the distribution strategy.
+    - get_species_mass : Calculate the mass per species.
+    - get_mass : Calculate the mass of the particles or bin.
+    - get_total_mass : Calculate the total mass of particles.
+    - get_radius : Calculate the radius of particles.
+    - add_mass : Add mass to the particle distribution.
+    - add_concentration : Add concentration to the distribution.
     """
 
     def get_species_mass(
@@ -429,13 +471,22 @@ class SpeciatedMassMovingBin(DistributionStrategy):
 
 
 class ParticleResolvedSpeciatedMass(DistributionStrategy):
-    """Strategy for resolved particles via speciated mass.
+    """
+    Strategy for particle-resolved masses with multiple species.
 
-    Strategy for resolved particles with speciated mass.
-    Particles may have different densities and their mass is
-    distributed across different species. This strategy calculates mass,
-    radius, and total mass based on the species at each mass, density,
-    the particle concentration.
+    Allows each particle to have separate masses for each species, with
+    individualized densities. This strategy provides a more detailed
+    approach when each particle's composition must be modeled explicitly.
+
+    Methods:
+    - get_name : Return the type of the distribution strategy.
+    - get_species_mass : Calculate the mass per species.
+    - get_mass : Calculate the mass of the particles or bin.
+    - get_total_mass : Calculate the total mass of particles.
+    - get_radius : Calculate the radius of particles.
+    - add_mass : Add mass to the particle distribution.
+    - add_concentration : Add concentration to the distribution.
+    - collide_pairs : Perform collision logic on specified particle pairs.
     """
 
     def get_species_mass(

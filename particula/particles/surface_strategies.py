@@ -1,6 +1,9 @@
-"""Strategies for surface effects on particles.
+"""
+Strategies for surface effects on particles.
 
-Should add the organic film strategy in the future.
+Provides classes for calculating effective surface tension and the
+Kelvin effect for species in particulate phases. Future expansions
+may include an organic film strategy.
 """
 
 from abc import ABC, abstractmethod
@@ -19,47 +22,46 @@ from particula.particles.properties.kelvin_effect_module import (
 
 
 class SurfaceStrategy(ABC):
-    """ABC class for Surface Strategies.
+    """
+    Abstract base class for surface strategies.
 
-    Abstract class for implementing strategies to calculate surface tension
-    and the Kelvin effect for species in particulate phases.
+    Implements methods for calculating effective surface tension, density,
+    and the Kelvin effect in particulate phases.
 
     Methods:
-        effective_surface_tension: Calculate the effective surface tension of
-            species based on their concentration.
-        effective_density: Calculate the effective density of species based on
-            their concentration.
-        get_name: Return the type of the surface strategy.
-        kelvin_radius: Calculate the Kelvin radius which determines the
-            curvature effect on vapor pressure.
-        kelvin_term: Calculate the Kelvin term, which quantifies the effect of
-            particle curvature on vapor pressure.
+    - effective_surface_tension : Calculate the effective surface tension.
+    - effective_density : Calculate the effective density.
+    - get_name : Return the type of the surface strategy.
+    - kelvin_radius : Calculate the Kelvin radius for curvature effects.
+    - kelvin_term : Calculate the exponential Kelvin term for vapor pressure.
     """
 
     @abstractmethod
     def effective_surface_tension(
         self, mass_concentration: Union[float, NDArray[np.float64]]
     ) -> float:
-        """Calculate the effective surface tension of the species mixture.
+        """
+        Calculate the effective surface tension of the species mixture.
 
-        Args:
-            mass_concentration: Concentration of the species [kg/m^3].
+        Arguments:
+            - mass_concentration : Concentration of the species in kg/m^3.
 
         Returns:
-            float or NDArray[float]: Effective surface tension [N/m].
+            - Effective surface tension in N/m.
         """
 
     @abstractmethod
     def effective_density(
         self, mass_concentration: Union[float, NDArray[np.float64]]
     ) -> float:
-        """Calculate the effective density of the species mixture.
+        """
+        Calculate the effective density of the species mixture.
 
-        Args:
-            mass_concentration: Concentration of the species [kg/m^3].
+        Arguments:
+            - mass_concentration : Concentration of the species in kg/m^3.
 
         Returns:
-            float or NDArray[float]: Effective density of the species [kg/m^3].
+            - Effective density in kg/m^3.
         """
 
     def get_name(self) -> str:
@@ -72,26 +74,20 @@ class SurfaceStrategy(ABC):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """Calculate the Kelvin radius which determines the curvature effect.
+        """
+        Calculate the Kelvin radius, which sets the curvature effect on vapor pressure.
 
-        The kelvin radius is molecule specific and depends on the surface
-        tension, molar mass, density, and temperature of the system. It is
-        used to calculate the Kelvin term, which quantifies the effect of
-        particle curvature on vapor pressure.
-
-        Args:
-            surface_tension: Surface tension of the mixture [N/m].
-            molar_mass: Molar mass of the species [kg/mol].
-            mass_concentration: Concentration of the species [kg/m^3].
-            temperature: Temperature of the system [K].
+        Arguments:
+            - molar_mass : Molar mass of the species in kg/mol.
+            - mass_concentration : Concentration of the species in kg/m^3.
+            - temperature : Temperature of the system in K.
 
         Returns:
-            float or NDArray[float]: Kelvin radius [m].
+            - Kelvin radius in meters.
 
         References:
-        - Based on Neil Donahue's approach to the Kelvin equation:
-        r = 2 * surface_tension * molar_mass / (R * T * density)
-        [Kelvin Wikipedia](https://en.wikipedia.org/wiki/Kelvin_equation)
+            - r = 2 × surface_tension × molar_mass / (R × T × density)
+              [Kelvin Equation](https://en.wikipedia.org/wiki/Kelvin_equation)
         """
         return get_kelvin_radius(
             self.effective_surface_tension(mass_concentration),
@@ -107,25 +103,21 @@ class SurfaceStrategy(ABC):
         mass_concentration: Union[float, NDArray[np.float64]],
         temperature: float,
     ) -> Union[float, NDArray[np.float64]]:
-        """Calculate the Kelvin term, which multiplies the vapor pressure.
+        """
+        Calculate the exponential Kelvin term that adjusts vapor pressure.
 
-        The Kelvin term is used to adjust the vapor pressure of a species due
-        to the curvature of the particle.
-
-        Args:
-            radius: Radius of the particle [m].
-            molar_mass: Molar mass of the species a [kg/mol].
-            mass_concentration: Concentration of the species [kg/m^3].
-            temperature: Temperature of the system [K].
+        Arguments:
+            - radius : Particle radius in meters.
+            - molar_mass : Molar mass of the species in kg/mol.
+            - mass_concentration : Concentration of the species in kg/m^3.
+            - temperature : Temperature of the system in K.
 
         Returns:
-            float or NDArray[float]: The exponential factor adjusting vapor
-                pressure due to curvature.
+            - Factor by which vapor pressure is increased.
 
         References:
-        Based on Neil Donahue's approach to the Kelvin equation:
-        exp(kelvin_radius / particle_radius)
-        [Kelvin Eq Wikipedia](https://en.wikipedia.org/wiki/Kelvin_equation)
+            - P_eff = P_sat × exp(kelvin_radius / particle_radius)
+              [Kelvin Equation](https://en.wikipedia.org/wiki/Kelvin_equation)
         """
         return get_kelvin_term(
             radius,
@@ -135,18 +127,16 @@ class SurfaceStrategy(ABC):
 
 # Surface mixing strategies
 class SurfaceStrategyMolar(SurfaceStrategy):
-    """Surface tension and density, based on mole fraction weighted values.
+    """
+    Surface tension and density based on mole-fraction weighting.
 
-    Arguments:
-        surface_tension: Surface tension of the species [N/m]. If a single
-            value is provided, it will be used for all species.
-        density: Density of the species [kg/m^3]. If a single value is
-            provided, it will be used for all species.
-        molar_mass: Molar mass of the species [kg/mol]. If a single value is
-            provided, it will be used for all species.
+    Attributes:
+        - surface_tension : Surface tension array or scalar in N/m.
+        - density : Density array or scalar in kg/m^3.
+        - molar_mass : Molar mass array or scalar in kg/mol.
 
     References:
-        [Mole Fractions](https://en.wikipedia.org/wiki/Mole_fraction)
+        - [Mole Fraction](https://en.wikipedia.org/wiki/Mole_fraction)
     """
 
     def __init__(
@@ -187,16 +177,15 @@ class SurfaceStrategyMolar(SurfaceStrategy):
 
 
 class SurfaceStrategyMass(SurfaceStrategy):
-    """Surface tension and density, based on mass fraction weighted values.
+    """
+    Surface tension and density based on mass-fraction weighting.
 
-    Args:
-        surface_tension: Surface tension of the species [N/m]. If a single
-            value is provided, it will be used for all species.
-        density: Density of the species [kg/m^3]. If a single value is
-            provided, it will be used for all species.
+    Attributes:
+        - surface_tension : Surface tension array or scalar in N/m.
+        - density : Density array or scalar in kg/m^3.
 
     References:
-    [Mass Fractions](https://en.wikipedia.org/wiki/Mass_fraction_(chemistry))
+    - [Mass Fraction](https://en.wikipedia.org/wiki/Mass_fraction_(chemistry))
     """
 
     def __init__(
@@ -231,16 +220,15 @@ class SurfaceStrategyMass(SurfaceStrategy):
 
 
 class SurfaceStrategyVolume(SurfaceStrategy):
-    """Surface tension and density, based on volume fraction weighted values.
+    """
+    Surface tension and density based on volume-fraction weighting.
 
-    Args:
-        surface_tension: Surface tension of the species [N/m]. If a single
-            value is provided, it will be used for all species.
-        density: Density of the species [kg/m^3]. If a single value is
-            provided, it will be used for all species.
+    Attributes:
+        - surface_tension : Surface tension array or scalar in N/m.
+        - density : Density array or scalar in kg/m^3.
 
     References:
-    [Volume Fractions](https://en.wikipedia.org/wiki/Volume_fraction)
+        - [Volume Fraction](https://en.wikipedia.org/wiki/Volume_fraction)
     """
 
     def __init__(

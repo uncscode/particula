@@ -14,27 +14,54 @@ from particula.gas.vapor_pressure_strategies import (
     VaporPressureStrategy,
     ConstantVaporPressureStrategy,
 )
+from particula.util.validate_inputs import validate_inputs
+
 
 logger = logging.getLogger("particula")
 
 
 class GasSpecies:
-    """GasSpecies represents an individual or array of gas species with
-    properties like name, molar mass, vapor pressure, and condensability.
+    """
+    Represents an individual or array of gas species with properties like
+    name, molar mass, vapor pressure, and condensability.
 
     Attributes:
         - name : The name of the gas species.
-        - molar_mass : The molar mass of the gas species.
-        - pure_vapor_pressure_strategy : The strategy for calculating the pure
-            vapor pressure of the gas species. Can be a single strategy or a
-            list of strategies. Default is a constant vapor pressure strategy
-            with a vapor pressure of 0.0 Pa.
+        - molar_mass : The molar mass of the gas species in kg/mol.
+        - pure_vapor_pressure_strategy : The strategy (or list of strategies)
+          for calculating the pure vapor pressure of the gas species.
         - condensable : Indicates whether the gas species is condensable.
-            Default is True.
-        - concentration : The concentration of the gas species in the mixture.
-            Default is 0.0 kg/m^3.
+        - concentration : The concentration of the gas species in kg/m^3.
+
+    Methods:
+    - get_name : Return the name of the gas species.
+    - get_molar_mass : Return the molar mass in kg/mol.
+    - get_condensable : Return whether the species is condensable.
+    - get_concentration : Return the concentration in kg/m^3.
+    - get_pure_vapor_pressure : Calculate pure vapor pressure at a given Temp.
+    - get_partial_pressure : Calculate partial pressure at a given Temp.
+    - get_saturation_ratio : Calculate saturation ratio at a given Temp.
+    - get_saturation_concentration : Calculate saturation concentration at a
+      given Temperature.
+    - add_concentration : Add concentration to the species.
+    - set_concentration : Overwrite concentration value.
+
+    Examples:
+        ```py title="GasSpecies usage example"
+        import particula as par
+        constant_vapor_pressure = par.gas.ConstantVaporPressureStrategy(2330)
+        species = par.gas.GasSpecies(
+            name="Water",
+            molar_mass=0.018,
+            vapor_pressure_strategy=constant_vapor_pressure,
+            condensable=True,
+            concentration=1e-3,  # kg/m^3
+        )
+        print(species.get_name(), species.get_concentration())
+        ```
     """
 
+    @validate_inputs({"molar_mass": "positive"})
     def __init__(  # pylint: disable=too-many-positional-arguments
         # pylint: disable=too-many-arguments
         self,
@@ -46,7 +73,21 @@ class GasSpecies:
         condensable: Union[bool, NDArray[np.bool_]] = True,
         concentration: Union[float, NDArray[np.float64]] = 0.0,
     ) -> None:
-        self._check_non_positive_value(molar_mass, "molar mass")
+        """
+        Initialize the GasSpecies with name, molar mass, and vapor pressure
+        strategy.
+
+        Arguments:
+            - name : The name of the gas species.
+            - molar_mass : The molar mass in kg/mol (must be > 0).
+            - vapor_pressure_strategy : A single or list of strategies for
+              calculating vapor pressure.
+            - condensable : Whether the species is condensable.
+            - concentration : The initial concentration in kg/m^3.
+
+        Raises:
+            - ValueError : If molar_mass is non-positive.
+        """
         self.molar_mass = molar_mass
         concentration = self._check_if_negative_concentration(concentration)
         self.concentration = concentration
@@ -56,11 +97,27 @@ class GasSpecies:
         self.condensable = condensable
 
     def __str__(self):
-        """Return a string representation of the GasSpecies object."""
+        """
+        Return a string representation of the GasSpecies object.
+
+        Returns:
+            - str : The string name of the gas species.
+        """
         return str(self.name)
 
     def __len__(self):
-        """Return the number of gas species."""
+        """
+        Return the number of gas species (1 if scalar; array length if
+        ndarray).
+
+        Returns:
+            - float or int : Number of species (array length or 1).
+
+        Examples:
+            ```py title="Example of len()"
+            len(gas_object)
+            ```
+        """
         return (
             len(self.molar_mass)
             if isinstance(self.molar_mass, np.ndarray)
@@ -68,58 +125,73 @@ class GasSpecies:
         )
 
     def get_name(self) -> Union[str, NDArray[np.str_]]:
-        """Get the name of the gas species.
+        """
+        Return the name of the gas species.
 
         Returns:
-            The name of the gas species.
+            - Name of the gas species.
+
+        Examples:
+            ```py title="Example of get_name()"
+            gas_object.get_name()
+            ```
         """
         return self.name
 
     def get_molar_mass(self) -> Union[float, NDArray[np.float64]]:
-        """Get the molar mass of the gas species in kg/mol.
+        """
+        Return the molar mass of the gas species in kg/mol.
 
         Returns:
-            The molar mass of the gas species, in kg/mol.
+            - Molar mass in kg/mol.
+
+        Examples:
+            ```py title="Example of get_molar_mass()"
+            gas_object.get_molar_mass()
+            ```
         """
         return self.molar_mass
 
     def get_condensable(self) -> Union[bool, NDArray[np.bool_]]:
-        """Check if the gas species is condensable or not.
+        """
+        Check if the gas species is condensable.
 
         Returns:
-            True if the gas species is condensable, False otherwise.
+            - True if condensable, else False.
+
+        Examples:
+            ``` py title="Example of get_condensable()"
+            gas_object.get_condensable()
+            ```
         """
         return self.condensable
 
     def get_concentration(self) -> Union[float, NDArray[np.float64]]:
-        """Get the concentration of the gas species in the mixture, in kg/m^3.
+        """
+        Return the concentration of the gas species in kg/m^3.
 
         Returns:
-            The concentration of the gas species in the mixture.
+            - Species concentration.
         """
         return self.concentration
 
     def get_pure_vapor_pressure(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """Calculate the pure vapor pressure of the gas species at a given
-        temperature in Kelvin.
+        """
+        Calculate the pure vapor pressure at a given temperature (K).
 
-        This method supports both a single strategy or a list of strategies
-        for calculating vapor pressure.
-
-        Args:
-            - temperature : The temperature in Kelvin at which to calculate
-                vapor pressure.
+        Arguments:
+            - temperature : The temperature in Kelvin.
 
         Returns:
-            The calculated pure vapor pressure in Pascals.
+            - Pure vapor pressure in Pa.
 
         Raises:
-            ValueError: If no vapor pressure strategy is set.
+            - ValueError : If no vapor pressure strategy is set.
 
-        Example:
-            ``` py title="Example usage of get_pure_vapor_pressure"
+        Examples:
+            ```py title="Example"
             gas_object.get_pure_vapor_pressure(temperature=298)
             ```
         """
@@ -142,25 +214,20 @@ class GasSpecies:
     def get_partial_pressure(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """Calculate the partial pressure of the gas based on the vapor
-        pressure strategy.
+        """
+        Calculate the partial pressure of the gas at a given temperature (K).
 
-        This method accounts for multiple strategies if assigned and
-        calculates partial pressure for each strategy based on the
-        corresponding concentration and molar mass.
-
-        Args:
-            - temperature : The temperature in Kelvin at which to calculate
-                the partial pressure.
+        Arguments:
+            - temperature : The temperature in Kelvin.
 
         Returns:
-            Partial pressure of the gas in Pascals.
+            - Partial pressure in Pa.
 
         Raises:
-            ValueError: If the vapor pressure strategy is not set.
+            - ValueError : If the vapor pressure strategy is not set.
 
-        Example:
-            ``` py title="Example usage of get_partial_pressure"
+        Examples:
+            ```py title="Example of get_partial_pressure()"
             gas_object.get_partial_pressure(temperature=298)
             ```
         """
@@ -190,25 +257,20 @@ class GasSpecies:
     def get_saturation_ratio(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """Calculate the saturation ratio of the gas based on the vapor
-        pressure strategy.
+        """
+        Calculate the saturation ratio of the gas at a given temperature (K).
 
-        This method accounts for multiple strategies if assigned and
-        calculates saturation ratio for each strategy based on the
-        corresponding concentration and molar mass.
-
-        Args:
-            - temperature : The temperature in Kelvin at which to calculate
-                the partial pressure.
+        Arguments:
+            - temperature : The temperature in Kelvin.
 
         Returns:
-            The saturation ratio of the gas.
+            - The saturation ratio.
 
         Raises:
-            ValueError : If the vapor pressure strategy is not set.
+            - ValueError : If the vapor pressure strategy is not set.
 
-        Example:
-            ``` py title="Example usage of get_saturation_ratio"
+        Examples:
+            ```py title="Example of get_saturation_ratio()"
             gas_object.get_saturation_ratio(temperature=298)
             ```
         """
@@ -238,25 +300,20 @@ class GasSpecies:
     def get_saturation_concentration(
         self, temperature: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """Calculate the saturation concentration of the gas based on the
-        vapor pressure strategy.
+        """
+        Calculate the saturation concentration at a given temperature (K).
 
-        This method accounts for multiple strategies if assigned and
-        calculates saturation concentration for each strategy based on the
-        molar mass.
-
-        Args:
-            - temperature : The temperature in Kelvin at which to calculate
-                the partial pressure.
+        Arguments:
+            - temperature : The temperature in Kelvin.
 
         Returns:
-            The saturation concentration of the gas.
+            - The saturation concentration in kg/m^3.
 
         Raises:
-            ValueError: If the vapor pressure strategy is not set.
+            - ValueError : If the vapor pressure strategy is not set.
 
-        Example:
-            ``` py title="Example usage of get_saturation_concentration"
+        Examples:
+            ```py title="Example of get_saturation_concentration()"
             gas_object.get_saturation_concentration(temperature=298)
             ```
         """
@@ -283,15 +340,15 @@ class GasSpecies:
     def add_concentration(
         self, added_concentration: Union[float, NDArray[np.float64]]
     ) -> None:
-        """Add concentration to the gas species.
+        """
+        Add concentration (kg/m^3) to the gas species.
 
-        Args:
-            - added_concentration : The concentration to add to the gas
-                species.
+        Arguments:
+            - added_concentration : The amount to add in kg/m^3.
 
-        Example:
-            ``` py title="Example usage of add_concentration"
-            gas_object.add_concentration(added_concentration=1e-10)
+        Examples:
+            ```py title="Example of add_concentration()"
+            gas_object.add_concentration(1e-10)
             ```
         """
         self.set_concentration(self.concentration + added_concentration)
@@ -299,14 +356,15 @@ class GasSpecies:
     def set_concentration(
         self, new_concentration: Union[float, NDArray[np.float64]]
     ) -> None:
-        """Set the concentration of the gas species.
+        """
+        Overwrite the concentration of the gas species in kg/m^3.
 
-        Args:
-            - new_concentration : The new concentration of the gas species.
+        Arguments:
+            - new_concentration : The new concentration value in kg/m^3.
 
-        Example:
-            ``` py title="Example usage of set_concentration"
-            gas_object.set_concentration(new_concentration=1e-10)
+        Examples:
+            ```py title="Example of set_concentration()"
+            gas_object.set_concentration(1e-10)
             ```
         """
         new_concentration = self._check_if_negative_concentration(
@@ -317,7 +375,16 @@ class GasSpecies:
     def _check_if_negative_concentration(
         self, values: Union[float, NDArray[np.float64]]
     ) -> Union[float, NDArray[np.float64]]:
-        """Log a warning if the concentration is negative."""
+        """
+        Ensure concentration is not negative. Log a warning if it is and set
+        to 0.
+
+        Arguments:
+            - values : Concentration values to check.
+
+        Returns:
+            - Corrected concentration (≥ 0).
+        """
         if np.any(values < 0.0):
             message = "Negative concentration in gas species, set = 0."
             logger.warning(message)
@@ -329,7 +396,16 @@ class GasSpecies:
     def _check_non_positive_value(
         self, value: Union[float, NDArray[np.float64]], name: str
     ) -> None:
-        """Check for non-positive values and raise an error if found."""
+        """
+        Raise an error if any value is non-positive.
+
+        Arguments:
+            - value : The numeric value(s) to check.
+            - name : Name of the parameter for the error message.
+
+        Raises:
+            - ValueError : If any value <= 0 is detected.
+        """
         if np.any(value <= 0.0):
             message = f"Non-positive {name} in gas species, stopping."
             logger.error(message)

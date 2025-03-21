@@ -27,46 +27,58 @@ class ActivityFactory(
         Union[ActivityIdealMass, ActivityIdealMolar, ActivityKappaParameter],
     ]
 ):
-    """Factory class to create activity strategy builders
+    """
+    Factory for creating activity strategy builders for liquid mixtures.
 
-    Factory class to create activity strategy builders for calculating
-    activity and partial pressure of species in a mixture of liquids.
+    This class supports various strategies (e.g., mass-ideal, molar-ideal,
+    kappa-parameter) to compute activity and partial pressures of species
+    based on Raoult's Law or kappa hygroscopic parameter.
 
     Methods:
-        get_builders(): Returns the mapping of strategy types to builder
-        instances.
-        get_strategy(strategy_type, parameters): Gets the strategy instance
-        for the specified strategy type.
-            strategy_type: Type of activity strategy to use, can be
-            'mass_ideal' (default), 'molar_ideal', or 'kappa_parameter'.
-            parameters(Dict[str, Any], optional): Parameters required for the
-            builder, dependent on the chosen strategy type.
-                mass_ideal: No parameters are required.
-                molar_ideal: molar_mass
-                kappa | kappa_parameter: kappa, density, molar_mass,
-                water_index
+        get_builders:
+            Provides a mapping from strategy type to its corresponding builder.
+        get_strategy(strategy_type, parameters):
+            Validates inputs and returns a strategy instance for the specified
+            strategy type (e.g., 'mass_ideal', 'molar_ideal', or
+            'kappa_parameter').
 
     Returns:
-        ActivityStrategy: An instance of the specified ActivityStrategy.
+        - ActivityStrategy: Instance configured for the chosen activity
+            approach.
 
     Raises:
-        ValueError: If an unknown strategy type is provided.
-        ValueError: If any required key is missing during check_keys or
-            pre_build_check, or if trying to set an invalid parameter.
+        - ValueError: If the strategy type is unknown or if required parameters
+          are missing or invalid.
 
-    Example:
-    >>> strategy_is = ActivityFactory().get_strategy("mass_ideal")
+    Examples:
+        ```py title="Factory Usage Example"
+        import particula as par
+        factory = par.particles.ActivityFactory()
+        strategy = factory.get_strategy("mass_ideal")
+        result = strategy.activity([1.0, 2.0, 3.0])
+        # result -> ...
+        ```
+
+    References:
+    - "Raoult's Law,"
+        [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
     """
 
     def get_builders(self):
-        """Returns the mapping of strategy types to builder instances.
+        """
+        Return a mapping of strategy types to their corresponding builders.
 
         Returns:
-            Dict[str, Any]: A dictionary mapping strategy types to builder
-            instances.
-                mass_ideal: IdealActivityMassBuilder
-                molar_ideal: IdealActivityMolarBuilder
-                kappa_parameter: KappaParameterActivityBuilder
+            dict[str, Any]: A dictionary mapping the activity strategy type
+            (e.g., 'mass_ideal', 'molar_ideal', 'kappa_parameter') to a builder
+            instance.
+
+        Examples:
+            ```py title="Builders Retrieval Example"
+            factory = ActivityFactory()
+            builder_map = factory.get_builders()
+            mass_ideal_builder = builder_map["mass_ideal"]
+            # mass_ideal_builder -> ActivityIdealMassBuilder()
         """
         return {
             "mass_ideal": ActivityIdealMassBuilder(),

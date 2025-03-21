@@ -1,8 +1,11 @@
 """
-Builder class for coagulation strategies. This class is used to create
-coagulation strategies based on the specified distribution type and kernel
-strategy. This provides a validation layer to ensure that the correct values
-are passed to the coagulation strategy.
+Coagulation Builder Mixin Classes
+
+Provides reusable mixin classes for building coagulation strategies
+with validated inputs (e.g., distribution type, turbulent dissipation,
+and fluid density). These mixins can be combined to form full-featured
+coagulation builders, ensuring correct parameter values are passed to
+the final coagulation strategy.
 """
 
 # pylint: disable=too-few-public-methods
@@ -22,12 +25,22 @@ logger = logging.getLogger("particula")
 class BuilderDistributionTypeMixin:
     """Mixin class for distribution type in coagulation strategies.
 
-    This mixin class is used to set the distribution type for coagulation
-    strategies. It provides a validation layer to ensure that the correct
-    distribution type is passed to the coagulation strategy.
+    Provides an interface to set the distribution type for coagulation
+    strategies. Ensures the chosen `distribution_type` is valid.
+
+    Attributes:
+        - distribution_type : Stores the selected distribution type
+          (e.g., "discrete", "continuous_pdf", "particle_resolved").
 
     Methods:
-        set_distribution_type(distribution_type): Set the distribution type.
+    - set_distribution_type : Set and validate the distribution type.
+
+    Examples:
+        ```py title="Example of using BuilderDistributionTypeMixin"
+        builder = SomeCoagulationBuilder()
+        builder.set_distribution_type("discrete")
+        # builder.distribution_type -> "discrete"
+        ```
     """
 
     def __init__(self):
@@ -45,8 +58,19 @@ class BuilderDistributionTypeMixin:
                 Options are "discrete", "continuous_pdf", "particle_resolved".
             distribution_type_units : Not used.
 
+        Returns:
+            - The instance of the class with the updated
+                distribution_type attribute.
+
         Raises:
             ValueError: If the distribution type is not valid.
+
+        Examples:
+            ```py title="Example of using set_distribution_type"
+            builder = SomeCoagulationBuilder()
+            builder.set_distribution_type("discrete")
+            # builder.distribution_type -> "discrete"
+            ```
         """
         valid_distribution_types = [
             "discrete",
@@ -73,9 +97,21 @@ class BuilderDistributionTypeMixin:
 class BuilderTurbulentDissipationMixin:
     """Mixin class for turbulent shear parameters.
 
-    This mixin class is used to set the turbulent dissipation and fluid
-    density for turbulent shear coagulation strategies. It provides a
-    validation layer to ensure that the correct values are passed.
+    Adds methods and attributes for setting and validating
+    turbulent dissipation parameters in coagulation strategies.
+
+    Attributes:
+        - turbulent_dissipation : Numeric value of the energy dissipation
+          rate in m^2/s^3 (default units).
+
+    Methods:
+    - set_turbulent_dissipation : Set and validate the turbulent
+        dissipation rate.
+
+    Examples:
+        ```py title="Example of using BuilderTurbulentDissipationMixin"
+        builder.set_turbulent_dissipation(1e-3, "m^2/s^3")
+        ```
     """
 
     def __init__(self):
@@ -93,6 +129,20 @@ class BuilderTurbulentDissipationMixin:
             turbulent_dissipation : Turbulent dissipation rate.
             turbulent_dissipation_units : Units of the turbulent dissipation
                 rate. Default is *m^2/s^3*.
+
+        Returns:
+            - The instance of the class with the updated
+                turbulent_dissipation attribute.
+
+        Raises:
+            ValueError: Must be non-negative value.
+
+        Examples:
+            ```py title="Example of using set_turbulent_dissipation"
+            builder = SomeCoagulationBuilder()
+            builder.set_turbulent_dissipation(1e-3, "m^2/s^3")
+            # builder.turbulent_dissipation -> 1e-3
+            ```
         """
         if turbulent_dissipation_units == "m^2/s^3":
             self.turbulent_dissipation = turbulent_dissipation
@@ -107,9 +157,20 @@ class BuilderTurbulentDissipationMixin:
 class BuilderFluidDensityMixin:
     """Mixin class for fluid density parameters.
 
-    This mixin class is used to set the fluid density for turbulent shear
-    coagulation strategies. It provides a validation layer to ensure that
-    the correct values are passed.
+    Adds methods and attributes for setting and validating fluid
+    density in coagulation strategies.
+
+    Attributes:
+        - fluid_density : Numeric value representing fluid density
+          in kg/m^3 (default units).
+
+    Methods:
+    - set_fluid_density : Set and validate the fluid density.
+
+    Examples:
+        ```py title="Example of using BuilderFluidDensityMixin"
+        builder.set_fluid_density(1.225, "kg/m^3")
+        ```
     """
 
     def __init__(self):
@@ -126,6 +187,20 @@ class BuilderFluidDensityMixin:
         Arguments:
             density : Density of the particle.
             density_units : Units of the density. Default is *kg/m^3*
+
+        Returns:
+            - The instance of the class with the updated
+                fluid_density attribute.
+
+        Raises:
+            ValueError: Must be positive value.
+
+        Examples:
+            ```py title="Example of using set_fluid_density"
+            builder = SomeCoagulationBuilder()
+            builder.set_fluid_density(1.225, "kg/m^3")
+            # builder.fluid_density -> 1.225
+            ```
         """
         if fluid_density_units == "kg/m^3":
             self.fluid_density = fluid_density

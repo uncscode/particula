@@ -68,15 +68,34 @@ class CondensationStrategy(ABC):
     used in atmospheric physics. Subclasses should implement specific
     condensation algorithms based on different physical models and equations.
 
-    Args:
-        - molar_mass : The molar mass of the species [kg/mol]. If a single
-            value is provided, it will be used for all species.
-        - diffusion_coefficient : The diffusion coefficient of the species
-            [m^2/s]. If a single value is provided, it will be used for all
-            species. Default is 2e-5 m^2/s for air.
-        - accommodation_coefficient : The mass accommodation coefficient of the
-            species. If a single value is provided, it will be used for all
-            species. Default is 1.0.
+    Attributes:
+        - molar_mass : The molar mass of the species [kg/mol].
+        - diffusion_coefficient : The diffusion coefficient [m^2/s].
+        - accommodation_coefficient : The mass accommodation coefficient
+          (unitless).
+        - update_gases : Whether to update gas concentrations after
+          condensation.
+
+    Methods:
+    - mean_free_path : Calculate the mean free path of the gas molecules.
+    - knudsen_number : Compute the Knudsen number for a given particle radius.
+    - first_order_mass_transport : Calculate first-order mass transport
+        coefficient.
+    - calculate_pressure_delta : Compute the partial pressure difference.
+    - mass_transfer_rate : Abstract method for the mass transfer rate [kg/s].
+    - rate : Abstract method for condensation rate per particle/bin.
+    - step : Abstract method to perform one timestep of condensation.
+
+    Examples:
+        ```py title="Example Usage of CondensationStrategy"
+        import particula as par
+        strategy = par.dynamics.ConcreteCondensationStrategy(...)
+        # Use strategy.mass_transfer_rate(...) to get the transfer rate
+        ```
+
+    References:
+    - Seinfeld, J. H. & Pandis, S. N. (2016). Atmospheric Chemistry and
+      Physics: From Air Pollution to Climate Change (3rd ed.). Wiley.
     """
 
     def __init__(
@@ -86,6 +105,17 @@ class CondensationStrategy(ABC):
         accommodation_coefficient: Union[float, NDArray[np.float64]] = 1.0,
         update_gases: bool = True,
     ):
+        """
+        Initialize the CondensationStrategy instance.
+
+        Arguments:
+            - molar_mass : Molar mass of the species [kg/mol].
+            - diffusion_coefficient : Diffusion coefficient [m^2/s].
+            - accommodation_coefficient : Mass accommodation coefficient
+              (unitless).
+            - update_gases : Flag indicating whether gas concentrations should
+              be updated on condensation.
+        """
         self.molar_mass = molar_mass
         self.diffusion_coefficient = diffusion_coefficient
         self.accommodation_coefficient = accommodation_coefficient
@@ -101,7 +131,7 @@ class CondensationStrategy(ABC):
         Calculate the mean free path of the gas molecules based on the
         temperature, pressure, and dynamic viscosity of the gas.
 
-        Args:
+        Arguments:
             - temperature : The temperature of the gas [K].
             - pressure : The pressure of the gas [Pa].
             - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
@@ -111,7 +141,7 @@ class CondensationStrategy(ABC):
             The mean free path of the gas molecules in meters (m).
 
         References:
-            Mean Free Path
+        - Mean Free Path
             [Wikipedia](https://en.wikipedia.org/wiki/Mean_free_path)
         """
         return get_molecule_mean_free_path(
@@ -133,7 +163,7 @@ class CondensationStrategy(ABC):
         Calculate the Knudsen number based on the mean free path of the gas
         molecules and the radius of the particle.
 
-        Args:
+        Arguments:
             - radius : The radius of the particle [m].
             - temperature : The temperature of the gas [K].
             - pressure : The pressure of the gas [Pa].
@@ -145,7 +175,7 @@ class CondensationStrategy(ABC):
                 the particle radius.
 
         References:
-            [Knudsen Number](https://en.wikipedia.org/wiki/Knudsen_number)
+            - [Knudsen Number](https://en.wikipedia.org/wiki/Knudsen_number)
         """
         return get_knudsen_number(
             mean_free_path=self.mean_free_path(
@@ -169,7 +199,7 @@ class CondensationStrategy(ABC):
         particle based on the diffusion coefficient, radius, and vapor
         transition correction factor.
 
-        Args:
+        Arguments:
             - radius : The radius of the particle [m].
             - temperature : The temperature at which the first-order mass
                 transport coefficient is to be calculated.
@@ -181,8 +211,10 @@ class CondensationStrategy(ABC):
             The first-order mass transport coefficient per particle (m^3/s).
 
         References:
-            - Aerosol Modeling, Chapter 2, Equation 2.49 (excluding particle
-                number)
+        - Chapter 2, Equation 2.49 (excluding particle number)
+        - Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling
+            (D. Topping & M. Bane, Eds.). Wiley.
+            [DOI](https://doi.org/10.1002/9781119625728)
         """
         vapor_transition = get_vapor_transition_correction(
             knudsen_number=self.knudsen_number(
@@ -206,7 +238,7 @@ class CondensationStrategy(ABC):
         value of zero will ensure that the rate of condensation is zero. The
         fill is necessary to avoid division by zero in the array operations.
 
-        Args:
+        Arguments:
             - radius : The radius of the particles.
 
         Returns:
@@ -235,7 +267,7 @@ class CondensationStrategy(ABC):
         """Calculate the difference in partial pressure between the gas and
         particle phases.
 
-        Args:
+        Arguments:
             - particle : The particle for which the partial pressure difference
                 is to be calculated.
             - gas_species : The gas species with which the particle is in
@@ -281,24 +313,36 @@ class CondensationStrategy(ABC):
         dynamic_viscosity: Optional[float] = None,
     ) -> Union[float, NDArray[np.float64]]:
         # pylint: disable=too-many-positional-arguments, too-many-arguments
-        """Mass transfer rate for a particle.
+        """
+        Compute the isothermal mass transfer rate for a particle.
 
-        Calculate the mass transfer rate based on the difference in partial
-        pressure and the first-order mass transport coefficient.
+        Implements dm/dt = 4π × r × Dᵢ × Mᵢ × f(Kn, α) × Δpᵢ / (R × T),
+        where:
+        - r is the particle radius,
+        - Dᵢ is diffusion coefficient,
+        - Mᵢ is molar mass,
+        - f(Kn, α) is the transition correction factor,
+        - Δpᵢ is the difference in partial pressure,
+        - R is the gas constant,
+        - T is temperature in Kelvin.
 
-        Args:
-            - particle : The particle for which the mass transfer rate is to be
-                calculated.
-            - gas_species : The gas species with which the particle is in
-                contact.
-            - temperature : The temperature at which the mass transfer rate
-                is to be calculated.
-            - pressure : The pressure of the gas phase.
-            - dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
-                not provided, it will be calculated based on the temperature
+        Arguments:
+            - particle : The particle representation, providing radius,
+              concentration, etc.
+            - gas_species : The gas species condensing onto the particles.
+            - temperature : System temperature [K].
+            - pressure : System pressure [Pa].
+            - dynamic_viscosity : Optional dynamic viscosity [Pa*s].
 
         Returns:
-            The mass transfer rate for the particle [kg/s].
+            - Mass transfer rate [kg/s] for each particle.
+
+        Examples:
+            ```py title="Example Usage of mass_transfer_rate"
+            m_rate = iso_cond.mass_transfer_rate(
+                particle, gas_species, 298.15, 101325
+            )
+            ```
         """
 
     @abstractmethod
@@ -310,25 +354,27 @@ class CondensationStrategy(ABC):
         pressure: float,
     ) -> NDArray[np.float64]:
         """
-        Calculate the rate of mass condensation for each particle due to
-        each condensable gas species.
+        Compute the net condensation rate per particle, scaled by
+        concentration.
 
-        The rate of condensation is determined based on the mass transfer rate,
-        which is a function of particle properties, gas species properties,
-        temperature, and pressure. This rate is then scaled by the
-        concentration of particles in the system to get the overall
-        condensation rate for each particle or bin.
+        Calculates the mass transfer rate and multiplies it by particle
+        concentration, yielding the total mass condensation rate per particle.
 
-        Args:
-            - particle : Representation of the particles, including properties
-                such as size, concentration, and mass.
-            - gas_species : The species of gas condensing onto the particles.
-            - temperature : The temperature of the system in Kelvin.
-            - pressure : The pressure of the system in Pascals.
+        Arguments:
+            - particle : ParticleRepresentation object with distribution and
+              concentration.
+            - gas_species : GasSpecies object for the condensing gas.
+            - temperature : The absolute temperature in Kelvin.
+            - pressure : The pressure in Pascals.
 
         Returns:
-            An array of condensation rates for each particle, scaled by
-                particle concentration.
+            - Condensation rate per particle or bin, in kg/s.
+
+        Examples:
+            ```py title="Example Usage of rate"
+            rates = iso_cond.rate(particle, gas_species, 298.15, 101325)
+            # returns array([...]) with condensation rates
+            ```
         """
 
     # pylint: disable=too-many-positional-arguments, too-many-arguments
@@ -342,30 +388,67 @@ class CondensationStrategy(ABC):
         time_step: float,
     ) -> Tuple[ParticleRepresentation, GasSpecies]:
         """
-        Execute the condensation process for a given time step.
+        Perform one timestep of isothermal condensation on the particle.
 
-        Args:
-            - particle : The particle to modify.
-            - gas_species : The gas species to condense onto the
-                particle.
-            - temperature : The temperature of the system in Kelvin.
-            - pressure : The pressure of the system in Pascals.
-            - time_step : The time step for the process in seconds.
+        Calculates the mass transfer for the specified time_step and updates
+        both the particle mass and the gas concentration
+        (if update_gases=True).
+
+        Arguments:
+            - particle : The particle representation to update.
+            - gas_species : The gas species whose concentration is reduced.
+            - temperature : System temperature [K].
+            - pressure : System pressure [Pa].
+            - time_step : The time interval for condensation [s].
 
         Returns:
-            The modified particle instance and the modified gas species
-                instance.
+            - Updated ParticleRepresentation.
+            - Updated GasSpecies.
+
+        Examples:
+            ```py
+            updated_particle, updated_gas = iso_cond.step(
+                particle, gas_species, 298.15, 101325, 1.0
+            )
+            ```
         """
 
 
 # Define a condensation strategy with no latent heat of vaporization effect
 class CondensationIsothermal(CondensationStrategy):
-    """Condensation strategy for isothermal conditions.
+    """
+    Condensation strategy under isothermal conditions.
 
-    Condensation strategy for isothermal conditions, where the temperature
-    remains constant. This class implements the mass transfer rate calculation
-    for condensation of particles based on partial pressures. No Latent heat
-    of vaporization effect is considered.
+    This class implements the isothermal condensation model, wherein
+    temperature remains constant during mass transfer. It calculates
+    condensation rates based on partial pressure differences, using
+    no latent heat terms.
+
+    Attributes:
+        - Inherits attributes from the base CondensationStrategy:
+          molar_mass, diffusion_coefficient, etc.
+
+    Methods:
+        - mass_transfer_rate : Calculate the mass transfer rate under
+          isothermal conditions.
+        - rate : Get the per-particle condensation rate, accounting for
+          concentration.
+        - step : Advance the condensation state over a given time step.
+
+    Examples:
+        ```py title="Example Usage"
+        iso_cond = CondensationIsothermal(molar_mass=0.018)
+        rate_array = iso_cond.rate(particle, gas_species, 298.15, 101325)
+        # rate_array now contains the condensation rate per particle
+        ```
+
+    References:
+        - Aerosol Modeling, Chapter 2, Equation 2.40
+        - Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling
+            (D. Topping & M. Bane, Eds.). Wiley.
+            [DOI](https://doi.org/10.1002/9781119625728)
+        - Seinfeld & Pandis, "Atmospheric Chemistry and Physics," 3rd Ed.,
+          Wiley, 2016.
     """
 
     def __init__(

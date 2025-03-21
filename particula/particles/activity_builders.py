@@ -25,10 +25,29 @@ logger = logging.getLogger("particula")
 
 
 class ActivityIdealMassBuilder(BuilderABC):
-    """Builder class for IdealActivityMass objects. No additional parameters.
+    """
+    Builds an ActivityIdealMass object for calculating activity based on
+    ideal mass fractions.
+
+    A concise builder for ActivityIdealMass. This class requires no extra
+    parameters beyond the defaults. It ensures the returned strategy follows
+    Raoult's Law for mass-based activities.
 
     Methods:
-        build(): Validate and return the IdealActivityMass object.
+        - build: Validates any required parameters and returns the strategy.
+
+    Examples:
+        ```py title="Example Usage"
+        import particula as par
+        builder = par.particles.ActivityIdealMassBuilder()
+        strategy = builder.build()
+        result = strategy.activity([1.0, 2.0, 3.0])
+        # result -> ...
+        ```
+
+    References:
+    - "Raoult's Law,"
+        [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
     """
 
     def __init__(self):
@@ -36,23 +55,56 @@ class ActivityIdealMassBuilder(BuilderABC):
         BuilderABC.__init__(self, required_parameters)
 
     def build(self) -> ActivityStrategy:
-        """Validate and return the IdealActivityMass object.
+        """
+        Validate and return an ActivityIdealMass strategy instance.
 
         Returns:
-            IdealActivityMass: The validated IdealActivityMass object.
+            - ActivityIdealMass : The validated strategy for
+              ideal mass-based activity calculations.
+
+        Examples:
+            ```py title="Build Method Example"
+            builder = par.particles.ActivityIdealMassBuilder()
+            mass_activity_strategy = builder.build()
+            # Use mass_activity_strategy.activity(...)
+            ```
         """
         return ActivityIdealMass()
 
 
 class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
-    """Builder class for IdealActivityMolar objects.
+    """
+    Builds an ActivityIdealMolar object for calculating activity from
+    ideal mole fractions.
+
+    This builder sets up any required parameters (e.g., molar mass) and
+    creates an ActivityIdealMolar strategy. Uses Raoult's Law in terms
+    of mole fraction.
+
+    Attributes:
+        - molar_mass : Molar mass for each species, in kilograms per mole.
 
     Methods:
-        set_molar_mass(molar_mass, molar_mass_units): Set the molar mass of the
-            particle in kg/mol. Default units are 'kg/mol'.
-        set_parameters(params): Set the parameters of the IdealActivityMolar
-            object from a dictionary including optional units.
-        build(): Validate and return the IdealActivityMolar object.
+        - set_molar_mass: Assigns the molar masses (with unit
+            handling).
+        - set_parameters: Batch-assign parameters from a dictionary.
+        - build: Finalizes the builder and returns the strategy.
+
+    Examples:
+        ```py title="Example Usage"
+        import particula as par
+        builder = (
+            par.particles.ActivityIdealMolarBuilder()
+            .set_molar_mass(0.01815, "kg/mol")
+        )
+        strategy = builder.build()
+        result = strategy.activity([1.0, 2.0, 3.0])
+        # result -> ...
+        ```
+
+    References:
+        - "Raoult's Law,"
+        [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
     """
 
     def __init__(self):
@@ -61,30 +113,77 @@ class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
         BuilderMolarMassMixin.__init__(self)
 
     def build(self) -> ActivityStrategy:
-        """Validate and return the IdealActivityMolar object.
+        """
+        Validate parameters and create an ActivityIdealMolar strategy.
+
+        Ensures molar_mass is properly configured before building.
 
         Returns:
-            IdealActivityMolar: The validated IdealActivityMolar object.
+            - ActivityIdealMolar : An ideal strategy based on mole fractions.
+
+        Examples:
+            ```py title="Build Method Example"
+            builder = (
+                par.particles.ActivityIdealMolarBuilder()
+                .set_molar_mass(0.028, "kg/mol")
+            )
+            molar_activity_strategy = builder.build()
+            # molar_activity_strategy.activity(...)
+            ```
         """
         self.pre_build_check()
-        return ActivityIdealMolar(molar_mass=self.molar_mass)  # type: ignore
+        return ActivityIdealMolar(molar_mass=self.molar_mass)
 
 
 class ActivityKappaParameterBuilder(
     BuilderABC, BuilderDensityMixin, BuilderMolarMassMixin
 ):
-    """Builder class for KappaParameterActivity objects.
+    """
+    Builds an ActivityKappaParameter object for non-ideal activity
+    calculations.
+
+    This builder requires kappa, density, molar_mass, and water_index.
+    Kappa is the hygroscopicity parameter, used to capture non-ideal
+    behavior. The optional water_index identifies which species is water.
+
+    Attributes:
+        - kappa : NDArray of kappa parameters for each species.
+        - density : NDArray of densities, in kilograms per cubic meter.
+        - molar_mass : NDArray of molar masses, in kilograms per mole.
+        - water_index : Integer index of the water species.
 
     Methods:
-        set_kappa(kappa): Set the kappa parameter for the activity calculation.
-        set_density(density,density_units): Set the density of the species in
-            kg/m^3. Default units are 'kg/m^3'.
-        set_molar_mass(molar_mass,molar_mass_units): Set the molar mass of the
-            species in kg/mol. Default units are 'kg/mol'.
-        set_water_index(water_index): Set the array index of the species.
-        set_parameters(dict): Set the parameters of the KappaParameterActivity
-            object from a dictionary including optional units.
-        build(): Validate and return the KappaParameterActivity object.
+        - set_kappa: Assigns kappa values (must be nonnegative).
+        - set_water_index: Sets the index of the water species.
+        - set_density: Assigns density values (with unit handling).
+        - set_molar_mass: Assigns molar mass values (with unit
+            handling).
+        - set_parameters: Batch-assign parameters from a dictionary.
+        - build: Finalizes checks and returns the strategy.
+
+    Examples:
+        ```py title="Example Usage"
+        import particula as par
+        import numpy as np
+
+        builder = (
+            par.particles.ActivityKappaParameterBuilder()
+            .set_kappa(np.array([0.1, 0.0]))
+            .set_density(np.array([1000, 1200]), "kg/m^3"))
+            .set_molar_mass(np.array([0.018, 0.058]), "kg/mol")
+            .set_water_index(0)
+        )
+        strategy = builder.build()
+        result = strategy.activity(np.array([1.0, 2.0]))
+        # result -> ...
+        ```
+
+    References:
+        - Petters, M. D., and Kreidenweis, S. M. (2007).
+          "A single parameter representation of hygroscopic growth and
+           cloud condensation nucleus activity," Atmospheric Chemistry
+           and Physics, 7(8), 1961–1971.
+           [DOI](https://doi.org/10.5194/acp-7-1961-2007)
     """
 
     def __init__(self):
@@ -134,11 +233,25 @@ class ActivityKappaParameterBuilder(
         return self
 
     def build(self) -> ActivityStrategy:
-        """Validate and return the KappaParameterActivity object.
+        """
+        Validate parameters and instantiate an ActivityKappaParameter strategy.
 
         Returns:
-            KappaParameterActivity: The validated KappaParameterActivity
-                object.
+            - ActivityKappaParameter : The non-ideal activity strategy
+              utilizing the kappa hygroscopic parameter.
+
+        Examples:
+            ```py title="Build Method Example"
+            kappa_activity_strategy = (
+                par.particles.ActivityKappaParameterBuilder()
+                .set_kappa([0.1, 0.2])
+                .set_density([1000, 1200], "kg/m^3")
+                .set_molar_mass([0.018, 0.046], "kg/mol")
+                .set_water_index(0)
+                .build()
+            )
+            # kappa_activity_strategy ...
+            ```
         """
         self.pre_build_check()
         return ActivityKappaParameter(

@@ -26,43 +26,43 @@ class SurfaceFactory(
         ],
     ]
 ):
-    """Factory class to call and create surface tension strategies.
+    """Factory for creating surface tension strategy builders.
 
-    Factory class to create surface tension strategy builders for
-    calculating surface tension and the Kelvin effect for species in
-    particulate phases.
+    Creates builder instances for volume-, mass-, or molar-based
+    surface tension strategies. These strategies calculate surface
+    tension and the Kelvin effect for species in particulate phases.
 
     Methods:
-    - get_builders() : Returns the mapping of strategy types to builder
+    - get_builders : Return a mapping of strategy types to builder
         instances.
-    - get_strategy(strategy_type, parameters): Gets the strategy instance
-        for the specified strategy type.
-        - strategy_type: Type of surface tension strategy to use, can be
-            'volume', 'mass', or 'molar'.
-        - parameters(Dict[str, Any], optional): Parameters required for the
-            builder, dependent on the chosen strategy type.
-            - volume: density, surface_tension
-            - mass: density, surface_tension
-            - molar: molar_mass, density, surface_tension
+    - get_strategy : Return a strategy instance for the specified type
+        ('volume', 'mass', or 'molar').
 
     Returns:
-        SurfaceStrategy : An instance of the specified SurfaceStrategy.
+        - SurfaceStrategy : The instance of the requested surface strategy.
 
     Raises:
-        ValueError : If an unknown strategy type is provided.
-        ValueError : If any required key is missing during check_keys or
-            pre_build_check, or if trying to set an invalid parameter.
+        - ValueError : If an unknown strategy type is provided or if
+          required parameters are missing during check_keys/pre_build_check.
     """
 
     def get_builders(self):
         """
-        Returns the mapping of strategy types to builder instances.
+        Return a mapping of strategy types to builder instances.
 
         Returns:
-            - A dictionary mapping strategy types to builder instances.
-                    - volume: SurfaceStrategyVolumeBuilder
-                    - mass: SurfaceStrategyMassBuilder
-                    - molar: SurfaceStrategyMolarBuilder
+            - Keys are 'volume', 'mass', or 'molar', each
+              mapped to the corresponding builder class.
+
+        Examples:
+            ```py title="SurfaceFactory Example"
+            import particula as par
+            factory = par.particles.SurfaceFactory()
+            builders = factory.get_builders()
+            volume_builder = builders["volume"]
+            mass_builder = builders["mass"]
+            molar_builder = builders["molar"]
+            ```
         """
         return {
             "volume": SurfaceStrategyVolumeBuilder(),

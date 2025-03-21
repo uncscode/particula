@@ -21,34 +21,52 @@ class StrategyFactoryABC(ABC, Generic[BuilderT, StrategyT]):
     using builder objects.
 
     Methods:
-    - get_builders : Returns the mapping of strategy types to builder
-        instances.
-    - get_strategy : Gets the strategy instance for the specified strategy.
-        - strategy_type : Type of strategy to use.
-        - parameters : Parameters required for the
-            builder, dependent on the chosen strategy type.
+        - get_builders:
+            Returns the mapping of strategy types to builder instances.
+        - get_strategy:
+            Gets the strategy instance for the specified strategy.
+
+    Examples:
+        ```py title="Simple Usage"
+        my_factory = SomeSpecificFactory()
+        strategy_instance = my_factory.get_strategy(
+            "example_type", {"param": 123}
+        )
+        # strategy_instance is now built using "example_type"
+        ```
+
+    References:
+    - "Factory Method Pattern,"
+    [Wikipedia](https://en.wikipedia.org/wiki/Factory_method_pattern)
     """
 
     @abstractmethod
     def get_builders(self) -> Dict[str, BuilderT]:
         """
-        Returns the mapping of key names to builders, and their strategy
-        build methods.
+        Retrieve a mapping of strategy types to builder instances.
 
         Returns:
-            A dictionary mapping strategy types to builder instances.
+            dict: A dictionary that maps strategy type names (str) to
+            builder instances.
 
-        Example:
-        ``` py title= "Coagulation Factory"
-        CoagulationFactory().get_builders()
-        # Returns:
-            {
-                "brownian": BrownianCoagulationBuilder(),
-                "charged": ChargedCoagulationBuilder(),
-                "turbulent_shear": TurbulentShearCoagulationBuilder(),
-                "turbulent_dns": TurbulentDNSCoagulationBuilder(),
-                "combine": CombineCoagulationStrategyBuilder(),
-            }
+        Examples:
+            ```py title="Coagulation Factory Example"
+            from particula.coagulation_factory import CoagulationFactory
+
+            builders = CoagulationFactory().get_builders()
+            # Example result:
+            # {
+            #     "brownian": BrownianCoagulationBuilder(),
+            #     "charged": ChargedCoagulationBuilder(),
+            #     "turbulent_shear": TurbulentShearCoagulationBuilder(),
+            #     "turbulent_dns": TurbulentDNSCoagulationBuilder(),
+            #     "combine": CombineCoagulationStrategyBuilder(),
+            # }
+            ```
+
+        References:
+            - "Factory Method Pattern,"
+            [Wikipedia](https://en.wikipedia.org/wiki/Factory_method_pattern)
         ```
         """
 
@@ -56,22 +74,34 @@ class StrategyFactoryABC(ABC, Generic[BuilderT, StrategyT]):
         self, strategy_type: str, parameters: Optional[Dict[str, Any]] = None
     ) -> StrategyT:
         """
-        Generic factory method to create objects instances.
+        Create a strategy instance for the specified type using its
+        corresponding builder.
 
-        Args:
-            - strategy_type : Type of strategy to use.
-            - parameters : Parameters required for the
-                builder, dependent on the chosen strategy type. Try building
-                with a builder first, to see if it is valid.
+        Arguments:
+            - strategy_type (str): Name of the strategy to build.
+            - parameters (Dict[str, Any], optional): Dictionary of parameters
+              to configure the chosen builder.
 
         Returns:
-            An object, built from selected builder with parameters.
+            StrategyT: The built strategy object corresponding to the
+                specified type.
 
         Raises:
-            - ValueError : If an unknown key is provided.
-            - ValueError : If any required parameter is missing during
-                check_keys or pre_build_check, or if trying to set an
-                invalid parameter.
+            - ValueError: If the `strategy_type` is unknown, or if any required
+              parameter is invalid/missing for the chosen builder.
+
+        Examples:
+            ```py title="Strategy Creation Example"
+            my_factory = SomeStrategyFactory()
+            my_strategy = my_factory.get_strategy(
+                "desired_strategy", {"param_x": 42}
+            )
+            # my_strategy is now an instance configured with param_x=42
+            ```
+
+        References:
+            - "Factory Method Pattern,"
+            [Wikipedia](https://en.wikipedia.org/wiki/Factory_method_pattern)
         """
         builder_map = self.get_builders()
         builder = builder_map.get(strategy_type.lower())
