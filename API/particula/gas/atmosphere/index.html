@@ -1809,11 +1809,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy/" class="md-nav__link">
+      <a href="../../dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Trubulent Dns Coagulation Strategy
+    TurbulentDNSCoagulationStrategy
     
   </span>
   
@@ -7869,31 +7869,30 @@ such as temperature and pressure, alongside a dynamic list of gas species
 present.</p>
 <h4 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>temperature</code> - Temperature of the gas mixture in Kelvin.</li>
-<li><code>total_pressure</code> - Total atmospheric pressure of the mixture inPascals.</li>
-<li><code>species</code> - List of GasSpecies objects representing the
+<li>temperature : Temperature of the gas mixture in Kelvin.</li>
+<li>total_pressure : Total atmospheric pressure of the mixture in
+  Pascals.</li>
+<li>species : List of GasSpecies objects representing the
     various species within the gas mixture.</li>
 </ul>
 <h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>add_species(self,</code> <em>species</em> - GasSpecies) -&gt; None:
-    Adds a GasSpecies object to the mixture.</li>
-<li><code>remove_species(self,</code> <em>index</em> - int) -&gt; None:
-    Removes a GasSpecies object from the mixture based on its index.</li>
+<li>add_species : Adds a GasSpecies object to the mixture.</li>
+<li>remove_species : Removes a GasSpecies object from the mixture by index.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Atmosphere</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="atmospheregetitem">Atmosphere().<strong>getitem</strong><a class="headerlink" href="#atmospheregetitem" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L64">Show source in atmosphere.py:64</a></p>
-<p>Retrieves a gas species by index.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L65">Show source in atmosphere.py:65</a></p>
+<p>Retrieve a gas species by index.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>index</code> - The index of the gas species to retrieve.</li>
+<li>index : The index of the gas species to retrieve.</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>GasSpecies</code> - The gas species at the specified index.</li>
+<li>The gas species at the specified index.</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GasSpecies</span><span class="p">:</span> <span class="o">...</span>
@@ -7903,42 +7902,41 @@ present.</p>
 <li><a href="../species/#gasspecies">GasSpecies</a></li>
 </ul>
 <h3 id="atmosphereiter">Atmosphere().<strong>iter</strong><a class="headerlink" href="#atmosphereiter" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L55">Show source in atmosphere.py:55</a></p>
-<p>Allows iteration over the species in the gas mixture.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L56">Show source in atmosphere.py:56</a></p>
+<p>Allow iteration over the species in the gas mixture.</p>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>Iterator[GasSpecies]</code> - An iterator over the gas species objects.</li>
+<li>Iterator[GasSpecies] : An iterator over the gas species objects.</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="atmospherelen">Atmosphere().<strong>len</strong><a class="headerlink" href="#atmospherelen" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L75">Show source in atmosphere.py:75</a></p>
-<p>Returns the number of species in the gas mixture.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L77">Show source in atmosphere.py:77</a></p>
+<p>Return the number of species in the gas mixture.</p>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>int</code> - The number of gas species in the mixture.</li>
+<li>The number of gas species in the mixture.</li>
 </ul>
 <h4 id="signature_3">Signature<a class="headerlink" href="#signature_3" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="atmospherestr">Atmosphere().<strong>str</strong><a class="headerlink" href="#atmospherestr" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L83">Show source in atmosphere.py:83</a></p>
-<p>Provides a string representation of the Atmosphere object.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L86">Show source in atmosphere.py:86</a></p>
+<p>Provide a string representation of the Atmosphere object.</p>
 <h4 id="returns_3">Returns<a class="headerlink" href="#returns_3" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>str</code> - A string that includes the temperature, pressure, and a
-    list of species in the mixture.</li>
+<li>Includes the temperature, pressure, and a list of species.</li>
 </ul>
 <h4 id="signature_4">Signature<a class="headerlink" href="#signature_4" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="atmosphereadd_species">Atmosphere().add_species<a class="headerlink" href="#atmosphereadd_species" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L32">Show source in atmosphere.py:32</a></p>
-<p>Adds a GasSpecies object to the mixture.</p>
+<p>Add a GasSpecies object to the mixture.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>gas_species</code> - The gas species to be added.</li>
+<li>gas_species : The gas species to be added.</li>
 </ul>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_species</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gas_species</span><span class="p">:</span> <span class="n">GasSpecies</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
@@ -7948,16 +7946,15 @@ present.</p>
 <li><a href="../species/#gasspecies">GasSpecies</a></li>
 </ul>
 <h3 id="atmosphereremove_species">Atmosphere().remove_species<a class="headerlink" href="#atmosphereremove_species" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L40">Show source in atmosphere.py:40</a></p>
-<p>Removes a gas species from the mixture by its index.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L41">Show source in atmosphere.py:41</a></p>
+<p>Remove a gas species from the mixture by its index.</p>
 <h4 id="arguments_2">Arguments<a class="headerlink" href="#arguments_2" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>index</code> - Index of the gas species to remove. Must be within
-            the current range of the list.</li>
+<li>index : Index of the gas species to remove. Must be in range.</li>
 </ul>
 <h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>IndexError</code> - If the provided index is out of bounds.</li>
+<li>IndexError : If the provided index is out of bounds.</li>
 </ul>
 <h4 id="signature_6">Signature<a class="headerlink" href="#signature_6" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">remove_species</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>

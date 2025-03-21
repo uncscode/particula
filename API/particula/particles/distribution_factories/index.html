@@ -1809,11 +1809,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy/" class="md-nav__link">
+      <a href="../../dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Trubulent Dns Coagulation Strategy
+    TurbulentDNSCoagulationStrategy
     
   </span>
   
@@ -3432,6 +3432,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -3463,6 +3472,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7416,6 +7434,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7447,6 +7474,15 @@
   <a href="#returns_1" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7497,40 +7533,32 @@
 </blockquote>
 <h2 id="distributionfactory">DistributionFactory<a class="headerlink" href="#distributionfactory" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_factories.py#L19">Show source in distribution_factories.py:19</a></p>
-<p>Factory class to create distribution strategy from builders.</p>
-<p>Used for calculating particle distributions based on the specified
-representation type.</p>
+<p>Factory class to create distribution strategies from builders.</p>
+<p>This factory is used to obtain particle distribution strategies
+based on the specified representation type (mass-based, radius-based,
+speciated, or particle-resolved).</p>
 <h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>get_builders()</code> - Returns the mapping of strategy types to builder
-instances.</li>
-<li><code>get_strategy(strategy_type,</code> <em>parameters)</em> - Gets the strategy instance
-for the specified strategy type.<ul>
-<li><code>strategy_type</code> - Type of distribution strategy to use, can be
-'mass_based_moving_bin', 'radii_based_moving_bin',
-'speciated_mass_moving_bin', 'particle_resolved_speciated_mass'.
-parameters(Dict[str, Any], optional): Parameters required for the
-builder, dependent on the chosen strategy type.<ul>
-<li><code>mass_based_moving_bin</code> - None</li>
-<li><code>radii_based_moving_bin</code> - None</li>
-<li><code>speciated_mass_moving_bin</code> - None</li>
-<li><code>particle_resolved_speciated_mass</code> - None</li>
-</ul>
-</li>
-</ul>
-</li>
+<li>get_builders : Return a mapping of strategy types to builder
+    instances.</li>
+<li>get_strategy : Return a strategy instance for a given strategy type.</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>DistributionStrategy</code> - An instance of the specified
-DistributionStrategy.</li>
+<li>DistributionStrategy : An instance configured for the chosen
+  distribution representation.</li>
 </ul>
 <h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>ValueError</code> - If an unknown strategy type is provided.</li>
-<li><code>ValueError</code> - If any required key is missing during check_keys or
-pre_build_check, or if trying to set an invalid parameter.</li>
+<li>ValueError : If an unknown strategy type is provided or if
+  required parameters are missing or invalid.</li>
 </ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">DistributionFactory Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">DistributionFactory</span><span class="p">()</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">&quot;mass_based_moving_bin&quot;</span><span class="p">)</span>
+<span class="c1"># strategy -&gt; MassBasedMovingBin()</span>
+</code></pre></div>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DistributionFactory</span><span class="p">(</span>
     <span class="n">StrategyFactoryABC</span><span class="p">[</span>
@@ -7561,18 +7589,19 @@ pre_build_check, or if trying to set an invalid parameter.</li>
 <li><a href="../distribution_strategies/#speciatedmassmovingbin">SpeciatedMassMovingBin</a></li>
 </ul>
 <h3 id="distributionfactoryget_builders">DistributionFactory().get_builders<a class="headerlink" href="#distributionfactoryget_builders" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_factories.py#L65">Show source in distribution_factories.py:65</a></p>
-<p>Returns the mapping of strategy types to builder instances.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/distribution_factories.py#L64">Show source in distribution_factories.py:64</a></p>
+<p>Return a mapping of strategy types to builder instances.</p>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>Dict[str,</code> <em>BuilderABC]</em> - Mapping of strategy types to builder
-instances.<ul>
-<li><code>'mass_based_moving_bin'</code> - MassBasedMovingBinBuilder</li>
-<li><code>'radii_based_moving_bin'</code> - RadiiBasedMovingBinBuilder</li>
-<li><code>'speciated_mass_moving_bin'</code> - SpeciatedMassMovingBinBuilder</li>
+<li>A dictionary where each key is a string identifying the strategy
+    type, and each value is the corresponding builder object.</li>
 </ul>
-</li>
-</ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">get_builders Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">DistributionFactory</span><span class="p">()</span>
+<span class="n">builder_map</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
+<span class="c1"># builder_map[&quot;mass_based_moving_bin&quot;] -&gt; MassBasedMovingBinBuilder</span>
+</code></pre></div>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>

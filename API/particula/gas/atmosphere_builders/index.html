@@ -1809,11 +1809,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy/" class="md-nav__link">
+      <a href="../../dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Trubulent Dns Coagulation Strategy
+    TurbulentDNSCoagulationStrategy
     
   </span>
   
@@ -2707,6 +2707,15 @@
   <a href="#methods" class="md-nav__link">
     <span class="md-ellipsis">
       Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7467,6 +7476,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7623,19 +7641,28 @@ allowing for step-by-step setting of atmospheric properties and
 species composition.</p>
 <h4 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>temperature</code> - Temperature of the gas mixture in Kelvin.</li>
-<li><code>total_pressure</code> <em>float</em> - Total pressure of the gas mixture in Pascals.</li>
-<li><code>species</code> <em>list[GasSpecies]</em> - List of GasSpecies objects in the mixture.
-    Starts empty.</li>
+<li>temperature : Temperature of the gas mixture in Kelvin.</li>
+<li>total_pressure : Total pressure of the gas mixture in Pascals.</li>
+<li>species : List of GasSpecies objects in the mixture (starts empty).</li>
 </ul>
 <h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>set_temperature(temperature,temperature_units)</code> - Sets the temperature.</li>
-<li><code>set_pressure(pressure,pressure_units)</code> - Sets the total pressure.</li>
-<li><code>add_species(species)</code> - Adds a GasSpecies object to the gas mixture.</li>
-<li><code>set_parameters(parameters)</code> - Sets multiple parameters from a dictionary.</li>
-<li><code>build()</code> - Validates the set parameters and returns an Atmosphere object.</li>
+<li>set_temperature : Set the temperature (with optional unit handling).</li>
+<li>set_pressure : Set the total pressure (with optional unit handling).</li>
+<li>add_species : Add a GasSpecies object to the gas mixture.</li>
+<li>set_parameters : Set multiple parameters from a dictionary.</li>
+<li>build : Validate parameters and return an Atmosphere object.</li>
 </ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Create an atmosphere using the builder</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">builder</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">AtmosphereBuilder</span><span class="p">()</span>
+<span class="n">atmosphere</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">builder</span><span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">set_pressure</span><span class="p">(</span><span class="mi">101325</span><span class="p">,</span> <span class="s2">&quot;Pa&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">add_species</span><span class="p">(</span><span class="n">par</span><span class="o">.</span><span class="n">gas</span><span class="o">.</span><span class="n">GasSpecies</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;O2&quot;</span><span class="p">,</span> <span class="n">molar_mass</span><span class="o">=</span><span class="mf">0.032</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="p">)</span>
+</code></pre></div>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AtmosphereBuilder</span><span class="p">(</span><span class="n">BuilderABC</span><span class="p">,</span> <span class="n">BuilderTemperatureMixin</span><span class="p">,</span> <span class="n">BuilderPressureMixin</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
@@ -7647,15 +7674,15 @@ species composition.</p>
 <li><a href="../../builder_mixin/#buildertemperaturemixin">BuilderTemperatureMixin</a></li>
 </ul>
 <h3 id="atmospherebuilderadd_species">AtmosphereBuilder().add_species<a class="headerlink" href="#atmospherebuilderadd_species" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere_builders.py#L50">Show source in atmosphere_builders.py:50</a></p>
-<p>Adds a GasSpecies object to the gas mixture.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere_builders.py#L62">Show source in atmosphere_builders.py:62</a></p>
+<p>Add a GasSpecies object to the gas mixture.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>species</code> <em>GasSpecies</em> - The GasSpecies object to be added.</li>
+<li>species : The GasSpecies object to be added.</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <ul>
-<li><a href="#atmospherebuilder">AtmosphereBuilder</a> - Instance of this builder for chaining.</li>
+<li>AtmosphereBuilder : This builder, for method chaining.</li>
 </ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_species</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">species</span><span class="p">:</span> <span class="n">GasSpecies</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AtmosphereBuilder&quot;</span><span class="p">:</span> <span class="o">...</span>
@@ -7665,19 +7692,18 @@ species composition.</p>
 <li><a href="../species/#gasspecies">GasSpecies</a></li>
 </ul>
 <h3 id="atmospherebuilderbuild">AtmosphereBuilder().build<a class="headerlink" href="#atmospherebuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere_builders.py#L62">Show source in atmosphere_builders.py:62</a></p>
-<p>Validates the configuration and constructs the Atmosphere object.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere_builders.py#L75">Show source in atmosphere_builders.py:75</a></p>
+<p>Validate the configuration and construct the Atmosphere object.</p>
 <p>This method checks that all necessary conditions are met for a valid
-Atmosphere instance(e.g., at least one species must be present) and
+Atmosphere instance (e.g., at least one species must be present) and
 then initializes the Atmosphere.</p>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>Atmosphere</code> - The newly created Atmosphere object, configured as
-specified.</li>
+<li>Atmosphere : The newly created Atmosphere object.</li>
 </ul>
 <h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>ValueError</code> - If no species have been added to the mixture.</li>
+<li>ValueError : If no species have been added to the mixture.</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Atmosphere</span><span class="p">:</span> <span class="o">...</span>

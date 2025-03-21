@@ -2156,11 +2156,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy/" class="md-nav__link">
+      <a href="../dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Trubulent Dns Coagulation Strategy
+    TurbulentDNSCoagulationStrategy
     
   </span>
   
@@ -7921,10 +7921,11 @@
 </blockquote>
 <h2 id="aerosol_1">Aerosol<a class="headerlink" href="#aerosol_1" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L14">Show source in aerosol.py:14</a></p>
-<p>Collection of Gas and Particle objects.</p>
-<p>A class for interacting with collections of Gas and Particle objects.
-Allows for the representation and manipulation of an aerosol, which
-is composed of various gases and particles.</p>
+<p>Represents a collection of Gas and Particle objects forming an aerosol
+environment.</p>
+<p>This class allows for the representation and manipulation of an aerosol,
+which consists of various gases in an Atmosphere object and one or more
+ParticleRepresentation objects.</p>
 <h4 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h4>
 <ul>
 <li>atmosphere : The atmosphere containing the gases.</li>
@@ -7932,11 +7933,12 @@ is composed of various gases and particles.</p>
 </ul>
 <h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
 <ul>
-<li>iterate_gas : Returns an iterator for atmosphere species.</li>
-<li>iterate_particle : Returns an iterator for particle.</li>
-<li>replace_atmosphere : Replaces the current Atmosphere instance
-    with a new one.</li>
-<li>add_particle : Adds a Particle instance to the aerosol.</li>
+<li><code>-</code> <em>iterate_gas</em> - Returns an iterator over the gas species in atmosphere.</li>
+<li><code>-</code> <em>iterate_particle</em> - Returns an iterator over ParticleRepresentation
+    objects.</li>
+<li><code>-</code> <em>replace_atmosphere</em> - Replaces the current atmosphere with a new one.</li>
+<li><code>-</code> <em>add_particle</em> - Adds a new ParticleRepresentation object to the
+    aerosol.</li>
 </ul>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Creating an Aerosol</span><pre><span></span><code><span class="n">aerosol_instance</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="p">)</span>
@@ -7962,11 +7964,11 @@ is composed of various gases and particles.</p>
 <li><a href="../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="aerosolstr">Aerosol().<strong>str</strong><a class="headerlink" href="#aerosolstr" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L64">Show source in aerosol.py:64</a></p>
-<p>Returns a string representation of the aerosol.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L70">Show source in aerosol.py:70</a></p>
+<p>Provide a string representation of the aerosol.</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <ul>
-<li>str : A string representation of the aerosol.</li>
+<li>str : A string summarizing the atmosphere and each particle.</li>
 </ul>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="n">aerosol_instance</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="p">)</span>
@@ -7976,11 +7978,11 @@ is composed of various gases and particles.</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
 <h3 id="aerosoladd_particle">Aerosol().add_particle<a class="headerlink" href="#aerosoladd_particle" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L127">Show source in aerosol.py:127</a></p>
-<p>Adds a Particle instance to the aerosol.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L138">Show source in aerosol.py:138</a></p>
+<p>Add a new ParticleRepresentation to the aerosol.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li>particle : The Particle instance to add.</li>
+<li>particle : The particle instance to add.</li>
 </ul>
 <h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Adding a Particle to the Aerosol</span><pre><span></span><code><span class="n">aerosol_instance</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="p">)</span>
@@ -7995,14 +7997,14 @@ is composed of various gases and particles.</p>
 <li><a href="../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="aerosoliterate_gas">Aerosol().iterate_gas<a class="headerlink" href="#aerosoliterate_gas" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L82">Show source in aerosol.py:82</a></p>
-<p>Returns an iterator for atmosphere species.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L89">Show source in aerosol.py:89</a></p>
+<p>Return an iterator over the gas species in the atmosphere.</p>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li>Iterator : An iterator over the gas species type.</li>
+<li>Iterator[GasSpecies] : An iterator over gas species objects.</li>
 </ul>
 <h4 id="examples_3">Examples<a class="headerlink" href="#examples_3" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Iterating over the Aerosol gas</span><pre><span></span><code><span class="n">aerosol_instance</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Iterating over aerosol gas</span><pre><span></span><code><span class="n">aerosol_instance</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">gas</span> <span class="ow">in</span> <span class="n">aerosol_instance</span><span class="o">.</span><span class="n">iterate_gas</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">gas</span><span class="p">)</span>
 </code></pre></div>
@@ -8014,14 +8016,15 @@ is composed of various gases and particles.</p>
 <li><a href="../gas/species/#gasspecies">GasSpecies</a></li>
 </ul>
 <h3 id="aerosoliterate_particle">Aerosol().iterate_particle<a class="headerlink" href="#aerosoliterate_particle" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L97">Show source in aerosol.py:97</a></p>
-<p>Returns an iterator for particle.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L105">Show source in aerosol.py:105</a></p>
+<p>Return an iterator over the particle representations.</p>
 <h4 id="returns_2">Returns<a class="headerlink" href="#returns_2" title="Permanent link">&para;</a></h4>
 <ul>
-<li>Iterator : An iterator over the particle type.</li>
+<li>Iterator[ParticleRepresentation] : An iterator over particle
+    objects.</li>
 </ul>
 <h4 id="examples_4">Examples<a class="headerlink" href="#examples_4" title="Permanent link">&para;</a></h4>
-<div class="highlight"><span class="filename">Iterating over the Aerosol particle</span><pre><span></span><code><span class="n">aerosol_instance</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Iterating over aerosol particles</span><pre><span></span><code><span class="n">aerosol_instance</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">particle</span> <span class="ow">in</span> <span class="n">aerosol_instance</span><span class="o">.</span><span class="n">iterate_particle</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span>
 </code></pre></div>
@@ -8033,11 +8036,11 @@ is composed of various gases and particles.</p>
 <li><a href="../particles/representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h3 id="aerosolreplace_atmosphere">Aerosol().replace_atmosphere<a class="headerlink" href="#aerosolreplace_atmosphere" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L112">Show source in aerosol.py:112</a></p>
-<p>Replaces the current Atmosphere instance with a new one.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L122">Show source in aerosol.py:122</a></p>
+<p>Replace the current atmosphere with a new Atmosphere instance.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li>atmosphere : The instance to replace the current one.</li>
+<li>atmosphere : The new Atmosphere to assign.</li>
 </ul>
 <h4 id="examples_5">Examples<a class="headerlink" href="#examples_5" title="Permanent link">&para;</a></h4>
 <div class="highlight"><span class="filename">Replacing the Atmosphere in the Aerosol</span><pre><span></span><code><span class="n">aerosol_instance</span> <span class="o">=</span> <span class="n">Aerosol</span><span class="p">(</span><span class="n">atmosphere</span><span class="p">,</span> <span class="n">particles</span><span class="p">)</span>

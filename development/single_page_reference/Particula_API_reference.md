@@ -46,7 +46,7 @@ A full list of [Particula](https://github.com/uncscode/particula) project module
                 - [CoagulationStrategyABC](particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.md#coagulationstrategyabc)
                 - [CombineCoagulationStrategy](particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.md#combinecoagulationstrategy)
                 - [SedimentationCoagulationStrategy](particula/dynamics/coagulation/coagulation_strategy/sedimentation_coagulation_strategy.md#sedimentationcoagulationstrategy)
-                - [Trubulent Dns Coagulation Strategy](particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.md#trubulent-dns-coagulation-strategy)
+                - [TurbulentDNSCoagulationStrategy](particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.md#turbulentdnscoagulationstrategy)
                 - [TurbulentShearCoagulationStrategy](particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.md#turbulentshearcoagulationstrategy)
             - [Particle Resolved Step](particula/dynamics/coagulation/particle_resolved_step/index.md#particle-resolved-step)
                 - [Particle Resolved Method](particula/dynamics/coagulation/particle_resolved_step/particle_resolved_method.md#particle-resolved-method)
@@ -166,19 +166,39 @@ A full list of [Particula](https://github.com/uncscode/particula) project module
 Abstract base class for builders with common methods to check keys and
 set parameters from a dictionary.
 
-#### Arguments
+#### Attributes
 
-- required_parameters : List of required parameters for the builder.
+- `-` *required_parameters* - List of required parameters for the builder.
 
 #### Raises
 
-- ValueError : If any required key is missing during check_keys or
-    pre_build_check, or if trying to set an invalid parameter.
-- Warning : If using default units for any parameter.
+- `-` *ValueError* - If any required key is missing during check_keys or
+  pre_build_check, or if trying to set an invalid parameter.
+- `-` *Warning* - If using default units for any parameter.
+
+#### Examples
+
+```py
+class MyBuilder(BuilderABC):
+    def set_parameter1(self, value, units=None):
+        ...
+    def set_parameter2(self, value, units=None):
+        ...
+    def build(self):
+        return SomeStrategy()
+
+strategy = (
+    MyBuilder()
+    .set_parameters1(10, 'm')
+    .set_parameters2(20, 's')
+    .build()
+)
+```
 
 #### References
 
-- Builder Pattern : https://refactoring.guru/design-patterns/builder
+- "Builder Pattern,"
+[Refactoring Guru](https://refactoring.guru/design-patterns/builder)
 
 #### Signature
 
@@ -189,17 +209,17 @@ class BuilderABC(ABC):
 
 ### BuilderABC().build
 
-[Show source in abc_builder.py:138](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L138)
+[Show source in abc_builder.py:160](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L160)
 
 Build and return the strategy object with the set parameters.
 
 #### Returns
 
-- strategy : The built strategy object.
+- `Any` - The built strategy object.
 
 #### Examples
 
-``` py
+```py
 builder = Builder()
 strategy = builder.build()
 ```
@@ -213,22 +233,22 @@ def build(self) -> Any: ...
 
 ### BuilderABC().check_keys
 
-[Show source in abc_builder.py:34](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L34)
+[Show source in abc_builder.py:54](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L54)
 
 Check if the keys are present and valid.
 
 #### Arguments
 
-- parameters : The parameters dictionary to check.
+- `-` *parameters* - The parameters dictionary to check.
 
 #### Raises
 
-- ValueError : If any required key is missing or if trying to set
-    an invalid parameter.
+- `-` *ValueError* - If any required key is missing or if trying to set
+  an invalid parameter.
 
 #### Examples
 
-``` py
+```py
 builder = Builder()
 builder.check_keys({
     "parameter1": 1,
@@ -244,17 +264,17 @@ def check_keys(self, parameters: dict[str, Any]): ...
 
 ### BuilderABC().pre_build_check
 
-[Show source in abc_builder.py:117](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L117)
+[Show source in abc_builder.py:138](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L138)
 
 Check if all required attribute parameters are set before building.
 
 #### Raises
 
-- ValueError : If any required parameter is missing.
+- `-` *ValueError* - If any required parameter is missing.
 
 #### Examples
 
-``` py
+```py
 builder = Builder()
 builder.pre_build_check()
 ```
@@ -267,27 +287,26 @@ def pre_build_check(self): ...
 
 ### BuilderABC().set_parameters
 
-[Show source in abc_builder.py:80](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L80)
+[Show source in abc_builder.py:101](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L101)
 
-Set parameters from a dictionary including optional suffix for
-units as '_units'.
+Set parameters from a dictionary, handling any '_units' suffix.
 
 #### Arguments
 
-- parameters : The parameters dictionary to set.
+- `-` *parameters* - The parameters dictionary to set.
 
 #### Returns
 
-- The builder object with the set parameters.
+- [BuilderABC](#builderabc) - This builder object with the set parameters.
 
 #### Raises
 
-- ValueError : If any required key is missing.
-- Warning : If using default units for any parameter.
+- `-` *ValueError* - If any required key is missing.
+- `-` *Warning* - If using default units for any parameter.
 
 #### Examples
 
-``` py
+```py
 builder = Builder().set_parameters({
     "parameter1": 1,
     "parameter2": 2,
@@ -327,12 +346,25 @@ using builder objects.
 
 #### Methods
 
-- get_builders : Returns the mapping of strategy types to builder
-    instances.
-- get_strategy : Gets the strategy instance for the specified strategy.
-    - strategy_type : Type of strategy to use.
-    - parameters : Parameters required for the
-        builder, dependent on the chosen strategy type.
+- get_builders:
+    Returns the mapping of strategy types to builder instances.
+- get_strategy:
+    Gets the strategy instance for the specified strategy.
+
+#### Examples
+
+```py title="Simple Usage"
+my_factory = SomeSpecificFactory()
+strategy_instance = my_factory.get_strategy(
+    "example_type", {"param": 123}
+)
+# strategy_instance is now built using "example_type"
+```
+
+#### References
+
+- "Factory Method Pattern,"
+[Wikipedia](https://en.wikipedia.org/wiki/Factory_method_pattern)
 
 #### Signature
 
@@ -347,27 +379,36 @@ class StrategyFactoryABC(ABC, Generic[BuilderT, StrategyT]): ...
 
 ### StrategyFactoryABC().get_builders
 
-[Show source in abc_factory.py:32](https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L32)
+[Show source in abc_factory.py:43](https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L43)
 
-Returns the mapping of key names to builders, and their strategy
-build methods.
+Retrieve a mapping of strategy types to builder instances.
 
 #### Returns
 
-A dictionary mapping strategy types to builder instances.
+- `dict` - A dictionary that maps strategy type names (str) to
+builder instances.
 
 #### Examples
 
-``` py title= "Coagulation Factory"
-CoagulationFactory().get_builders()
-# Returns:
-    {
-        "brownian": BrownianCoagulationBuilder(),
-        "charged": ChargedCoagulationBuilder(),
-        "turbulent_shear": TurbulentShearCoagulationBuilder(),
-        "turbulent_dns": TurbulentDNSCoagulationBuilder(),
-        "combine": CombineCoagulationStrategyBuilder(),
-    }
+```py title="Coagulation Factory Example"
+from particula.coagulation_factory import CoagulationFactory
+
+builders = CoagulationFactory().get_builders()
+# Example result:
+# {
+#     "brownian": BrownianCoagulationBuilder(),
+#     "charged": ChargedCoagulationBuilder(),
+#     "turbulent_shear": TurbulentShearCoagulationBuilder(),
+#     "turbulent_dns": TurbulentDNSCoagulationBuilder(),
+#     "combine": CombineCoagulationStrategyBuilder(),
+# }
+```
+
+#### References
+
+- "Factory Method Pattern,"
+[Wikipedia](https://en.wikipedia.org/wiki/Factory_method_pattern)
+
 ```
 
 #### Signature
@@ -383,27 +424,41 @@ def get_builders(self) -> Dict[str, BuilderT]: ...
 
 ### StrategyFactoryABC().get_strategy
 
-[Show source in abc_factory.py:55](https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L55)
+[Show source in abc_factory.py:73](https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L73)
 
-Generic factory method to create objects instances.
+Create a strategy instance for the specified type using its
+corresponding builder.
 
 #### Arguments
 
-- strategy_type : Type of strategy to use.
-- parameters : Parameters required for the
-    builder, dependent on the chosen strategy type. Try building
-    with a builder first, to see if it is valid.
+- strategy_type (str): Name of the strategy to build.
+- parameters (Dict[str, Any], optional): Dictionary of parameters
+  to configure the chosen builder.
 
 #### Returns
 
-An object, built from selected builder with parameters.
+- [StrategyT](#abc-factory) - The built strategy object corresponding to the
+    specified type.
 
 #### Raises
 
-- ValueError : If an unknown key is provided.
-- ValueError : If any required parameter is missing during
-    check_keys or pre_build_check, or if trying to set an
-    invalid parameter.
+- `-` *ValueError* - If the `strategy_type` is unknown, or if any required
+  parameter is invalid/missing for the chosen builder.
+
+#### Examples
+
+```py title="Strategy Creation Example"
+my_factory = SomeStrategyFactory()
+my_strategy = my_factory.get_strategy(
+    "desired_strategy", {"param_x": 42}
+)
+# my_strategy is now an instance configured with param_x=42
+```
+
+#### References
+
+- "Factory Method Pattern,"
+[Wikipedia](https://en.wikipedia.org/wiki/Factory_method_pattern)
 
 #### Signature
 
@@ -1165,11 +1220,12 @@ def fixed_water_activity(
 
 [Show source in aerosol.py:14](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L14)
 
-Collection of Gas and Particle objects.
+Represents a collection of Gas and Particle objects forming an aerosol
+environment.
 
-A class for interacting with collections of Gas and Particle objects.
-Allows for the representation and manipulation of an aerosol, which
-is composed of various gases and particles.
+This class allows for the representation and manipulation of an aerosol,
+which consists of various gases in an Atmosphere object and one or more
+ParticleRepresentation objects.
 
 #### Attributes
 
@@ -1178,20 +1234,21 @@ is composed of various gases and particles.
 
 #### Methods
 
-- iterate_gas : Returns an iterator for atmosphere species.
-- iterate_particle : Returns an iterator for particle.
-- replace_atmosphere : Replaces the current Atmosphere instance
-    with a new one.
-- add_particle : Adds a Particle instance to the aerosol.
+- `-` *iterate_gas* - Returns an iterator over the gas species in atmosphere.
+- `-` *iterate_particle* - Returns an iterator over ParticleRepresentation
+    objects.
+- `-` *replace_atmosphere* - Replaces the current atmosphere with a new one.
+- `-` *add_particle* - Adds a new ParticleRepresentation object to the
+    aerosol.
 
 #### Examples
 
-``` py title="Creating an Aerosol"
+```py title="Creating an Aerosol"
 aerosol_instance = Aerosol(atmosphere, particles)
 print(aerosol_instance)
 ```
 
-``` py title="Iterating over the Aerosol"
+```py title="Iterating over the Aerosol"
 aerosol_instance = Aerosol(atmosphere, particles)
 for gas in aerosol_instance.iterate_gas():
     print(gas)
@@ -1217,17 +1274,17 @@ class Aerosol:
 
 ### Aerosol().__str__
 
-[Show source in aerosol.py:64](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L64)
+[Show source in aerosol.py:70](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L70)
 
-Returns a string representation of the aerosol.
+Provide a string representation of the aerosol.
 
 #### Returns
 
-- str : A string representation of the aerosol.
+- str : A string summarizing the atmosphere and each particle.
 
 #### Examples
 
-``` py
+```py
 aerosol_instance = Aerosol(atmosphere, particles)
 print(aerosol_instance)
 ```
@@ -1240,17 +1297,17 @@ def __str__(self) -> str: ...
 
 ### Aerosol().add_particle
 
-[Show source in aerosol.py:127](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L127)
+[Show source in aerosol.py:138](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L138)
 
-Adds a Particle instance to the aerosol.
+Add a new ParticleRepresentation to the aerosol.
 
 #### Arguments
 
-- particle : The Particle instance to add.
+- particle : The particle instance to add.
 
 #### Examples
 
-``` py title="Adding a Particle to the Aerosol"
+```py title="Adding a Particle to the Aerosol"
 aerosol_instance = Aerosol(atmosphere, particles)
 new_particle = ParticleRepresentation()
 aerosol_instance.add_particle(new_particle)
@@ -1268,17 +1325,17 @@ def add_particle(self, particle: ParticleRepresentation): ...
 
 ### Aerosol().iterate_gas
 
-[Show source in aerosol.py:82](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L82)
+[Show source in aerosol.py:89](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L89)
 
-Returns an iterator for atmosphere species.
+Return an iterator over the gas species in the atmosphere.
 
 #### Returns
 
-- Iterator : An iterator over the gas species type.
+- Iterator[GasSpecies] : An iterator over gas species objects.
 
 #### Examples
 
-``` py title="Iterating over the Aerosol gas"
+```py title="Iterating over aerosol gas"
 aerosol_instance = Aerosol(atmosphere, particles)
 for gas in aerosol_instance.iterate_gas():
     print(gas)
@@ -1296,17 +1353,18 @@ def iterate_gas(self) -> Iterator[GasSpecies]: ...
 
 ### Aerosol().iterate_particle
 
-[Show source in aerosol.py:97](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L97)
+[Show source in aerosol.py:105](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L105)
 
-Returns an iterator for particle.
+Return an iterator over the particle representations.
 
 #### Returns
 
-- Iterator : An iterator over the particle type.
+- Iterator[ParticleRepresentation] : An iterator over particle
+    objects.
 
 #### Examples
 
-``` py title="Iterating over the Aerosol particle"
+```py title="Iterating over aerosol particles"
 aerosol_instance = Aerosol(atmosphere, particles)
 for particle in aerosol_instance.iterate_particle():
     print(particle)
@@ -1324,17 +1382,17 @@ def iterate_particle(self) -> Iterator[ParticleRepresentation]: ...
 
 ### Aerosol().replace_atmosphere
 
-[Show source in aerosol.py:112](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L112)
+[Show source in aerosol.py:122](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L122)
 
-Replaces the current Atmosphere instance with a new one.
+Replace the current atmosphere with a new Atmosphere instance.
 
 #### Arguments
 
-- atmosphere : The instance to replace the current one.
+- atmosphere : The new Atmosphere to assign.
 
 #### Examples
 
-``` py title="Replacing the Atmosphere in the Aerosol"
+```py title="Replacing the Atmosphere in the Aerosol"
 aerosol_instance = Aerosol(atmosphere, particles)
 new_atmosphere = Atmosphere()
 aerosol_instance.replace_atmosphere(new_atmosphere)
@@ -1362,13 +1420,24 @@ def replace_atmosphere(self, atmosphere: Atmosphere): ...
 
 ## BuilderChargeMixin
 
-[Show source in builder_mixin.py:147](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L147)
+[Show source in builder_mixin.py:233](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L233)
 
-Mixin class for Builder classes to set charge and charge_units.
+Mixin class for setting a particle's charge.
+
+This class provides a method to assign charge in terms of number of
+elemental charges (dimensionless), ignoring units.
+
+#### Attributes
+
+- charge : The assigned charge.
 
 #### Methods
 
-- `set_charge` - Set the charge attribute and units.
+- `-` *set_charge* - Assign the particle's charge.
+
+#### References
+
+- No references available yet.
 
 #### Signature
 
@@ -1379,14 +1448,26 @@ class BuilderChargeMixin:
 
 ### BuilderChargeMixin().set_charge
 
-[Show source in builder_mixin.py:157](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L157)
+[Show source in builder_mixin.py:253](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L253)
 
 Set the number of elemental charges on the particle.
 
 #### Arguments
 
-charge : Charge of the particle [C].
-charge_units : Not used. (for interface consistency)
+- charge : Numeric value of the charge.
+- charge_units : Optional; if provided, a warning is logged
+    and ignored.
+
+#### Returns
+
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_charge(10)
+# charge is now 10 elementary charges
+```
 
 #### Signature
 
@@ -1400,18 +1481,29 @@ def set_charge(
 
 ## BuilderConcentrationMixin
 
-[Show source in builder_mixin.py:110](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L110)
+[Show source in builder_mixin.py:176](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L176)
 
-Mixin class for Builder classes to set concentration and
-concentration_units.
+Mixin class for setting concentration in a mixture.
 
-#### Arguments
+This class provides a method to assign a particle or species concentration
+in kg/m^3 by default, optionally converting from other units.
 
-default_units : Default units of concentration. Default is *kg/m^3*.
+#### Attributes
+
+- concentration : The concentration in the default units.
+- default_units : The default concentration units (e.g., "kg/m^3").
 
 #### Methods
 
-- `set_concentration` - Set the concentration attribute and units.
+- `-` *set_concentration* - Assign the concentration, converting units
+    as needed.
+
+#### Examples
+
+```py title="Example usage"
+builder = MyBuilderClass(default_units="g/m^3")
+builder.set_concentration(500, "g/m^3")
+```
 
 #### Signature
 
@@ -1422,15 +1514,25 @@ class BuilderConcentrationMixin:
 
 ### BuilderConcentrationMixin().set_concentration
 
-[Show source in builder_mixin.py:125](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L125)
+[Show source in builder_mixin.py:202](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L202)
 
-Set the concentration.
+Set the concentration in the mixture.
 
 #### Arguments
 
-concentration : Concentration in the mixture.
-concentration_units : Units of the concentration.
-    Default is *kg/m^3*.
+- concentration : Concentration value.
+- concentration_units : Units of the provided concentration.
+
+#### Returns
+
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_concentration(0.5, "kg/m^3")
+# stored as 0.5 in the default_units
+```
 
 #### Signature
 
@@ -1447,11 +1549,27 @@ def set_concentration(
 
 [Show source in builder_mixin.py:17](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L17)
 
-Mixin class for Builder classes to set density and density_units.
+Mixin class for setting density and density_units.
+
+This class provides a method to assign a particle's density in kg/m^3,
+optionally converting from other units.
+
+#### Attributes
+
+- density : Stores the density in kg/m^3 after conversion.
 
 #### Methods
 
-- `set_density` - Set the density attribute and units.
+- `-` *set_density* - Assign the density attribute, converting from given
+    units to kg/m^3.
+
+#### Examples
+
+```py title="Setting particle density"
+builder = MyBuilderClass()
+builder.set_density(1000, "g/m^3")
+# density is now 1.0 kg/m^3
+```
 
 #### Signature
 
@@ -1462,14 +1580,26 @@ class BuilderDensityMixin:
 
 ### BuilderDensityMixin().set_density
 
-[Show source in builder_mixin.py:27](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L27)
+[Show source in builder_mixin.py:42](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L42)
 
 Set the density of the particle in kg/m^3.
 
 #### Arguments
 
-density : Density of the particle.
-density_units : Units of the density. Default is *kg/m^3*
+- density : Density value.
+- density_units : Units of the provided density.
+    Default is "kg/m^3".
+
+#### Returns
+
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_density(1000, "g/m^3")
+# density is now 1.0 kg/m^3
+```
 
 #### Signature
 
@@ -1484,17 +1614,26 @@ def set_density(
 
 ## BuilderLognormalMixin
 
-[Show source in builder_mixin.py:331](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L331)
+[Show source in builder_mixin.py:517](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L517)
 
-Mixin class for Builder classes to set lognormal distributions.
+Mixin class for setting lognormal distribution parameters.
+
+This class provides methods to assign and manage lognormal distribution
+parameters for particle radius, including the mode, geometric standard
+deviation, and number concentration.
+
+#### Attributes
+
+- mode : Array of modes in meters.
+- number_concentration : Number concentration in 1/m^3.
+- geometric_standard_deviation : The dimensionless geometric std. dev.
 
 #### Methods
 
-- `set_mode` - Set the mode attribute and units.
-- `set_geometric_standard_deviation` - Set the geometric standard deviation
-    attribute and units.
-- `set_number_concentration` - Set the number concentration attribute and
-    units.
+- `-` *set_mode* - Assign the modal radius.
+- `-` *set_geometric_standard_deviation* - Assign the geometric std. dev.
+    (ignored units).
+- `-` *set_number_concentration* - Assign the number concentration in 1/m^3.
 
 #### Signature
 
@@ -1505,16 +1644,26 @@ class BuilderLognormalMixin:
 
 ### BuilderLognormalMixin().set_geometric_standard_deviation
 
-[Show source in builder_mixin.py:365](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L365)
+[Show source in builder_mixin.py:570](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L570)
 
-Set the geometric standard deviation for the distribution.
+Set the geometric standard deviation for the lognormal distribution.
 
 #### Arguments
 
-geometric_standard_deviation : The geometric standard deviation for
-    the radius.
-geometric_standard_deviation_units : Optional, ignored units for
-    geometric standard deviation [dimensionless].
+- geometric_standard_deviation : Dimensionless geometric std. dev.
+- geometric_standard_deviation_units : Ignored
+    (for interface consistency).
+
+#### Returns
+
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_geometric_standard_deviation(np.array([1.5, 2.0]))
+# geometric std dev is now [1.5, 2.0]
+```
 
 #### Signature
 
@@ -1529,14 +1678,25 @@ def set_geometric_standard_deviation(
 
 ### BuilderLognormalMixin().set_mode
 
-[Show source in builder_mixin.py:347](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L347)
+[Show source in builder_mixin.py:542](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L542)
 
-Set the mode for distribution.
+Set the mode for the lognormal distribution in meters.
 
 #### Arguments
 
-mode : The modes for the radius.
-mode_units : The units for the modes, default is [m].
+- mode : Array of modal radius values.
+- mode_units : Units of the provided mode. Default is "m".
+
+#### Returns
+
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_mode(np.array([1e-8, 2e-8]), "m")
+# modes are now [1e-8, 2e-8] m
+```
 
 #### Signature
 
@@ -1547,15 +1707,26 @@ def set_mode(self, mode: NDArray[np.float64], mode_units: str): ...
 
 ### BuilderLognormalMixin().set_number_concentration
 
-[Show source in builder_mixin.py:384](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L384)
+[Show source in builder_mixin.py:598](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L598)
 
-Set the number concentration for the distribution.
+Set the number concentration for the lognormal distribution in 1/m^3.
 
 #### Arguments
 
-number_concentration : The number concentration for the radius.
-number_concentration_units : The units for the number
-    concentration, "1/m^3".
+- number_concentration : Array of number concentration values.
+- number_concentration_units : Units of the concentration,
+    must be "1/m^3" or equivalent.
+
+#### Returns
+
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_number_concentration(np.array([1e6, 5e5]), "m^-3")
+# stored as [1e6, 5e5] 1/m^3
+```
 
 #### Signature
 
@@ -1570,13 +1741,20 @@ def set_number_concentration(
 
 ## BuilderMassMixin
 
-[Show source in builder_mixin.py:174](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L174)
+[Show source in builder_mixin.py:281](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L281)
 
-Mixin class for Builder classes to set mass and mass_units.
+Mixin class for setting particle mass in kg.
+
+This class provides a method to assign mass in kg, optionally converting
+from other units.
+
+#### Attributes
+
+- mass : The mass of the particle in kg.
 
 #### Methods
 
-- `set_mass` - Set the mass attribute and units.
+- `-` *set_mass* - Assign the mass, converting from specified units.
 
 #### Signature
 
@@ -1587,14 +1765,25 @@ class BuilderMassMixin:
 
 ### BuilderMassMixin().set_mass
 
-[Show source in builder_mixin.py:184](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L184)
+[Show source in builder_mixin.py:298](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L298)
 
 Set the mass of the particle in kg.
 
 #### Arguments
 
-mass : Mass of the particle.
-mass_units : Units of the mass. Default is *kg*.
+- mass : Numeric mass value.
+- mass_units : Units of the provided mass. Default is "kg".
+
+#### Returns
+
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_mass(1.0, "g")
+# mass is now 0.001 kg
+```
 
 #### Signature
 
@@ -1607,13 +1796,24 @@ def set_mass(self, mass: Union[float, NDArray[np.float64]], mass_units: str): ..
 
 ## BuilderMolarMassMixin
 
-[Show source in builder_mixin.py:78](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L78)
+[Show source in builder_mixin.py:124](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L124)
 
-Mixin class for Builder classes to set molar_mass and molar_mass_units.
+Mixin class for setting molar_mass and molar_mass_units.
+
+This class provides a method to assign a particle's molar mass in kg/mol,
+optionally converting from other units.
+
+#### Attributes
+
+- molar_mass : Stores the molar mass in kg/mol.
 
 #### Methods
 
-- `set_molar_mass` - Set the molar_mass attribute and units.
+- `-` *set_molar_mass* - Assign the molar_mass, converting units as necessary.
+
+#### References
+
+- No references available yet.
 
 #### Signature
 
@@ -1624,14 +1824,26 @@ class BuilderMolarMassMixin:
 
 ### BuilderMolarMassMixin().set_molar_mass
 
-[Show source in builder_mixin.py:88](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L88)
+[Show source in builder_mixin.py:144](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L144)
 
 Set the molar mass of the particle in kg/mol.
 
 #### Arguments
 
-molar_mass : Molar mass of the particle.
-molar_mass_units : Units of the molar mass. Default is *kg/mol*.
+- molar_mass : Molar mass value.
+- molar_mass_units : Units of the provided molar mass.
+    Default is "kg/mol".
+
+#### Returns
+
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_molar_mass(18, "g/mol")
+# molar_mass is now 0.018 kg/mol
+```
 
 #### Signature
 
@@ -1646,13 +1858,20 @@ def set_molar_mass(
 
 ## BuilderParticleResolvedCountMixin
 
-[Show source in builder_mixin.py:406](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L406)
+[Show source in builder_mixin.py:630](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L630)
 
-Mixin class for Builder classes to set particle_resolved_count.
+Mixin class for setting a particle-resolved count.
+
+This class provides a method to define how many individual particles
+should be resolved in a simulation or model.
+
+#### Attributes
+
+- particle_resolved_count : The number of particles to resolve.
 
 #### Methods
 
-- `set_particle_resolved_count` - Set the number of particles to resolve.
+- `-` *set_particle_resolved_count* - Assign the particle-resolved count.
 
 #### Signature
 
@@ -1663,15 +1882,25 @@ class BuilderParticleResolvedCountMixin:
 
 ### BuilderParticleResolvedCountMixin().set_particle_resolved_count
 
-[Show source in builder_mixin.py:416](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L416)
+[Show source in builder_mixin.py:647](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L647)
 
 Set the number of particles to resolve.
 
 #### Arguments
 
-particle_resolved_count : The number of particles to resolve.
-particle_resolved_count_units : Ignored units for particle
-    resolved.
+- particle_resolved_count : Positive integer count of particles.
+- particle_resolved_count_units : Ignored, for interface
+    consistency.
+
+#### Returns
+
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_particle_resolved_count(1000)
+```
 
 #### Signature
 
@@ -1688,13 +1917,21 @@ def set_particle_resolved_count(
 
 ## BuilderPressureMixin
 
-[Show source in builder_mixin.py:298](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L298)
+[Show source in builder_mixin.py:470](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L470)
 
-Mixin class for AtmosphereBuilder to set total pressure.
+Mixin class for setting total pressure in Pa.
+
+This class provides a method to assign the total gas mixture pressure
+in pascals, optionally converting from units like 'kPa', 'MPa', 'psi',
+'bar', or 'atm'.
+
+#### Attributes
+
+- pressure : The total pressure in Pa.
 
 #### Methods
 
-- `set_pressure` - Set the total pressure attribute and units.
+- `-` *set_pressure* - Assign the pressure, converting units as needed.
 
 #### Signature
 
@@ -1705,19 +1942,25 @@ class BuilderPressureMixin:
 
 ### BuilderPressureMixin().set_pressure
 
-[Show source in builder_mixin.py:308](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L308)
+[Show source in builder_mixin.py:488](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L488)
 
 Set the total pressure of the atmosphere.
 
 #### Arguments
 
-pressure : Total pressure of the gas mixture.
-pressure_units : Units of the pressure. Options include
-    'Pa', 'kPa', 'MPa', 'psi', 'bar', 'atm'. Default is 'Pa'.
+- pressure : Numeric pressure value.
+- pressure_units : Units of the given pressure. Default is "Pa".
 
 #### Returns
 
-- `AtmosphereBuilderMixin` - This object instance with updated pressure.
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_pressure(1.0, "bar")
+# pressure is now 1e5 Pa
+```
 
 #### Signature
 
@@ -1732,13 +1975,20 @@ def set_pressure(
 
 ## BuilderRadiusMixin
 
-[Show source in builder_mixin.py:232](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L232)
+[Show source in builder_mixin.py:373](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L373)
 
-Mixin class for Builder classes to set radius and radius_units.
+Mixin class for setting a particle's radius in meters.
+
+This class provides a method to assign radius in meters,
+optionally converting from other units.
+
+#### Attributes
+
+- radius : The radius in meters.
 
 #### Methods
 
-- `set_radius` - Set the radius attribute and units.
+- `-` *set_radius* - Assign the radius, converting units as needed.
 
 #### Signature
 
@@ -1749,14 +1999,25 @@ class BuilderRadiusMixin:
 
 ### BuilderRadiusMixin().set_radius
 
-[Show source in builder_mixin.py:242](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L242)
+[Show source in builder_mixin.py:390](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L390)
 
 Set the radius of the particle in meters.
 
 #### Arguments
 
-radius : Radius of the particle.
-radius_units : Units of the radius. Default is *m*.
+- radius : Numeric radius value.
+- radius_units : Units of the provided radius. Default is "m".
+
+#### Returns
+
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_radius(1.0, "um")
+# radius is now 1e-6 m
+```
 
 #### Signature
 
@@ -1769,13 +2030,25 @@ def set_radius(self, radius: Union[float, NDArray[np.float64]], radius_units: st
 
 ## BuilderSurfaceTensionMixin
 
-[Show source in builder_mixin.py:47](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L47)
+[Show source in builder_mixin.py:72](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L72)
 
-Mixin class for Builder classes to set surface_tension.
+Mixin class for setting surface_tension.
+
+This class provides a method to assign a particle's surface tension,
+in N/m units, optionally converting from other units.
+
+#### Attributes
+
+- surface_tension : Stores the surface tension in N/m after conversion.
 
 #### Methods
 
-- `set_surface_tension` - Set the surface_tension attribute and units.
+- `-` *set_surface_tension* - Assign the surface_tension, converting from
+    other units as needed.
+
+#### References
+
+- No references available yet.
 
 #### Signature
 
@@ -1786,14 +2059,25 @@ class BuilderSurfaceTensionMixin:
 
 ### BuilderSurfaceTensionMixin().set_surface_tension
 
-[Show source in builder_mixin.py:57](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L57)
+[Show source in builder_mixin.py:93](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L93)
 
 Set the surface tension of the particle in N/m.
 
 #### Arguments
 
-surface_tension : Surface tension of the particle.
-surface_tension_units : Surface tension units. Default is *N/m*.
+- surface_tension : Surface tension value.
+- surface_tension_units : Units of the provided surface tension.
+    Default is "N/m".
+
+#### Returns
+
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_surface_tension(0.072, "N/m")
+```
 
 #### Signature
 
@@ -1808,13 +2092,21 @@ def set_surface_tension(
 
 ## BuilderTemperatureMixin
 
-[Show source in builder_mixin.py:261](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L261)
+[Show source in builder_mixin.py:419](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L419)
 
-Mixin class for AtmosphereBuilder to set temperature.
+Mixin class for setting temperature in Kelvin.
+
+This class provides a method to assign temperature in Kelvin,
+optionally converting from specified units such as 'degC', 'degF',
+'degR', or 'K'.
+
+#### Attributes
+
+- temperature : The temperature in Kelvin.
 
 #### Methods
 
-- `set_temperature` - Set the temperature attribute and units.
+- `-` *set_temperature* - Assign the temperature, converting units as needed.
 
 #### Signature
 
@@ -1825,24 +2117,30 @@ class BuilderTemperatureMixin:
 
 ### BuilderTemperatureMixin().set_temperature
 
-[Show source in builder_mixin.py:271](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L271)
+[Show source in builder_mixin.py:437](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L437)
 
-Set the temperature of the atmosphere.
+Set the temperature of the atmosphere in Kelvin.
 
 #### Arguments
 
-temperature : Temperature of the gas mixture.
-temperature_units : Units of the temperature.
-    Options include 'degC', 'degF', 'degR', 'K'. Default is 'K'.
+- temperature : Numeric temperature value.
+- temperature_units : Units of the given temperature.
+    Defaults to "K". Accepts "degC", "degF", "degR", or "K".
 
 #### Returns
 
-- `AtmosphereBuilderMixin` - This object instance with updated
-    temperature.
+- self : The class instance for method chaining.
 
 #### Raises
 
-- `ValueError` - If the converted temperature is below absolute zero.
+- ValueError : If the converted temperature is below absolute zero.
+
+#### Examples
+
+```py title="Setting temperature"
+builder.set_temperature(25, "degC")
+# temperature is now 298.15 K
+```
 
 #### Signature
 
@@ -1855,13 +2153,20 @@ def set_temperature(self, temperature: float, temperature_units: str = "K"): ...
 
 ## BuilderVolumeMixin
 
-[Show source in builder_mixin.py:203](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L203)
+[Show source in builder_mixin.py:327](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L327)
 
-Mixin class for Builder classes to set volume and volume_units.
+Mixin class for setting volume in m^3.
+
+This class provides a method to assign volume in m^3,
+optionally converting from other units.
+
+#### Attributes
+
+- volume : The volume in m^3.
 
 #### Methods
 
-- `set_volume` - Set the volume attribute and units.
+- `-` *set_volume* - Assign the volume, converting units as needed.
 
 #### Signature
 
@@ -1872,14 +2177,25 @@ class BuilderVolumeMixin:
 
 ### BuilderVolumeMixin().set_volume
 
-[Show source in builder_mixin.py:213](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L213)
+[Show source in builder_mixin.py:344](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L344)
 
 Set the volume in m^3.
 
 #### Arguments
 
-volume : Volume.
-volume_units : Units of the volume. Default is *m^3*.
+- volume : Volume value.
+- volume_units : Units of the provided volume. Default is "m^3".
+
+#### Returns
+
+- self : The class instance for method chaining.
+
+#### Examples
+
+```py
+builder.set_volume(1.0, "L")
+# volume is now 0.001 m^3
+```
 
 #### Signature
 
@@ -2150,7 +2466,7 @@ def get_brownian_kernel_via_system_state(
 
 ## _system_state_properties
 
-[Show source in charged_dimensional_kernel.py:33](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L33)
+[Show source in charged_dimensional_kernel.py:34](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L34)
 
 Get the system state properties for charged particles.
 
@@ -2196,7 +2512,7 @@ def _system_state_properties(
 
 ## get_coulomb_kernel_chahl2019_via_system_state
 
-[Show source in charged_dimensional_kernel.py:388](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L388)
+[Show source in charged_dimensional_kernel.py:389](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L389)
 
 The dimensioned coagulation kernel via system state
 using Chahl (2019).
@@ -2249,7 +2565,7 @@ def get_coulomb_kernel_chahl2019_via_system_state(
 
 ## get_coulomb_kernel_dyachkov2007_via_system_state
 
-[Show source in charged_dimensional_kernel.py:195](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L195)
+[Show source in charged_dimensional_kernel.py:196](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L196)
 
 The dimensioned coagulation kernel via system state using Dyachkov (2007).
 
@@ -2301,7 +2617,7 @@ def get_coulomb_kernel_dyachkov2007_via_system_state(
 
 ## get_coulomb_kernel_gatti2008_via_system_state
 
-[Show source in charged_dimensional_kernel.py:259](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L259)
+[Show source in charged_dimensional_kernel.py:260](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L260)
 
 The dimensioned coagulation kernel via system state using Gatti (2008).
 
@@ -2353,7 +2669,7 @@ def get_coulomb_kernel_gatti2008_via_system_state(
 
 ## get_coulomb_kernel_gopalakrishnan2012_via_system_state
 
-[Show source in charged_dimensional_kernel.py:323](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L323)
+[Show source in charged_dimensional_kernel.py:324](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L324)
 
 The dimensioned coagulation kernel via system state
 using Gopalakrishnan (2012).
@@ -2406,7 +2722,7 @@ def get_coulomb_kernel_gopalakrishnan2012_via_system_state(
 
 ## get_hard_sphere_kernel_via_system_state
 
-[Show source in charged_dimensional_kernel.py:121](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L121)
+[Show source in charged_dimensional_kernel.py:122](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_dimensional_kernel.py#L122)
 
 The hard sphere dimensioned coagulation kernel via system state.
 
@@ -2722,18 +3038,41 @@ def get_hard_sphere_kernel(
 
 ## ChargedKernelStrategyABC
 
-[Show source in charged_kernel_strategy.py:32](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L32)
+[Show source in charged_kernel_strategy.py:28](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L28)
 
-Abstract class for dimensionless coagulation strategies. This class defines
-the dimensionless kernel (H) method that must be implemented by any
-dimensionless coagulation strategy.
+Abstract base class for dimensionless coagulation strategies.
+
+This class defines the dimensionless kernel (H) method, which must be
+implemented by subclasses, and the `kernel` method that converts the
+dimensionless kernel into a dimensioned coagulation kernel.
 
 #### Methods
 
---------
-- dimensionless (abstractmethod): Calculate the dimensionless coagulation
-kernel.
-- `-` *kernel* - Calculate the dimensioned coagulation kernel.
+- dimensionless : Compute the dimensionless coagulation kernel (H).
+- kernel : Convert a dimensionless kernel into a dimensioned kernel.
+
+#### Examples
+
+```py
+class CustomKernel(ChargedKernelStrategyABC):
+    def dimensionless(self, diff_kn, phi):
+        # user-defined approaches
+        return np.ones_like(diff_kn)
+
+kernel_strategy = CustomKernel()
+dim_kernel = kernel_strategy.kernel(
+    dimensionless_kernel=kernel_strategy.dimensionless(...),
+    coulomb_potential_ratio=...,
+    sum_of_radii=...,
+    reduced_mass=...,
+    reduced_friction_factor=...
+)
+```
+
+#### References
+
+- See references in the individual subclasses for details on specific
+  Coulomb approximations.
 
 #### Signature
 
@@ -2743,46 +3082,27 @@ class ChargedKernelStrategyABC(ABC): ...
 
 ### ChargedKernelStrategyABC().dimensionless
 
-[Show source in charged_kernel_strategy.py:45](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L45)
+[Show source in charged_kernel_strategy.py:62](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L62)
 
-Return the dimensionless coagulation kernel (H)
+Return the dimensionless coagulation kernel (H).
 
 #### Arguments
 
------
-- `-` *diffusive_knudsen* - The diffusive Knudsen number (K_nD)
-[dimensionless].
-- `-` *coulomb_potential_ratio* - The Coulomb potential ratio (phi_E)
-[dimensionless].
+- diffusive_knudsen : The diffusive Knudsen number (KₙD)
+  [dimensionless].
+- coulomb_potential_ratio : The Coulomb potential ratio (φ_E)
+  [dimensionless].
 
 #### Returns
 
---------
-The dimensionless coagulation kernel (H) [dimensionless].
+- NDArray[np.float64] : The dimensionless coagulation kernel (H).
 
 #### References
 
------------
-- Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation
-of particles in the transition regime: The effect of the Coulomb
-potential. Journal of Chemical Physics, 126(12).
-https://doi.org/10.1063/1.2713719
-- Gatti, M., & Kortshagen, U. (2008). Analytical model of particle
-charging in plasmas over a wide range of collisionality. Physical
-Review E - Statistical, Nonlinear, and Soft Matter Physics, 78(4).
-https://doi.org/10.1103/PhysRevE.78.046402
-- Gopalakrishnan, R., & Hogan, C. J. (2011). Determination of the
-transition regime collision kernel from mean first passage times.
-Aerosol Science and Technology, 45(12), 1499-1509.
-https://doi.org/10.1080/02786826.2011.601775
-- Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced
-collisions in aerosols and dusty plasmas. Physical Review E -
-Statistical, Nonlinear, and Soft Matter Physics, 85(2).
-https://doi.org/10.1103/PhysRevE.85.026410
-- Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
-molecular regime Coulombic collisions in aerosols and dusty plasmas.
-Aerosol Science and Technology, 53(8), 933-957.
-https://doi.org/10.1080/02786826.2019.1614522
+- Dyachkov, S. A., et al. (2007).
+- Gatti, M., & Kortshagen, U. (2008).
+- Gopalakrishnan, R., & Hogan, C. J. (2012).
+- Chahl, H. S., & Gopalakrishnan, R. (2019).
 
 #### Signature
 
@@ -2797,33 +3117,39 @@ def dimensionless(
 
 ### ChargedKernelStrategyABC().kernel
 
-[Show source in charged_kernel_strategy.py:88](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L88)
+[Show source in charged_kernel_strategy.py:87](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L87)
 
-The dimensioned coagulation kernel for each particle pair, calculated
-from the dimensionless coagulation kernel and the reduced quantities.
-All inputs are square matrices, for all particle-particle interactions.
+Convert a dimensionless kernel into a dimensioned coagulation kernel.
+
+Uses reduced mass, friction factors, and particle radii to obtain units
+of [m³/s] for each particle-particle interaction.
 
 #### Arguments
 
-- dimensionless_kernel : The dimensionless coagulation kernel
-    [dimensionless].
+- dimensionless_kernel : The dimensionless coagulation kernel (H)
+  [dimensionless].
 - coulomb_potential_ratio : The Coulomb potential ratio
-    [dimensionless].
-- sum_of_radii : The sum of the radii of the particles [m].
-- reduced_mass : The reduced mass of the particles [kg].
-- reduced_friction_factor : The reduced friction factor of the
-    particles [dimensionless].
+  [dimensionless].
+- sum_of_radii : The sum of the two particle radii [m].
+- reduced_mass : The reduced mass of the two particles [kg].
+- reduced_friction_factor : The reduced friction factor
+  [dimensionless].
 
 #### Returns
 
-- The dimensioned coagulation kernel, as a square matrix, of all
-    particle-particle interactions [m^3/s].
+- The dimensioned coagulation kernel [m³/s].
 
-*References*:
-- Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
-molecular regime Coulombic collisions in aerosols and dusty plasmas.
-Aerosol Science and Technology, 53(8), 933-957.
-https://doi.org/10.1080/02786826.2019.1614522
+#### Examples
+
+```py title="Kernel Conversion Example"
+dim_kernel = kernel_strategy.kernel(
+    dimensionless_kernel=H,
+    coulomb_potential_ratio=phi,
+    sum_of_radii=r_sum,
+    reduced_mass=m_reduced,
+    reduced_friction_factor=zeta
+)
+```
 
 #### Signature
 
@@ -2842,17 +3168,33 @@ def kernel(
 
 ## CoulombDyachkov2007KernelStrategy
 
-[Show source in charged_kernel_strategy.py:148](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L148)
+[Show source in charged_kernel_strategy.py:174](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L174)
 
 Dyachkov et al. (2007) approximation for the dimensionless coagulation
-kernel. Accounts for the Coulomb potential between particles.
+kernel.
+
+Accounts for Coulomb potential between particles, suitable for
+transition regime calculations.
+
+#### Methods
+
+- dimensionless : Return the dimensionless kernel (H) following Dyachkov
+  et al. (2007).
+
+#### Examples
+
+```py title="Use Dyachkov Kernel Strategy"
+import particula as par
+strategy = par.dynamics.CoulombDyachkov2007KernelStrategy()
+H = strategy.dimensionless(diffusive_knudsen, coulomb_potential_ratio)
+```
 
 #### References
 
-- Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation of
-particles in the transition regime: The effect of the Coulomb potential.
-Journal of Chemical Physics, 126(12).
-https://doi.org/10.1063/1.2713719
+- Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007). Coagulation
+  of particles in the transition regime: The effect of the Coulomb
+  potential. J. Chem. Phys., 126(12).
+  [DOI](https://doi.org/10.1063/1.2713719)
 
 #### Signature
 
@@ -2866,7 +3208,7 @@ class CoulombDyachkov2007KernelStrategy(ChargedKernelStrategyABC): ...
 
 ### CoulombDyachkov2007KernelStrategy().dimensionless
 
-[Show source in charged_kernel_strategy.py:160](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L160)
+[Show source in charged_kernel_strategy.py:200](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L200)
 
 #### Signature
 
@@ -2882,18 +3224,33 @@ def dimensionless(
 
 ## CoulombGatti2008KernelStrategy
 
-[Show source in charged_kernel_strategy.py:170](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L170)
+[Show source in charged_kernel_strategy.py:210](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L210)
 
-Gatti and Kortshagen (2008) approximation for the dimensionless coagulation
-kernel. Accounts for the Coulomb potential between particles.
+Gatti & Kortshagen (2008) approximation for the dimensionless coagulation
+kernel.
+
+Captures Coulomb potential effects for a broad range of charge and
+collisionality conditions.
+
+#### Methods
+
+- dimensionless : Return the dimensionless kernel (H) following Gatti
+  and Kortshagen (2008).
+
+#### Examples
+
+```py title="Use Gatti Kernel Strategy"
+import particula as par
+strategy = par.dynamics.CoulombGatti2008KernelStrategy()
+H = strategy.dimensionless(diff_kn, phi_ratio)
+```
 
 #### References
 
------------
 - Gatti, M., & Kortshagen, U. (2008). Analytical model of particle
-charging in plasmas over a wide range of collisionality. Physical Review
-E - Statistical, Nonlinear, and Soft Matter Physics, 78(4).
-https://doi.org/10.1103/PhysRevE.78.046402
+  charging in plasmas over a wide range of collisionality. Phys. Rev. E,
+  78(4).
+  [DOI](https://doi.org/10.1103/PhysRevE.78.046402)
 
 #### Signature
 
@@ -2907,7 +3264,7 @@ class CoulombGatti2008KernelStrategy(ChargedKernelStrategyABC): ...
 
 ### CoulombGatti2008KernelStrategy().dimensionless
 
-[Show source in charged_kernel_strategy.py:183](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L183)
+[Show source in charged_kernel_strategy.py:236](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L236)
 
 #### Signature
 
@@ -2923,18 +3280,32 @@ def dimensionless(
 
 ## CoulombGopalakrishnan2012KernelStrategy
 
-[Show source in charged_kernel_strategy.py:193](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L193)
+[Show source in charged_kernel_strategy.py:246](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L246)
 
-Gopalakrishnan and Hogan (2012) approximation for the dimensionless
-coagulation kernel. Accounts for the Coulomb potential between particles.
+Gopalakrishnan & Hogan (2012) approximation for the dimensionless
+coagulation kernel.
+
+Incorporates Coulomb-influenced collisions in aerosol and dusty plasma
+environments.
+
+#### Methods
+
+- dimensionless : Return the dimensionless kernel (H) following
+  Gopalakrishnan & Hogan (2012).
+
+#### Examples
+
+```py title="Use Gopalakrishnan Kernel Strategy"
+import particula as par
+strategy = par.dynamics.CoulombGopalakrishnan2012KernelStrategy()
+H = strategy.dimensionless(kn, phi_ratio)
+```
 
 #### References
 
------------
 - Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
-in aerosols and dusty plasmas. Physical Review E - Statistical, Nonlinear,
-and Soft Matter Physics, 85(2).
-https://doi.org/10.1103/PhysRevE.85.026410
+  in aerosols and dusty plasmas. Phys. Rev. E, 85(2).
+  [DOI](https://doi.org/10.1103/PhysRevE.85.026410)
 
 #### Signature
 
@@ -2948,7 +3319,7 @@ class CoulombGopalakrishnan2012KernelStrategy(ChargedKernelStrategyABC): ...
 
 ### CoulombGopalakrishnan2012KernelStrategy().dimensionless
 
-[Show source in charged_kernel_strategy.py:206](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L206)
+[Show source in charged_kernel_strategy.py:271](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L271)
 
 #### Signature
 
@@ -2964,18 +3335,33 @@ def dimensionless(
 
 ## CoulumbChahl2019KernelStrategy
 
-[Show source in charged_kernel_strategy.py:218](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L218)
+[Show source in charged_kernel_strategy.py:283](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L283)
 
-Chahl and Gopalakrishnan (2019) approximation for the dimensionless
-coagulation kernel. Accounts for the Coulomb potential between particles.
+Chahl & Gopalakrishnan (2019) approximation for the dimensionless
+coagulation kernel.
+
+Focuses on high-potential, near-free molecular regime Coulombic collisions
+in aerosols and dusty plasmas.
+
+#### Methods
+
+- dimensionless : Return the dimensionless kernel (H) following
+  Chahl & Gopalakrishnan (2019).
+
+#### Examples
+
+```py title="Use Chahl 2019 Kernel Strategy"
+import particula as par
+strategy = CoulumbChahl2019KernelStrategy()
+H = strategy.dimensionless(kn, phi)
+```
 
 #### References
 
------------
 - Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
-molecular regime Coulombic collisions in aerosols and dusty plasmas.
-Aerosol Science and Technology, 53(8), 933-957.
-https://doi.org/10.1080/02786826.2019.1614522
+  molecular regime Coulombic collisions in aerosols and dusty plasmas.
+  Aerosol Sci. Technol., 53(8).
+  [DOI](https://doi.org/10.1080/02786826.2019.1614522)
 
 #### Signature
 
@@ -2989,7 +3375,7 @@ class CoulumbChahl2019KernelStrategy(ChargedKernelStrategyABC): ...
 
 ### CoulumbChahl2019KernelStrategy().dimensionless
 
-[Show source in charged_kernel_strategy.py:231](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L231)
+[Show source in charged_kernel_strategy.py:309](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L309)
 
 #### Signature
 
@@ -3005,9 +3391,34 @@ def dimensionless(
 
 ## HardSphereKernelStrategy
 
-[Show source in charged_kernel_strategy.py:133](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L133)
+[Show source in charged_kernel_strategy.py:137](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L137)
 
 Hard sphere dimensionless coagulation strategy.
+
+Idealized Coulomb interactions and assumes particles interact as
+perfectly charged spheres.
+
+#### Methods
+
+- dimensionless : Compute the dimensionless kernel under hard sphere
+  assumptions.
+
+#### Examples
+
+```py title="Hard Sphere Kernel Strategy"
+import particula as par
+hs_strategy = par.dynamics.HardSphereKernelStrategy()
+H = hs_strategy.dimensionless(
+    diffusive_knudsen, coulomb_potential_ratio
+)
+# H is the hard-sphere dimensionless kernel
+```
+
+#### References
+
+- Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced collisions
+  in aerosols and dusty plasmas. Phys. Rev. E, 85(2).
+  [DOI](https://doi.org/10.1103/PhysRevE.85.026410)
 
 #### Signature
 
@@ -3021,7 +3432,7 @@ class HardSphereKernelStrategy(ChargedKernelStrategyABC): ...
 
 ### HardSphereKernelStrategy().dimensionless
 
-[Show source in charged_kernel_strategy.py:138](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L138)
+[Show source in charged_kernel_strategy.py:164](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/charged_kernel_strategy.py#L164)
 
 #### Signature
 
@@ -3043,21 +3454,35 @@ def dimensionless(
 
 ## BrownianCoagulationBuilder
 
-[Show source in brownian_coagulation_builder.py:18](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/brownian_coagulation_builder.py#L18)
+[Show source in brownian_coagulation_builder.py:27](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/brownian_coagulation_builder.py#L27)
 
-Brownian Coagulation Builder class for coagulation strategies.
+Brownian Coagulation builder class.
 
-This class is used to create coagulation strategies based on the specified
-distribution type and kernel strategy. This provides a validation layer to
-ensure that the correct values are passed to the coagulation strategy.
+Creates a `BrownianCoagulationStrategy` given a distribution type
+(e.g., "discrete", "continuous_pdf", or "particle_resolved"). Ensures
+the required parameters are set before building the strategy.
+
+#### Attributes
+
+- distribution_type : Representation of the particle
+  size distribution.
 
 #### Methods
 
-- `set_distribution_type(distribution_type)` - Set the distribution type.
-- `set_kernel_strategy(kernel_strategy)` - Set the kernel strategy.
-- `set_parameters(params)` - Set the parameters of the CoagulationStrategy
-    object from a dictionary including optional units.
-- `build()` - Validate and return the CoagulationStrategy object.
+- set_distribution_type : Assign the distribution type.
+- set_parameters : Inherited from BuilderABC to set multiple
+  parameters via a dict.
+- build : Validate and return a `BrownianCoagulationStrategy`.
+
+#### Examples
+
+```py title="Example of using BrownianCoagulationBuilder"
+import particula as par
+builder = BrownianCoagulationBuilder()
+builder.set_distribution_type("discrete")
+strategy = builder.build()
+# strategy is now a BrownianCoagulationStrategy instance
+```
 
 #### Signature
 
@@ -3073,13 +3498,17 @@ class BrownianCoagulationBuilder(BuilderABC, BuilderDistributionTypeMixin):
 
 ### BrownianCoagulationBuilder().build
 
-[Show source in brownian_coagulation_builder.py:41](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/brownian_coagulation_builder.py#L41)
+[Show source in brownian_coagulation_builder.py:63](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/brownian_coagulation_builder.py#L63)
 
-Validate and return the CoagulationStrategy object.
+Validate and return the BrownianCoagulationStrategy object.
+
+Checks that all required parameters (e.g., distribution_type) are set
+before creating and returning a `BrownianCoagulationStrategy`.
 
 #### Returns
 
-- `CoagulationStrategy` - Instance of the CoagulationStrategy object.
+BrownianCoagulationStrategy : The newly created
+Brownian coagulation strategy.
 
 #### Signature
 
@@ -3103,22 +3532,42 @@ def build(self) -> CoagulationStrategyABC: ...
 
 ## ChargedCoagulationBuilder
 
-[Show source in charged_coagulation_builder.py:23](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L23)
+[Show source in charged_coagulation_builder.py:29](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L29)
 
-Charged Coagulation Builder class for coagulation strategies.
+Charged Coagulation builder class.
 
-This class is used to create charged coagulation strategies based on the
-specified distribution type and kernel strategy. This provides a validation
-layer to ensure that the correct values are passed to the coagulation
-strategy.
+Creates a `ChargedCoagulationStrategy` based on a specified distribution
+type and a `ChargedKernelStrategyABC` instance, enforcing the correct
+parameters for modeling electrostatic interactions in aerosol coagulation.
+
+#### Attributes
+
+- distribution_type : Distribution representation
+  ("discrete", "continuous_pdf", or "particle_resolved").
+- charged_kernel_strategy : Instance of `ChargedKernelStrategyABC`
+  for electrostatic kernel calculations.
 
 #### Methods
 
-- `set_distribution_type(distribution_type)` - Set the distribution type.
-- `set_kernel_strategy(kernel_strategy)` - Set the kernel strategy.
-- `set_parameters(params)` - Set the parameters of the CoagulationStrategy
-    object from a dictionary including optional units.
-- `build()` - Validate and return the CoagulationStrategy object.
+- set_distribution_type : Set the distribution type.
+- set_charged_kernel_strategy : Set the charged kernel strategy.
+- set_parameters : Configure parameters from a dictionary.
+- build : Validate inputs and return a `ChargedCoagulationStrategy`.
+
+#### Examples
+
+```py title="Example of using ChargedCoagulationBuilder"
+import particula as par
+builder = par.dynamics.ChargedCoagulationBuilder()
+builder.set_distribution_type("discrete")
+builder.set_charged_kernel_strategy(charged_kernel_strategy)
+coagulation_strategy = builder.build()
+```
+
+#### References
+
+- Seinfeld, J. H., & Pandis, S. N. (2016). "Atmospheric Chemistry
+  and Physics." Wiley.
 
 #### Signature
 
@@ -3134,13 +3583,28 @@ class ChargedCoagulationBuilder(BuilderABC, BuilderDistributionTypeMixin):
 
 ### ChargedCoagulationBuilder().build
 
-[Show source in charged_coagulation_builder.py:79](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L79)
+[Show source in charged_coagulation_builder.py:107](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L107)
 
 Validate and return the ChargedCoagulationStrategy object.
 
+This method checks whether all required parameters have been
+specified (e.g., distribution type, charged kernel strategy)
+before creating a `ChargedCoagulationStrategy`.
+
 #### Returns
 
-- `CoagulationStrategy` - Instance of the CoagulationStrategy object.
+- CoagulationStrategyABC : The properly configured
+  charged coagulation strategy.
+
+#### Examples
+
+```py title="Example of using ChargedCoagulationBuilder build"
+import particula as par
+builder = ChargedCoagulationBuilder()
+builder.set_distribution_type("discrete")
+builder.set_charged_kernel_strategy(charged_kernel_strategy)
+charged_strategy = builder.build()
+```
 
 #### Signature
 
@@ -3154,18 +3618,21 @@ def build(self) -> CoagulationStrategyABC: ...
 
 ### ChargedCoagulationBuilder().set_charged_kernel_strategy
 
-[Show source in charged_coagulation_builder.py:48](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L48)
+[Show source in charged_coagulation_builder.py:72](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L72)
 
-Set the kernel strategy.
+Set the charged kernel strategy for electrostatic coagulation.
 
 #### Arguments
 
-charged_kernel_strategy : The kernel strategy to be set.
-charged_kernel_strategy_units : Not used.
+- charged_kernel_strategy : An instance of
+  `ChargedKernelStrategyABC`.
+- charged_kernel_strategy_units : For interface consistency,
+  unused.
 
 #### Raises
 
-- `ValueError` - If the kernel strategy is not valid.
+- ValueError : If the kernel strategy is invalid or units passed
+  are unsupported.
 
 #### Signature
 
@@ -3193,17 +3660,29 @@ def set_charged_kernel_strategy(
 
 ## BuilderDistributionTypeMixin
 
-[Show source in coagulation_builder_mixin.py:22](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin.py#L22)
+[Show source in coagulation_builder_mixin.py:25](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin.py#L25)
 
 Mixin class for distribution type in coagulation strategies.
 
-This mixin class is used to set the distribution type for coagulation
-strategies. It provides a validation layer to ensure that the correct
-distribution type is passed to the coagulation strategy.
+Provides an interface to set the distribution type for coagulation
+strategies. Ensures the chosen `distribution_type` is valid.
+
+#### Attributes
+
+- distribution_type : Stores the selected distribution type
+  (e.g., "discrete", "continuous_pdf", "particle_resolved").
 
 #### Methods
 
-- `set_distribution_type(distribution_type)` - Set the distribution type.
+- set_distribution_type : Set and validate the distribution type.
+
+#### Examples
+
+```py title="Example of using BuilderDistributionTypeMixin"
+builder = SomeCoagulationBuilder()
+builder.set_distribution_type("discrete")
+# builder.distribution_type -> "discrete"
+```
 
 #### Signature
 
@@ -3214,7 +3693,7 @@ class BuilderDistributionTypeMixin:
 
 ### BuilderDistributionTypeMixin().set_distribution_type
 
-[Show source in coagulation_builder_mixin.py:36](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin.py#L36)
+[Show source in coagulation_builder_mixin.py:49](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin.py#L49)
 
 Set the distribution type.
 
@@ -3224,9 +3703,22 @@ distribution_type : The distribution type to be set.
     Options are "discrete", "continuous_pdf", "particle_resolved".
 distribution_type_units : Not used.
 
+#### Returns
+
+- The instance of the class with the updated
+    distribution_type attribute.
+
 #### Raises
 
 - `ValueError` - If the distribution type is not valid.
+
+#### Examples
+
+```py title="Example of using set_distribution_type"
+builder = SomeCoagulationBuilder()
+builder.set_distribution_type("discrete")
+# builder.distribution_type -> "discrete"
+```
 
 #### Signature
 
@@ -3240,13 +3732,27 @@ def set_distribution_type(
 
 ## BuilderFluidDensityMixin
 
-[Show source in coagulation_builder_mixin.py:107](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin.py#L107)
+[Show source in coagulation_builder_mixin.py:157](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin.py#L157)
 
 Mixin class for fluid density parameters.
 
-This mixin class is used to set the fluid density for turbulent shear
-coagulation strategies. It provides a validation layer to ensure that
-the correct values are passed.
+Adds methods and attributes for setting and validating fluid
+density in coagulation strategies.
+
+#### Attributes
+
+- fluid_density : Numeric value representing fluid density
+  in kg/m^3 (default units).
+
+#### Methods
+
+- set_fluid_density : Set and validate the fluid density.
+
+#### Examples
+
+```py title="Example of using BuilderFluidDensityMixin"
+builder.set_fluid_density(1.225, "kg/m^3")
+```
 
 #### Signature
 
@@ -3257,7 +3763,7 @@ class BuilderFluidDensityMixin:
 
 ### BuilderFluidDensityMixin().set_fluid_density
 
-[Show source in coagulation_builder_mixin.py:118](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin.py#L118)
+[Show source in coagulation_builder_mixin.py:179](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin.py#L179)
 
 Set the density of the particle in kg/m^3.
 
@@ -3265,6 +3771,23 @@ Set the density of the particle in kg/m^3.
 
 density : Density of the particle.
 density_units : Units of the density. Default is *kg/m^3*
+
+#### Returns
+
+- The instance of the class with the updated
+    fluid_density attribute.
+
+#### Raises
+
+- `ValueError` - Must be positive value.
+
+#### Examples
+
+```py title="Example of using set_fluid_density"
+builder = SomeCoagulationBuilder()
+builder.set_fluid_density(1.225, "kg/m^3")
+# builder.fluid_density -> 1.225
+```
 
 #### Signature
 
@@ -3279,13 +3802,28 @@ def set_fluid_density(
 
 ## BuilderTurbulentDissipationMixin
 
-[Show source in coagulation_builder_mixin.py:73](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin.py#L73)
+[Show source in coagulation_builder_mixin.py:97](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin.py#L97)
 
 Mixin class for turbulent shear parameters.
 
-This mixin class is used to set the turbulent dissipation and fluid
-density for turbulent shear coagulation strategies. It provides a
-validation layer to ensure that the correct values are passed.
+Adds methods and attributes for setting and validating
+turbulent dissipation parameters in coagulation strategies.
+
+#### Attributes
+
+- turbulent_dissipation : Numeric value of the energy dissipation
+  rate in m^2/s^3 (default units).
+
+#### Methods
+
+- set_turbulent_dissipation : Set and validate the turbulent
+    dissipation rate.
+
+#### Examples
+
+```py title="Example of using BuilderTurbulentDissipationMixin"
+builder.set_turbulent_dissipation(1e-3, "m^2/s^3")
+```
 
 #### Signature
 
@@ -3296,7 +3834,7 @@ class BuilderTurbulentDissipationMixin:
 
 ### BuilderTurbulentDissipationMixin().set_turbulent_dissipation
 
-[Show source in coagulation_builder_mixin.py:84](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin.py#L84)
+[Show source in coagulation_builder_mixin.py:120](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/coagulation_builder_mixin.py#L120)
 
 Set the turbulent dissipation rate.
 
@@ -3305,6 +3843,23 @@ Set the turbulent dissipation rate.
 turbulent_dissipation : Turbulent dissipation rate.
 turbulent_dissipation_units : Units of the turbulent dissipation
     rate. Default is *m^2/s^3*.
+
+#### Returns
+
+- The instance of the class with the updated
+    turbulent_dissipation attribute.
+
+#### Raises
+
+- `ValueError` - Must be non-negative value.
+
+#### Examples
+
+```py title="Example of using set_turbulent_dissipation"
+builder = SomeCoagulationBuilder()
+builder.set_turbulent_dissipation(1e-3, "m^2/s^3")
+# builder.turbulent_dissipation -> 1e-3
+```
 
 #### Signature
 
@@ -3327,14 +3882,33 @@ def set_turbulent_dissipation(
 
 ## CombineCoagulationStrategyBuilder
 
-[Show source in combine_coagulation_strategy_builder.py:22](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L22)
+[Show source in combine_coagulation_strategy_builder.py:27](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L27)
 
-Builder used to create a CombineCoagulationStrategy object.
+Builder for a combined coagulation strategy.
+
+This class constructs a `CombineCoagulationStrategy` from multiple
+sub-strategies (instances of `CoagulationStrategyABC`), enabling
+advanced modeling scenarios where different coagulation mechanisms
+act concurrently. Each sub-strategy's rate calculations are effectively
+merged to act on the same particle population.
 
 #### Attributes
 
-strategies (List[CoagulationStrategyABC]):
-    Collection of CoagulationStrategyABC objects to be combined.
+- strategies : List of `CoagulationStrategyABC` objects to combine.
+
+#### Methods
+
+- set_strategies : Set the list of coagulation strategies to combine.
+- build : Create and return the combined coagulation strategy.
+
+#### Examples
+
+```py title="Combine Coagulation Strategy Example"
+import particula as par
+builder = par.dynamics.CombineCoagulationStrategyBuilder()
+builder.set_strategies([brownian_strategy, turbulent_strategy])
+combined_strategy = builder.build()
+```
 
 #### Signature
 
@@ -3349,7 +3923,7 @@ class CombineCoagulationStrategyBuilder(BuilderABC):
 
 ### CombineCoagulationStrategyBuilder().build
 
-[Show source in combine_coagulation_strategy_builder.py:59](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L59)
+[Show source in combine_coagulation_strategy_builder.py:98](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L98)
 
 Builds and returns the combined coagulation strategy.
 
@@ -3358,6 +3932,14 @@ Builds and returns the combined coagulation strategy.
 CombineCoagulationStrategy :
     A strategy that combines all the previously added
     sub-strategies.
+
+#### Examples
+
+```py title="Build Example with CombineCoagulationStrategy"
+combined_strategy = builder.build()
+# Now you can use `combined_strategy.kernel(...)` to calculate
+# combined coagulation effects from each sub-strategy.
+```
 
 #### Signature
 
@@ -3371,7 +3953,7 @@ def build(self) -> CombineCoagulationStrategy: ...
 
 ### CombineCoagulationStrategyBuilder().set_strategies
 
-[Show source in combine_coagulation_strategy_builder.py:36](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L36)
+[Show source in combine_coagulation_strategy_builder.py:69](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L69)
 
 Sets a list of CoagulationStrategyABC objects to be combined.
 
@@ -3379,6 +3961,13 @@ Sets a list of CoagulationStrategyABC objects to be combined.
 
 strategies : A list of coagulation strategies to be combined.
 strategies_units : For interface consistency, not used.
+
+#### Examples
+
+```py title="Set Strategies Example"
+builder = CombineCoagulationStrategyBuilder()
+builder.set_strategies([brownian_strategy, turbulent_strategy])
+```
 
 #### Returns
 
@@ -3407,14 +3996,50 @@ def set_strategies(
 
 ## TurbulentDNSCoagulationBuilder
 
-[Show source in turbulent_dns_coagulation_builder.py:29](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_dns_coagulation_builder.py#L29)
+[Show source in turbulent_dns_coagulation_builder.py:36](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_dns_coagulation_builder.py#L36)
 
-Turbulent DNS Coagulation Builder class.
+Turbulent DNS coagulation builder class.
 
-This class is used to create coagulation strategies for turbulent DNS
-coagulation and ensures that the correct values (distribution_type,
-turbulent_dissipation, fluid_density, reynolds_lambda, relative_velocity)
-are passed.
+Creates and configures a `TurbulentDNSCoagulationStrategy` to simulate
+coagulation in turbulent flow fields using Direct Numerical Simulation
+parameters. This builder enforces that the required parameters
+(distribution_type, turbulent_dissipation, fluid_density, reynolds_lambda,
+relative_velocity) are set prior to building the strategy.
+
+#### Attributes
+
+- distribution_type : The particle distribution type
+  ("discrete", "continuous_pdf", or "particle_resolved").
+- turbulent_dissipation : Rate of turbulent energy dissipation (m²/s³).
+- fluid_density : Fluid density in kg/m³.
+- reynolds_lambda : Taylor-scale Reynolds number (dimensionless).
+- relative_velocity : Relative velocity in m/s (particle vs. airflow).
+
+#### Methods
+
+- set_distribution_type : Set the distribution type.
+- set_turbulent_dissipation : Set the turbulent dissipation rate.
+- set_fluid_density : Set the fluid density.
+- set_reynolds_lambda : Set the Taylor-scale Reynolds number.
+- set_relative_velocity : Set the relative velocity.
+- build : Validate parameters and return a
+  `TurbulentDNSCoagulationStrategy`.
+
+#### Examples
+
+```py title="Turbulent DNS Builder Example"
+builder = TurbulentDNSCoagulationBuilder()
+builder.set_distribution_type("discrete")
+builder.set_turbulent_dissipation(1e-3)
+builder.set_fluid_density(1.225)
+builder.set_reynolds_lambda(250.)
+builder.set_relative_velocity(0.5, "m/s")
+strategy = builder.build()
+# Now 'strategy' can be used to compute DNS-based coagulation rates.
+
+References:
+- Saffman, P. G., & Turner, J. S. (1956) "On the collision of drops
+  in turbulent clouds." Journal of Fluid Mechanics, 1(1): 16–30.
 
 #### Signature
 
@@ -3437,7 +4062,17 @@ class TurbulentDNSCoagulationBuilder(
 
 ### TurbulentDNSCoagulationBuilder().build
 
-[Show source in turbulent_dns_coagulation_builder.py:107](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_dns_coagulation_builder.py#L107)
+[Show source in turbulent_dns_coagulation_builder.py:161](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_dns_coagulation_builder.py#L161)
+
+Construct a TurbulentDNSCoagulationStrategy.
+
+Validates the required parameters, then instantiates a
+`TurbulentDNSCoagulationStrategy` for DNS-based coagulation
+calculations.
+
+#### Returns
+
+- CoagulationStrategyABC : The configured DNS coagulation strategy.
 
 #### Signature
 
@@ -3451,17 +4086,22 @@ def build(self) -> CoagulationStrategyABC: ...
 
 ### TurbulentDNSCoagulationBuilder().set_relative_velocity
 
-[Show source in turbulent_dns_coagulation_builder.py:83](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_dns_coagulation_builder.py#L83)
+[Show source in turbulent_dns_coagulation_builder.py:133](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_dns_coagulation_builder.py#L133)
 
-Set the relative vertical velocity. This is the relative
-velocity between particles and airflow,
-(excluding turbulence, and gravity).
+Set the relative particle-airflow velocity for DNS coagulation.
+
+This value is typically a background flow velocity or a
+sedimentation-adjusted velocity, excluding turbulence.
 
 #### Arguments
 
-- relative_velocity : Relative velocity.
-- relative_velocity_units : Units of the relative velocity
-    [m/s].
+- relative_velocity : Numeric value of velocity.
+- relative_velocity_units : Units of the velocity
+  (e.g., "m/s").
+
+#### Returns
+
+- self : The builder instance for chaining.
 
 #### Signature
 
@@ -3474,17 +4114,29 @@ def set_relative_velocity(
 
 ### TurbulentDNSCoagulationBuilder().set_reynolds_lambda
 
-[Show source in turbulent_dns_coagulation_builder.py:59](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_dns_coagulation_builder.py#L59)
+[Show source in turbulent_dns_coagulation_builder.py:99](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_dns_coagulation_builder.py#L99)
 
-Set the Reynolds lambda. This is a measure of the turbulence length
-scale, of airflow, and is used in the turbulent DNS model.
-Shorthand for the Taylor-scale Reynolds number, Reλ.
+Set the Taylor-scale Reynolds number (Reλ).
+
+Represents a measure of turbulence intensity in DNS flows.
+When specifying units, only "dimensionless" is recognized here.
+Any other unit triggers a warning and is treated as dimensionless.
 
 #### Arguments
 
-- reynolds_lambda : Reynolds lambda.
-- reynolds_lambda_units : Units of the Reynolds lambda
-    [dimensionless].
+- reynolds_lambda : Numeric value for Reλ.
+- reynolds_lambda_units : String indicating units
+  (default "dimensionless").
+
+#### Returns
+
+- self : The builder instance for chaining.
+
+#### Examples
+
+```py
+builder.set_reynolds_lambda(250.)
+```
 
 #### Signature
 
@@ -3509,20 +4161,44 @@ def set_reynolds_lambda(
 
 [Show source in turbulent_shear_coagulation_builder.py:23](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_shear_coagulation_builder.py#L23)
 
-Turbulent Shear Coagulation Builder class.
+Turbulent shear coagulation builder.
 
-This class is used to create coagulation strategies for turbulent shear
-coagulation. This provides a validation layer to ensure that the correct
-values are passed to the coagulation strategy.
+Creates a TurbulentShearCoagulationStrategy that calculates coagulation
+rates under turbulent flow conditions. Ensures the correct distribution
+type, turbulent dissipation, and fluid density values are provided.
+
+#### Attributes
+
+- distribution_type : Type of the particle distribution
+  ("discrete", "continuous_pdf", or "particle_resolved").
+- turbulent_dissipation : Turbulent energy dissipation rate (m²/s³).
+- fluid_density : Fluid density (kg/m³) for the coagulation medium.
 
 #### Methods
 
-- `set_distribution_type(distribution_type)` - Set the distribution type.
-- `set_turbulent_dissipation(turbulent_dissipation)` - Set the turbulent
-    dissipation rate.
-- `set_fluid_density(fluid_density)` - Set the fluid density.
-- `build()` - Validate and return the TurbulentShearCoagulationStrategy
-    object.
+- set_distribution_type : Set the distribution type.
+- set_turbulent_dissipation : Set turbulent dissipation rate.
+- set_fluid_density : Set fluid density.
+- build : Validate parameters and return a
+  TurbulentShearCoagulationStrategy.
+
+#### Examples
+
+```py title="Turbulent Shear Coagulation Builder Example"
+import particula as par
+builder = par.dynamics.TurbulentShearCoagulationBuilder()
+builder.set_distribution_type("discrete")
+builder.set_turbulent_dissipation(1e-3)
+builder.set_fluid_density(1000.)
+strategy = builder.build()
+# Now 'strategy' can be used to compute turbulent shear coagulation
+# rates.
+```
+
+#### References
+
+- Saffman, P. G., & Turner, J. S. (1956). "On the collision of drops
+  in turbulent clouds." J. Fluid Mech., 1, 16-30.
 
 #### Signature
 
@@ -3545,7 +4221,17 @@ class TurbulentShearCoagulationBuilder(
 
 ### TurbulentShearCoagulationBuilder().build
 
-[Show source in turbulent_shear_coagulation_builder.py:55](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_shear_coagulation_builder.py#L55)
+[Show source in turbulent_shear_coagulation_builder.py:87](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_shear_coagulation_builder.py#L87)
+
+Construct a TurbulentShearCoagulationStrategy.
+
+This method performs a final check to ensure all required parameters
+have been set. It then creates and returns an instance of
+TurbulentShearCoagulationStrategy.
+
+#### Returns
+
+- The resulting turbulent shear coagulation strategy object.
 
 #### Signature
 
@@ -3859,28 +4545,49 @@ def get_coagulation_loss_rate_discrete(
 
 [Show source in brownian_coagulation_strategy.py:22](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/brownian_coagulation_strategy.py#L22)
 
-Discrete Brownian coagulation strategy class. This class implements the
-methods defined in the CoagulationStrategy abstract class.
+Discrete Brownian coagulation strategy class for aerosol simulations.
+
+This class implements methods defined in CoagulationStrategyABC
+to simulate Brownian coagulation in particle populations. It calculates
+coagulation rates via a Brownian kernel that depends on properties such
+as temperature, pressure, and particle radius.
 
 #### Attributes
 
-- distribution_type : The type of distribution to be used with the
-    coagulation strategy. Options are "discrete", "continuous_pdf",
-    and "particle_resolved".
+- distribution_type : Defines how particles are represented
+  (e.g., "discrete", "continuous_pdf", or "particle_resolved").
 
 #### Methods
 
-- `-` *kernel* - Calculate the coagulation kernel.
-- `-` *loss_rate* - Calculate the coagulation loss rate.
-- `-` *gain_rate* - Calculate the coagulation gain rate.
-- `-` *net_rate* - Calculate the net coagulation rate.
+- kernel : Calculate the Brownian coagulation kernel (dimensioned).
+- loss_rate : Calculate the coagulation loss rate (not shown here).
+- gain_rate : Calculate the coagulation gain rate (not shown here).
+- net_rate : Calculate the net coagulation rate (not shown here).
+- dimensionless_kernel : Not implemented, raises NotImplementedError.
+- step : Perform a single step of coagulation.
+- diffusive_knudsen : Calculate the diffusive Knudsen number.
+- coulomb_potential_ratio : Compute Coulomb potential ratio.
+- friction_factor : Compute the effective friction factor.
+
+#### Examples
+
+```py title="Example Usage of BrownianCoagulationStrategy"
+import particula as par
+brownian_strat = par.dynamics.BrownianCoagulationStrategy(
+    distribution_type="discrete"
+)
+# Suppose we have a ParticleRepresentation object called 'particle_rep'
+# kernel_values = brownian_strat.kernel(
+#   particle_rep, temperature=298, pressure=101325
+# )
+# ...
+```
 
 #### References
 
-- function `brownian_coagulation_kernel_via_system_state`
-- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-    physics, Section 13 TABLE 13.1 Fuchs Form of the Brownian Coagulation
-    Coefficient K12.
+- `get_brownian_kernel_via_system_state`
+- Seinfeld, J. H., & Pandis, S. N. (2016). "Atmospheric chemistry
+  and physics," Section 13, Table 13.1.
 
 #### Signature
 
@@ -3895,7 +4602,22 @@ class BrownianCoagulationStrategy(CoagulationStrategyABC):
 
 ### BrownianCoagulationStrategy().dimensionless_kernel
 
-[Show source in brownian_coagulation_strategy.py:50](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/brownian_coagulation_strategy.py#L50)
+[Show source in brownian_coagulation_strategy.py:77](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/brownian_coagulation_strategy.py#L77)
+
+Not implemented for BrownianCoagulationStrategy.
+
+This method raises NotImplementedError since dimensionless
+Brownian kernels are not defined here.
+
+#### Arguments
+
+- diffusive_knudsen : Knudsen number array (unused).
+- coulomb_potential_ratio : Coulomb ratio array (unused).
+
+#### Raises
+
+- NotImplementedError : Always, as no dimensionless kernel is
+provided.
 
 #### Signature
 
@@ -3909,7 +4631,31 @@ def dimensionless_kernel(
 
 ### BrownianCoagulationStrategy().kernel
 
-[Show source in brownian_coagulation_strategy.py:62](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/brownian_coagulation_strategy.py#L62)
+[Show source in brownian_coagulation_strategy.py:103](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/brownian_coagulation_strategy.py#L103)
+
+Calculate the dimensioned Brownian coagulation kernel.
+
+Leverages the `get_brownian_kernel_via_system_state` function to
+compute the kernel, which accounts for particle size, temperature,
+and pressure. The kernel typically has units of volume per time.
+
+#### Arguments
+
+- particle : ParticleRepresentation containing the distribution
+  and density or mass data needed for the kernel calculation.
+- temperature : System temperature in Kelvin.
+- pressure : System pressure in Pascals.
+
+#### Returns
+
+- Brownian coagulation kernel values. Shape depends on the
+  underlying distribution.
+
+#### Examples
+
+```py
+kernel_matrix = brownian_strat.kernel(particle_rep, 300, 101325)
+```
 
 #### Signature
 
@@ -3937,23 +4683,49 @@ def kernel(
 
 [Show source in charged_coagulation_strategy.py:23](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/charged_coagulation_strategy.py#L23)
 
-General charged dependent brownian coagulation strategy.
+Charged Brownian coagulation strategy using a dimensionless kernel.
 
-This class implements the methods defined in the CoagulationStrategy
-abstract class. The kernel strategy is passed as an argument to the class,
-to use a dimensionless kernel representation.
+This class implements the methods defined in the CoagulationStrategyABC
+abstract class. A ChargedKernelStrategyABC instance is passed to define
+how the dimensionless kernel is calculated. This approach allows flexible
+handling of Coulomb interactions under various regimes.
 
-#### Arguments
+#### Attributes
 
-- kernel_strategy : The kernel strategy to be used for the coagulation,
-    from the KernelStrategy class.
+- kernel_strategy : Instance of ChargedKernelStrategyABC used to
+  calculate dimensionless and dimensioned kernels.
 
 #### Methods
 
-- `-` *kernel* - Calculate the coagulation kernel.
-- `-` *loss_rate* - Calculate the coagulation loss rate.
-- `-` *gain_rate* - Calculate the coagulation gain rate.
-- `-` *net_rate* - Calculate the net coagulation rate.
+- dimensionless_kernel : Compute dimensionless kernel values for
+  charged coagulation.
+- kernel : Convert dimensionless kernel values into a dimensioned
+  coagulation kernel.
+- loss_rate : Calculate the coagulation loss rate.
+- gain_rate : Calculate the coagulation gain rate.
+- net_rate : Get the net coagulation rate (gain - loss).
+- step : Perform a single step of coagulation.
+- diffusive_knudsen : Calculate the diffusive Knudsen number.
+- coulomb_potential_ratio : Compute Coulomb potential ratio.
+- friction_factor : Compute the effective friction factor.
+
+#### Examples
+
+```py title="Example Usage"
+import numpy as np
+import particula as par
+kernel_strategy = par.dynamics.HardSphereKernelStrategy()
+charged_coag = par.dynamics.ChargedCoagulationStrategy(
+    distribution_type="discrete", kernel_strategy=kernel_strategy
+)
+# Now the charged_coag object can compute dimensionless and
+# dimensioned kernels given a ParticleRepresentation object.
+```
+
+#### References
+
+- Seinfeld, J. H., & Pandis, S. N. "Atmospheric Chemistry and
+  - `Physics` - From Air Pollution to Climate Change." Wiley, 2016.
 
 #### Signature
 
@@ -3971,7 +4743,33 @@ class ChargedCoagulationStrategy(CoagulationStrategyABC):
 
 ### ChargedCoagulationStrategy().dimensionless_kernel
 
-[Show source in charged_coagulation_strategy.py:50](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/charged_coagulation_strategy.py#L50)
+[Show source in charged_coagulation_strategy.py:88](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/charged_coagulation_strategy.py#L88)
+
+Compute the dimensionless kernel for charged coagulation.
+
+This method delegates computation to the provided kernel strategy. It
+returns the dimensionless kernel (H) as a function of the diffusive
+Knudsen number and the Coulomb potential ratio.
+
+#### Arguments
+
+- diffusive_knudsen : Dimensionless Knudsen number(s) describing
+  particle diffusive behavior.
+- coulomb_potential_ratio : Dimensionless ratio(s) incorporating
+  electrostatic interactions.
+
+#### Returns
+
+- NDArray[np.float64] : Array of dimensionless kernel values.
+
+#### Examples
+
+```py title="Dimensionless Kernel Example"
+kn = np.array([0.1, 0.2])
+phi = np.array([1.0, 2.0])
+dim_kernel = charged_coag.dimensionless_kernel(kn, phi)
+# dim_kernel -> array of dimensionless kernel values
+```
 
 #### Signature
 
@@ -3985,7 +4783,40 @@ def dimensionless_kernel(
 
 ### ChargedCoagulationStrategy().kernel
 
-[Show source in charged_coagulation_strategy.py:60](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/charged_coagulation_strategy.py#L60)
+[Show source in charged_coagulation_strategy.py:122](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/charged_coagulation_strategy.py#L122)
+
+Compute the dimensioned coagulation kernel for charged particles.
+
+This method converts the dimensionless kernel into a dimensioned
+coagulation kernel by combining Coulomb parameters, the pairwise
+radii of particles, reduced mass, and friction factors.
+
+#### Arguments
+
+- particle : A ParticleRepresentation instance containing
+  distribution, density, and concentration data.
+- temperature : Float specifying the system temperature (K).
+- pressure : Float specifying the system pressure (Pa).
+
+#### Returns
+
+- float or NDArray[np.float64] : The dimensioned coagulation
+  kernel value(s).
+
+#### Examples
+
+```py title="Dimensioned Kernel Example"
+kernel_matrix = charged_coag.kernel(
+    particle=my_particle, temperature=300, pressure=101325
+)
+# kernel_matrix -> 2D array of size (n_particles, n_particles)
+```
+
+#### References
+
+- Gopalakrishnan, R. & Hogan, C. J. "Determination of the Transition
+  Regime Collision Kernel from Mean First Passage Times." Aerosol
+  Science and Technology, 46: 887-899, 2012.
 
 #### Signature
 
@@ -4011,25 +4842,45 @@ def kernel(
 
 ## CoagulationStrategyABC
 
-[Show source in coagulation_strategy_abc.py:23](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L23)
+[Show source in coagulation_strategy_abc.py:28](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L28)
 
-Abstract class for defining a coagulation strategy. This class defines the
-methods that must be implemented by any coagulation strategy.
+Abstract base class for defining a coagulation strategy.
+
+This class defines the methods that must be implemented by any coagulation
+strategy (e.g., for discrete, continuous, or particle-resolved distributions).
 
 #### Attributes
 
-- `-` *distribution_type* - The type of distribution to be used with the
-    coagulation strategy. Default is "discrete", options are
-    "discrete", "continuous_pdf", and "particle_resolved".
+- distribution_type : The type of distribution to be used, one of
+  ("discrete", "continuous_pdf", or "particle_resolved").
 
 #### Methods
 
-- `kernel` - Calculate the coagulation kernel.
-- `loss_rate` - Calculate the coagulation loss rate.
-- `gain_rate` - Calculate the coagulation gain rate.
-- `net_rate` - Calculate the net coagulation rate.
-- `diffusive_knudsen` - Calculate the diffusive Knudsen number.
-- `coulomb_potential_ratio` - Calculate the Coulomb potential ratio.
+- dimensionless_kernel : Calculate the dimensionless coagulation kernel.
+- kernel : Obtain the dimensioned coagulation kernel [m^3/s].
+- loss_rate : Calculate the coagulation loss rate.
+- gain_rate : Calculate the coagulation gain rate.
+- net_rate : Get the net coagulation rate (gain - loss).
+- step : Perform a single step of coagulation.
+- diffusive_knudsen : Calculate the diffusive Knudsen number.
+- coulomb_potential_ratio : Compute Coulomb potential ratio.
+- friction_factor : Compute the effective friction factor.
+
+#### Examples
+
+```py
+class ExampleCoagulation(CoagulationStrategyABC):
+    def dimensionless_kernel(self, diff_kn, coulomb_phi):
+        return diff_kn + coulomb_phi
+    def kernel(self, particle, temperature, pressure):
+        return 1.0
+strategy = ExampleCoagulation("discrete")
+```
+
+#### References
+
+- Seinfeld, J. H. & Pandis, S. N. (2016). Atmospheric Chemistry and Physics:
+  From Air Pollution to Climate Change (3rd ed.). Wiley.
 
 #### Signature
 
@@ -4046,21 +4897,27 @@ class CoagulationStrategyABC(ABC):
 
 ### CoagulationStrategyABC().coulomb_potential_ratio
 
-[Show source in coagulation_strategy_abc.py:328](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L328)
+[Show source in coagulation_strategy_abc.py:380](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L380)
 
-Calculate the Coulomb potential ratio based on the particle properties
-and temperature.
+Calculate the Coulomb potential ratio for each particle.
+
+This ratio characterizes the influence of electrostatic forces on
+coagulation processes.
 
 #### Arguments
 
-- `particle` - The particles for which the Coulomb
-    potential ratio is to be calculated.
-- `temperature` - The temperature of the gas phase [K].
+- particle : The ParticleRepresentation.
+- temperature : The gas-phase temperature [K].
 
 #### Returns
 
-The Coulomb potential ratio for the particle
-    [dimensionless].
+- NDArray[np.float64] : Coulomb potential ratio(s) [dimensionless].
+
+#### Examples
+
+```py
+phi = strategy.coulomb_potential_ratio(particle, 298.15)
+```
 
 #### Signature
 
@@ -4076,22 +4933,28 @@ def coulomb_potential_ratio(
 
 ### CoagulationStrategyABC().diffusive_knudsen
 
-[Show source in coagulation_strategy_abc.py:292](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L292)
+[Show source in coagulation_strategy_abc.py:339](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L339)
 
-Calculate the diffusive Knudsen number based on the particle
-properties, temperature, and pressure.
+Calculate the diffusive Knudsen number for each particle.
+
+The Knudsen number is used to characterize the relative importance of
+diffusion-controlled processes.
 
 #### Arguments
 
-- `particle` - The particle for which the diffusive
-    Knudsen number is to be calculated.
-- `temperature` - The temperature of the gas phase [K].
-- `pressure` - The pressure of the gas phase [Pa].
+- particle : The ParticleRepresentation.
+- temperature : The gas-phase temperature [K].
+- pressure : The gas-phase pressure [Pa].
 
 #### Returns
 
-- `NDArray[np.float64]` - The diffusive Knudsen number for the particle
-    [dimensionless].
+- NDArray[np.float64] : Diffusive Knudsen number(s) [dimensionless].
+
+#### Examples
+
+```py
+knudsen_nums = strategy.diffusive_knudsen(particle, 298.15, 101325)
+```
 
 #### Signature
 
@@ -4107,23 +4970,25 @@ def diffusive_knudsen(
 
 ### CoagulationStrategyABC().dimensionless_kernel
 
-[Show source in coagulation_strategy_abc.py:69](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L69)
+[Show source in coagulation_strategy_abc.py:92](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L92)
 
-Calculate the dimensionless coagulation kernel based on the particle
-properties interactions, diffusive Knudsen number and Coulomb
-potential.
+Calculate the dimensionless coagulation kernel.
 
 #### Arguments
 
-- diffusive_knudsen : The diffusive Knudsen number
-    for the particle [dimensionless].
-- coulomb_potential_ratio : The Coulomb potential
-    ratio for the particle [dimensionless].
+- diffusive_knudsen : The diffusive Knudsen number [dimensionless].
+- coulomb_potential_ratio : The Coulomb potential ratio [dimensionless].
 
 #### Returns
 
-The dimensionless coagulation kernel for the particle
-    [dimensionless].
+- NDArray[np.float64] : Dimensionless kernel for particle coagulation.
+
+#### Examples
+
+```py
+H = strategy.dimensionless_kernel(kn_array, phi_array)
+# H might be array([...]) representing the dimensionless kernel
+```
 
 #### Signature
 
@@ -4138,21 +5003,28 @@ def dimensionless_kernel(
 
 ### CoagulationStrategyABC().friction_factor
 
-[Show source in coagulation_strategy_abc.py:350](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L350)
+[Show source in coagulation_strategy_abc.py:407](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L407)
 
-Calculate the friction factor based on the particle properties,
-temperature, and pressure.
+Compute the friction factor for each particle in the aerosol.
+
+Considers dynamic viscosity, mean free path, and slip correction to
+determine the friction factor [dimensionless].
 
 #### Arguments
 
-- `particle` - The particle for which the friction factor
-    is to be calculated.
-- `temperature` - The temperature of the gas phase [K].
-- `pressure` - The pressure of the gas phase [Pa].
+- particle : The ParticleRepresentation for which to compute friction factor.
+- temperature : Gas temperature [K].
+- pressure : Gas pressure [Pa].
 
 #### Returns
 
-The friction factor for the particle [dimensionless].
+- NDArray[np.float64] : Friction factor(s) [dimensionless].
+
+#### Examples
+
+```py
+fr = strategy.friction_factor(particle, 298.15, 101325)
+```
 
 #### Signature
 
@@ -4168,26 +5040,28 @@ def friction_factor(
 
 ### CoagulationStrategyABC().gain_rate
 
-[Show source in coagulation_strategy_abc.py:149](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L149)
+[Show source in coagulation_strategy_abc.py:182](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L182)
 
-Calculate the coagulation gain rate based on the particle radius,
-distribution, and the coagulation kernel. Used for discrete and
-continuous PDF distributions.
+Calculate the coagulation gain rate [kg/s].
 
 #### Arguments
 
-- `particle` - The particle for which the coagulation
-    gain rate is to be calculated.
-- [CoagulationStrategyABC().kernel](#coagulationstrategyabckernel) - The coagulation kernel.
+- particle : The particle representation used in the calculation.
+- kernel : The coagulation kernel [m^3/s].
 
 #### Returns
 
-The coagulation gain rate for the particle [kg/s].
+- float or NDArray[np.float64] : The gain rate [kg/s].
 
 #### Raises
 
-ValueError : If the distribution type is not valid. Only
-    'discrete' and 'continuous_pdf' are valid.
+- ValueError : If the distribution type is invalid.
+
+#### Examples
+
+```py
+gain = strategy.gain_rate(particle, k_val)
+```
 
 #### Signature
 
@@ -4203,21 +5077,29 @@ def gain_rate(
 
 ### CoagulationStrategyABC().kernel
 
-[Show source in coagulation_strategy_abc.py:91](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L91)
+[Show source in coagulation_strategy_abc.py:115](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L115)
 
-Calculate the coagulation kernel based on the particle properties,
-temperature, and pressure.
+Calculate the coagulation kernel [m^3/s].
+
+Uses particle attributes (e.g., radius, mass) along with temperature
+and pressure to return a dimensional kernel for coagulation.
 
 #### Arguments
 
-- `particle` - The particle for which the coagulation
-    kernel is to be calculated.
-- `temperature` - The temperature of the gas phase [K].
-- `pressure` - The pressure of the gas phase [Pa].
+- particle : The ParticleRepresentation object, providing radius and concentration.
+- temperature : The temperature in Kelvin [K].
+- pressure : The pressure in Pascals [Pa].
 
 #### Returns
 
-The coagulation kernel for the particle [m^3/s].
+- float or NDArray[np.float64] : The coagulation kernel [m^3/s].
+
+#### Examples
+
+```py
+k_val = strategy.kernel(particle, 298.15, 101325)
+# k_val can be a scalar or array
+```
 
 #### Signature
 
@@ -4234,25 +5116,28 @@ def kernel(
 
 ### CoagulationStrategyABC().loss_rate
 
-[Show source in coagulation_strategy_abc.py:112](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L112)
+[Show source in coagulation_strategy_abc.py:143](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L143)
 
-Calculate the coagulation loss rate based on the particle radius,
-distribution, and the coagulation kernel.
+Calculate the coagulation loss rate [kg/s].
 
 #### Arguments
 
-- `particle` - The particle for which the coagulation
-    loss rate is to be calculated.
-- [CoagulationStrategyABC().kernel](#coagulationstrategyabckernel) - The coagulation kernel.
+- particle : The particle representation for which the loss rate is calculated.
+- kernel : The coagulation kernel [m^3/s].
 
 #### Returns
 
-The coagulation loss rate for the particle [kg/s].
+- float or NDArray[np.float64] : The loss rate [kg/s].
 
 #### Raises
 
-ValueError : If the distribution type is not valid. Only
-    'discrete' and 'continuous_pdf' are valid.
+- ValueError : If the distribution type is invalid.
+
+#### Examples
+
+```py
+loss = strategy.loss_rate(particle, k_val)
+```
 
 #### Signature
 
@@ -4268,22 +5153,26 @@ def loss_rate(
 
 ### CoagulationStrategyABC().net_rate
 
-[Show source in coagulation_strategy_abc.py:188](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L188)
+[Show source in coagulation_strategy_abc.py:222](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L222)
 
-Calculate the net coagulation rate based on the particle radius,
-distribution, and the coagulation kernel.
+Compute the net coagulation rate = gain - loss [kg/s].
 
 #### Arguments
 
-- particle : The particle class for which the
-    coagulation net rate is to be calculated.
-- temperature : The temperature of the gas phase [K].
-- pressure : The pressure of the gas phase [Pa].
+- particle : The particle representation.
+- temperature : The gas-phase temperature [K].
+- pressure : The gas-phase pressure [Pa].
 
 #### Returns
 
-- `Union[float,` *NDArray[np.float64]]* - The net coagulation rate for the
-    particle [kg/s].
+- float or NDArray[np.float64] : The net coagulation rate [kg/s].
+    (positive => net gain, negative => net loss).
+
+#### Examples
+
+```py
+net = strategy.net_rate(particle, 298.15, 101325)
+```
 
 #### Signature
 
@@ -4299,21 +5188,33 @@ def net_rate(
 
 ### CoagulationStrategyABC().step
 
-[Show source in coagulation_strategy_abc.py:216](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L216)
+[Show source in coagulation_strategy_abc.py:253](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/coagulation_strategy_abc.py#L253)
 
-Perform a single step of the coagulation process.
+Perform a single coagulation step over a specified time interval.
+
+Updates the particle distribution or representation based on the net_rate
+calculated for the given time_step.
 
 #### Arguments
 
-- `particle` - The particle for which the coagulation step
-    is to be performed.
-- `temperature` - The temperature of the gas phase [K].
-- `pressure` - The pressure of the gas phase [Pa].
-- `time_step` - The time step for the coagulation process [s].
+- particle : The particle representation to update.
+- temperature : The gas-phase temperature [K].
+- pressure : The gas-phase pressure [Pa].
+- time_step : The timestep over which to integrate [s].
 
 #### Returns
 
-- `ParticleRepresentation` - The particle after the coagulation step.
+- ParticleRepresentation : Updated particle representation after this step.
+
+#### Raises
+
+- ValueError : If the distribution type is invalid or unsupported.
+
+#### Examples
+
+```py
+updated_particle = strategy.step(particle, 298.15, 101325, 1.0)
+```
 
 #### Signature
 
@@ -4343,24 +5244,47 @@ def step(
 
 ## CombineCoagulationStrategy
 
-[Show source in combine_coagulation_strategy.py:19](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L19)
+[Show source in combine_coagulation_strategy.py:26](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L26)
 
-Combines multiple coagulation strategies into one.
+Combine multiple coagulation strategies into one.
 
-This class takes a list of coagulation strategies and combines their
-kernels by summing them. All strategies must have the same distribution
-type.
+This class takes a list of coagulation strategies and merges their
+kernels by summing them. Each included strategy must share the same
+distribution type.
 
-#### Arguments
+#### Attributes
 
-- `-` *strategies* - A list of coagulation strategies to combine.
+- distribution_type : Matches the distribution_type of the first
+  strategy.
+- strategies : A list of individual CoagulationStrategyABC instances.
 
 #### Methods
 
-- `-` *kernel* - Calculate the combined coagulation kernel.
-- `-` *loss_rate* - Calculate the combined coagulation loss rate.
-- `-` *gain_rate* - Calculate the combined coagulation gain rate.
-- `-` *net_rate* - Calculate the combined net coagulation rate.
+- dimensionless_kernel : Raises NotImplementedError, as not supported here.
+- kernel : Compute the sum of all strategy kernels.
+- loss_rate : Calculate the coagulation loss rate.
+- gain_rate : Calculate the coagulation gain rate.
+- net_rate : Get the net coagulation rate (gain - loss).
+- step : Perform a single step of coagulation.
+- diffusive_knudsen : Calculate the diffusive Knudsen number.
+- coulomb_potential_ratio : Compute Coulomb potential ratio.
+- friction_factor : Compute the effective friction factor.
+
+#### Examples
+
+```py title="Example Usage of CombineCoagulationStrategy"
+import particula as par
+combined_strategy = par.dynamics.CombineCoagulationStrategy(
+    [strategy1, strategy2]
+)
+k_value = combined_strategy.kernel(
+    particle=aerosol, temperature=300, pressure=101325
+) # combined kernel value
+```
+
+#### References
+
+- No specific references. Summation approach is straightforward.
 
 #### Signature
 
@@ -4375,7 +5299,25 @@ class CombineCoagulationStrategy(CoagulationStrategyABC):
 
 ### CombineCoagulationStrategy().dimensionless_kernel
 
-[Show source in combine_coagulation_strategy.py:51](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L51)
+[Show source in combine_coagulation_strategy.py:94](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L94)
+
+Raise NotImplementedError for dimensionless kernel in combined
+strategy.
+
+Dimensionless kernels must be handled individually by the underlying
+strategies. This method logs an error and raises NotImplementedError.
+
+#### Arguments
+
+- diffusive_knudsen : The diffusive Knudsen number(s)
+  [dimensionless].
+- coulomb_potential_ratio : The Coulomb potential ratio(s)
+  [dimensionless].
+
+#### Raises
+
+- NotImplementedError : This method is not supported in the
+  combined strategy.
 
 #### Signature
 
@@ -4389,7 +5331,34 @@ def dimensionless_kernel(
 
 ### CombineCoagulationStrategy().kernel
 
-[Show source in combine_coagulation_strategy.py:63](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L63)
+[Show source in combine_coagulation_strategy.py:123](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/combine_coagulation_strategy.py#L123)
+
+Compute the total coagulation kernel by summing the kernels from all
+underlying strategies.
+
+#### Arguments
+
+- particle : The ParticleRepresentation instance containing
+  particle data (radii, distribution, etc.).
+- temperature : The temperature in Kelvin [K].
+- pressure : The pressure in Pascals [Pa].
+
+#### Returns
+
+- float or NDArray[np.float64] : The combined coagulation kernel,
+  equal to the sum of each strategy's kernel.
+
+#### Examples
+
+```py
+k_combined = combined_strategy.kernel(
+    particle=my_particle,
+    temperature=300.0,
+    pressure=101325
+)
+# k_combined is the sum of kernels from each strategy in
+# combined_strategy
+```
 
 #### Signature
 
@@ -4415,31 +5384,46 @@ def kernel(
 
 ## SedimentationCoagulationStrategy
 
-[Show source in sedimentation_coagulation_strategy.py:21](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/sedimentation_coagulation_strategy.py#L21)
+[Show source in sedimentation_coagulation_strategy.py:25](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/sedimentation_coagulation_strategy.py#L25)
 
-Sedimentation coagulation strategy.
+Sedimentation coagulation strategy for aerosol particles.
 
-This implements the methods defined in `CoagulationStrategy` abstract
-class. Applied to the Seinfeld and Pandis (2016) sedimentation
-coagulation kernel.
+Implements the Seinfeld & Pandis (2016) sedimentation kernel as part of
+the CoagulationStrategyABC. This approach models collisions driven by
+gravitational settling.
 
-#### Arguments
+#### Attributes
 
-- distribution_type : The type of distribution to be used with the
-    coagulation strategy. Must be "discrete", "continuous_pdf", or
-    "particle_resolved".
+- distribution_type : The particle distribution type ("discrete",
+  "continuous_pdf", or "particle_resolved").
 
 #### Methods
 
-- kernel : Calculate the coagulation kernel.
-- loss_rate : Calculate the coagulation loss rate.
-- gain_rate : Calculate the coagulation gain rate.
-- net_rate : Calculate the net coagulation rate.
+- dimensionless_kernel : Raises NotImplementedError for this strategy.
+- kernel : Return the sedimentation coagulation kernel [m^3/s].
+- loss_rate : (Inherited) Calculate coagulation loss rate.
+- gain_rate : (Inherited) Calculate coagulation gain rate.
+- net_rate : (Inherited) Calculate net coagulation rate.
+- step : Perform a single step of coagulation.
+- diffusive_knudsen : Calculate the diffusive Knudsen number.
+- coulomb_potential_ratio : Compute Coulomb potential ratio.
+- friction_factor : Compute the effective friction factor.
+
+#### Examples
+
+```py title="Sedimentation Coagulation Strategy Example"
+import particula as par
+strategy = SedimentationCoagulationStrategy(
+    distribution_type="discrete"
+)
+# Use strategy.kernel(aerosol_particle, 298.15, 101325) to get the
+# sedimentation kernel.
+```
 
 #### References
 
-- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric chemistry and
-    physics, Chapter 13, Equation 13A.4.
+- Seinfeld, J. H., & Pandis, S. N. (2016). Atmospheric Chemistry and
+  Physics, Chapter 13, Equation 13A.4, Wiley.
 
 #### Signature
 
@@ -4454,7 +5438,22 @@ class SedimentationCoagulationStrategy(CoagulationStrategyABC):
 
 ### SedimentationCoagulationStrategy().dimensionless_kernel
 
-[Show source in sedimentation_coagulation_strategy.py:53](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/sedimentation_coagulation_strategy.py#L53)
+[Show source in sedimentation_coagulation_strategy.py:71](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/sedimentation_coagulation_strategy.py#L71)
+
+Raise NotImplementedError for dimensionless kernel in sedimentation
+strategy.
+
+This method is not applicable to sedimentation-based collisions.
+
+#### Arguments
+
+- diffusive_knudsen : The diffusive Knudsen number [dimensionless].
+- coulomb_potential_ratio : The Coulomb potential ratio
+  [dimensionless].
+
+#### Raises
+
+- NotImplementedError : Always raised for this strategy.
 
 #### Signature
 
@@ -4468,7 +5467,32 @@ def dimensionless_kernel(
 
 ### SedimentationCoagulationStrategy().kernel
 
-[Show source in sedimentation_coagulation_strategy.py:65](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/sedimentation_coagulation_strategy.py#L65)
+[Show source in sedimentation_coagulation_strategy.py:97](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/sedimentation_coagulation_strategy.py#L97)
+
+Compute the sedimentation coagulation kernel [m^3/s].
+
+Uses the Seinfeld & Pandis (2016) sedimentation kernel via
+`get_sedimentation_kernel_sp2016_via_system_state`.
+
+#### Arguments
+
+- particle : The ParticleRepresentation providing particle radius
+  and density.
+- temperature : The system temperature [K].
+- pressure : The system pressure [Pa].
+
+#### Returns
+
+- The sedimentation coagulation kernel.
+
+#### Examples
+
+```py
+k_values = strategy.kernel(
+    ParticleRepresentation, temperature=298.15, pressure=101325
+)
+# k_values may be a single float or an array
+```
 
 #### Signature
 
@@ -4484,48 +5508,70 @@ def kernel(
 
 
 ---
-# trubulent_dns_coagulation_strategy.md
+# turbulent_dns_coagulation_strategy.md
 
-# Trubulent Dns Coagulation Strategy
+# TurbulentDNSCoagulationStrategy
 
-[Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Dynamics](../../index.md#dynamics) / [Coagulation](../index.md#coagulation) / [Coagulation Strategy](./index.md#coagulation-strategy) / Trubulent Dns Coagulation Strategy
+[Particula Index](../../../../README.md#particula-index) / [Particula](../../../index.md#particula) / [Dynamics](../../index.md#dynamics) / [Coagulation](../index.md#coagulation) / [Coagulation Strategy](./index.md#coagulation-strategy) / TurbulentDNSCoagulationStrategy
 
-> Auto-generated documentation for [particula.dynamics.coagulation.coagulation_strategy.trubulent_dns_coagulation_strategy](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py) module.
+> Auto-generated documentation for [particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py) module.
 
 ## TurbulentDNSCoagulationStrategy
 
-[Show source in trubulent_dns_coagulation_strategy.py:22](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py#L22)
+[Show source in turbulent_dns_coagulation_strategy.py:26](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py#L26)
 
-Turbulent DNS coagulation strategy.
+Turbulent DNS coagulation strategy for aerosols.
 
-This implements the methods defined in `CoagulationStrategy` abstract
-class. Applied with the turbulent DNS kernel from Ayala et al. (2008).
+Implements methods from `CoagulationStrategyABC`, applying the
+turbulent DNS kernel following Ayala et al. (2008). Suitable for
+coagulation of particles larger than 1 µm in turbulent flow fields.
 
-#### Arguments
+#### Attributes
 
-- distribution_type : The type of distribution to be used with the
-    coagulation strategy. Must be "discrete", "continuous_pdf", or
-    "particle_resolved".
-- turbulent_dissipation : The turbulent kinetic energy of the system
-    [m^2/s^2]. DNS fits are for 0.001, 0.01, and 0.04 [m^2/s^2].
-- fluid_density : The density of the fluid [kg/m^3].
-- reynolds_lambda : The Reynolds lambda of air, DNS fits are for
-    23 and 74 [dimensionless].
-- relative_velocity : The relative velocity of the air [m/s].
+- distribution_type : The particle distribution type ("discrete",
+  "continuous_pdf", or "particle_resolved").
+- turbulent_dissipation : Turbulent kinetic energy dissipation
+  [m^2/s^3] used in DNS fits (examples: 0.001, 0.01, 0.04).
+- fluid_density : The fluid (air) density [kg/m^3].
+- reynolds_lambda : Reynolds lambda of air (e.g., 23 or 74).
+- relative_velocity : Relative velocity of the air [m/s] for
+  collisions.
 
 #### Methods
 
-- kernel : Calculate the coagulation kernel.
+- set_turbulent_dissipation : Change turbulent dissipation rate.
+- set_reynolds_lambda : Update the Reynolds lambda.
+- set_relative_velocity : Update the relative velocity.
+- dimensionless_kernel : Raise NotImplementedError for DNS approach.
+- kernel : Return the DNS-based coagulation kernel.
 - loss_rate : Calculate the coagulation loss rate.
 - gain_rate : Calculate the coagulation gain rate.
-- net_rate : Calculate the net coagulation rate.
+- net_rate : Get the net coagulation rate (gain - loss).
+- step : Perform a single step of coagulation.
+- diffusive_knudsen : Calculate the diffusive Knudsen number.
+- coulomb_potential_ratio : Compute Coulomb potential ratio.
+- friction_factor : Compute the effective friction factor.
+
+#### Examples
+
+```py title="Example usage of TurbulentDNSCoagulationStrategy"
+import particula as par
+strategy = par.dynamics.TurbulentDNSCoagulationStrategy(
+    distribution_type="discrete",
+    turbulent_dissipation=0.01,
+    fluid_density=1.225,
+    reynolds_lambda=23,
+    relative_velocity=0.5
+)
+# Use strategy.kernel(...) to compute the DNS-based kernel
+```
 
 #### References
 
-- Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on
-    the geometric collision rate of sedimenting droplets. Part 2.
-    Theory and parameterization. New Journal of Physics, 10.
-    https://doi.org/10.1088/1367-2630/10/7/075016
+- Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence on the
+  geometric collision rate of sedimenting droplets. Part 2. Theory and
+  parameterization. New Journal of Physics, 10.
+  [DOI](https://doi.org/10.1088/1367-2630/10/7/075016)
 
 #### Signature
 
@@ -4547,7 +5593,28 @@ class TurbulentDNSCoagulationStrategy(CoagulationStrategyABC):
 
 ### TurbulentDNSCoagulationStrategy().dimensionless_kernel
 
-[Show source in trubulent_dns_coagulation_strategy.py:85](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py#L85)
+[Show source in turbulent_dns_coagulation_strategy.py:165](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py#L165)
+
+Compute or return the dimensionless kernel (H).
+
+Not implemented for DNS-based approaches, so raises
+NotImplementedError.
+
+#### Arguments
+
+- diffusive_knudsen : The diffusive Knudsen number(s)
+  [dimensionless].
+- coulomb_potential_ratio : The Coulomb potential ratio(s)
+  [dimensionless].
+
+#### Returns
+
+- None : Raises NotImplementedError instead.
+
+#### Raises
+
+- NotImplementedError : This strategy does not support
+dimensionless kernels.
 
 #### Signature
 
@@ -4561,7 +5628,45 @@ def dimensionless_kernel(
 
 ### TurbulentDNSCoagulationStrategy().kernel
 
-[Show source in trubulent_dns_coagulation_strategy.py:97](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py#L97)
+[Show source in turbulent_dns_coagulation_strategy.py:196](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py#L196)
+
+Compute the DNS-based coagulation kernel [m^3/s].
+
+Uses the `get_turbulent_dns_kernel_ao2008_via_system_state` function to
+calculate collision rates following Ayala et al. (2008). This approach
+accounts for turbulent dissipation, fluid density, Reynolds lambda,
+and relative velocity.
+
+#### Arguments
+
+- particle : The ParticleRepresentation whose radii and density
+  are needed.
+- temperature : The temperature of the system [K].
+- pressure : The system pressure [Pa] (unused here, but included
+  for interface consistency).
+
+#### Returns
+
+- The DNS-based coagulation kernel(s).
+
+#### Examples
+
+```py
+kernel_values = strategy.kernel(
+    particle=my_particle,
+    temperature=298.15,
+    pressure=101325
+)
+# kernel_values may be a float or array, depending on the
+# distribution
+```
+
+#### References
+
+- Ayala, O., Rosa, B., & Wang, L. P. (2008). Effects of turbulence
+  on the geometric collision rate of sedimenting droplets. Part 2.
+  New Journal of Physics, 10.
+  [DOI](https://doi.org/10.1088/1367-2630/10/7/075016)
 
 #### Signature
 
@@ -4577,9 +5682,23 @@ def kernel(
 
 ### TurbulentDNSCoagulationStrategy().set_relative_velocity
 
-[Show source in trubulent_dns_coagulation_strategy.py:80](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py#L80)
+[Show source in turbulent_dns_coagulation_strategy.py:147](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py#L147)
 
-Set the relative velocity.
+Set the relative velocity of the flow [m/s].
+
+#### Arguments
+
+- relative_velocity : Relative velocity in [m/s].
+
+#### Returns
+
+- TurbulentDNSCoagulationStrategy : Self, for method chaining.
+
+#### Examples
+
+```py
+strategy.set_relative_velocity(0.8)
+```
 
 #### Signature
 
@@ -4589,9 +5708,23 @@ def set_relative_velocity(self, relative_velocity: float): ...
 
 ### TurbulentDNSCoagulationStrategy().set_reynolds_lambda
 
-[Show source in trubulent_dns_coagulation_strategy.py:75](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py#L75)
+[Show source in turbulent_dns_coagulation_strategy.py:129](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py#L129)
 
-Set the Reynolds lambda.
+Set the Reynolds lambda value.
+
+#### Arguments
+
+- reynolds_lambda : Reynolds lambda [dimensionless].
+
+#### Returns
+
+- TurbulentDNSCoagulationStrategy : Self, for method chaining.
+
+#### Examples
+
+```py
+strategy.set_reynolds_lambda(74)
+```
 
 #### Signature
 
@@ -4601,9 +5734,23 @@ def set_reynolds_lambda(self, reynolds_lambda: float): ...
 
 ### TurbulentDNSCoagulationStrategy().set_turbulent_dissipation
 
-[Show source in trubulent_dns_coagulation_strategy.py:70](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy.py#L70)
+[Show source in turbulent_dns_coagulation_strategy.py:111](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy.py#L111)
 
-Set the turbulent kinetic energy.
+Set the turbulent kinetic energy dissipation rate.
+
+#### Arguments
+
+- turbulent_dissipation : Turbulent dissipation [m^2/s^3].
+
+#### Returns
+
+- TurbulentDNSCoagulationStrategy : Self, allowing method chaining.
+
+#### Examples
+
+```py
+strategy.set_turbulent_dissipation(0.02)
+```
 
 #### Signature
 
@@ -4623,35 +5770,54 @@ def set_turbulent_dissipation(self, turbulent_dissipation: float): ...
 
 ## TurbulentShearCoagulationStrategy
 
-[Show source in turbulent_shear_coagulation_strategy.py:21](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.py#L21)
+[Show source in turbulent_shear_coagulation_strategy.py:29](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.py#L29)
 
-Turbulent Shear coagulation strategy.
+Turbulent shear coagulation strategy for aerosol particles.
 
-This implements the methods defined in `CoagulationStrategy` abstract
-class. Applied to the Saffman and Turner (1956) turbulent shear
-coagulation kernel.
+Implements the Saffman & Turner (1956) turbulent shear coagulation kernel,
+extending the base `CoagulationStrategyABC` class to provide a physically
+consistent model of coagulation in turbulent flow.
 
-#### Arguments
+#### Attributes
 
-- distribution_type : The type of distribution to be used with the
-    coagulation strategy. Must be "discrete", "continuous_pdf", or
-    "particle_resolved".
-- turbulent_dissipation : The turbulent kinetic energy of the system
-    [m^2/s^2].
-- fluid_density : The density of the fluid [kg/m^3].
+- distribution_type : The type of particle distribution for coagulation
+  ("discrete", "continuous_pdf", or "particle_resolved").
+- turbulent_dissipation : Turbulent kinetic energy dissipation
+  rate [m^2/s^3].
+- fluid_density : Fluid density [kg/m^3].
 
 #### Methods
 
-- kernel : Calculate the coagulation kernel.
+- set_turbulent_dissipation : Set the turbulent kinetic energy dissipation
+  rate.
+- dimensionless_kernel : (Not implemented here) Raise NotImplementedError.
+- kernel : Compute the turbulent shear coagulation kernel via
+  Saffman-Turner approach.
 - loss_rate : Calculate the coagulation loss rate.
 - gain_rate : Calculate the coagulation gain rate.
-- net_rate : Calculate the net coagulation rate.
+- net_rate : Get the net coagulation rate (gain - loss).
+- step : Perform a single step of coagulation.
+- diffusive_knudsen : Calculate the diffusive Knudsen number.
+- coulomb_potential_ratio : Compute Coulomb potential ratio.
+- friction_factor : Compute the effective friction factor.
+
+#### Examples
+
+```py title="Example usage of TurbulentShearCoagulationStrategy"
+import particula as par
+strategy = par.dynamics.TurbulentShearCoagulationStrategy(
+    distribution_type="discrete",
+    turbulent_dissipation=0.01,
+    fluid_density=1.225,
+)
+# Use strategy.kernel(...) to get the coagulation kernel
+```
 
 #### References
 
 - Saffman, P. G., & Turner, J. S. (1956). On the collision of drops in
-    turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
-    https://doi.org/10.1017/S0022112056000020
+  turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
+  https://doi.org/10.1017/S0022112056000020
 
 #### Signature
 
@@ -4668,7 +5834,36 @@ class TurbulentShearCoagulationStrategy(CoagulationStrategyABC):
 
 ### TurbulentShearCoagulationStrategy().dimensionless_kernel
 
-[Show source in turbulent_shear_coagulation_strategy.py:66](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.py#L66)
+[Show source in turbulent_shear_coagulation_strategy.py:119](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.py#L119)
+
+Compute a dimensionless kernel (H).
+
+Not implemented for turbulent shear; raises NotImplementedError.
+
+#### Arguments
+
+- diffusive_knudsen : The diffusive Knudsen number [dimensionless].
+- coulomb_potential_ratio : The Coulomb potential ratio
+  [dimensionless].
+
+#### Returns
+
+- NDArray[np.float64] : Not returned; raises error instead.
+
+#### Examples
+
+```py
+# This method is not supported here
+try:
+    result = strategy.dimensionless_kernel(diff_kn, phi_ratio)
+except NotImplementedError:
+    print("Not implemented for turbulent shear strategy.")
+```
+
+#### References
+
+- Saffman & Turner (1956) used dimensional forms; dimensionless
+  form is not covered.
 
 #### Signature
 
@@ -4682,7 +5877,42 @@ def dimensionless_kernel(
 
 ### TurbulentShearCoagulationStrategy().kernel
 
-[Show source in turbulent_shear_coagulation_strategy.py:78](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.py#L78)
+[Show source in turbulent_shear_coagulation_strategy.py:157](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.py#L157)
+
+Compute the dimensioned turbulent shear coagulation kernel [m^3/s].
+
+Uses the system state to calculate the Saffman-Turner (1956) kernel,
+which depends on the dissipation rate of turbulent kinetic energy,
+fluid density, and particle radius.
+
+#### Arguments
+
+- particle : The ParticleRepresentation instance to retrieve
+  particle radii.
+- temperature : The system temperature [K].
+- pressure : The system pressure [Pa].
+
+#### Returns
+
+- float or NDArray[np.float64] : The coagulation kernel(s) [m^3/s].
+
+#### Examples
+
+```py title="Example usage of kernel method"
+kernel_value = strategy.kernel(
+    particle=ParticleRepresentation(...),
+    temperature=298.15,
+    pressure=101325
+)
+# kernel_value could be a float or array depending on the
+# particle representation
+```
+
+#### References
+
+- Saffman, P. G., & Turner, J. S. (1956). On the collision of drops
+  in turbulent clouds. Journal of Fluid Mechanics, 1(1), 16-30.
+  https://doi.org/10.1017/S0022112056000020
 
 #### Signature
 
@@ -4698,9 +5928,24 @@ def kernel(
 
 ### TurbulentShearCoagulationStrategy().set_turbulent_dissipation
 
-[Show source in turbulent_shear_coagulation_strategy.py:61](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.py#L61)
+[Show source in turbulent_shear_coagulation_strategy.py:100](https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_strategy/turbulent_shear_coagulation_strategy.py#L100)
 
-Set the turbulent kinetic energy.
+Set the turbulent kinetic energy dissipation rate.
+
+#### Arguments
+
+- turbulent_dissipation : Turbulent kinetic energy dissipation
+  rate [m^2/s^3].
+
+#### Returns
+
+- Self (TurbulentShearCoagulationStrategy)
+
+#### Examples
+
+```py
+strategy.set_turbulent_dissipation(0.02)
+```
 
 #### Signature
 
@@ -7474,14 +8719,44 @@ def get_turbulent_shear_kernel_st1956_via_system_state(
 
 ## CondensationIsothermal
 
-[Show source in condensation_strategies.py:362](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L362)
+[Show source in condensation_strategies.py:418](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L418)
 
-Condensation strategy for isothermal conditions.
+Condensation strategy under isothermal conditions.
 
-Condensation strategy for isothermal conditions, where the temperature
-remains constant. This class implements the mass transfer rate calculation
-for condensation of particles based on partial pressures. No Latent heat
-of vaporization effect is considered.
+This class implements the isothermal condensation model, wherein
+temperature remains constant during mass transfer. It calculates
+condensation rates based on partial pressure differences, using
+no latent heat terms.
+
+#### Attributes
+
+- Inherits attributes from the base CondensationStrategy:
+  molar_mass, diffusion_coefficient, etc.
+
+#### Methods
+
+- mass_transfer_rate : Calculate the mass transfer rate under
+  isothermal conditions.
+- rate : Get the per-particle condensation rate, accounting for
+  concentration.
+- step : Advance the condensation state over a given time step.
+
+#### Examples
+
+```py title="Example Usage"
+iso_cond = CondensationIsothermal(molar_mass=0.018)
+rate_array = iso_cond.rate(particle, gas_species, 298.15, 101325)
+# rate_array now contains the condensation rate per particle
+```
+
+#### References
+
+- Aerosol Modeling, Chapter 2, Equation 2.40
+- Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling
+    (D. Topping & M. Bane, Eds.). Wiley.
+    [DOI](https://doi.org/10.1002/9781119625728)
+- Seinfeld & Pandis, "Atmospheric Chemistry and Physics," 3rd Ed.,
+  Wiley, 2016.
 
 #### Signature
 
@@ -7502,7 +8777,7 @@ class CondensationIsothermal(CondensationStrategy):
 
 ### CondensationIsothermal().mass_transfer_rate
 
-[Show source in condensation_strategies.py:385](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L385)
+[Show source in condensation_strategies.py:468](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L468)
 
 #### Signature
 
@@ -7524,7 +8799,7 @@ def mass_transfer_rate(
 
 ### CondensationIsothermal().rate
 
-[Show source in condensation_strategies.py:412](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L412)
+[Show source in condensation_strategies.py:495](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L495)
 
 #### Signature
 
@@ -7545,7 +8820,7 @@ def rate(
 
 ### CondensationIsothermal().step
 
-[Show source in condensation_strategies.py:441](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L441)
+[Show source in condensation_strategies.py:524](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L524)
 
 #### Signature
 
@@ -7577,16 +8852,38 @@ This class defines the interface for various condensation models
 used in atmospheric physics. Subclasses should implement specific
 condensation algorithms based on different physical models and equations.
 
-#### Arguments
+#### Attributes
 
-- molar_mass : The molar mass of the species [kg/mol]. If a single
-    value is provided, it will be used for all species.
-- diffusion_coefficient : The diffusion coefficient of the species
-    [m^2/s]. If a single value is provided, it will be used for all
-    species. Default is 2e-5 m^2/s for air.
-- accommodation_coefficient : The mass accommodation coefficient of the
-    species. If a single value is provided, it will be used for all
-    species. Default is 1.0.
+- molar_mass : The molar mass of the species [kg/mol].
+- diffusion_coefficient : The diffusion coefficient [m^2/s].
+- accommodation_coefficient : The mass accommodation coefficient
+  (unitless).
+- update_gases : Whether to update gas concentrations after
+  condensation.
+
+#### Methods
+
+- mean_free_path : Calculate the mean free path of the gas molecules.
+- knudsen_number : Compute the Knudsen number for a given particle radius.
+- first_order_mass_transport : Calculate first-order mass transport
+    coefficient.
+- calculate_pressure_delta : Compute the partial pressure difference.
+- mass_transfer_rate : Abstract method for the mass transfer rate [kg/s].
+- rate : Abstract method for condensation rate per particle/bin.
+- step : Abstract method to perform one timestep of condensation.
+
+#### Examples
+
+```py title="Example Usage of CondensationStrategy"
+import particula as par
+strategy = par.dynamics.ConcreteCondensationStrategy(...)
+# Use strategy.mass_transfer_rate(...) to get the transfer rate
+```
+
+#### References
+
+- Seinfeld, J. H. & Pandis, S. N. (2016). Atmospheric Chemistry and
+  - `Physics` - From Air Pollution to Climate Change (3rd ed.). Wiley.
 
 #### Signature
 
@@ -7603,7 +8900,7 @@ class CondensationStrategy(ABC):
 
 ### CondensationStrategy()._fill_zero_radius
 
-[Show source in condensation_strategies.py:202](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L202)
+[Show source in condensation_strategies.py:234](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L234)
 
 Fill zero radius values with the maximum radius. The concentration
 value of zero will ensure that the rate of condensation is zero. The
@@ -7629,7 +8926,7 @@ def _fill_zero_radius(self, radius: NDArray[np.float64]) -> NDArray[np.float64]:
 
 ### CondensationStrategy().calculate_pressure_delta
 
-[Show source in condensation_strategies.py:228](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L228)
+[Show source in condensation_strategies.py:260](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L260)
 
 Calculate the difference in partial pressure between the gas and
 particle phases.
@@ -7668,7 +8965,7 @@ def calculate_pressure_delta(
 
 ### CondensationStrategy().first_order_mass_transport
 
-[Show source in condensation_strategies.py:159](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L159)
+[Show source in condensation_strategies.py:189](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L189)
 
 First-order mass transport coefficient per particle.
 
@@ -7691,15 +8988,17 @@ The first-order mass transport coefficient per particle (m^3/s).
 
 #### References
 
-- Aerosol Modeling, Chapter 2, Equation 2.49 (excluding particle
-    number)
+- Chapter 2, Equation 2.49 (excluding particle number)
+- Topping, D., & Bane, M. (2022). Introduction to Aerosol Modelling
+    (D. Topping & M. Bane, Eds.). Wiley.
+    [DOI](https://doi.org/10.1002/9781119625728)
 
 #### Signature
 
 ```python
 def first_order_mass_transport(
     self,
-    radius: Union[float, NDArray[np.float64]],
+    particle_radius: Union[float, NDArray[np.float64]],
     temperature: float,
     pressure: float,
     dynamic_viscosity: Optional[float] = None,
@@ -7708,7 +9007,7 @@ def first_order_mass_transport(
 
 ### CondensationStrategy().knudsen_number
 
-[Show source in condensation_strategies.py:124](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L124)
+[Show source in condensation_strategies.py:154](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L154)
 
 The Knudsen number for a particle.
 
@@ -7730,7 +9029,7 @@ The Knudsen number, which is the ratio of the mean free path to
 
 #### References
 
-[Knudsen Number](https://en.wikipedia.org/wiki/Knudsen_number)
+- [Knudsen Number](https://en.wikipedia.org/wiki/Knudsen_number)
 
 #### Signature
 
@@ -7746,28 +9045,40 @@ def knudsen_number(
 
 ### CondensationStrategy().mass_transfer_rate
 
-[Show source in condensation_strategies.py:274](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L274)
+[Show source in condensation_strategies.py:306](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L306)
 
-Mass transfer rate for a particle.
+Compute the isothermal mass transfer rate for a particle.
 
-Calculate the mass transfer rate based on the difference in partial
-pressure and the first-order mass transport coefficient.
+Implements dm/dt = 4π × r × Dᵢ × Mᵢ × f(Kn, α) × Δpᵢ / (R × T),
+where:
+- r is the particle radius,
+- Dᵢ is diffusion coefficient,
+- Mᵢ is molar mass,
+- f(Kn, α) is the transition correction factor,
+- Δpᵢ is the difference in partial pressure,
+- R is the gas constant,
+- T is temperature in Kelvin.
 
 #### Arguments
 
-- particle : The particle for which the mass transfer rate is to be
-    calculated.
-- gas_species : The gas species with which the particle is in
-    contact.
-- temperature : The temperature at which the mass transfer rate
-    is to be calculated.
-- pressure : The pressure of the gas phase.
-- dynamic_viscosity : The dynamic viscosity of the gas [Pa*s]. If
-    not provided, it will be calculated based on the temperature
+- particle : The particle representation, providing radius,
+  concentration, etc.
+- gas_species : The gas species condensing onto the particles.
+- temperature : System temperature [K].
+- pressure : System pressure [Pa].
+- dynamic_viscosity : Optional dynamic viscosity [Pa*s].
 
 #### Returns
 
-The mass transfer rate for the particle [kg/s].
+- Mass transfer rate [kg/s] for each particle.
+
+#### Examples
+
+```py title="Example Usage of mass_transfer_rate"
+m_rate = iso_cond.mass_transfer_rate(
+    particle, gas_species, 298.15, 101325
+)
+```
 
 #### Signature
 
@@ -7790,7 +9101,7 @@ def mass_transfer_rate(
 
 ### CondensationStrategy().mean_free_path
 
-[Show source in condensation_strategies.py:94](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L94)
+[Show source in condensation_strategies.py:124](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L124)
 
 Calculate the mean free path of the gas molecules based on the
 temperature, pressure, and dynamic viscosity of the gas.
@@ -7808,8 +9119,8 @@ The mean free path of the gas molecules in meters (m).
 
 #### References
 
-Mean Free Path
-[Wikipedia](https://en.wikipedia.org/wiki/Mean_free_path)
+- Mean Free Path
+    [Wikipedia](https://en.wikipedia.org/wiki/Mean_free_path)
 
 #### Signature
 
@@ -7821,29 +9132,32 @@ def mean_free_path(
 
 ### CondensationStrategy().rate
 
-[Show source in condensation_strategies.py:304](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L304)
+[Show source in condensation_strategies.py:348](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L348)
 
-Calculate the rate of mass condensation for each particle due to
-each condensable gas species.
+Compute the net condensation rate per particle, scaled by
+concentration.
 
-The rate of condensation is determined based on the mass transfer rate,
-which is a function of particle properties, gas species properties,
-temperature, and pressure. This rate is then scaled by the
-concentration of particles in the system to get the overall
-condensation rate for each particle or bin.
+Calculates the mass transfer rate and multiplies it by particle
+concentration, yielding the total mass condensation rate per particle.
 
 #### Arguments
 
-- particle : Representation of the particles, including properties
-    such as size, concentration, and mass.
-- gas_species : The species of gas condensing onto the particles.
-- temperature : The temperature of the system in Kelvin.
-- pressure : The pressure of the system in Pascals.
+- particle : ParticleRepresentation object with distribution and
+  concentration.
+- gas_species : GasSpecies object for the condensing gas.
+- temperature : The absolute temperature in Kelvin.
+- pressure : The pressure in Pascals.
 
 #### Returns
 
-An array of condensation rates for each particle, scaled by
-    particle concentration.
+- Condensation rate per particle or bin, in kg/s.
+
+#### Examples
+
+```py title="Example Usage of rate"
+rates = iso_cond.rate(particle, gas_species, 298.15, 101325)
+# returns array([...]) with condensation rates
+```
 
 #### Signature
 
@@ -7865,23 +9179,34 @@ def rate(
 
 ### CondensationStrategy().step
 
-[Show source in condensation_strategies.py:335](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L335)
+[Show source in condensation_strategies.py:381](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L381)
 
-Execute the condensation process for a given time step.
+Perform one timestep of isothermal condensation on the particle.
+
+Calculates the mass transfer for the specified time_step and updates
+both the particle mass and the gas concentration
+(if update_gases=True).
 
 #### Arguments
 
-- particle : The particle to modify.
-- gas_species : The gas species to condense onto the
-    particle.
-- temperature : The temperature of the system in Kelvin.
-- pressure : The pressure of the system in Pascals.
-- time_step : The time step for the process in seconds.
+- particle : The particle representation to update.
+- gas_species : The gas species whose concentration is reduced.
+- temperature : System temperature [K].
+- pressure : System pressure [Pa].
+- time_step : The time interval for condensation [s].
 
 #### Returns
 
-The modified particle instance and the modified gas species
-    instance.
+- Updated ParticleRepresentation.
+- Updated GasSpecies.
+
+#### Examples
+
+```py
+updated_particle, updated_gas = iso_cond.step(
+    particle, gas_species, 298.15, 101325, 1.0
+)
+```
 
 #### Signature
 
@@ -7912,9 +9237,76 @@ def step(
 
 > Auto-generated documentation for [particula.dynamics.condensation.mass_transfer](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py) module.
 
-## calculate_mass_transfer
+## get_first_order_mass_transport_k
 
-[Show source in mass_transfer.py:224](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L224)
+[Show source in mass_transfer.py:35](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L35)
+
+Calculate the first-order mass transport coefficient per particle.
+
+This function computes the coefficient K that governs how fast mass is
+transported to or from a particle in a vapor. The equation is:
+
+- K = 4π × radius × D × X
+    - K : Mass transport coefficient [m³/s].
+    - radius : Particle radius [m].
+    - D : Diffusion coefficient of the vapor [m²/s].
+    - X : Vapor transition correction factor [unitless].
+
+#### Arguments
+
+- particle_radius : The radius of the particle [m].
+- vapor_transition : The vapor transition correction factor [unitless].
+- diffusion_coefficient : The diffusion coefficient of the vapor [m²/s].
+  Defaults to 2e-5 (approx. air).
+
+#### Returns
+
+- The first-order mass transport coefficient per particle [m³/s].
+
+#### Examples
+
+```py title="Float input"
+import particula as par
+par.dynamics.get_first_order_mass_transport_k(
+    particle_radius=1e-6,
+    vapor_transition=0.6,
+    diffusion_coefficient=2e-9
+)
+# Output: 1.5079644737231005e-14
+```
+
+```py title="Array input"
+import particula as par
+par.dynamics.get_first_order_mass_transport_k(
+    particle_radius=np.array([1e-6, 2e-6]),
+    vapor_transition=np.array([0.6, 0.6]),
+    diffusion_coefficient=2e-9
+)
+# Output: array([1.50796447e-14, 6.03185789e-14])
+```
+
+#### References
+
+- Aerosol Modeling: Chapter 2, Equation 2.49
+- Wikipedia contributors, "Mass diffusivity,"
+  https://en.wikipedia.org/wiki/Mass_diffusivity
+
+#### Signature
+
+```python
+@validate_inputs({"particle_radius": "nonnegative"})
+def get_first_order_mass_transport_k(
+    particle_radius: Union[float, NDArray[np.float64]],
+    vapor_transition: Union[float, NDArray[np.float64]],
+    diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-05,
+) -> Union[float, NDArray[np.float64]]: ...
+```
+
+
+
+## get_mass_transfer
+
+[Show source in mass_transfer.py:236](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L236)
 
 Route mass transfer calculation to single or multiple-species routines.
 
@@ -7940,7 +9332,8 @@ involves:
 #### Examples
 
 ```py title="Single species input"
-calculate_mass_transfer(
+import particula as par
+par.dynamics.get_mass_transfer(
     mass_rate=np.array([0.1, 0.5]),
     time_step=10,
     gas_mass=np.array([0.5]),
@@ -7950,7 +9343,8 @@ calculate_mass_transfer(
 ```
 
 ```py title="Multiple species input"
-calculate_mass_transfer(
+import particula as par
+par.dynamics.get_mass_transfer(
     mass_rate=np.array([[0.1, 0.05, 0.03], [0.2, 0.15, 0.07]]),
     time_step=10,
     gas_mass=np.array([1.0, 0.8, 0.5]),
@@ -7971,7 +9365,7 @@ calculate_mass_transfer(
         "particle_concentration": "nonnegative",
     }
 )
-def calculate_mass_transfer(
+def get_mass_transfer(
     mass_rate: NDArray[np.float64],
     time_step: float,
     gas_mass: NDArray[np.float64],
@@ -7982,9 +9376,9 @@ def calculate_mass_transfer(
 
 
 
-## calculate_mass_transfer_multiple_species
+## get_mass_transfer_of_multiple_species
 
-[Show source in mass_transfer.py:373](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L373)
+[Show source in mass_transfer.py:388](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L388)
 
 Calculate mass transfer for multiple gas species.
 
@@ -8013,7 +9407,8 @@ particle mass in each species bin.
 #### Examples
 
 ```py title="Multiple species input"
-calculate_mass_transfer_multiple_species(
+import particula as par
+par.dynamics.get_mass_transfer_of_multiple_species(
     mass_rate=np.array([[0.1, 0.05, 0.03], [0.2, 0.15, 0.07]]),
     time_step=10,
     gas_mass=np.array([1.0, 0.8, 0.5]),
@@ -8035,7 +9430,7 @@ calculate_mass_transfer_multiple_species(
         "particle_concentration": "nonnegative",
     }
 )
-def calculate_mass_transfer_multiple_species(
+def get_mass_transfer_of_multiple_species(
     mass_rate: NDArray[np.float64],
     time_step: float,
     gas_mass: NDArray[np.float64],
@@ -8046,9 +9441,9 @@ def calculate_mass_transfer_multiple_species(
 
 
 
-## calculate_mass_transfer_single_species
+## get_mass_transfer_of_single_species
 
-[Show source in mass_transfer.py:299](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L299)
+[Show source in mass_transfer.py:313](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L313)
 
 Calculate mass transfer for a single gas species.
 
@@ -8076,7 +9471,8 @@ particle mass.
 #### Examples
 
 ```py title="Single species input"
-calculate_mass_transfer_single_species(
+import particula as par
+par.dynamics.get_mass_transfer_of_single_species(
     mass_rate=np.array([0.1, 0.5]),
     time_step=10,
     gas_mass=np.array([0.5]),
@@ -8098,7 +9494,7 @@ calculate_mass_transfer_single_species(
         "particle_concentration": "nonnegative",
     }
 )
-def calculate_mass_transfer_single_species(
+def get_mass_transfer_of_single_species(
     mass_rate: NDArray[np.float64],
     time_step: float,
     gas_mass: NDArray[np.float64],
@@ -8109,74 +9505,9 @@ def calculate_mass_transfer_single_species(
 
 
 
-## first_order_mass_transport_k
+## get_mass_transfer_rate
 
-[Show source in mass_transfer.py:35](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L35)
-
-Calculate the first-order mass transport coefficient per particle.
-
-This function computes the coefficient K that governs how fast mass is
-transported to or from a particle in a vapor. The equation is:
-
-- K = 4π × radius × D × X
-    - K : Mass transport coefficient [m³/s].
-    - radius : Particle radius [m].
-    - D : Diffusion coefficient of the vapor [m²/s].
-    - X : Vapor transition correction factor [unitless].
-
-#### Arguments
-
-- radius : The radius of the particle [m].
-- vapor_transition : The vapor transition correction factor [unitless].
-- diffusion_coefficient : The diffusion coefficient of the vapor [m²/s].
-  Defaults to 2e-5 (approx. air).
-
-#### Returns
-
-- The first-order mass transport coefficient per particle [m³/s].
-
-#### Examples
-
-```py title="Float input"
-first_order_mass_transport_k(
-    radius=1e-6,
-    vapor_transition=0.6,
-    diffusion_coefficient=2e-9
-)
-# Output: 1.5079644737231005e-14
-```
-
-```py title="Array input"
-first_order_mass_transport_k(
-    radius=np.array([1e-6, 2e-6]),
-    vapor_transition=np.array([0.6, 0.6]),
-    diffusion_coefficient=2e-9
-)
-# Output: array([1.50796447e-14, 6.03185789e-14])
-```
-
-#### References
-
-- Aerosol Modeling: Chapter 2, Equation 2.49
-- Wikipedia contributors, "Mass diffusivity,"
-  https://en.wikipedia.org/wiki/Mass_diffusivity
-
-#### Signature
-
-```python
-@validate_inputs({"radius": "nonnegative"})
-def first_order_mass_transport_k(
-    radius: Union[float, NDArray[np.float64]],
-    vapor_transition: Union[float, NDArray[np.float64]],
-    diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-05,
-) -> Union[float, NDArray[np.float64]]: ...
-```
-
-
-
-## mass_transfer_rate
-
-[Show source in mass_transfer.py:99](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L99)
+[Show source in mass_transfer.py:103](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L103)
 
 Calculate the mass transfer rate for a particle.
 
@@ -8206,7 +9537,8 @@ mass transport coefficient (K). The equation is:
 #### Examples
 
 ```py title="Single value input"
-mass_transfer_rate(
+import particula as par
+par.dynamics.mass_transfer_rate(
     pressure_delta=10.0,
     first_order_mass_transport=1e-17,
     temperature=300.0,
@@ -8216,7 +9548,8 @@ mass_transfer_rate(
 ```
 
 ```py title="Array input"
-mass_transfer_rate(
+import particula as par
+par.dynamics.mass_transfer_rate(
     pressure_delta=np.array([10.0, 15.0]),
     first_order_mass_transport=np.array([1e-17, 2e-17]),
     temperature=300.0,
@@ -8242,7 +9575,7 @@ mass_transfer_rate(
         "molar_mass": "positive",
     }
 )
-def mass_transfer_rate(
+def get_mass_transfer_rate(
     pressure_delta: Union[float, NDArray[np.float64]],
     first_order_mass_transport: Union[float, NDArray[np.float64]],
     temperature: Union[float, NDArray[np.float64]],
@@ -8252,9 +9585,9 @@ def mass_transfer_rate(
 
 
 
-## radius_transfer_rate
+## get_radius_transfer_rate
 
-[Show source in mass_transfer.py:172](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L172)
+[Show source in mass_transfer.py:178](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L178)
 
 Convert mass rate to radius growth/evaporation rate.
 
@@ -8270,7 +9603,7 @@ change rate (dr/dt). The equation is:
 #### Arguments
 
 - mass_rate : The mass transfer rate [kg/s].
-- radius : The radius of the particle [m].
+- particle_radius : The radius of the particle [m].
 - density : The density of the particle [kg/m³].
 
 #### Returns
@@ -8280,18 +9613,20 @@ change rate (dr/dt). The equation is:
 #### Examples
 
 ```py title="Single value input"
-radius_transfer_rate(
+import particula as par
+par.dynamics.radius_transfer_rate(
     mass_rate=1e-21,
-    radius=1e-6,
+    particle_radius=1e-6,
     density=1000
 )
 # Output: 7.95774715e-14
 ```
 
 ```py title="Array input"
-radius_transfer_rate(
+import particula as par
+par.dynamics.radius_transfer_rate(
     mass_rate=np.array([1e-21, 2e-21]),
-    radius=np.array([1e-6, 2e-6]),
+    particle_radius=np.array([1e-6, 2e-6]),
     density=1000
 )
 # Output: array([7.95774715e-14, 1.98943679e-14])
@@ -8300,10 +9635,12 @@ radius_transfer_rate(
 #### Signature
 
 ```python
-@validate_inputs({"mass_rate": "finite", "radius": "nonnegative", "density": "positive"})
-def radius_transfer_rate(
+@validate_inputs(
+    {"mass_rate": "finite", "particle_radius": "nonnegative", "density": "positive"}
+)
+def get_radius_transfer_rate(
     mass_rate: Union[float, NDArray[np.float64]],
-    radius: Union[float, NDArray[np.float64]],
+    particle_radius: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]: ...
 ```
@@ -8442,19 +9779,40 @@ def get_volume_dilution_coefficient(
 
 ## Coagulation
 
-[Show source in particle_process.py:94](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L94)
+[Show source in particle_process.py:142](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L142)
 
-A class for running a coagulation strategy.
+Implements a coagulation process for aerosol particles.
 
-#### Arguments
+This class applies a specified coagulation strategy to each particle
+in an Aerosol, merging or aggregating particles as needed, based on
+the chosen physical model.
 
-- `coagulation_strategy` *CoagulationStrategy* - The coagulation strategy to
-    use.
+#### Attributes
+
+- coagulation_strategy : The coagulation strategy used for particle
+  collision calculations.
 
 #### Methods
 
-- `execute` - Execute the coagulation process.
-- `rate` - Calculate the rate of coagulation for each particle.
+- execute : Perform the coagulation step over a given time interval.
+- rate : Calculate the coagulation rate for each particle.
+
+#### Examples
+
+```py title="Example Usage"
+import particula as par
+coagulation = par.dynamics.Coagulation(
+    coagulation_strategy=my_strategy
+)
+updated_aerosol = coagulation.execute(aerosol, time_step=0.5)
+# updated_aerosol now reflects coalesced or aggregated particles
+```
+
+#### References
+
+- [Aerosol Wikipedia](https://en.wikipedia.org/wiki/Aerosol)
+- Seinfeld, J. H. and Pandis, S. N., "Atmospheric Chemistry and
+  - `Physics` - From Air Pollution to Climate Change," Wiley, 2016.
 
 #### Signature
 
@@ -8470,13 +9828,29 @@ class Coagulation(Runnable):
 
 ### Coagulation().execute
 
-[Show source in particle_process.py:110](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L110)
+[Show source in particle_process.py:184](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L184)
 
-Execute the coagulation process.
+Perform the coagulation process over a given time step.
 
 #### Arguments
 
-- `aerosol` *Aerosol* - The aerosol instance to modify.
+- aerosol : The Aerosol instance to modify.
+- time_step : The total time interval for coagulation.
+- sub_steps : Number of internal subdivisions for iterative
+  calculation.
+
+#### Returns
+
+- Aerosol : The updated aerosol object after the coagulation step.
+
+#### Examples
+
+```py title="Example Coagulation Execution"
+updated_aerosol = coagulation.execute(
+    aerosol, time_step=0.5, sub_steps=2
+)
+# The aerosol now reflects changes from particle collisions
+```
 
 #### Signature
 
@@ -8490,17 +9864,25 @@ def execute(self, aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aer
 
 ### Coagulation().rate
 
-[Show source in particle_process.py:131](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L131)
+[Show source in particle_process.py:219](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L219)
 
-Calculate the rate of coagulation for each particle.
+Compute the coagulation rate for each particle in the aerosol.
 
 #### Arguments
 
-- `aerosol` *Aerosol* - The aerosol instance to modify.
+- aerosol : The Aerosol instance containing particles.
 
 #### Returns
 
-- `np.ndarray` - An array of coagulation rates for each particle.
+- np.ndarray : An array of coagulation rates for each particle,
+  in units related to particle collisions per unit time.
+
+#### Examples
+
+```py title="Coagulation Rate Calculation Example"
+rates = coagulation.rate(aerosol)
+# rates might look like array([0.1, 0.05, ...])
+```
 
 #### Signature
 
@@ -8518,18 +9900,39 @@ def rate(self, aerosol: Aerosol) -> Any: ...
 
 [Show source in particle_process.py:19](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L19)
 
-A class for running a mass condensation process.
+Handles the mass condensation process for aerosols.
 
-#### Arguments
+This class applies a specified condensation strategy to each particle
+in an Aerosol, updating particle mass and reducing gas concentration
+accordingly. It is designed to work with any CondensationStrategy
+subclass.
 
-- `condensation_strategy` *CondensationStrategy* - The condensation strategy
-    to use.
+#### Attributes
+
+- condensation_strategy : The condensation strategy used for mass
+  transfer calculations.
 
 #### Methods
 
-- `execute` - Execute the mass condensation process.
-- `rate` - Calculate the rate of mass condensation for each particle due to
-    each condensable gas species.
+- execute : Perform the mass condensation over a specified time step.
+- rate : Calculate the mass condensation rate for each particle.
+
+#### Examples
+
+```py title="Example Mass Condensation"
+import particula as par
+condensation = par.dyanmics.MassCondensation(
+    condensation_strategy=my_strategy
+)
+updated_aerosol = condensation.execute(aerosol, time_step=1.0)
+# updated_aerosol now reflects condensed mass
+```
+
+#### References
+
+- [Aerosol Wikipedia](https://en.wikipedia.org/wiki/Aerosol)
+- Seinfeld, J. H. and Pandis, S. N., "Atmospheric Chemistry and Physics:
+  From Air Pollution to Climate Change," Wiley, 2016.
 
 #### Signature
 
@@ -8545,13 +9948,28 @@ class MassCondensation(Runnable):
 
 ### MassCondensation().execute
 
-[Show source in particle_process.py:36](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L36)
+[Show source in particle_process.py:65](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L65)
 
-Execute the mass condensation process.
+Perform the mass condensation process over a given time step.
 
 #### Arguments
 
-- `aerosol` *Aerosol* - The aerosol instance to modify.
+- aerosol : The Aerosol instance to modify.
+- time_step : The total time interval for condensation.
+- sub_steps : Number of subdivisions for iterative calculation.
+
+#### Returns
+
+- The updated aerosol object after condensation.
+
+#### Examples
+
+```py title="Example Condensation Execution"
+updated_aerosol = condensation.execute(
+    aerosol, time_step=1.0, sub_steps=2
+)
+# The aerosol now has reduced/increased particle/gas mass
+```
 
 #### Signature
 
@@ -8565,18 +9983,25 @@ def execute(self, aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aer
 
 ### MassCondensation().rate
 
-[Show source in particle_process.py:63](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L63)
+[Show source in particle_process.py:105](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L105)
 
-Calculate the rate of mass condensation for each particle due to
-each condensable gas species.
+Compute mass condensation rates for each particle.
 
 #### Arguments
 
-- `aerosol` *Aerosol* - The aerosol instance to modify.
+- aerosol : The Aerosol instance containing particles and gases.
 
 #### Returns
 
-- `np.ndarray` - An array of condensation rates for each particle.
+- An array of condensation rates for each particle,
+  in units of mass per unit time.
+
+#### Examples
+
+```py title="Rate Calculation Example"
+rates = condensation.rate(aerosol)
+# rates may look like array([1.2e-12, 4.5e-12, ...])
+```
 
 #### Signature
 
@@ -9086,17 +10511,16 @@ present.
 
 #### Attributes
 
-- `temperature` - Temperature of the gas mixture in Kelvin.
-- `total_pressure` - Total atmospheric pressure of the mixture inPascals.
-- `species` - List of GasSpecies objects representing the
+- temperature : Temperature of the gas mixture in Kelvin.
+- total_pressure : Total atmospheric pressure of the mixture in
+  Pascals.
+- species : List of GasSpecies objects representing the
     various species within the gas mixture.
 
 #### Methods
 
-- `add_species(self,` *species* - GasSpecies) -> None:
-    Adds a GasSpecies object to the mixture.
-- `remove_species(self,` *index* - int) -> None:
-    Removes a GasSpecies object from the mixture based on its index.
+- add_species : Adds a GasSpecies object to the mixture.
+- remove_species : Removes a GasSpecies object from the mixture by index.
 
 #### Signature
 
@@ -9106,17 +10530,17 @@ class Atmosphere: ...
 
 ### Atmosphere().__getitem__
 
-[Show source in atmosphere.py:64](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L64)
+[Show source in atmosphere.py:65](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L65)
 
-Retrieves a gas species by index.
+Retrieve a gas species by index.
 
 #### Arguments
 
-- `index` - The index of the gas species to retrieve.
+- index : The index of the gas species to retrieve.
 
 #### Returns
 
-- `GasSpecies` - The gas species at the specified index.
+- The gas species at the specified index.
 
 #### Signature
 
@@ -9130,13 +10554,13 @@ def __getitem__(self, index: int) -> GasSpecies: ...
 
 ### Atmosphere().__iter__
 
-[Show source in atmosphere.py:55](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L55)
+[Show source in atmosphere.py:56](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L56)
 
-Allows iteration over the species in the gas mixture.
+Allow iteration over the species in the gas mixture.
 
 #### Returns
 
-- `Iterator[GasSpecies]` - An iterator over the gas species objects.
+- Iterator[GasSpecies] : An iterator over the gas species objects.
 
 #### Signature
 
@@ -9146,13 +10570,13 @@ def __iter__(self): ...
 
 ### Atmosphere().__len__
 
-[Show source in atmosphere.py:75](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L75)
+[Show source in atmosphere.py:77](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L77)
 
-Returns the number of species in the gas mixture.
+Return the number of species in the gas mixture.
 
 #### Returns
 
-- `int` - The number of gas species in the mixture.
+- The number of gas species in the mixture.
 
 #### Signature
 
@@ -9162,14 +10586,13 @@ def __len__(self) -> int: ...
 
 ### Atmosphere().__str__
 
-[Show source in atmosphere.py:83](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L83)
+[Show source in atmosphere.py:86](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L86)
 
-Provides a string representation of the Atmosphere object.
+Provide a string representation of the Atmosphere object.
 
 #### Returns
 
-- `str` - A string that includes the temperature, pressure, and a
-    list of species in the mixture.
+- Includes the temperature, pressure, and a list of species.
 
 #### Signature
 
@@ -9181,11 +10604,11 @@ def __str__(self) -> str: ...
 
 [Show source in atmosphere.py:32](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L32)
 
-Adds a GasSpecies object to the mixture.
+Add a GasSpecies object to the mixture.
 
 #### Arguments
 
-- `gas_species` - The gas species to be added.
+- gas_species : The gas species to be added.
 
 #### Signature
 
@@ -9199,18 +10622,17 @@ def add_species(self, gas_species: GasSpecies) -> None: ...
 
 ### Atmosphere().remove_species
 
-[Show source in atmosphere.py:40](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L40)
+[Show source in atmosphere.py:41](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere.py#L41)
 
-Removes a gas species from the mixture by its index.
+Remove a gas species from the mixture by its index.
 
 #### Arguments
 
-- `index` - Index of the gas species to remove. Must be within
-            the current range of the list.
+- index : Index of the gas species to remove. Must be in range.
 
 #### Raises
 
-- `IndexError` - If the provided index is out of bounds.
+- IndexError : If the provided index is out of bounds.
 
 #### Signature
 
@@ -9240,18 +10662,30 @@ species composition.
 
 #### Attributes
 
-- `temperature` - Temperature of the gas mixture in Kelvin.
-- `total_pressure` *float* - Total pressure of the gas mixture in Pascals.
-- `species` *list[GasSpecies]* - List of GasSpecies objects in the mixture.
-    Starts empty.
+- temperature : Temperature of the gas mixture in Kelvin.
+- total_pressure : Total pressure of the gas mixture in Pascals.
+- species : List of GasSpecies objects in the mixture (starts empty).
 
 #### Methods
 
-- `set_temperature(temperature,temperature_units)` - Sets the temperature.
-- `set_pressure(pressure,pressure_units)` - Sets the total pressure.
-- `add_species(species)` - Adds a GasSpecies object to the gas mixture.
-- `set_parameters(parameters)` - Sets multiple parameters from a dictionary.
-- `build()` - Validates the set parameters and returns an Atmosphere object.
+- set_temperature : Set the temperature (with optional unit handling).
+- set_pressure : Set the total pressure (with optional unit handling).
+- add_species : Add a GasSpecies object to the gas mixture.
+- set_parameters : Set multiple parameters from a dictionary.
+- build : Validate parameters and return an Atmosphere object.
+
+#### Examples
+
+```py title="Create an atmosphere using the builder"
+import particula as par
+builder = par.gas.AtmosphereBuilder()
+atmosphere = (
+    builder.set_temperature(300, "K")
+    .set_pressure(101325, "Pa")
+    .add_species(par.gas.GasSpecies(name="O2", molar_mass=0.032))
+    .build()
+)
+```
 
 #### Signature
 
@@ -9268,17 +10702,17 @@ class AtmosphereBuilder(BuilderABC, BuilderTemperatureMixin, BuilderPressureMixi
 
 ### AtmosphereBuilder().add_species
 
-[Show source in atmosphere_builders.py:50](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere_builders.py#L50)
+[Show source in atmosphere_builders.py:62](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere_builders.py#L62)
 
-Adds a GasSpecies object to the gas mixture.
+Add a GasSpecies object to the gas mixture.
 
 #### Arguments
 
-- `species` *GasSpecies* - The GasSpecies object to be added.
+- species : The GasSpecies object to be added.
 
 #### Returns
 
-- [AtmosphereBuilder](#atmospherebuilder) - Instance of this builder for chaining.
+- AtmosphereBuilder : This builder, for method chaining.
 
 #### Signature
 
@@ -9292,22 +10726,21 @@ def add_species(self, species: GasSpecies) -> "AtmosphereBuilder": ...
 
 ### AtmosphereBuilder().build
 
-[Show source in atmosphere_builders.py:62](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere_builders.py#L62)
+[Show source in atmosphere_builders.py:75](https://github.com/uncscode/particula/blob/main/particula/gas/atmosphere_builders.py#L75)
 
-Validates the configuration and constructs the Atmosphere object.
+Validate the configuration and construct the Atmosphere object.
 
 This method checks that all necessary conditions are met for a valid
-Atmosphere instance(e.g., at least one species must be present) and
+Atmosphere instance (e.g., at least one species must be present) and
 then initializes the Atmosphere.
 
 #### Returns
 
-- `Atmosphere` - The newly created Atmosphere object, configured as
-specified.
+- Atmosphere : The newly created Atmosphere object.
 
 #### Raises
 
-- `ValueError` - If no species have been added to the mixture.
+- ValueError : If no species have been added to the mixture.
 
 #### Signature
 
@@ -10580,28 +12013,54 @@ def get_clausius_clapeyron_vapor_pressure(
 
 ## GasSpecies
 
-[Show source in species.py:21](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L21)
+[Show source in species.py:23](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L23)
 
-GasSpecies represents an individual or array of gas species with
-properties like name, molar mass, vapor pressure, and condensability.
+Represents an individual or array of gas species with properties like
+name, molar mass, vapor pressure, and condensability.
 
 #### Attributes
 
 - name : The name of the gas species.
-- molar_mass : The molar mass of the gas species.
-- pure_vapor_pressure_strategy : The strategy for calculating the pure
-    vapor pressure of the gas species. Can be a single strategy or a
-    list of strategies. Default is a constant vapor pressure strategy
-    with a vapor pressure of 0.0 Pa.
+- molar_mass : The molar mass of the gas species in kg/mol.
+- pure_vapor_pressure_strategy : The strategy (or list of strategies)
+  for calculating the pure vapor pressure of the gas species.
 - condensable : Indicates whether the gas species is condensable.
-    Default is True.
-- concentration : The concentration of the gas species in the mixture.
-    Default is 0.0 kg/m^3.
+- concentration : The concentration of the gas species in kg/m^3.
+
+#### Methods
+
+- get_name : Return the name of the gas species.
+- get_molar_mass : Return the molar mass in kg/mol.
+- get_condensable : Return whether the species is condensable.
+- get_concentration : Return the concentration in kg/m^3.
+- get_pure_vapor_pressure : Calculate pure vapor pressure at a given Temp.
+- get_partial_pressure : Calculate partial pressure at a given Temp.
+- get_saturation_ratio : Calculate saturation ratio at a given Temp.
+- get_saturation_concentration : Calculate saturation concentration at a
+  given Temperature.
+- add_concentration : Add concentration to the species.
+- set_concentration : Overwrite concentration value.
+
+#### Examples
+
+```py title="GasSpecies usage example"
+import particula as par
+constant_vapor_pressure = par.gas.ConstantVaporPressureStrategy(2330)
+species = par.gas.GasSpecies(
+    name="Water",
+    molar_mass=0.018,
+    vapor_pressure_strategy=constant_vapor_pressure,
+    condensable=True,
+    concentration=1e-3,  # kg/m^3
+)
+print(species.get_name(), species.get_concentration())
+```
 
 #### Signature
 
 ```python
 class GasSpecies:
+    @validate_inputs({"molar_mass": "positive"})
     def __init__(
         self,
         name: Union[str, NDArray[np.str_]],
@@ -10620,9 +12079,20 @@ class GasSpecies:
 
 ### GasSpecies().__len__
 
-[Show source in species.py:62](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L62)
+[Show source in species.py:108](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L108)
 
-Return the number of gas species.
+Return the number of gas species (1 if scalar; array length if
+ndarray).
+
+#### Returns
+
+- float or int : Number of species (array length or 1).
+
+#### Examples
+
+```py title="Example of len()"
+len(gas_object)
+```
 
 #### Signature
 
@@ -10632,9 +12102,13 @@ def __len__(self): ...
 
 ### GasSpecies().__str__
 
-[Show source in species.py:58](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L58)
+[Show source in species.py:99](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L99)
 
 Return a string representation of the GasSpecies object.
+
+#### Returns
+
+- str : The string name of the gas species.
 
 #### Signature
 
@@ -10644,9 +12118,18 @@ def __str__(self): ...
 
 ### GasSpecies()._check_if_negative_concentration
 
-[Show source in species.py:317](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L317)
+[Show source in species.py:375](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L375)
 
-Log a warning if the concentration is negative.
+Ensure concentration is not negative. Log a warning if it is and set
+to 0.
+
+#### Arguments
+
+- values : Concentration values to check.
+
+#### Returns
+
+- Corrected concentration (≥ 0).
 
 #### Signature
 
@@ -10658,9 +12141,18 @@ def _check_if_negative_concentration(
 
 ### GasSpecies()._check_non_positive_value
 
-[Show source in species.py:329](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L329)
+[Show source in species.py:396](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L396)
 
-Check for non-positive values and raise an error if found.
+Raise an error if any value is non-positive.
+
+#### Arguments
+
+- value : The numeric value(s) to check.
+- name : Name of the parameter for the error message.
+
+#### Raises
+
+- ValueError : If any value <= 0 is detected.
 
 #### Signature
 
@@ -10672,19 +12164,18 @@ def _check_non_positive_value(
 
 ### GasSpecies().add_concentration
 
-[Show source in species.py:283](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L283)
+[Show source in species.py:340](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L340)
 
-Add concentration to the gas species.
+Add concentration (kg/m^3) to the gas species.
 
 #### Arguments
 
-- added_concentration : The concentration to add to the gas
-    species.
+- added_concentration : The amount to add in kg/m^3.
 
 #### Examples
 
-``` py title="Example usage of add_concentration"
-gas_object.add_concentration(added_concentration=1e-10)
+```py title="Example of add_concentration()"
+gas_object.add_concentration(1e-10)
 ```
 
 #### Signature
@@ -10697,13 +12188,13 @@ def add_concentration(
 
 ### GasSpecies().get_concentration
 
-[Show source in species.py:94](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L94)
+[Show source in species.py:169](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L169)
 
-Get the concentration of the gas species in the mixture, in kg/m^3.
+Return the concentration of the gas species in kg/m^3.
 
 #### Returns
 
-The concentration of the gas species in the mixture.
+- Species concentration.
 
 #### Signature
 
@@ -10713,13 +12204,19 @@ def get_concentration(self) -> Union[float, NDArray[np.float64]]: ...
 
 ### GasSpecies().get_condensable
 
-[Show source in species.py:86](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L86)
+[Show source in species.py:155](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L155)
 
-Check if the gas species is condensable or not.
+Check if the gas species is condensable.
 
 #### Returns
 
-True if the gas species is condensable, False otherwise.
+- True if condensable, else False.
+
+#### Examples
+
+``` py title="Example of get_condensable()"
+gas_object.get_condensable()
+```
 
 #### Signature
 
@@ -10729,13 +12226,19 @@ def get_condensable(self) -> Union[bool, NDArray[np.bool_]]: ...
 
 ### GasSpecies().get_molar_mass
 
-[Show source in species.py:78](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L78)
+[Show source in species.py:141](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L141)
 
-Get the molar mass of the gas species in kg/mol.
+Return the molar mass of the gas species in kg/mol.
 
 #### Returns
 
-The molar mass of the gas species, in kg/mol.
+- Molar mass in kg/mol.
+
+#### Examples
+
+```py title="Example of get_molar_mass()"
+gas_object.get_molar_mass()
+```
 
 #### Signature
 
@@ -10745,13 +12248,19 @@ def get_molar_mass(self) -> Union[float, NDArray[np.float64]]: ...
 
 ### GasSpecies().get_name
 
-[Show source in species.py:70](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L70)
+[Show source in species.py:127](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L127)
 
-Get the name of the gas species.
+Return the name of the gas species.
 
 #### Returns
 
-The name of the gas species.
+- Name of the gas species.
+
+#### Examples
+
+```py title="Example of get_name()"
+gas_object.get_name()
+```
 
 #### Signature
 
@@ -10761,31 +12270,25 @@ def get_name(self) -> Union[str, NDArray[np.str_]]: ...
 
 ### GasSpecies().get_partial_pressure
 
-[Show source in species.py:142](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L142)
+[Show source in species.py:214](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L214)
 
-Calculate the partial pressure of the gas based on the vapor
-pressure strategy.
-
-This method accounts for multiple strategies if assigned and
-calculates partial pressure for each strategy based on the
-corresponding concentration and molar mass.
+Calculate the partial pressure of the gas at a given temperature (K).
 
 #### Arguments
 
-- temperature : The temperature in Kelvin at which to calculate
-    the partial pressure.
+- temperature : The temperature in Kelvin.
 
 #### Returns
 
-Partial pressure of the gas in Pascals.
+- Partial pressure in Pa.
 
 #### Raises
 
-- `ValueError` - If the vapor pressure strategy is not set.
+- ValueError : If the vapor pressure strategy is not set.
 
 #### Examples
 
-``` py title="Example usage of get_partial_pressure"
+```py title="Example of get_partial_pressure()"
 gas_object.get_partial_pressure(temperature=298)
 ```
 
@@ -10799,30 +12302,25 @@ def get_partial_pressure(
 
 ### GasSpecies().get_pure_vapor_pressure
 
-[Show source in species.py:102](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L102)
+[Show source in species.py:178](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L178)
 
-Calculate the pure vapor pressure of the gas species at a given
-temperature in Kelvin.
-
-This method supports both a single strategy or a list of strategies
-for calculating vapor pressure.
+Calculate the pure vapor pressure at a given temperature (K).
 
 #### Arguments
 
-- temperature : The temperature in Kelvin at which to calculate
-    vapor pressure.
+- temperature : The temperature in Kelvin.
 
 #### Returns
 
-The calculated pure vapor pressure in Pascals.
+- Pure vapor pressure in Pa.
 
 #### Raises
 
-- `ValueError` - If no vapor pressure strategy is set.
+- ValueError : If no vapor pressure strategy is set.
 
 #### Examples
 
-``` py title="Example usage of get_pure_vapor_pressure"
+```py title="Example"
 gas_object.get_pure_vapor_pressure(temperature=298)
 ```
 
@@ -10836,31 +12334,25 @@ def get_pure_vapor_pressure(
 
 ### GasSpecies().get_saturation_concentration
 
-[Show source in species.py:238](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L238)
+[Show source in species.py:300](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L300)
 
-Calculate the saturation concentration of the gas based on the
-vapor pressure strategy.
-
-This method accounts for multiple strategies if assigned and
-calculates saturation concentration for each strategy based on the
-molar mass.
+Calculate the saturation concentration at a given temperature (K).
 
 #### Arguments
 
-- temperature : The temperature in Kelvin at which to calculate
-    the partial pressure.
+- temperature : The temperature in Kelvin.
 
 #### Returns
 
-The saturation concentration of the gas.
+- The saturation concentration in kg/m^3.
 
 #### Raises
 
-- `ValueError` - If the vapor pressure strategy is not set.
+- ValueError : If the vapor pressure strategy is not set.
 
 #### Examples
 
-``` py title="Example usage of get_saturation_concentration"
+```py title="Example of get_saturation_concentration()"
 gas_object.get_saturation_concentration(temperature=298)
 ```
 
@@ -10874,31 +12366,25 @@ def get_saturation_concentration(
 
 ### GasSpecies().get_saturation_ratio
 
-[Show source in species.py:190](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L190)
+[Show source in species.py:257](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L257)
 
-Calculate the saturation ratio of the gas based on the vapor
-pressure strategy.
-
-This method accounts for multiple strategies if assigned and
-calculates saturation ratio for each strategy based on the
-corresponding concentration and molar mass.
+Calculate the saturation ratio of the gas at a given temperature (K).
 
 #### Arguments
 
-- temperature : The temperature in Kelvin at which to calculate
-    the partial pressure.
+- temperature : The temperature in Kelvin.
 
 #### Returns
 
-The saturation ratio of the gas.
+- The saturation ratio.
 
 #### Raises
 
-ValueError : If the vapor pressure strategy is not set.
+- ValueError : If the vapor pressure strategy is not set.
 
 #### Examples
 
-``` py title="Example usage of get_saturation_ratio"
+```py title="Example of get_saturation_ratio()"
 gas_object.get_saturation_ratio(temperature=298)
 ```
 
@@ -10912,18 +12398,18 @@ def get_saturation_ratio(
 
 ### GasSpecies().set_concentration
 
-[Show source in species.py:299](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L299)
+[Show source in species.py:356](https://github.com/uncscode/particula/blob/main/particula/gas/species.py#L356)
 
-Set the concentration of the gas species.
+Overwrite the concentration of the gas species in kg/m^3.
 
 #### Arguments
 
-- new_concentration : The new concentration of the gas species.
+- new_concentration : The new concentration value in kg/m^3.
 
 #### Examples
 
-``` py title="Example usage of set_concentration"
-gas_object.set_concentration(new_concentration=1e-10)
+```py title="Example of set_concentration()"
+gas_object.set_concentration(1e-10)
 ```
 
 #### Signature
@@ -10946,10 +12432,24 @@ def set_concentration(
 
 ## GasSpeciesBuilder
 
-[Show source in species_builders.py:27](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L27)
+[Show source in species_builders.py:28](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L28)
 
-Builder class for GasSpecies objects, allowing for a more fluent and
-readable creation of GasSpecies instances with optional parameters.
+Builder class for GasSpecies objects with preset default parameters.
+
+This subclass of GasSpeciesBuilder initializes certain parameters
+(e.g., name, molar_mass, vapor_pressure_strategy, etc.) to predefined
+values. Suitable for quick testing or examples.
+
+#### Methods
+
+- build : Validate parameters and return a GasSpecies object.
+
+- set_name : Set the name of the gas species.
+- set_vapor_pressure_strategy : Set the vapor pressure strategy.
+- set_condensable : Set whether the species is condensable.
+- set_molar_mass : From BuilderMolarMassMixin.
+- set_concentration : From BuilderConcentrationMixin.
+- build : Validate parameters and return a GasSpecies object.
 
 #### Attributes
 
@@ -10961,11 +12461,24 @@ readable creation of GasSpecies instances with optional parameters.
 - concentration : The concentration of the gas species in the
     mixture, in kg/m^3.
 
-#### Raises
+#### Examples
 
-- ValueError : If any required key is missing. During check_keys and
-    pre_build_check. Or if trying to set an invalid parameter.
-- Warning : If using default units for any parameter.
+``` py title="Create a gas species using the builder"
+import particula as par
+builder = par.gas.GasSpeciesBuilder()
+gas_object = (
+    builder.set_name("Oxygen")
+    .set_molar_mass(0.032, "kg/mol")
+    .set_vapor_pressure_strategy(
+        par.gas.ConstantVaporPressureStrategy(vapor_pressure=101325)
+    )
+    .set_condensable(False)
+    .set_concentration(1.2, "kg/m^3")
+    .build()
+)
+# gas_object is now a GasSpecies instance with the specified
+# parameters.
+```
 
 #### Signature
 
@@ -10982,7 +12495,17 @@ class GasSpeciesBuilder(BuilderABC, BuilderMolarMassMixin, BuilderConcentrationM
 
 ### GasSpeciesBuilder().build
 
-[Show source in species_builders.py:125](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L125)
+[Show source in species_builders.py:139](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L139)
+
+Validate parameters and return a GasSpecies object.
+
+#### Returns
+
+- The constructed GasSpecies instance.
+
+#### Raises
+
+- ValueError : If any required parameters are missing or invalid.
 
 #### Signature
 
@@ -10996,87 +12519,66 @@ def build(self) -> GasSpecies: ...
 
 ### GasSpeciesBuilder().set_condensable
 
-[Show source in species_builders.py:104](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L104)
+[Show source in species_builders.py:123](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L123)
 
-Set the condensable bool of the gas species.
+Set whether the gas species is condensable.
 
 #### Arguments
 
-condensable : Whether the gas species is condensable.
+- condensable : Boolean or array indicating condensability.
 
 #### Returns
 
-self : The GasSpeciesBuilder object.
-
-#### Examples
-
-``` py title="Set a single condensable bool"
-builder = GasSpeciesBuilder()
-builder.set_condensable(False)
-```
+- This builder instance.
 
 #### Signature
 
 ```python
-def set_condensable(self, condensable: Union[bool, NDArray[np.bool_]]): ...
+def set_condensable(
+    self, condensable: Union[bool, NDArray[np.bool_]]
+) -> "GasSpeciesBuilder": ...
 ```
 
 ### GasSpeciesBuilder().set_name
 
-[Show source in species_builders.py:63](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L63)
+[Show source in species_builders.py:92](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L92)
 
 Set the name of the gas species.
 
 #### Arguments
 
-name : The name of the gas species.
+- name : The name of the gas species.
 
 #### Returns
 
-self : The GasSpeciesBuilder object.
-
-#### Examples
-
-``` py title="Set a single name"
-builder = GasSpeciesBuilder()
-builder.set_name("Oxygen")
-```
+- This builder instance.
 
 #### Signature
 
 ```python
-def set_name(self, name: Union[str, NDArray[np.str_]]): ...
+def set_name(self, name: Union[str, NDArray[np.str_]]) -> "GasSpeciesBuilder": ...
 ```
 
 ### GasSpeciesBuilder().set_vapor_pressure_strategy
 
-[Show source in species_builders.py:81](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L81)
+[Show source in species_builders.py:107](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L107)
 
 Set the vapor pressure strategy for the gas species.
 
 #### Arguments
 
-strategy : The vapor pressure strategy for the gas species.
+- strategy : The vapor pressure strategy (or list of strategies).
 
 #### Returns
 
-self : The GasSpeciesBuilder object.
-
-#### Examples
-
-``` py title="Set a single vapor pressure strategy"
-builder = GasSpeciesBuilder()
-builder.set_vapor_pressure_strategy(
-    ConstantVaporPressureStrategy(vapor_pressure=1.0)
-)
-```
+- This builder instance.
 
 #### Signature
 
 ```python
 def set_vapor_pressure_strategy(
     self, strategy: Union[VaporPressureStrategy, list[VaporPressureStrategy]]
-): ...
+) -> "GasSpeciesBuilder": ...
 ```
 
 #### See also
@@ -11087,10 +12589,18 @@ def set_vapor_pressure_strategy(
 
 ## PresetGasSpeciesBuilder
 
-[Show source in species_builders.py:136](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L136)
+[Show source in species_builders.py:158](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L158)
 
 Builder class for GasSpecies objects, allowing for a more fluent and
 readable creation of GasSpecies instances with optional parameters.
+
+#### Examples
+
+``` py title="Create a gas species using the preset builder"
+import particula as par
+gas_object = par.gas.PresetGasSpeciesBuilder().build()
+# gas_object is now a GasSpecies instance with the preset
+# parameters.
 
 #### Signature
 
@@ -11105,7 +12615,14 @@ class PresetGasSpeciesBuilder(GasSpeciesBuilder):
 
 ### PresetGasSpeciesBuilder().build
 
-[Show source in species_builders.py:153](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L153)
+[Show source in species_builders.py:182](https://github.com/uncscode/particula/blob/main/particula/gas/species_builders.py#L182)
+
+Validate parameters and return a GasSpecies object with preset
+defaults.
+
+#### Returns
+
+- GasSpecies : The constructed GasSpecies instance.
 
 #### Signature
 
@@ -11131,37 +12648,37 @@ def build(self) -> GasSpecies: ...
 
 [Show source in species_factories.py:12](https://github.com/uncscode/particula/blob/main/particula/gas/species_factories.py#L12)
 
-Factory class to create species builders
+Factory for creating species builders that produce GasSpecies objects.
 
-Factory class to create species builders for creating gas species.
+This class provides methods to retrieve a builder (e.g., 'gas_species'
+or 'preset_gas_species') and instantiate a GasSpecies object from it
+using user-specified parameters.
 
 #### Methods
 
-- get_builders : Returns the mapping of strategy types to builder
-instances.
-- get_strategy : Gets the strategy instance
-    - strategy_type : Type of species builder to use, can be
-        'gas_species' or 'preset_gas_species'.
-    - parameters : Parameters required for the
-        builder, dependent on the chosen strategy type.
+- get_builders : Return a dictionary of builder objects.
+- get_strategy : Construct and return a GasSpecies object with the
+  chosen builder.
 
 #### Returns
 
-GasSpecies : An instance of the specified GasSpecies.
+- GasSpecies : A gas species instance from the specified builder.
 
 #### Raises
 
-ValueError : If an unknown strategy type is provided.
+- ValueError : If an unknown strategy type is provided.
 
 #### Examples
 
-``` py title="Create a preset gas species using the factory"
-factory = GasSpeciesFactory()
+```py title="Create a preset gas species using the factory"
+import particula as par
+factory = par.gas.GasSpeciesFactory()
 gas_object = factory.get_strategy("preset_gas_species", parameters)
 ```
 
-``` py title="Create a gas species using the factory"
-factory = GasSpeciesFactory()
+```py title="Create a gas species using the factory"
+import particula as par
+factory = par.gas.GasSpeciesFactory()
 parameters = {
     "name": "Oxygen",
     "molar_mass": 0.032,
@@ -11190,15 +12707,25 @@ class GasSpeciesFactory(
 
 ### GasSpeciesFactory().get_builders
 
-[Show source in species_factories.py:62](https://github.com/uncscode/particula/blob/main/particula/gas/species_factories.py#L62)
+[Show source in species_factories.py:63](https://github.com/uncscode/particula/blob/main/particula/gas/species_factories.py#L63)
 
-Returns the mapping of strategy types to builder instances.
+Return a mapping of strategy types to builder instances.
 
 #### Returns
 
-A dictionary mapping strategy types to builder instances.
-    - gas_species : GasSpeciesBuilder
-    - preset_gas_species : PresetGasSpeciesBuilder
+- dict[str, Union[GasSpeciesBuilder, PresetGasSpeciesBuilder]] :
+  A dictionary where:
+    * "gas_species" -> GasSpeciesBuilder
+    * "preset_gas_species" -> PresetGasSpeciesBuilder
+
+#### Examples
+
+```py title="get_builders Example"
+import particula as par
+factory = par.gas.GasSpeciesFactory()
+builder_map = factory.get_builders()
+# builder_map["gas_species"] -> GasSpeciesBuilder()
+```
 
 #### Signature
 
@@ -11218,11 +12745,27 @@ def get_builders(self): ...
 
 ## AntoineBuilder
 
-[Show source in vapor_pressure_builders.py:19](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L19)
+[Show source in vapor_pressure_builders.py:37](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L37)
 
-Builder class for AntoineVaporPressureStrategy. It allows setting the
-coefficients 'a', 'b', and 'c' separately and then building the strategy
-object.
+Builder class for AntoineVaporPressureStrategy. It allows setting
+the coefficients 'a', 'b', and 'c' separately and then building the
+strategy object. Follows the general form of the Antoine equation in
+Unicode:
+
+log₁₀(P) = a − b / (T − c)
+
+#### Attributes
+
+- a : Coefficient "a" of the Antoine equation (dimensionless).
+- b : Coefficient "b" (in Kelvin).
+- c : Coefficient "c" (in Kelvin).
+
+#### Methods
+
+- set_a : Set the coefficient "a" of the Antoine equation.
+- set_b : Set the coefficient "b".
+- set_c : Set the coefficient "c".
+- build : Validate parameters and return an AntoineVaporPressureStrategy.
 
 #### Examples
 
@@ -11250,6 +12793,10 @@ strategy = (
 
 - `-` *Equation* - log10(P_mmHG) = a - b / (Temperature_K - c)
   - `(Reference` - https://en.wikipedia.org/wiki/Antoine_equation)
+- "Vapor Pressure,"
+  [Wikipedia](https://en.wikipedia.org/wiki/Vapor_pressure)
+- "Atmospheric Pressure Unit Conversions,"
+  [Wikipedia](https://en.wikipedia.org/wiki/Pascal_(unit))
 
 #### Signature
 
@@ -11264,10 +12811,14 @@ class AntoineBuilder(BuilderABC):
 
 ### AntoineBuilder().build
 
-[Show source in vapor_pressure_builders.py:86](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L86)
+[Show source in vapor_pressure_builders.py:123](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L123)
 
-Build the AntoineVaporPressureStrategy object with the set
+Validate and return an AntoineVaporPressureStrategy using the set
 coefficients.
+
+#### Returns
+
+- Configured with coefficients a, b, and c.
 
 #### Signature
 
@@ -11281,7 +12832,7 @@ def build(self) -> AntoineVaporPressureStrategy: ...
 
 ### AntoineBuilder().set_a
 
-[Show source in vapor_pressure_builders.py:58](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L58)
+[Show source in vapor_pressure_builders.py:95](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L95)
 
 Set the coefficient 'a' of the Antoine equation.
 
@@ -11293,7 +12844,7 @@ def set_a(self, a: float, a_units: Optional[str] = None) -> "AntoineBuilder": ..
 
 ### AntoineBuilder().set_b
 
-[Show source in vapor_pressure_builders.py:70](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L70)
+[Show source in vapor_pressure_builders.py:107](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L107)
 
 Set the coefficient 'b' of the Antoine equation.
 
@@ -11306,7 +12857,7 @@ def set_b(self, b: float, b_units: str = "K") -> "AntoineBuilder": ...
 
 ### AntoineBuilder().set_c
 
-[Show source in vapor_pressure_builders.py:78](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L78)
+[Show source in vapor_pressure_builders.py:115](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L115)
 
 Set the coefficient 'c' of the Antoine equation.
 
@@ -11321,11 +12872,24 @@ def set_c(self, c: float, c_units: str = "K") -> "AntoineBuilder": ...
 
 ## ClausiusClapeyronBuilder
 
-[Show source in vapor_pressure_builders.py:93](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L93)
+[Show source in vapor_pressure_builders.py:135](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L135)
 
 Builder class for ClausiusClapeyronStrategy. This class facilitates
 setting the latent heat of vaporization, initial temperature, and initial
 pressure with unit handling and then builds the strategy object.
+
+The Clausius–Clapeyron relation can be approximated as:
+
+- dP / dT = (L / (R × T²))
+
+#### Methods
+
+- set_latent_heat : Set latent heat in J/kg (or convertible units).
+- set_temperature_initial : Set initial temperature in K
+    (or convertible units).
+- set_pressure_initial : Set initial pressure in Pa
+    (or convertible units).
+- build : Validate parameters and return a ClausiusClapeyronStrategy.
 
 #### Examples
 
@@ -11367,10 +12931,13 @@ class ClausiusClapeyronBuilder(BuilderABC):
 
 ### ClausiusClapeyronBuilder().build
 
-[Show source in vapor_pressure_builders.py:174](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L174)
+[Show source in vapor_pressure_builders.py:230](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L230)
 
-Build and return a ClausiusClapeyronStrategy object with the set
-parameters.
+Validate parameters and return a ClausiusClapeyronStrategy object.
+
+#### Returns
+
+- Configured with latent heat, initial Temperature, and Pressure.
 
 #### Signature
 
@@ -11384,7 +12951,7 @@ def build(self) -> ClausiusClapeyronStrategy: ...
 
 ### ClausiusClapeyronBuilder().set_latent_heat
 
-[Show source in vapor_pressure_builders.py:135](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L135)
+[Show source in vapor_pressure_builders.py:191](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L191)
 
 Set the latent heat of vaporization: Default units J/kg.
 
@@ -11399,7 +12966,7 @@ def set_latent_heat(
 
 ### ClausiusClapeyronBuilder().set_pressure_initial
 
-[Show source in vapor_pressure_builders.py:161](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L161)
+[Show source in vapor_pressure_builders.py:217](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L217)
 
 Set the initial pressure. Default units: Pa.
 
@@ -11414,7 +12981,7 @@ def set_pressure_initial(
 
 ### ClausiusClapeyronBuilder().set_temperature_initial
 
-[Show source in vapor_pressure_builders.py:148](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L148)
+[Show source in vapor_pressure_builders.py:204](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L204)
 
 Set the initial temperature. Default units: K.
 
@@ -11431,10 +12998,20 @@ def set_temperature_initial(
 
 ## ConstantBuilder
 
-[Show source in vapor_pressure_builders.py:185](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L185)
+[Show source in vapor_pressure_builders.py:245](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L245)
 
 Builder class for ConstantVaporPressureStrategy. This class facilitates
 setting the constant vapor pressure and then building the strategy object.
+
+#### Attributes
+
+- `-` *vapor_pressure* - The vapor pressure in Pa (scalar/float).
+
+#### Methods
+
+- `-` *set_vapor_pressure* - Set the constant vapor pressure in Pa
+  (or convertible units).
+- build : Validate parameters and return a ConstantVaporPressureStrategy.
 
 #### Examples
 
@@ -11472,10 +13049,13 @@ class ConstantBuilder(BuilderABC):
 
 ### ConstantBuilder().build
 
-[Show source in vapor_pressure_builders.py:229](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L229)
+[Show source in vapor_pressure_builders.py:297](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L297)
 
-Build and return a ConstantVaporPressureStrategy object with the set
-parameters.
+Validate parameters and return a ConstantVaporPressureStrategy object.
+
+#### Returns
+
+- Configured with vapor_pressure in Pa.
 
 #### Signature
 
@@ -11489,7 +13069,7 @@ def build(self) -> ConstantVaporPressureStrategy: ...
 
 ### ConstantBuilder().set_vapor_pressure
 
-[Show source in vapor_pressure_builders.py:216](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L216)
+[Show source in vapor_pressure_builders.py:284](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L284)
 
 Set the constant vapor pressure.
 
@@ -11506,17 +13086,19 @@ def set_vapor_pressure(
 
 ## WaterBuckBuilder
 
-[Show source in vapor_pressure_builders.py:236](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L236)
+[Show source in vapor_pressure_builders.py:308](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L308)
 
-Builder class for WaterBuckStrategy. This class facilitates
-the building of the WaterBuckStrategy object. Which as of now has no
-additional parameters to set. But could be extended in the future for
-ice only calculations.
+Builder class for WaterBuckStrategy.
+
+This class facilitates the building of the WaterBuckStrategy object.
+Which as of now has no additional parameters to set but could be
+extended in the future (e.g., ice-only calculations).
 
 #### Examples
 
-``` py title="WaterBuckBuilder"
-WaterBuckBuilder().build()
+```py title="WaterBuckBuilder"
+import particula as par
+strategy = par.gas.WaterBuckBuilder().build()
 ```
 
 #### Signature
@@ -11532,9 +13114,13 @@ class WaterBuckBuilder(BuilderABC):
 
 ### WaterBuckBuilder().build
 
-[Show source in vapor_pressure_builders.py:251](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L251)
+[Show source in vapor_pressure_builders.py:325](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_builders.py#L325)
 
 Build and return a WaterBuckStrategy object.
+
+#### Returns
+
+- Configured for water-specific Buck vapor pressure.
 
 #### Signature
 
@@ -11558,45 +13144,44 @@ def build(self) -> WaterBuckStrategy: ...
 
 ## VaporPressureFactory
 
-[Show source in vapor_pressure_factories.py:20](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_factories.py#L20)
+[Show source in vapor_pressure_factories.py:22](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_factories.py#L22)
 
-Factory class to create vapor pressure strategy builders
+Factory class to create vapor pressure strategy
+builders.
 
-Factory class to create vapor pressure strategy builders for calculating
-vapor pressure of gas species.
+This class provides a way to generate multiple vapor pressure calculation
+strategies (e.g., constant, Antoine, Clausius-Clapeyron, or Water Buck) by
+commissioning the appropriate builder. It is useful for scenarios requiring
+a flexible way to switch or extend vapor pressure calculation methods.
+
+#### Attributes
+
+- None
 
 #### Methods
 
 - get_builders : Returns the mapping of strategy types to builder
-    instances.
-- get_strategy : Gets the strategy instance
-    for the specified strategy type.
-    - strategy_type : Type of vapor pressure strategy to use, can be
-        'constant', 'antoine', 'clausius_clapeyron', or 'water_buck'.
-    - parameters : Parameters required for the
-        builder, dependent on the chosen strategy type.
-            - `-` *constant* - constant_vapor_pressure
-            - `-` *antoine* - A, B, C
-            - `-` *clausius_clapeyron* - A, B, C
-            - `-` *water_buck* - No parameters are required.
-
-#### Returns
-
-VaporPressureStrategy : An instance of the specified
-    VaporPressureStrategy.
-
-#### Raises
-
-ValueError : If an unknown strategy type is provided.
-ValueError : If any required key is missing during check_keys or
-    pre_build_check, or if trying to set an invalid parameter.
+  instances.
+- get_strategy : Returns the selected vapor pressure strategy,
+  given a strategy type and parameters.
 
 #### Examples
 
-``` py title="constant vapor pressure strategy"
-strategy_is = VaporPressureFactory().get_strategy("constant")
-# returns ConstantVaporPressureStrategy
+```py title="Example VaporPressureFactory usage"
+import particula as par
+
+factory = par.gas.VaporPressureFactory()
+# Create a constant vapor pressure strategy:
+strategy = factory.get_strategy(
+    "constant", {"constant_vapor_pressure": 101325.0}
+)
+# strategy is an instance of ConstantVaporPressureStrategy
 ```
+
+#### References
+
+- "Vapor Pressure,"
+[Wikipedia](https://en.wikipedia.org/wiki/Vapor_pressure).
 
 #### Signature
 
@@ -11629,17 +13214,26 @@ class VaporPressureFactory(
 
 ### VaporPressureFactory().get_builders
 
-[Show source in vapor_pressure_factories.py:71](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_factories.py#L71)
+[Show source in vapor_pressure_factories.py:73](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_factories.py#L73)
 
-Returns the mapping of strategy types to builder instances.
+Return a dictionary mapping strategy types to builder instances.
 
 #### Returns
 
-A dictionary mapping strategy types to builder instances.
-    - `-` *constant* - ConstantBuilder
-    - `-` *antoine* - AntoineBuilder
-    - `-` *clausius_clapeyron* - ClausiusClapeyronBuilder
-    - `-` *water_buck* - WaterBuckBuilder
+dict:
+    - `-` *"constant"* - ConstantBuilder
+    - `-` *"antoine"* - AntoineBuilder
+    - `-` *"clausius_clapeyron"* - ClausiusClapeyronBuilder
+    - `-` *"water_buck"* - WaterBuckBuilder
+
+#### Examples
+
+```py
+import particula as par
+builders_dict = par.gas.VaporPressureFactory().get_builders()
+builder = builders_dict["constant"]
+# builder is an instance of ConstantBuilder
+```
 
 #### Signature
 
@@ -11659,10 +13253,45 @@ def get_builders(self): ...
 
 ## AntoineVaporPressureStrategy
 
-[Show source in vapor_pressure_strategies.py:193](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L193)
+[Show source in vapor_pressure_strategies.py:249](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L249)
 
-Concrete implementation of the VaporPressureStrategy using the
-Antoine equation for vapor pressure calculations.
+Vapor pressure strategy using the Antoine equation.
+
+This class calculates vapor pressure by applying the Antoine equation,
+which relates temperature in Kelvin to the logarithm of vapor pressure.
+
+#### Attributes
+
+- a : Coefficient "a" in the Antoine equation.
+- b : Coefficient "b" in the Antoine equation.
+- c : Coefficient "c" in the Antoine equation.
+
+#### Methods
+
+- `-` *partial_pressure* - Compute partial pressure from concentration.
+- `-` *concentration* - Compute concentration from partial pressure.
+- `-` *saturation_ratio* - Compute ratio of partial pressure to saturation
+  pressure.
+- `-` *saturation_concentration* - Compute concentration at saturation pressure.
+- `-` *pure_vapor_pressure* - Computes vapor pressure from the Antoine equation.
+
+#### Examples
+
+```py title="Antoine Vapor Pressure Example"
+import particula as par
+strategy = par.gas.AntoineVaporPressureStrategy(
+    a=8.07131, b=1730.63, c=233.426
+)
+vp = strategy.pure_vapor_pressure(temperature=373.15)
+# Returns the vapor pressure in Pascals
+```
+
+#### References
+
+- "Antoine Equation,"
+  [Wikipedia](https://en.wikipedia.org/wiki/Antoine_equation).
+- Kelvin-based adaptation:
+  https://onlinelibrary.wiley.com/doi/pdf/10.1002/9781118135341.app1
 
 #### Signature
 
@@ -11682,7 +13311,7 @@ class AntoineVaporPressureStrategy(VaporPressureStrategy):
 
 ### AntoineVaporPressureStrategy().pure_vapor_pressure
 
-[Show source in vapor_pressure_strategies.py:209](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L209)
+[Show source in vapor_pressure_strategies.py:298](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L298)
 
 Calculate vapor pressure using the Antoine equation.
 
@@ -11721,10 +13350,45 @@ def pure_vapor_pressure(
 
 ## ClausiusClapeyronStrategy
 
-[Show source in vapor_pressure_strategies.py:239](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L239)
+[Show source in vapor_pressure_strategies.py:328](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L328)
 
-Concrete implementation of the VaporPressureStrategy using the
-Clausius-Clapeyron equation for vapor pressure calculations.
+Vapor pressure strategy using the Clausius-Clapeyron equation.
+
+This class calculates vapor pressure by applying the Clausius-Clapeyron
+relation, which relates how the vapor pressure of a substance changes
+with temperature, given latent heat data and a reference point.
+
+#### Attributes
+
+- latent_heat : Latent heat of vaporization (J/mol).
+- temperature_initial : Reference temperature (K).
+- pressure_initial : Reference pressure (Pa).
+
+#### Methods
+
+- `-` *partial_pressure* - Compute partial pressure from concentration.
+- `-` *concentration* - Compute concentration from partial pressure.
+- `-` *saturation_ratio* - Compute ratio of partial pressure to saturation
+  pressure.
+- `-` *saturation_concentration* - Compute concentration at saturation pressure.
+- `-` *pure_vapor_pressure* - Computes vapor pressure via Clausius-Clapeyron
+  relation.
+
+#### Examples
+
+```py title="Clausius-Clapeyron Example"
+strategy = ClausiusClapeyronStrategy(
+    latent_heat=4.07e4,
+    temperature_initial=298.15,
+    pressure_initial=3167.0
+)
+vp = strategy.pure_vapor_pressure(temperature=310)
+```
+
+#### References
+
+- "Clausius–Clapeyron relation,"
+  [Wikipedia](https://en.wikipedia.org/wiki/Clausius%E2%80%93Clapeyron_relation).
 
 #### Signature
 
@@ -11744,7 +13408,7 @@ class ClausiusClapeyronStrategy(VaporPressureStrategy):
 
 ### ClausiusClapeyronStrategy().pure_vapor_pressure
 
-[Show source in vapor_pressure_strategies.py:262](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L262)
+[Show source in vapor_pressure_strategies.py:384](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L384)
 
 Calculate vapor pressure using Clausius-Clapeyron equation.
 
@@ -11780,10 +13444,39 @@ def pure_vapor_pressure(
 
 ## ConstantVaporPressureStrategy
 
-[Show source in vapor_pressure_strategies.py:163](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L163)
+[Show source in vapor_pressure_strategies.py:192](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L192)
 
-Concrete implementation of the VaporPressureStrategy using a constant
-vapor pressure value.
+Vapor pressure strategy with a constant value.
+
+This class returns a single, unchanging vapor pressure value regardless of
+the temperature. It is useful for scenarios that require a simplified
+model.
+
+#### Attributes
+
+- vapor_pressure : The constant vapor pressure in Pascals.
+
+#### Methods
+
+- `-` *partial_pressure* - Compute partial pressure from concentration.
+- `-` *concentration* - Compute concentration from partial pressure.
+- `-` *saturation_ratio* - Compute ratio of partial pressure to saturation
+  pressure.
+- `-` *saturation_concentration* - Compute concentration at saturation pressure.
+- `-` *pure_vapor_pressure* - Returns the constant vapor pressure.
+
+#### Examples
+
+```py title="Constant Vapor Pressure Example"
+import particula as par
+strategy = par.gas.ConstantVaporPressureStrategy(101325.0)
+vp = strategy.pure_vapor_pressure(temperature=300)
+# vp is 101325.0
+```
+
+#### References
+
+- None
 
 #### Signature
 
@@ -11798,7 +13491,7 @@ class ConstantVaporPressureStrategy(VaporPressureStrategy):
 
 ### ConstantVaporPressureStrategy().pure_vapor_pressure
 
-[Show source in vapor_pressure_strategies.py:170](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L170)
+[Show source in vapor_pressure_strategies.py:226](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L226)
 
 Return the constant vapor pressure value.
 
@@ -11832,8 +13525,39 @@ def pure_vapor_pressure(
 
 [Show source in vapor_pressure_strategies.py:28](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L28)
 
-Abstract class for vapor pressure calculations. The methods
-defined here must be implemented by subclasses below.
+Base class for vapor pressure calculations.
+
+This abstract class defines standard methods for partial pressure,
+concentration, saturation ratio, saturation concentration, and pure vapor
+pressure. Subclasses must implement the pure_vapor_pressure method
+with specific formulae or empirical correlations for vapor pressure.
+
+#### Attributes
+
+- None
+
+#### Methods
+
+- `-` *partial_pressure* - Compute partial pressure from concentration.
+- `-` *concentration* - Compute concentration from partial pressure.
+- `-` *saturation_ratio* - Compute ratio of partial pressure to saturation
+  pressure.
+- `-` *saturation_concentration* - Compute concentration at saturation pressure.
+- `-` *pure_vapor_pressure* - Abstract method to compute pure (saturation) vapor
+  pressure.
+
+#### Examples
+
+```py title="General Usage"
+# Cannot instantiate directly:
+#    strategy = VaporPressureStrategy()  # Error (abstract)
+# Use a derived strategy class instead.
+```
+
+#### References
+
+- "Vapor Pressure,"
+[Wikipedia](https://en.wikipedia.org/wiki/Vapor_pressure).
 
 #### Signature
 
@@ -11843,7 +13567,7 @@ class VaporPressureStrategy(ABC): ...
 
 ### VaporPressureStrategy().concentration
 
-[Show source in vapor_pressure_strategies.py:61](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L61)
+[Show source in vapor_pressure_strategies.py:90](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L90)
 
 Calculate the concentration of the gas at a given pressure and
 temperature.
@@ -11881,7 +13605,7 @@ def concentration(
 
 ### VaporPressureStrategy().partial_pressure
 
-[Show source in vapor_pressure_strategies.py:32](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L32)
+[Show source in vapor_pressure_strategies.py:61](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L61)
 
 Calculate the partial pressure of the gas from its concentration, molar
 mass, and temperature.
@@ -11919,7 +13643,7 @@ def partial_pressure(
 
 ### VaporPressureStrategy().pure_vapor_pressure
 
-[Show source in vapor_pressure_strategies.py:151](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L151)
+[Show source in vapor_pressure_strategies.py:180](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L180)
 
 Calculate the pure (saturation) vapor pressure at a given
 temperature. Units are in Pascals Pa=kg/(m·s²).
@@ -11939,7 +13663,7 @@ def pure_vapor_pressure(
 
 ### VaporPressureStrategy().saturation_concentration
 
-[Show source in vapor_pressure_strategies.py:122](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L122)
+[Show source in vapor_pressure_strategies.py:151](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L151)
 
 Calculate the saturation concentration of the gas at a given
 temperature.
@@ -11974,7 +13698,7 @@ def saturation_concentration(
 
 ### VaporPressureStrategy().saturation_ratio
 
-[Show source in vapor_pressure_strategies.py:92](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L92)
+[Show source in vapor_pressure_strategies.py:121](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L121)
 
 Calculate the saturation ratio of the gas at a given pressure and
 temperature.
@@ -12013,10 +13737,37 @@ def saturation_ratio(
 
 ## WaterBuckStrategy
 
-[Show source in vapor_pressure_strategies.py:292](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L292)
+[Show source in vapor_pressure_strategies.py:414](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L414)
 
-Concrete implementation of the VaporPressureStrategy using the
-Buck equation for water vapor pressure calculations.
+Vapor pressure strategy using the Buck equation for water.
+
+This class computes water vapor pressure using the Buck equation, an
+empirically derived correlation often applied in meteorology to determine
+the saturation vapor pressure of water.
+
+#### Methods
+
+- `-` *partial_pressure* - Compute partial pressure from concentration.
+- `-` *concentration* - Compute concentration from partial pressure.
+- `-` *saturation_ratio* - Compute ratio of partial pressure to saturation
+  pressure.
+- `-` *saturation_concentration* - Compute concentration at saturation pressure.
+- `-` *pure_vapor_pressure* - Computes water vapor pressure from the Buck
+  equation.
+
+#### Examples
+
+```py title="Water Buck Vapor Pressure Example"
+strategy = WaterBuckStrategy()
+vp = strategy.pure_vapor_pressure(temperature=298.15)
+# Returns water vapor pressure in Pascals
+```
+
+#### References
+
+- A. L. Buck, "New Equations for Computing Vapor Pressure...",
+  J. Appl. Meteor. Climatol. 20(12), 1527–1532 (1981).
+- https://en.wikipedia.org/wiki/Arden_Buck_equation
 
 #### Signature
 
@@ -12030,7 +13781,7 @@ class WaterBuckStrategy(VaporPressureStrategy): ...
 
 ### WaterBuckStrategy().pure_vapor_pressure
 
-[Show source in vapor_pressure_strategies.py:296](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L296)
+[Show source in vapor_pressure_strategies.py:444](https://github.com/uncscode/particula/blob/main/particula/gas/vapor_pressure_strategies.py#L444)
 
 Calculate vapor pressure using the Buck equation for water vapor.
 
@@ -12108,11 +13859,31 @@ def setup(): ...
 
 [Show source in activity_builders.py:27](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L27)
 
-Builder class for IdealActivityMass objects. No additional parameters.
+Builds an ActivityIdealMass object for calculating activity based on
+ideal mass fractions.
+
+A concise builder for ActivityIdealMass. This class requires no extra
+parameters beyond the defaults. It ensures the returned strategy follows
+Raoult's Law for mass-based activities.
 
 #### Methods
 
-- `build()` - Validate and return the IdealActivityMass object.
+- `-` *build* - Validates any required parameters and returns the strategy.
+
+#### Examples
+
+```py title="Example Usage"
+import particula as par
+builder = par.particles.ActivityIdealMassBuilder()
+strategy = builder.build()
+result = strategy.activity([1.0, 2.0, 3.0])
+# result -> ...
+```
+
+#### References
+
+- "Raoult's Law,"
+    [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
 
 #### Signature
 
@@ -12127,13 +13898,22 @@ class ActivityIdealMassBuilder(BuilderABC):
 
 ### ActivityIdealMassBuilder().build
 
-[Show source in activity_builders.py:38](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L38)
+[Show source in activity_builders.py:57](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L57)
 
-Validate and return the IdealActivityMass object.
+Validate and return an ActivityIdealMass strategy instance.
 
 #### Returns
 
-- `IdealActivityMass` - The validated IdealActivityMass object.
+- ActivityIdealMass : The validated strategy for
+  ideal mass-based activity calculations.
+
+#### Examples
+
+```py title="Build Method Example"
+builder = par.particles.ActivityIdealMassBuilder()
+mass_activity_strategy = builder.build()
+# Use mass_activity_strategy.activity(...)
+```
 
 #### Signature
 
@@ -12149,17 +13929,43 @@ def build(self) -> ActivityStrategy: ...
 
 ## ActivityIdealMolarBuilder
 
-[Show source in activity_builders.py:47](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L47)
+[Show source in activity_builders.py:75](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L75)
 
-Builder class for IdealActivityMolar objects.
+Builds an ActivityIdealMolar object for calculating activity from
+ideal mole fractions.
+
+This builder sets up any required parameters (e.g., molar mass) and
+creates an ActivityIdealMolar strategy. Uses Raoult's Law in terms
+of mole fraction.
+
+#### Attributes
+
+- molar_mass : Molar mass for each species, in kilograms per mole.
 
 #### Methods
 
-- `set_molar_mass(molar_mass,` *molar_mass_units)* - Set the molar mass of the
-    particle in kg/mol. Default units are 'kg/mol'.
-- `set_parameters(params)` - Set the parameters of the IdealActivityMolar
-    object from a dictionary including optional units.
-- `build()` - Validate and return the IdealActivityMolar object.
+- `-` *set_molar_mass* - Assigns the molar masses (with unit
+    handling).
+- `-` *set_parameters* - Batch-assign parameters from a dictionary.
+- `-` *build* - Finalizes the builder and returns the strategy.
+
+#### Examples
+
+```py title="Example Usage"
+import particula as par
+builder = (
+    par.particles.ActivityIdealMolarBuilder()
+    .set_molar_mass(0.01815, "kg/mol")
+)
+strategy = builder.build()
+result = strategy.activity([1.0, 2.0, 3.0])
+# result -> ...
+```
+
+#### References
+
+- "Raoult's Law,"
+[Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
 
 #### Signature
 
@@ -12175,13 +13981,26 @@ class ActivityIdealMolarBuilder(BuilderABC, BuilderMolarMassMixin):
 
 ### ActivityIdealMolarBuilder().build
 
-[Show source in activity_builders.py:63](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L63)
+[Show source in activity_builders.py:115](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L115)
 
-Validate and return the IdealActivityMolar object.
+Validate parameters and create an ActivityIdealMolar strategy.
+
+Ensures molar_mass is properly configured before building.
 
 #### Returns
 
-- `IdealActivityMolar` - The validated IdealActivityMolar object.
+- ActivityIdealMolar : An ideal strategy based on mole fractions.
+
+#### Examples
+
+```py title="Build Method Example"
+builder = (
+    par.particles.ActivityIdealMolarBuilder()
+    .set_molar_mass(0.028, "kg/mol")
+)
+molar_activity_strategy = builder.build()
+# molar_activity_strategy.activity(...)
+```
 
 #### Signature
 
@@ -12197,21 +14016,57 @@ def build(self) -> ActivityStrategy: ...
 
 ## ActivityKappaParameterBuilder
 
-[Show source in activity_builders.py:73](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L73)
+[Show source in activity_builders.py:138](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L138)
 
-Builder class for KappaParameterActivity objects.
+Builds an ActivityKappaParameter object for non-ideal activity
+calculations.
+
+This builder requires kappa, density, molar_mass, and water_index.
+Kappa is the hygroscopicity parameter, used to capture non-ideal
+behavior. The optional water_index identifies which species is water.
+
+#### Attributes
+
+- kappa : NDArray of kappa parameters for each species.
+- density : NDArray of densities, in kilograms per cubic meter.
+- molar_mass : NDArray of molar masses, in kilograms per mole.
+- water_index : Integer index of the water species.
 
 #### Methods
 
-- `set_kappa(kappa)` - Set the kappa parameter for the activity calculation.
-- `set_density(density,density_units)` - Set the density of the species in
-    kg/m^3. Default units are 'kg/m^3'.
-- `set_molar_mass(molar_mass,molar_mass_units)` - Set the molar mass of the
-    species in kg/mol. Default units are 'kg/mol'.
-- `set_water_index(water_index)` - Set the array index of the species.
-- `set_parameters(dict)` - Set the parameters of the KappaParameterActivity
-    object from a dictionary including optional units.
-- `build()` - Validate and return the KappaParameterActivity object.
+- `-` *set_kappa* - Assigns kappa values (must be nonnegative).
+- `-` *set_water_index* - Sets the index of the water species.
+- `-` *set_density* - Assigns density values (with unit handling).
+- `-` *set_molar_mass* - Assigns molar mass values (with unit
+    handling).
+- `-` *set_parameters* - Batch-assign parameters from a dictionary.
+- `-` *build* - Finalizes checks and returns the strategy.
+
+#### Examples
+
+```py title="Example Usage"
+import particula as par
+import numpy as np
+
+builder = (
+    par.particles.ActivityKappaParameterBuilder()
+    .set_kappa(np.array([0.1, 0.0]))
+    .set_density(np.array([1000, 1200]), "kg/m^3"))
+    .set_molar_mass(np.array([0.018, 0.058]), "kg/mol")
+    .set_water_index(0)
+)
+strategy = builder.build()
+result = strategy.activity(np.array([1.0, 2.0]))
+# result -> ...
+```
+
+#### References
+
+- Petters, M. D., and Kreidenweis, S. M. (2007).
+  "A single parameter representation of hygroscopic growth and
+   cloud condensation nucleus activity," Atmospheric Chemistry
+   and Physics, 7(8), 1961–1971.
+   [DOI](https://doi.org/10.5194/acp-7-1961-2007)
 
 #### Signature
 
@@ -12230,14 +14085,28 @@ class ActivityKappaParameterBuilder(
 
 ### ActivityKappaParameterBuilder().build
 
-[Show source in activity_builders.py:136](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L136)
+[Show source in activity_builders.py:235](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L235)
 
-Validate and return the KappaParameterActivity object.
+Validate parameters and instantiate an ActivityKappaParameter strategy.
 
 #### Returns
 
-- `KappaParameterActivity` - The validated KappaParameterActivity
-    object.
+- ActivityKappaParameter : The non-ideal activity strategy
+  utilizing the kappa hygroscopic parameter.
+
+#### Examples
+
+```py title="Build Method Example"
+kappa_activity_strategy = (
+    par.particles.ActivityKappaParameterBuilder()
+    .set_kappa([0.1, 0.2])
+    .set_density([1000, 1200], "kg/m^3")
+    .set_molar_mass([0.018, 0.046], "kg/mol")
+    .set_water_index(0)
+    .build()
+)
+# kappa_activity_strategy ...
+```
 
 #### Signature
 
@@ -12251,7 +14120,7 @@ def build(self) -> ActivityStrategy: ...
 
 ### ActivityKappaParameterBuilder().set_kappa
 
-[Show source in activity_builders.py:98](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L98)
+[Show source in activity_builders.py:197](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L197)
 
 Set the kappa parameter for the activity calculation.
 
@@ -12270,7 +14139,7 @@ def set_kappa(
 
 ### ActivityKappaParameterBuilder().set_water_index
 
-[Show source in activity_builders.py:118](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L118)
+[Show source in activity_builders.py:217](https://github.com/uncscode/particula/blob/main/particula/particles/activity_builders.py#L217)
 
 Set the array index of the species.
 
@@ -12299,41 +14168,45 @@ def set_water_index(self, water_index: int, water_index_units: Optional[str] = N
 
 [Show source in activity_factories.py:20](https://github.com/uncscode/particula/blob/main/particula/particles/activity_factories.py#L20)
 
-Factory class to create activity strategy builders
+Factory for creating activity strategy builders for liquid mixtures.
 
-Factory class to create activity strategy builders for calculating
-activity and partial pressure of species in a mixture of liquids.
+This class supports various strategies (e.g., mass-ideal, molar-ideal,
+kappa-parameter) to compute activity and partial pressures of species
+based on Raoult's Law or kappa hygroscopic parameter.
 
 #### Methods
 
-- `get_builders()` - Returns the mapping of strategy types to builder
-instances.
-- `get_strategy(strategy_type,` *parameters)* - Gets the strategy instance
-for the specified strategy type.
-    - `strategy_type` - Type of activity strategy to use, can be
-    'mass_ideal' (default), 'molar_ideal', or 'kappa_parameter'.
-    parameters(Dict[str, Any], optional): Parameters required for the
-    builder, dependent on the chosen strategy type.
-        - `mass_ideal` - No parameters are required.
-        - `molar_ideal` - molar_mass
-        kappa | kappa_parameter: kappa, density, molar_mass,
-        water_index
+get_builders:
+    Provides a mapping from strategy type to its corresponding builder.
+get_strategy(strategy_type, parameters):
+    Validates inputs and returns a strategy instance for the specified
+    strategy type (e.g., 'mass_ideal', 'molar_ideal', or
+    'kappa_parameter').
 
 #### Returns
 
-- `ActivityStrategy` - An instance of the specified ActivityStrategy.
+- `-` *ActivityStrategy* - Instance configured for the chosen activity
+    approach.
 
 #### Raises
 
-- `ValueError` - If an unknown strategy type is provided.
-- `ValueError` - If any required key is missing during check_keys or
-    pre_build_check, or if trying to set an invalid parameter.
+- `-` *ValueError* - If the strategy type is unknown or if required parameters
+  are missing or invalid.
 
 #### Examples
 
-```python
->>> strategy_is = ActivityFactory().get_strategy("mass_ideal")
+```py title="Factory Usage Example"
+import particula as par
+factory = par.particles.ActivityFactory()
+strategy = factory.get_strategy("mass_ideal")
+result = strategy.activity([1.0, 2.0, 3.0])
+# result -> ...
 ```
+
+#### References
+
+- "Raoult's Law,"
+    [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
 
 #### Signature
 
@@ -12361,17 +14234,23 @@ class ActivityFactory(
 
 ### ActivityFactory().get_builders
 
-[Show source in activity_factories.py:61](https://github.com/uncscode/particula/blob/main/particula/particles/activity_factories.py#L61)
+[Show source in activity_factories.py:67](https://github.com/uncscode/particula/blob/main/particula/particles/activity_factories.py#L67)
 
-Returns the mapping of strategy types to builder instances.
+Return a mapping of strategy types to their corresponding builders.
 
 #### Returns
 
-- `Dict[str,` *Any]* - A dictionary mapping strategy types to builder
-instances.
-    - `mass_ideal` - IdealActivityMassBuilder
-    - `molar_ideal` - IdealActivityMolarBuilder
-    - `kappa_parameter` - KappaParameterActivityBuilder
+- `dict[str,` *Any]* - A dictionary mapping the activity strategy type
+(e.g., 'mass_ideal', 'molar_ideal', 'kappa_parameter') to a builder
+instance.
+
+#### Examples
+
+```py title="Builders Retrieval Example"
+factory = ActivityFactory()
+builder_map = factory.get_builders()
+mass_ideal_builder = builder_map["mass_ideal"]
+# mass_ideal_builder -> ActivityIdealMassBuilder()
 
 #### Signature
 
@@ -12391,16 +14270,32 @@ def get_builders(self): ...
 
 ## ActivityIdealMass
 
-[Show source in activity_strategies.py:115](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L115)
+[Show source in activity_strategies.py:145](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L145)
 
-Calculate ideal activity based on mass fractions.
+Calculate ideal activity based on mass fractions (Raoult's Law).
 
-This strategy utilizes mass fractions to determine the activity, consistent
-with the principles outlined in Raoult's Law.
+#### Attributes
+
+- None
+
+#### Methods
+
+- activity : Computes activity from mass concentration,
+    treating mass fractions as ideal.
+
+#### Examples
+
+```py title="Example Usage"
+import particula as par
+strategy = par.particles.ActivityIdealMass()
+a = strategy.activity([0.5, 1.0, 1.5])
+# a -> ...
+```
 
 #### References
 
-Mass Based [Raoult's Law](https://en.wikipedia.org/wiki/Raoult%27s_law)
+- "Raoult's Law,"
+    [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
 
 #### Signature
 
@@ -12414,19 +14309,17 @@ class ActivityIdealMass(ActivityStrategy): ...
 
 ### ActivityIdealMass().activity
 
-[Show source in activity_strategies.py:125](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L125)
+[Show source in activity_strategies.py:169](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L169)
 
 Calculate the activity of a species based on mass concentration.
 
 #### Arguments
 
-- `mass_concentration` - Concentration of the species in kilograms
-per cubic meter (kg/m^3).
+- mass_concentration : Concentration of the species in kg/m^3.
 
 #### Returns
 
-- `Union[float,` *NDArray[np.float64]]* - Activity of the particle,
-unitless.
+- Activity of the species, unitless.
 
 #### Signature
 
@@ -12440,22 +14333,33 @@ def activity(
 
 ## ActivityIdealMolar
 
-[Show source in activity_strategies.py:79](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L79)
+[Show source in activity_strategies.py:94](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L94)
 
-Calculate ideal activity based on mole fractions.
+Calculate ideal activity based on mole fractions (Raoult's Law).
 
-This strategy uses mole fractions to compute the activity, adhering to
-the principles of Raoult's Law.
+#### Attributes
 
-#### Arguments
+- molar_mass : Molar mass of the species in kg/mol.
 
-molar_mass (Union[float, NDArray[np.float64]]): Molar mass of the
-species [kg/mol]. A single value applies to all species if only one
-is provided.
+#### Methods
+
+- activity : Computes ideal activity from mass concentration
+  and molar mass.
+
+#### Examples
+
+```py title="Example Usage"
+import particula as par
+strategy = par.particles.ActivityIdealMolar(molar_mass=0.018)
+# mass_concentration in kg/m^3
+a = strategy.activity(np.array([1.2, 2.5, 3.0]))
+# a -> ...
+```
 
 #### References
 
-Molar [Raoult's Law](https://en.wikipedia.org/wiki/Raoult%27s_law)
+- "Raoult's Law,"
+[Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
 
 #### Signature
 
@@ -12470,19 +14374,17 @@ class ActivityIdealMolar(ActivityStrategy):
 
 ### ActivityIdealMolar().activity
 
-[Show source in activity_strategies.py:97](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L97)
+[Show source in activity_strategies.py:128](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L128)
 
 Calculate the activity of a species based on mass concentration.
 
 #### Arguments
 
-- `mass_concentration` - Concentration of the species in kilograms per
-cubic meter (kg/m^3).
+- mass_concentration : Concentration of the species in kg/m^3.
 
 #### Returns
 
-- `Union[float,` *NDArray[np.float64]]* - Activity of the species,
-unitless.
+- Activity of the species, unitless.
 
 #### Signature
 
@@ -12496,17 +14398,31 @@ def activity(
 
 ## ActivityIdealVolume
 
-[Show source in activity_strategies.py:141](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L141)
+[Show source in activity_strategies.py:184](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L184)
 
-Calculate ideal activity based on volume fractions.
+Calculate ideal activity based on volume fractions (Raoult's Law).
 
-This strategy uses volume fractions to compute the activity, following
-the principles of Raoult's Law.
+#### Attributes
+
+- density : The density of the species in kg/m^3, used to
+  derive volume fractions from mass concentrations.
+
+#### Methods
+
+- activity : Computes activity from mass concentration and density.
+
+#### Examples
+
+```py title="Example Usage"
+strategy = ActivityIdealVolume(density=1000.0)
+a = strategy.activity(2.5)
+# a -> ...
+```
 
 #### References
 
-Volume Based
-    [Raoult's Law](https://en.wikipedia.org/wiki/Raoult%27s_law)
+- "Raoult's Law,"
+    [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
 
 #### Signature
 
@@ -12521,21 +14437,18 @@ class ActivityIdealVolume(ActivityStrategy):
 
 ### ActivityIdealVolume().activity
 
-[Show source in activity_strategies.py:155](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L155)
+[Show source in activity_strategies.py:216](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L216)
 
 Calculate the activity of a species based on mass concentration.
 
 #### Arguments
 
-- `mass_concentration` - Concentration of the species in kilograms per
-    cubic meter (kg/m^3).
-- `density` - Density of the species in kilograms per cubic meter
-    (kg/m^3).
+- mass_concentration : Concentration of the species in kg/m^3.
+- density : Density of the species in kg/m^3.
 
 #### Returns
 
-- `Union[float,` *NDArray[np.float64]]* - Activity of the particle,
-unitless.
+- Activity of the species, unitless.
 
 #### Signature
 
@@ -12549,23 +14462,43 @@ def activity(
 
 ## ActivityKappaParameter
 
-[Show source in activity_strategies.py:176](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L176)
+[Show source in activity_strategies.py:235](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L235)
 
-Non-ideal activity strategy based on the kappa hygroscopic parameter.
+Non-ideal activity strategy using the kappa hygroscopic parameter.
 
-This strategy calculates the activity using the kappa hygroscopic
-parameter, a measure of hygroscopicity. The activity is determined by the
-species' mass concentration along with the hygroscopic parameter.
+#### Attributes
 
-#### Arguments
+- kappa : Kappa hygroscopic parameters (array or scalar).
+- density : Densities (array or scalar) in kg/m^3.
+- molar_mass : Molar masses (array or scalar) in kg/mol.
+- water_index : Index identifying the water species in arrays.
 
-- `kappa` - Kappa hygroscopic parameter, unitless.
-    Includes a value for water which is excluded in calculations.
-- `density` - Density of the species in kilograms per
-    cubic meter (kg/m^3).
-- `molar_mass` - Molar mass of the species in kilograms
-    per mole (kg/mol).
-- `water_index` - Index of water in the mass concentration array.
+#### Methods
+
+- activity : Computes non-ideal activity using kappa
+  hygroscopicity approach.
+
+#### Examples
+
+```py title="Example Usage"
+import particula as par
+import numpy as np
+strategy = par.particles.ActivityKappaParameter(
+    kappa=np.array([0.1, 0.0]),
+    density=np.array([1000.0, 1200.0]),
+    molar_mass=np.array([0.018, 0.058]),
+    water_index=0,
+)
+a = strategy.activity(np.array([1.0, 2.0]))
+# a -> ...
+```
+
+#### References
+
+- Petters, M. D., & Kreidenweis, S. M. (2007). A single parameter
+  representation of hygroscopic growth and cloud condensation
+  nucleus activity. Atmospheric Chemistry and Physics, 7(8),
+  1961-1971. [DOI](https://doi.org/10.5194/acp-7-1961-2007).
 
 #### Signature
 
@@ -12586,26 +14519,24 @@ class ActivityKappaParameter(ActivityStrategy):
 
 ### ActivityKappaParameter().activity
 
-[Show source in activity_strategies.py:205](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L205)
+[Show source in activity_strategies.py:291](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L291)
 
 Calculate the activity of a species based on mass concentration.
 
 #### Arguments
 
-- `mass_concentration` - Concentration of the species in kilograms per
-cubic meter (kg/m^3).
+- mass_concentration : Concentration of the species in kg/m^3.
 
 #### Returns
 
-- `Union[float,` *NDArray[np.float64]]* - Activity of the particle,
-unitless.
+- Activity of the species, unitless.
 
 #### References
 
-Petters, M. D., & Kreidenweis, S. M. (2007). A single parameter
-representation of hygroscopic growth and cloud condensation nucleus
-activity. Atmospheric Chemistry and Physics, 7(8), 1961-1971.
-[DOI](https://doi.org/10.5194/acp-7-1961-2007), see EQ 2 and 7.
+- Petters, M. D., & Kreidenweis, S. M. (2007). A single parameter
+  representation of hygroscopic growth and cloud condensation
+  nucleus activity. Atmospheric Chemistry and Physics, 7(8),
+  1961-1971. [DOI](https://doi.org/10.5194/acp-7-1961-2007).
 
 #### Signature
 
@@ -12621,17 +14552,39 @@ def activity(
 
 [Show source in activity_strategies.py:22](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L22)
 
-Abstract base class for vapor pressure strategies.
+Abstract base class for vapor pressure and activity calculations.
 
-This interface is used for implementing strategies based on particle
-activity calculations, specifically for calculating vapor pressures.
+This interface is used by subclasses for computing particle activity
+and partial pressures. General methods include activity() and
+partial_pressure().
+
+#### Attributes
+
+- None
 
 #### Methods
 
-- `get_name` - Return the type of the activity strategy.
-- `activity` - Calculate the activity of a species.
-- `partial_pressure` - Calculate the partial pressure of a species in
-    the mixture.
+- get_name : Return the type of the activity strategy.
+- activity : Calculate the activity of a species. (abstract method)
+- partial_pressure : Calculate the partial pressure of a species
+    using its pure vapor pressure and computed activity.
+
+#### Examples
+
+```py title="Example Subclass"
+class CustomActivity(ActivityStrategy):
+    def activity(self, mass_concentration):
+        return 1.0
+
+my_activity = CustomActivity()
+pvap = my_activity.partial_pressure(101325.0, 1.0)
+# pvap -> 101325.0
+```
+
+#### References
+
+- "Vapor Pressure,"
+    [Wikipedia](https://en.wikipedia.org/wiki/Vapor_pressure).
 
 #### Signature
 
@@ -12641,17 +14594,17 @@ class ActivityStrategy(ABC): ...
 
 ### ActivityStrategy().activity
 
-[Show source in activity_strategies.py:35](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L35)
+[Show source in activity_strategies.py:55](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L55)
 
 Calculate the activity of a species based on its mass concentration.
 
 #### Arguments
 
-- `mass_concentration` - Concentration of the species [kg/m^3]
+- mass_concentration : Concentration of the species in kg/m^3.
 
 #### Returns
 
-float or NDArray[float]: Activity of the particle, unitless.
+- Activity of the species, unitless.
 
 #### Signature
 
@@ -12664,7 +14617,7 @@ def activity(
 
 ### ActivityStrategy().get_name
 
-[Show source in activity_strategies.py:48](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L48)
+[Show source in activity_strategies.py:69](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L69)
 
 Return the type of the activity strategy.
 
@@ -12676,24 +14629,18 @@ def get_name(self) -> str: ...
 
 ### ActivityStrategy().partial_pressure
 
-[Show source in activity_strategies.py:52](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L52)
+[Show source in activity_strategies.py:73](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L73)
 
 Calculate the vapor pressure of species in the particle phase.
 
-This method computes the vapor pressure based on the species' activity
-considering its pure vapor pressure and mass concentration.
-
 #### Arguments
 
-- `pure_vapor_pressure` - Pure vapor pressure of the species in
-pascals (Pa).
-- `mass_concentration` - Concentration of the species in kilograms per
-cubic meter (kg/m^3).
+- pure_vapor_pressure : Pure vapor pressure of the species in Pa.
+- mass_concentration : Concentration of the species in kg/m^3.
 
 #### Returns
 
-- `Union[float,` *NDArray[np.float64]]* - Vapor pressure of the particle
-in pascals (Pa).
+- Vapor pressure of the particle in Pa.
 
 #### Signature
 
@@ -12719,25 +14666,28 @@ def partial_pressure(
 
 [Show source in change_particle_representation.py:18](https://github.com/uncscode/particula/blob/main/particula/particles/change_particle_representation.py#L18)
 
-Get the binning for the for particle radius. Used in the kernel
-calculation.
+Determine binned radii for kernel calculations.
 
-If the kernel radius is not set, it will be calculated based on the
-particle radius.
+If bin_radius is provided, those edges are used directly. Otherwise,
+a log-spaced array is generated based on the particle's minimum and
+maximum radii and either a total number of bins or bins per radius
+decade.
 
 #### Arguments
 
-- particle : The particle for which the radius is to be binned.
-- bin_radius : The radii for the particle [m].
-- total_bins : The number of kernel bins for the particle
-    [dimensionless], if set, this will be used instead of
-    bins_per_radius_decade.
-- bins_per_radius_decade : The number of kernel bins per decade
-    [dimensionless]. Not used if total_bins is set.
+- particle : The ParticleRepresentation instance for radius binning.
+- bin_radius : Optional array of radius bin edges in meters.
+- total_bins : Exact number of bins to generate, if set.
+- bins_per_radius_decade : Number of bins per decade of radius,
+  used only if total_bins is None.
 
 #### Returns
 
-The kernel radius for the particle [m].
+- NDArray[np.float64] : The bin edges (radii) in meters.
+
+#### Raises
+
+- ValueError : If finite radii cannot be determined for binning.
 
 #### Signature
 
@@ -12758,19 +14708,24 @@ def get_particle_resolved_binned_radius(
 
 ## get_speciated_mass_representation_from_particle_resolved
 
-[Show source in change_particle_representation.py:77](https://github.com/uncscode/particula/blob/main/particula/particles/change_particle_representation.py#L77)
+[Show source in change_particle_representation.py:80](https://github.com/uncscode/particula/blob/main/particula/particles/change_particle_representation.py#L80)
 
-Converts a `ParticleResolvedSpeciatedMass` to a `SpeciatedMassMovingBin`
-by binning the mass of each species.
+Convert a ParticleResolvedSpeciatedMass to a SpeciatedMassMovingBin.
+
+This function bins the mass and charge distributions for each species
+according to the provided bin_radius array, using median or mean
+values in each bin. The distribution_strategy is switched to
+SpeciatedMassMovingBin.
 
 #### Arguments
 
-- particle : The particle for which the mass is to be binned.
-- bin_radius : The radii for the particle [m].
+- particle : The ParticleRepresentation to convert.
+- bin_radius : Array of radius bin edges in meters.
 
 #### Returns
 
-The particle representation with the binned mass.
+- ParticleRepresentation : A new representation with binned
+  mass and concentration for each species.
 
 #### Signature
 
@@ -12798,7 +14753,26 @@ def get_speciated_mass_representation_from_particle_resolved(
 
 [Show source in distribution_builders.py:16](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L16)
 
-Builds a MassBasedMovingBin instance.
+Builds and configures a MassBasedMovingBin instance for mass-based
+distributions.
+
+This builder requires no parameters, but is kept for consistency with
+other builder patterns. Ensures a uniform interface for creating
+MassBasedMovingBin objects.
+
+#### Methods
+
+- build : Return a MassBasedMovingBin instance.
+
+#### Examples
+
+```py title="Example"
+import particula as par
+
+builder = par.particles.MassBasedMovingBinBuilder()
+strategy = builder.build()
+# strategy -> MassBasedMovingBin()
+```
 
 #### Signature
 
@@ -12813,9 +14787,22 @@ class MassBasedMovingBinBuilder(BuilderABC):
 
 ### MassBasedMovingBinBuilder().build
 
-[Show source in distribution_builders.py:23](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L23)
+[Show source in distribution_builders.py:42](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L42)
 
-Builds a MassBasedMovingBin instance.
+Build and return a MassBasedMovingBin instance.
+
+#### Returns
+
+- MassBasedMovingBin : A strategy for mass-based particle
+    distributions.
+
+#### Examples
+
+```py title="Build Example"
+import particula as par
+builder = par.particles.MassBasedMovingBinBuilder()
+strategy = builder.build()
+```
 
 #### Signature
 
@@ -12831,9 +14818,27 @@ def build(self) -> MassBasedMovingBin: ...
 
 ## ParticleResolvedSpeciatedMassBuilder
 
-[Show source in distribution_builders.py:52](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L52)
+[Show source in distribution_builders.py:145](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L145)
 
-Builds a ParticleResolvedSpeciatedMass instance.
+Builds and configures a ParticleResolvedSpeciatedMass instance.
+
+This builder requires no parameters, but follows the same pattern
+to ensure uniform usage. ParticleResolvedSpeciatedMass is useful for
+specific calculations when each particle's species composition must
+be resolved individually.
+
+#### Methods
+
+- build : Return a ParticleResolvedSpeciatedMass instance.
+
+#### Examples
+
+```py title="Example"
+import particula as par
+builder = par.particles.ParticleResolvedSpeciatedMassBuilder()
+strategy = builder.build()
+# strategy -> ParticleResolvedSpeciatedMass()
+```
 
 #### Signature
 
@@ -12848,7 +14853,22 @@ class ParticleResolvedSpeciatedMassBuilder(BuilderABC):
 
 ### ParticleResolvedSpeciatedMassBuilder().build
 
-[Show source in distribution_builders.py:59](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L59)
+[Show source in distribution_builders.py:170](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L170)
+
+Build and return a ParticleResolvedSpeciatedMass instance.
+
+#### Returns
+
+- ParticleResolvedSpeciatedMass : A strategy that resolves
+  each particle's species composition independently.
+
+#### Examples
+
+```py title="Build Example"
+import particula as par
+builder = par.particles.ParticleResolvedSpeciatedMassBuilder()
+strategy = builder.build()
+```
 
 #### Signature
 
@@ -12864,9 +14884,27 @@ def build(self) -> ParticleResolvedSpeciatedMass: ...
 
 ## RadiiBasedMovingBinBuilder
 
-[Show source in distribution_builders.py:28](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L28)
+[Show source in distribution_builders.py:60](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L60)
 
-Builds a RadiiBasedMovingBin instance.
+Builds and configures a RadiiBasedMovingBin instance for radius-based
+distributions.
+
+This builder requires no parameters, but is provided for consistency
+with other builder patterns. Ensures a uniform interface for creating
+RadiiBasedMovingBin objects.
+
+#### Methods
+
+- build : Return a RadiiBasedMovingBin instance.
+
+#### Examples
+
+```py title="Example"
+import particula as par
+builder = par.particles.RadiiBasedMovingBinBuilder()
+strategy = builder.build()
+# strategy -> RadiiBasedMovingBin()
+```
 
 #### Signature
 
@@ -12881,9 +14919,22 @@ class RadiiBasedMovingBinBuilder(BuilderABC):
 
 ### RadiiBasedMovingBinBuilder().build
 
-[Show source in distribution_builders.py:35](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L35)
+[Show source in distribution_builders.py:85](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L85)
 
-Builds a RadiiBasedMovingBin instance.
+Build and return a RadiiBasedMovingBin instance.
+
+#### Returns
+
+- RadiiBasedMovingBin : A strategy for radius-based particle
+    distributions.
+
+#### Examples
+
+```py title="Build Example"
+import particula as par
+builder = par.particles.RadiiBasedMovingBinBuilder()
+strategy = builder.build()
+```
 
 #### Signature
 
@@ -12899,9 +14950,27 @@ def build(self) -> RadiiBasedMovingBin: ...
 
 ## SpeciatedMassMovingBinBuilder
 
-[Show source in distribution_builders.py:40](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L40)
+[Show source in distribution_builders.py:103](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L103)
 
-Builds a SpeciatedMassMovingBin instance.
+Builds and configures a SpeciatedMassMovingBin instance for speciated
+mass distributions.
+
+This builder requires no parameters, but provides consistency with
+other builder patterns and ensures a uniform interface for creating
+SpeciatedMassMovingBin objects.
+
+#### Methods
+
+- build : Return a SpeciatedMassMovingBin instance.
+
+#### Examples
+
+```py title="Example"
+import particula as par
+builder = par.particles.SpeciatedMassMovingBinBuilder()
+strategy = builder.build()
+# strategy -> SpeciatedMassMovingBin()
+```
 
 #### Signature
 
@@ -12916,9 +14985,21 @@ class SpeciatedMassMovingBinBuilder(BuilderABC):
 
 ### SpeciatedMassMovingBinBuilder().build
 
-[Show source in distribution_builders.py:47](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L47)
+[Show source in distribution_builders.py:128](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_builders.py#L128)
 
-Builds a SpeciatedMassMovingBin instance.
+Build and return a SpeciatedMassMovingBin instance.
+
+#### Returns
+
+- SpeciatedMassMovingBin : A strategy for speciated mass
+    distributions.
+
+#### Examples
+
+```py title="Build Example"
+builder = SpeciatedMassMovingBinBuilder()
+strategy = builder.build()
+```
 
 #### Signature
 
@@ -12944,37 +15025,36 @@ def build(self) -> SpeciatedMassMovingBin: ...
 
 [Show source in distribution_factories.py:19](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_factories.py#L19)
 
-Factory class to create distribution strategy from builders.
+Factory class to create distribution strategies from builders.
 
-Used for calculating particle distributions based on the specified
-representation type.
+This factory is used to obtain particle distribution strategies
+based on the specified representation type (mass-based, radius-based,
+speciated, or particle-resolved).
 
 #### Methods
 
-- `get_builders()` - Returns the mapping of strategy types to builder
-instances.
-- `get_strategy(strategy_type,` *parameters)* - Gets the strategy instance
-for the specified strategy type.
-    - `strategy_type` - Type of distribution strategy to use, can be
-    'mass_based_moving_bin', 'radii_based_moving_bin',
-    'speciated_mass_moving_bin', 'particle_resolved_speciated_mass'.
-    parameters(Dict[str, Any], optional): Parameters required for the
-    builder, dependent on the chosen strategy type.
-        - `mass_based_moving_bin` - None
-        - `radii_based_moving_bin` - None
-        - `speciated_mass_moving_bin` - None
-        - `particle_resolved_speciated_mass` - None
+- get_builders : Return a mapping of strategy types to builder
+    instances.
+- get_strategy : Return a strategy instance for a given strategy type.
 
 #### Returns
 
-- `DistributionStrategy` - An instance of the specified
-DistributionStrategy.
+- DistributionStrategy : An instance configured for the chosen
+  distribution representation.
 
 #### Raises
 
-- `ValueError` - If an unknown strategy type is provided.
-- `ValueError` - If any required key is missing during check_keys or
-pre_build_check, or if trying to set an invalid parameter.
+- ValueError : If an unknown strategy type is provided or if
+  required parameters are missing or invalid.
+
+#### Examples
+
+```py title="DistributionFactory Example"
+import particula as par
+factory = par.particles.DistributionFactory()
+strategy = factory.get_strategy("mass_based_moving_bin")
+# strategy -> MassBasedMovingBin()
+```
 
 #### Signature
 
@@ -13010,17 +15090,23 @@ class DistributionFactory(
 
 ### DistributionFactory().get_builders
 
-[Show source in distribution_factories.py:65](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_factories.py#L65)
+[Show source in distribution_factories.py:64](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_factories.py#L64)
 
-Returns the mapping of strategy types to builder instances.
+Return a mapping of strategy types to builder instances.
 
 #### Returns
 
-- `Dict[str,` *BuilderABC]* - Mapping of strategy types to builder
-instances.
-    - `'mass_based_moving_bin'` - MassBasedMovingBinBuilder
-    - `'radii_based_moving_bin'` - RadiiBasedMovingBinBuilder
-    - `'speciated_mass_moving_bin'` - SpeciatedMassMovingBinBuilder
+- A dictionary where each key is a string identifying the strategy
+    type, and each value is the corresponding builder object.
+
+#### Examples
+
+```py title="get_builders Example"
+import particula as par
+factory = par.particles.DistributionFactory()
+builder_map = factory.get_builders()
+# builder_map["mass_based_moving_bin"] -> MassBasedMovingBinBuilder
+```
 
 #### Signature
 
@@ -13040,19 +15126,22 @@ def get_builders(self): ...
 
 ## DistributionStrategy
 
-[Show source in distribution_strategies.py:13](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L13)
+[Show source in distribution_strategies.py:17](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L17)
 
-Abstract base class for particle strategy, defining the common
-interface for mass, radius, and total mass calculations for different
-particle representations.
+Abstract base class defining common interfaces for
+mass, radius, and total mass calculations across
+different particle distribution representations.
 
 #### Methods
 
-- `get_name` - Returns the type of the distribution strategy.
-- `get_mass` - Calculates the mass of particles.
-- `get_radius` - Calculates the radius of particles.
-- `get_total_mass` - Calculates the total mass of particles.
-- `add_mass` - Adds mass to the distribution of particles.
+- get_name : Return the type of the distribution strategy.
+- get_species_mass : Calculate the mass per species.
+- get_mass : Calculate the mass of the particles or bin.
+- get_total_mass : Calculate the total mass of particles.
+- get_radius : Calculate the radius of particles.
+- add_mass : Add mass to the particle distribution.
+- add_concentration : Add concentration to the distribution.
+- collide_pairs : Perform collision logic on specified particle pairs.
 
 #### Signature
 
@@ -13062,22 +15151,22 @@ class DistributionStrategy(ABC): ...
 
 ### DistributionStrategy().add_concentration
 
-[Show source in distribution_strategies.py:120](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L120)
+[Show source in distribution_strategies.py:132](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L132)
 
-Adds concentration to the distribution of particles.
+Add concentration to the distribution of particles.
 
 #### Arguments
 
-- `distribution` - The distribution of particle sizes or masses.
-- `concentration` - The concentration of each particle size or mass in
-    the distribution.
-- `added_distribution` - The distribution to be added.
-- `added_concentration` - The concentration to be added.
+- distribution : The distribution of particle sizes or masses.
+- concentration : The concentration of each particle
+  size or mass.
+- added_distribution : The distribution to be added.
+- added_concentration : The concentration to be added.
 
 #### Returns
 
-- `(distribution,` *concentration)* - The new distribution array and the
-    new concentration array.
+- The updated distribution array
+- The updated concentration array.
 
 #### Signature
 
@@ -13094,22 +15183,22 @@ def add_concentration(
 
 ### DistributionStrategy().add_mass
 
-[Show source in distribution_strategies.py:98](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L98)
+[Show source in distribution_strategies.py:109](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L109)
 
-Adds mass to the distribution of particles.
+Add mass to the distribution of particles.
 
 #### Arguments
 
-- `distribution` - The distribution of particle sizes or masses.
-- `concentration` - The concentration of each particle size or mass in
-    the distribution.
-- `density` - The density of the particles.
-- `added_mass` - The mass to be added per distribution bin.
+- distribution : The distribution of particle sizes or masses.
+- concentration : The concentration of each particle
+  size or mass.
+- density : The density of the particles.
+- added_mass : The mass to be added per distribution bin.
 
 #### Returns
 
-- `(distribution,` *concentration)* - The new distribution array and the
-    new concentration array.
+- The updated distribution array.
+- The updated concentration array.
 
 #### Signature
 
@@ -13126,22 +15215,21 @@ def add_mass(
 
 ### DistributionStrategy().collide_pairs
 
-[Show source in distribution_strategies.py:142](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L142)
+[Show source in distribution_strategies.py:155](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L155)
 
-Collides index pairs.
+Collide index pairs in the distribution.
 
 #### Arguments
 
-- `distribution` - The distribution of particle sizes or masses.
-- `concentration` - The concentration of each particle size or mass in
-    the distribution.
-- `density` - The density of the particles.
-- `indices` - The indices of the particles to collide.
+- distribution : The distribution of particle sizes or masses.
+- concentration : The concentration of each particle size or mass.
+- density : The density of the particles.
+- indices : The indices of the particles to collide.
 
 #### Returns
 
-- `(distribution,` *concentration)* - The new distribution array and the
-    new concentration array.
+- The updated distribution array
+- The updated concentration array.
 
 #### Signature
 
@@ -13158,18 +15246,18 @@ def collide_pairs(
 
 ### DistributionStrategy().get_mass
 
-[Show source in distribution_strategies.py:45](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L45)
+[Show source in distribution_strategies.py:53](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L53)
 
-Calculates the mass of the particles (or bin).
+Calculate the mass of the particles or bin.
 
 #### Arguments
 
-- `distribution` - The distribution of particle sizes or masses.
-- `density` - The density of the particles.
+- distribution : The distribution of particle sizes or masses.
+- density : The density of the particles.
 
 #### Returns
 
-- `NDArray[np.float64]` - The mass of the particles.
+- The mass of the particles.
 
 #### Signature
 
@@ -13181,7 +15269,7 @@ def get_mass(
 
 ### DistributionStrategy().get_name
 
-[Show source in distribution_strategies.py:27](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L27)
+[Show source in distribution_strategies.py:34](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L34)
 
 Return the type of the distribution strategy.
 
@@ -13193,18 +15281,18 @@ def get_name(self) -> str: ...
 
 ### DistributionStrategy().get_radius
 
-[Show source in distribution_strategies.py:84](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L84)
+[Show source in distribution_strategies.py:94](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L94)
 
-Calculates the radius of the particles.
+Calculate the radius of the particles.
 
 #### Arguments
 
-- `distribution` - The distribution of particle sizes or masses.
-- `density` - The density of the particles.
+- distribution : The distribution of particle sizes or masses.
+- density : The density of the particles.
 
 #### Returns
 
-- `NDArray[np.float64]` - The radius of the particles.
+- The radius of the particles in meters.
 
 #### Signature
 
@@ -13217,18 +15305,18 @@ def get_radius(
 
 ### DistributionStrategy().get_species_mass
 
-[Show source in distribution_strategies.py:31](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L31)
+[Show source in distribution_strategies.py:38](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L38)
 
-The mass per species in the particles (or bin).
+Return the mass per species in the distribution.
 
 #### Arguments
 
-- `distribution` - The distribution of particle sizes or masses.
-- `density` - The density of the particles.
+- distribution : The distribution of particle sizes or masses.
+- density : The density of the particles.
 
 #### Returns
 
-- `NDArray[np.float64]` - The mass of the particles
+- The mass of the particles (per species).
 
 #### Signature
 
@@ -13241,20 +15329,20 @@ def get_species_mass(
 
 ### DistributionStrategy().get_total_mass
 
-[Show source in distribution_strategies.py:63](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L63)
+[Show source in distribution_strategies.py:72](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L72)
 
-Calculates the total mass of all particles (or bin).
+Calculate the total mass of all particles (or bin).
 
 #### Arguments
 
-- `distribution` - The distribution of particle sizes or masses.
-- `concentration` - The concentration of each particle size or mass in
-the distribution.
-- `density` - The density of the particles.
+- distribution : The distribution of particle sizes or masses.
+- concentration : The concentration of each particle
+  size or mass in the distribution.
+- density : The density of the particles.
 
 #### Returns
 
-- `np.float64` - The total mass of the particles.
+- The total mass of the particles.
 
 #### Signature
 
@@ -13271,13 +15359,23 @@ def get_total_mass(
 
 ## MassBasedMovingBin
 
-[Show source in distribution_strategies.py:165](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L165)
+[Show source in distribution_strategies.py:178](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L178)
 
-A strategy for particles represented by their mass distribution.
+Strategy for particles represented by their mass distribution.
 
-This strategy calculates particle mass, radius, and total mass based on
-the particle's mass, number concentration, and density. It also moves the
-bins when adding mass to the distribution.
+Calculates particle mass, radius, and total mass based on the
+particle mass, number concentration, and density. This moving-bin
+approach adjusts mass bins on mass addition events.
+
+#### Methods
+
+- get_name : Return the type of the distribution strategy.
+- get_species_mass : Calculate the mass per species.
+- get_mass : Calculate the mass of the particles or bin.
+- get_total_mass : Calculate the total mass of particles.
+- get_radius : Calculate the radius of particles.
+- add_mass : Add mass to the particle distribution.
+- add_concentration : Add concentration to the distribution.
 
 #### Signature
 
@@ -13291,7 +15389,7 @@ class MassBasedMovingBin(DistributionStrategy): ...
 
 ### MassBasedMovingBin().add_concentration
 
-[Show source in distribution_strategies.py:197](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L197)
+[Show source in distribution_strategies.py:220](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L220)
 
 #### Signature
 
@@ -13307,7 +15405,7 @@ def add_concentration(
 
 ### MassBasedMovingBin().add_mass
 
-[Show source in distribution_strategies.py:187](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L187)
+[Show source in distribution_strategies.py:210](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L210)
 
 #### Signature
 
@@ -13323,7 +15421,7 @@ def add_mass(
 
 ### MassBasedMovingBin().collide_pairs
 
-[Show source in distribution_strategies.py:233](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L233)
+[Show source in distribution_strategies.py:256](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L256)
 
 #### Signature
 
@@ -13339,7 +15437,7 @@ def collide_pairs(
 
 ### MassBasedMovingBin().get_radius
 
-[Show source in distribution_strategies.py:179](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L179)
+[Show source in distribution_strategies.py:202](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L202)
 
 #### Signature
 
@@ -13351,7 +15449,7 @@ def get_radius(
 
 ### MassBasedMovingBin().get_species_mass
 
-[Show source in distribution_strategies.py:173](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L173)
+[Show source in distribution_strategies.py:196](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L196)
 
 #### Signature
 
@@ -13365,15 +15463,24 @@ def get_species_mass(
 
 ## ParticleResolvedSpeciatedMass
 
-[Show source in distribution_strategies.py:431](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L431)
+[Show source in distribution_strategies.py:473](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L473)
 
-Strategy for resolved particles via speciated mass.
+Strategy for particle-resolved masses with multiple species.
 
-Strategy for resolved particles with speciated mass.
-Particles may have different densities and their mass is
-distributed across different species. This strategy calculates mass,
-radius, and total mass based on the species at each mass, density,
-the particle concentration.
+Allows each particle to have separate masses for each species, with
+individualized densities. This strategy provides a more detailed
+approach when each particle's composition must be modeled explicitly.
+
+#### Methods
+
+- get_name : Return the type of the distribution strategy.
+- get_species_mass : Calculate the mass per species.
+- get_mass : Calculate the mass of the particles or bin.
+- get_total_mass : Calculate the total mass of particles.
+- get_radius : Calculate the radius of particles.
+- add_mass : Add mass to the particle distribution.
+- add_concentration : Add concentration to the distribution.
+- collide_pairs : Perform collision logic on specified particle pairs.
 
 #### Signature
 
@@ -13387,7 +15494,7 @@ class ParticleResolvedSpeciatedMass(DistributionStrategy): ...
 
 ### ParticleResolvedSpeciatedMass().add_concentration
 
-[Show source in distribution_strategies.py:484](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L484)
+[Show source in distribution_strategies.py:535](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L535)
 
 #### Signature
 
@@ -13403,7 +15510,7 @@ def add_concentration(
 
 ### ParticleResolvedSpeciatedMass().add_mass
 
-[Show source in distribution_strategies.py:456](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L456)
+[Show source in distribution_strategies.py:507](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L507)
 
 #### Signature
 
@@ -13419,7 +15526,7 @@ def add_mass(
 
 ### ParticleResolvedSpeciatedMass().collide_pairs
 
-[Show source in distribution_strategies.py:542](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L542)
+[Show source in distribution_strategies.py:593](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L593)
 
 #### Signature
 
@@ -13435,7 +15542,7 @@ def collide_pairs(
 
 ### ParticleResolvedSpeciatedMass().get_radius
 
-[Show source in distribution_strategies.py:446](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L446)
+[Show source in distribution_strategies.py:497](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L497)
 
 #### Signature
 
@@ -13447,7 +15554,7 @@ def get_radius(
 
 ### ParticleResolvedSpeciatedMass().get_species_mass
 
-[Show source in distribution_strategies.py:441](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L441)
+[Show source in distribution_strategies.py:492](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L492)
 
 #### Signature
 
@@ -13461,12 +15568,23 @@ def get_species_mass(
 
 ## RadiiBasedMovingBin
 
-[Show source in distribution_strategies.py:248](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L248)
+[Show source in distribution_strategies.py:271](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L271)
 
-A strategy for particles represented by their radius.
+Strategy for particles represented by their radius distribution.
 
-This strategy calculates particle mass, radius, and total mass based on
-the particle's radius, number concentration, and density.
+Calculates particle mass, radius, and total mass based on particle
+radius, number concentration, and density. This moving-bin approach
+recalculates radii when mass is added.
+
+#### Methods
+
+- get_name : Return the type of the distribution strategy.
+- get_species_mass : Calculate the mass per species.
+- get_mass : Calculate the mass of the particles or bin.
+- get_total_mass : Calculate the total mass of particles.
+- get_radius : Calculate the radius of particles.
+- add_mass : Add mass to the particle distribution.
+- add_concentration : Add concentration to the distribution.
 
 #### Signature
 
@@ -13480,7 +15598,7 @@ class RadiiBasedMovingBin(DistributionStrategy): ...
 
 ### RadiiBasedMovingBin().add_concentration
 
-[Show source in distribution_strategies.py:287](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L287)
+[Show source in distribution_strategies.py:321](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L321)
 
 #### Signature
 
@@ -13496,7 +15614,7 @@ def add_concentration(
 
 ### RadiiBasedMovingBin().add_mass
 
-[Show source in distribution_strategies.py:269](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L269)
+[Show source in distribution_strategies.py:303](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L303)
 
 #### Signature
 
@@ -13512,7 +15630,7 @@ def add_mass(
 
 ### RadiiBasedMovingBin().collide_pairs
 
-[Show source in distribution_strategies.py:322](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L322)
+[Show source in distribution_strategies.py:356](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L356)
 
 #### Signature
 
@@ -13528,7 +15646,7 @@ def collide_pairs(
 
 ### RadiiBasedMovingBin().get_radius
 
-[Show source in distribution_strategies.py:262](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L262)
+[Show source in distribution_strategies.py:296](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L296)
 
 #### Signature
 
@@ -13540,7 +15658,7 @@ def get_radius(
 
 ### RadiiBasedMovingBin().get_species_mass
 
-[Show source in distribution_strategies.py:255](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L255)
+[Show source in distribution_strategies.py:289](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L289)
 
 #### Signature
 
@@ -13554,15 +15672,23 @@ def get_species_mass(
 
 ## SpeciatedMassMovingBin
 
-[Show source in distribution_strategies.py:337](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L337)
+[Show source in distribution_strategies.py:371](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L371)
 
 Strategy for particles with speciated mass distribution.
 
-Strategy for particles with speciated mass distribution.
-Some particles may have different densities and their mass is
-distributed across different species. This strategy calculates mass,
-radius, and total mass based on the species at each mass, density,
-the particle concentration.
+Each particle may contain multiple species, each with a unique
+density. This strategy calculates mass, radius, and total mass from
+the species-level masses and overall particle concentrations.
+
+#### Methods
+
+- get_name : Return the type of the distribution strategy.
+- get_species_mass : Calculate the mass per species.
+- get_mass : Calculate the mass of the particles or bin.
+- get_total_mass : Calculate the total mass of particles.
+- get_radius : Calculate the radius of particles.
+- add_mass : Add mass to the particle distribution.
+- add_concentration : Add concentration to the distribution.
 
 #### Signature
 
@@ -13576,7 +15702,7 @@ class SpeciatedMassMovingBin(DistributionStrategy): ...
 
 ### SpeciatedMassMovingBin().add_concentration
 
-[Show source in distribution_strategies.py:381](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L381)
+[Show source in distribution_strategies.py:423](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L423)
 
 #### Signature
 
@@ -13592,7 +15718,7 @@ def add_concentration(
 
 ### SpeciatedMassMovingBin().add_mass
 
-[Show source in distribution_strategies.py:359](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L359)
+[Show source in distribution_strategies.py:401](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L401)
 
 #### Signature
 
@@ -13608,7 +15734,7 @@ def add_mass(
 
 ### SpeciatedMassMovingBin().collide_pairs
 
-[Show source in distribution_strategies.py:416](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L416)
+[Show source in distribution_strategies.py:458](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L458)
 
 #### Signature
 
@@ -13624,7 +15750,7 @@ def collide_pairs(
 
 ### SpeciatedMassMovingBin().get_radius
 
-[Show source in distribution_strategies.py:352](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L352)
+[Show source in distribution_strategies.py:394](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L394)
 
 #### Signature
 
@@ -13636,7 +15762,7 @@ def get_radius(
 
 ### SpeciatedMassMovingBin().get_species_mass
 
-[Show source in distribution_strategies.py:347](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L347)
+[Show source in distribution_strategies.py:389](https://github.com/uncscode/particula/blob/main/particula/particles/distribution_strategies.py#L389)
 
 #### Signature
 
@@ -16314,7 +18440,7 @@ def get_vapor_transition_correction(
 
 ## ParticleRepresentation
 
-[Show source in representation.py:20](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L20)
+[Show source in representation.py:22](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L22)
 
 Everything needed to represent a particle or a collection of particles.
 
@@ -16338,6 +18464,28 @@ allows for flexibility in representing particles.
 - charge : The charge on each particle.
 - volume : The air volume for simulation of particles in the air,
     default is 1 m^3. This is only used in ParticleResolved Strategies.
+
+#### Methods
+
+- get_strategy : Return the distribution strategy (optionally cloned).
+- get_strategy_name : Return the name of the distribution strategy.
+- get_activity : Return the activity strategy (optionally cloned).
+- get_activity_name : Return the name of the activity strategy.
+- get_surface : Return the surface strategy (optionally cloned).
+- get_surface_name : Return the name of the surface strategy.
+- get_distribution : Return the distribution array (optionally cloned).
+- get_density : Return the density array (optionally cloned).
+- get_concentration : Return the concentration array (optionally cloned).
+- get_total_concentration : Return the total concentration (1/m^3).
+- get_charge : Return the per-particle charge (optionally cloned).
+- get_volume : Return the representation volume in m^3 (optionally cloned).
+- get_species_mass : Return the mass per species, in kg.
+- get_mass : Return the array of total particle masses, in kg.
+- get_mass_concentration : Return the total mass concentration in kg/m^3.
+- get_radius : Return the array of particle radii in meters.
+- add_mass : Add mass to the distribution in each bin.
+- add_concentration : Add concentration to the distribution in each bin.
+- collide_pairs : Collide pairs of indices (ParticleResolved strategies).
 
 #### Signature
 
@@ -16364,13 +18512,13 @@ class ParticleRepresentation:
 
 ### ParticleRepresentation().__str__
 
-[Show source in representation.py:64](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L64)
+[Show source in representation.py:87](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L87)
 
 Returns a string representation of the particle representation.
 
 #### Returns
 
-- str : A string representation of the particle representation.
+- A string representation of the particle representation.
 
 #### Examples
 
@@ -16387,14 +18535,17 @@ def __str__(self) -> str: ...
 
 ### ParticleRepresentation().add_concentration
 
-[Show source in representation.py:416](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L416)
+[Show source in representation.py:455](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L455)
 
-Adds concentration to the particle distribution.
+Add concentration to the particle distribution.
 
 #### Arguments
 
-- added_concentration : The concentration to be
-  added per distribution bin.
+- added_concentration : The concentration to be added per bin
+    (1/m^3).
+- added_distribution : Optional distribution array to merge into
+  the existing distribution. If None, the current distribution
+  is reused.
 
 #### Examples
 
@@ -16414,14 +18565,13 @@ def add_concentration(
 
 ### ParticleRepresentation().add_mass
 
-[Show source in representation.py:396](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L396)
+[Show source in representation.py:436](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L436)
 
-Adds mass to the particle distribution, and updates parameters.
+Add mass to the particle distribution and update parameters.
 
 #### Arguments
 
-- added_mass : The mass to be added per
-  distribution bin.
+- added_mass : The mass to be added per distribution bin, in kg.
 
 #### Examples
 
@@ -16437,13 +18587,13 @@ def add_mass(self, added_mass: NDArray[np.float64]) -> None: ...
 
 ### ParticleRepresentation().collide_pairs
 
-[Show source in representation.py:447](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L447)
+[Show source in representation.py:490](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L490)
 
-Collide pairs of indices, used for ParticleResolved Strategies.
+Collide pairs of particles, used for ParticleResolved Strategies.
 
 #### Arguments
 
-- indices : The indices to collide.
+- indices : The indices of the particles to collide.
 
 #### Examples
 
@@ -16459,10 +18609,9 @@ def collide_pairs(self, indices: NDArray[np.int64]) -> None: ...
 
 ### ParticleRepresentation().get_activity
 
-[Show source in representation.py:119](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L119)
+[Show source in representation.py:145](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L145)
 
-Returns the activity strategy used for partial pressure
-calculations.
+Return the activity strategy used for partial pressure calculations.
 
 #### Arguments
 
@@ -16470,7 +18619,8 @@ calculations.
 
 #### Returns
 
-- The activity strategy used for partial pressure calculations.
+- The activity strategy used for partial
+  pressure calculations.
 
 #### Examples
 
@@ -16490,15 +18640,15 @@ def get_activity(self, clone: bool = False) -> ActivityStrategy: ...
 
 ### ParticleRepresentation().get_activity_name
 
-[Show source in representation.py:138](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L138)
+[Show source in representation.py:165](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L165)
 
-Returns the name of the activity strategy used for partial pressure
+Return the name of the activity strategy used for partial pressure
 calculations.
 
 #### Returns
 
-- The name of the activity strategy used for partial pressure
-  calculations.
+- The name of the activity strategy used for partial
+  pressure calculations.
 
 #### Examples
 
@@ -16515,9 +18665,9 @@ def get_activity_name(self) -> str: ...
 
 ### ParticleRepresentation().get_charge
 
-[Show source in representation.py:266](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L266)
+[Show source in representation.py:299](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L299)
 
-Returns the charge per particle.
+Return the charge per particle.
 
 #### Arguments
 
@@ -16525,7 +18675,7 @@ Returns the charge per particle.
 
 #### Returns
 
-- The charge of the particles.
+- The charge of the particles (dimensionless).
 
 #### Examples
 
@@ -16541,13 +18691,12 @@ def get_charge(self, clone: bool = False) -> NDArray[np.float64]: ...
 
 ### ParticleRepresentation().get_concentration
 
-[Show source in representation.py:225](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L225)
+[Show source in representation.py:257](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L257)
 
-Returns the volume concentration of the particles.
+Return the volume concentration of the particles.
 
-For ParticleResolved Strategies, the concentration is the number of
-particles per self.volume to get concentration/m^3. For other
-Strategies, the concentration is the already per 1/m^3.
+For ParticleResolved Strategies, this is the number of
+particles per self.volume. Otherwise, it's per 1/m^3.
 
 #### Arguments
 
@@ -16555,7 +18704,7 @@ Strategies, the concentration is the already per 1/m^3.
 
 #### Returns
 
-- The concentration of the particles.
+- The concentration of the particles in 1/m^3.
 
 #### Examples
 
@@ -16571,9 +18720,9 @@ def get_concentration(self, clone: bool = False) -> NDArray[np.float64]: ...
 
 ### ParticleRepresentation().get_density
 
-[Show source in representation.py:207](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L207)
+[Show source in representation.py:238](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L238)
 
-Returns the density of the particles.
+Return the density of the particles.
 
 #### Arguments
 
@@ -16597,9 +18746,9 @@ def get_density(self, clone: bool = False) -> NDArray[np.float64]: ...
 
 ### ParticleRepresentation().get_distribution
 
-[Show source in representation.py:189](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L189)
+[Show source in representation.py:219](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L219)
 
-Returns the distribution of the particles.
+Return the distribution of the particles.
 
 #### Arguments
 
@@ -16623,9 +18772,9 @@ def get_distribution(self, clone: bool = False) -> NDArray[np.float64]: ...
 
 ### ParticleRepresentation().get_mass
 
-[Show source in representation.py:322](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L322)
+[Show source in representation.py:358](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L358)
 
-Returns the mass of the particles as calculated by the strategy.
+Return the mass of the particles as calculated by the strategy.
 
 #### Arguments
 
@@ -16633,7 +18782,7 @@ Returns the mass of the particles as calculated by the strategy.
 
 #### Returns
 
-- The mass of the particles.
+- The mass of the particles in kg.
 
 #### Examples
 
@@ -16649,20 +18798,21 @@ def get_mass(self, clone: bool = False) -> NDArray[np.float64]: ...
 
 ### ParticleRepresentation().get_mass_concentration
 
-[Show source in representation.py:342](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L342)
+[Show source in representation.py:379](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L379)
 
-Returns the total mass / volume simulated.
+Return the total mass per volume of the simulated particles.
 
-The mass concentration is as calculated by the strategy, taking into
-account the distribution and concentration.
+The mass concentration is calculated from the distribution
+and concentration arrays.
 
 #### Arguments
 
-- clone : If True, then return a copy of the mass concentration.
+- clone : If True, then return a copy of the mass concentration
+  value.
 
 #### Returns
 
-- np.float64 : The mass concentration of the particles, kg/m^3.
+- The mass concentration in kg/m^3.
 
 #### Examples
 
@@ -16681,9 +18831,9 @@ def get_mass_concentration(self, clone: bool = False) -> np.float64: ...
 
 ### ParticleRepresentation().get_radius
 
-[Show source in representation.py:376](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L376)
+[Show source in representation.py:415](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L415)
 
-Returns the radius of the particles as calculated by the strategy.
+Return the radius of the particles as calculated by the strategy.
 
 #### Arguments
 
@@ -16691,7 +18841,7 @@ Returns the radius of the particles as calculated by the strategy.
 
 #### Returns
 
-- The radius of the particles.
+- The radius of the particles in meters.
 
 #### Examples
 
@@ -16707,17 +18857,17 @@ def get_radius(self, clone: bool = False) -> NDArray[np.float64]: ...
 
 ### ParticleRepresentation().get_species_mass
 
-[Show source in representation.py:302](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L302)
+[Show source in representation.py:337](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L337)
 
-Returns the masses per species in the particles.
+Return the masses per species in the particles.
 
 #### Arguments
 
-- clone : If True, then return a copy of the mass array.
+- clone : If True, then return a copy of the computed mass array.
 
 #### Returns
 
-- The mass of the particles per species.
+- The mass of the particles per species in kg.
 
 #### Examples
 
@@ -16733,9 +18883,9 @@ def get_species_mass(self, clone: bool = False) -> NDArray[np.float64]: ...
 
 ### ParticleRepresentation().get_strategy
 
-[Show source in representation.py:87](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L87)
+[Show source in representation.py:110](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L110)
 
-Returns the strategy used for particle representation.
+Return the strategy used for particle representation.
 
 #### Arguments
 
@@ -16743,7 +18893,8 @@ Returns the strategy used for particle representation.
 
 #### Returns
 
-- The strategy used for particle representation.
+- The strategy used for particle
+    representation.
 
 #### Examples
 
@@ -16763,9 +18914,9 @@ def get_strategy(self, clone: bool = False) -> DistributionStrategy: ...
 
 ### ParticleRepresentation().get_strategy_name
 
-[Show source in representation.py:105](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L105)
+[Show source in representation.py:130](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L130)
 
-Returns the name of the strategy used for particle representation.
+Return the name of the strategy used for particle representation.
 
 #### Returns
 
@@ -16786,10 +18937,9 @@ def get_strategy_name(self) -> str: ...
 
 ### ParticleRepresentation().get_surface
 
-[Show source in representation.py:154](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L154)
+[Show source in representation.py:182](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L182)
 
-Returns the surface strategy used for surface tension and
-Kelvin effect.
+Return the surface strategy used for surface tension and Kelvin effect.
 
 #### Arguments
 
@@ -16797,7 +18947,8 @@ Kelvin effect.
 
 #### Returns
 
-- The surface strategy used for surface tension and Kelvin effect.
+- The surface strategy used for surface tension
+  and Kelvin effect.
 
 #### Examples
 
@@ -16817,15 +18968,15 @@ def get_surface(self, clone: bool = False) -> SurfaceStrategy: ...
 
 ### ParticleRepresentation().get_surface_name
 
-[Show source in representation.py:173](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L173)
+[Show source in representation.py:202](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L202)
 
-Returns the name of the surface strategy used for surface tension
-and Kelvin effect.
+Return the name of the surface strategy used for surface tension and
+Kelvin effect.
 
 #### Returns
 
-- The name of the surface strategy used for surface tension and
-    Kelvin effect.
+- The name of the surface strategy used for surface tension
+  and Kelvin effect.
 
 #### Examples
 
@@ -16842,9 +18993,9 @@ def get_surface_name(self) -> str: ...
 
 ### ParticleRepresentation().get_total_concentration
 
-[Show source in representation.py:247](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L247)
+[Show source in representation.py:279](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L279)
 
-Returns the total concentration of the particles.
+Return the total concentration of the particles.
 
 #### Arguments
 
@@ -16852,7 +19003,7 @@ Returns the total concentration of the particles.
 
 #### Returns
 
-- The concentration of the particles.
+- The total number concentration of the particles in 1/m^3.
 
 #### Examples
 
@@ -16871,17 +19022,17 @@ def get_total_concentration(self, clone: bool = False) -> np.float64: ...
 
 ### ParticleRepresentation().get_volume
 
-[Show source in representation.py:284](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L284)
+[Show source in representation.py:318](https://github.com/uncscode/particula/blob/main/particula/particles/representation.py#L318)
 
-Returns the volume of the particles.
+Return the volume used for the particle representation.
 
 #### Arguments
 
-- clone : If True, then return a copy of the volume array.
+- clone : If True, then return a copy of the volume value.
 
 #### Returns
 
-- The volume of the particles.
+- The volume of the particles in m^3.
 
 #### Examples
 
@@ -16907,13 +19058,14 @@ def get_volume(self, clone: bool = False) -> float: ...
 
 ## BuilderActivityStrategyMixin
 
-[Show source in representation_builders.py:113](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L113)
+[Show source in representation_builders.py:126](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L126)
 
-Mixin class for Builder classes to set activity_strategy.
+Mixin class for setting the activity_strategy attribute.
 
 #### Methods
 
-- set_activity_strategy : Set the activity_strategy attribute.
+- set_activity_strategy : Assign the activity strategy (e.g., ideal mass,
+    ideal molar, kappa-parameter).
 
 #### Signature
 
@@ -16924,14 +19076,19 @@ class BuilderActivityStrategyMixin:
 
 ### BuilderActivityStrategyMixin().set_activity_strategy
 
-[Show source in representation_builders.py:123](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L123)
+[Show source in representation_builders.py:138](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L138)
 
-Set the activity strategy of the particle.
+Assign the activity strategy for the particle representation.
 
 #### Arguments
 
-- activity_strategy : Activity strategy of the particle.
-- activity_strategy_units : Not used. (for interface consistency)
+- activity_strategy : An ActivityStrategy instance (e.g.,
+  ActivityIdealMass, ActivityIdealMolar).
+- activity_strategy_units : Not used (for interface consistency).
+
+#### Returns
+
+- self : For method chaining.
 
 #### Signature
 
@@ -16951,13 +19108,14 @@ def set_activity_strategy(
 
 ## BuilderDistributionStrategyMixin
 
-[Show source in representation_builders.py:83](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L83)
+[Show source in representation_builders.py:88](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L88)
 
-Mixin class for Builder classes to set distribution_strategy.
+Mixin class for setting the distribution_strategy attribute.
 
 #### Methods
 
-- set_distribution_strategy : Set the distribution_strategy attribute.
+- set_distribution_strategy : Assign the distribution strategy
+    (e.g., mass-based, radii-based).
 
 #### Signature
 
@@ -16968,14 +19126,20 @@ class BuilderDistributionStrategyMixin:
 
 ### BuilderDistributionStrategyMixin().set_distribution_strategy
 
-[Show source in representation_builders.py:93](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L93)
+[Show source in representation_builders.py:100](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L100)
 
-Set the distribution strategy of the particle.
+Assign the distribution strategy for the particle representation.
 
 #### Arguments
 
-- distribution_strategy : Distribution strategy of the particle.
-- distribution_strategy_units : Not used. (for interface)
+- distribution_strategy : A DistributionStrategy instance
+  (e.g., mass-based bins, radius-based bins).
+- distribution_strategy_units : Not used
+    (for interface consistency).
+
+#### Returns
+
+- self : For method chaining.
 
 #### Signature
 
@@ -16995,13 +19159,14 @@ def set_distribution_strategy(
 
 ## BuilderSurfaceStrategyMixin
 
-[Show source in representation_builders.py:55](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L55)
+[Show source in representation_builders.py:53](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L53)
 
-Mixin class for Builder classes to set surface_strategy.
+Mixin class for setting the surface_strategy attribute.
 
 #### Methods
 
-- set_surface_strategy : Set the surface_strategy attribute.
+- set_surface_strategy : Assign the surface strategy controlling
+    surface tension or other surface-related properties.
 
 #### Signature
 
@@ -17014,12 +19179,17 @@ class BuilderSurfaceStrategyMixin:
 
 [Show source in representation_builders.py:65](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L65)
 
-Set the surface strategy of the particle.
+Assign the surface strategy for the particle representation.
 
 #### Arguments
 
-- surface_strategy : Surface strategy of the particle.
-- surface_strategy_units : Not used. (for interface consistency)
+- surface_strategy : A SurfaceStrategy instance defining surface
+  tension or other surface-related properties.
+- surface_strategy_units : Not used (for interface consistency).
+
+#### Returns
+
+- self : For method chaining.
 
 #### Signature
 
@@ -17037,21 +19207,33 @@ def set_surface_strategy(
 
 ## ParticleMassRepresentationBuilder
 
-[Show source in representation_builders.py:140](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L140)
+[Show source in representation_builders.py:160](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L160)
 
-General ParticleRepresentation objects with mass-based bins.
+Builder for ParticleRepresentation objects using mass-based distributions.
 
 #### Attributes
 
-- distribution_strategy : Set the DistributionStrategy.
-- activity_strategy : Set the ActivityStrategy.
-- surface_strategy : Set the SurfaceStrategy.
-- mass : Set the mass of the particles. Default units are 'kg'.
-- density : Set the density of the particles. Default units are
-    'kg/m^3'.
-- concentration : Set the concentration of the particles.
-    Default units are '1/m^3'.
-- charge : Set the number of charges.
+- distribution_strategy : The DistributionStrategy
+    (e.g., mass-based bins).
+- activity_strategy : The ActivityStrategy (e.g., ideal mass).
+- surface_strategy : The SurfaceStrategy
+    (e.g., surface tension calculations).
+- mass : The total or per-bin mass of particles in kg.
+- density : The particle density in kg/m^3.
+- concentration : The number concentration in 1/m^3.
+- charge : Number of charges per particle (dimensionless).
+
+#### Methods
+
+- set_distribution_strategy : Assign the distribution strategy.
+- set_activity_strategy : Assign the activity strategy.
+- set_surface_strategy : Assign the surface strategy.
+- set_mass : Assign the mass of the particles.
+- set_density : Assign the density of the particles.
+- set_concentration : Assign the number concentration.
+- set_charge : Assign the charge of the particles.
+- build : Validate and return a ParticleRepresentation with
+    mass-based distribution data.
 
 #### Signature
 
@@ -17082,13 +19264,15 @@ class ParticleMassRepresentationBuilder(
 
 ### ParticleMassRepresentationBuilder().build
 
-[Show source in representation_builders.py:183](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L183)
+[Show source in representation_builders.py:215](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L215)
 
-Validate and return the ParticleRepresentation object.
+Validate all required parameters and return a ParticleRepresentation.
 
 #### Returns
 
-- The validated ParticleRepresentation object.
+- ParticleRepresentation : An object configured to represent
+  mass-based particle distributions, activity, and surface
+  properties.
 
 #### Signature
 
@@ -17104,21 +19288,34 @@ def build(self) -> ParticleRepresentation: ...
 
 ## ParticleRadiusRepresentationBuilder
 
-[Show source in representation_builders.py:201](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L201)
+[Show source in representation_builders.py:236](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L236)
 
-General ParticleRepresentation objects with radius-based bins.
+Builder for ParticleRepresentation objects using radius-based
+distributions.
 
 #### Attributes
 
-- distribution_strategy : Set the DistributionStrategy.
-- activity_strategy : Set the ActivityStrategy.
-- surface_strategy : Set the SurfaceStrategy.
-- radius : Set the radius of the particles. Default units are 'm'.
-- density : Set the density of the particles. Default units are
-    'kg/m**3'.
-- concentration : Set the concentration of the particles. Default units
-    are '1/m^3'.
-- charge : Set the number of charges.
+- distribution_strategy : The DistributionStrategy (e.g.,
+    radius-based bins).
+- activity_strategy : The ActivityStrategy (e.g., ideal mass).
+- surface_strategy : The SurfaceStrategy (e.g., surface tension
+    calculations).
+- radius : The radius of the particles in meters.
+- density : The particle density in kg/m^3.
+- concentration : The number concentration in 1/m^3.
+- charge : Number of charges per particle (dimensionless).
+
+#### Methods
+
+- set_distribution_strategy : Assign the distribution strategy.
+- set_activity_strategy : Assign the activity strategy.
+- set_surface_strategy : Assign the surface strategy.
+- set_radius : Assign the radius of the particles.
+- set_density : Assign the density of the particles.
+- set_concentration : Assign the number concentration.
+- set_charge : Assign the charge of the particles.
+- build : Validate and return a ParticleRepresentation with
+  radius-based distribution data.
 
 #### Signature
 
@@ -17149,13 +19346,14 @@ class ParticleRadiusRepresentationBuilder(
 
 ### ParticleRadiusRepresentationBuilder().build
 
-[Show source in representation_builders.py:244](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L244)
+[Show source in representation_builders.py:292](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L292)
 
-Validate and return the ParticleRepresentation object.
+Validate all required parameters and return a ParticleRepresentation.
 
 #### Returns
 
-- The validated ParticleRepresentation object.
+- ParticleRepresentation : An object configured to represent
+  radius-based particle distributions, activity, and surface properties.
 
 #### Signature
 
@@ -17171,21 +19369,29 @@ def build(self) -> ParticleRepresentation: ...
 
 ## PresetParticleRadiusBuilder
 
-[Show source in representation_builders.py:262](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L262)
+[Show source in representation_builders.py:312](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L312)
 
-General ParticleRepresentation objects with radius-based bins.
+Builder for ParticleRepresentation objects with radius-based bins
+generated from a lognormal size distribution.
 
 #### Attributes
 
-- mode : Set the mode(s) of the distribution.
-    Default is np.array([100e-9, 1e-6]) meters.
-- geometric_standard_deviation : Set the geometric standard
-    deviation(s) of the distribution. Default is np.array([1.2, 1.4]).
-- number_concentration : Set the number concentration of the
-    distribution. Default is np.array([1e4x1e6, 1e3x1e6])
-    particles/m^3.
-- radius_bins : Set the radius bins of the distribution. Default is
-    np.logspace(-9, -4, 250), meters.
+- mode : Mode(s) of the lognormal distribution in meters.
+- geometric_standard_deviation : Geometric standard deviation(s).
+- number_concentration : Number concentration(s) in 1/m^3.
+- radius_bins : The array of radius bins in meters for the
+    distribution.
+- distribution_type : The type of lognormal distribution
+    ("pdf" or "pmf").
+
+#### Methods
+
+- set_distribution_strategy : Assign the distribution strategy.
+- set_activity_strategy : Assign the activity strategy.
+- set_surface_strategy : Assign the surface strategy.
+- set_radius_bins : Assign radius bin edges in meters.
+- set_distribution_type : Choose between "pdf" or "pmf".
+- build : Generate the distribution and return a ParticleRepresentation.
 
 #### Signature
 
@@ -17218,16 +19424,15 @@ class PresetParticleRadiusBuilder(
 
 ### PresetParticleRadiusBuilder().build
 
-[Show source in representation_builders.py:355](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L355)
+[Show source in representation_builders.py:428](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L428)
 
-Validate and return the ParticleRepresentation object.
-
-This will build a distribution of particles with a lognormal size
-distribution, before returning the ParticleRepresentation object.
+Generate a lognormal distribution (PDF or PMF) based on
+current parameters and return a ParticleRepresentation.
 
 #### Returns
 
-- The validated ParticleRepresentation object.
+- ParticleRepresentation : An object with radius-based lognormal
+  distribution, activity, and surface properties.
 
 #### Signature
 
@@ -17241,13 +19446,19 @@ def build(self) -> ParticleRepresentation: ...
 
 ### PresetParticleRadiusBuilder().set_distribution_type
 
-[Show source in representation_builders.py:336](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L336)
+[Show source in representation_builders.py:403](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L403)
 
-Set the distribution type for the particle representation.
+Choose between "pdf" (probability density function) or "pmf"
+(probability mass function) for the distribution.
 
 #### Arguments
 
-- distribution_type : The type of distribution to use.
+- distribution_type : Must be either 'pdf' or 'pmf'.
+- distribution_type_units : Not used (for interface consistency).
+
+#### Returns
+
+- self : For method chaining.
 
 #### Signature
 
@@ -17259,17 +19470,23 @@ def set_distribution_type(
 
 ### PresetParticleRadiusBuilder().set_radius_bins
 
-[Show source in representation_builders.py:317](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L317)
+[Show source in representation_builders.py:375](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L375)
 
-Set the radius bins for the distribution
+Assign an array of radius bin edges.
 
 #### Arguments
 
-- radius_bins : The radius bins for the distribution.
+- radius_bins : The radius bin edges in meters.
+- radius_bins_units : The units of the radius bins. Default is "m".
+
+#### Returns
+
+- self : For method chaining.
 
 #### Signature
 
 ```python
+@validate_inputs({"radius_bins": "positive"})
 def set_radius_bins(
     self, radius_bins: NDArray[np.float64], radius_bins_units: str = "m"
 ): ...
@@ -17279,32 +19496,27 @@ def set_radius_bins(
 
 ## PresetResolvedParticleMassBuilder
 
-[Show source in representation_builders.py:472](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L472)
+[Show source in representation_builders.py:551](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L551)
 
-General ParticleRepresentation objects with particle resolved masses.
+Builder for ParticleRepresentation objects with preset parameters
+for particle-resolved masses derived from a lognormal size distribution.
 
-This class has preset values for all the attributes, and allows you to
-override them as needed. This is useful when you want to quickly
-particle representation object with resolved masses.
+Generates random samples of particle radii (lognormal) and converts
+them to per-particle masses. Includes defaults for mode, geometric
+standard deviation, concentration, and total resolved count.
 
 #### Attributes
 
-- distribution_strategy : Set the DistributionStrategy.
-- activity_strategy : Set the ActivityStrategy.
-- surface_strategy : Set the SurfaceStrategy.
-- mass : Set the mass of the particles Default
-    units are 'kg'.
-- density : Set the density of the particles.
-    Default units are 'kg/m^3'.
-- charge : Set the number of charges.
-- mode : Set the mode(s) of the distribution.
-    Default is np.array([100e-9, 1e-6]) meters.
-- geometric_standard_deviation : Set the geometric standard
-    deviation(s) of the distribution. Default is np.array([1.2, 1.4]).
-- number_concentration : Set the number concentration of the
-    distribution. Default is np.array([1e4 1e6, 1e3 1e6])
-    particles/m^3.
-- particle_resolved_count : Set the number of resolved particles.
+- mode : Lognormal mode(s) in meters.
+- geometric_standard_deviation : GSD(s).
+- number_concentration : Number concentration(s) in 1/m^3.
+- particle_resolved_count : Number of resolved particles.
+- volume : Volume in m^3 for the representation.
+
+#### Methods
+
+- build : Sample radii from a lognormal distribution, convert to mass,
+    and create a ParticleRepresentation.
 
 #### Signature
 
@@ -17337,16 +19549,16 @@ class PresetResolvedParticleMassBuilder(
 
 ### PresetResolvedParticleMassBuilder().build
 
-[Show source in representation_builders.py:540](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L540)
+[Show source in representation_builders.py:614](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L614)
 
-Validate and return the ParticleRepresentation object.
-
-This will build a distribution of particles with a lognormal size
-distribution, before returning the ParticleRepresentation object.
+Sample particle radii from a lognormal distribution, convert
+to mass, and return a ParticleRepresentation with resolved
+per-particle masses.
 
 #### Returns
 
-- The validated ParticleRepresentation object.
+- ParticleRepresentation : Configured for particle-resolved
+  masses with the specified distribution, activity, and surface.
 
 #### Signature
 
@@ -17362,24 +19574,35 @@ def build(self) -> ParticleRepresentation: ...
 
 ## ResolvedParticleMassRepresentationBuilder
 
-[Show source in representation_builders.py:395](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L395)
+[Show source in representation_builders.py:468](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L468)
 
-Builder class for constructing ParticleRepresentation objects with
-resolved masses.
+Builder for ParticleRepresentation objects with fully resolved
+particle masses (array-based).
 
-This class allows you to set various attributes for a particle
-representation, such as distribution strategy, mass, density, charge,
-volume, and more. These attributes are validated and there a no presets.
+Allows setting distribution strategy, mass, density, charge,
+volume, etc. No default values are assumed.
 
 #### Attributes
 
-- distribution_strategy : Set the distribution strategy for particles.
-- activity_strategy : Set the activity strategy for the particles.
-- surface_strategy : Set the surface strategy for the particles.
-- mass : Set the particle mass. Defaults to 'kg'.
-- density : Set the particle density. Defaults to 'kg/m^3'.
-- charge : Set the particle charge.
-- volume : Set the particle volume. Defaults to 'm^3'.
+- distribution_strategy : Strategy for the resolved mass distribution.
+- activity_strategy : Activity strategy (e.g., ideal mass).
+- surface_strategy : Surface strategy (e.g., tension).
+- mass : Per-particle or resolved mass in kg.
+- density : Particle density in kg/m^3.
+- charge : Number of charges (dimensionless).
+- volume : Volume of simulation in m^3.
+
+#### Methods
+
+- set_distribution_strategy : Assign the distribution strategy.
+- set_activity_strategy : Assign the activity strategy.
+- set_surface_strategy : Assign the surface strategy.
+- set_mass : Assign the mass of the particles.
+- set_density : Assign the density of the particles.
+- set_charge : Assign the charge of the particles.
+- set_volume : Assign the volume of the particles.
+- build : Validate all parameters and return
+    a ParticleRepresentation with resolved masses.
 
 #### Signature
 
@@ -17410,17 +19633,15 @@ class ResolvedParticleMassRepresentationBuilder(
 
 ### ResolvedParticleMassRepresentationBuilder().build
 
-[Show source in representation_builders.py:442](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L442)
+[Show source in representation_builders.py:525](https://github.com/uncscode/particula/blob/main/particula/particles/representation_builders.py#L525)
 
-Validate and return a ParticleRepresentation object.
-
-This method validates all the required attributes and builds a particle
-representation with a lognormal size distribution.
+Validate attributes and construct a ParticleRepresentation
+with array-based, resolved masses.
 
 #### Returns
 
-- ParticleRepresentation : A validated particle representation
-    object.
+- ParticleRepresentation : Configured with the specified
+  distribution, activity, and surface strategies.
 
 #### Signature
 
@@ -17444,19 +19665,28 @@ def build(self) -> ParticleRepresentation: ...
 
 ## ParticleRepresentationFactory
 
-[Show source in representation_factories.py:17](https://github.com/uncscode/particula/blob/main/particula/particles/representation_factories.py#L17)
+[Show source in representation_factories.py:20](https://github.com/uncscode/particula/blob/main/particula/particles/representation_factories.py#L20)
 
-Factory class to create particle representation builders.
+Factory for creating particle representation builders.
 
 #### Methods
 
-- get_builders : Returns the mapping of strategy types to builder
-    instances.
-- get_strategy : Gets the strategy instance for the specified strategy.
-    - strategy_type : Type of particle representation strategy to use,
-        can be 'radius' (default) or 'mass'.
-    - parameters : Parameters required for
-        the builder
+- get_builders : Return a dictionary of strategy builder instances.
+- get_strategy : Obtain a ParticleRepresentation from a chosen builder.
+
+#### Examples
+
+```py title="Factory Usage Example"
+import particula as par
+factory = par.particles.ParticleRepresentationFactory()
+rep = factory.get_strategy("mass")
+# rep -> ParticleRepresentation with mass-based distribution
+```
+
+#### References
+
+- Builder Pattern,
+  [Wikipedia](https://en.wikipedia.org/wiki/Builder_pattern).
 
 #### Signature
 
@@ -17486,19 +19716,25 @@ class ParticleRepresentationFactory(
 
 ### ParticleRepresentationFactory().get_builders
 
-[Show source in representation_factories.py:43](https://github.com/uncscode/particula/blob/main/particula/particles/representation_factories.py#L43)
+[Show source in representation_factories.py:53](https://github.com/uncscode/particula/blob/main/particula/particles/representation_factories.py#L53)
 
-Returns the mapping of strategy types to builder instances.
+Return a mapping of strategy types to builder instances.
 
 #### Returns
 
-A dictionary with the strategy types as keys and
-the builder instances as values.
-- 'mass' : MassParticleRepresentationBuilder
-- 'radius' : RadiusParticleRepresentationBuilder
-- 'preset_radius' : LimitedRadiusParticleBuilder
-- 'resolved_mass' : ResolvedMassParticleRepresentationBuilder
-- 'preset_resolved_mass' : PresetResolvedMassParticleBuilder
+- A dictionary where each key is a strategy type
+  ("mass", "radius", etc.) and each value is the
+  corresponding builder instance.
+
+#### Examples
+
+```py title="get_builders usage"
+import particula as par
+factory = par.particles.ParticleRepresentationFactory()
+builders = factory.get_builders()
+mass_builder = builders["mass"]
+# mass_builder -> ParticleMassRepresentationBuilder()
+```
 
 #### Signature
 
@@ -17518,19 +19754,19 @@ def get_builders(self): ...
 
 ## SurfaceStrategyMassBuilder
 
-[Show source in surface_builders.py:67](https://github.com/uncscode/particula/blob/main/particula/particles/surface_builders.py#L67)
+[Show source in surface_builders.py:66](https://github.com/uncscode/particula/blob/main/particula/particles/surface_builders.py#L66)
 
 Builder class for SurfaceStrategyMass objects.
 
+For calculating the Kelvin effect based on mass mixing. Needed for
+the effective surface tension calculation.
+
 #### Methods
 
-- `set_surface_tension(surface_tension,` *surface_tension_units)* - Set the
-    surface tension of the particle in N/m. Default units are 'N/m'.
-- `set_density(density,` *density_units)* - Set the density of the particle in
-    kg/m^3. Default units are 'kg/m^3'.
-- `set_parameters(params)` - Set the parameters of the SurfaceStrategyMass
-    object from a dictionary including optional units.
-- `build()` - Validate and return the SurfaceStrategyMass object.
+- set_surface_tension : Set the surface tension in N/m.
+- set_density : Set the density in kg/m^3.
+- set_parameters : Configure multiple parameters at once.
+- build : Validate parameters and return the strategy.
 
 #### Signature
 
@@ -17549,7 +19785,7 @@ class SurfaceStrategyMassBuilder(
 
 ### SurfaceStrategyMassBuilder().build
 
-[Show source in surface_builders.py:88](https://github.com/uncscode/particula/blob/main/particula/particles/surface_builders.py#L88)
+[Show source in surface_builders.py:87](https://github.com/uncscode/particula/blob/main/particula/particles/surface_builders.py#L87)
 
 Validate and return the SurfaceStrategyMass object.
 
@@ -17575,17 +19811,16 @@ def build(self) -> SurfaceStrategyMass: ...
 
 Builder class for SurfaceStrategyMolar objects.
 
+For calculating the Kelvin effect based on molar mass. Needed for
+the effective surface tension calculation.
+
 #### Methods
 
-- `set_surface_tension(surface_tension,` *surface_tension_units)* - Set the
-    surface tension of the particle in N/m. Default units are 'N/m'.
-- `set_density(density,` *density_units)* - Set the density of the particle in
-    kg/m^3. Default units are 'kg/m^3'.
-- `set_molar_mass(molar_mass,` *molar_mass_units)* - Set the molar mass of the
-    particle in kg/mol. Default units are 'kg/mol'.
-- `set_parameters(params)` - Set the parameters of the SurfaceStrategyMolar
-    object from a dictionary including optional units.
-- `build()` - Validate and return the SurfaceStrategyMolar object.
+- set_surface_tension : Set the surface tension in N/m.
+- set_density : Set the density in kg/m^3.
+- set_molar_mass : Set the molar mass in kg/mol.
+- set_parameters : Configure multiple parameters at once.
+- build : Validate parameters and return the strategy.
 
 #### Signature
 
@@ -17605,9 +19840,9 @@ class SurfaceStrategyMolarBuilder(
 
 ### SurfaceStrategyMolarBuilder().build
 
-[Show source in surface_builders.py:53](https://github.com/uncscode/particula/blob/main/particula/particles/surface_builders.py#L53)
+[Show source in surface_builders.py:52](https://github.com/uncscode/particula/blob/main/particula/particles/surface_builders.py#L52)
 
-Validate and return the SurfaceStrategyMass object.
+Validate and return the SurfaceStrategyMolar object.
 
 #### Returns
 
@@ -17627,19 +19862,19 @@ def build(self) -> SurfaceStrategyMolar: ...
 
 ## SurfaceStrategyVolumeBuilder
 
-[Show source in surface_builders.py:101](https://github.com/uncscode/particula/blob/main/particula/particles/surface_builders.py#L101)
+[Show source in surface_builders.py:100](https://github.com/uncscode/particula/blob/main/particula/particles/surface_builders.py#L100)
 
 Builder class for SurfaceStrategyVolume objects.
 
+For calculating the Kelvin effect based on volume mixing. Needed for
+the effective surface tension calculation.
+
 #### Methods
 
-- `set_surface_tension(surface_tension,` *surface_tension_units)* - Set the
-    surface tension of the particle in N/m. Default units are 'N/m'.
-- `set_density(density,` *density_units)* - Set the density of the particle in
-    kg/m^3. Default units are 'kg/m^3'.
-- `set_parameters(params)` - Set the parameters of the SurfaceStrategyVolume
-    object from a dictionary including optional units.
-- `build()` - Validate and return the SurfaceStrategyVolume object.
+- set_surface_tension : Set the surface tension in N/m.
+- set_density : Set the density in kg/m^3.
+- set_parameters : Configure multiple parameters at once.
+- build : Validate parameters and return the strategy.
 
 #### Signature
 
@@ -17658,7 +19893,7 @@ class SurfaceStrategyVolumeBuilder(
 
 ### SurfaceStrategyVolumeBuilder().build
 
-[Show source in surface_builders.py:122](https://github.com/uncscode/particula/blob/main/particula/particles/surface_builders.py#L122)
+[Show source in surface_builders.py:121](https://github.com/uncscode/particula/blob/main/particula/particles/surface_builders.py#L121)
 
 Validate and return the SurfaceStrategyVolume object.
 
@@ -17691,35 +19926,27 @@ def build(self) -> SurfaceStrategyVolume: ...
 
 [Show source in surface_factories.py:17](https://github.com/uncscode/particula/blob/main/particula/particles/surface_factories.py#L17)
 
-Factory class to call and create surface tension strategies.
+Factory for creating surface tension strategy builders.
 
-Factory class to create surface tension strategy builders for
-calculating surface tension and the Kelvin effect for species in
-particulate phases.
+Creates builder instances for volume-, mass-, or molar-based
+surface tension strategies. These strategies calculate surface
+tension and the Kelvin effect for species in particulate phases.
 
 #### Methods
 
-- get_builders() : Returns the mapping of strategy types to builder
+- get_builders : Return a mapping of strategy types to builder
     instances.
-- get_strategy(strategy_type, parameters): Gets the strategy instance
-    for the specified strategy type.
-    - `-` *strategy_type* - Type of surface tension strategy to use, can be
-        'volume', 'mass', or 'molar'.
-    - parameters(Dict[str, Any], optional): Parameters required for the
-        builder, dependent on the chosen strategy type.
-        - `-` *volume* - density, surface_tension
-        - `-` *mass* - density, surface_tension
-        - `-` *molar* - molar_mass, density, surface_tension
+- get_strategy : Return a strategy instance for the specified type
+    ('volume', 'mass', or 'molar').
 
 #### Returns
 
-SurfaceStrategy : An instance of the specified SurfaceStrategy.
+- SurfaceStrategy : The instance of the requested surface strategy.
 
 #### Raises
 
-ValueError : If an unknown strategy type is provided.
-ValueError : If any required key is missing during check_keys or
-    pre_build_check, or if trying to set an invalid parameter.
+- ValueError : If an unknown strategy type is provided or if
+  required parameters are missing during check_keys/pre_build_check.
 
 #### Signature
 
@@ -17747,16 +19974,25 @@ class SurfaceFactory(
 
 ### SurfaceFactory().get_builders
 
-[Show source in surface_factories.py:57](https://github.com/uncscode/particula/blob/main/particula/particles/surface_factories.py#L57)
+[Show source in surface_factories.py:49](https://github.com/uncscode/particula/blob/main/particula/particles/surface_factories.py#L49)
 
-Returns the mapping of strategy types to builder instances.
+Return a mapping of strategy types to builder instances.
 
 #### Returns
 
-- A dictionary mapping strategy types to builder instances.
-        - `-` *volume* - SurfaceStrategyVolumeBuilder
-        - `-` *mass* - SurfaceStrategyMassBuilder
-        - `-` *molar* - SurfaceStrategyMolarBuilder
+- Keys are 'volume', 'mass', or 'molar', each
+  mapped to the corresponding builder class.
+
+#### Examples
+
+```py title="SurfaceFactory Example"
+import particula as par
+factory = par.particles.SurfaceFactory()
+builders = factory.get_builders()
+volume_builder = builders["volume"]
+mass_builder = builders["mass"]
+molar_builder = builders["molar"]
+```
 
 #### Signature
 
@@ -17776,24 +20012,20 @@ def get_builders(self): ...
 
 ## SurfaceStrategy
 
-[Show source in surface_strategies.py:21](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L21)
+[Show source in surface_strategies.py:24](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L24)
 
-ABC class for Surface Strategies.
+Abstract base class for surface strategies.
 
-Abstract class for implementing strategies to calculate surface tension
-and the Kelvin effect for species in particulate phases.
+Implements methods for calculating effective surface tension, density,
+and the Kelvin effect in particulate phases.
 
 #### Methods
 
-- `effective_surface_tension` - Calculate the effective surface tension of
-    species based on their concentration.
-- `effective_density` - Calculate the effective density of species based on
-    their concentration.
-- `get_name` - Return the type of the surface strategy.
-- `kelvin_radius` - Calculate the Kelvin radius which determines the
-    curvature effect on vapor pressure.
-- `kelvin_term` - Calculate the Kelvin term, which quantifies the effect of
-    particle curvature on vapor pressure.
+- effective_surface_tension : Calculate the effective surface tension.
+- effective_density : Calculate the effective density.
+- get_name : Return the type of the surface strategy.
+- kelvin_radius : Calculate the Kelvin radius for curvature effects.
+- kelvin_term : Calculate the exponential Kelvin term for vapor pressure.
 
 #### Signature
 
@@ -17803,17 +20035,17 @@ class SurfaceStrategy(ABC): ...
 
 ### SurfaceStrategy().effective_density
 
-[Show source in surface_strategies.py:52](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L52)
+[Show source in surface_strategies.py:53](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L53)
 
 Calculate the effective density of the species mixture.
 
 #### Arguments
 
-- `mass_concentration` - Concentration of the species [kg/m^3].
+- mass_concentration : Concentration of the species in kg/m^3.
 
 #### Returns
 
-float or NDArray[float]: Effective density of the species [kg/m^3].
+- Effective density in kg/m^3.
 
 #### Signature
 
@@ -17832,11 +20064,11 @@ Calculate the effective surface tension of the species mixture.
 
 #### Arguments
 
-- `mass_concentration` - Concentration of the species [kg/m^3].
+- mass_concentration : Concentration of the species in kg/m^3.
 
 #### Returns
 
-float or NDArray[float]: Effective surface tension [N/m].
+- Effective surface tension in N/m.
 
 #### Signature
 
@@ -17849,7 +20081,7 @@ def effective_surface_tension(
 
 ### SurfaceStrategy().get_name
 
-[Show source in surface_strategies.py:65](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L65)
+[Show source in surface_strategies.py:67](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L67)
 
 Return the type of the surface strategy.
 
@@ -17861,31 +20093,24 @@ def get_name(self) -> str: ...
 
 ### SurfaceStrategy().kelvin_radius
 
-[Show source in surface_strategies.py:69](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L69)
+[Show source in surface_strategies.py:71](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L71)
 
-Calculate the Kelvin radius which determines the curvature effect.
-
-The kelvin radius is molecule specific and depends on the surface
-tension, molar mass, density, and temperature of the system. It is
-used to calculate the Kelvin term, which quantifies the effect of
-particle curvature on vapor pressure.
+Calculate the Kelvin radius, which sets the curvature effect on vapor pressure.
 
 #### Arguments
 
-- `surface_tension` - Surface tension of the mixture [N/m].
-- `molar_mass` - Molar mass of the species [kg/mol].
-- `mass_concentration` - Concentration of the species [kg/m^3].
-- `temperature` - Temperature of the system [K].
+- molar_mass : Molar mass of the species in kg/mol.
+- mass_concentration : Concentration of the species in kg/m^3.
+- temperature : Temperature of the system in K.
 
 #### Returns
 
-float or NDArray[float]: Kelvin radius [m].
+- Kelvin radius in meters.
 
 #### References
 
-- Based on Neil Donahue's approach to the Kelvin equation:
-r = 2 * surface_tension * molar_mass / (R * T * density)
-[Kelvin Wikipedia](https://en.wikipedia.org/wiki/Kelvin_equation)
+- r = 2 × surface_tension × molar_mass / (R × T × density)
+  [Kelvin Equation](https://en.wikipedia.org/wiki/Kelvin_equation)
 
 #### Signature
 
@@ -17900,30 +20125,25 @@ def kelvin_radius(
 
 ### SurfaceStrategy().kelvin_term
 
-[Show source in surface_strategies.py:103](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L103)
+[Show source in surface_strategies.py:99](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L99)
 
-Calculate the Kelvin term, which multiplies the vapor pressure.
-
-The Kelvin term is used to adjust the vapor pressure of a species due
-to the curvature of the particle.
+Calculate the exponential Kelvin term that adjusts vapor pressure.
 
 #### Arguments
 
-- `radius` - Radius of the particle [m].
-- `molar_mass` - Molar mass of the species a [kg/mol].
-- `mass_concentration` - Concentration of the species [kg/m^3].
-- `temperature` - Temperature of the system [K].
+- radius : Particle radius in meters.
+- molar_mass : Molar mass of the species in kg/mol.
+- mass_concentration : Concentration of the species in kg/m^3.
+- temperature : Temperature of the system in K.
 
 #### Returns
 
-float or NDArray[float]: The exponential factor adjusting vapor
-    pressure due to curvature.
+- Factor by which vapor pressure is increased.
 
 #### References
 
-Based on Neil Donahue's approach to the Kelvin equation:
-exp(kelvin_radius / particle_radius)
-[Kelvin Eq Wikipedia](https://en.wikipedia.org/wiki/Kelvin_equation)
+- P_eff = P_sat × exp(kelvin_radius / particle_radius)
+  [Kelvin Equation](https://en.wikipedia.org/wiki/Kelvin_equation)
 
 #### Signature
 
@@ -17941,20 +20161,18 @@ def kelvin_term(
 
 ## SurfaceStrategyMass
 
-[Show source in surface_strategies.py:189](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L189)
+[Show source in surface_strategies.py:179](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L179)
 
-Surface tension and density, based on mass fraction weighted values.
+Surface tension and density based on mass-fraction weighting.
 
-#### Arguments
+#### Attributes
 
-- `surface_tension` - Surface tension of the species [N/m]. If a single
-    value is provided, it will be used for all species.
-- `density` - Density of the species [kg/m^3]. If a single value is
-    provided, it will be used for all species.
+- surface_tension : Surface tension array or scalar in N/m.
+- density : Density array or scalar in kg/m^3.
 
 #### References
 
-[Mass Fractions](https://en.wikipedia.org/wiki/Mass_fraction_(chemistry))
+- [Mass Fraction](https://en.wikipedia.org/wiki/Mass_fraction_(chemistry))
 
 #### Signature
 
@@ -17973,7 +20191,7 @@ class SurfaceStrategyMass(SurfaceStrategy):
 
 ### SurfaceStrategyMass().effective_density
 
-[Show source in surface_strategies.py:222](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L222)
+[Show source in surface_strategies.py:211](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L211)
 
 #### Signature
 
@@ -17985,7 +20203,7 @@ def effective_density(
 
 ### SurfaceStrategyMass().effective_surface_tension
 
-[Show source in surface_strategies.py:210](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L210)
+[Show source in surface_strategies.py:199](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L199)
 
 #### Signature
 
@@ -17999,22 +20217,19 @@ def effective_surface_tension(
 
 ## SurfaceStrategyMolar
 
-[Show source in surface_strategies.py:137](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L137)
+[Show source in surface_strategies.py:129](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L129)
 
-Surface tension and density, based on mole fraction weighted values.
+Surface tension and density based on mole-fraction weighting.
 
-#### Arguments
+#### Attributes
 
-- `surface_tension` - Surface tension of the species [N/m]. If a single
-    value is provided, it will be used for all species.
-- `density` - Density of the species [kg/m^3]. If a single value is
-    provided, it will be used for all species.
-- `molar_mass` - Molar mass of the species [kg/mol]. If a single value is
-    provided, it will be used for all species.
+- surface_tension : Surface tension array or scalar in N/m.
+- density : Density array or scalar in kg/m^3.
+- molar_mass : Molar mass array or scalar in kg/mol.
 
 #### References
 
-[Mole Fractions](https://en.wikipedia.org/wiki/Mole_fraction)
+- [Mole Fraction](https://en.wikipedia.org/wiki/Mole_fraction)
 
 #### Signature
 
@@ -18034,7 +20249,7 @@ class SurfaceStrategyMolar(SurfaceStrategy):
 
 ### SurfaceStrategyMolar().effective_density
 
-[Show source in surface_strategies.py:175](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L175)
+[Show source in surface_strategies.py:165](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L165)
 
 #### Signature
 
@@ -18046,7 +20261,7 @@ def effective_density(
 
 ### SurfaceStrategyMolar().effective_surface_tension
 
-[Show source in surface_strategies.py:162](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L162)
+[Show source in surface_strategies.py:152](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L152)
 
 #### Signature
 
@@ -18060,20 +20275,18 @@ def effective_surface_tension(
 
 ## SurfaceStrategyVolume
 
-[Show source in surface_strategies.py:233](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L233)
+[Show source in surface_strategies.py:222](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L222)
 
-Surface tension and density, based on volume fraction weighted values.
+Surface tension and density based on volume-fraction weighting.
 
-#### Arguments
+#### Attributes
 
-- `surface_tension` - Surface tension of the species [N/m]. If a single
-    value is provided, it will be used for all species.
-- `density` - Density of the species [kg/m^3]. If a single value is
-    provided, it will be used for all species.
+- surface_tension : Surface tension array or scalar in N/m.
+- density : Density array or scalar in kg/m^3.
 
 #### References
 
-[Volume Fractions](https://en.wikipedia.org/wiki/Volume_fraction)
+- [Volume Fraction](https://en.wikipedia.org/wiki/Volume_fraction)
 
 #### Signature
 
@@ -18092,7 +20305,7 @@ class SurfaceStrategyVolume(SurfaceStrategy):
 
 ### SurfaceStrategyVolume().effective_density
 
-[Show source in surface_strategies.py:267](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L267)
+[Show source in surface_strategies.py:255](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L255)
 
 #### Signature
 
@@ -18104,7 +20317,7 @@ def effective_density(
 
 ### SurfaceStrategyVolume().effective_surface_tension
 
-[Show source in surface_strategies.py:254](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L254)
+[Show source in surface_strategies.py:242](https://github.com/uncscode/particula/blob/main/particula/particles/surface_strategies.py#L242)
 
 #### Signature
 
@@ -18126,17 +20339,37 @@ def effective_surface_tension(
 
 ## Runnable
 
-[Show source in runnable.py:9](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L9)
+[Show source in runnable.py:27](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L27)
 
-Runnable process that can modify an aerosol instance.
+Abstract base class for processes modifying an Aerosol instance.
 
-Parameters: None
+This class enforces the implementation of a process rate calculation
+and an execution method that modifies the Aerosol in-place. Subclasses
+must implement both 'rate' and 'execute', which define how the process
+affects the Aerosol over a time step.
 
 #### Methods
 
-- `-` *rate* - Return the rate of the process.
-- `-` *execute* - Execute the process and modify the aerosol instance.
-- `-` *__or__* - Chain this process with another process using the | operator.
+- `-` *rate* - Calculate and return the rate of the process.
+- `-` *execute* - Apply the process logic to the Aerosol over a specified
+    time.
+- `-` *__or__* - Chain two processes using the '|' operator.
+
+#### Examples
+
+```py title="Defining a Custom Process"
+class CustomProcess(Runnable):
+    def rate(self, aerosol):
+        return 42
+
+    def execute(self, aerosol, time_step, sub_steps=1):
+        # Modify aerosol here
+        return aerosol
+```
+
+#### References
+
+- No references available yet.
 
 #### Signature
 
@@ -18146,9 +20379,27 @@ class Runnable(ABC): ...
 
 ### Runnable().__or__
 
-[Show source in runnable.py:44](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L44)
+[Show source in runnable.py:102](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L102)
 
-Chain this process with another process using the | operator.
+Chain this Runnable with another using the '|' operator.
+
+This method enables an easy way to sequence processes, so they
+can be executed in a defined order.
+
+#### Arguments
+
+- other : Another Runnable to append after this one.
+
+#### Returns
+
+- RunnableSequence : A sequence containing both processes.
+
+#### Examples
+
+```py title="Chaining two processes"
+combined_process = process1 | process2
+final_aerosol = combined_process.execute(aerosol, time_step=1.0)
+```
 
 #### Signature
 
@@ -18158,17 +20409,27 @@ def __or__(self, other: "Runnable"): ...
 
 ### Runnable().execute
 
-[Show source in runnable.py:27](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L27)
+[Show source in runnable.py:76](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L76)
 
-Execute the process and modify the aerosol instance.
+Execute the process, modifying the Aerosol in-place over a time step.
 
 #### Arguments
 
-- `aerosol` *Aerosol* - The aerosol instance to modify.
-- `time_step` *float* - The time step for the process in seconds.
-- `sub_steps` *int* - The number of sub-steps to use for the process,
-    default is 1. Which means the full time step is used. A value
-    of 2 would mean the time step is divided into two sub-steps.
+- aerosol : The Aerosol instance to be updated.
+- time_step : The time step size in seconds.
+- sub_steps : Number of sub-steps to subdivide the time step,
+    default 1.
+
+#### Returns
+
+- The updated Aerosol after this process runs.
+
+#### Examples
+
+```py title="Executing the process"
+process = CustomProcess()
+updated_aerosol = process.execute(my_aerosol, time_step=1.0)
+```
 
 #### Signature
 
@@ -18183,13 +20444,25 @@ def execute(self, aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aer
 
 ### Runnable().rate
 
-[Show source in runnable.py:20](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L20)
+[Show source in runnable.py:57](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L57)
 
-Return the rate of the process.
+Calculate and return the rate of this process for the given Aerosol.
 
 #### Arguments
 
-- aerosol (Aerosol): The aerosol instance to modify.
+- aerosol : The Aerosol instance on which to calculate the rate.
+
+#### Returns
+
+- Any : The computed rate of this process.
+
+#### Examples
+
+```py title="Using the rate method"
+process = CustomProcess()
+process_rate = process.rate(my_aerosol)
+print(process_rate)
+```
 
 #### Signature
 
@@ -18206,19 +20479,32 @@ def rate(self, aerosol: Aerosol) -> Any: ...
 
 ## RunnableSequence
 
-[Show source in runnable.py:53](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L53)
+[Show source in runnable.py:128](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L128)
 
-A sequence of processes to be executed in order.
+A sequence of Runnable processes executed in order.
+
+This class maintains a list of processes to be applied sequentially
+to an Aerosol. Each process modifies the Aerosol and passes it along
+to the next in the sequence.
 
 #### Attributes
 
-- processes (List[Runnable]): A list of RunnableProcess objects.
+- processes : A list of Runnable objects forming the sequence.
 
 #### Methods
 
-- `-` *add_process* - Add a process to the sequence.
-- `-` *execute* - Execute the sequence of processes on an aerosol instance.
-- `-` *__or__* - Add a process to the sequence using the | operator.
+- `-` *add_process* - Add a Runnable to the sequence.
+- `-` *execute* - Apply each Runnable in the sequence to an Aerosol.
+- `-` *__or__* - Chain a new Runnable into this sequence.
+
+#### Examples
+
+```py title="Building and running a RunnableSequence"
+sequence = RunnableSequence()
+sequence.add_process(CustomProcess())
+sequence.add_process(AnotherProcess())
+final_aerosol = sequence.execute(aerosol, time_step=2.0)
+```
 
 #### Signature
 
@@ -18229,9 +20515,26 @@ class RunnableSequence:
 
 ### RunnableSequence().__or__
 
-[Show source in runnable.py:79](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L79)
+[Show source in runnable.py:196](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L196)
 
-Add a runnable to the sequence using the | operator.
+Chain another Runnable into this sequence using the '|' operator.
+
+#### Arguments
+
+- process : The Runnable to add.
+
+#### Returns
+
+- RunnableSequence : This sequence with the new Runnable appended.
+
+#### Examples
+
+```py
+sequence = RunnableSequence()
+sequence |= CustomProcess()
+# or
+sequence = sequence | AnotherProcess()
+```
 
 #### Signature
 
@@ -18245,9 +20548,20 @@ def __or__(self, process: Runnable): ...
 
 ### RunnableSequence().add_process
 
-[Show source in runnable.py:68](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L68)
+[Show source in runnable.py:156](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L156)
 
-Add a process to the sequence.
+Add a Runnable to the sequence.
+
+#### Arguments
+
+- process : The Runnable to add.
+
+#### Examples
+
+```py
+sequence = RunnableSequence()
+sequence.add_process(CustomProcess())
+```
 
 #### Signature
 
@@ -18261,9 +20575,28 @@ def add_process(self, process: Runnable): ...
 
 ### RunnableSequence().execute
 
-[Show source in runnable.py:72](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L72)
+[Show source in runnable.py:171](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L171)
 
-Execute the sequence of runnables on an aerosol instance.
+Execute all processes in the sequence on the given Aerosol.
+
+Each Runnable in the sequence modifies the Aerosol and passes
+it to the next Runnable until all have been executed.
+
+#### Arguments
+
+- aerosol : The Aerosol instance to be updated.
+- time_step : The time step size in seconds for each process.
+
+#### Returns
+
+- Aerosol : The resulting Aerosol after all processes run.
+
+#### Examples
+
+```py title="Executing a RunnableSequence"
+sequence = RunnableSequence()
+final_aerosol = sequence.execute(aerosol, time_step=1.0)
+```
 
 #### Signature
 
@@ -19014,6 +21347,9 @@ def get_mass_fractions_from_moles(
 
 [Show source in convert_size_distribution.py:39](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L39)
 
+#### Methods
+
+    - `-` *convert* - Convert distribution data between input and output scales.
 Defines an interface for conversion strategies between particle size
 distribution formats.
 
@@ -19037,7 +21373,7 @@ class ConversionStrategy: ...
 
 ### ConversionStrategy().convert
 
-[Show source in convert_size_distribution.py:56](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L56)
+[Show source in convert_size_distribution.py:58](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L58)
 
 Convert distribution data from one scale to another.
 
@@ -19068,7 +21404,7 @@ def convert(
 
 ## DNdlogDPtoPDFConversionStrategy
 
-[Show source in convert_size_distribution.py:187](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L187)
+[Show source in convert_size_distribution.py:189](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L189)
 
 Conversion strategy for converting between dn/dlogdp and PDF formats,
 possibly through an intermediate PMF conversion.
@@ -19093,7 +21429,7 @@ class DNdlogDPtoPDFConversionStrategy(ConversionStrategy): ...
 
 ### DNdlogDPtoPDFConversionStrategy().convert
 
-[Show source in convert_size_distribution.py:200](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L200)
+[Show source in convert_size_distribution.py:202](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L202)
 
 Convert between dn/dlogdp and PDF formats through an intermediate
 PMF step.
@@ -19121,7 +21457,7 @@ def convert(
 
 ## DNdlogDPtoPMFConversionStrategy
 
-[Show source in convert_size_distribution.py:117](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L117)
+[Show source in convert_size_distribution.py:119](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L119)
 
 Conversion strategy for converting between dn/dlogdp and PMF formats.
 
@@ -19145,7 +21481,7 @@ class DNdlogDPtoPMFConversionStrategy(ConversionStrategy): ...
 
 ### DNdlogDPtoPMFConversionStrategy().convert
 
-[Show source in convert_size_distribution.py:129](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L129)
+[Show source in convert_size_distribution.py:131](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L131)
 
 Perform the conversion between dn/dlogdp and PMF formats.
 
@@ -19172,7 +21508,7 @@ def convert(
 
 ## PMFtoPDFConversionStrategy
 
-[Show source in convert_size_distribution.py:152](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L152)
+[Show source in convert_size_distribution.py:154](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L154)
 
 Conversion strategy for converting between PMF and PDF formats.
 
@@ -19196,7 +21532,7 @@ class PMFtoPDFConversionStrategy(ConversionStrategy): ...
 
 ### PMFtoPDFConversionStrategy().convert
 
-[Show source in convert_size_distribution.py:164](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L164)
+[Show source in convert_size_distribution.py:166](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L166)
 
 Perform the conversion between PMF and PDF formats.
 
@@ -19223,7 +21559,7 @@ def convert(
 
 ## SameScaleConversionStrategy
 
-[Show source in convert_size_distribution.py:82](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L82)
+[Show source in convert_size_distribution.py:84](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L84)
 
 Conversion strategy that returns the input concentration unchanged.
 
@@ -19232,7 +21568,7 @@ same.
 
 #### Examples
 
-``` py title="Example Usage"
+```py title="Example Usage"
 strategy = SameScaleConversionStrategy()
 result = strategy.convert(diameters, concentration)
 # result is identical to concentration
@@ -19250,7 +21586,7 @@ class SameScaleConversionStrategy(ConversionStrategy): ...
 
 ### SameScaleConversionStrategy().convert
 
-[Show source in convert_size_distribution.py:97](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L97)
+[Show source in convert_size_distribution.py:99](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L99)
 
 Return the concentration unchanged, since no conversion is needed.
 
@@ -19276,7 +21612,7 @@ def convert(
 
 ## SizerConverter
 
-[Show source in convert_size_distribution.py:235](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L235)
+[Show source in convert_size_distribution.py:237](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L237)
 
 A converter that composes a ConversionStrategy to transform
 particle size distribution data between formats.
@@ -19306,7 +21642,7 @@ class SizerConverter:
 
 ### SizerConverter().convert
 
-[Show source in convert_size_distribution.py:260](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L260)
+[Show source in convert_size_distribution.py:262](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L262)
 
 Convert the particle size distribution data using the assigned
 strategy.
@@ -19334,7 +21670,7 @@ def convert(
 
 ## get_conversion_strategy
 
-[Show source in convert_size_distribution.py:282](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L282)
+[Show source in convert_size_distribution.py:284](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L284)
 
 Factory function to obtain a conversion strategy based on the input and
 output scales.
@@ -19378,7 +21714,7 @@ def get_conversion_strategy(
 
 ## get_distribution_in_dn
 
-[Show source in convert_size_distribution.py:344](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L344)
+[Show source in convert_size_distribution.py:346](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L346)
 
 Convert the sizer data between dn/dlogdp and d_num formats.
 
@@ -19403,7 +21739,7 @@ If inverse=True, it reverts:
 
 #### Examples
 
-``` py
+```py
 import numpy as np
 from particula.util.size_distribution_convert import convert_sizer_dn
 
@@ -19433,7 +21769,7 @@ def get_distribution_in_dn(
 
 ## get_pdf_distribution_in_pmf
 
-[Show source in convert_size_distribution.py:406](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L406)
+[Show source in convert_size_distribution.py:404](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L404)
 
 Convert the distribution data between a probability density function (PDF)
 and a probability mass spectrum (PMF).
@@ -19455,7 +21791,7 @@ The conversion uses:
 
 #### Examples
 
-``` py
+```py
 import numpy as np
 import particula as par
 x_vals = np.array([1.0, 2.0, 3.0])

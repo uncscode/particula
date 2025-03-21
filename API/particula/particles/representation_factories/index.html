@@ -1809,11 +1809,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy/" class="md-nav__link">
+      <a href="../../dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Trubulent Dns Coagulation Strategy
+    TurbulentDNSCoagulationStrategy
     
   </span>
   
@@ -3502,6 +3502,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -3533,6 +3551,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7380,6 +7407,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7411,6 +7456,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7460,19 +7514,23 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_factories.py">particula.particles.representation_factories</a> module.</p>
 </blockquote>
 <h2 id="particlerepresentationfactory">ParticleRepresentationFactory<a class="headerlink" href="#particlerepresentationfactory" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_factories.py#L17">Show source in representation_factories.py:17</a></p>
-<p>Factory class to create particle representation builders.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_factories.py#L20">Show source in representation_factories.py:20</a></p>
+<p>Factory for creating particle representation builders.</p>
 <h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
 <ul>
-<li>get_builders : Returns the mapping of strategy types to builder
-    instances.</li>
-<li>get_strategy : Gets the strategy instance for the specified strategy.<ul>
-<li>strategy_type : Type of particle representation strategy to use,
-    can be 'radius' (default) or 'mass'.</li>
-<li>parameters : Parameters required for
-    the builder</li>
+<li>get_builders : Return a dictionary of strategy builder instances.</li>
+<li>get_strategy : Obtain a ParticleRepresentation from a chosen builder.</li>
 </ul>
-</li>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Factory Usage Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleRepresentationFactory</span><span class="p">()</span>
+<span class="n">rep</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="s2">&quot;mass&quot;</span><span class="p">)</span>
+<span class="c1"># rep -&gt; ParticleRepresentation with mass-based distribution</span>
+</code></pre></div>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Builder Pattern,
+  <a href="https://en.wikipedia.org/wiki/Builder_pattern">Wikipedia</a>.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ParticleRepresentationFactory</span><span class="p">(</span>
@@ -7498,16 +7556,21 @@
 <li><a href="../representation_builders/#resolvedparticlemassrepresentationbuilder">ResolvedParticleMassRepresentationBuilder</a></li>
 </ul>
 <h3 id="particlerepresentationfactoryget_builders">ParticleRepresentationFactory().get_builders<a class="headerlink" href="#particlerepresentationfactoryget_builders" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_factories.py#L43">Show source in representation_factories.py:43</a></p>
-<p>Returns the mapping of strategy types to builder instances.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/representation_factories.py#L53">Show source in representation_factories.py:53</a></p>
+<p>Return a mapping of strategy types to builder instances.</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>A dictionary with the strategy types as keys and
-the builder instances as values.
-- 'mass' : MassParticleRepresentationBuilder
-- 'radius' : RadiusParticleRepresentationBuilder
-- 'preset_radius' : LimitedRadiusParticleBuilder
-- 'resolved_mass' : ResolvedMassParticleRepresentationBuilder
-- 'preset_resolved_mass' : PresetResolvedMassParticleBuilder</p>
+<ul>
+<li>A dictionary where each key is a strategy type
+  ("mass", "radius", etc.) and each value is the
+  corresponding builder instance.</li>
+</ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">get_builders usage</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">ParticleRepresentationFactory</span><span class="p">()</span>
+<span class="n">builders</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_builders</span><span class="p">()</span>
+<span class="n">mass_builder</span> <span class="o">=</span> <span class="n">builders</span><span class="p">[</span><span class="s2">&quot;mass&quot;</span><span class="p">]</span>
+<span class="c1"># mass_builder -&gt; ParticleMassRepresentationBuilder()</span>
+</code></pre></div>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
 </code></pre></div>

@@ -1662,9 +1662,36 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     <span class="md-ellipsis">
       Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
     </span>
   </a>
   
@@ -1697,6 +1724,15 @@
   
     <nav class="md-nav" aria-label="TurbulentShearCoagulationBuilder().build">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#signature_1" class="md-nav__link">
@@ -1931,11 +1967,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../coagulation_strategy/trubulent_dns_coagulation_strategy/" class="md-nav__link">
+      <a href="../../coagulation_strategy/turbulent_dns_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Trubulent Dns Coagulation Strategy
+    TurbulentDNSCoagulationStrategy
     
   </span>
   
@@ -7375,9 +7411,36 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     <span class="md-ellipsis">
       Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
     </span>
   </a>
   
@@ -7410,6 +7473,15 @@
   
     <nav class="md-nav" aria-label="TurbulentShearCoagulationBuilder().build">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#signature_1" class="md-nav__link">
@@ -7465,18 +7537,39 @@
 </blockquote>
 <h2 id="turbulentshearcoagulationbuilder_1">TurbulentShearCoagulationBuilder<a class="headerlink" href="#turbulentshearcoagulationbuilder_1" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_shear_coagulation_builder.py#L23">Show source in turbulent_shear_coagulation_builder.py:23</a></p>
-<p>Turbulent Shear Coagulation Builder class.</p>
-<p>This class is used to create coagulation strategies for turbulent shear
-coagulation. This provides a validation layer to ensure that the correct
-values are passed to the coagulation strategy.</p>
+<p>Turbulent shear coagulation builder.</p>
+<p>Creates a TurbulentShearCoagulationStrategy that calculates coagulation
+rates under turbulent flow conditions. Ensures the correct distribution
+type, turbulent dissipation, and fluid density values are provided.</p>
+<h4 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h4>
+<ul>
+<li>distribution_type : Type of the particle distribution
+  ("discrete", "continuous_pdf", or "particle_resolved").</li>
+<li>turbulent_dissipation : Turbulent energy dissipation rate (m²/s³).</li>
+<li>fluid_density : Fluid density (kg/m³) for the coagulation medium.</li>
+</ul>
 <h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>set_distribution_type(distribution_type)</code> - Set the distribution type.</li>
-<li><code>set_turbulent_dissipation(turbulent_dissipation)</code> - Set the turbulent
-    dissipation rate.</li>
-<li><code>set_fluid_density(fluid_density)</code> - Set the fluid density.</li>
-<li><code>build()</code> - Validate and return the TurbulentShearCoagulationStrategy
-    object.</li>
+<li>set_distribution_type : Set the distribution type.</li>
+<li>set_turbulent_dissipation : Set turbulent dissipation rate.</li>
+<li>set_fluid_density : Set fluid density.</li>
+<li>build : Validate parameters and return a
+  TurbulentShearCoagulationStrategy.</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Turbulent Shear Coagulation Builder Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">builder</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">TurbulentShearCoagulationBuilder</span><span class="p">()</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_turbulent_dissipation</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_fluid_density</span><span class="p">(</span><span class="mf">1000.</span><span class="p">)</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="c1"># Now &#39;strategy&#39; can be used to compute turbulent shear coagulation</span>
+<span class="c1"># rates.</span>
+</code></pre></div>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Saffman, P. G., &amp; Turner, J. S. (1956). "On the collision of drops
+  in turbulent clouds." J. Fluid Mech., 1, 16-30.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TurbulentShearCoagulationBuilder</span><span class="p">(</span>
@@ -7495,7 +7588,15 @@ values are passed to the coagulation strategy.</p>
 <li><a href="../coagulation_builder_mixin/#builderturbulentdissipationmixin">BuilderTurbulentDissipationMixin</a></li>
 </ul>
 <h3 id="turbulentshearcoagulationbuilderbuild">TurbulentShearCoagulationBuilder().build<a class="headerlink" href="#turbulentshearcoagulationbuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_shear_coagulation_builder.py#L55">Show source in turbulent_shear_coagulation_builder.py:55</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/turbulent_shear_coagulation_builder.py#L87">Show source in turbulent_shear_coagulation_builder.py:87</a></p>
+<p>Construct a TurbulentShearCoagulationStrategy.</p>
+<p>This method performs a final check to ensure all required parameters
+have been set. It then creates and returns an instance of
+TurbulentShearCoagulationStrategy.</p>
+<h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
+<ul>
+<li>The resulting turbulent shear coagulation strategy object.</li>
+</ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoagulationStrategyABC</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>

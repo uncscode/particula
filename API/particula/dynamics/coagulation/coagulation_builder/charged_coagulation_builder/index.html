@@ -1574,9 +1574,36 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     <span class="md-ellipsis">
       Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
     </span>
   </a>
   
@@ -1614,6 +1641,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -1991,11 +2027,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../coagulation_strategy/trubulent_dns_coagulation_strategy/" class="md-nav__link">
+      <a href="../../coagulation_strategy/turbulent_dns_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Trubulent Dns Coagulation Strategy
+    TurbulentDNSCoagulationStrategy
     
   </span>
   
@@ -7435,9 +7471,36 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#methods" class="md-nav__link">
     <span class="md-ellipsis">
       Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
     </span>
   </a>
   
@@ -7475,6 +7538,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7584,19 +7656,36 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py">particula.dynamics.coagulation.coagulation_builder.charged_coagulation_builder</a> module.</p>
 </blockquote>
 <h2 id="chargedcoagulationbuilder_1">ChargedCoagulationBuilder<a class="headerlink" href="#chargedcoagulationbuilder_1" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L23">Show source in charged_coagulation_builder.py:23</a></p>
-<p>Charged Coagulation Builder class for coagulation strategies.</p>
-<p>This class is used to create charged coagulation strategies based on the
-specified distribution type and kernel strategy. This provides a validation
-layer to ensure that the correct values are passed to the coagulation
-strategy.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L29">Show source in charged_coagulation_builder.py:29</a></p>
+<p>Charged Coagulation builder class.</p>
+<p>Creates a <code>ChargedCoagulationStrategy</code> based on a specified distribution
+type and a <code>ChargedKernelStrategyABC</code> instance, enforcing the correct
+parameters for modeling electrostatic interactions in aerosol coagulation.</p>
+<h4 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h4>
+<ul>
+<li>distribution_type : Distribution representation
+  ("discrete", "continuous_pdf", or "particle_resolved").</li>
+<li>charged_kernel_strategy : Instance of <code>ChargedKernelStrategyABC</code>
+  for electrostatic kernel calculations.</li>
+</ul>
 <h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>set_distribution_type(distribution_type)</code> - Set the distribution type.</li>
-<li><code>set_kernel_strategy(kernel_strategy)</code> - Set the kernel strategy.</li>
-<li><code>set_parameters(params)</code> - Set the parameters of the CoagulationStrategy
-    object from a dictionary including optional units.</li>
-<li><code>build()</code> - Validate and return the CoagulationStrategy object.</li>
+<li>set_distribution_type : Set the distribution type.</li>
+<li>set_charged_kernel_strategy : Set the charged kernel strategy.</li>
+<li>set_parameters : Configure parameters from a dictionary.</li>
+<li>build : Validate inputs and return a <code>ChargedCoagulationStrategy</code>.</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example of using ChargedCoagulationBuilder</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">builder</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedCoagulationBuilder</span><span class="p">()</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_charged_kernel_strategy</span><span class="p">(</span><span class="n">charged_kernel_strategy</span><span class="p">)</span>
+<span class="n">coagulation_strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+</code></pre></div>
+<h4 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Seinfeld, J. H., &amp; Pandis, S. N. (2016). "Atmospheric Chemistry
+  and Physics." Wiley.</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ChargedCoagulationBuilder</span><span class="p">(</span><span class="n">BuilderABC</span><span class="p">,</span> <span class="n">BuilderDistributionTypeMixin</span><span class="p">):</span>
@@ -7608,12 +7697,23 @@ strategy.</p>
 <li><a href="../coagulation_builder_mixin/#builderdistributiontypemixin">BuilderDistributionTypeMixin</a></li>
 </ul>
 <h3 id="chargedcoagulationbuilderbuild">ChargedCoagulationBuilder().build<a class="headerlink" href="#chargedcoagulationbuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L79">Show source in charged_coagulation_builder.py:79</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L107">Show source in charged_coagulation_builder.py:107</a></p>
 <p>Validate and return the ChargedCoagulationStrategy object.</p>
+<p>This method checks whether all required parameters have been
+specified (e.g., distribution type, charged kernel strategy)
+before creating a <code>ChargedCoagulationStrategy</code>.</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>CoagulationStrategy</code> - Instance of the CoagulationStrategy object.</li>
+<li>CoagulationStrategyABC : The properly configured
+  charged coagulation strategy.</li>
 </ul>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Example of using ChargedCoagulationBuilder build</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">builder</span> <span class="o">=</span> <span class="n">ChargedCoagulationBuilder</span><span class="p">()</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_charged_kernel_strategy</span><span class="p">(</span><span class="n">charged_kernel_strategy</span><span class="p">)</span>
+<span class="n">charged_strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+</code></pre></div>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoagulationStrategyABC</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
@@ -7622,14 +7722,19 @@ strategy.</p>
 <li><a href="../../coagulation_strategy/coagulation_strategy_abc/#coagulationstrategyabc">CoagulationStrategyABC</a></li>
 </ul>
 <h3 id="chargedcoagulationbuilderset_charged_kernel_strategy">ChargedCoagulationBuilder().set_charged_kernel_strategy<a class="headerlink" href="#chargedcoagulationbuilderset_charged_kernel_strategy" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L48">Show source in charged_coagulation_builder.py:48</a></p>
-<p>Set the kernel strategy.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/charged_coagulation_builder.py#L72">Show source in charged_coagulation_builder.py:72</a></p>
+<p>Set the charged kernel strategy for electrostatic coagulation.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
-<p>charged_kernel_strategy : The kernel strategy to be set.
-charged_kernel_strategy_units : Not used.</p>
+<ul>
+<li>charged_kernel_strategy : An instance of
+  <code>ChargedKernelStrategyABC</code>.</li>
+<li>charged_kernel_strategy_units : For interface consistency,
+  unused.</li>
+</ul>
 <h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>ValueError</code> - If the kernel strategy is not valid.</li>
+<li>ValueError : If the kernel strategy is invalid or units passed
+  are unsupported.</li>
 </ul>
 <h4 id="signature_2">Signature<a class="headerlink" href="#signature_2" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_charged_kernel_strategy</span><span class="p">(</span>

@@ -1809,11 +1809,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../dynamics/coagulation/coagulation_strategy/trubulent_dns_coagulation_strategy/" class="md-nav__link">
+      <a href="../../dynamics/coagulation/coagulation_strategy/turbulent_dns_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Trubulent Dns Coagulation Strategy
+    TurbulentDNSCoagulationStrategy
     
   </span>
   
@@ -3373,6 +3373,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
     </span>
   </a>
   
@@ -7416,6 +7425,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7515,22 +7533,27 @@
 </blockquote>
 <h2 id="get_particle_resolved_binned_radius">get_particle_resolved_binned_radius<a class="headerlink" href="#get_particle_resolved_binned_radius" title="Permanent link">&para;</a></h2>
 <p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/change_particle_representation.py#L18">Show source in change_particle_representation.py:18</a></p>
-<p>Get the binning for the for particle radius. Used in the kernel
-calculation.</p>
-<p>If the kernel radius is not set, it will be calculated based on the
-particle radius.</p>
+<p>Determine binned radii for kernel calculations.</p>
+<p>If bin_radius is provided, those edges are used directly. Otherwise,
+a log-spaced array is generated based on the particle's minimum and
+maximum radii and either a total number of bins or bins per radius
+decade.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li>particle : The particle for which the radius is to be binned.</li>
-<li>bin_radius : The radii for the particle [m].</li>
-<li>total_bins : The number of kernel bins for the particle
-    [dimensionless], if set, this will be used instead of
-    bins_per_radius_decade.</li>
-<li>bins_per_radius_decade : The number of kernel bins per decade
-    [dimensionless]. Not used if total_bins is set.</li>
+<li>particle : The ParticleRepresentation instance for radius binning.</li>
+<li>bin_radius : Optional array of radius bin edges in meters.</li>
+<li>total_bins : Exact number of bins to generate, if set.</li>
+<li>bins_per_radius_decade : Number of bins per decade of radius,
+  used only if total_bins is None.</li>
 </ul>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
-<p>The kernel radius for the particle [m].</p>
+<ul>
+<li>NDArray[np.float64] : The bin edges (radii) in meters.</li>
+</ul>
+<h4 id="raises">Raises<a class="headerlink" href="#raises" title="Permanent link">&para;</a></h4>
+<ul>
+<li>ValueError : If finite radii cannot be determined for binning.</li>
+</ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_particle_resolved_binned_radius</span><span class="p">(</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span>
@@ -7544,16 +7567,22 @@ particle radius.</p>
 <li><a href="../representation/#particlerepresentation">ParticleRepresentation</a></li>
 </ul>
 <h2 id="get_speciated_mass_representation_from_particle_resolved">get_speciated_mass_representation_from_particle_resolved<a class="headerlink" href="#get_speciated_mass_representation_from_particle_resolved" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/change_particle_representation.py#L77">Show source in change_particle_representation.py:77</a></p>
-<p>Converts a <code>ParticleResolvedSpeciatedMass</code> to a <code>SpeciatedMassMovingBin</code>
-by binning the mass of each species.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/particles/change_particle_representation.py#L80">Show source in change_particle_representation.py:80</a></p>
+<p>Convert a ParticleResolvedSpeciatedMass to a SpeciatedMassMovingBin.</p>
+<p>This function bins the mass and charge distributions for each species
+according to the provided bin_radius array, using median or mean
+values in each bin. The distribution_strategy is switched to
+SpeciatedMassMovingBin.</p>
 <h4 id="arguments_1">Arguments<a class="headerlink" href="#arguments_1" title="Permanent link">&para;</a></h4>
 <ul>
-<li>particle : The particle for which the mass is to be binned.</li>
-<li>bin_radius : The radii for the particle [m].</li>
+<li>particle : The ParticleRepresentation to convert.</li>
+<li>bin_radius : Array of radius bin edges in meters.</li>
 </ul>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
-<p>The particle representation with the binned mass.</p>
+<ul>
+<li>ParticleRepresentation : A new representation with binned
+  mass and concentration for each species.</li>
+</ul>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_speciated_mass_representation_from_particle_resolved</span><span class="p">(</span>
     <span class="n">particle</span><span class="p">:</span> <span class="n">ParticleRepresentation</span><span class="p">,</span> <span class="n">bin_radius</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>

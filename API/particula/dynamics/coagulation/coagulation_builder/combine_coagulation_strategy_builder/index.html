@@ -1627,6 +1627,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -1658,6 +1676,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -1700,6 +1727,15 @@
   <a href="#arguments" class="md-nav__link">
     <span class="md-ellipsis">
       Arguments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -1982,11 +2018,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../coagulation_strategy/trubulent_dns_coagulation_strategy/" class="md-nav__link">
+      <a href="../../coagulation_strategy/turbulent_dns_coagulation_strategy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Trubulent Dns Coagulation Strategy
+    TurbulentDNSCoagulationStrategy
     
   </span>
   
@@ -7435,6 +7471,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#signature" class="md-nav__link">
     <span class="md-ellipsis">
       Signature
@@ -7466,6 +7520,15 @@
   <a href="#returns" class="md-nav__link">
     <span class="md-ellipsis">
       Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7508,6 +7571,15 @@
   <a href="#arguments" class="md-nav__link">
     <span class="md-ellipsis">
       Arguments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Examples
     </span>
   </a>
   
@@ -7566,11 +7638,28 @@
 <p>Auto-generated documentation for <a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py">particula.dynamics.coagulation.coagulation_builder.combine_coagulation_strategy_builder</a> module.</p>
 </blockquote>
 <h2 id="combinecoagulationstrategybuilder_1">CombineCoagulationStrategyBuilder<a class="headerlink" href="#combinecoagulationstrategybuilder_1" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L22">Show source in combine_coagulation_strategy_builder.py:22</a></p>
-<p>Builder used to create a CombineCoagulationStrategy object.</p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L27">Show source in combine_coagulation_strategy_builder.py:27</a></p>
+<p>Builder for a combined coagulation strategy.</p>
+<p>This class constructs a <code>CombineCoagulationStrategy</code> from multiple
+sub-strategies (instances of <code>CoagulationStrategyABC</code>), enabling
+advanced modeling scenarios where different coagulation mechanisms
+act concurrently. Each sub-strategy's rate calculations are effectively
+merged to act on the same particle population.</p>
 <h4 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h4>
-<p>strategies (List[CoagulationStrategyABC]):
-    Collection of CoagulationStrategyABC objects to be combined.</p>
+<ul>
+<li>strategies : List of <code>CoagulationStrategyABC</code> objects to combine.</li>
+</ul>
+<h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
+<ul>
+<li>set_strategies : Set the list of coagulation strategies to combine.</li>
+<li>build : Create and return the combined coagulation strategy.</li>
+</ul>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Combine Coagulation Strategy Example</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="n">builder</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CombineCoagulationStrategyBuilder</span><span class="p">()</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_strategies</span><span class="p">([</span><span class="n">brownian_strategy</span><span class="p">,</span> <span class="n">turbulent_strategy</span><span class="p">])</span>
+<span class="n">combined_strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+</code></pre></div>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CombineCoagulationStrategyBuilder</span><span class="p">(</span><span class="n">BuilderABC</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
@@ -7580,12 +7669,17 @@
 <li><a href="../../../../abc_builder/#builderabc">BuilderABC</a></li>
 </ul>
 <h3 id="combinecoagulationstrategybuilderbuild">CombineCoagulationStrategyBuilder().build<a class="headerlink" href="#combinecoagulationstrategybuilderbuild" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L59">Show source in combine_coagulation_strategy_builder.py:59</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L98">Show source in combine_coagulation_strategy_builder.py:98</a></p>
 <p>Builds and returns the combined coagulation strategy.</p>
 <h4 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h4>
 <p>CombineCoagulationStrategy :
     A strategy that combines all the previously added
     sub-strategies.</p>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Build Example with CombineCoagulationStrategy</span><pre><span></span><code><span class="n">combined_strategy</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="c1"># Now you can use `combined_strategy.kernel(...)` to calculate</span>
+<span class="c1"># combined coagulation effects from each sub-strategy.</span>
+</code></pre></div>
 <h4 id="signature_1">Signature<a class="headerlink" href="#signature_1" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CombineCoagulationStrategy</span><span class="p">:</span> <span class="o">...</span>
 </code></pre></div>
@@ -7594,11 +7688,15 @@
 <li><a href="../../coagulation_strategy/combine_coagulation_strategy/#combinecoagulationstrategy">CombineCoagulationStrategy</a></li>
 </ul>
 <h3 id="combinecoagulationstrategybuilderset_strategies">CombineCoagulationStrategyBuilder().set_strategies<a class="headerlink" href="#combinecoagulationstrategybuilderset_strategies" title="Permanent link">&para;</a></h3>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L36">Show source in combine_coagulation_strategy_builder.py:36</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/coagulation/coagulation_builder/combine_coagulation_strategy_builder.py#L69">Show source in combine_coagulation_strategy_builder.py:69</a></p>
 <p>Sets a list of CoagulationStrategyABC objects to be combined.</p>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <p>strategies : A list of coagulation strategies to be combined.
 strategies_units : For interface consistency, not used.</p>
+<h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><span class="filename">Set Strategies Example</span><pre><span></span><code><span class="n">builder</span> <span class="o">=</span> <span class="n">CombineCoagulationStrategyBuilder</span><span class="p">()</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">set_strategies</span><span class="p">([</span><span class="n">brownian_strategy</span><span class="p">,</span> <span class="n">turbulent_strategy</span><span class="p">])</span>
+</code></pre></div>
 <h4 id="returns_1">Returns<a class="headerlink" href="#returns_1" title="Permanent link">&para;</a></h4>
 <p>CombineCoagulationStrategyBuilder:
     The builder instance, for fluent chaining.</p>
