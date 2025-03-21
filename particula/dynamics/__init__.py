@@ -34,10 +34,12 @@ from particula.dynamics.condensation.condensation_strategies import (
     CondensationIsothermal,
 )
 from particula.dynamics.condensation.mass_transfer import (
-    mass_transfer_rate,
-    first_order_mass_transport_k,
-    radius_transfer_rate,
-    calculate_mass_transfer,
+    get_mass_transfer_rate,
+    get_first_order_mass_transport_k,
+    get_radius_transfer_rate,
+    get_mass_transfer,
+    get_mass_transfer_of_single_species,
+    get_mass_transfer_of_multiple_species,
 )
 
 # particula.dynamics.coagulation

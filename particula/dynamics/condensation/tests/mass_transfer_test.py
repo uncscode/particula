@@ -2,12 +2,12 @@
 
 import numpy as np
 from particula.dynamics.condensation.mass_transfer import (
-    first_order_mass_transport_k,
-    mass_transfer_rate,
-    calculate_mass_transfer,
-    calculate_mass_transfer_single_species,
-    calculate_mass_transfer_multiple_species,
-    radius_transfer_rate,  # Import the function to be tested
+    get_first_order_mass_transport_k,
+    get_mass_transfer_rate,
+    get_mass_transfer,
+    get_mass_transfer_of_single_species,
+    get_mass_transfer_of_multiple_species,
+    get_radius_transfer_rate,  # Import the function to be tested
 )
 
 
@@ -17,7 +17,7 @@ def test_first_order_mass_transport_k():
     vapor_transition = 0.6
     diffusion_coefficient = 2e-9
     expected_result = 1.5079644737231005e-14
-    result = first_order_mass_transport_k(
+    result = get_first_order_mass_transport_k(
         radius, vapor_transition, diffusion_coefficient
     )
     np.testing.assert_allclose(result, expected_result, rtol=1e-8)
@@ -31,7 +31,7 @@ def test_multi_radius_first_order_mass_transport_k():
     expected_result = np.array(
         [1.50796447e-14, 3.01592895e-14, 4.52389342e-14]
     )
-    result = first_order_mass_transport_k(
+    result = get_first_order_mass_transport_k(
         radius, vapor_transition, diffusion_coefficient
     )
     np.testing.assert_allclose(result, expected_result, rtol=1e-8)
@@ -44,7 +44,7 @@ def test_mass_transfer_rate():
     temperature = 300.0
     molar_mass = 0.02897
     expected_result = 1.16143004e-21
-    result = mass_transfer_rate(
+    result = get_mass_transfer_rate(
         pressure_delta, first_order_mass_transport, temperature, molar_mass
     )
     assert np.isclose(
@@ -60,7 +60,7 @@ def test_mass_transfer_mulit_particle_rate():
     temperature = 300.0
     molar_mass = 0.02897
     expected_result = np.array([1.16143004e-21, 3.48429013e-21])
-    result = mass_transfer_rate(
+    result = get_mass_transfer_rate(
         pressure_delta, first_order_mass_transport, temperature, molar_mass
     )
     np.testing.assert_allclose(result, expected_result, rtol=1e-8)
@@ -73,7 +73,7 @@ def test_multi_species_mass_transfer_rate():
     temperature = 300.0
     molar_mass = np.array([0.02897, 0.018015])
     expected_result = np.array([1.16143004e-21, 2.16670648e-21])
-    result = mass_transfer_rate(
+    result = get_mass_transfer_rate(
         pressure_delta, first_order_mass_transport, temperature, molar_mass
     )
     np.testing.assert_allclose(result, expected_result, rtol=1e-8)
@@ -104,14 +104,14 @@ def test_single_species_condensation_not_enough_gas_mass():
     expected_mass_transfer = total_mass_to_change * scaling_factor
 
     # Calculate using the direct single species function
-    result_direct = calculate_mass_transfer_single_species(
+    result_direct = get_mass_transfer_of_single_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
     np.testing.assert_allclose(
         result_direct, expected_mass_transfer, rtol=1e-8
     )
     # second calc
-    result_direct2 = calculate_mass_transfer_single_species(
+    result_direct2 = get_mass_transfer_of_single_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
     np.testing.assert_allclose(
@@ -119,7 +119,7 @@ def test_single_species_condensation_not_enough_gas_mass():
     )
 
     # Calculate using the general helper function
-    result = calculate_mass_transfer(
+    result = get_mass_transfer(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
     np.testing.assert_allclose(result, expected_mass_transfer, rtol=1e-8)
@@ -140,14 +140,14 @@ def test_single_species_evaporation_not_enough_particle_mass():
     # However, the transfer is limited by available particle mass: [-0.8, -1.5]
     expected_mass_transfer = np.array([-0.8, -1.5])
 
-    result_direct = calculate_mass_transfer_single_species(
+    result_direct = get_mass_transfer_of_single_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
     np.testing.assert_allclose(
         result_direct, expected_mass_transfer, rtol=1e-8
     )
 
-    result = calculate_mass_transfer(
+    result = get_mass_transfer(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
     np.testing.assert_allclose(result, expected_mass_transfer, rtol=1e-8)
@@ -191,7 +191,7 @@ def test_multiple_species_condensation():
     expected_mass_transfer = mass_to_change * scaling_factor
 
     # Test the direct multiple species function
-    result_direct = calculate_mass_transfer_multiple_species(
+    result_direct = get_mass_transfer_of_multiple_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
     # Check that the total mass transfer for each gas species is equal to the
@@ -203,7 +203,7 @@ def test_multiple_species_condensation():
     )
 
     # Test the general helper function
-    result = calculate_mass_transfer(
+    result = get_mass_transfer(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
     np.testing.assert_allclose(result, expected_mass_transfer, rtol=1e-8)
@@ -245,7 +245,7 @@ def test_multiple_species_evaporation_not_enough_particle_mass():
     )
 
     # Test the direct multiple species function
-    result_direct = calculate_mass_transfer_multiple_species(
+    result_direct = get_mass_transfer_of_multiple_species(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
     # Check the individual mass transfer for each particle and species
@@ -259,7 +259,7 @@ def test_multiple_species_evaporation_not_enough_particle_mass():
     )
 
     # Test the general helper function
-    result = calculate_mass_transfer(
+    result = get_mass_transfer(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
     np.testing.assert_allclose(result, expected_mass_transfer, rtol=1e-8)
@@ -275,7 +275,7 @@ def test_zero_mass_transfer():
 
     expected_mass_transfer = np.array([0.0])  # No mass transfer should occur
 
-    result = calculate_mass_transfer(
+    result = get_mass_transfer(
         mass_rate, time_step, gas_mass, particle_mass, particle_concentration
     )
     np.testing.assert_array_almost_equal(result, expected_mass_transfer)
@@ -284,18 +284,18 @@ def test_zero_mass_transfer():
 def test_radius_transfer_rate():
     """Test the radius_transfer_rate function."""
     # Test normal case
-    result = radius_transfer_rate(1e-21, 1e-6, 1000)
+    result = get_radius_transfer_rate(1e-21, 1e-6, 1000)
     np.testing.assert_allclose(result, 7.95774715e-14, atol=1e-8)
 
     # Test edge cases
-    np.testing.assert_allclose(radius_transfer_rate(0, 1e-6, 1000), 0)
+    np.testing.assert_allclose(get_radius_transfer_rate(0, 1e-6, 1000), 0)
 
     # Test with array inputs
     mass_rate = np.array([1e-21, 2e-21])  # kg/s
     radius = np.array([1e-6, 2e-6])  # m
     density = 1000  # kg/m^3
     expected_result = np.array([7.95774715e-14, 1.98943679e-14])  # m/s
-    result = radius_transfer_rate(mass_rate, radius, density)
+    result = get_radius_transfer_rate(mass_rate, radius, density)
     np.testing.assert_allclose(result, expected_result, atol=1e-8)
 
     # Test with zero mass rate
@@ -303,5 +303,5 @@ def test_radius_transfer_rate():
     radius = np.array([1e-6, 2e-6])  # m
     density = 1000  # kg/m^3
     expected_result = np.array([7.95774715e-14, 0])  # m/s
-    result = radius_transfer_rate(mass_rate, radius, density)
+    result = get_radius_transfer_rate(mass_rate, radius, density)
     np.testing.assert_allclose(result, expected_result, atol=1e-8)

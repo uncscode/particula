@@ -37,7 +37,7 @@ from particula.util.validate_inputs import validate_inputs
         "radius": "nonnegative",
     }
 )
-def first_order_mass_transport_k(
+def get_first_order_mass_transport_k(
     radius: Union[float, NDArray[np.float64]],
     vapor_transition: Union[float, NDArray[np.float64]],
     diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-5,
@@ -65,7 +65,8 @@ def first_order_mass_transport_k(
 
     Examples:
         ```py title="Float input"
-        first_order_mass_transport_k(
+        import particula as par
+        par.dynamics.get_first_order_mass_transport_k(
             radius=1e-6,
             vapor_transition=0.6,
             diffusion_coefficient=2e-9
@@ -74,7 +75,8 @@ def first_order_mass_transport_k(
         ```
 
         ```py title="Array input"
-        first_order_mass_transport_k(
+        import particula as par
+        par.dynamics.get_first_order_mass_transport_k(
             radius=np.array([1e-6, 2e-6]),
             vapor_transition=np.array([0.6, 0.6]),
             diffusion_coefficient=2e-9
@@ -104,7 +106,7 @@ def first_order_mass_transport_k(
         "molar_mass": "positive",
     }
 )
-def mass_transfer_rate(
+def get_mass_transfer_rate(
     pressure_delta: Union[float, NDArray[np.float64]],
     first_order_mass_transport: Union[float, NDArray[np.float64]],
     temperature: Union[float, NDArray[np.float64]],
@@ -136,7 +138,8 @@ def mass_transfer_rate(
 
     Examples:
         ```py title="Single value input"
-        mass_transfer_rate(
+        import particula as par
+        par.dynamics.mass_transfer_rate(
             pressure_delta=10.0,
             first_order_mass_transport=1e-17,
             temperature=300.0,
@@ -146,7 +149,8 @@ def mass_transfer_rate(
         ```
 
         ```py title="Array input"
-        mass_transfer_rate(
+        import particula as par
+        par.dynamics.mass_transfer_rate(
             pressure_delta=np.array([10.0, 15.0]),
             first_order_mass_transport=np.array([1e-17, 2e-17]),
             temperature=300.0,
@@ -172,7 +176,7 @@ def mass_transfer_rate(
 @validate_inputs(
     {"mass_rate": "finite", "radius": "nonnegative", "density": "positive"}
 )
-def radius_transfer_rate(
+def get_radius_transfer_rate(
     mass_rate: Union[float, NDArray[np.float64]],
     radius: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
@@ -199,7 +203,8 @@ def radius_transfer_rate(
 
     Examples:
         ```py title="Single value input"
-        radius_transfer_rate(
+        import particula as par
+        par.dynamics.radius_transfer_rate(
             mass_rate=1e-21,
             radius=1e-6,
             density=1000
@@ -208,7 +213,8 @@ def radius_transfer_rate(
         ```
 
         ```py title="Array input"
-        radius_transfer_rate(
+        import particula as par
+        par.dynamics.radius_transfer_rate(
             mass_rate=np.array([1e-21, 2e-21]),
             radius=np.array([1e-6, 2e-6]),
             density=1000
@@ -230,7 +236,7 @@ def radius_transfer_rate(
         "particle_concentration": "nonnegative",
     }
 )
-def calculate_mass_transfer(
+def get_mass_transfer(
     mass_rate: NDArray[np.float64],
     time_step: float,
     gas_mass: NDArray[np.float64],
@@ -259,7 +265,8 @@ def calculate_mass_transfer(
 
     Examples:
         ```py title="Single species input"
-        calculate_mass_transfer(
+        import particula as par
+        par.dynamics.get_mass_transfer(
             mass_rate=np.array([0.1, 0.5]),
             time_step=10,
             gas_mass=np.array([0.5]),
@@ -269,7 +276,8 @@ def calculate_mass_transfer(
         ```
 
         ```py title="Multiple species input"
-        calculate_mass_transfer(
+        import particula as par
+        par.dynamics.get_mass_transfer(
             mass_rate=np.array([[0.1, 0.05, 0.03], [0.2, 0.15, 0.07]]),
             time_step=10,
             gas_mass=np.array([1.0, 0.8, 0.5]),
@@ -279,7 +287,7 @@ def calculate_mass_transfer(
         ```
     """
     if gas_mass.size == 1:  # Single species case
-        return calculate_mass_transfer_single_species(
+        return get_mass_transfer_of_single_species(
             mass_rate,
             time_step,
             gas_mass,
@@ -287,7 +295,7 @@ def calculate_mass_transfer(
             particle_concentration,
         )
     # Multiple species case
-    return calculate_mass_transfer_multiple_species(
+    return get_mass_transfer_of_multiple_species(
         mass_rate,
         time_step,
         gas_mass,
@@ -305,7 +313,7 @@ def calculate_mass_transfer(
         "particle_concentration": "nonnegative",
     }
 )
-def calculate_mass_transfer_single_species(
+def get_mass_transfer_of_single_species(
     mass_rate: NDArray[np.float64],
     time_step: float,
     gas_mass: NDArray[np.float64],
@@ -336,7 +344,8 @@ def calculate_mass_transfer_single_species(
 
     Examples:
         ```py title="Single species input"
-        calculate_mass_transfer_single_species(
+        import particula as par
+        par.dynamics.get_mass_transfer_of_single_species(
             mass_rate=np.array([0.1, 0.5]),
             time_step=10,
             gas_mass=np.array([0.5]),
@@ -379,7 +388,7 @@ def calculate_mass_transfer_single_species(
         "particle_concentration": "nonnegative",
     }
 )
-def calculate_mass_transfer_multiple_species(
+def get_mass_transfer_of_multiple_species(
     mass_rate: NDArray[np.float64],
     time_step: float,
     gas_mass: NDArray[np.float64],
@@ -411,7 +420,8 @@ def calculate_mass_transfer_multiple_species(
 
     Examples:
         ```py title="Multiple species input"
-        calculate_mass_transfer_multiple_species(
+        import particula as par
+        par.dynamics.get_mass_transfer_of_multiple_species(
             mass_rate=np.array([[0.1, 0.05, 0.03], [0.2, 0.15, 0.07]]),
             time_step=10,
             gas_mass=np.array([1.0, 0.8, 0.5]),
