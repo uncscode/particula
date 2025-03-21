@@ -15,7 +15,7 @@ import logging
 from particula.abc_builder import BuilderABC
 
 from particula.util.validate_inputs import validate_inputs
-from particula.util.converting.convert_units import get_unit_conversion
+from particula.util.convert_units import get_unit_conversion
 
 from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,

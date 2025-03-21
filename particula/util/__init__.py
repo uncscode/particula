@@ -29,7 +29,7 @@ from particula.util.converting.convert_dtypes import (
     get_shape_check,
     get_values_of_dict,
 )
-from particula.util.converting.convert_units import (
+from particula.util.convert_units import (
     get_unit_conversion,
 )
 from particula.util.colors import (

@@ -3,7 +3,7 @@ Tests for Converting Units
 """
 
 import unittest
-from particula.util.converting.convert_units import get_unit_conversion
+from particula.util.convert_units import get_unit_conversion
 
 # flake8: noqa
 try:
