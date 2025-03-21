@@ -52,6 +52,8 @@ class TestCondensationIsothermal(unittest.TestCase):
         """Test the first order mass transport call."""
         radius = 1e-9  # m
         result = self.strategy.first_order_mass_transport(
-            radius=radius, temperature=self.temperature, pressure=self.pressure
+            particle_radius=radius,
+            temperature=self.temperature,
+            pressure=self.pressure,
         )
         self.assertIsNotNone(result)

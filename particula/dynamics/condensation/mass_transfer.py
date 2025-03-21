@@ -67,7 +67,7 @@ def get_first_order_mass_transport_k(
         ```py title="Float input"
         import particula as par
         par.dynamics.get_first_order_mass_transport_k(
-            radius=1e-6,
+            particle_radius=1e-6,
             vapor_transition=0.6,
             diffusion_coefficient=2e-9
         )
@@ -77,7 +77,7 @@ def get_first_order_mass_transport_k(
         ```py title="Array input"
         import particula as par
         par.dynamics.get_first_order_mass_transport_k(
-            radius=np.array([1e-6, 2e-6]),
+            particle_radius=np.array([1e-6, 2e-6]),
             vapor_transition=np.array([0.6, 0.6]),
             diffusion_coefficient=2e-9
         )
