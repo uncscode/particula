@@ -108,6 +108,10 @@ A full list of [Particula](https://github.com/uncscode/particula) project module
             - [Aerodynamic Mobility Module](particula/particles/properties/aerodynamic_mobility_module.md#aerodynamic-mobility-module)
             - [Aerodynamic Size](particula/particles/properties/aerodynamic_size.md#aerodynamic-size)
             - [Collision Radius Module](particula/particles/properties/collision_radius_module.md#collision-radius-module)
+            - [Convert Kappa Volumes](particula/particles/properties/convert_kappa_volumes.md#convert-kappa-volumes)
+            - [Convert Mass Concentration](particula/particles/properties/convert_mass_concentration.md#convert-mass-concentration)
+            - [Convert Mole Fraction](particula/particles/properties/convert_mole_fraction.md#convert-mole-fraction)
+            - [Convert Size Distribution](particula/particles/properties/convert_size_distribution.md#convert-size-distribution)
             - [Coulomb Enhancement](particula/particles/properties/coulomb_enhancement.md#coulomb-enhancement)
             - [Diffusion Coefficient](particula/particles/properties/diffusion_coefficient.md#diffusion-coefficient)
             - [Diffusive Knudsen Module](particula/particles/properties/diffusive_knudsen_module.md#diffusive-knudsen-module)
@@ -135,13 +139,8 @@ A full list of [Particula](https://github.com/uncscode/particula) project module
         - [Arbitrary Round](particula/util/arbitrary_round.md#arbitrary-round)
         - [Colors](particula/util/colors.md#colors)
         - [Constants](particula/util/constants.md#constants)
-        - [Converting](particula/util/converting/index.md#converting)
-            - [Convert Dtypes](particula/util/converting/convert_dtypes.md#convert-dtypes)
-            - [Convert Kappa Volumes](particula/util/converting/convert_kappa_volumes.md#convert-kappa-volumes)
-            - [Convert Mass Concentration](particula/util/converting/convert_mass_concentration.md#convert-mass-concentration)
-            - [Convert Mole Fraction](particula/util/converting/convert_mole_fraction.md#convert-mole-fraction)
-            - [Convert Size Distribution](particula/util/converting/convert_size_distribution.md#convert-size-distribution)
-            - [Convert Units](particula/util/converting/convert_units.md#convert-units)
+        - [Convert Dtypes](particula/util/convert_dtypes.md#convert-dtypes)
+        - [Convert Units](particula/util/convert_units.md#convert-units)
         - [Lf2013 Coagulation](particula/util/lf2013_coagulation/index.md#lf2013-coagulation)
             - [Src Lf2013 Coagulation](particula/util/lf2013_coagulation/src_lf2013_coagulation.md#src-lf2013-coagulation)
         - [Machine Limit](particula/util/machine_limit.md#machine-limit)
@@ -16689,6 +16688,923 @@ def get_collision_radius_wq2022_rg_df_k0_a13(
 
 
 ---
+# convert_kappa_volumes.md
+
+# Convert Kappa Volumes
+
+[Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Convert Kappa Volumes
+
+> Auto-generated documentation for [particula.particles.properties.convert_kappa_volumes](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_kappa_volumes.py) module.
+
+## get_kappa_from_volumes
+
+[Show source in convert_kappa_volumes.py:108](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_kappa_volumes.py#L108)
+
+Compute the κ parameter from known volumes of solute and water, given
+water activity.
+
+Rearranging κ-Köhler-based relationships, we have:
+- κ = ( (1/aw) - 1 ) × (V_water / V_solute).
+
+#### Arguments
+
+- volume_solute : Solute volume (float or NDArray).
+- volume_water : Water volume (float or NDArray).
+- water_activity : Water activity (float or NDArray, 0 < aw ≤ 1).
+
+#### Returns
+
+- The kappa parameter (float or NDArray).
+
+#### Examples
+
+``` py
+import particula as par
+kappa_val = par.get_kappa_from_volumes(1e-19, 4e-19, 0.95)
+print(kappa_val)
+# ~indicative value for the solute's hygroscopicity
+```
+
+#### References
+
+- Petters, M. D. & Kreidenweis, S. M. (2007). "A single parameter
+  representation of hygroscopic growth and cloud condensation nucleus
+  activity." Atmos. Chem. Phys.
+
+#### Signature
+
+```python
+def get_kappa_from_volumes(
+    volume_solute: Union[float, np.ndarray],
+    volume_water: Union[float, np.ndarray],
+    water_activity: Union[float, np.ndarray],
+) -> Union[float, np.ndarray]: ...
+```
+
+
+
+## get_solute_volume_from_kappa
+
+[Show source in convert_kappa_volumes.py:19](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_kappa_volumes.py#L19)
+
+Calculate the solute volume from the total solution volume using κ-Köhler
+theory.
+
+The relation for κ-Köhler can be written as:
+- V_solute = V_total × F
+  where F depends on kappa and water activity (aw), ensuring that
+  for aw → 0, V_solute → V_total.
+
+#### Arguments
+
+- volume_total : Volume of the total solution (float or NDArray).
+- kappa : Kappa parameter (float or NDArray).
+- water_activity : Water activity (float or NDArray, 0 < aw ≤ 1).
+
+#### Returns
+
+- Solute volume (float or NDArray).
+
+#### Examples
+
+``` py  title="Example Usage"
+import particula as par
+v_sol = par.get_solute_from_kappa_volume(1e-18, 0.8, 0.9)
+print(v_sol)
+# ~some fraction of the total volume
+```
+
+#### References
+
+- Petters, M. D. & Kreidenweis, S. M. (2007). "A single parameter
+  representation of hygroscopic growth and cloud condensation nucleus
+  activity." Atmos. Chem. Phys.
+
+#### Signature
+
+```python
+def get_solute_volume_from_kappa(
+    volume_total: Union[float, np.ndarray],
+    kappa: Union[float, np.ndarray],
+    water_activity: Union[float, np.ndarray],
+) -> Union[float, np.ndarray]: ...
+```
+
+
+
+## get_water_volume_from_kappa
+
+[Show source in convert_kappa_volumes.py:65](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_kappa_volumes.py#L65)
+
+Calculate the water volume from the solute volume, κ parameter, and water
+activity.
+
+This uses κ-Köhler-type relations where:
+- V_water = V_solute × ( κ / (1/aw - 1) ), ensuring that for aw → 0,
+  V_water → 0.
+
+#### Arguments
+
+- volume_solute : Volume of solute (float or NDArray).
+- kappa : Kappa parameter (float or NDArray).
+- water_activity : Water activity (float or NDArray, 0 < aw ≤ 1).
+
+#### Returns
+
+- Water volume (float or NDArray).
+
+#### Examples
+
+``` py title="Example Usage"
+import particula as par
+v_water = par.get_water_volume_from_kappa(1e-19, 0.5, 0.95)
+print(v_water)
+# ~some fraction of the solute volume
+```
+
+#### References
+
+- Petters, M. D. & Kreidenweis, S. M. (2007). "A single parameter
+  representation of hygroscopic growth and cloud condensation nucleus
+  activity." Atmos. Chem. Phys.
+
+#### Signature
+
+```python
+def get_water_volume_from_kappa(
+    volume_solute: Union[float, NDArray[np.float64]],
+    kappa: Union[float, NDArray[np.float64]],
+    water_activity: Union[float, NDArray[np.float64]],
+) -> Union[float, NDArray[np.float64]]: ...
+```
+
+
+
+## get_water_volume_in_mixture
+
+[Show source in convert_kappa_volumes.py:149](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_kappa_volumes.py#L149)
+
+Calculate the water volume in a solute-water mixture from a specified water
+volume fraction.
+
+The relationship is:
+
+- V_water = (φ_water × V_solute_dry) / (1 - φ_water)
+    - φ_water is the water volume fraction.
+
+#### Arguments
+
+- volume_solute_dry : Volume of the solute (float), excluding water.
+- volume_fraction_water : Fraction of water volume in the total mixture
+  (float, 0 ≤ φ_water < 1).
+
+#### Returns
+
+- The water volume (float), in the same units as volume_solute_dry.
+
+#### Examples
+
+``` py title="Example Usage"
+import particula as par
+v_water = par.get_water_volume_in_mixture(100.0, 0.8)
+print(v_water)
+# 400.0
+```
+
+#### References
+
+- "Volume Fractions in Mixture Calculations," Standard Chemistry Texts.
+
+#### Signature
+
+```python
+def get_water_volume_in_mixture(
+    volume_solute_dry: Union[float, np.ndarray],
+    volume_fraction_water: Union[float, np.ndarray],
+) -> float: ...
+```
+
+
+---
+# convert_mass_concentration.md
+
+# Convert Mass Concentration
+
+[Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Convert Mass Concentration
+
+> Auto-generated documentation for [particula.particles.properties.convert_mass_concentration](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_mass_concentration.py) module.
+
+## get_mass_fraction_from_mass
+
+[Show source in convert_mass_concentration.py:165](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_mass_concentration.py#L165)
+
+Convert mass concentrations to mass fractions for N components.
+
+The mass fraction is computed by:
+
+- wᵢ = mᵢ / mₜₒₜₐₗ
+    - wᵢ is the mass fraction of component i (unitless),
+    - mᵢ is the mass concentration of component i (kg/m³),
+    - mₜₒₜₐₗ is the total mass concentration of all components (kg/m³).
+
+#### Arguments
+
+- mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
+
+#### Returns
+
+- Mass fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
+  mass fractions if input is 1D.
+
+#### Examples
+
+```py
+import numpy as np
+import particula as par
+
+mass_conc = np.array([10.0, 30.0, 60.0])  # kg/m³
+par.get_mass_fraction(mass_conc)
+# Output might be array([0.1, 0.3, 0.6])
+```
+
+#### References
+
+- Wikipedia contributors, "Mass fraction (chemistry)," Wikipedia,
+  https://en.wikipedia.org/wiki/Mass_fraction_(chemistry).
+
+#### Signature
+
+```python
+@validate_inputs({"mass_concentrations": "nonnegative"})
+def get_mass_fraction_from_mass(
+    mass_concentrations: NDArray[np.float64],
+) -> NDArray[np.float64]: ...
+```
+
+
+
+## get_mole_fraction_from_mass
+
+[Show source in convert_mass_concentration.py:9](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_mass_concentration.py#L9)
+
+Convert mass concentrations to mole fractions for N components.
+
+The mole fraction is computed using:
+
+- xᵢ = (mᵢ / Mᵢ) / Σⱼ(mⱼ / Mⱼ)
+    - xᵢ is the mole fraction of component i,
+    - mᵢ is the mass concentration of component i (kg/m³),
+    - Mᵢ is the molar mass of component i (kg/mol).
+
+#### Arguments
+
+- mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
+- molar_masses : Molar masses (kg/mol). Must match dimensions of
+  mass_concentrations.
+
+#### Returns
+
+- Mole fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
+  mole fractions if input is 1D.
+
+#### Examples
+
+```py
+import numpy as np
+import particula as par
+mass_conc = np.array([0.2, 0.8])  # kg/m³
+mol_masses = np.array([0.018, 0.032])  # kg/mol
+get_mole_fraction_from_mass(mass_conc, mol_masses))
+# Output might be array([0.379..., 0.620...])
+```
+
+#### References
+
+- Wikipedia contributors, "Mole fraction," Wikipedia,
+  https://en.wikipedia.org/wiki/Mole_fraction.
+
+#### Signature
+
+```python
+@validate_inputs({"mass_concentrations": "nonnegative", "molar_masses": "positive"})
+def get_mole_fraction_from_mass(
+    mass_concentrations: NDArray[np.float64], molar_masses: NDArray[np.float64]
+) -> NDArray[np.float64]: ...
+```
+
+
+
+## get_volume_fraction_from_mass
+
+[Show source in convert_mass_concentration.py:84](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_mass_concentration.py#L84)
+
+Convert mass concentrations to volume fractions for N components.
+
+The volume fraction is determined by:
+
+- ϕᵢ = vᵢ / vₜₒₜₐₗ
+    - ϕᵢ is the volume fraction of component i (unitless),
+    - vᵢ is the volume of component i (m³),
+    - vₜₒₜₐₗ is the total volume of all components (m³).
+
+Volumes computed from mass concentration (mᵢ) and density (ρᵢ) using:
+- vᵢ = mᵢ / ρᵢ.
+
+#### Arguments
+
+- mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
+- densities : Densities (kg/m³). Must match the shape of
+  mass_concentrations.
+
+#### Returns
+
+- Volume fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
+  volume fractions if input is 1D.
+
+#### Examples
+
+```py
+import numpy as np
+import particula as par
+
+mass_conc = np.array([[1.0, 2.0], [0.5, 0.5]])  # kg/m³
+dens = np.array([1000.0, 800.0])               # kg/m³
+par.get_volume_fraction_from_mass(mass_conc, dens))
+# Output:
+# array([[0.444..., 0.555...],
+#        [0.5     , 0.5     ]])
+```
+
+#### References
+
+- Wikipedia contributors, "Volume fraction," Wikipedia,
+  https://en.wikipedia.org/wiki/Volume_fraction.
+
+#### Signature
+
+```python
+@validate_inputs({"mass_concentrations": "nonnegative", "densities": "positive"})
+def get_volume_fraction_from_mass(
+    mass_concentrations: NDArray[np.float64], densities: NDArray[np.float64]
+) -> NDArray[np.float64]: ...
+```
+
+
+---
+# convert_mole_fraction.md
+
+# Convert Mole Fraction
+
+[Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Convert Mole Fraction
+
+> Auto-generated documentation for [particula.particles.properties.convert_mole_fraction](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_mole_fraction.py) module.
+
+## get_mass_fractions_from_moles
+
+[Show source in convert_mole_fraction.py:11](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_mole_fraction.py#L11)
+
+Convert mole fractions to mass fractions for N components.
+
+The relationship between mass fraction (wᵢ) and mole fraction (xᵢ) is:
+
+- wᵢ = (xᵢ × Mᵢ) / Σⱼ(xⱼ × Mⱼ)
+    - wᵢ is the mass fraction of component i (unitless),
+    - xᵢ is the mole fraction of component i (unitless),
+    - Mᵢ is the molecular weight of component i (kg/mol),
+    - Σⱼ(xⱼ × Mⱼ) is the total mass (per total moles).
+
+#### Arguments
+
+mole_fractions : Mole fractions (unitless). Can be 1D or 2D.
+    If 2D, each row is treated as a set of mole fractions for N
+    components.
+molecular_weights : Molecular weights (kg/mol). Must match the shape of
+    ``mole_fractions`` in the last dimension.
+
+#### Returns
+
+- Mass fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
+  mass fractions if input is 1D.
+
+#### Examples
+
+``` py title="Example 1: 1D"
+import numpy as np
+import particula as par
+x_1d = np.array([0.2, 0.5, 0.3])    # mole fractions
+mw_1d = np.array([18.0, 44.0, 28.0])  # molecular weights
+par.get_mass_fractions_from_moles(x_1d, mw_1d)
+# Output: ([0.379..., 0.620..., 0.0])
+```
+
+``` py title="Example 2: 2D"
+import numpy as np
+import particula as par
+x_2d = np.array([
+    [0.2, 0.5, 0.3],
+    [0.3, 0.3, 0.4]
+])
+mw_2d = np.array([18.0, 44.0, 28.0])
+par.get_mass_fractions_from_moles(x_2d, mw_2d)
+```
+
+#### References
+
+- Wikipedia contributors, "Mass fraction (chemistry)," Wikipedia,
+  https://en.wikipedia.org/wiki/Mass_fraction_(chemistry).
+
+#### Signature
+
+```python
+@validate_inputs({"mole_fractions": "nonnegative", "molecular_weights": "positive"})
+def get_mass_fractions_from_moles(
+    mole_fractions: NDArray[np.float64], molecular_weights: NDArray[np.float64]
+) -> NDArray[np.float64]: ...
+```
+
+
+---
+# convert_size_distribution.md
+
+# Convert Size Distribution
+
+[Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Particles](../index.md#particles) / [Properties](./index.md#properties) / Convert Size Distribution
+
+> Auto-generated documentation for [particula.particles.properties.convert_size_distribution](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py) module.
+
+## ConversionStrategy
+
+[Show source in convert_size_distribution.py:39](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L39)
+
+#### Methods
+
+    - `-` *convert* - Convert distribution data between input and output scales.
+Defines an interface for conversion strategies between particle size
+distribution formats.
+
+All subclasses must implement the convert method to perform the actual
+conversion logic.
+
+#### Examples
+
+``` py title="Subclass Example"
+class CustomStrategy(ConversionStrategy):
+    def convert(self, diameters, concentration, inverse=False):
+        # Custom conversion logic here
+        return concentration
+```
+
+#### Signature
+
+```python
+class ConversionStrategy: ...
+```
+
+### ConversionStrategy().convert
+
+[Show source in convert_size_distribution.py:58](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L58)
+
+Convert distribution data from one scale to another.
+
+#### Arguments
+
+- diameters : Array of particle diameters.
+- concentration : The distribution data corresponding to these
+    diameters.
+- inverse : If True, reverse the direction of the conversion.
+
+#### Returns
+
+- np.ndarray of converted distribution data.
+
+#### Raises
+
+- NotImplementedError : If not overridden by a subclass.
+
+#### Signature
+
+```python
+def convert(
+    self, diameters: np.ndarray, concentration: np.ndarray, inverse: bool = False
+) -> np.ndarray: ...
+```
+
+
+
+## DNdlogDPtoPDFConversionStrategy
+
+[Show source in convert_size_distribution.py:189](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L189)
+
+Conversion strategy for converting between dn/dlogdp and PDF formats,
+possibly through an intermediate PMF conversion.
+
+#### Examples
+
+``` py title="Example Usage"
+strategy = DNdlogDPtoPDFConversionStrategy()
+result_pdf = strategy.convert(diameters, dn_dlogdp_data)
+# result_pdf is now in PDF format
+```
+
+#### Signature
+
+```python
+class DNdlogDPtoPDFConversionStrategy(ConversionStrategy): ...
+```
+
+#### See also
+
+- [ConversionStrategy](#conversionstrategy)
+
+### DNdlogDPtoPDFConversionStrategy().convert
+
+[Show source in convert_size_distribution.py:202](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L202)
+
+Convert between dn/dlogdp and PDF formats through an intermediate
+PMF step.
+
+#### Arguments
+
+- diameters : Array of particle diameters.
+- concentration : Distribution data in dn/dlogdp or PDF format.
+- inverse : If True, convert from PDF to dn/dlogdp; otherwise the
+    opposite.
+
+#### Returns
+
+- np.ndarray of the distribution in the target format.
+
+#### Signature
+
+```python
+def convert(
+    self, diameters: np.ndarray, concentration: np.ndarray, inverse: bool = False
+) -> np.ndarray: ...
+```
+
+
+
+## DNdlogDPtoPMFConversionStrategy
+
+[Show source in convert_size_distribution.py:119](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L119)
+
+Conversion strategy for converting between dn/dlogdp and PMF formats.
+
+#### Examples
+
+``` py title="Example Usage"
+strategy = DNdlogDPtoPMFConversionStrategy()
+result = strategy.convert(diameters, dn_dlogdp_conc)
+# result is now in PMF format
+```
+
+#### Signature
+
+```python
+class DNdlogDPtoPMFConversionStrategy(ConversionStrategy): ...
+```
+
+#### See also
+
+- [ConversionStrategy](#conversionstrategy)
+
+### DNdlogDPtoPMFConversionStrategy().convert
+
+[Show source in convert_size_distribution.py:131](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L131)
+
+Perform the conversion between dn/dlogdp and PMF formats.
+
+#### Arguments
+
+- diameters : Array of particle diameters.
+- concentration : Distribution data in dn/dlogdp or PMF format.
+- inverse : If True, convert from PMF to dn/dlogdp; otherwise the
+    opposite.
+
+#### Returns
+
+- np.ndarray of the distribution in the target format.
+
+#### Signature
+
+```python
+def convert(
+    self, diameters: np.ndarray, concentration: np.ndarray, inverse: bool = False
+) -> np.ndarray: ...
+```
+
+
+
+## PMFtoPDFConversionStrategy
+
+[Show source in convert_size_distribution.py:154](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L154)
+
+Conversion strategy for converting between PMF and PDF formats.
+
+#### Examples
+
+``` py title="Example Usage"
+strategy = PMFtoPDFConversionStrategy()
+result_pdf = strategy.convert(diameters, PMF_data, inverse=False)
+# result_pdf is now in PDF format
+```
+
+#### Signature
+
+```python
+class PMFtoPDFConversionStrategy(ConversionStrategy): ...
+```
+
+#### See also
+
+- [ConversionStrategy](#conversionstrategy)
+
+### PMFtoPDFConversionStrategy().convert
+
+[Show source in convert_size_distribution.py:166](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L166)
+
+Perform the conversion between PMF and PDF formats.
+
+#### Arguments
+
+- diameters : Array of particle diameters.
+- concentration : Distribution data in PMF or PDF format.
+- inverse : If True, convert from PDF to PMF; otherwise from PMF
+    to PDF.
+
+#### Returns
+
+- np.ndarray of the distribution in the target format.
+
+#### Signature
+
+```python
+def convert(
+    self, diameters: np.ndarray, concentration: np.ndarray, inverse: bool = False
+) -> np.ndarray: ...
+```
+
+
+
+## SameScaleConversionStrategy
+
+[Show source in convert_size_distribution.py:84](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L84)
+
+Conversion strategy that returns the input concentration unchanged.
+
+No conversion is performed because the input and output scales are the
+same.
+
+#### Examples
+
+```py title="Example Usage"
+strategy = SameScaleConversionStrategy()
+result = strategy.convert(diameters, concentration)
+# result is identical to concentration
+```
+
+#### Signature
+
+```python
+class SameScaleConversionStrategy(ConversionStrategy): ...
+```
+
+#### See also
+
+- [ConversionStrategy](#conversionstrategy)
+
+### SameScaleConversionStrategy().convert
+
+[Show source in convert_size_distribution.py:99](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L99)
+
+Return the concentration unchanged, since no conversion is needed.
+
+#### Arguments
+
+- diameters : Array of particle diameters (unused).
+- concentration : The original distribution data.
+- inverse : Flag indicating direction (unused).
+
+#### Returns
+
+- np.ndarray identical to the input concentration.
+
+#### Signature
+
+```python
+def convert(
+    self, diameters: np.ndarray, concentration: np.ndarray, inverse: bool = False
+) -> np.ndarray: ...
+```
+
+
+
+## SizerConverter
+
+[Show source in convert_size_distribution.py:237](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L237)
+
+A converter that composes a ConversionStrategy to transform
+particle size distribution data between formats.
+[might not be needed or used, -kyle]
+
+#### Examples
+
+``` py title="Example Usage"
+diameters = [1e-7, 1e-6, 1e-5]
+concentration = [1e6, 1e5, 1e4]
+
+strategy = DNdlogDPtoPMFConversionStrategy()
+converter = SizerConverter(strategy)
+new_conc = converter.convert(diameters, concentration)
+```
+
+#### Signature
+
+```python
+class SizerConverter:
+    def __init__(self, strategy: ConversionStrategy): ...
+```
+
+#### See also
+
+- [ConversionStrategy](#conversionstrategy)
+
+### SizerConverter().convert
+
+[Show source in convert_size_distribution.py:262](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L262)
+
+Convert the particle size distribution data using the assigned
+strategy.
+
+#### Arguments
+
+- diameters : Array of particle diameters.
+- concentration : Distribution data.
+- inverse : If True, reverse the conversion direction
+    (if supported).
+
+#### Returns
+
+- np.ndarray of the converted distribution.
+
+#### Signature
+
+```python
+def convert(
+    self, diameters: np.ndarray, concentration: np.ndarray, inverse: bool = False
+) -> np.ndarray: ...
+```
+
+
+
+## get_distribution_conversion_strategy
+
+[Show source in convert_size_distribution.py:284](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L284)
+
+Factory function to obtain a conversion strategy based on the input and
+output scales.
+
+#### Arguments
+
+- input_scale : Scale of the input distribution, e.g.
+    'dn/dlogdp' or 'pmf'.
+- output_scale : Desired scale of the output distribution, e.g.
+    'pmf' or 'pdf'.
+
+#### Returns
+
+- A ConversionStrategy object supporting the requested conversion.
+
+#### Raises
+
+- ValueError : If scales are invalid or unsupported.
+
+#### Examples
+
+``` py title="Example Usage"
+strategy = get_distribution_conversion_strategy('dn/dlogdp', 'pdf')
+converter = SizerConverter(strategy)
+converted_data = converter.convert(diameters, concentration)
+```
+
+#### Signature
+
+```python
+def get_distribution_conversion_strategy(
+    input_scale: str, output_scale: str
+) -> ConversionStrategy: ...
+```
+
+#### See also
+
+- [ConversionStrategy](#conversionstrategy)
+
+
+
+## get_distribution_in_dn
+
+[Show source in convert_size_distribution.py:346](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L346)
+
+Convert the sizer data between dn/dlogdp and d_num formats.
+
+If inverse=False, this function applies:
+- d_num = dn_dlogdp × (log10(upper / lower))
+    - The bin width is determined by upper and lower diameter limits,
+      with log10 scaling.
+
+If inverse=True, it reverts:
+- dn/dlogdp = d_num / (log10(upper / lower))
+
+#### Arguments
+
+- diameter : Array of particle diameters.
+- dn_dlogdp : Array representing either dn/dlogdp or d_num.
+- inverse : If True, converts from d_num to dn/dlogdp; otherwise the
+    opposite.
+
+#### Returns
+
+- A np.ndarray of the converted distribution.
+
+#### Examples
+
+```py
+import numpy as np
+from particula.util.size_distribution_convert import convert_sizer_dn
+
+diam = np.array([1e-7, 2e-7, 4e-7])
+dn_logdp = np.array([1e6, 1e5, 1e4])
+result = convert_sizer_dn(diam, dn_logdp, inverse=False)
+print(result)
+# Output: d_num format for each diameter bin
+```
+
+#### References
+
+- "dN/dlogD_p and dN/dD_p," TSI Application Note PR-001, 2010.
+    [link](
+    https://tsi.com/getmedia/1621329b-f410-4dce-992b-e21e1584481a/
+    PR-001-RevA_Aerosol-Statistics-AppNote?ext=.pd)
+
+#### Signature
+
+```python
+def get_distribution_in_dn(
+    diameter: np.ndarray, dn_dlogdp: np.ndarray, inverse: bool = False
+) -> np.ndarray: ...
+```
+
+
+
+## get_pdf_distribution_in_pmf
+
+[Show source in convert_size_distribution.py:404](https://github.com/uncscode/particula/blob/main/particula/particles/properties/convert_size_distribution.py#L404)
+
+Convert the distribution data between a probability density function (PDF)
+and a probability mass spectrum (PMF).
+
+The conversion uses:
+- y_pdf = y_PMF / Δx
+- y_PMF = y_pdf * Δx
+  - Δx is the bin width, determined by consecutive differences in x_array.
+
+#### Arguments
+
+- x_array : An array of diameters/radii for the distribution bins.
+- distribution : The original distribution data (PMF or PDF).
+- to_pdf : If True, convert from PMF to PDF; if False, from PDF to PMF.
+
+#### Returns
+
+- A np.ndarray of the converted distribution data.
+
+#### Examples
+
+```py
+import numpy as np
+import particula as par
+x_vals = np.array([1.0, 2.0, 3.0])
+PMF = np.array([10.0, 5.0, 2.5])
+pdf = par.get_pdf_distribution_in_pmf(x_vals, PMF, to_pdf=True)
+print(pdf)
+# Output: [10.  5.  2.5] / [1.0, 1.0, ...] = ...
+```
+
+#### References
+
+- Detailed bin width discussion in: TSI Application Note
+  "Aerosol Statistics and Densities."
+
+#### Signature
+
+```python
+def get_pdf_distribution_in_pmf(
+    x_array: np.ndarray, distribution: np.ndarray, to_pdf: bool = True
+) -> np.ndarray: ...
+```
+
+
+---
 # coulomb_enhancement.md
 
 # Coulomb Enhancement
@@ -20722,13 +21638,13 @@ def get_arbitrary_round(
 
 # Convert Dtypes
 
-[Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Util](../index.md#util) / [Converting](./index.md#converting) / Convert Dtypes
+[Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Convert Dtypes
 
-> Auto-generated documentation for [particula.util.converting.convert_dtypes](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_dtypes.py) module.
+> Auto-generated documentation for [particula.util.convert_dtypes](https://github.com/uncscode/particula/blob/main/particula/util/convert_dtypes.py) module.
 
 ## get_coerced_type
 
-[Show source in convert_dtypes.py:16](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_dtypes.py#L16)
+[Show source in convert_dtypes.py:16](https://github.com/uncscode/particula/blob/main/particula/util/convert_dtypes.py#L16)
 
 Coerce the given data to the specified dtype if it is not already of that
 type.
@@ -20777,7 +21693,7 @@ def get_coerced_type(data, dtype): ...
 
 ## get_dict_from_list
 
-[Show source in convert_dtypes.py:58](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_dtypes.py#L58)
+[Show source in convert_dtypes.py:58](https://github.com/uncscode/particula/blob/main/particula/util/convert_dtypes.py#L58)
 
 Convert a list of strings into a dictionary mapping each string to its
 index.
@@ -20815,7 +21731,7 @@ def get_dict_from_list(list_of_str: list) -> dict: ...
 
 ## get_shape_check
 
-[Show source in convert_dtypes.py:130](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_dtypes.py#L130)
+[Show source in convert_dtypes.py:130](https://github.com/uncscode/particula/blob/main/particula/util/convert_dtypes.py#L130)
 
 Validate or reshape a data array to ensure compatibility with a time array
 and header list.
@@ -20862,7 +21778,7 @@ def get_shape_check(time: np.ndarray, data: np.ndarray, header: list) -> np.ndar
 
 ## get_values_of_dict
 
-[Show source in convert_dtypes.py:93](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_dtypes.py#L93)
+[Show source in convert_dtypes.py:93](https://github.com/uncscode/particula/blob/main/particula/util/convert_dtypes.py#L93)
 
 Retrieve a list of index values from a dictionary for the specified keys.
 
@@ -20899,934 +21815,17 @@ def get_values_of_dict(
 
 
 ---
-# convert_kappa_volumes.md
-
-# Convert Kappa Volumes
-
-[Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Util](../index.md#util) / [Converting](./index.md#converting) / Convert Kappa Volumes
-
-> Auto-generated documentation for [particula.util.converting.convert_kappa_volumes](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_kappa_volumes.py) module.
-
-## get_kappa_from_volumes
-
-[Show source in convert_kappa_volumes.py:108](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_kappa_volumes.py#L108)
-
-Compute the κ parameter from known volumes of solute and water, given
-water activity.
-
-Rearranging κ-Köhler-based relationships, we have:
-- κ = ( (1/aw) - 1 ) × (V_water / V_solute).
-
-#### Arguments
-
-- volume_solute : Solute volume (float or NDArray).
-- volume_water : Water volume (float or NDArray).
-- water_activity : Water activity (float or NDArray, 0 < aw ≤ 1).
-
-#### Returns
-
-- The kappa parameter (float or NDArray).
-
-#### Examples
-
-``` py
-import particula as par
-kappa_val = par.get_kappa_from_volumes(1e-19, 4e-19, 0.95)
-print(kappa_val)
-# ~indicative value for the solute's hygroscopicity
-```
-
-#### References
-
-- Petters, M. D. & Kreidenweis, S. M. (2007). "A single parameter
-  representation of hygroscopic growth and cloud condensation nucleus
-  activity." Atmos. Chem. Phys.
-
-#### Signature
-
-```python
-def get_kappa_from_volumes(
-    volume_solute: Union[float, np.ndarray],
-    volume_water: Union[float, np.ndarray],
-    water_activity: Union[float, np.ndarray],
-) -> Union[float, np.ndarray]: ...
-```
-
-
-
-## get_solute_volume_from_kappa
-
-[Show source in convert_kappa_volumes.py:19](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_kappa_volumes.py#L19)
-
-Calculate the solute volume from the total solution volume using κ-Köhler
-theory.
-
-The relation for κ-Köhler can be written as:
-- V_solute = V_total × F
-  where F depends on kappa and water activity (aw), ensuring that
-  for aw → 0, V_solute → V_total.
-
-#### Arguments
-
-- volume_total : Volume of the total solution (float or NDArray).
-- kappa : Kappa parameter (float or NDArray).
-- water_activity : Water activity (float or NDArray, 0 < aw ≤ 1).
-
-#### Returns
-
-- Solute volume (float or NDArray).
-
-#### Examples
-
-``` py  title="Example Usage"
-import particula as par
-v_sol = par.get_solute_from_kappa_volume(1e-18, 0.8, 0.9)
-print(v_sol)
-# ~some fraction of the total volume
-```
-
-#### References
-
-- Petters, M. D. & Kreidenweis, S. M. (2007). "A single parameter
-  representation of hygroscopic growth and cloud condensation nucleus
-  activity." Atmos. Chem. Phys.
-
-#### Signature
-
-```python
-def get_solute_volume_from_kappa(
-    volume_total: Union[float, np.ndarray],
-    kappa: Union[float, np.ndarray],
-    water_activity: Union[float, np.ndarray],
-) -> Union[float, np.ndarray]: ...
-```
-
-
-
-## get_water_volume_from_kappa
-
-[Show source in convert_kappa_volumes.py:65](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_kappa_volumes.py#L65)
-
-Calculate the water volume from the solute volume, κ parameter, and water
-activity.
-
-This uses κ-Köhler-type relations where:
-- V_water = V_solute × ( κ / (1/aw - 1) ), ensuring that for aw → 0,
-  V_water → 0.
-
-#### Arguments
-
-- volume_solute : Volume of solute (float or NDArray).
-- kappa : Kappa parameter (float or NDArray).
-- water_activity : Water activity (float or NDArray, 0 < aw ≤ 1).
-
-#### Returns
-
-- Water volume (float or NDArray).
-
-#### Examples
-
-``` py title="Example Usage"
-import particula as par
-v_water = par.get_water_volume_from_kappa(1e-19, 0.5, 0.95)
-print(v_water)
-# ~some fraction of the solute volume
-```
-
-#### References
-
-- Petters, M. D. & Kreidenweis, S. M. (2007). "A single parameter
-  representation of hygroscopic growth and cloud condensation nucleus
-  activity." Atmos. Chem. Phys.
-
-#### Signature
-
-```python
-def get_water_volume_from_kappa(
-    volume_solute: Union[float, NDArray[np.float64]],
-    kappa: Union[float, NDArray[np.float64]],
-    water_activity: Union[float, NDArray[np.float64]],
-) -> Union[float, NDArray[np.float64]]: ...
-```
-
-
-
-## get_water_volume_in_mixture
-
-[Show source in convert_kappa_volumes.py:149](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_kappa_volumes.py#L149)
-
-Calculate the water volume in a solute-water mixture from a specified water
-volume fraction.
-
-The relationship is:
-
-- V_water = (φ_water × V_solute_dry) / (1 - φ_water)
-    - φ_water is the water volume fraction.
-
-#### Arguments
-
-- volume_solute_dry : Volume of the solute (float), excluding water.
-- volume_fraction_water : Fraction of water volume in the total mixture
-  (float, 0 ≤ φ_water < 1).
-
-#### Returns
-
-- The water volume (float), in the same units as volume_solute_dry.
-
-#### Examples
-
-``` py title="Example Usage"
-import particula as par
-v_water = par.get_water_volume_in_mixture(100.0, 0.8)
-print(v_water)
-# 400.0
-```
-
-#### References
-
-- "Volume Fractions in Mixture Calculations," Standard Chemistry Texts.
-
-#### Signature
-
-```python
-def get_water_volume_in_mixture(
-    volume_solute_dry: Union[float, np.ndarray],
-    volume_fraction_water: Union[float, np.ndarray],
-) -> float: ...
-```
-
-
----
-# convert_mass_concentration.md
-
-# Convert Mass Concentration
-
-[Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Util](../index.md#util) / [Converting](./index.md#converting) / Convert Mass Concentration
-
-> Auto-generated documentation for [particula.util.converting.convert_mass_concentration](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mass_concentration.py) module.
-
-## get_mass_fraction_from_mass
-
-[Show source in convert_mass_concentration.py:165](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mass_concentration.py#L165)
-
-Convert mass concentrations to mass fractions for N components.
-
-The mass fraction is computed by:
-
-- wᵢ = mᵢ / mₜₒₜₐₗ
-    - wᵢ is the mass fraction of component i (unitless),
-    - mᵢ is the mass concentration of component i (kg/m³),
-    - mₜₒₜₐₗ is the total mass concentration of all components (kg/m³).
-
-#### Arguments
-
-- mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
-
-#### Returns
-
-- Mass fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
-  mass fractions if input is 1D.
-
-#### Examples
-
-```py
-import numpy as np
-import particula as par
-
-mass_conc = np.array([10.0, 30.0, 60.0])  # kg/m³
-par.get_mass_fraction(mass_conc)
-# Output might be array([0.1, 0.3, 0.6])
-```
-
-#### References
-
-- Wikipedia contributors, "Mass fraction (chemistry)," Wikipedia,
-  https://en.wikipedia.org/wiki/Mass_fraction_(chemistry).
-
-#### Signature
-
-```python
-@validate_inputs({"mass_concentrations": "nonnegative"})
-def get_mass_fraction_from_mass(
-    mass_concentrations: NDArray[np.float64],
-) -> NDArray[np.float64]: ...
-```
-
-
-
-## get_mole_fraction_from_mass
-
-[Show source in convert_mass_concentration.py:9](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mass_concentration.py#L9)
-
-Convert mass concentrations to mole fractions for N components.
-
-The mole fraction is computed using:
-
-- xᵢ = (mᵢ / Mᵢ) / Σⱼ(mⱼ / Mⱼ)
-    - xᵢ is the mole fraction of component i,
-    - mᵢ is the mass concentration of component i (kg/m³),
-    - Mᵢ is the molar mass of component i (kg/mol).
-
-#### Arguments
-
-- mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
-- molar_masses : Molar masses (kg/mol). Must match dimensions of
-  mass_concentrations.
-
-#### Returns
-
-- Mole fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
-  mole fractions if input is 1D.
-
-#### Examples
-
-```py
-import numpy as np
-import particula as par
-mass_conc = np.array([0.2, 0.8])  # kg/m³
-mol_masses = np.array([0.018, 0.032])  # kg/mol
-get_mole_fraction_from_mass(mass_conc, mol_masses))
-# Output might be array([0.379..., 0.620...])
-```
-
-#### References
-
-- Wikipedia contributors, "Mole fraction," Wikipedia,
-  https://en.wikipedia.org/wiki/Mole_fraction.
-
-#### Signature
-
-```python
-@validate_inputs({"mass_concentrations": "nonnegative", "molar_masses": "positive"})
-def get_mole_fraction_from_mass(
-    mass_concentrations: NDArray[np.float64], molar_masses: NDArray[np.float64]
-) -> NDArray[np.float64]: ...
-```
-
-
-
-## get_volume_fraction_from_mass
-
-[Show source in convert_mass_concentration.py:84](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mass_concentration.py#L84)
-
-Convert mass concentrations to volume fractions for N components.
-
-The volume fraction is determined by:
-
-- ϕᵢ = vᵢ / vₜₒₜₐₗ
-    - ϕᵢ is the volume fraction of component i (unitless),
-    - vᵢ is the volume of component i (m³),
-    - vₜₒₜₐₗ is the total volume of all components (m³).
-
-Volumes computed from mass concentration (mᵢ) and density (ρᵢ) using:
-- vᵢ = mᵢ / ρᵢ.
-
-#### Arguments
-
-- mass_concentrations : Mass concentrations (kg/m³). Can be 1D or 2D.
-- densities : Densities (kg/m³). Must match the shape of
-  mass_concentrations.
-
-#### Returns
-
-- Volume fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
-  volume fractions if input is 1D.
-
-#### Examples
-
-```py
-import numpy as np
-import particula as par
-
-mass_conc = np.array([[1.0, 2.0], [0.5, 0.5]])  # kg/m³
-dens = np.array([1000.0, 800.0])               # kg/m³
-par.get_volume_fraction_from_mass(mass_conc, dens))
-# Output:
-# array([[0.444..., 0.555...],
-#        [0.5     , 0.5     ]])
-```
-
-#### References
-
-- Wikipedia contributors, "Volume fraction," Wikipedia,
-  https://en.wikipedia.org/wiki/Volume_fraction.
-
-#### Signature
-
-```python
-@validate_inputs({"mass_concentrations": "nonnegative", "densities": "positive"})
-def get_volume_fraction_from_mass(
-    mass_concentrations: NDArray[np.float64], densities: NDArray[np.float64]
-) -> NDArray[np.float64]: ...
-```
-
-
----
-# convert_mole_fraction.md
-
-# Convert Mole Fraction
-
-[Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Util](../index.md#util) / [Converting](./index.md#converting) / Convert Mole Fraction
-
-> Auto-generated documentation for [particula.util.converting.convert_mole_fraction](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mole_fraction.py) module.
-
-## get_mass_fractions_from_moles
-
-[Show source in convert_mole_fraction.py:11](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_mole_fraction.py#L11)
-
-Convert mole fractions to mass fractions for N components.
-
-The relationship between mass fraction (wᵢ) and mole fraction (xᵢ) is:
-
-- wᵢ = (xᵢ × Mᵢ) / Σⱼ(xⱼ × Mⱼ)
-    - wᵢ is the mass fraction of component i (unitless),
-    - xᵢ is the mole fraction of component i (unitless),
-    - Mᵢ is the molecular weight of component i (kg/mol),
-    - Σⱼ(xⱼ × Mⱼ) is the total mass (per total moles).
-
-#### Arguments
-
-mole_fractions : Mole fractions (unitless). Can be 1D or 2D.
-    If 2D, each row is treated as a set of mole fractions for N
-    components.
-molecular_weights : Molecular weights (kg/mol). Must match the shape of
-    ``mole_fractions`` in the last dimension.
-
-#### Returns
-
-- Mass fractions (unitless). Rows sum to 1 if input is 2D; returns 1D
-  mass fractions if input is 1D.
-
-#### Examples
-
-``` py title="Example 1: 1D"
-import numpy as np
-import particula as par
-x_1d = np.array([0.2, 0.5, 0.3])    # mole fractions
-mw_1d = np.array([18.0, 44.0, 28.0])  # molecular weights
-par.get_mass_fractions_from_moles(x_1d, mw_1d)
-# Output: ([0.379..., 0.620..., 0.0])
-```
-
-``` py title="Example 2: 2D"
-import numpy as np
-import particula as par
-x_2d = np.array([
-    [0.2, 0.5, 0.3],
-    [0.3, 0.3, 0.4]
-])
-mw_2d = np.array([18.0, 44.0, 28.0])
-par.get_mass_fractions_from_moles(x_2d, mw_2d)
-```
-
-#### References
-
-- Wikipedia contributors, "Mass fraction (chemistry)," Wikipedia,
-  https://en.wikipedia.org/wiki/Mass_fraction_(chemistry).
-
-#### Signature
-
-```python
-@validate_inputs({"mole_fractions": "nonnegative", "molecular_weights": "positive"})
-def get_mass_fractions_from_moles(
-    mole_fractions: NDArray[np.float64], molecular_weights: NDArray[np.float64]
-) -> NDArray[np.float64]: ...
-```
-
-
----
-# convert_size_distribution.md
-
-# Convert Size Distribution
-
-[Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Util](../index.md#util) / [Converting](./index.md#converting) / Convert Size Distribution
-
-> Auto-generated documentation for [particula.util.converting.convert_size_distribution](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py) module.
-
-## ConversionStrategy
-
-[Show source in convert_size_distribution.py:39](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L39)
-
-#### Methods
-
-    - `-` *convert* - Convert distribution data between input and output scales.
-Defines an interface for conversion strategies between particle size
-distribution formats.
-
-All subclasses must implement the convert method to perform the actual
-conversion logic.
-
-#### Examples
-
-``` py title="Subclass Example"
-class CustomStrategy(ConversionStrategy):
-    def convert(self, diameters, concentration, inverse=False):
-        # Custom conversion logic here
-        return concentration
-```
-
-#### Signature
-
-```python
-class ConversionStrategy: ...
-```
-
-### ConversionStrategy().convert
-
-[Show source in convert_size_distribution.py:58](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L58)
-
-Convert distribution data from one scale to another.
-
-#### Arguments
-
-- diameters : Array of particle diameters.
-- concentration : The distribution data corresponding to these
-    diameters.
-- inverse : If True, reverse the direction of the conversion.
-
-#### Returns
-
-- np.ndarray of converted distribution data.
-
-#### Raises
-
-- NotImplementedError : If not overridden by a subclass.
-
-#### Signature
-
-```python
-def convert(
-    self, diameters: np.ndarray, concentration: np.ndarray, inverse: bool = False
-) -> np.ndarray: ...
-```
-
-
-
-## DNdlogDPtoPDFConversionStrategy
-
-[Show source in convert_size_distribution.py:189](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L189)
-
-Conversion strategy for converting between dn/dlogdp and PDF formats,
-possibly through an intermediate PMF conversion.
-
-#### Examples
-
-``` py title="Example Usage"
-strategy = DNdlogDPtoPDFConversionStrategy()
-result_pdf = strategy.convert(diameters, dn_dlogdp_data)
-# result_pdf is now in PDF format
-```
-
-#### Signature
-
-```python
-class DNdlogDPtoPDFConversionStrategy(ConversionStrategy): ...
-```
-
-#### See also
-
-- [ConversionStrategy](#conversionstrategy)
-
-### DNdlogDPtoPDFConversionStrategy().convert
-
-[Show source in convert_size_distribution.py:202](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L202)
-
-Convert between dn/dlogdp and PDF formats through an intermediate
-PMF step.
-
-#### Arguments
-
-- diameters : Array of particle diameters.
-- concentration : Distribution data in dn/dlogdp or PDF format.
-- inverse : If True, convert from PDF to dn/dlogdp; otherwise the
-    opposite.
-
-#### Returns
-
-- np.ndarray of the distribution in the target format.
-
-#### Signature
-
-```python
-def convert(
-    self, diameters: np.ndarray, concentration: np.ndarray, inverse: bool = False
-) -> np.ndarray: ...
-```
-
-
-
-## DNdlogDPtoPMFConversionStrategy
-
-[Show source in convert_size_distribution.py:119](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L119)
-
-Conversion strategy for converting between dn/dlogdp and PMF formats.
-
-#### Examples
-
-``` py title="Example Usage"
-strategy = DNdlogDPtoPMFConversionStrategy()
-result = strategy.convert(diameters, dn_dlogdp_conc)
-# result is now in PMF format
-```
-
-#### Signature
-
-```python
-class DNdlogDPtoPMFConversionStrategy(ConversionStrategy): ...
-```
-
-#### See also
-
-- [ConversionStrategy](#conversionstrategy)
-
-### DNdlogDPtoPMFConversionStrategy().convert
-
-[Show source in convert_size_distribution.py:131](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L131)
-
-Perform the conversion between dn/dlogdp and PMF formats.
-
-#### Arguments
-
-- diameters : Array of particle diameters.
-- concentration : Distribution data in dn/dlogdp or PMF format.
-- inverse : If True, convert from PMF to dn/dlogdp; otherwise the
-    opposite.
-
-#### Returns
-
-- np.ndarray of the distribution in the target format.
-
-#### Signature
-
-```python
-def convert(
-    self, diameters: np.ndarray, concentration: np.ndarray, inverse: bool = False
-) -> np.ndarray: ...
-```
-
-
-
-## PMFtoPDFConversionStrategy
-
-[Show source in convert_size_distribution.py:154](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L154)
-
-Conversion strategy for converting between PMF and PDF formats.
-
-#### Examples
-
-``` py title="Example Usage"
-strategy = PMFtoPDFConversionStrategy()
-result_pdf = strategy.convert(diameters, PMF_data, inverse=False)
-# result_pdf is now in PDF format
-```
-
-#### Signature
-
-```python
-class PMFtoPDFConversionStrategy(ConversionStrategy): ...
-```
-
-#### See also
-
-- [ConversionStrategy](#conversionstrategy)
-
-### PMFtoPDFConversionStrategy().convert
-
-[Show source in convert_size_distribution.py:166](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L166)
-
-Perform the conversion between PMF and PDF formats.
-
-#### Arguments
-
-- diameters : Array of particle diameters.
-- concentration : Distribution data in PMF or PDF format.
-- inverse : If True, convert from PDF to PMF; otherwise from PMF
-    to PDF.
-
-#### Returns
-
-- np.ndarray of the distribution in the target format.
-
-#### Signature
-
-```python
-def convert(
-    self, diameters: np.ndarray, concentration: np.ndarray, inverse: bool = False
-) -> np.ndarray: ...
-```
-
-
-
-## SameScaleConversionStrategy
-
-[Show source in convert_size_distribution.py:84](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L84)
-
-Conversion strategy that returns the input concentration unchanged.
-
-No conversion is performed because the input and output scales are the
-same.
-
-#### Examples
-
-```py title="Example Usage"
-strategy = SameScaleConversionStrategy()
-result = strategy.convert(diameters, concentration)
-# result is identical to concentration
-```
-
-#### Signature
-
-```python
-class SameScaleConversionStrategy(ConversionStrategy): ...
-```
-
-#### See also
-
-- [ConversionStrategy](#conversionstrategy)
-
-### SameScaleConversionStrategy().convert
-
-[Show source in convert_size_distribution.py:99](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L99)
-
-Return the concentration unchanged, since no conversion is needed.
-
-#### Arguments
-
-- diameters : Array of particle diameters (unused).
-- concentration : The original distribution data.
-- inverse : Flag indicating direction (unused).
-
-#### Returns
-
-- np.ndarray identical to the input concentration.
-
-#### Signature
-
-```python
-def convert(
-    self, diameters: np.ndarray, concentration: np.ndarray, inverse: bool = False
-) -> np.ndarray: ...
-```
-
-
-
-## SizerConverter
-
-[Show source in convert_size_distribution.py:237](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L237)
-
-A converter that composes a ConversionStrategy to transform
-particle size distribution data between formats.
-[might not be needed or used, -kyle]
-
-#### Examples
-
-``` py title="Example Usage"
-diameters = [1e-7, 1e-6, 1e-5]
-concentration = [1e6, 1e5, 1e4]
-
-strategy = DNdlogDPtoPMFConversionStrategy()
-converter = SizerConverter(strategy)
-new_conc = converter.convert(diameters, concentration)
-```
-
-#### Signature
-
-```python
-class SizerConverter:
-    def __init__(self, strategy: ConversionStrategy): ...
-```
-
-#### See also
-
-- [ConversionStrategy](#conversionstrategy)
-
-### SizerConverter().convert
-
-[Show source in convert_size_distribution.py:262](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L262)
-
-Convert the particle size distribution data using the assigned
-strategy.
-
-#### Arguments
-
-- diameters : Array of particle diameters.
-- concentration : Distribution data.
-- inverse : If True, reverse the conversion direction
-    (if supported).
-
-#### Returns
-
-- np.ndarray of the converted distribution.
-
-#### Signature
-
-```python
-def convert(
-    self, diameters: np.ndarray, concentration: np.ndarray, inverse: bool = False
-) -> np.ndarray: ...
-```
-
-
-
-## get_conversion_strategy
-
-[Show source in convert_size_distribution.py:284](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L284)
-
-Factory function to obtain a conversion strategy based on the input and
-output scales.
-
-#### Arguments
-
-- input_scale : Scale of the input distribution, e.g.
-    'dn/dlogdp' or 'pmf'.
-- output_scale : Desired scale of the output distribution, e.g.
-    'pmf' or 'pdf'.
-
-#### Returns
-
-- A ConversionStrategy object supporting the requested conversion.
-
-#### Raises
-
-- ValueError : If scales are invalid or unsupported.
-
-#### Examples
-
-``` py title="Example Usage"
-strategy = get_conversion_strategy('dn/dlogdp', 'pdf')
-converter = SizerConverter(strategy)
-converted_data = converter.convert(diameters, concentration)
-```
-
-#### Signature
-
-```python
-def get_conversion_strategy(
-    input_scale: str, output_scale: str
-) -> ConversionStrategy: ...
-```
-
-#### See also
-
-- [ConversionStrategy](#conversionstrategy)
-
-
-
-## get_distribution_in_dn
-
-[Show source in convert_size_distribution.py:346](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L346)
-
-Convert the sizer data between dn/dlogdp and d_num formats.
-
-If inverse=False, this function applies:
-- d_num = dn_dlogdp × (log10(upper / lower))
-    - The bin width is determined by upper and lower diameter limits,
-      with log10 scaling.
-
-If inverse=True, it reverts:
-- dn/dlogdp = d_num / (log10(upper / lower))
-
-#### Arguments
-
-- diameter : Array of particle diameters.
-- dn_dlogdp : Array representing either dn/dlogdp or d_num.
-- inverse : If True, converts from d_num to dn/dlogdp; otherwise the
-    opposite.
-
-#### Returns
-
-- A np.ndarray of the converted distribution.
-
-#### Examples
-
-```py
-import numpy as np
-from particula.util.size_distribution_convert import convert_sizer_dn
-
-diam = np.array([1e-7, 2e-7, 4e-7])
-dn_logdp = np.array([1e6, 1e5, 1e4])
-result = convert_sizer_dn(diam, dn_logdp, inverse=False)
-print(result)
-# Output: d_num format for each diameter bin
-```
-
-#### References
-
-- "dN/dlogD_p and dN/dD_p," TSI Application Note PR-001, 2010.
-    [link](
-    https://tsi.com/getmedia/1621329b-f410-4dce-992b-e21e1584481a/
-    PR-001-RevA_Aerosol-Statistics-AppNote?ext=.pd)
-
-#### Signature
-
-```python
-def get_distribution_in_dn(
-    diameter: np.ndarray, dn_dlogdp: np.ndarray, inverse: bool = False
-) -> np.ndarray: ...
-```
-
-
-
-## get_pdf_distribution_in_pmf
-
-[Show source in convert_size_distribution.py:404](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_size_distribution.py#L404)
-
-Convert the distribution data between a probability density function (PDF)
-and a probability mass spectrum (PMF).
-
-The conversion uses:
-- y_pdf = y_PMF / Δx
-- y_PMF = y_pdf * Δx
-  - Δx is the bin width, determined by consecutive differences in x_array.
-
-#### Arguments
-
-- x_array : An array of diameters/radii for the distribution bins.
-- distribution : The original distribution data (PMF or PDF).
-- to_pdf : If True, convert from PMF to PDF; if False, from PDF to PMF.
-
-#### Returns
-
-- A np.ndarray of the converted distribution data.
-
-#### Examples
-
-```py
-import numpy as np
-import particula as par
-x_vals = np.array([1.0, 2.0, 3.0])
-PMF = np.array([10.0, 5.0, 2.5])
-pdf = par.get_pdf_distribution_in_pmf(x_vals, PMF, to_pdf=True)
-print(pdf)
-# Output: [10.  5.  2.5] / [1.0, 1.0, ...] = ...
-```
-
-#### References
-
-- Detailed bin width discussion in: TSI Application Note
-  "Aerosol Statistics and Densities."
-
-#### Signature
-
-```python
-def get_pdf_distribution_in_pmf(
-    x_array: np.ndarray, distribution: np.ndarray, to_pdf: bool = True
-) -> np.ndarray: ...
-```
-
-
----
 # convert_units.md
 
 # Convert Units
 
-[Particula Index](../../../README.md#particula-index) / [Particula](../../index.md#particula) / [Util](../index.md#util) / [Converting](./index.md#converting) / Convert Units
+[Particula Index](../../README.md#particula-index) / [Particula](../index.md#particula) / [Util](./index.md#util) / Convert Units
 
-> Auto-generated documentation for [particula.util.converting.convert_units](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_units.py) module.
+> Auto-generated documentation for [particula.util.convert_units](https://github.com/uncscode/particula/blob/main/particula/util/convert_units.py) module.
 
 ## get_unit_conversion
 
-[Show source in convert_units.py:29](https://github.com/uncscode/particula/blob/main/particula/util/converting/convert_units.py#L29)
+[Show source in convert_units.py:29](https://github.com/uncscode/particula/blob/main/particula/util/convert_units.py#L29)
 
 Convert a numeric value or unit expression from one unit to another using
 Pint.
