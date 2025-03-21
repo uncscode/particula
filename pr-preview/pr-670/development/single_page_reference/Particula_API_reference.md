@@ -9254,7 +9254,7 @@ transported to or from a particle in a vapor. The equation is:
 
 #### Arguments
 
-- radius : The radius of the particle [m].
+- particle_radius : The radius of the particle [m].
 - vapor_transition : The vapor transition correction factor [unitless].
 - diffusion_coefficient : The diffusion coefficient of the vapor [m²/s].
   Defaults to 2e-5 (approx. air).
@@ -9294,9 +9294,9 @@ par.dynamics.get_first_order_mass_transport_k(
 #### Signature
 
 ```python
-@validate_inputs({"radius": "nonnegative"})
+@validate_inputs({"particle_radius": "nonnegative"})
 def get_first_order_mass_transport_k(
-    radius: Union[float, NDArray[np.float64]],
+    particle_radius: Union[float, NDArray[np.float64]],
     vapor_transition: Union[float, NDArray[np.float64]],
     diffusion_coefficient: Union[float, NDArray[np.float64]] = 2e-05,
 ) -> Union[float, NDArray[np.float64]]: ...
@@ -9306,7 +9306,7 @@ def get_first_order_mass_transport_k(
 
 ## get_mass_transfer
 
-[Show source in mass_transfer.py:230](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L230)
+[Show source in mass_transfer.py:236](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L236)
 
 Route mass transfer calculation to single or multiple-species routines.
 
@@ -9378,7 +9378,7 @@ def get_mass_transfer(
 
 ## get_mass_transfer_of_multiple_species
 
-[Show source in mass_transfer.py:382](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L382)
+[Show source in mass_transfer.py:388](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L388)
 
 Calculate mass transfer for multiple gas species.
 
@@ -9443,7 +9443,7 @@ def get_mass_transfer_of_multiple_species(
 
 ## get_mass_transfer_of_single_species
 
-[Show source in mass_transfer.py:307](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L307)
+[Show source in mass_transfer.py:313](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L313)
 
 Calculate mass transfer for a single gas species.
 
@@ -9507,7 +9507,7 @@ def get_mass_transfer_of_single_species(
 
 ## get_mass_transfer_rate
 
-[Show source in mass_transfer.py:101](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L101)
+[Show source in mass_transfer.py:103](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L103)
 
 Calculate the mass transfer rate for a particle.
 
@@ -9587,7 +9587,7 @@ def get_mass_transfer_rate(
 
 ## get_radius_transfer_rate
 
-[Show source in mass_transfer.py:176](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L176)
+[Show source in mass_transfer.py:178](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L178)
 
 Convert mass rate to radius growth/evaporation rate.
 
@@ -9603,7 +9603,7 @@ change rate (dr/dt). The equation is:
 #### Arguments
 
 - mass_rate : The mass transfer rate [kg/s].
-- radius : The radius of the particle [m].
+- particle_radius : The radius of the particle [m].
 - density : The density of the particle [kg/m³].
 
 #### Returns
@@ -9616,7 +9616,7 @@ change rate (dr/dt). The equation is:
 import particula as par
 par.dynamics.radius_transfer_rate(
     mass_rate=1e-21,
-    radius=1e-6,
+    particle_radius=1e-6,
     density=1000
 )
 # Output: 7.95774715e-14
@@ -9626,7 +9626,7 @@ par.dynamics.radius_transfer_rate(
 import particula as par
 par.dynamics.radius_transfer_rate(
     mass_rate=np.array([1e-21, 2e-21]),
-    radius=np.array([1e-6, 2e-6]),
+    particle_radius=np.array([1e-6, 2e-6]),
     density=1000
 )
 # Output: array([7.95774715e-14, 1.98943679e-14])
@@ -9635,10 +9635,12 @@ par.dynamics.radius_transfer_rate(
 #### Signature
 
 ```python
-@validate_inputs({"mass_rate": "finite", "radius": "nonnegative", "density": "positive"})
+@validate_inputs(
+    {"mass_rate": "finite", "particle_radius": "nonnegative", "density": "positive"}
+)
 def get_radius_transfer_rate(
     mass_rate: Union[float, NDArray[np.float64]],
-    radius: Union[float, NDArray[np.float64]],
+    particle_radius: Union[float, NDArray[np.float64]],
     density: Union[float, NDArray[np.float64]],
 ) -> Union[float, NDArray[np.float64]]: ...
 ```

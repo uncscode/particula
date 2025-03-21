@@ -7975,7 +7975,7 @@ transported to or from a particle in a vapor. The equation is:</p>
 </ul>
 <h4 id="arguments">Arguments<a class="headerlink" href="#arguments" title="Permanent link">&para;</a></h4>
 <ul>
-<li>radius : The radius of the particle [m].</li>
+<li>particle_radius : The radius of the particle [m].</li>
 <li>vapor_transition : The vapor transition correction factor [unitless].</li>
 <li>diffusion_coefficient : The diffusion coefficient of the vapor [m²/s].
   Defaults to 2e-5 (approx. air).</li>
@@ -8008,15 +8008,15 @@ transported to or from a particle in a vapor. The equation is:</p>
   https://en.wikipedia.org/wiki/Mass_diffusivity</li>
 </ul>
 <h4 id="signature">Signature<a class="headerlink" href="#signature" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_first_order_mass_transport_k</span><span class="p">(</span>
-    <span class="n">radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">vapor_transition</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">diffusion_coefficient</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">2e-05</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_mass_transfer">get_mass_transfer<a class="headerlink" href="#get_mass_transfer" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L230">Show source in mass_transfer.py:230</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L236">Show source in mass_transfer.py:236</a></p>
 <p>Route mass transfer calculation to single or multiple-species routines.</p>
 <p>Depending on whether gas_mass represents one or multiple species, this
 function calls either calculate_mass_transfer_single_species or
@@ -8075,7 +8075,7 @@ involves:</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_mass_transfer_of_multiple_species">get_mass_transfer_of_multiple_species<a class="headerlink" href="#get_mass_transfer_of_multiple_species" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L382">Show source in mass_transfer.py:382</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L388">Show source in mass_transfer.py:388</a></p>
 <p>Calculate mass transfer for multiple gas species.</p>
 <p>Here, gas_mass has multiple elements (each species). For each species,
 this function calculates mass_to_change for all particle bins:</p>
@@ -8128,7 +8128,7 @@ particle mass in each species bin.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_mass_transfer_of_single_species">get_mass_transfer_of_single_species<a class="headerlink" href="#get_mass_transfer_of_single_species" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L307">Show source in mass_transfer.py:307</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L313">Show source in mass_transfer.py:313</a></p>
 <p>Calculate mass transfer for a single gas species.</p>
 <p>This function assumes gas_mass has a size of 1 (single species).
 It first computes the total mass_to_change per particle:</p>
@@ -8180,7 +8180,7 @@ particle mass.</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_mass_transfer_rate">get_mass_transfer_rate<a class="headerlink" href="#get_mass_transfer_rate" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L101">Show source in mass_transfer.py:101</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L103">Show source in mass_transfer.py:103</a></p>
 <p>Calculate the mass transfer rate for a particle.</p>
 <p>This function calculates the mass transfer rate dm/dt, leveraging the
 difference in partial pressure (pressure_delta) and the first-order
@@ -8249,7 +8249,7 @@ mass transport coefficient (K). The equation is:</p>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
 <h2 id="get_radius_transfer_rate">get_radius_transfer_rate<a class="headerlink" href="#get_radius_transfer_rate" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L176">Show source in mass_transfer.py:176</a></p>
+<p><a href="https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/mass_transfer.py#L178">Show source in mass_transfer.py:178</a></p>
 <p>Convert mass rate to radius growth/evaporation rate.</p>
 <p>This function converts the mass transfer rate (dm/dt) into a radius
 change rate (dr/dt). The equation is:</p>
@@ -8265,7 +8265,7 @@ change rate (dr/dt). The equation is:</p>
 <h4 id="arguments_5">Arguments<a class="headerlink" href="#arguments_5" title="Permanent link">&para;</a></h4>
 <ul>
 <li>mass_rate : The mass transfer rate [kg/s].</li>
-<li>radius : The radius of the particle [m].</li>
+<li>particle_radius : The radius of the particle [m].</li>
 <li>density : The density of the particle [kg/m³].</li>
 </ul>
 <h4 id="returns_5">Returns<a class="headerlink" href="#returns_5" title="Permanent link">&para;</a></h4>
@@ -8276,7 +8276,7 @@ change rate (dr/dt). The equation is:</p>
 <div class="highlight"><span class="filename">Single value input</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">radius_transfer_rate</span><span class="p">(</span>
     <span class="n">mass_rate</span><span class="o">=</span><span class="mf">1e-21</span><span class="p">,</span>
-    <span class="n">radius</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
     <span class="n">density</span><span class="o">=</span><span class="mi">1000</span>
 <span class="p">)</span>
 <span class="c1"># Output: 7.95774715e-14</span>
@@ -8284,16 +8284,18 @@ change rate (dr/dt). The equation is:</p>
 <div class="highlight"><span class="filename">Array input</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">radius_transfer_rate</span><span class="p">(</span>
     <span class="n">mass_rate</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-21</span><span class="p">,</span> <span class="mf">2e-21</span><span class="p">]),</span>
-    <span class="n">radius</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">2e-6</span><span class="p">]),</span>
+    <span class="n">particle_radius</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">2e-6</span><span class="p">]),</span>
     <span class="n">density</span><span class="o">=</span><span class="mi">1000</span>
 <span class="p">)</span>
 <span class="c1"># Output: array([7.95774715e-14, 1.98943679e-14])</span>
 </code></pre></div>
 <h4 id="signature_5">Signature<a class="headerlink" href="#signature_5" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">({</span><span class="s2">&quot;mass_rate&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span> <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">})</span>
+<div class="highlight"><pre><span></span><code><span class="nd">@validate_inputs</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">&quot;mass_rate&quot;</span><span class="p">:</span> <span class="s2">&quot;finite&quot;</span><span class="p">,</span> <span class="s2">&quot;particle_radius&quot;</span><span class="p">:</span> <span class="s2">&quot;nonnegative&quot;</span><span class="p">,</span> <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="s2">&quot;positive&quot;</span><span class="p">}</span>
+<span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_radius_transfer_rate</span><span class="p">(</span>
     <span class="n">mass_rate</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
-    <span class="n">radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
+    <span class="n">particle_radius</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">density</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]:</span> <span class="o">...</span>
 </code></pre></div>
