@@ -188,7 +188,7 @@ class CondensationStrategy(ABC):
 
     def first_order_mass_transport(
         self,
-        radius: Union[float, NDArray[np.float64]],
+        particle_radius: Union[float, NDArray[np.float64]],
         temperature: float,
         pressure: float,
         dynamic_viscosity: Optional[float] = None,
@@ -218,7 +218,7 @@ class CondensationStrategy(ABC):
         """
         vapor_transition = get_vapor_transition_correction(
             knudsen_number=self.knudsen_number(
-                radius=radius,
+                radius=particle_radius,
                 temperature=temperature,
                 pressure=pressure,
                 dynamic_viscosity=dynamic_viscosity,
@@ -226,7 +226,7 @@ class CondensationStrategy(ABC):
             mass_accommodation=self.accommodation_coefficient,
         )
         return get_first_order_mass_transport_k(
-            particle_radius=radius,
+            particle_radius=particle_radius,
             vapor_transition=vapor_transition,
             diffusion_coefficient=self.diffusion_coefficient,
         )
@@ -477,7 +477,7 @@ class CondensationIsothermal(CondensationStrategy):
 
         radius_with_fill = self._fill_zero_radius(particle.get_radius())
         first_order_mass_transport = self.first_order_mass_transport(
-            radius=radius_with_fill,
+            particle_radius=radius_with_fill,
             temperature=temperature,
             pressure=pressure,
             dynamic_viscosity=dynamic_viscosity,
