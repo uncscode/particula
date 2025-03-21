@@ -61,10 +61,10 @@ We welcome contributions from scientists, developers, and students—and anyone 
 
 Get more by posting on [GitHub Discussions](https://github.com/uncscode/particula/discussions) and tag any of the [contributors](https://github.com/uncscode/particula/graphs/contributors) using `@github-handle`.
 
-- 💬 **Ask questions** or **get help**.
-- 🚀 *Share your projects* or *research findings* with the community to inspire others.
-- 📣 *Give us feedback*
-- 🌟 **Contribute** to Particula by *submitting pull requests* or *reporting issues* on GitHub
+- 💬 [**Ask questions** and **get help**](https://github.com/uncscode/particula/discussions/new?category=q-a).
+- 🚀 [*Share your research*](https://github.com/uncscode/particula/discussions/new?category=show-and-tell) with the community to inspire others.
+- 📣 [*Give us feedback.*](https://github.com/uncscode/particula/discussions/new?category=feedback)
+- 🌟 **Contribute** to Particula by [*submitting pull requests*](https://github.com/uncscode/particula/pulls) or [*reporting issues*](https://github.com/uncscode/particula/issues) on GitHub.
 - 🔗 Read our [**Contributing Guide**](contribute/CONTRIBUTING.md) to learn how you can make an impact.
 
 We’re excited to collaborate with you! ✨
@@ -72,4 +72,5 @@ We’re excited to collaborate with you! ✨
 ---
 
 ## Cite Particula in Your Research
+
 Particula [Computer software]. [DOI: 10.5281/zenodo.6634653](https://doi.org/10.5281/zenodo.6634653)
