@@ -10,7 +10,6 @@ from particula.gas import (
 )
 from particula.aerosol import Aerosol
 from particula.gas.species import GasSpecies
-from particula.particles.representation import ParticleRepresentation
 
 
 class TestAerosol(unittest.TestCase):
