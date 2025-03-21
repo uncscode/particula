@@ -8500,14 +8500,14 @@ total_number_pdf = np.zeros_like(time, dtype=np.float64)</div>
     <span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">(</span><span class="n">clone</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">total_number_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">number_distribution_resolved</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
 
-    <span class="n">total_mass_pmf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_pmf</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
-    <span class="n">number_distribution_pmf</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_pmf</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(</span>
+    <span class="n">total_mass_pmf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_pmf</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
+    <span class="n">number_distribution_pmf</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_pmf</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(</span>
         <span class="n">clone</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
     <span class="n">total_number_pmf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">number_distribution_pmf</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span>
 
-    <span class="n">total_mass_pdf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_pdf</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
-    <span class="n">number_distribution_pdf</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_pdf</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(</span>
+    <span class="n">total_mass_pdf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">aerosol_pdf</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_mass_concentration</span><span class="p">()</span>
+    <span class="n">number_distribution_pdf</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">aerosol_pdf</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_concentration</span><span class="p">(</span>
         <span class="n">clone</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
     <span class="n">total_number_pdf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapezoid</span><span class="p">(</span>
@@ -8539,14 +8539,14 @@ for i, t in enumerate(time):
     ].get_radius(clone=True)
     total_number_resolved[i] = np.sum(number_distribution_resolved[i, :] &gt; 0)
 
-    total_mass_pmf[i] = aerosol_pmf.particles[0].get_mass_concentration()
-    number_distribution_pmf[i, :] = aerosol_pmf.particles[0].get_concentration(
+    total_mass_pmf[i] = aerosol_pmf.particles.get_mass_concentration()
+    number_distribution_pmf[i, :] = aerosol_pmf.particles.get_concentration(
         clone=True
     )
     total_number_pmf[i] = np.sum(number_distribution_pmf[i, :])
 
-    total_mass_pdf[i] = aerosol_pdf.particles[0].get_mass_concentration()
-    number_distribution_pdf[i, :] = aerosol_pdf.particles[0].get_concentration(
+    total_mass_pdf[i] = aerosol_pdf.particles.get_mass_concentration()
+    number_distribution_pdf[i, :] = aerosol_pdf.particles.get_concentration(
         clone=True
     )
     total_number_pdf[i] = np.trapezoid(

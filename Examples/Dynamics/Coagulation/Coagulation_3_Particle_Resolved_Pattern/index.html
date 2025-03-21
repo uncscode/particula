@@ -8054,22 +8054,22 @@ print(aerosol)</div>
 <span class="n">bins_lognormal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 
 <span class="c1"># Get initial particle radii before the coagulation process</span>
-<span class="n">initial_radii</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
+<span class="n">initial_radii</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
 
 <span class="c1"># Perform coagulation process for step 1</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span>
 <span class="p">)</span>
-<span class="n">radii_after_step_1</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
+<span class="n">radii_after_step_1</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
 
 <span class="c1"># Perform coagulation process for step 2</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span>
 <span class="p">)</span>
-<span class="n">radii_after_step_2</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
+<span class="n">radii_after_step_2</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
 
 <span class="c1"># Count particles that have coagulated (i.e., have zero mass)</span>
-<span class="n">zero_count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_mass</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">zero_count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_mass</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Particles that coagulated: </span><span class="si">{</span><span class="n">zero_count</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Define the coagulation strategy and process
@@ -8090,22 +8090,22 @@ sub_steps = 100
 bins_lognormal = np.logspace(-8, -6, 100)
 
 # Get initial particle radii before the coagulation process
-initial_radii = aerosol.particles[0].get_radius()
+initial_radii = aerosol.particles.get_radius()
 
 # Perform coagulation process for step 1
 aerosol = coagulation_process.execute(
     aerosol, time_step=time_step, sub_steps=sub_steps
 )
-radii_after_step_1 = aerosol.particles[0].get_radius()
+radii_after_step_1 = aerosol.particles.get_radius()
 
 # Perform coagulation process for step 2
 aerosol = coagulation_process.execute(
     aerosol, time_step=time_step, sub_steps=sub_steps
 )
-radii_after_step_2 = aerosol.particles[0].get_radius()
+radii_after_step_2 = aerosol.particles.get_radius()
 
 # Count particles that have coagulated (i.e., have zero mass)
-zero_count = np.sum(aerosol.particles[0].get_mass() == 0)
+zero_count = np.sum(aerosol.particles.get_mass() == 0)
 print(f"Particles that coagulated: {zero_count}")</div>
 </div>
 </div>

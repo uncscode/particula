@@ -337,7 +337,7 @@ number_of_new_particles = (
 print(f"Number of new particles nucleated: {number_of_new_particles}")
 
 # 5. Determine the number of resolved particles to create (based on simulation volume)
-single_resolved_particle = aerosol.particles[0].get_concentration().max()
+single_resolved_particle = aerosol.particles.get_concentration().max()
 number_of_new_resolved_particles = int(
     number_of_new_particles // single_resolved_particle
 )
@@ -361,13 +361,13 @@ if number_of_new_resolved_particles > 0:
     )  # Concentration of 1 per particle
 
     # Add the new resolved particles to the aerosol
-    aerosol.particles[0].add_concentration(
+    aerosol.particles.add_concentration(
         added_concentration=new_resolved_particle_concentrations,
         added_distribution=new_resolved_particle_masses,
     )
 
 # Print the total particle concentration before dynamics (for monitoring)
-total_particle_concentration = aerosol.particles[0].get_total_concentration()
+total_particle_concentration = aerosol.particles.get_total_concentration()
 print(
     f"Total particle concentration before dynamics [#/m^3]: {total_particle_concentration}"
 )
@@ -511,9 +511,7 @@ for i, t in enumerate(time):
         )
 
         # 5. Determine the number of resolved particles to create (based on simulation volume)
-        single_resolved_particle = (
-            aerosol.particles[0].get_concentration().max()
-        )
+        single_resolved_particle = aerosol.particles.get_concentration().max()
         number_of_new_resolved_particles = int(
             number_of_new_particles // single_resolved_particle
         )
@@ -534,7 +532,7 @@ for i, t in enumerate(time):
             )  # Concentration of 1 per particle
 
             # Add the new resolved particles to the aerosol
-            aerosol.particles[0].add_concentration(
+            aerosol.particles.add_concentration(
                 added_concentration=new_resolved_particle_concentrations,
                 added_distribution=new_resolved_particle_masses,
             )
@@ -545,8 +543,8 @@ for i, t in enumerate(time):
         # 8. Perform the coagulation step
         coagulation_runnable.execute(aerosol, time_step, sub_steps)
 
-    total_mass_resolved[i] = aerosol.particles[0].get_mass_concentration()
-    number_distribution = aerosol.particles[0].get_radius(clone=True)
+    total_mass_resolved[i] = aerosol.particles.get_mass_concentration()
+    number_distribution = aerosol.particles.get_radius(clone=True)
     number_distribution_binned[i, :], edges = np.histogram(
         number_distribution, bins=bins_lognormal
     )

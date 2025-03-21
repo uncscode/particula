@@ -8026,22 +8026,22 @@ print(aerosol)</div>
 <span class="n">time_step</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="n">sub_steps</span> <span class="o">=</span> <span class="mi">100</span>
 
-<span class="n">initial_radii</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
-<span class="n">concentration_initial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span>
+<span class="n">initial_radii</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
+<span class="n">concentration_initial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span>
 
 <span class="c1"># # Perform coagulation process for step 1</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span>
 <span class="p">)</span>
-<span class="n">radii_after_step_1</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
-<span class="n">concentration_step_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span>
+<span class="n">radii_after_step_1</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
+<span class="n">concentration_step_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span>
 
 <span class="c1"># Perform coagulation process for step 2</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="n">coagulation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
     <span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="n">time_step</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="n">sub_steps</span>
 <span class="p">)</span>
-<span class="n">radii_after_step_2</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
-<span class="n">concentration_step_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span>
+<span class="n">radii_after_step_2</span> <span class="o">=</span> <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span>
+<span class="n">concentration_step_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Define the coagulation strategy and process
 coagulation_strategy = (
@@ -8057,22 +8057,22 @@ coagulation_process = par.dynamics.Coagulation(
 time_step = 1000
 sub_steps = 100
 
-initial_radii = aerosol.particles[0].get_radius()
-concentration_initial = np.copy(aerosol.particles[0].concentration)
+initial_radii = aerosol.particles.get_radius()
+concentration_initial = np.copy(aerosol.particles.concentration)
 
 # # Perform coagulation process for step 1
 aerosol = coagulation_process.execute(
     aerosol, time_step=time_step, sub_steps=sub_steps
 )
-radii_after_step_1 = aerosol.particles[0].get_radius()
-concentration_step_1 = np.copy(aerosol.particles[0].concentration)
+radii_after_step_1 = aerosol.particles.get_radius()
+concentration_step_1 = np.copy(aerosol.particles.concentration)
 
 # Perform coagulation process for step 2
 aerosol = coagulation_process.execute(
     aerosol, time_step=time_step, sub_steps=sub_steps
 )
-radii_after_step_2 = aerosol.particles[0].get_radius()
-concentration_step_2 = np.copy(aerosol.particles[0].concentration)</div>
+radii_after_step_2 = aerosol.particles.get_radius()
+concentration_step_2 = np.copy(aerosol.particles.concentration)</div>
 </div>
 </div>
 </div>

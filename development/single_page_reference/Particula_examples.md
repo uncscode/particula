@@ -707,9 +707,9 @@ print(f"Particles to add: {particle_mass_add.shape}")
 
 ```python
 # Get initial particle radii before adding particle
-initial_radii = aerosol.particles[0].get_radius(clone=True)
+initial_radii = aerosol.particles.get_radius(clone=True)
 print(
-    f"Initial concentration: {aerosol.particles[0].get_total_concentration()}"
+    f"Initial concentration: {aerosol.particles.get_total_concentration()}"
 )
 
 # Perform the add process
@@ -719,22 +719,22 @@ aerosol.particles[
     added_concentration=concentration_add,
     added_distribution=particle_mass_add,
 )
-radii_after_step_1 = aerosol.particles[0].get_radius(clone=True)
+radii_after_step_1 = aerosol.particles.get_radius(clone=True)
 print(
-    f"Concentration after step 1: {aerosol.particles[0].get_total_concentration()}"
+    f"Concentration after step 1: {aerosol.particles.get_total_concentration()}"
 )
 
 # Perform the add process
-aerosol.particles[0].add_concentration(
+aerosol.particles.add_concentration(
     added_concentration=concentration_add,
     added_distribution=particle_mass_add,
 )
-radii_after_step_2 = aerosol.particles[0].get_radius(clone=True)
+radii_after_step_2 = aerosol.particles.get_radius(clone=True)
 
 print(
-    f"Concentration after step 2: {aerosol.particles[0].get_total_concentration()}"
+    f"Concentration after step 2: {aerosol.particles.get_total_concentration()}"
 )
-concentration_value = aerosol.particles[0].concentration
+concentration_value = aerosol.particles.concentration
 ```
 
     Initial concentration: 99999999999.99998
@@ -1849,22 +1849,22 @@ coagulation_process = par.dynamics.Coagulation(
 time_step = 1000
 sub_steps = 100
 
-initial_radii = aerosol.particles[0].get_radius()
-concentration_initial = np.copy(aerosol.particles[0].concentration)
+initial_radii = aerosol.particles.get_radius()
+concentration_initial = np.copy(aerosol.particles.concentration)
 
 # # Perform coagulation process for step 1
 aerosol = coagulation_process.execute(
     aerosol, time_step=time_step, sub_steps=sub_steps
 )
-radii_after_step_1 = aerosol.particles[0].get_radius()
-concentration_step_1 = np.copy(aerosol.particles[0].concentration)
+radii_after_step_1 = aerosol.particles.get_radius()
+concentration_step_1 = np.copy(aerosol.particles.concentration)
 
 # Perform coagulation process for step 2
 aerosol = coagulation_process.execute(
     aerosol, time_step=time_step, sub_steps=sub_steps
 )
-radii_after_step_2 = aerosol.particles[0].get_radius()
-concentration_step_2 = np.copy(aerosol.particles[0].concentration)
+radii_after_step_2 = aerosol.particles.get_radius()
+concentration_step_2 = np.copy(aerosol.particles.concentration)
 ```
 
 ## Graphing
@@ -2067,22 +2067,22 @@ sub_steps = 100
 bins_lognormal = np.logspace(-8, -6, 100)
 
 # Get initial particle radii before the coagulation process
-initial_radii = aerosol.particles[0].get_radius()
+initial_radii = aerosol.particles.get_radius()
 
 # Perform coagulation process for step 1
 aerosol = coagulation_process.execute(
     aerosol, time_step=time_step, sub_steps=sub_steps
 )
-radii_after_step_1 = aerosol.particles[0].get_radius()
+radii_after_step_1 = aerosol.particles.get_radius()
 
 # Perform coagulation process for step 2
 aerosol = coagulation_process.execute(
     aerosol, time_step=time_step, sub_steps=sub_steps
 )
-radii_after_step_2 = aerosol.particles[0].get_radius()
+radii_after_step_2 = aerosol.particles.get_radius()
 
 # Count particles that have coagulated (i.e., have zero mass)
-zero_count = np.sum(aerosol.particles[0].get_mass() == 0)
+zero_count = np.sum(aerosol.particles.get_mass() == 0)
 print(f"Particles that coagulated: {zero_count}")
 ```
 
@@ -2469,14 +2469,14 @@ for i, t in enumerate(time):
     ].get_radius(clone=True)
     total_number_resolved[i] = np.sum(number_distribution_resolved[i, :] > 0)
 
-    total_mass_pmf[i] = aerosol_pmf.particles[0].get_mass_concentration()
-    number_distribution_pmf[i, :] = aerosol_pmf.particles[0].get_concentration(
+    total_mass_pmf[i] = aerosol_pmf.particles.get_mass_concentration()
+    number_distribution_pmf[i, :] = aerosol_pmf.particles.get_concentration(
         clone=True
     )
     total_number_pmf[i] = np.sum(number_distribution_pmf[i, :])
 
-    total_mass_pdf[i] = aerosol_pdf.particles[0].get_mass_concentration()
-    number_distribution_pdf[i, :] = aerosol_pdf.particles[0].get_concentration(
+    total_mass_pdf[i] = aerosol_pdf.particles.get_mass_concentration()
+    number_distribution_pdf[i, :] = aerosol_pdf.particles.get_concentration(
         clone=True
     )
     total_number_pdf[i] = np.trapezoid(
@@ -6687,22 +6687,22 @@ rate = condensation_process.rate(aerosol)
 
 fig, ax = plt.subplots(figsize=(8, 6))
 ax.semilogx(
-    aerosol.particles[0].get_radius() * 1e9,
-    aerosol.particles[0].concentration,
+    aerosol.particles.get_radius() * 1e9,
+    aerosol.particles.concentration,
     label="Initial",
 )
 # singe step
 aerosol = condensation_process.execute(aerosol, time_step)
 ax.semilogx(
-    aerosol.particles[0].get_radius() * 1e9,
-    aerosol.particles[0].concentration,
+    aerosol.particles.get_radius() * 1e9,
+    aerosol.particles.concentration,
     label="After 1 step",
 )
 # second step
 aerosol = condensation_process.execute(aerosol, time_step)
 ax.semilogx(
-    aerosol.particles[0].get_radius() * 1e9,
-    aerosol.particles[0].concentration,
+    aerosol.particles.get_radius() * 1e9,
+    aerosol.particles.concentration,
     label="After 2 steps",
 )
 # 5th step
@@ -6710,8 +6710,8 @@ aerosol = condensation_process.execute(aerosol, time_step)
 aerosol = condensation_process.execute(aerosol, time_step)
 aerosol = condensation_process.execute(aerosol, time_step)
 ax.semilogx(
-    aerosol.particles[0].get_radius() * 1e9,
-    aerosol.particles[0].concentration,
+    aerosol.particles.get_radius() * 1e9,
+    aerosol.particles.concentration,
     label="After 5 steps",
 )
 plt.legend()
@@ -6920,7 +6920,7 @@ aerosol_sim = []
 
 fig, ax = plt.subplots(figsize=(8, 6))
 bins, edges = np.histogram(
-    aerosol.particles[0].get_radius(), bins=bins_lognormal
+    aerosol.particles.get_radius(), bins=bins_lognormal
 )
 ax.bar(edges[:-1], bins, width=np.diff(edges), align="edge", label="Initial")
 
@@ -6928,7 +6928,7 @@ print(aerosol)
 # one step
 aerosol = condensation_process.execute(aerosol, time_step, sub_steps)
 bins, edges = np.histogram(
-    aerosol.particles[0].get_radius(), bins=bins_lognormal
+    aerosol.particles.get_radius(), bins=bins_lognormal
 )
 ax.bar(
     edges[:-1],
@@ -6943,7 +6943,7 @@ print(aerosol)
 # 10 seconds
 aerosol = condensation_process.execute(aerosol, time_step, sub_steps)
 bins, edges = np.histogram(
-    aerosol.particles[0].get_radius(), bins=bins_lognormal
+    aerosol.particles.get_radius(), bins=bins_lognormal
 )
 ax.bar(
     edges[:-1],
@@ -7668,7 +7668,7 @@ number_of_new_particles = (
 print(f"Number of new particles nucleated: {number_of_new_particles}")
 
 # 5. Determine the number of resolved particles to create (based on simulation volume)
-single_resolved_particle = aerosol.particles[0].get_concentration().max()
+single_resolved_particle = aerosol.particles.get_concentration().max()
 number_of_new_resolved_particles = int(
     number_of_new_particles // single_resolved_particle
 )
@@ -7692,13 +7692,13 @@ if number_of_new_resolved_particles > 0:
     )  # Concentration of 1 per particle
 
     # Add the new resolved particles to the aerosol
-    aerosol.particles[0].add_concentration(
+    aerosol.particles.add_concentration(
         added_concentration=new_resolved_particle_concentrations,
         added_distribution=new_resolved_particle_masses,
     )
 
 # Print the total particle concentration before dynamics (for monitoring)
-total_particle_concentration = aerosol.particles[0].get_total_concentration()
+total_particle_concentration = aerosol.particles.get_total_concentration()
 print(
     f"Total particle concentration before dynamics [#/m^3]: {total_particle_concentration}"
 )
@@ -7869,7 +7869,7 @@ for i, t in enumerate(time):
 
         # 5. Determine the number of resolved particles to create (based on simulation volume)
         single_resolved_particle = (
-            aerosol.particles[0].get_concentration().max()
+            aerosol.particles.get_concentration().max()
         )
         number_of_new_resolved_particles = int(
             number_of_new_particles // single_resolved_particle
@@ -7891,7 +7891,7 @@ for i, t in enumerate(time):
             )  # Concentration of 1 per particle
 
             # Add the new resolved particles to the aerosol
-            aerosol.particles[0].add_concentration(
+            aerosol.particles.add_concentration(
                 added_concentration=new_resolved_particle_concentrations,
                 added_distribution=new_resolved_particle_masses,
             )
@@ -7901,8 +7901,8 @@ for i, t in enumerate(time):
         # 8. Perform the coagulation step
         coagulation_runnable.execute(aerosol, time_step, sub_steps)
 
-    total_mass_resolved[i] = aerosol.particles[0].get_mass_concentration()
-    number_distribution = aerosol.particles[0].get_radius(clone=True)
+    total_mass_resolved[i] = aerosol.particles.get_mass_concentration()
+    number_distribution = aerosol.particles.get_radius(clone=True)
     number_distribution_binned[i, :], edges = np.histogram(
         number_distribution, bins=bins_lognormal
     )

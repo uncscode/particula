@@ -1223,22 +1223,19 @@ Represents a collection of Gas and Particle objects forming an aerosol
 environment.
 
 This class allows for the representation and manipulation of an aerosol,
-which consists of various gases in an Atmosphere object and one or more
-ParticleRepresentation objects.
+which consists of various gases in an Atmosphere object and one
+ParticleRepresentation object.
 
 #### Attributes
 
 - atmosphere : The atmosphere containing the gases.
-- particles : A list of particles in the aerosol.
+- particles : The particle Representation object.
 
 #### Methods
 
 - `-` *iterate_gas* - Returns an iterator over the gas species in atmosphere.
-- `-` *iterate_particle* - Returns an iterator over ParticleRepresentation
-    objects.
 - `-` *replace_atmosphere* - Replaces the current atmosphere with a new one.
-- `-` *add_particle* - Adds a new ParticleRepresentation object to the
-    aerosol.
+- `-` *replace_particle* - Replaces a particle in the aerosol with a new one.
 
 #### Examples
 
@@ -1251,19 +1248,13 @@ print(aerosol_instance)
 aerosol_instance = Aerosol(atmosphere, particles)
 for gas in aerosol_instance.iterate_gas():
     print(gas)
-for particle in aerosol_instance.iterate_particle():
-    print(particle)
 ```
 
 #### Signature
 
 ```python
 class Aerosol:
-    def __init__(
-        self,
-        atmosphere: Atmosphere,
-        particles: Union[ParticleRepresentation, List[ParticleRepresentation]],
-    ): ...
+    def __init__(self, atmosphere: Atmosphere, particles: ParticleRepresentation): ...
 ```
 
 #### See also
@@ -1273,15 +1264,13 @@ class Aerosol:
 
 ### Aerosol().__str__
 
-[Show source in aerosol.py:70](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L70)
+[Show source in aerosol.py:61](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L61)
 
 Provide a string representation of the aerosol.
 
 #### Returns
 
 - str : A string summarizing the atmosphere and each particle.
-
-#### Examples
 
 ```py
 aerosol_instance = Aerosol(atmosphere, particles)
@@ -1294,37 +1283,9 @@ print(aerosol_instance)
 def __str__(self) -> str: ...
 ```
 
-### Aerosol().add_particle
-
-[Show source in aerosol.py:138](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L138)
-
-Add a new ParticleRepresentation to the aerosol.
-
-#### Arguments
-
-- particle : The particle instance to add.
-
-#### Examples
-
-```py title="Adding a Particle to the Aerosol"
-aerosol_instance = Aerosol(atmosphere, particles)
-new_particle = ParticleRepresentation()
-aerosol_instance.add_particle(new_particle)
-```
-
-#### Signature
-
-```python
-def add_particle(self, particle: ParticleRepresentation): ...
-```
-
-#### See also
-
-- [ParticleRepresentation](particles/representation.md#particlerepresentation)
-
 ### Aerosol().iterate_gas
 
-[Show source in aerosol.py:89](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L89)
+[Show source in aerosol.py:76](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L76)
 
 Return an iterator over the gas species in the atmosphere.
 
@@ -1350,38 +1311,9 @@ def iterate_gas(self) -> Iterator[GasSpecies]: ...
 
 - [GasSpecies](gas/species.md#gasspecies)
 
-### Aerosol().iterate_particle
-
-[Show source in aerosol.py:105](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L105)
-
-Return an iterator over the particle representations.
-
-#### Returns
-
-- Iterator[ParticleRepresentation] : An iterator over particle
-    objects.
-
-#### Examples
-
-```py title="Iterating over aerosol particles"
-aerosol_instance = Aerosol(atmosphere, particles)
-for particle in aerosol_instance.iterate_particle():
-    print(particle)
-```
-
-#### Signature
-
-```python
-def iterate_particle(self) -> Iterator[ParticleRepresentation]: ...
-```
-
-#### See also
-
-- [ParticleRepresentation](particles/representation.md#particlerepresentation)
-
 ### Aerosol().replace_atmosphere
 
-[Show source in aerosol.py:122](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L122)
+[Show source in aerosol.py:92](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L92)
 
 Replace the current atmosphere with a new Atmosphere instance.
 
@@ -1406,6 +1338,34 @@ def replace_atmosphere(self, atmosphere: Atmosphere): ...
 #### See also
 
 - [Atmosphere](gas/atmosphere.md#atmosphere)
+
+### Aerosol().replace_particles
+
+[Show source in aerosol.py:108](https://github.com/uncscode/particula/blob/main/particula/aerosol.py#L108)
+
+Replace a particles in the aerosol with a new ParticleRepresentation.
+
+#### Arguments
+
+- particle : The new ParticleRepresentation to assign.
+
+#### Examples
+
+```py title="Replacing a Particle in the Aerosol"
+aerosol_instance = Aerosol(atmosphere, particles)
+new_particle = ParticleRepresentation()
+aerosol_instance.replace_particles(new_particle)
+```
+
+#### Signature
+
+```python
+def replace_particles(self, particles: ParticleRepresentation): ...
+```
+
+#### See also
+
+- [ParticleRepresentation](particles/representation.md#particlerepresentation)
 
 
 ---
@@ -9778,7 +9738,7 @@ def get_volume_dilution_coefficient(
 
 ## Coagulation
 
-[Show source in particle_process.py:142](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L142)
+[Show source in particle_process.py:140](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L140)
 
 Implements a coagulation process for aerosol particles.
 
@@ -9827,7 +9787,7 @@ class Coagulation(Runnable):
 
 ### Coagulation().execute
 
-[Show source in particle_process.py:184](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L184)
+[Show source in particle_process.py:182](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L182)
 
 Perform the coagulation process over a given time step.
 
@@ -9863,7 +9823,7 @@ def execute(self, aerosol: Aerosol, time_step: float, sub_steps: int = 1) -> Aer
 
 ### Coagulation().rate
 
-[Show source in particle_process.py:219](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L219)
+[Show source in particle_process.py:216](https://github.com/uncscode/particula/blob/main/particula/dynamics/particle_process.py#L216)
 
 Compute the coagulation rate for each particle in the aerosol.
 

@@ -8024,22 +8024,22 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Glycerol']
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
-    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span>
-    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span>
+    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
     <span class="n">label</span><span class="o">=</span><span class="s2">"Initial"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># singe step</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="n">condensation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
-    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span>
-    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span>
+    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
     <span class="n">label</span><span class="o">=</span><span class="s2">"After 1 step"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># second step</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="n">condensation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
-    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span>
-    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span>
+    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
     <span class="n">label</span><span class="o">=</span><span class="s2">"After 2 steps"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># 5th step</span>
@@ -8047,8 +8047,8 @@ Gas mixture at 298.15 K and 101325.0 Pa consisting of ['Glycerol']
 <span class="n">aerosol</span> <span class="o">=</span> <span class="n">condensation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="n">condensation_process</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
-    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span>
-    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">get_radius</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span>
+    <span class="n">aerosol</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
     <span class="n">label</span><span class="o">=</span><span class="s2">"After 5 steps"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
@@ -8081,22 +8081,22 @@ rate = condensation_process.rate(aerosol)
 
 fig, ax = plt.subplots(figsize=(8, 6))
 ax.semilogx(
-    aerosol.particles[0].get_radius() * 1e9,
-    aerosol.particles[0].concentration,
+    aerosol.particles.get_radius() * 1e9,
+    aerosol.particles.concentration,
     label="Initial",
 )
 # singe step
 aerosol = condensation_process.execute(aerosol, time_step)
 ax.semilogx(
-    aerosol.particles[0].get_radius() * 1e9,
-    aerosol.particles[0].concentration,
+    aerosol.particles.get_radius() * 1e9,
+    aerosol.particles.concentration,
     label="After 1 step",
 )
 # second step
 aerosol = condensation_process.execute(aerosol, time_step)
 ax.semilogx(
-    aerosol.particles[0].get_radius() * 1e9,
-    aerosol.particles[0].concentration,
+    aerosol.particles.get_radius() * 1e9,
+    aerosol.particles.concentration,
     label="After 2 steps",
 )
 # 5th step
@@ -8104,8 +8104,8 @@ aerosol = condensation_process.execute(aerosol, time_step)
 aerosol = condensation_process.execute(aerosol, time_step)
 aerosol = condensation_process.execute(aerosol, time_step)
 ax.semilogx(
-    aerosol.particles[0].get_radius() * 1e9,
-    aerosol.particles[0].concentration,
+    aerosol.particles.get_radius() * 1e9,
+    aerosol.particles.concentration,
     label="After 5 steps",
 )
 plt.legend()
