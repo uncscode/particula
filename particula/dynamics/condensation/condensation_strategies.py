@@ -51,9 +51,9 @@ from particula.particles import (
 )
 from particula.gas import get_molecule_mean_free_path
 from particula.dynamics.condensation.mass_transfer import (
-    first_order_mass_transport_k,
-    mass_transfer_rate,
-    calculate_mass_transfer,
+    get_first_order_mass_transport_k,
+    get_mass_transfer_rate,
+    get_mass_transfer,
 )
 
 logger = logging.getLogger("particula")
@@ -225,7 +225,7 @@ class CondensationStrategy(ABC):
             ),
             mass_accommodation=self.accommodation_coefficient,
         )
-        return first_order_mass_transport_k(
+        return get_first_order_mass_transport_k(
             radius=radius,
             vapor_transition=vapor_transition,
             diffusion_coefficient=self.diffusion_coefficient,
@@ -485,7 +485,7 @@ class CondensationIsothermal(CondensationStrategy):
         pressure_delta = self.calculate_pressure_delta(
             particle, gas_species, temperature, radius_with_fill
         )
-        return mass_transfer_rate(
+        return get_mass_transfer_rate(
             pressure_delta=pressure_delta,
             first_order_mass_transport=first_order_mass_transport,
             temperature=temperature,
@@ -538,7 +538,7 @@ class CondensationIsothermal(CondensationStrategy):
             pressure=pressure,
         )
         # calculate the mass gain or loss per bin
-        mass_transfer = calculate_mass_transfer(
+        mass_transfer = get_mass_transfer(
             mass_rate=mass_rate,  # type: ignore
             time_step=time_step,
             gas_mass=gas_species.get_concentration(),  # type: ignore
