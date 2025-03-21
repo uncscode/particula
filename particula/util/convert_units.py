@@ -4,7 +4,7 @@ units. The Pint library must be installed to use all features.
 
 Examples:
     ``` py title="Basic Usage"
-    from particula.util.converting.convert_units import get_unit_conversion
+    from particula.util.convert_units import get_unit_conversion
 
     # Convert 10 degrees Celsius to degrees Fahrenheit:
     converted_value = get_unit_conversion("degC", "degF", value=10)
