@@ -99,7 +99,7 @@ from particula.dynamics.coagulation.coagulation_strategy.turbulent_shear_coagula
 from particula.dynamics.coagulation.coagulation_strategy.coagulation_strategy_abc import (
     CoagulationStrategyABC,
 )
-from particula.dynamics.coagulation.coagulation_strategy.trubulent_dns_coagulation_strategy import (
+from particula.dynamics.coagulation.coagulation_strategy.turbulent_dns_coagulation_strategy import (
     TurbulentDNSCoagulationStrategy,
 )
 from particula.dynamics.coagulation.coagulation_strategy.combine_coagulation_strategy import (
