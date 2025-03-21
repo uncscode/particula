@@ -11,7 +11,7 @@ from typing import Union
 from numpy.typing import NDArray
 import numpy as np
 
-from particula.util.converting.convert_mass_concentration import (
+from particula.particles.properties.convert_mass_concentration import (
     get_mole_fraction_from_mass,
     get_volume_fraction_from_mass,
 )
